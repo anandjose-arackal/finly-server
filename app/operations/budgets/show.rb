@@ -34,19 +34,19 @@ class Budgets::Show < Budgets::Base
     def init
       self.budget = params[:budget]
 
-      if budget.budgetable_type == 'User'
-        op = ::BudgetsProcessor::Calculate::User.(user, {budget: budget, get_items: true})
-      elsif budget.budgetable_type == 'Category'
-        op = ::BudgetsProcessor::Calculate::Category.(user, {budget: budget, get_items: true})
-      elsif budget.budgetable_type == 'YesBankVendor'
-        op = ::BudgetsProcessor::Calculate::YesBankVendor.(user, {budget: budget, get_items: true})
-      elsif budget.budgetable_type == 'FieldDropDownItem'
-        op = ::BudgetsProcessor::Calculate::FieldDropDownItem.(user, {budget: budget, get_items: true})
-      elsif budget.budgetable_type == 'CostCenter'
-        op = ::BudgetsProcessor::Calculate::CostCenter.(user, {budget: budget, get_items: true})
-      end
-      self.spent_amount = op.result[:spent_amount]
-      self.budget_trail_items = op.result[:budget_trail_items] rescue []
+      # if budget.budgetable_type == 'User'
+      #   op = ::BudgetsProcessor::Calculate::User.(user, {budget: budget, get_items: true})
+      # elsif budget.budgetable_type == 'Category'
+      #   op = ::BudgetsProcessor::Calculate::Category.(user, {budget: budget, get_items: true})
+      # elsif budget.budgetable_type == 'YesBankVendor'
+      #   op = ::BudgetsProcessor::Calculate::YesBankVendor.(user, {budget: budget, get_items: true})
+      # elsif budget.budgetable_type == 'FieldDropDownItem'
+      #   op = ::BudgetsProcessor::Calculate::FieldDropDownItem.(user, {budget: budget, get_items: true})
+      # elsif budget.budgetable_type == 'CostCenter'
+      #   op = ::BudgetsProcessor::Calculate::CostCenter.(user, {budget: budget, get_items: true})
+      # end
+      # self.spent_amount = op.result[:spent_amount]
+      # self.budget_trail_items = op.result[:budget_trail_items] rescue []
     end
   end
 

@@ -14,6 +14,8 @@ json.array!(@result.paginated_payments) do |payment|
   if payment.completed? || payment.processing?
     json.utr payment.reference_resource&.bank_reference_number
   end
+  json.bank_payment_request_id payment.payment_order.bank_payment_request.id
+  json.payment_order_id payment.payment_order.bank_payment_request.id
 end
 
 #
