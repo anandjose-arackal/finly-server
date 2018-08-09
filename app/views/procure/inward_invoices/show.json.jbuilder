@@ -180,6 +180,15 @@ json.tds_slabs do
   end
 end
 
+json.attachments do
+  json.array! invoice.attachments do |attachment|
+    json.extract! attachment, :id, :description
+    json.file_name attachment.file_file_name
+    json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
+    json.url attachment.file.url
+  end
+end
+
 
 json.comments do
   json.array! invoice.comments do |comment|

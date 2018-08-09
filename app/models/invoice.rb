@@ -90,6 +90,9 @@ class Invoice < ActiveRecord::Base
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
+
+  # Attachments created for procurement
+  has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   # From Procurement workflow

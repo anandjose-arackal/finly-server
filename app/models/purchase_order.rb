@@ -212,7 +212,7 @@ class PurchaseOrder < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.status_id)
+    if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.purchase_order_status_id)
       self.items.each do |item|
         BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
       end

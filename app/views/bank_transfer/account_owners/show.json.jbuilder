@@ -1,6 +1,10 @@
 json.account_owner do
   json.extract! @result.account_owner, :id, :name, :email, :mobile_number
   if @result.account_owner.is_a?(YesBankVendor)
+    json.payment_term @result.account_owner.payment_term
+    json.currency @result.account_owner.currency
+    json.business_name @result.account_owner.business_name
+    json.address @result.account_owner.address
     json.authorized @result.account_owner.authorized
     json.description @result.account_owner.description
     json.editable_details (@result.user.permission.create_beneficiaries || @result.user.vendor_payments_admin?)

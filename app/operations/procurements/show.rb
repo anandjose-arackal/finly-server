@@ -16,7 +16,7 @@ class Procurements::Show < Procurements::Base
 
   class Procurements::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations,
-                  :payment_terms, :bill_of_supplies, :delivery_challans,
+                  :payment_terms, :bill_of_supplies, :delivery_challans, :vendor,
                   :procurement_terms, :policies, :e_way_bills, :status_tags, :actions
 
     def init
@@ -24,6 +24,7 @@ class Procurements::Show < Procurements::Base
 
       # Procurement Documents
       self.purchase_order = self.procurement.purchase_order
+      self.vendor = self.purchase_order.vendor
       self.invoices = self.procurement.invoices
       self.inward_documents = self.procurement.inward_documents
       self.bill_of_supplies = self.procurement.bill_of_supplies
@@ -34,7 +35,7 @@ class Procurements::Show < Procurements::Base
       self.locations = user.company.locations
       self.payment_terms = user.company.payment_terms
       self.procurement_terms = user.company.procurement_terms
-      self.status_tags = self.procurement.status_tags
+      self.status_tags = self.procurement.status_tags.reverse
       self.actions = get_actions
 
       policies_op = Policy::Index.(user, view: params[:view])

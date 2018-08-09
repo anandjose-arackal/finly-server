@@ -25,6 +25,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                      original_amount_attributes: [:value, :currency_id],
                                      freight_amount_attributes: [:value, :currency_id],
                                      advance_amount_attributes: [:value, :currency_id],
+                                     attachments: [],
                                      invoice_attachments_attributes: [:attached_file, :description, :remove_file],
                                      invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac, :comment],
                                      custom_fields: [])

@@ -2682,6 +2682,7 @@ end
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
 
   get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
+  get 'autocomplete/vendors', to: 'autocomplete#vendors'
 
   # get 'features', to: 'static_pages#features'
 

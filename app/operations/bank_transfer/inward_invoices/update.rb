@@ -1,6 +1,6 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
-  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields
+  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
@@ -53,6 +53,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    # Procurement Attachments
+    self.invoice_current_attachments = user.company.procurement_attachments.with_id(inward_invoice_params[:attachments])
+    self.inward_invoice_params.delete(:attachments)
+    self.invoice_old_attachments = self.inward_invoice.attachments
+
     # add logic to remove line items if required
     if inward_invoice_params&.dig(:invoice_items_attributes).present?
       self.inward_invoice_params[:invoice_items_attributes].each do |data|
@@ -93,6 +98,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
+
+      self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
+      self.invoice_current_attachments.update_all(procurement_document_id: inward_invoice.id, procurement_document_type: inward_invoice.class.name)
     else
       add_message :error, self.inward_invoice.errors.full_messages
     end

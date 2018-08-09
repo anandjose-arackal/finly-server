@@ -36,6 +36,7 @@
 #  api_initiated                  :boolean          default(FALSE)
 #  processed_at                   :date
 #  original_payment_for_refund_id :integer
+#  cost_center_id                 :integer
 #
 
 require 'test_helper'

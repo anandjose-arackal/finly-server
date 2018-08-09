@@ -21,17 +21,17 @@ class Procurement < ActiveRecord::Base
   belongs_to :procurement_status
   belongs_to :vendor, class_name: "YesBankVendor"
 
-  has_one :purchase_order
-  has_many :inward_documents
-  has_many :invoices
-  has_many :bill_of_supplies
-  has_many :delivery_challans
-  has_many :e_way_bills
-  has_many :procurement_status_taggables
+  has_one :purchase_order, dependent: :destroy
+  has_many :inward_documents, dependent: :destroy
+  has_many :invoices, dependent: :destroy
+  has_many :bill_of_supplies, dependent: :destroy
+  has_many :delivery_challans, dependent: :destroy
+  has_many :e_way_bills, dependent: :destroy
+  has_many :procurement_status_taggables, dependent: :destroy
 
-  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable, dependent: :destroy
 
-  has_many :status_tags, through: :procurement_status_taggables
+  has_many :status_tags, through: :procurement_status_taggables, dependent: :destroy
 
   default_scope { order(updated_at: :desc) }
 
