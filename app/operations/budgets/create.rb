@@ -27,6 +27,8 @@ class Budgets::Create < Budgets::Base
 
     self.budget.user_id = user.id
 
+    debugger
+
     if budget.valid?
       budget.save
     else

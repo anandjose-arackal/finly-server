@@ -11,11 +11,41 @@ json.array! @result.budgets do |budget|
     json.extract! budget.budget_amount, :id, :value, :currency_id
   end
 
-  json.spent_amount 0
-  json.associated_item do
-    json.id budget.budgetable_id
-    json.type budget.budgetable_type
-    json.item budget.budgetable
+  json.associated_vendors do
+    json.array!(budget.budgetable_vendors) do |vendor|
+      json.id vendor.id
+      json.name vendor.name
+    end
+  end
+  json.associated_categories do
+    json.array!(budget.budgetable_categories) do |category|
+      json.id category.id
+      json.name category.name
+    end
+  end
+  json.associated_cost_centers do
+    json.array!(budget.budgetable_cost_centers) do |cost_center|
+      json.id cost_center.id
+      json.name cost_center.name
+    end
+  end
+  json.associated_locations do
+    json.array!(budget.budgetable_locations) do |location|
+      json.id location.id
+      json.name location.name
+    end
+  end
+  json.associated_departments do
+    json.array!(budget.budgetable_departments) do |department|
+      json.id department.id
+      json.name department.name
+    end
+  end
+  json.associated_users do
+    json.array!(budget.budgetable_users) do |user|
+      json.id user.id
+      json.name user.name
+    end
   end
 
   json.user do
