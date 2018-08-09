@@ -78,8 +78,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       self.invoice_categories = self.user.company.categories.vendor_payments_only
       self.invoice_line_items_categories = self.user.company.categories.inward_invoice_items_only
 
-      budgets_op = BudgetsProcessor::PaymentRequest.(user, {payment_request: self.bank_payment_request})
-      self.budgets = budgets_op.budgets
+      # budgets_op = BudgetsProcessor::PaymentRequest.(user, {payment_request: self.bank_payment_request})
+      # self.budgets = budgets_op.budgets
     end
 
     def invoice_custom_field_configurations
