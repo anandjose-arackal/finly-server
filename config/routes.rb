@@ -597,14 +597,6 @@
 #                                            load_options GET    /companies/load_options(.:format)                                                            companies#load_options
 #                   companies_categories_and_cost_centers GET    /companies/categories_and_cost_centers(.:format)                                             companies#categories_and_cost_centers
 #                                     company_add_balance POST   /companies/:company_id/add_balance(.:format)                                                 companies#add_balance
-#                                       company_locations GET    /companies/:company_id/locations(.:format)                                                   locations#index
-#                                                         POST   /companies/:company_id/locations(.:format)                                                   locations#create
-#                                    new_company_location GET    /companies/:company_id/locations/new(.:format)                                               locations#new
-#                                   edit_company_location GET    /companies/:company_id/locations/:id/edit(.:format)                                          locations#edit
-#                                        company_location GET    /companies/:company_id/locations/:id(.:format)                                               locations#show
-#                                                         PATCH  /companies/:company_id/locations/:id(.:format)                                               locations#update
-#                                                         PUT    /companies/:company_id/locations/:id(.:format)                                               locations#update
-#                                                         DELETE /companies/:company_id/locations/:id(.:format)                                               locations#destroy
 #                                               companies GET    /companies(.:format)                                                                         companies#index
 #                                                         POST   /companies(.:format)                                                                         companies#create
 #                                             new_company GET    /companies/new(.:format)                                                                     companies#new
@@ -929,6 +921,22 @@
 #                                                         GET    /cards/reimbursement/orders(.:format)                                                        benefits/reimbursement_cards#index
 #                                                         GET    /cards/reimbursement/orders/:id(.:format)                                                    benefits/reimbursement_cards#show
 #                                                         DELETE /cards/reimbursement/orders/:id(.:format)                                                    benefits/reimbursement_cards#destroy
+#                                               locations GET    /locations(.:format)                                                                         locations#index
+#                                                         POST   /locations(.:format)                                                                         locations#create
+#                                            new_location GET    /locations/new(.:format)                                                                     locations#new
+#                                           edit_location GET    /locations/:id/edit(.:format)                                                                locations#edit
+#                                                location GET    /locations/:id(.:format)                                                                     locations#show
+#                                                         PATCH  /locations/:id(.:format)                                                                     locations#update
+#                                                         PUT    /locations/:id(.:format)                                                                     locations#update
+#                                                         DELETE /locations/:id(.:format)                                                                     locations#destroy
+#                                             departments GET    /departments(.:format)                                                                       departments#index
+#                                                         POST   /departments(.:format)                                                                       departments#create
+#                                          new_department GET    /departments/new(.:format)                                                                   departments#new
+#                                         edit_department GET    /departments/:id/edit(.:format)                                                              departments#edit
+#                                              department GET    /departments/:id(.:format)                                                                   departments#show
+#                                                         PATCH  /departments/:id(.:format)                                                                   departments#update
+#                                                         PUT    /departments/:id(.:format)                                                                   departments#update
+#                                                         DELETE /departments/:id(.:format)                                                                   departments#destroy
 #                            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                                                      bank_transfer/reimbursement#show
 #                                                         PATCH  /bank_transfer/reimbursements(.:format)                                                      bank_transfer/reimbursement#update
 #                                                         POST   /bank_transfer/reimbursements(.:format)                                                      bank_transfer/reimbursement#create
@@ -1354,6 +1362,7 @@
 #                          procure_purchase_order_approve PUT    /procure/purchase_orders/:purchase_order_id/approve(.:format)                                procure/purchase_orders#approve
 #                           procure_purchase_order_reject PUT    /procure/purchase_orders/:purchase_order_id/reject(.:format)                                 procure/purchase_orders#reject
 #                            procure_purchase_order_close PUT    /procure/purchase_orders/:purchase_order_id/close(.:format)                                  procure/purchase_orders#close
+#                         procure_purchase_order_download GET    /procure/purchase_orders/:purchase_order_id/download_pdf(.:format)                           procure/purchase_orders#download
 #                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                           procure/purchase_orders#index
 #                                                         POST   /procure/purchase_orders(.:format)                                                           procure/purchase_orders#create
 #                              new_procure_purchase_order GET    /procure/purchase_orders/new(.:format)                                                       procure/purchase_orders#new
@@ -2435,7 +2444,6 @@ end
   get 'companies/categories_and_cost_centers', to: 'companies#categories_and_cost_centers'
   resources :companies do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
-    resources :locations
   end
 
   # get 'organization_account' => 'organization_account#show'
@@ -2750,6 +2758,10 @@ end
   get 'cards/reimbursement/orders' => 'benefits/reimbursement_cards#index'
   get 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#show'
   delete 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#destroy'
+
+  resources :locations
+
+  resources :departments
 
   namespace :bank_transfer do
     get 'reimbursements' => 'reimbursement#show'

@@ -8,14 +8,12 @@
 #  inventory_line_item_id :integer
 #  product_id             :string(255)
 #  description            :string(255)
-#  quantity               :decimal(20, 5)
-#  delivered              :decimal(20, 5)
-#  accepted               :decimal(20, 5)
-#  rejected               :decimal(20, 5)
+#  quantity               :decimal(10, )
+#  delivered              :decimal(10, )
+#  accepted               :decimal(10, )
+#  rejected               :decimal(10, )
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  comment                :string(255)
-#  previously_delivered   :decimal(20, 5)
 #
 
 require 'test_helper'
