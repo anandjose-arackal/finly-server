@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180807095330) do
+ActiveRecord::Schema.define(version: 20180808113944) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -5116,23 +5116,27 @@ ActiveRecord::Schema.define(version: 20180807095330) do
   end
 
   create_table "yes_bank_vendors", force: :cascade do |t|
-    t.string   "name",           limit: 255
-    t.integer  "company_id",     limit: 4
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-    t.string   "email",          limit: 255
-    t.string   "mobile_number",  limit: 255
+    t.string   "name",            limit: 255
+    t.integer  "company_id",      limit: 4
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.string   "email",           limit: 255
+    t.string   "mobile_number",   limit: 255
     t.boolean  "authorized"
-    t.text     "description",    limit: 65535
-    t.boolean  "is_deleted",                   default: false
-    t.string   "pan",            limit: 255
-    t.string   "tin",            limit: 255
-    t.string   "gst",            limit: 255
+    t.text     "description",     limit: 65535
+    t.boolean  "is_deleted",                    default: false
+    t.string   "pan",             limit: 255
+    t.string   "tin",             limit: 255
+    t.string   "gst",             limit: 255
     t.boolean  "gst_registered"
-    t.string   "state",          limit: 255
-    t.integer  "state_code_id",  limit: 4
-    t.integer  "created_by_id",  limit: 4
-    t.integer  "vendor_type_id", limit: 4
+    t.string   "state",           limit: 255
+    t.integer  "state_code_id",   limit: 4
+    t.integer  "created_by_id",   limit: 4
+    t.integer  "vendor_type_id",  limit: 4
+    t.string   "address",         limit: 255
+    t.string   "business_name",   limit: 255
+    t.integer  "payment_term_id", limit: 4
+    t.integer  "currency_id",     limit: 4
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree

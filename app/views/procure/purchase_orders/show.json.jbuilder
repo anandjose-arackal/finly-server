@@ -1,6 +1,6 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
-              :payment_term_id, :procurement_term_text, :policy_id
+              :payment_term_id, :procurement_term_text, :policy_id, :department_id
 json.vendor do
   json.extract! @result.purchase_order.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
 end
@@ -82,6 +82,12 @@ end
 json.policies do
   json.array! @result.policies do |policy|
     json.extract! policy, :id, :name
+  end
+end
+
+json.departments do
+  json.array! @result.departments do |department|
+    json.extract! department, :id, :name
   end
 end
 

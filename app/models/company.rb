@@ -85,6 +85,8 @@ class Company < ActiveRecord::Base
   has_many :purchase_orders
   has_many :inward_documents # purchase order inward documents
 
+  has_many :departments
+
 
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
