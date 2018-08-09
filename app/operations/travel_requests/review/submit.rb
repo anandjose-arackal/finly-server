@@ -7,18 +7,23 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
 
   def validate
     unless travel_request.present?
-      add_message :error, "Travel Request not found"
+      add_message :error, 'Travel Request not found'
       return
     end
 
     unless travel_request.can_submit?
-      add_message :error, "Travel Request cannot be submitted at this time"
+      add_message :error, 'Travel Request cannot be submitted at this time'
       return
     end
 
     unless travel_request.user_id == user.id
-      add_message :error, "Only owner can submit a Travel Request"
-      return false
+      add_message :error, 'Only owner can submit a Travel Request'
+      return
+    end
+
+    unless travel_request.destinations.present?
+      add_message :error, 'Please add a destination to submit travel request'
+      return
     end
   end
 

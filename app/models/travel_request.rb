@@ -104,6 +104,14 @@ class TravelRequest < ActiveRecord::Base
     open? or retracted? or rejected?
   end
 
+  def destinations_list
+    names = []
+    self.destinations.each do |destination|
+      names << destination.location.name
+    end
+    names
+  end
+
   def as_json(options = {})
     {
         id: id,
@@ -118,7 +126,8 @@ class TravelRequest < ActiveRecord::Base
             from: DateUtils.date_formatted(from_date),
             to: DateUtils.date_formatted(to_date)
         },
-        destinations: destinations
+        destinations: destinations,
+        destinations_list: destinations_list
     }
   end
 
