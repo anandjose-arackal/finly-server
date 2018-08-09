@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180808144752) do
+ActiveRecord::Schema.define(version: 20180809091632) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2528,6 +2528,7 @@ ActiveRecord::Schema.define(version: 20180808144752) do
     t.string   "parent_id",              limit: 255
     t.integer  "inventory_line_item_id", limit: 4
     t.text     "item_info",              limit: 65535
+    t.string   "comment",                limit: 255
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -2621,10 +2622,14 @@ ActiveRecord::Schema.define(version: 20180808144752) do
     t.integer  "remaining_amount_id",    limit: 4
     t.integer  "invoice_type_id",        limit: 4
     t.integer  "procurement_id",         limit: 4
+    t.integer  "location_id",            limit: 4
+    t.integer  "delivery_location_id",   limit: 4
+    t.integer  "payment_term_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
   add_index "invoices", ["discount_type_id"], name: "index_invoices_on_discount_type_id", using: :btree
+  add_index "invoices", ["payment_term_id"], name: "index_invoices_on_payment_term_id", using: :btree
   add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
 
   create_table "inward_document_items", force: :cascade do |t|
@@ -2633,12 +2638,14 @@ ActiveRecord::Schema.define(version: 20180808144752) do
     t.integer  "inventory_line_item_id", limit: 4
     t.string   "product_id",             limit: 255
     t.string   "description",            limit: 255
-    t.decimal  "quantity",                           precision: 10
-    t.decimal  "delivered",                          precision: 10
-    t.decimal  "accepted",                           precision: 10
-    t.decimal  "rejected",                           precision: 10
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
+    t.decimal  "quantity",                           precision: 20, scale: 5
+    t.decimal  "delivered",                          precision: 20, scale: 5
+    t.decimal  "accepted",                           precision: 20, scale: 5
+    t.decimal  "rejected",                           precision: 20, scale: 5
+    t.datetime "created_at",                                                  null: false
+    t.datetime "updated_at",                                                  null: false
+    t.string   "comment",                limit: 255
+    t.decimal  "previously_delivered",               precision: 20, scale: 5
   end
 
   add_index "inward_document_items", ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id", using: :btree
@@ -4403,6 +4410,30 @@ ActiveRecord::Schema.define(version: 20180808144752) do
 
   add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
 
+  create_table "trail_actions", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
+  create_table "trails", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.integer  "action_user_id",      limit: 4
+    t.integer  "action_id",           limit: 4
+    t.integer  "action_user_role_id", limit: 4
+    t.integer  "action_level_id",     limit: 4
+    t.integer  "modified_level_id",   limit: 4
+    t.text     "note",                limit: 65535
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "trails", ["action_id"], name: "index_trails_on_action_id", using: :btree
+  add_index "trails", ["action_level_id"], name: "index_trails_on_action_level_id", using: :btree
+  add_index "trails", ["action_user_id"], name: "index_trails_on_action_user_id", using: :btree
+  add_index "trails", ["action_user_role_id"], name: "index_trails_on_action_user_role_id", using: :btree
+  add_index "trails", ["modified_level_id"], name: "index_trails_on_modified_level_id", using: :btree
+  add_index "trails", ["parent_type", "parent_id"], name: "index_trails_on_parent_type_and_parent_id", using: :btree
+
   create_table "transaction_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -4581,6 +4612,16 @@ ActiveRecord::Schema.define(version: 20180808144752) do
   add_index "user_balance_histories", ["finly_money_load_id"], name: "index_user_balance_histories_on_finly_money_load_id", using: :btree
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
+
+  create_table "user_department_mappings", force: :cascade do |t|
+    t.integer  "user_id",       limit: 4
+    t.integer  "department_id", limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "user_department_mappings", ["department_id"], name: "index_user_department_mappings_on_department_id", using: :btree
+  add_index "user_department_mappings", ["user_id"], name: "index_user_department_mappings_on_user_id", using: :btree
 
   create_table "user_group_item_mappings", force: :cascade do |t|
     t.integer  "user_id",            limit: 4
@@ -4892,6 +4933,7 @@ ActiveRecord::Schema.define(version: 20180808144752) do
     t.integer  "yes_bank_vendor_id",         limit: 4
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
+    t.string   "type",                       limit: 255
   end
 
   add_index "vendor_attachments", ["yes_bank_vendor_id"], name: "index_vendor_attachments_on_yes_bank_vendor_id", using: :btree
@@ -5104,23 +5146,27 @@ ActiveRecord::Schema.define(version: 20180808144752) do
   end
 
   create_table "yes_bank_vendors", force: :cascade do |t|
-    t.string   "name",           limit: 255
-    t.integer  "company_id",     limit: 4
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-    t.string   "email",          limit: 255
-    t.string   "mobile_number",  limit: 255
+    t.string   "name",            limit: 255
+    t.integer  "company_id",      limit: 4
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.string   "email",           limit: 255
+    t.string   "mobile_number",   limit: 255
     t.boolean  "authorized"
-    t.text     "description",    limit: 65535
-    t.boolean  "is_deleted",                   default: false
-    t.string   "pan",            limit: 255
-    t.string   "tin",            limit: 255
-    t.string   "gst",            limit: 255
+    t.text     "description",     limit: 65535
+    t.boolean  "is_deleted",                    default: false
+    t.string   "pan",             limit: 255
+    t.string   "tin",             limit: 255
+    t.string   "gst",             limit: 255
     t.boolean  "gst_registered"
-    t.string   "state",          limit: 255
-    t.integer  "state_code_id",  limit: 4
-    t.integer  "created_by_id",  limit: 4
-    t.integer  "vendor_type_id", limit: 4
+    t.string   "state",           limit: 255
+    t.integer  "state_code_id",   limit: 4
+    t.integer  "created_by_id",   limit: 4
+    t.integer  "vendor_type_id",  limit: 4
+    t.string   "address",         limit: 255
+    t.string   "business_name",   limit: 255
+    t.integer  "payment_term_id", limit: 4
+    t.integer  "currency_id",     limit: 4
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
@@ -5271,6 +5317,7 @@ ActiveRecord::Schema.define(version: 20180808144752) do
   add_foreign_key "invoice_number_configs", "invoice_number_config_types"
   add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
+  add_foreign_key "invoices", "payment_terms"
   add_foreign_key "inward_document_items", "inventory_line_items"
   add_foreign_key "inward_document_items", "inward_documents"
   add_foreign_key "inward_document_items", "purchase_order_items"
@@ -5405,6 +5452,8 @@ ActiveRecord::Schema.define(version: 20180808144752) do
   add_foreign_key "travel_requests", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_department_mappings", "departments"
+  add_foreign_key "user_department_mappings", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"
   add_foreign_key "user_group_item_mappings", "user_groups"
   add_foreign_key "user_group_item_mappings", "users"

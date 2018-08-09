@@ -180,6 +180,9 @@ class User < ActiveRecord::Base
   has_many :outward_invoices
   has_many :outward_invoice_attachments
 
+  has_many :user_department_mappings
+  has_many :departments, through: :user_department_mappings
+
   #Budgets
 
   # many-to-many mapping between user and budget
@@ -190,8 +193,6 @@ class User < ActiveRecord::Base
 
   has_many :procurements
   has_many :level_reviewer_mappings
-
-
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
