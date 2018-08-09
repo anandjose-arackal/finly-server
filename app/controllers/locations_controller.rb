@@ -16,4 +16,9 @@ class LocationsController < ApplicationController
     @result = Company::Locations::Update.(current_user, params)
     respond
   end
+
+  def index
+    @result = Company::Locations::Index.(current_user, params)
+    respond
+  end
 end
