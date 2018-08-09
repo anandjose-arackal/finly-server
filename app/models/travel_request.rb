@@ -107,7 +107,8 @@ class TravelRequest < ActiveRecord::Base
   def destinations_list
     names = []
     self.destinations.each do |destination|
-      names << destination.location.name
+      name = destination&.location&.name
+      names << name if name.present?
     end
     names
   end
