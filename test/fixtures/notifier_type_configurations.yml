@@ -4,7 +4,7 @@
 #
 #  id                      :integer          not null, primary key
 #  user_id                 :integer          not null
-#  notifier_type_id        :integer          not null
+#  event_id                :integer          not null
 #  allow_push_notification :boolean
 #  allow_mailer            :boolean
 #  created_at              :datetime         not null
