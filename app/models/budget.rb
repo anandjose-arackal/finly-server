@@ -9,8 +9,8 @@
 #  end_date         :date
 #  budget_amount_id :integer
 #  spent_amount_id  :integer
-#  budgetable_id    :integer          not null
-#  budgetable_type  :string(255)      not null
+#  budgetable_id    :integer
+#  budgetable_type  :string(255)
 #  is_deleted       :boolean          default(FALSE)
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
@@ -37,9 +37,10 @@ class Budget < ActiveRecord::Base
   has_many :budgetable_categories, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Category'
   has_many :budgetable_locations, through: :budget_criteria_mappings, source: :budgetable, source_type: 'BranchLocation'
   has_many :budgetable_users, through: :budget_criteria_mappings, source: :budgetable, source_type: 'User'
-  # has_many :budgetable_departments, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Department'
+  has_many :budgetable_departments, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Department'
 
   accepts_nested_attributes_for :budget_amount
+  accepts_nested_attributes_for :budget_criteria_mappings
 
   validates :name, presence: true
   validates :start_date, presence: true
@@ -61,9 +62,9 @@ class Budget < ActiveRecord::Base
   }
 
   # todo - change this to reflect the new structure
-  scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
-  scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}
-  scope :with_budgetable_yes_bank_vendor_id, -> (ids) {where budgetable_id: ids, budgetable_type: "YesBankVendor"}
-  scope :with_budgetable_field_drop_down_item, -> (ids)  { where budgetable_type: "FieldDropDownItem", budgetable_id: ids }
-  scope :with_budgetable_cost_center_id, -> (ids)  { where budgetable_type: "CostCenter", budgetable_id: ids }
+  # scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
+  # scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}
+  # scope :with_budgetable_yes_bank_vendor_id, -> (ids) {where budgetable_id: ids, budgetable_type: "YesBankVendor"}
+  # scope :with_budgetable_field_drop_down_item, -> (ids)  { where budgetable_type: "FieldDropDownItem", budgetable_id: ids }
+  # scope :with_budgetable_cost_center_id, -> (ids)  { where budgetable_type: "CostCenter", budgetable_id: ids }
 end

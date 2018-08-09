@@ -1,19 +1,26 @@
 class Budgets::Update < Budgets::Base
 
-  def pre_validate
-
-  end
-
   def init
     id = (params[:id] or params[:budget_id])
     self.budget = Budgets::Index.(user, params).budgets.with_id(id).first rescue nil
 
-    self.budget_params = update_budget_params
+    self.budget_params = budget_params
   end
 
   def validate
-    if self.budget.blank?
-      add_message :error, 'Budget not found'
+    budgetables = budget_params[:budget_criteria_mappings_attributes]
+    budgetables.each do |budgetable|
+      unless ["Category", "CostCenter", "YesBankVendor", "Department", "Location", "User"].include?(budgetable[:budgetable_type])
+        add_message :error, "Invalid criteria provided"
+        return
+      end
+    end
+
+    budgetables.each do |budgetable|
+      if budgetable[:budgetable_id].blank?
+        add_message :error, "Criteria ID not provided"
+        return
+      end
     end
   end
 
@@ -26,5 +33,6 @@ class Budgets::Update < Budgets::Base
   end
 
   def post_process
+    add_message :error, "Successfully updated budget"
   end
 end

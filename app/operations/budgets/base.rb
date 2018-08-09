@@ -13,10 +13,19 @@ class Budgets::Base < BaseOperation
 
 
   private
+
+  def budget_params
+    params.require(:budget).permit(:name, :period_id, :start_date, :end_date,
+                                   :payment, :expense, :purchase_order,
+                                   budget_amount_attributes: [:value, :currency_id],
+                                   budget_criteria_mappings_attributes: [:budgetable_type, :budgetable_id]
+    )
+  end
+
   def create_budget_params
     params.require(:budget).permit(:name, :period_id, :start_date, :end_date,
-                                   :budgetable_id, :budgetable_type,
-                                   budget_amount_attributes: [:value, :currency_id]
+                                   budget_amount_attributes: [:value, :currency_id],
+                                   budget_criteria_mappings_attributes: [:budgetable_type, :budgetable_id]
     )
   end
 

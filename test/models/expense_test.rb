@@ -31,6 +31,7 @@
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
 #  gst_amount_id          :integer
+#  spent_from_id          :integer
 #
 
 require 'test_helper'

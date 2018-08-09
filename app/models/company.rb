@@ -76,8 +76,7 @@ class Company < ActiveRecord::Base
   has_many :outward_invoice_attachments
   has_many :inward_invoices, class_name: "Invoice"
 
-  has_many :budget_criteria_mappings, as: :budgetable
-  has_many :budgets, through: :budget_criteria_mappings
+  has_many :budgets
   has_many :procurements
   has_many :procurement_terms
   has_many :procurement_attachments

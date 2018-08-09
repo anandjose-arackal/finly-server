@@ -11,4 +11,7 @@
 
 class Department < ActiveRecord::Base
   belongs_to :company
+
+  has_many :user_department_mappings
+  has_many :users, through: :user_department_mappings
 end
