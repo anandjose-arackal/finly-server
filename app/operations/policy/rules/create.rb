@@ -52,6 +52,14 @@ class Policy::Rules::Create < Policy::Rules::Base
       rule_params[:amount_attributes][:currency_id] = self.policy.base_currency_id
     end
 
+    if rule_params[:with_receipt_amount_attributes].present?
+      rule_params[:with_receipt_amount_attributes][:currency_id] = self.policy.base_currency_id
+    end
+
+    if rule_params[:without_receipt_amount_attributes].present?
+      rule_params[:without_receipt_amount_attributes][:currency_id] = self.policy.base_currency_id
+    end
+
     # for expense rule
     if rule_params[:greater_than_amount_attributes].present?
       rule_params[:greater_than_amount_attributes][:currency_id] = self.policy.base_currency_id
