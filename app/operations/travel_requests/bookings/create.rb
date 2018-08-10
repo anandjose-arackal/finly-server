@@ -20,7 +20,9 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
     unless request_params.is_a?(Array)
       request_params = [request_params]
     end
-    request_params.first[:booking_status_id] = BookingStatus.id_for(params[:status])
+    request_params.each do |p|
+      p[:booking_status_id] = BookingStatus.id_for(params[:status])
+    end
     self.booking_parameters = []
     request_params.each do |param|
       self.booking_parameters << booking_params(param)
