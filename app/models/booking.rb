@@ -97,7 +97,6 @@ class Booking < ActiveRecord::Base
     data = {
         id: id,
         booking_type: booking_type,
-        booking_request: booking_request,
         note: note,
         booking_status: booking_status,
         travel_members: travel_members,
