@@ -10,9 +10,9 @@
       <img src="<%= @company.configuration.logo.url(:thumb) %>" width="250" height="auto">
     </div>
     <div class="vendor-address">
-      <span class="company-name font-size-14 bold"><%= @result.purchase_order.location.name %></span>
+      <span class="company-name font-size-14 bold"><%= @result.purchase_order.location&.name %></span>
       <span class="address-line-1"></span>
-      <span class="address-line-2"><%= @result.purchase_order.location.address %></span>
+      <span class="address-line-2"><%= @result.purchase_order.location&.address %></span>
     </div>
   </div>
   <div class="document-details">
@@ -58,19 +58,19 @@
   <div class="billing-address wd-33">
     <div class="main-title width-fit-content">Billing Address</div>
     <div class="address">
-      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.location.name %></span>
-      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.location.address %></span>
-      <span class="city mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.location.gstin %></span>
-      <span class="state mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.location.pan %></span>
+      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.location&.name %></span>
+      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.location&.address %></span>
+      <span class="city mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.location&.gstin %></span>
+      <span class="state mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.location&.pan %></span>
     </div>
   </div>
   <div class="shipping-address wd-33">
     <div class="main-title width-fit-content">Shipping Address</div>
     <div class="address">
-      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.delivery_location.name %></span>
-      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.delivery_location.address %></span>
-      <span class="city bold mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.delivery_location.gstin %></span>
-      <span class="state bold mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.delivery_location.pan %></span>
+      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.delivery_location&.name %></span>
+      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.delivery_location&.address %></span>
+      <span class="city bold mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.delivery_location&.gstin %></span>
+      <span class="state bold mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.delivery_location&.pan %></span>
     </div>
   </div>
 </div>
