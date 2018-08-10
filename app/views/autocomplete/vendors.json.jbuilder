@@ -1,4 +1,5 @@
 json.array!(@result.vendors) do |vendor|
-  json.label vendor.name
+  name = vendor.business_name || vendor.name
+  json.label name
   json.value vendor.id
 end

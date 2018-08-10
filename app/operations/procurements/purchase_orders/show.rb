@@ -26,7 +26,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments
+    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets
 
     def init
       self.purchase_order = params[:purchase_order]
@@ -47,6 +47,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         }
         self.reviewal_chains.push(chain)
       end
+
+      op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
+      if op.success?
+        self.budgets = op.budget_data
+      end
+
 
     end
 
