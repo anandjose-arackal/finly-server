@@ -5,6 +5,14 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
     [:employee, :travel_manager]
   end
 
+  def pre_validate
+    return unless user_present? and params_present?
+    if params&.dig(:booking).blank?
+      add_message :error, 'Invalid Request'
+      return
+    end
+  end
+
   def init
     params[:booking][:booking_status_id] = BookingStatus.id_for(params[:status])
     self.booking_parameters = booking_params
