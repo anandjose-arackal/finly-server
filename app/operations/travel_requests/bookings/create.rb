@@ -1,5 +1,7 @@
 class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
-  attr_accessor :travel_request, :booking, :parent_booking, :booking_parameters, :booking_attachments, :destination, :travel_request
+  attr_accessor :travel_request, :parent_booking,
+                :booking_parameters, :booking_attachments,
+                :destination, :travel_request
 
   def authorized_user_types
     [:employee, :travel_manager]
@@ -14,10 +16,17 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
   end
 
   def init
-    params[:booking][:booking_status_id] = BookingStatus.id_for(params[:status])
-    self.booking_parameters = booking_params
+    request_params = params[:booking]
+    unless request_params.is_a?(Array)
+      request_params = [request_params]
+    end
+    request_params.first[:booking_status_id] = BookingStatus.id_for(params[:status])
+    self.booking_parameters = []
+    request_params.each do |param|
+      self.booking_parameters << booking_params(param)
+    end
 
-    if params&.dig(:parent_booking_id).present?
+    if request_params.first&.dig(:parent_booking_id).present?
       parent_booking_presenter = TravelRequests::Bookings::Show.(user, {
           id: params&.dig(:parent_booking_id),
           travel_request_id: params[:travel_request_id],
@@ -50,27 +59,38 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
     # Nothing to validate
   end
 
-  def pre_process
-    # Extracting booking attachments from params
-    self.booking_attachments = user.company.booking_attachments.with_id(booking_parameters[:booking_attachments])
-
-    # Remove :invoice_attachments from parameters
-    self.booking_parameters.delete(:booking_attachments)
-  end
-
   def process
-    self.booking = self.destination.bookings.build(booking_parameters)
-    self.booking.parent_booking = self.parent_booking
-    self.booking.travel_request = self.travel_request
-    self.booking.created_by_user = user
 
-    if self.booking.valid?
-      self.booking.save
-      add_message :success, 'Successfully Added Booking'
+    self.booking_parameters.each do |booking_param|
+      # Extracting booking attachments from params
+      booking = self.destination.bookings.build(booking_param.except(:booking_attachments))
+      booking.parent_booking = self.parent_booking
+      booking.travel_request = self.travel_request
+      booking.created_by_user = user
 
-      booking_attachments.update_all(booking_id: self.booking.id)
-    else
-      add_message :error, self.booking.errors.full_messages
+      if booking.valid?
+      else
+        add_message :error, booking.errors.full_messages
+      end
+    end
+
+    return if has_errors?
+
+    self.booking_parameters.each do |booking_param|
+      # Extracting booking attachments from params
+      booking_attachments = user.company.booking_attachments.with_id(booking_param[:booking_attachments])
+      booking = self.destination.bookings.build(booking_param.except(:booking_attachments))
+      booking.parent_booking = self.parent_booking
+      booking.travel_request = self.travel_request
+      booking.created_by_user = user
+
+      if booking.valid?
+        booking.save
+        add_message :success, 'Successfully Added Booking'
+        booking_attachments.update_all(booking_id: booking.id)
+      else
+        add_message :error, booking.errors.full_messages
+      end
     end
   end
 

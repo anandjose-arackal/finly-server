@@ -2,8 +2,8 @@ class TravelRequests::Bookings::Base < TravelRequests::Base
 
   protected
 
-  def booking_params
-    params.require(:booking).permit(
+  def booking_params(param=params)
+    param.require(:booking).permit(
         [:booking_type_id, :note, :booking_status_id,
          booking_flight_attributes: [
              :id, {from_attributes: [:id, :name, :address, :latitude, :longitude, :maps_id]},
