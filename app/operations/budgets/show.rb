@@ -33,7 +33,8 @@ class Budgets::Show < Budgets::Base
 
     def init
       self.budget = params[:budget]
-
+      processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(self.budget)
+      self.spent_amount = processor_instance.spent_amount
       # if budget.budgetable_type == 'User'
       #   op = ::BudgetsProcessor::Calculate::User.(user, {budget: budget, get_items: true})
       # elsif budget.budgetable_type == 'Category'

@@ -18,9 +18,9 @@ json.amounts do
   json.budget_amount do
     json.extract! @result.budget.budget_amount, :id, :value
   end
-  # json.spent_amount do
-  #   json.value @result.spent_amount
-  # end
+  json.spent_amount do
+    json.value @result.spent_amount
+  end
   json.currency do
     json.extract! @result.budget.budget_amount.currency, :id, :country, :country_code, :symbol
   end
