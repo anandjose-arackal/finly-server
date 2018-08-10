@@ -26,7 +26,6 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
         }}
       end
     end
-
   end
 
   def init
