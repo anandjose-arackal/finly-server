@@ -2,21 +2,19 @@
 #
 # Table name: policies
 #
-#  id               :integer          not null, primary key
-#  name             :string(255)
-#  company_id       :integer
-#  owner_id         :integer
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  default          :boolean          default(FALSE), not null
-#  is_deleted       :boolean          default(FALSE), not null
-#  description      :text(65535)
-#  base_currency_id :integer          default(1)
-#  application      :string(255)
+#  id                     :integer          not null, primary key
+#  name                   :string(255)
+#  company_id             :integer
+#  owner_id               :integer
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  default                :boolean          default(FALSE), not null
+#  is_deleted             :boolean          default(FALSE), not null
+#  description            :text(65535)
+#  base_currency_id       :integer          default(1)
+#  application            :string(255)
+#  settlement_currency_id :integer          default(1), not null
 #
-
-
-
 
 
 
@@ -25,7 +23,8 @@ class Policy < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :company
-  belongs_to :base_currency, class_name: "Currency"
+  belongs_to :base_currency, class_name: 'Currency'
+  belongs_to :settlement_currency, class_name: 'Currency'
   has_one :configuration, class_name: 'PolicyConfiguration', dependent: :destroy
   has_many :user_mapping, class_name: 'PolicyUserMapping', dependent: :destroy
   has_many :users, through: :user_mapping
@@ -42,30 +41,37 @@ class Policy < ActiveRecord::Base
   has_one :per_diem_expense_config
 
   has_many :per_diems, as: :configurable
+  has_many :vehicle_rates
 
-  scope :default, -> { where default: true }
-  scope :non_default, -> { where default: false }
-  scope :company, ->(company_id) { where company_id: company_id }
-  scope :by_name, ->(name) { where name: name }
-  scope :with_id, -> (id) { where id: id }
-  scope :without_id, ->(id) { where.not id: id }
-  scope :not_deleted, -> { where is_deleted: false }
-  scope :find_from_id, -> (id) { find_by(id: id) }
-  scope :with_application, -> (application) { where application: application }
+  scope :default, -> {where default: true}
+  scope :non_default, -> {where default: false}
+  scope :company, ->(company_id) {where company_id: company_id}
+  scope :by_name, ->(name) {where name: name}
+  scope :with_id, -> (id) {where id: id}
+  scope :without_id, ->(id) {where.not id: id}
+  scope :not_deleted, -> {where is_deleted: false}
+  scope :find_from_id, -> (id) {find_by(id: id)}
+  scope :with_application, -> (application) {where application: application}
+  scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
 
-  has_many :field_configurations, as: :configurable
+  # has_many :field_configurations, as: :configurable
+  has_many :policy_field_mappings
+  has_many :field_configurations, through: :policy_field_mappings
 
   validates :company_id, presence: true
   validate :one_default_per_company
 
   has_paper_trail
 
+  # Set base currency ID as INR unless set explicitly
+  before_save {self.base_currency_id = Currency.id_for(:INR) if self.base_currency_id.blank?}
+
   after_create :initialize_expense_configs
 
-  default_scope { order('policies.created_at ASC') }
+  default_scope {order('policies.created_at ASC')}
 
   def admins
     admin_mapping_ids = self.user_mapping.admin.pluck(:user_id)
@@ -100,7 +106,7 @@ class Policy < ActiveRecord::Base
     self.per_diem_expense_config.enabled
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name

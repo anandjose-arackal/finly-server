@@ -80,26 +80,23 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
     end
     user_ids = self.money_requests.pluck(:user_id).uniq
     users_map = User.with_id(user_ids).index_by(&:id)
-    request_total_hash = {}#self.money_requests.group_user.sum_total
-    user_ids.each do |user_id|
-      request_ids = self.money_requests.with_user(user_id).pluck(:id)
-      amount = MoneyRequestItem.with_money_request(request_ids).sum_amount
-      request_total_hash[user_id] = amount
-    end
-
     self.user_money_requests = []
     self.request_total = 0
     self.user_count = 0
-    request_total_hash.each do |user_id, total|
+
+    user_ids.each do |user_id|
+      request_ids = self.money_requests.with_user(user_id).pluck(:id)
+      amount = MoneyRequestItem.with_money_request(request_ids).sum_amount
       self.user_count += 1
-      self.request_total += total
+      self.request_total += amount
       user_money_requests << {
           user: users_map[user_id],
-          request_total: total,
+          request_total: amount,
           money_requests: self.money_requests.with_user(user_id),
           has_errors: false
       }
     end
+
   end
 
   def init_bank_transfer

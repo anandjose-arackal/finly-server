@@ -2305,6 +2305,7 @@ end
     post 'add_rule', to: 'rules#create', as: :add_rule
     delete 'remove_rule', to: 'rules#destroy', as: :remove_rule
     get 'description', to: 'policies#show_description'
+    resources :vehicle_rates, controller: 'vehicle_rates', only: [:create, :destroy]
   end
 
   resources :user_permissions do
@@ -2561,6 +2562,8 @@ end
 
   get 'about', to: 'home#about'
   get 'resources', to: 'home#resources'
+
+  get 'currencies', to: 'expenses#currencies'
 
 
   #Filters/Autocomplete

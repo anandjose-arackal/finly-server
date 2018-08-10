@@ -99,7 +99,7 @@ class Report::Update < Report::Base
   def calculate_amounts
     report.expenses.each do |expense|
       if expense.distance_expense? || expense.time_expense? || expense.per_diem_expense?
-        expense.amount.update(value: expense.calculate_amount_value(report.policy))
+        expense.amount.update(value: expense.calculate_amount_value(report.policy), currency_id: expense.report.policy.base_currency_id)
       end
     end
   end

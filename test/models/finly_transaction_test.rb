@@ -19,6 +19,7 @@
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  date                        :datetime
+#  sequence_number             :integer
 #
 
 require 'test_helper'

@@ -8,6 +8,10 @@
 #     days_after : number of days after which the rule becomes applicable to the expense
 #     expense_rule_type_id : require receipt, require note, or disallow
 #     rule_type_id: warning or blocking
+#     budget_rule_field_mappings_attributes: [
+#       field_configuration_id
+#       field_drop_down_item_id
+#     ]
 #
 # budget_rule:
 #     amount: the budget amount
@@ -15,6 +19,10 @@
 #     category_id: if it's a category specific budget
 #     rule_type_id: blocking or warning
 #     period_id: the id based on the period of the budget - day, week, month, year
+#     budget_rule_field_mappings_attributes: [
+#       field_configuration_id
+#       field_drop_down_item_id
+#     ]
 #
 
 class Policy::Rules::Create < Policy::Rules::Base
@@ -42,6 +50,14 @@ class Policy::Rules::Create < Policy::Rules::Base
     # for budget rule
     if rule_params[:amount_attributes].present?
       rule_params[:amount_attributes][:currency_id] = self.policy.base_currency_id
+    end
+
+    if rule_params[:with_receipt_amount_attributes].present?
+      rule_params[:with_receipt_amount_attributes][:currency_id] = self.policy.base_currency_id
+    end
+
+    if rule_params[:without_receipt_amount_attributes].present?
+      rule_params[:without_receipt_amount_attributes][:currency_id] = self.policy.base_currency_id
     end
 
     # for expense rule
