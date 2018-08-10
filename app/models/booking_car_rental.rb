@@ -28,6 +28,10 @@ class BookingCarRental < ActiveRecord::Base
   belongs_to :pickup_city, class_name: 'Location', dependent: :destroy
   belongs_to :drop_city, class_name: 'Location', dependent: :destroy
 
+  accepts_nested_attributes_for :pickup_city
+  accepts_nested_attributes_for :drop_city
+  accepts_nested_attributes_for :cost
+
   validates :pickup_date, presence: true
   validates :drop_date, presence: true
   validates :pickup_city_id, presence: true

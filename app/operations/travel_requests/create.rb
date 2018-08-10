@@ -18,6 +18,7 @@ class TravelRequests::Create < TravelRequests::Base
     if self.travel_request_parameters[:policy_id].blank? and for_user.enforce_policy_enabled?
       self.travel_request_parameters[:policy_id] = for_user.policies.non_default&.first&.id
     end
+    debugger
     if self.travel_request_parameters[:policy_id].blank?
       self.travel_request_parameters[:policy_id] = user.company.default_policy.id
     end

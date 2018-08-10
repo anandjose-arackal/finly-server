@@ -28,7 +28,7 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
       self.booking_parameters << booking_params(param)
     end
 
-    if request_params.first&.dig(:parent_booking_id).present?
+    if params&.dig(:parent_booking_id).present?
       parent_booking_presenter = TravelRequests::Bookings::Show.(user, {
           id: params&.dig(:parent_booking_id),
           travel_request_id: params[:travel_request_id],

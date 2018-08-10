@@ -40,7 +40,7 @@ class BookingFlight < ActiveRecord::Base
   validates :from, presence: true
   validates :to, presence: true
   validates :departure_date, presence: true
-  validates :departure_time, presence: true
+  # validates :departure_time, presence: true
 
 
   def as_json(options={})
