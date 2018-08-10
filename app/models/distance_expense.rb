@@ -42,7 +42,7 @@ class DistanceExpense < ActiveRecord::Base
 
   # validates :distance, presence: true
   validate :distance_presence
-  validates :vehicle_rate, presence: true
+  # validates :vehicle_rate, presence: true
 
   delegate :distance_value, to: :distance, allow_nil: true
   delegate :maps_distance_value, to: :distance, allow_nil: true
