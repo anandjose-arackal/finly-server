@@ -27,6 +27,8 @@ class TravelRequestComment < ActiveRecord::Base
   belongs_to :booking
   belongs_to :booking_request
 
+  default_scope { order created_at: :desc }
+
   def retrieve_content(user)
     comment_content = ""
 

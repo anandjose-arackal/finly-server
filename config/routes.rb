@@ -2398,6 +2398,8 @@ Rails.application.routes.draw do
         patch 'select_option', to: 'travel_request_bookings#select_option'
       end
     end
+
+    resources :comments, controller: 'travel_requests_comments', only: [:create]
   end
   post 'bookings/upload_attachment', to: 'bookings#upload_attachment'
 

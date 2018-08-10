@@ -37,7 +37,7 @@ class TravelRequests::Comment::Create < TravelRequests::Comment::Base
   end
 
   def post_process
-    Event::EReport::EComment::Create.(user, report: self.report)
+    # Event::EReport::EComment::Create.(user, report: self.report)
     add_message :success, 'Comment posted'
   end
 end
