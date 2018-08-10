@@ -36,22 +36,34 @@ class BudgetTrail < ActiveRecord::Base
 
   scope :joins_amount, -> { joins(:amount) }
   scope :with_users, -> (user_ids) {
-    where(user_id: user_ids)
+    unless user_ids.empty?
+      where(user_id: user_ids)
+    end
   }
   scope :with_departments, -> (department_ids) {
-    where(department_id: department_ids)
+    unless department_ids.empty?
+      where(department_id: department_ids)
+    end
   }
   scope :with_locations, -> (location_ids) {
-    where(location_id: location_ids)
+    unless location_ids.empty?
+      where(location_id: location_ids)
+    end
   }
   scope :with_vendors, -> (vendor_ids) {
-    where(vendor_id: vendor_ids)
+    unless vendor_ids.empty?
+      where(vendor_id: vendor_ids)
+    end
   }
   scope :with_categories, -> (category_ids) {
-    where(category_id: category_ids)
+    unless category_ids.empty?
+      where(category_id: category_ids)
+    end
   }
   scope :with_cost_centers, -> (cost_center_ids) {
-    where(cost_center_id: cost_center_ids)
+    unless cost_center_ids
+      where(cost_center_id: cost_center_ids)
+    end
   }
   scope :with_budgetable_entities, -> (budgetable_entities) {
     where(entity_type: budgetable_entities)
