@@ -9,7 +9,7 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
       return
     end
     self.booking = booking_presenter.booking
-    self.booking_parameters = booking_params
+    self.booking_parameters = booking_params(params[:booking])
   end
 
   def pre_process
