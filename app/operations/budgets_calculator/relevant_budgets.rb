@@ -16,7 +16,10 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
         processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
         spent_amount = processor_instance.spent_amount
         expenses, payments, purchase_order_items = processor_instance.spent_entities
-        self.budget_data << {spent_amount: spent_amount, spent_entities: {
+        self.budget_data << {
+            budget: budget,
+            spent_amount: spent_amount,
+            spent_entities: {
             expenses: expenses,
             payments: payments,
             purchase_order_items: purchase_order_items
@@ -39,11 +42,11 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
   def process
     case self.object.class.name
       when "PurchaseOrder"
-        self.relevant_budgets = current_company.budgets.applicable_to_purchase_orders
+        self.relevant_budgets = user.company.budgets.applicable_to_purchase_orders
       when "Expense", "Report"
-        self.relevant_budgets = current_company.budgets.applicable_to_expenses
+        self.relevant_budgets = user.company.budgets.applicable_to_expenses
       when "Payment", "PaymentOrder", "BankPaymentRequest"
-        self.relevant_budgets = current_company.budgets.applicable_to_payments
+        self.relevant_budgets = user.company.budgets.applicable_to_payments
       else
         self.relevant_budgets = []
     end
