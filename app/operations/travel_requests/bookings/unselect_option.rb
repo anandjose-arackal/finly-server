@@ -1,4 +1,4 @@
-class TravelRequests::Bookings::SelectOption < TravelRequests::Bookings::Base
+class TravelRequests::Bookings::UnselectOption < TravelRequests::Bookings::Base
   attr_accessor :booking, :destination, :travel_request
 
   def init
