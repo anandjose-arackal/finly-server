@@ -30,6 +30,7 @@ class CreateVehicleRates < ActiveRecord::Migration
       next if distance_expense.expense.blank?
       next if distance_expense.expense.report_id.blank?
       policy = distance_expense.expense.report.policy
+      next unless policy.distance_expense_config.enabled
       vehicle_rate = policy.vehicle_rates.first
       if vehicle_rate.blank?
         raise "Vehicle rate not found #{distance_expense.id}"
