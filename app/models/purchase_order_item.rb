@@ -34,6 +34,7 @@ class PurchaseOrderItem < ActiveRecord::Base
   validates :purchase_order_id, presence: true
 
   belongs_to :purchase_order
+  belongs_to :inventory_line_item
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :total_amount, class_name: "Amount"
