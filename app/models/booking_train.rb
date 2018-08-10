@@ -52,9 +52,9 @@ class BookingTrain < ActiveRecord::Base
         to: to,
         destination_station: destination_station,
         departure_date: DateUtils.date_formatted(departure_date),
-        departure_time: DateUtils.time_formatted(departure_time),
+        departure_time: DateUtils.time_formatted(departure_time, military_time: true),
         arrival_date: DateUtils.date_formatted(arrival_date),
-        arrival_time: DateUtils.time_formatted(arrival_time),
+        arrival_time: DateUtils.time_formatted(arrival_time, military_time: true),
         description: description,
         seat_number: seat_number,
         cost: cost

@@ -38,7 +38,7 @@ class BookingRestaurant < ActiveRecord::Base
         location: location,
         restaurant_address: restaurant_address,
         reservation_date: DateUtils.date_formatted(reservation_date),
-        reservation_time: DateUtils.time_formatted(reservation_time),
+        reservation_time: DateUtils.time_formatted(reservation_time, military_time: true),
         number_of_guests: number_of_guests,
         description: description
     }

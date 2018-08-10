@@ -40,9 +40,9 @@ class BookingHotel < ActiveRecord::Base
         hotel_name: hotel_name,
         location: location,
         checkin_date: DateUtils.date_formatted(checkin_date),
-        checkin_time: DateUtils.time_formatted(checkin_time),
+        checkin_time: DateUtils.time_formatted(checkin_time, military_time: true),
         checkout_date: DateUtils.date_formatted(checkout_date),
-        checkout_time: DateUtils.time_formatted(checkout_time),
+        checkout_time: DateUtils.time_formatted(checkout_time, military_time: true),
         description: description,
         hotel_address: hotel_address,
         cost: cost
