@@ -2,25 +2,20 @@
 #
 # Table name: budget_rules
 #
-#  id                   :integer          not null, primary key
-#  category_id          :integer
-#  amount_id            :integer
-#  period_id            :integer
-#  policy_id            :integer
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  rule_type_id         :integer
-#  include_reimbursable :boolean          default(TRUE)
-#  is_deleted           :boolean          default(FALSE)
-#  expense_type_id      :integer
+#  id                        :integer          not null, primary key
+#  category_id               :integer
+#  amount_id                 :integer
+#  period_id                 :integer
+#  policy_id                 :integer
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  rule_type_id              :integer
+#  include_reimbursable      :boolean          default(TRUE)
+#  is_deleted                :boolean          default(FALSE)
+#  expense_type_id           :integer
+#  with_receipt_amount_id    :integer
+#  without_receipt_amount_id :integer
 #
-
-
-
-
-
-
-
 
 
 # expense_type_id: contains details about whether the budget is scoped to a particular
@@ -35,34 +30,39 @@ class BudgetRule < ActiveRecord::Base
   belongs_to :period
   belongs_to :policy
   belongs_to :rule_type
+  belongs_to :with_receipt_amount, class_name: 'Amount'
+  belongs_to :without_receipt_amount, class_name: 'Amount'
   has_many :budget_rule_field_mappings
   has_many :field_drop_down_items, through: :budget_rule_field_mappings
   has_many :field_configurations, through: :budget_rule_field_mappings
 
   accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :with_receipt_amount
+  accepts_nested_attributes_for :without_receipt_amount
   accepts_nested_attributes_for :budget_rule_field_mappings
 
   # delegate :period, to: :period
   delegate :type, to: :rule_type
-  delegate :amount_value, to: :amount
+  delegate :amount_value, to: :amount, allow_nil: true
   delegate :category_name, to: :category
 
-  default_scope { unscope(:where)}
+  default_scope {unscope(:where)}
 
   validates :period_id, presence: true
   validates :policy_id, presence: true
   validates :rule_type_id, presence: true
 
   validate :no_duplicates
+  validate :amount_presence
 
   before_create :update_parent_version
   before_destroy :update_parent_version
 
   has_paper_trail
 
-  scope :warning_rules, -> { where rule_type_id: RuleType.warning_rule_id }
+  scope :warning_rules, -> {where rule_type_id: RuleType.warning_rule_id}
 
-  scope :blocking_rules, -> { where rule_type_id: RuleType.blocking_rule_id }
+  scope :blocking_rules, -> {where rule_type_id: RuleType.blocking_rule_id}
 
   def include_reimbursable_expenses?
     self.include_reimbursable
@@ -74,34 +74,46 @@ class BudgetRule < ActiveRecord::Base
     Amount.new(value: super.value, currency_id: self.policy.base_currency_id)
   end
 
-  def rule_in_words(options={})
+  # Amount currency is always picked up from base currency of the policy
+  def with_receipt_amount
+    return nil if super.nil?
+    Amount.new(value: super.value, currency_id: self.policy.base_currency_id)
+  end
+
+  # Amount currency is always picked up from base currency of the policy
+  def without_receipt_amount
+    return nil if super.nil?
+    Amount.new(value: super.value, currency_id: self.policy.base_currency_id)
+  end
+
+  def rule_in_words(options = {})
     case self.expense_type_id
-      when 1
-        type = "of Cash"
-      when 2
-        type = "of Card"
-      when 3
-        type = "of Distance"
-      when 4
-        type = "of Time"
-      when 5
-        type = "of Per Diem"
-      else
-        type = ""
+    when 1
+      type = "of Cash"
+    when 2
+      type = "of Card"
+    when 3
+      type = "of Distance"
+    when 4
+      type = "of Time"
+    when 5
+      type = "of Per Diem"
+    else
+      type = ""
     end
     rule_in_words = "Total #{type} Expenses"
     if self.period_id
       case self.period_id
-        when 1
-          period = "day"
-        when 2
-          period = "week"
-        when 3
-          period = "month"
-        when 4
-          period = "year"
-        else
-          period = ""
+      when 1
+        period = "day"
+      when 2
+        period = "week"
+      when 3
+        period = "month"
+      when 4
+        period = "year"
+      else
+        period = ""
       end
       rule_in_words += " per " + period
     end
@@ -125,23 +137,51 @@ class BudgetRule < ActiveRecord::Base
         end
       end
     end
+
+    if options&.dig(:violation)
+      rule_in_words += " have exceeded"
+    else
+      rule_in_words += " should not exceed"
+    end
+
     if self.amount_id
-      if options&.dig(:violation)
-        rule_in_words += " have exceeded"
-      else
-        rule_in_words += " should not exceed"
-      end
       rule_in_words += " #{self.amount.currency.symbol}#{self.amount_value.to_s} #{self.amount.currency.country_code}"
       if options&.dig(:exceeded_by)
         rule_in_words += " by #{self.amount.currency.symbol}#{options&.dig(:exceeded_by)} #{self.amount.currency.country_code}"
+      end
+    else
+      with_receipt_presence = self.with_receipt_amount_id.present?
+      if self.with_receipt_amount_id and (not options&.dig(:violation) or (options[:violation_type] == :with_receipt))
+        rule_in_words += " #{self.with_receipt_amount.currency.symbol}#{self.with_receipt_amount.value.to_s} #{self.with_receipt_amount.currency.country_code}"
+        if options&.dig(:exceeded_by)
+          rule_in_words += " by #{self.with_receipt_amount.currency.symbol}#{options&.dig(:exceeded_by)} #{self.with_receipt_amount.currency.country_code}"
+        end
+        rule_in_words += " with receipt"
+      end
+      if self.without_receipt_amount_id and (not options&.dig(:violation) or (options[:violation_type] == :without_receipt))
+        if with_receipt_presence  and not options&.dig(:violation)
+          rule_in_words += ' and'
+        end
+        rule_in_words += " #{self.without_receipt_amount.currency.symbol}#{self.without_receipt_amount.value.to_s} #{self.without_receipt_amount.currency.country_code}"
+        if options&.dig(:exceeded_by)
+          rule_in_words += " by #{self.without_receipt_amount.currency.symbol}#{options&.dig(:exceeded_by)} #{self.without_receipt_amount.currency.country_code}"
+        end
+        rule_in_words += " without receipt"
       end
     end
     rule_in_words
   end
 
   private
+
   def update_parent_version
     self.policy.update_attribute(:updated_at, DateTime.now)
+  end
+
+  def amount_presence
+    if amount.blank? and without_receipt_amount.blank? and with_receipt_amount.blank?
+      errors.add :amount, 'is not defined'
+    end
   end
 
   # todo - look for a more elegant way to do this. Shitty code.

@@ -248,7 +248,23 @@ class Report::Violation < Report::Base
     #   return true
     # end
     # false
-    rule.amount.value - total_expenses
+
+    if rule.amount.present?
+      # Rule is independent of receipt
+      return (rule.amount.value - total_expenses), :total
+    else
+      # Rule contains condition of with and without receipt
+      all_receipts_avaialble = (Receipt.with_expense_id(expenses.pluck(:id)).pluck(:parent_id).uniq.size == expenses.count)
+      if all_receipts_avaialble
+        # All expenses have receipts
+        return 0 if rule.with_receipt_amount.blank?
+        return (rule.with_receipt_amount.value - total_expenses), :with_receipt
+      else
+        # Expenses are present which do not have receipts
+        return 0 if rule.without_receipt_amount.blank?
+        return (rule.without_receipt_amount.value - total_expenses), :without_receipt
+      end
+    end
   end
 
   def check_budget(rule, expense)
@@ -266,7 +282,7 @@ class Report::Violation < Report::Base
     dates.each do |date|
       start_date = nil
       end_date = nil
-      if rule.amount_value
+      if rule.amount&.value or rule.without_receipt_amount&.value or rule.with_receipt_amount&.value
         if rule.period
           # setting the start and end date based on the kind of period set by the user
           if rule.period_id == Period.id_for(:month)
@@ -291,10 +307,10 @@ class Report::Violation < Report::Base
           if rule.budget_rule_field_mappings.present?
             field_drop_down_item_ids = rule.budget_rule_field_mappings.pluck(:field_drop_down_item_id)
           end
-          available_budget = available_budget(expense, rule, start_date, end_date, category, field_drop_down_item_ids)
+          available_budget, violation_type = available_budget(expense, rule, start_date, end_date, category, field_drop_down_item_ids)
           if available_budget < 0
             type = category ? 'category' : 'total'
-            message = rule.rule_in_words(violation: true, exceeded_by: available_budget.abs)
+            message = rule.rule_in_words(violation: true, violation_type: violation_type, exceeded_by: available_budget.abs)
             violation_type = (rule.type == 'Warning') ? 'budget_warning' : 'budget_blocking'
             self.warning_messages[expense.id][violation_type] << {type: type, message: message}
           end

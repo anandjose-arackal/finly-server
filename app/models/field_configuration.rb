@@ -7,7 +7,7 @@
 #  field_type_id           :integer          not null
 #  mandatory               :boolean          default(FALSE), not null
 #  company_id              :integer          not null
-#  configurable_id         :integer          not null
+#  configurable_id         :integer
 #  configurable_type       :string(255)      not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null

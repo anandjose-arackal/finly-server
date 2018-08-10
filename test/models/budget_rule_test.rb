@@ -2,17 +2,19 @@
 #
 # Table name: budget_rules
 #
-#  id                   :integer          not null, primary key
-#  category_id          :integer
-#  amount_id            :integer
-#  period_id            :integer
-#  policy_id            :integer
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  rule_type_id         :integer
-#  include_reimbursable :boolean          default(TRUE)
-#  is_deleted           :boolean          default(FALSE)
-#  expense_type_id      :integer
+#  id                        :integer          not null, primary key
+#  category_id               :integer
+#  amount_id                 :integer
+#  period_id                 :integer
+#  policy_id                 :integer
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  rule_type_id              :integer
+#  include_reimbursable      :boolean          default(TRUE)
+#  is_deleted                :boolean          default(FALSE)
+#  expense_type_id           :integer
+#  with_receipt_amount_id    :integer
+#  without_receipt_amount_id :integer
 #
 
 require 'test_helper'
