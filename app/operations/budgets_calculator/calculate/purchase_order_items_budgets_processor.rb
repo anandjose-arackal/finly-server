@@ -15,6 +15,7 @@ class BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor < Budgets
         user_id: purchase_order_item.purchase_order.user_id,
         location_id: purchase_order_item.purchase_order.location_id,
         department_id: purchase_order_item.purchase_order.department_id,
+        date: purchase_order_item.purchase_order.delivery_date,
         amount_attributes: {
             value: purchase_order_item.total_amount&.id,
             currency_id: purchase_order_item.total_amount&.currency_id
