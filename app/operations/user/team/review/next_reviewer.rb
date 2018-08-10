@@ -15,7 +15,7 @@ class User::Team::Review::NextReviewer < BaseOperation
   end
 
   def validate
-    messages[:error] << 'Error retrieving next approver' if obj.blank?
+    messages[:error] << 'Error retrieving next reviewer' if obj.blank?
   end
 
   def process
@@ -35,12 +35,14 @@ class User::Team::Review::NextReviewer < BaseOperation
       end
       amount = obj[:amount]
       currency_id = obj[:currency_id]
-      manager = User::Team::Approver.(user, type: :manager, amount: amount, currency_id: currency_id)
+      manager = User::Team::Approver.(user, type: :manager, amount: amount,
+          currency_id: currency_id, has_violations: params&.dig(:has_violations))
       if manager.blank?
         self.role_id = UserRole.id_for(:manager)
         self.next_approver = manager
       else
-        self.next_approver = User::Team::Approver.(user, type: :finance_manager, amount: amount, currency_id: currency_id)
+        self.next_approver = User::Team::Approver.(user, type: :finance_manager, amount: amount,
+            currency_id: currency_id, has_violations: params&.dig(:has_violations))
         if self.next_approver.present?
           self.role_id = UserRole.id_for(:finance_manager)
         end
@@ -62,12 +64,14 @@ class User::Team::Review::NextReviewer < BaseOperation
   end
 
   private
+
   def next_reviewer(sym, obj)
     user = params[:controlling_user] || (obj.controlling_for_user or obj.controlling_user or obj.user)
     role = params[:controlling_user_role_id] || (obj.controlling_for_user_role_id or obj.controlling_user_role_id)
     role = ::UserRole.id_for(:employee) if role.blank? and obj.controlling_user == obj.user
     arg_hash = {}
     arg_hash[sym] = obj
+    arg_hash[:has_violations] = params&.dig(:has_violations)
     if role.blank?
       add_message :error, 'Error loading configuration'
       return
@@ -84,7 +88,7 @@ class User::Team::Review::NextReviewer < BaseOperation
             self.role_id = UserRole.id_for(:travel_manager)
           end
           return
-        # i.e. if it's not a travel request, the next approver / action taker is the travel manager
+          # i.e. if it's not a travel request, the next approver / action taker is the travel manager
         else
           arg_hash[:type] = :finance_manager
           self.response = User::Team::Approver.(user, arg_hash)

@@ -14,6 +14,9 @@
 #  odometer_reading_end              :decimal(10, 2)
 #  odometer_reading_receipt_start_id :integer
 #  odometer_reading_receipt_end_id   :integer
+#  vehicle_rate_id                   :integer
+#  distance_rate_id                  :integer
+#  distance_unit_id                  :integer
 #
 
 class DistanceExpense < ActiveRecord::Base
@@ -27,17 +30,25 @@ class DistanceExpense < ActiveRecord::Base
   belongs_to :type, class_name: 'DistanceExpenseType'
   belongs_to :odometer_reading_receipt_start, class_name: 'Receipt'
   belongs_to :odometer_reading_receipt_end, class_name: 'Receipt'
+  belongs_to :vehicle_rate
+  belongs_to :distance_rate, class_name: 'Amount'
+  belongs_to :distance_unit, class_name: 'PhysicalUnit'
 
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations
   accepts_nested_attributes_for :distance
   accepts_nested_attributes_for :maps_distance, allow_destroy: true
+  accepts_nested_attributes_for :distance_rate
 
   # validates :distance, presence: true
   validate :distance_presence
+  # validates :vehicle_rate, presence: true
 
   delegate :distance_value, to: :distance, allow_nil: true
   delegate :maps_distance_value, to: :distance, allow_nil: true
+
+  before_save :update_mileage_rates
+
 
   def maps_distance_value
     maps_distance&.value
@@ -93,6 +104,18 @@ class DistanceExpense < ActiveRecord::Base
     end
     if self.distance_value.present? and self.distance_value <= 0
       self.errors.add :distance, 'value has to be greater than 0'
+    end
+  end
+
+  def update_mileage_rates
+    return unless self.expense.present?
+    if vehicle_rate.present?
+      if distance_rate.blank?
+        build_distance_rate(value: vehicle_rate.rate.value, currency_id: vehicle_rate.rate.currency_id)
+      else
+        distance_rate.assign_attributes(value: vehicle_rate.rate.value, currency_id: vehicle_rate.rate.currency_id)
+      end
+      self.distance_unit_id = vehicle_rate.distance_unit_id
     end
   end
 

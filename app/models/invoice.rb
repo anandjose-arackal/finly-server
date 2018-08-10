@@ -46,7 +46,6 @@
 #  receiving_account_type :string(255)
 #  note                   :text(65535)
 #  remaining_amount_id    :integer
-#  invoice_type_id        :integer
 #
 
 #  gst_type_id: 1 - IGST

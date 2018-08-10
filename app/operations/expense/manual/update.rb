@@ -134,6 +134,14 @@ class Expense::Manual::Update < Expense::Manual::Base
     # add comment in report if expense is added within report
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
+    if expense.date == DateUtils.local_date
+      if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
+        expense.destroy_other_currencies
+      end
+    else
+      expense.update_other_currencies
+    end
+
     Expense::Manual::Duplicate::ProcessDuplicate.(self.user, expense: self.expense)
 
     # marking the expense as non-transcribed after the first edit
@@ -162,14 +170,6 @@ class Expense::Manual::Update < Expense::Manual::Base
       if coh_adapter.balance(display_balance: true) < 0
         expense.update(cash_on_hand_blocked: false)
       end
-    end
-
-    if expense.date == DateUtils.local_date
-      if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
-        expense.destroy_other_currencies
-      end
-    else
-      expense.update_other_currencies
     end
 
     add_message :success, 'Expense updated'

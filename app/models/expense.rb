@@ -31,7 +31,11 @@
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
 #  gst_amount_id          :integer
+#  usage_date_start       :datetime
+#  usage_date_end         :datetime
+#  usage_date_type        :string(255)
 #
+
 
 
 
@@ -92,6 +96,8 @@ class Expense < ActiveRecord::Base
   validates :category_id, presence: true
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
+  validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', nil]}
+  validate :validate_usage_dates
   validate :no_future_date
   validate :valid_expense_type
   validate :valid_amount_value
@@ -186,6 +192,9 @@ class Expense < ActiveRecord::Base
   scope :with_user_id, ->(user_id) {where user_id: user_id}
   scope :with_user_or_report, ->(user_id, report_id) {where 'user_id IN (?) OR report_id IN (?)', user_id, report_id}
   scope :date_before, -> (date) {where 'date < ?', date}
+  scope :without_usage_date_type, -> {where usage_date_type: nil}
+  scope :with_usage_date_type, -> {where.not usage_date_type: nil}
+  scope :usage_date_within, ->(start_date, end_date) {where.not('usage_date_start > ? OR usage_date_end < ? ', end_date, start_date)}
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) do
     type_id = [type_id] unless type_id.is_a?(Array)
@@ -328,7 +337,7 @@ class Expense < ActiveRecord::Base
   scope :unverified, -> {where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted])}
 
   scope :joins_amount, -> {joins(:amount)}
-  scope :sum_amount, -> {joins_amount.sum(:INR)}
+  scope :sum_amount, -> (currency_code = :INR) {joins_amount.sum(currency_code)}
 
   scope :joins_card_expenses, -> {only_card_expenses.joins(:card_expense)}
   scope :pluck_card_transaction_id, -> {joins_card_expenses.pluck('card_expense.card_transaction_id')}
@@ -361,14 +370,20 @@ class Expense < ActiveRecord::Base
                                        {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
                                        {amount: [:currency]}, :expense_status)}
   scope :includes_amount, -> {includes :amount}
-  scope :sum_amounts, -> {includes_amount.sum('amounts.INR')}
+  scope :sum_amounts, -> (currency_code = :INR) {includes_amount.sum("amounts.#{currency_code}")}
   scope :includes_tds_amount, -> {includes :tds_amount}
-  scope :sum_tds_amounts, -> do
+  scope :sum_tds_amounts, -> (currency_code = :INR) do
     amount_ids = pluck(:tds_amount_id)
-    Amount.with_id(amount_ids).sum_INR
+    Amount.with_id(amount_ids).sum(currency_code)
   end
-  scope :sum_reimbursements, -> { reimbursable.sum_amounts - reimbursable.sum_tds_amounts }
-  scope :with_expense_tax_type_id, -> (id){ where expense_tax_type_id: id }
+  scope :sum_reimbursements, -> (currency_code = :INR) {reimbursable.sum_amounts(currency_code) - reimbursable.sum_tds_amounts(currency_code)}
+  scope :with_expense_tax_type_id, -> (id) {where expense_tax_type_id: id}
+  scope :filter_custom_drop_down_selection, ->(drop_down_item_id) do
+    drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
+    configs = CustomField.with_drop_down_selection(drop_down_selection_ids).includes_parent.with_parent_report
+    expense_ids = configs.map {|item| item.parent&.id}
+    with_id(expense_ids)
+  end
 
 
   scope :user_budget_expenses, -> (from, to) {
@@ -468,19 +483,22 @@ class Expense < ActiveRecord::Base
     when ExpenseType.id_for(:card)
       return self.amount.value
     when ExpenseType.id_for(:distance)
+      if distance_expense.vehicle_rate.blank?
+        distance_expense.update(vehicle_rate_id: policy.vehicle_rates&.first&.id)
+      end
       if distance_expense&.distance.present?
-        rate = policy.distance_expense_config.rate_value rescue nil
+        rate = policy.distance_expense_config.rate_value # rescue nil
         amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
         return amount
       end
     when ExpenseType.id_for(:time)
-      rate = policy.time_expense_config.rate_value rescue nil
+      rate = policy.time_expense_config.rate_value # rescue nil
       amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
       return amount
     when ExpenseType.id_for(:per_diem)
       per_diem = self.per_diem_expense.per_diem
       if policy.per_diems.include?(per_diem)
-        rate = self.per_diem_expense.per_diem.rate_value rescue nil
+        rate = self.per_diem_expense.per_diem.rate_value # rescue nil
         amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
         return amount
       else
@@ -518,26 +536,20 @@ class Expense < ActiveRecord::Base
       end
       return "#{policy_name} - #{per_diem_name}"
     else
-      if self.report.nil?
-        if self.distance_expense?
-          return "#{self.distance_expense.distance_value} KM"
-        elsif self.time_expense?
-          return "#{self.time_expense.time_object_value} Hours"
+      if self.distance_expense?
+        rate = ''
+        if distance_expense.vehicle_rate.present?
+          rate = simple ? " @ " : " at "
+          rate += "#{distance_expense.vehicle_rate.rate.currency.symbol}#{distance_expense.vehicle_rate&.rate&.value} #{distance_expense.vehicle_rate.rate.currency.country_code} per KM"
         end
-      else
-        if self.distance_expense?
-          if simple
-            return "#{self.distance_expense.distance_value} KM at INR#{report.policy.distance_expense_config.rate_value} per KM"
-          else
-            return "#{self.distance_expense.distance_value} KM @ ₹#{report.policy.distance_expense_config.rate_value} per KM"
-          end
-        elsif self.time_expense?
-          if simple
-            return "#{self.time_expense.time_object_value} Hours @ ₹#{report.policy.time_expense_config.rate_value} per Hour"
-          else
-            return "#{self.time_expense.time_object_value} Hours at INR#{report.policy.time_expense_config.rate_value} per Hour"
-          end
+        return "#{self.distance_expense.distance_value} KM#{rate}"
+      elsif self.time_expense?
+        rate = ''
+        if (not self.report.nil?) and report.policy.time_expense_config.rate_value.present?
+          rate = simple ? " @ " : " at "
+          rate += "#{report.policy.base_currency.symbol}#{report.policy.time_expense_config.rate_value} #{report.policy.base_currency.country_code} per Hour"
         end
+        return "#{self.time_expense.time_object_value} Hours#{rate}"
       end
     end
   end
@@ -902,6 +914,7 @@ class Expense < ActiveRecord::Base
     tds_amount = tds_slab.tds * amount&.value.to_f / 100
     precision_value(amount&.value.to_f - tds_amount)
   end
+
   # alias_method :reimbursable_amount, :reimbursable_amount_value
 
   def reimbursable_amount
@@ -960,6 +973,15 @@ class Expense < ActiveRecord::Base
         self.build_tds_amount(value: value, currency_id: Currency.id_for(:INR))
       end
     end
+  end
+
+  def usage_days
+    return nil unless usage_date_type.present?
+    days = (usage_date_start.to_date..usage_date_end.to_date).to_a
+    unless usage_date_end.to_date == usage_date_start.to_date
+      days.pop
+    end
+    days
   end
 
   private
@@ -1035,4 +1057,16 @@ class Expense < ActiveRecord::Base
       end
     end
   end
+
+  def validate_usage_dates
+    if (usage_date_start.present? or usage_date_end.present?) and usage_date_type.blank?
+      errors.add :usage_date_type, 'has not been defined'
+      return
+    end
+    if usage_date_type.present? and usage_date_start.blank?
+      errors.add :usage_dates, 'have not been defined'
+      return
+    end
+  end
+
 end

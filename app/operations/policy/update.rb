@@ -1,5 +1,4 @@
 class Policy::Update < Policy::Base
-  attr_accessor :description
 
   def authorized_user_types
     [:admin, :policy_admin]
@@ -15,7 +14,6 @@ class Policy::Update < Policy::Base
   end
 
   def init
-    self.description = params[:policy][:description] rescue nil
     self.policy = Policy::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
   end
 
@@ -30,11 +28,19 @@ class Policy::Update < Policy::Base
   end
 
   def process
-    self.policy.update(description: description)
+    unless self.policy.update(strong_params)
+      add_message :error, self.policy.errors.full_messages
+      return
+    end
   end
 
   def post_process
     add_message :success, 'Updated Policy Description'
+  end
+
+  protected
+  def strong_params
+    params.require(:policy).permit(:description, :name, :base_currency_id, :settlement_currency_id)
   end
 
 end

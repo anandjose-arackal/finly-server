@@ -9,6 +9,8 @@
 #  travel_request_destination_id :integer
 #  booking_type_id               :integer
 #  note                          :text(65535)
+#  is_deleted                    :boolean          default(FALSE)
+#  travel_request_id             :integer          not null
 #
 
 class BookingRequest < ActiveRecord::Base

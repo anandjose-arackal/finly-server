@@ -108,9 +108,9 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     if expense.report.present?
       if expense.amount.present?
         amount = expense.amount
-        amount.update(value: expense.calculate_amount_value(expense.report.policy))
+        amount.update(value: expense.calculate_amount_value(expense.report.policy), currency_id: expense.report.policy.base_currency_id)
       else
-        expense.amount = Amount.create(value: expense.calculate_amount_value(expense.report.policy), currency_id: Currency.id_for(:INR))
+        expense.amount = Amount.create(value: expense.calculate_amount_value(expense.report.policy), currency_id: expense.report.policy.base_currency_id)
         expense.save
       end
     end
