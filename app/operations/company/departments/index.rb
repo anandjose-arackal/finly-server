@@ -19,7 +19,7 @@ class Company::Departments::Index < Company::Departments::Base
   end
 
   def process
-    if user.company_admin?
+    if user.company_admin? || user.vendor_payment_admin?
       self.departments = self.company.departments
     else
       self.departments = user.departments
