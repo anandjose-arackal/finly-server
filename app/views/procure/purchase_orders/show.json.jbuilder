@@ -109,3 +109,12 @@ json.reviewal_chains do
     end
   end
 end
+
+json.budgets do
+  json.array! @result.budgets do |budget|
+    json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :purchase_order, :start_date
+    json.user budget[:budget].user.as_json
+    json.spent_amount budget[:spent_amount]
+    json.budget_amount budget[:budget].budget_amount.as_json
+  end
+end
