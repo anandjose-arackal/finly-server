@@ -11,6 +11,7 @@
 #  account_code          :string(255)
 #  atm_withdrawal_pocket :boolean          default(FALSE)
 #  user_id               :integer
+#  base_currency_id      :integer
 #
 
 class UserPocket < ActiveRecord::Base
@@ -18,6 +19,7 @@ class UserPocket < ActiveRecord::Base
   belongs_to :user_pocket_type
   belongs_to :balance, class_name: "Amount"
   belongs_to :user
+  belongs_to :base_currency, class_name: "Currency"
 
   validates :user, presence: true
   validates :user_pocket_type, presence: true

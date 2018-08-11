@@ -15,6 +15,7 @@ json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
 json.enforce_policy_enabled @result.money_request.user.enforce_policy_enabled?
+json.destination_pocket @result.money_request.destination_pocket&.as_json
 
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
 
@@ -32,6 +33,20 @@ json.user_travel_requests current_user.travel_requests
 #   json.id @result.money_request.report&.travel_request&.id
 #   json.name @result.money_request.report&.travel_request&.name
 # end
+
+json.cash_pockets do
+  json.array!(@result.cash_pockets) do |pocket|
+    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    json.name pocket.name
+    json.balance adapter.balance
+    json.id pocket.id
+    json.base_currency do
+      json.symbol pocket.base_currency&.symbol
+      json.country_code pocket.base_currency&.country_code
+      json.id pocket.base_currency&.id
+    end
+  end
+end
 
 json.forwardable_users do
   forwardable_users = @result.forwardable_users

@@ -11,6 +11,7 @@
 #  account_code          :string(255)
 #  atm_withdrawal_pocket :boolean          default(FALSE)
 #  user_id               :integer
+#  base_currency_id      :integer
 #
 
 require 'test_helper'
