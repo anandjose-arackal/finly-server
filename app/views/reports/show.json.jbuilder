@@ -127,6 +127,15 @@ json.expense_sections sorted_expenses do |category|
       json.id expense.tds_slab&.id
       json.tds expense.tds_slab&.tds
     end
+
+    # adding pocket information for an expense
+    if expense.spent_from.present?
+      json.pocket do
+        json.pocket_name expense.spent_from&.name
+        json.pocket_id expense.spent_from&.id
+        json.pocket_balance expense.spent_from&.name
+      end
+    end
   end
 end
 

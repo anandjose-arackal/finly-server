@@ -1,4 +1,4 @@
-class AccountManager::CardTransferPockets::CashPocketsAdapter < AccountManager::BaseAdapter
+class AccountManager::CashPockets::CashPocketsAdapter < AccountManager::BaseAdapter
 
   def account_class
     UserPocket

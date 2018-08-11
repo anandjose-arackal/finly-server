@@ -125,7 +125,8 @@ class Expense::Base < BaseOperation
   # end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted, :conversion_rate, :em_tax_tracking, :tds_slabs
+    attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted, :conversion_rate, :em_tax_tracking, :tds_slabs,
+                  :user_pockets
 
     def init
       self.expense = params[:expense]
@@ -135,6 +136,7 @@ class Expense::Base < BaseOperation
       self.per_diems = retrieve_per_diems(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
+      self.cash_pockets = user.user_pockets.cash_pockets_only
     end
 
     def retrieve_per_diems(expense)
@@ -215,6 +217,5 @@ class Expense::Base < BaseOperation
     end
 
   end
-
 
 end
