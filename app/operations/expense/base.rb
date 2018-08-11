@@ -126,7 +126,7 @@ class Expense::Base < BaseOperation
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted, :conversion_rate, :em_tax_tracking, :tds_slabs,
-                  :user_pockets
+                  :cash_pockets
 
     def init
       self.expense = params[:expense]
