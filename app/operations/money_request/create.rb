@@ -51,7 +51,7 @@ class MoneyRequest::Create < MoneyRequest::Base
   private
   def create_params
     return {} unless params[:money_request].present?
-    params[:money_request].permit(:name, :required_by_date, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
+    params[:money_request].permit(:name, :required_by_date, :policy_id, :destination_pocket_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
   end
 
 end
