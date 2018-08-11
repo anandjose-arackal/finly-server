@@ -108,7 +108,7 @@ class Booking < ActiveRecord::Base
       data[:confirmed] = self.bookings.confirmed&.first
     end
     if self.confirmed?
-      data[:attachments] = self.booking_attachments
+      data[:attachments] = self.attachments
     end
     data
   end
