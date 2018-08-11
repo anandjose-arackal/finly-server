@@ -1,7 +1,7 @@
 class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
   attr_accessor :travel_request, :parent_booking,
                 :booking_parameters, :booking_attachments,
-                :destination, :travel_request
+                :destination, :travel_request, :request_params
 
   def authorized_user_types
     [:employee, :travel_manager]
@@ -16,15 +16,15 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
   end
 
   def init
-    request_params = params[:booking]
+    self.request_params = params[:booking]
     unless request_params.is_a?(Array)
-      request_params = [request_params]
+      self.request_params = [request_params]
     end
-    request_params.each do |p|
+    self.request_params.each do |p|
       p[:booking_status_id] = BookingStatus.id_for(params[:status])
     end
     self.booking_parameters = []
-    request_params.each do |param|
+    self.request_params.each do |param|
       self.booking_parameters << booking_params(param)
     end
 
@@ -78,7 +78,7 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
 
     return if has_errors?
 
-    self.params[:booking].each do |param|
+    self.request_params.each do |param|
       booking_param = booking_params param
       # Extracting booking attachments from params
       booking_attachments = user.company.booking_attachments.with_id(param[:booking_attachments])
@@ -89,7 +89,6 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
 
       if booking.valid?
         booking.save
-        debugger
         add_message :success, 'Successfully Added Booking'
         booking_attachments.update_all(booking_id: booking.id)
       else

@@ -20,9 +20,9 @@ class Booking < ActiveRecord::Base
   belongs_to :booking_type
   belongs_to :booking_status
   # belongs_to :booking_request
-  belongs_to :destination, class_name: 'TravelRequestDestination', dependent: :destroy
-  belongs_to :travel_request, dependent: :destroy
-  belongs_to :travel_request_comment, dependent: :destroy
+  belongs_to :destination, class_name: 'TravelRequestDestination'
+  belongs_to :travel_request
+  belongs_to :travel_request_comment
   belongs_to :created_by_user, class_name: 'User'
 
   has_many :bookings, foreign_key: :parent_booking_id
