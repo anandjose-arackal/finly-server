@@ -20,7 +20,7 @@ json.cash_pockets do
   json.array!(@result.cash_pockets) do |pocket|
     adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
     json.name pocket.name
-    json.balance adapter.balance
+    json.balance adapter.balance(display_balance: true)
     json.id pocket.id
   end
 end

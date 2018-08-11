@@ -58,6 +58,9 @@ class Expense::ExTime::Update < Expense::ExTime::Base
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
     end
+
+    pocket_id = self.updated_expense_params[:spent_from_id]
+    self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
   end
 
   def authorize
@@ -82,6 +85,9 @@ class Expense::ExTime::Update < Expense::ExTime::Base
         add_message :error, "You do not own this receipt"
       end
     end
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_availability_create(self.pocket, updated_expense_params)
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_update(updated_expense_params)

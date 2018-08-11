@@ -2326,6 +2326,9 @@ end
     resources :locations
   end
 
+  resources :user_pockets
+  get 'assignable_pockets', to: 'user_pockets#assignable_pockets'
+
   # get 'organization_account' => 'organization_account#show'
   get 'organization_account/sidebar_menu_config' => 'organization_account#sidebar_menu_config'
   get 'organization_account/policies_list' => 'organization_account#policies_list'

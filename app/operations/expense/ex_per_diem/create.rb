@@ -46,6 +46,9 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     if expense_params[:receipts_attributes] == [nil] or expense_params[:receipts_attributes] == ['']
       expense_params.delete(:receipts_attributes)
     end
+
+    pocket_id = self.expense_params[:spent_from_id]
+    self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
   end
 
   def validate
@@ -68,8 +71,13 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       end
     end
 
+    if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+      add_message :error, "Could not find pocket from which this expense was spent"
+      return
+    end
+
     # checking if the user has enough cash on hand balance to mark this expense against it
-    check_coh_availability_create(expense_params)
+    check_coh_availability_create(self.cash_pocket, expense_params)
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_create(expense_params)
