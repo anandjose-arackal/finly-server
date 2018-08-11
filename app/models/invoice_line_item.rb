@@ -23,6 +23,7 @@
 #  parent_id              :string(255)
 #  inventory_line_item_id :integer
 #  item_info              :text(65535)
+#  comment                :string(255)
 #
 
 class InvoiceLineItem < ActiveRecord::Base

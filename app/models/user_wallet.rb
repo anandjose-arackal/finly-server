@@ -14,8 +14,8 @@ class UserWallet < ActiveRecord::Base
   belongs_to :user
   belongs_to :balance, class_name: 'Amount'
 
-  has_many :initiating_payments, as: :initiating_account
-  has_many :receiving_payments, as: :receiving_account
+  has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
+  has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
   has_many :finly_transactions, as: :finly_account
   has_many :auto_reload_configs, as: :source_account
 

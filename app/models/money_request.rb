@@ -27,9 +27,8 @@
 #  auto_approve                       :boolean
 #  money_request_processor_mapping_id :integer
 #  approved_at                        :datetime
+#  destination_pocket_id              :integer
 #
-
-
 
 
 
@@ -50,6 +49,7 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :policy
   belongs_to :payment
   belongs_to :money_request_processor_mapping
+  belongs_to :destination_pocket, class_name: "UserPocket"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

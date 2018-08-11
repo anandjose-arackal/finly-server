@@ -40,3 +40,11 @@ end
 json.tds_slabs do
   json.array! @result.tds_slabs, :id, :name, :tds
 end
+
+json.cash_pockets do
+  json.array!(@result.cash_pockets) do |pocket|
+    json.name pocket.name
+    json.balance pocket.balance_value
+    json.id pocket.id
+  end
+end
