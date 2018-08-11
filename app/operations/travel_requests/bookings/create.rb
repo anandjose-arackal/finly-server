@@ -78,16 +78,18 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
 
     return if has_errors?
 
-    self.booking_parameters.each do |booking_param|
+    self.params[:booking].each do |param|
+      booking_param = booking_params param
       # Extracting booking attachments from params
-      booking_attachments = user.company.booking_attachments.with_id(booking_param[:booking_attachments])
-      booking = self.destination.bookings.build(booking_param.except(:booking_attachments))
+      booking_attachments = user.company.booking_attachments.with_id(param[:booking_attachments])
+      booking = self.destination.bookings.build(booking_param)
       booking.parent_booking = self.parent_booking
       booking.travel_request = self.travel_request
       booking.created_by_user = user
 
       if booking.valid?
         booking.save
+        debugger
         add_message :success, 'Successfully Added Booking'
         booking_attachments.update_all(booking_id: booking.id)
       else
