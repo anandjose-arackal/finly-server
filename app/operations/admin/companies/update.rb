@@ -33,7 +33,6 @@ class Admin::Companies::Update < Admin::Companies::Base
 
   def process
     unless company.update(company_update_params)
-      debugger
       add_message :error, company.errors.full_messages
     end
   end
