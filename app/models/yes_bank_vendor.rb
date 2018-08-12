@@ -86,8 +86,10 @@ class YesBankVendor < ActiveRecord::Base
   end
 
   def as_json(options={})
+    display_name = self.business_name || self.name
     {
         id: id,
+        display_name: display_name,
         name: name,
         created_at: created_at,
         email: email,

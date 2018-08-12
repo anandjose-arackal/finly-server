@@ -6,7 +6,9 @@ class Procurements::Mailers::SendMail < Procurements::Mailers::Base
       when 'PurchaseOrder'
         procurement = self.document&.procurement
         status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_sent))
-        procurement.status_tags << status_tag
+        unless procurement.status_tags.include? status_tag
+          procurement.status_tags << status_tag
+        end
 
     end
   end

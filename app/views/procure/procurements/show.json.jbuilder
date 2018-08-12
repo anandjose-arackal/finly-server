@@ -41,8 +41,6 @@ json.trail do
           json.id comment.user&.id
         end
       end
-
-
     end
 
     if item.is_a?(Invoice)
@@ -52,7 +50,6 @@ json.trail do
           json.id item.invoice_status&.id
           json.name item.invoice_status&.name
         end
-
         json.due_date item.due_date&.strftime("%b %d, %Y")
       end
 

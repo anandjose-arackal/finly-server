@@ -27,13 +27,19 @@ class ProcurementMailer < ApplicationMailer
   end
 
   # for explicitly sending to vendor or other people
-  def send_mail(document, options, user)
-    @document = document
-    @options = options
-    @user = user
+  def send_mail(presenter)
+    @data = presenter
+    @document = presenter.document
+    @purchase_order = presenter.document
+    @user = presenter.user
+    @company = @user.company
 
-    mail from: "#{@user.company.name} <noreply@finly.io>", :reply_to => "#{@user.email}", to: @options[:email_to],
-         bcc: @options[:email_bcc_to], subject: @options[:email_subject], template_name: 'mail_procurement'
+    @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id })
+    attachments["purchase_order-#{@document.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
+         render_to_string(pdf: "purchase-order-#{@document.po_number}", template: "export/purchase_order", layout: "pdf.html.erb", print_media_type: true)
+      )
+    mail from: "#{@user.company.name} <noreply@finly.io>", :reply_to => "#{@user.email}", to: @data.email_to,
+         bcc: @data.email_bcc_to, subject: @data.email_subject, template_name: 'mail_procurement'
   end
 
   # Automatically sent for purchase order actions
@@ -48,9 +54,12 @@ class ProcurementMailer < ApplicationMailer
       @curr_user = @data.user
       ########################################################
       attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(pdf: "report-#{@data.purchase_order.po_number}", template: "export/purchase_order", layout: "pdf.html.erb", print_media_type: true)
+         render_to_string(pdf: "purchase-order-#{@data.purchase_order.po_number}", template: "export/purchase_order", layout: "pdf.html.erb", print_media_type: true)
       )
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
     end
   end
 end
+
+
+

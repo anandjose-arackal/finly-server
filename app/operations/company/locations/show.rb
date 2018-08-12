@@ -3,7 +3,7 @@ class Company::Locations::Show < Company::Locations::Base
   def init
     super
     id = params[:id] || params[:location_id]
-    self.location = self.company.locations.find_by id: id
+    self.location = self.user.company.locations.find_by id: id
   end
 
   def validate

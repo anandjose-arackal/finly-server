@@ -72,9 +72,11 @@ views:
         - name: Procure
           type: group
           items:
+          <% if current_user.company.procurement_enabled? %>
           - name: Procurements
             id: procurements
             url: procurements
+          <% end %>
           - name: Inventory
             id: inventory
             url: inventory
@@ -132,9 +134,11 @@ views:
         - name: Procure
           type: group
           items:
+          <% if current_user.company.procurement_enabled? %>
           - name: Procurements
             id: procurements
             url: procurements
+          <% end %>
           - name: Inventory
             id: inventory
             url: inventory
@@ -187,9 +191,11 @@ views:
         - name: Procure
           type: group
           items:
+          <% if current_user.company.procurement_enabled? %>
           - name: Procurements
             id: procurements
             url: procurements
+          <% end %>
           - name: Inventory
             id: inventory
             url: inventory
@@ -226,9 +232,11 @@ views:
         - name: Procure
           type: group
           items:
+          <% if current_user.company.procurement_enabled? %>
           - name: Procurements
             id: procurements
             url: procurements
+          <% end %>
           - name: Inventory
             id: inventory
             url: inventory
@@ -265,9 +273,11 @@ views:
         - name: Procure
           type: group
           items:
+          <% if current_user.company.procurement_enabled? %>
           - name: Procurements
             id: procurements
             url: procurements
+          <% end %>
           - name: Inventory
             id: inventory
             url: inventory

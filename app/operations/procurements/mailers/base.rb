@@ -36,7 +36,11 @@ class Procurements::Mailers::Base < BaseOperation
   end
 
   def process
-    ProcurementMailer.delay.send_mail(document, email_options, user)
+    params[:document] = self.document
+    params[:email_options] = self.email_options
+    op = Procurements::Mailers::Base::MailerPresenter.new(user, params, messages)
+    # ProcurementMailer.delay.send_mail(document, email_options, user)
+    ProcurementMailer.delay.send_mail(op)
   end
 
   def post_process
@@ -48,9 +52,16 @@ class Procurements::Mailers::Base < BaseOperation
   end
 
   class Procurements::Mailers::Base::MailerPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :mailer
+    attr_accessor :document, :user, :email_to, :email_bcc_to, :email_subject, :email_body, :company
 
     def init
+      self.document = params[:document]
+      # self.purchase_order = params[:document]
+      self.email_body = params[:email_options][:email_body]
+      self.email_to = params[:email_options][:email_to]
+      self.email_bcc_to = params[:email_options][:email_bcc_to]
+      self.email_subject = params[:email_options][:email_subject]
+      self.company = user.company
     end
   end
 end

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= @document.class.name %></title>
+  <title>Purchase Order</title>
 </head>
 <body style="margin:0;">
 
@@ -11,38 +11,41 @@
       <img src="company_logo.png" style="float: left;" class="company-logo" width="75" height="auto">
     </div>
     <div style="width: 50%; height: auto; overflow: hidden; float:left;">
-      <span style="display: block; float: right; font-weight: 300; font-family: sans-serif; font-size: 16px; text-transform: capitalize; line-height: 1.5; color: #7b7b7b;">Thrusday, 12th Feb 2018</span>
+      <span style="display: block; float: right; font-weight: 300; font-family: sans-serif; font-size: 16px; text-transform: capitalize; line-height: 1.5; color: #7b7b7b;"><%= @document.created_at.strftime("%b %d %Y") %></span>
     </div>
   </div>
   <div style="width: 550px; height: auto; margin-left: auto; margin-right: auto; overflow: hidden; background-color: white !important;border:1px solid #c4c4c4; box-shadow: 0 10px 10px #c4c4c4;">
     <div style="width: 100%; height: 25px; background-color: #233e7285;"></div>
     <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 10px; border-bottom: 1px solid #c4c4c4;">
-      <img src="vendor-logo-flipkart.png" style="float: left;" class="company-logo" width="100" height="auto">
-      <span style="display: block; float: right; font-weight: bold; font-family: sans-serif; font-size: 22px; text-transform: capitalize; color: lightslategray;">Pseudo Inc. Ventures <br> <span style="font-size: 14px !important; font-weight: 300 !important; float: right; padding-right: 10px; color: #7b7b7b !important;">Bangalore,  India</span></span>
+      <% if @company.configuration.logo.present? %>
+        <img src="<%= @company.configuration.logo.url(:thumb) %>" style="float: left;" class="company-logo" width="100" height="auto">
+      <% else %>
+        <span style="font-weight: bold; font-family: sans-serif; font-size: 20px; text-transform: capitalize; color: lightslategray;"><%= @company.name %></span>
+      <% end %>
+
+      <span style="display: block; width: 250px; word-break: break-all; float: right; font-weight: bold; font-family: sans-serif; font-size: 18px; text-transform: capitalize; color: lightslategray;"><%= @document.vendor.name %> <br> <span style="font-size: 14px !important; font-weight: 300 !important; float: right; padding-right: 10px; color: #7b7b7b !important;"></span></span>
     </div>
 
     <!-- START -->
     <!-- SHOW THIS ONLY IF THE DOCUMENT TYPE IS 'E-WAY-BILL' -->
     <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 20px; border-bottom: 1px solid #c4c4c4; font-family: sans-serif; font-weight: 300;">
-      <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
+      <div style="width: 29%; border-right: 1px solid #c4c4c4; padding-left: 10px; padding-right: 10px; height: auto; overflow: hidden; float: left; text-align: center; word-break: break-all; display: list-item; min-height: 120px;">
         <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Document Number </span> <br>
-        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> AXNGSUNA71 </span>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> <%= @document.po_number %> </span>
       </div>
-      <div style="width: 0.31%; height: 54px; background-color: #c4c4c4; float: left;"></div>
-      <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
-        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Due Date </span> <br>
-        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> 9th July 2018 </span>
+      <div style="width: 29%; border-right: 1px solid #c4c4c4; padding-left: 10px; padding-right: 10px; height: auto; overflow: hidden; float: left; text-align: center; word-break: break-all; display: list-item; min-height: 120px;">
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Document Date </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> <%= @document.delivery_date %> </span>
       </div>
-      <div style="width: 0.33%; height: 54px; background-color: #c4c4c4; float: left"></div>
-      <div style="width:33.33%; height: auto; overflow: hidden; float: left; text-align: center;">
-        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Balance Due </span> <br>
-        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> &#8377; 10,872 </span>
+      <div style="width: 29%;padding-left: 10px; padding-right: 10px; height: auto; overflow: hidden; float: left; text-align: center; word-break: break-all; display: list-item; min-height: 120px;">
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Total Amount </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> &#8377; <%= @document.balance_amount.value %> </span>
       </div>
     </div>
     <!-- SHOW THIS ONLY IF THE DOCUMENT TYPE IS 'E-WAY-BILL' -->
     <!-- END -->
 
-    <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 20px; border-bottom: 1px solid #c4c4c4; font-family: sans-serif; font-weight: 300;">
+    <!-- <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 20px; border-bottom: 1px solid #c4c4c4; font-family: sans-serif; font-weight: 300;">
       <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
         <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Transportion Mode </span> <br>
         <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> Flight </span>
@@ -57,18 +60,10 @@
         <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Transporter ID </span> <br>
         <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;">213808HD9829</span>
       </div>
-    </div>
+    </div> -->
     <div style="width: 100%; height: auto; overflow: hidden; min-height: 300px;">
       <div style="width: 90%; margin-left: 5%; margin-right: 5%; height: auto; overflow: hidden; padding-top: 25px; color: #7b7b7b; font-size: 14px; margin-bottom:20px;">
-        Dear VCOMMISSION MEDIA PRIVATE LIMITED, <br> <br>
-
-        The Invoice for Replacement of cards is generated. <br><br>
-
-        You can do a direct transfer to the account number below. <br><br>
-
-        <span style="display: block; width: 100px; float: left;">Account No. :</span> &nbsp; 2225550898035761 <br>
-        <span style="display: block; width: 100px; float: left;">IFSC :</span> &nbsp; YESB0CMSNOC <br>
-        <span style="display: block; width: 100px; float: left;">Name :</span> &nbsp; JOUSKA TECH PRIVATE LIMITED <br>  <br>
+        <%= h @data.email_body %>
 
         Regards, <br>
         Finly Team, <br>

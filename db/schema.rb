@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180809091632) do
+ActiveRecord::Schema.define(version: 20180812081621) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -789,18 +789,20 @@ ActiveRecord::Schema.define(version: 20180809091632) do
   add_index "bookings", ["booking_type_id"], name: "index_bookings_on_booking_type_id", using: :btree
 
   create_table "branch_locations", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.string   "gstin",      limit: 255
-    t.string   "pan",        limit: 255
-    t.integer  "company_id", limit: 4
-    t.string   "address_1",  limit: 255
-    t.string   "address_2",  limit: 255
-    t.string   "city",       limit: 255
-    t.integer  "state_id",   limit: 4
-    t.string   "country",    limit: 255
-    t.string   "pin",        limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "name",                  limit: 255
+    t.string   "gstin",                 limit: 255
+    t.string   "pan",                   limit: 255
+    t.integer  "company_id",            limit: 4
+    t.string   "address_1",             limit: 255
+    t.string   "address_2",             limit: 255
+    t.string   "city",                  limit: 255
+    t.integer  "state_id",              limit: 4
+    t.string   "country",               limit: 255
+    t.string   "pin",                   limit: 255
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.string   "contact_name",          limit: 255
+    t.string   "contact_mobile_number", limit: 255
   end
 
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
@@ -2177,6 +2179,7 @@ ActiveRecord::Schema.define(version: 20180809091632) do
     t.boolean  "travel_request",                         default: false
     t.boolean  "budgeting_system",                       default: false
     t.boolean  "em_tax_tracking",                        default: false
+    t.boolean  "procurement",                            default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
