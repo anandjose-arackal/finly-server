@@ -98,6 +98,13 @@ class Expense::Manual::Create < Expense::Manual::Base
       Receipt::ReceiptEmails::ProcessEmail.call_async(user, receipt_email_id: self.expense.receipt_email.id)
     end
 
+    # calculate the equivalent amount in all currencies in the amounts table
+    if expense.date == DateUtils.local_date
+      expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+    else
+      expense.update_other_currencies
+    end
+
     Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
 
     # add comment in report if expense is added within report
@@ -116,13 +123,6 @@ class Expense::Manual::Create < Expense::Manual::Base
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?
       expense.receipts.update_all(to_be_transcribed: false)
-    end
-
-    # calculate the equivalent amount in all currencies in the amounts table
-    if expense.date == DateUtils.local_date
-      expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
-    else
-      expense.update_other_currencies
     end
 
     add_message :success, 'Expense created'

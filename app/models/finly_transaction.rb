@@ -76,6 +76,8 @@ class FinlyTransaction < ActiveRecord::Base
   scope :sort_date_desc, -> { unscope(:order).order(date: :desc, id: :desc) }
   scope :limit_to_one, -> { limit 1 }
 
+  after_save :set_sequence_number
+
   before_create do
     ref_id = payment&.reference_id
     if ref_id.blank?
@@ -84,8 +86,15 @@ class FinlyTransaction < ActiveRecord::Base
     self.transaction_reference_id = ref_id
   end
 
-  default_scope { order(id: :desc) }
+  default_scope { order(sequence_number: :desc) }
 
   delegate :credit?, :debit?, to: :transaction_type
+
+  def set_sequence_number
+    if sequence_number.blank?
+      self.sequence_number = id * 10
+      save
+    end
+  end
 
 end

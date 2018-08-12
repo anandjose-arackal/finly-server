@@ -5,6 +5,7 @@
 # controlling_for_user_id: if a user is submitting a report for someone else
 
 class Report::Submit < Report::Base
+  attr_accessor :has_violations
 
   def authorized_user_types
     return nil if params.present? and (params[:auto_approve] or params[:auto_submit])
@@ -44,13 +45,13 @@ class Report::Submit < Report::Base
     end
     # checking for blocking violations
     violations = Report::Violation.(user, report: report)
-    violations_present = false
+    blocking_violations_present = false
     violations.each do |key, value|
-      if value['expense_blocking'].present? or value['budget_blocking'].present?
-        violations_present = true
-      end
+      blocking_violations_present ||= (value['expense_blocking'].present? or value['budget_blocking'].present?)
+      self.has_violations ||= (blocking_violations_present or  value['budget_warning'].present? or value['expense_warning'].present?)
+      break if blocking_violations_present
     end
-    if violations_present
+    if blocking_violations_present
       add_message :error, 'Reports with blocking violations cannot be submitted'
     end
 
@@ -73,7 +74,7 @@ class Report::Submit < Report::Base
   end
 
   def process
-    presenter = User::Team::Review::NextReviewer.(report)
+    presenter = User::Team::Review::NextReviewer.(report, has_violations: self.has_violations)
     manager = presenter.user
     manager_role_id = presenter.role_id
     # If no manager assigned, auto approve the report

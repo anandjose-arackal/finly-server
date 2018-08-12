@@ -56,6 +56,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -765,6 +766,11 @@ class User < ActiveRecord::Base
     end
     # if none of the above conditions are satisfied
     false
+  end
+
+  def vehicle_rates_list
+    policies = self.policies
+    VehicleRate.with_policy_id(policies.pluck(:id))
   end
 
   # returns the list of per diems that the user has access to

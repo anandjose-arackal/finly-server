@@ -59,9 +59,10 @@ class User::AvailableExpenseTypes::Show < User::Base
   def process
     if report
       if policy
-        self.distance_config = {enabled: policy.distance_expense_enabled?,
-                                rate: policy.distance_expense_config.rate,
-                                default_category_id: policy.distance_expense_config.default_category_id
+        self.distance_config = {
+            enabled: policy.distance_expense_enabled?,
+            vehicle_rates: policy.vehicle_rates,
+            default_category_id: policy.distance_expense_config.default_category_id
         }
         self.time_config = {enabled: policy.time_expense_enabled?,
                             rate: policy.time_expense_config.rate,
@@ -86,7 +87,12 @@ class User::AvailableExpenseTypes::Show < User::Base
       # checks whether distance, time and per diem expenses are enabled for this particular report
     else
       # checks whether for this particular user the distance, time and per diem expenses are enabled
-      self.distance_config = {enabled: user.distance_expense_enabled?}
+      self.distance_config = {enabled: user.distance_expense_enabled?, vehicle_rates: []}
+      user.policies.each do |policy|
+        policy.vehicle_rates.each do |vehicle_rate|
+        self.distance_config[:vehicle_rates] << vehicle_rate.as_json
+        end
+      end
       self.time_config = {enabled: user.time_expense_enabled?}
       self.per_diem_config = {enabled: user.per_diem_expense_enabled?}
       if per_diem_config

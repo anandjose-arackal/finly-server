@@ -21,12 +21,13 @@ class PaymentOrderAttachment < ActiveRecord::Base
 
   CONTENT_TYPES = {content_type: []}
 
-  has_attached_file :attached_file, styles: lambda { |a| a.instance.style_format(a) }, default_url: '/assets/:style/missing.png'
+  has_attached_file :attached_file, styles: lambda {|a| a.instance.style_format(a)}, default_url: '/assets/:style/missing.png'
+
   # has_attached_file :attached_file, styles: {
   #         :thumb => ["500x500>", :png],
   #         :normal => ["1080x1080>", :png],
   #         :large => ["2160x2160>", :png]
   #     }, default_url: '/assets/:style/missing.png'
   validates_attachment :attached_file, content_type: CONTENT_TYPES
-  
+
 end

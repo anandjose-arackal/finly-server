@@ -36,20 +36,22 @@ class Receipt < ActiveRecord::Base
   validates :image, presence: true
 
   # Reference for adding more file types: http://stackoverflow.com/questions/20920212/generate-thumbnail-from-pdf-in-rails-paperclip
-  has_attached_file :image, styles: lambda { |a| a.instance.check_file_type }, #{large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"},
-                    default_url: '/assets/:style/missing.png'
+  has_attached_file :image, {
+      styles: lambda {|a| a.instance.check_file_type}, #{large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"},
+      default_url: '/assets/:style/missing.png'
+  }
   validates_attachment :image, content_type: {
       # content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document)
       content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)
   }
 
-  default_scope { order(created_at: :desc) }
+  default_scope {order(created_at: :desc)}
 
-  scope :with_user_id, -> (user_ids) { where user_id: user_ids }
-  scope :with_id, ->(id) { where id: id }
-  scope :without_parent, -> { where(parent_id: nil) }
-  scope :with_parent, -> { where.not(parent_id: nil) }
-  scope :with_expense_id, -> (expense_ids) { where(parent_type: 'Expense').where(parent_id: expense_ids) }
+  scope :with_user_id, -> (user_ids) {where user_id: user_ids}
+  scope :with_id, ->(id) {where id: id}
+  scope :without_parent, -> {where(parent_id: nil)}
+  scope :with_parent, -> {where.not(parent_id: nil)}
+  scope :with_expense_id, -> (expense_ids) {where(parent_type: 'Expense').where(parent_id: expense_ids)}
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     unless date_from.blank? && date_to.blank?
       type_val = :created_at
@@ -66,10 +68,10 @@ class Receipt < ActiveRecord::Base
     joins(:users).select('receipts.*').where(company_id: company_id)
   }
 
-  scope :filter_user, -> (user_id) { where user_id: user_id }
+  scope :filter_user, -> (user_id) {where user_id: user_id}
 
   # this scope is basically to separately retrieve receipts from companies that have OCR enabled
-  scope :untranscribed, -> { where(to_be_transcribed: true) }
+  scope :untranscribed, -> {where(to_be_transcribed: true)}
 
   def receipt_file_name
     self.image_file_name
@@ -114,18 +116,18 @@ class Receipt < ActiveRecord::Base
 
   def image_extension
     case image_content_type
-      when 'image/jpg', 'image/jpeg'
-        return 'jpg'
-      when 'image/png'
-        return 'png'
-      when 'image/gif'
-        return 'gif'
-      when 'application/pdf'
-        return 'pdf'
-      when 'application/rtf'
-        return 'rtf'
-      else
-        nil
+    when 'image/jpg', 'image/jpeg'
+      return 'jpg'
+    when 'image/png'
+      return 'png'
+    when 'image/gif'
+      return 'gif'
+    when 'application/pdf'
+      return 'pdf'
+    when 'application/rtf'
+      return 'rtf'
+    else
+      nil
     end
   end
 

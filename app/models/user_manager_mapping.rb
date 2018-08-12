@@ -17,6 +17,8 @@
 #  travel_manager_id             :integer
 #  travel_booking_selector_id    :integer
 #  travel_booking_approves_to_id :integer
+#  manager_violation_only        :boolean
+#  finance_violation_only        :boolean
 #
 
 
