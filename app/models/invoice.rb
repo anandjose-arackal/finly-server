@@ -71,7 +71,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :taxable_amount, class_name: "Amount"
   belongs_to :category
   belongs_to :cost_center
-  belongs_to :created_by, class_name: "User"
+  belongs_to :created_by, class_name: "User", foreign_key: :created_by_user_id
   belongs_to :company
   belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
   belongs_to :receiving_account, polymorphic: true

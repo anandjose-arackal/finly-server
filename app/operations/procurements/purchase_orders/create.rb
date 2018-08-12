@@ -33,6 +33,8 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
       self.procurement.status_tags << status_tag
 
+      CustomField::SetFields.(purchase_order, FieldParentType.id_for(:purchase_order), reset_fields: true, save: true)
+
     else
       add_message :error, purchase_order.errors.full_messages
     end

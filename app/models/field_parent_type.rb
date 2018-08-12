@@ -25,8 +25,18 @@ class FieldParentType < ActiveRecord::Base
       purchase_order: 12
   }
 
+  scope :with_name, -> (name) { where name: name }
   def self.id_for(sym)
     TYPES[sym]
+  end
+
+  def self.seed_data
+    c = self.count
+    TYPES.each do |name, id|
+      if c == 0 or self.with_name(name).blank?
+        self.create name: name
+      end
+    end
   end
 
   def self.expense_ids
