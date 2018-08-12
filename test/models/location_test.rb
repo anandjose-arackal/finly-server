@@ -13,6 +13,7 @@
 #  updated_at     :datetime         not null
 #  order          :integer
 #  maps_id        :string(255)
+#  is_deleted     :boolean          default(FALSE)
 #
 
 require 'test_helper'

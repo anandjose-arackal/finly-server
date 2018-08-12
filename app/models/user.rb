@@ -769,6 +769,11 @@ class User < ActiveRecord::Base
     false
   end
 
+  def vehicle_rates_list
+    policies = self.policies
+    VehicleRate.with_policy_id(policies.pluck(:id))
+  end
+
   # returns the list of per diems that the user has access to
   def per_diems_list
     per_diems = self.company.per_diems.active

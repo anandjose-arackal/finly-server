@@ -7,7 +7,7 @@
 #  field_type_id           :integer          not null
 #  mandatory               :boolean          default(FALSE), not null
 #  company_id              :integer          not null
-#  configurable_id         :integer          not null
+#  configurable_id         :integer
 #  configurable_type       :string(255)      not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
@@ -37,27 +37,31 @@ class FieldConfiguration < ActiveRecord::Base
   # Applicable for User, Policy, Company
   belongs_to :configurable, polymorphic: true
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
-  has_many :multiselect_items, class_name: "FieldMultiselectItem"
+  has_many :multiselect_items, class_name: 'FieldMultiselectItem'
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
   belongs_to :external_reference, polymorphic: true
   belongs_to :parent, polymorphic: true
+  has_many :policy_field_mappings
+  has_many :policies, through: :policy_field_mappings
 
   validates :field_name, presence: true
   validates :enabled, presence: true
   validates :field_type_id, presence: true
   validates :company_id, presence: true
   # validates :field_parent_type_id, presence: true
-  validates :configurable_id, presence: true
+  # validates :configurable_id, presence: true
   validates_uniqueness_of :field_key, :allow_blank => true, :scope => [:company_id], :case_sensitive => false
   validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company']} #, 'User']}
   validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiSelectSelection']}
   validate :validate_config
+  validate :field_parent_type_presence
 
   accepts_nested_attributes_for :drop_down_items
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :multiselect_items
   accepts_nested_attributes_for :field_parent_mappings
+  accepts_nested_attributes_for :policy_field_mappings
 
   scope :with_id, -> (id) {where id: id}
 
@@ -209,6 +213,15 @@ class FieldConfiguration < ActiveRecord::Base
   def validate_parent
     if !self.root_field && self.parent.blank?
       errors.add(:field_configuration, "cannot set a non-root custom field without a parent")
+    end
+  end
+
+  def field_parent_type_presence
+    if self.field_parent_mappings.blank?
+      errors.add(:field_configuration, "has not defined a parent")
+    end
+    if self.configurable_type&.downcase == 'policy' and self.policy_field_mappings.blank?
+      errors.add(:at_least, "one policy is required to create a custom field")
     end
   end
 

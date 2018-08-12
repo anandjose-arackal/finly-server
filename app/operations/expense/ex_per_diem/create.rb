@@ -107,10 +107,10 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     # calculate amount of the expense
     amount = expense.amount
     if amount.blank?
-      amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency: Currency.first)
+      amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency_id: expense.report.policy.base_currency_id)
       expense.update(amount: amount)
     else
-      amount.update(value: expense.calculate_amount_value(per_diem.configurable))
+      amount.update(value: expense.calculate_amount_value(per_diem.configurable), currency_id: expense.report.policy.base_currency_id)
 
       # calculate the equivalent amount in all currencies in the amounts table
       if expense.date == DateUtils.local_date

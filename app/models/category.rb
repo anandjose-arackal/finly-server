@@ -30,6 +30,7 @@
 
 
 
+
 class Category < ActiveRecord::Base
   has_ancestry
 
@@ -116,6 +117,13 @@ class Category < ActiveRecord::Base
 
   def gl_name
     gl_code || name
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
   end
 
   private

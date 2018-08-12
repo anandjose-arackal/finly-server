@@ -169,4 +169,9 @@ class ExpensesController < ApplicationController
     respond
   end
 
+  def currencies
+    @result = User::AvailableExpenseTypes::Show.(current_user, params)
+    respond
+  end
+
 end

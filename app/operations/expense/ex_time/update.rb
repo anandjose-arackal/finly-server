@@ -139,7 +139,7 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     # if the expense has an associated amount, update the amount
     if expense.amount.present? && expense.report.present?
       amount = expense.amount
-      amount.update(value: expense.calculate_amount_value(expense.report.policy))
+      amount.update(value: expense.calculate_amount_value(expense.report.policy), currency_id: expense.report.policy.base_currency_id)
     end
 
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
