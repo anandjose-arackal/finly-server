@@ -38,7 +38,7 @@ class BudgetRule < ActiveRecord::Base
 
   # delegate :period, to: :period
   delegate :type, to: :rule_type
-  delegate :amount_value, to: :amount
+  delegate :amount_value, to: :amount, allow_nil: true
   delegate :category_name, to: :category
 
   default_scope { unscope(:where)}

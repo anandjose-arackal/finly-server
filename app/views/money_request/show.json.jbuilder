@@ -23,11 +23,6 @@ json.card @result.card
 json.user_reports current_user.reports
 json.user_travel_requests current_user.travel_requests
 
-json.linked_report do
-  json.id @result.money_request.report&.id
-  json.name @result.money_request.report&.name
-end
-
 json.linked_travel_request do
   json.id @result.money_request.report&.travel_request&.id
   json.name @result.money_request.report&.travel_request&.name

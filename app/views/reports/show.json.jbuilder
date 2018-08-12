@@ -179,4 +179,3 @@ json.budgets do
 end
 
 json.user_travel_requests current_user.travel_requests
-json.user_money_requests current_user.money_requests
