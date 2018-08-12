@@ -25,7 +25,11 @@ class TravelRequests::Destroy < TravelRequests::Base
 
     self.travel_requests.each do |tr|
       unless tr.can_destroy?
-        add_message :error, "Travel request with #{tr.id} can only be deleted once it's retracted or rejected."
+        add_message :error, "Travel request with ID #{tr.trip_id} can only be deleted once it's retracted or rejected."
+        return
+      end
+      unless tr.bookings.blank?
+        add_message :error, "Travel request with ID #{tr.trip_id} can only be delete once all booking requests have been removed"
         return
       end
     end

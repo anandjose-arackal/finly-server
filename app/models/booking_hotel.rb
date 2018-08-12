@@ -33,6 +33,7 @@ class BookingHotel < ActiveRecord::Base
   validates :location, presence: true
   validates :checkin_date, presence: true
   validates :checkout_date, presence: true
+  validate :acceptable_dates?
 
   def as_json(options = {})
     {
@@ -45,7 +46,18 @@ class BookingHotel < ActiveRecord::Base
         checkout_time: DateUtils.time_formatted(checkout_time, military_time: true),
         description: description,
         hotel_address: hotel_address,
+        number_of_guests: number_of_guests,
         cost: cost
     }
   end
+
+  protected
+  def acceptable_dates?
+    return if checkin_date.blank?
+    return if checkout_date.blank?
+    unless checkin_date <= checkout_date
+      errors.add :checking_date, 'cannot be after checkout date'
+    end
+  end
+
 end

@@ -39,6 +39,7 @@ class TravelRequest < ActiveRecord::Base
   belongs_to :status, class_name: 'TravelRequestStatus'
   has_many :reports
   has_many :money_requests
+  has_many :bookings
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_user_role, class_name: 'UserRole'
@@ -59,6 +60,7 @@ class TravelRequest < ActiveRecord::Base
   validates :name, presence: true#, unless: :open?
   validates :from_date, presence: true
   validates :to_date, presence: true
+  validate :acceptable_dates?
 
   default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
@@ -115,6 +117,7 @@ class TravelRequest < ActiveRecord::Base
     names
   end
 
+
   def as_json(options = {})
     {
         id: id,
@@ -132,6 +135,16 @@ class TravelRequest < ActiveRecord::Base
         destinations: destinations,
         destinations_list: destinations_list
     }
+  end
+
+  protected
+
+  def acceptable_dates?
+    return if from_date.blank?
+    return if to_date.blank?
+    unless from_date <= to_date
+      errors.add :from_date, 'cannot be after to date'
+    end
   end
 
 end
