@@ -551,6 +551,8 @@
 #                                         policy_add_rule POST   /policies/:policy_id/add_rule(.:format)                                                      rules#create
 #                                      policy_remove_rule DELETE /policies/:policy_id/remove_rule(.:format)                                                   rules#destroy
 #                                      policy_description GET    /policies/:policy_id/description(.:format)                                                   policies#show_description
+#                                    policy_vehicle_rates POST   /policies/:policy_id/vehicle_rates(.:format)                                                 vehicle_rates#create
+#                                     policy_vehicle_rate DELETE /policies/:policy_id/vehicle_rates/:id(.:format)                                             vehicle_rates#destroy
 #                                                         GET    /policies(.:format)                                                                          policies#index
 #                                                         POST   /policies(.:format)                                                                          policies#create
 #                                              new_policy GET    /policies/new(.:format)                                                                      policies#new
@@ -890,6 +892,7 @@
 #                                                 welcome GET    /welcome(.:format)                                                                           home#welcome
 #                                                   about GET    /about(.:format)                                                                             home#about
 #                                               resources GET    /resources(.:format)                                                                         home#resources
+#                                              currencies GET    /currencies(.:format)                                                                        expenses#currencies
 #                                   autocomplete_merchant GET    /autocomplete/merchant(.:format)                                                             autocomplete#merchant
 #                                       autocomplete_user GET    /autocomplete/user(.:format)                                                                 autocomplete#user
 #                                       autocomplete_card GET    /autocomplete/card(.:format)                                                                 autocomplete#card

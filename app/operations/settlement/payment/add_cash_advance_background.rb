@@ -44,6 +44,12 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
     # setting the initiating account based on what is sent from the front end
     self.initiating_account = retrieve_initiating_account(payment_param[:initiating_account_type])
     self.receiving_account = retrieve_receiving_account(payment_param[:receiving_account_type])
+
+    if self.initiating_account.blank?
+      add_message :error, "Destination pocket / bank account does not exist"
+      return
+    end
+
     self.payment_purpose = :cash_advance
 
     # this is creating the payment request for crediting money to the bank account, if at all they choose to
@@ -92,7 +98,8 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
         id = payment_param[:receiving_account_id]
         return to_user.bank_accounts.find_by(id: id)
       when 2, '2' # i.e. outside of Finly
-        return to_user.cash_on_hand
+        id = params[:destination_pocket_id]
+        return to_user.user_pockets.cash_pockets_only.find_by(id: id)
       else
         # do nothing?
     end

@@ -4,7 +4,7 @@ class UserPockets::AssignablePockets < UserPockets::Base
 
   def init
     selected_user_id = params[:id] || params[:selected_user_id]
-    self.selected_user = company.users.find_by(id: selected_user_id)
+    self.selected_user = current_company.users.find_by(id: selected_user_id)
     self.selected_user = user if self.selected_user.blank?
     self.existing_pockets = self.selected_user.user_pockets
   end
@@ -17,6 +17,7 @@ class UserPockets::AssignablePockets < UserPockets::Base
 
   def success
     params[:pocket_templates] = self.pocket_templates
+    UserPockets::AssignablePockets::PocketsPresenter.new(user, params, messages)
   end
 
   class UserPockets::AssignablePockets::PocketsPresenter < BaseOperation::BasePresenter::SuccessPresenter

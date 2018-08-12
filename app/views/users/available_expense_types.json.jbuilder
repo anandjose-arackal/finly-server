@@ -47,5 +47,12 @@ json.cash_pockets do
     json.name pocket.name
     json.balance adapter.balance(display_balance: true)
     json.id pocket.id
+
+    currency = pocket.base_currency
+    json.base_currency do
+      json.symbol currency&.symbol
+      json.country_code currency&.country_code
+      json.id currency&.id
+    end
   end
 end
