@@ -612,6 +612,16 @@
 #                                                         PATCH  /companies/:id(.:format)                                                                     companies#update
 #                                                         PUT    /companies/:id(.:format)                                                                     companies#update
 #                                                         DELETE /companies/:id(.:format)                                                                     companies#destroy
+#                                            user_pockets GET    /user_pockets(.:format)                                                                      user_pockets#index
+#                                                         POST   /user_pockets(.:format)                                                                      user_pockets#create
+#                                         new_user_pocket GET    /user_pockets/new(.:format)                                                                  user_pockets#new
+#                                        edit_user_pocket GET    /user_pockets/:id/edit(.:format)                                                             user_pockets#edit
+#                                             user_pocket GET    /user_pockets/:id(.:format)                                                                  user_pockets#show
+#                                                         PATCH  /user_pockets/:id(.:format)                                                                  user_pockets#update
+#                                                         PUT    /user_pockets/:id(.:format)                                                                  user_pockets#update
+#                                                         DELETE /user_pockets/:id(.:format)                                                                  user_pockets#destroy
+#                                                         GET    /assignable_pockets/:selected_user_id(.:format)                                              user_pockets#assignable_pockets
+#                                           assign_pocket POST   /assign_pockets(.:format)                                                                    user_pockets#assign_pocket
 #                organization_account_sidebar_menu_config GET    /organization_account/sidebar_menu_config(.:format)                                          organization_account#sidebar_menu_config
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                                organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                   organization_account#categories
@@ -2327,7 +2337,8 @@ end
   end
 
   resources :user_pockets
-  get 'assignable_pockets', to: 'user_pockets#assignable_pockets'
+  get 'assignable_pockets/:selected_user_id', to: 'user_pockets#assignable_pockets'
+  post 'assign_pockets', to: 'user_pockets#assign_pocket', as: :assign_pocket
 
   # get 'organization_account' => 'organization_account#show'
   get 'organization_account/sidebar_menu_config' => 'organization_account#sidebar_menu_config'

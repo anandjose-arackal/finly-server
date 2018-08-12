@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180811150801) do
+ActiveRecord::Schema.define(version: 20180812034638) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1436,6 +1436,17 @@ ActiveRecord::Schema.define(version: 20180811150801) do
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
+
+  create_table "company_pocket_templates", force: :cascade do |t|
+    t.string   "name",                limit: 255
+    t.integer  "company_id",          limit: 4
+    t.integer  "user_pocket_type_id", limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "company_pocket_templates", ["company_id"], name: "index_company_pocket_templates_on_company_id", using: :btree
+  add_index "company_pocket_templates", ["user_pocket_type_id"], name: "index_company_pocket_templates_on_user_pocket_type_id", using: :btree
 
   create_table "company_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -4724,15 +4735,16 @@ ActiveRecord::Schema.define(version: 20180811150801) do
   end
 
   create_table "user_pockets", force: :cascade do |t|
-    t.string   "name",                  limit: 255
-    t.integer  "balance_id",            limit: 4
-    t.integer  "user_pocket_type_id",   limit: 4
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
-    t.string   "account_code",          limit: 255
-    t.boolean  "atm_withdrawal_pocket",             default: false
-    t.integer  "user_id",               limit: 4
-    t.integer  "base_currency_id",      limit: 4
+    t.string   "name",                       limit: 255
+    t.integer  "balance_id",                 limit: 4
+    t.integer  "user_pocket_type_id",        limit: 4
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.string   "account_code",               limit: 255
+    t.boolean  "atm_withdrawal_pocket",                  default: false
+    t.integer  "user_id",                    limit: 4
+    t.integer  "base_currency_id",           limit: 4
+    t.integer  "company_pocket_template_id", limit: 4
   end
 
   add_index "user_pockets", ["balance_id"], name: "index_user_pockets_on_balance_id", using: :btree
@@ -5252,6 +5264,8 @@ ActiveRecord::Schema.define(version: 20180811150801) do
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_kyc_trails", "company_kycs"
   add_foreign_key "company_kycs", "companies"
+  add_foreign_key "company_pocket_templates", "companies"
+  add_foreign_key "company_pocket_templates", "user_pocket_types"
   add_foreign_key "company_tags", "companies"
   add_foreign_key "cost_centers", "companies"
   add_foreign_key "custom_fields", "field_configurations"

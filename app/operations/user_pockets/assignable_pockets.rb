@@ -1,26 +1,30 @@
 class UserPockets::AssignablePockets < UserPockets::Base
 
-  attr_accessor :pockets, :existing_pockets
+  attr_accessor :pocket_templates, :existing_pockets, :selected_user
 
   def init
-    self.existing_pockets = user.user_pockets
+    selected_user_id = params[:id] || params[:selected_user_id]
+    self.selected_user = company.users.find_by(id: selected_user_id)
+    self.selected_user = user if self.selected_user.blank?
+    self.existing_pockets = self.selected_user.user_pockets
   end
 
   def process
-    pocket_ids = user.company.user_pockets.pluck(:id) - self.existing_pockets.pluck(:id)
-    self.pockets = UserPocket.with_id(pocket_ids)
+    pocket_template_ids = user.company.company_pocket_templates
+    applicable_pocket_templates = pocket_template_ids - self.existing_pockets.pluck(:company_pocket_template_id)
+    self.pocket_templates = CompanyPocketTemplate.with_id(applicable_pocket_templates)
   end
 
   def success
-    params[:pockets] = self.pockets
+    params[:pocket_templates] = self.pocket_templates
   end
 
   class UserPockets::AssignablePockets::PocketsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :pockets
+    attr_accessor :pocket_templates
 
     def init
-      self.pockets = params[:pockets]
+      self.pocket_templates = params[:pocket_templates]
     end
   end
 end

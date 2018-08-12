@@ -2,16 +2,17 @@
 #
 # Table name: user_pockets
 #
-#  id                    :integer          not null, primary key
-#  name                  :string(255)
-#  balance_id            :integer
-#  user_pocket_type_id   :integer
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#  account_code          :string(255)
-#  atm_withdrawal_pocket :boolean          default(FALSE)
-#  user_id               :integer
-#  base_currency_id      :integer
+#  id                         :integer          not null, primary key
+#  name                       :string(255)
+#  balance_id                 :integer
+#  user_pocket_type_id        :integer
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  account_code               :string(255)
+#  atm_withdrawal_pocket      :boolean          default(FALSE)
+#  user_id                    :integer
+#  base_currency_id           :integer
+#  company_pocket_template_id :integer
 #
 
 class UserPocket < ActiveRecord::Base
@@ -20,6 +21,7 @@ class UserPocket < ActiveRecord::Base
   belongs_to :balance, class_name: "Amount"
   belongs_to :user
   belongs_to :base_currency, class_name: "Currency"
+  belongs_to :company_pocket_template
 
   validates :user, presence: true
   validates :user_pocket_type, presence: true
@@ -36,6 +38,10 @@ class UserPocket < ActiveRecord::Base
   }
   scope :bank_transfer_pockets_only, -> {
     where user_pocket_type_id: UserPocketType.id_for(:bank_transfer)
+  }
+
+  scope :atm_withdrawal_pockets, -> {
+    where atm_withdrawal_pocket: true
   }
 
   def blocked_amount_for_pending_payments(excluded_payment_order_id = nil)
