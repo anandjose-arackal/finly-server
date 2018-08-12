@@ -417,6 +417,10 @@ class BaseOperation
     is_view?(:finance) or is_view? :finance_manager or is_view?(:creditor)
   end
 
+  def travel_manager_view?
+    is_view?(:travel_manager)
+  end
+
   def auditor_view?
     is_view?(:auditor)
   end

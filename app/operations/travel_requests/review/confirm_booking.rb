@@ -27,9 +27,12 @@ class TravelRequests::Review::ConfirmBooking < TravelRequests::Review::Base
       add_message :error, 'You cannot perform this action at the moment'
       return
     end
-    unless travel_request.booking_pending? or travel_request.selection_confirmed?
+    unless travel_request.booking_pending? or travel_request.processing? or travel_request.selection_confirmed?
       add_message :error, 'You cannot perform this action at the moment'
       return
+    end
+    unless travel_request.bookings.confirmed.present?
+      add_message :error, 'Please add atleast one booking to mark as completed'
     end
     # todo status validation
     # validate if necessary booking requests with unselected options are available

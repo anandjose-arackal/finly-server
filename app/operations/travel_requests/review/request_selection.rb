@@ -19,6 +19,12 @@ class TravelRequests::Review::RequestSelection < TravelRequests::Review::Base
       add_message :error, 'You cannot perform this action at the moment'
       return
     end
+
+    unless self.travel_request.bookings.options.present?
+      add_message :error, 'Please add atleast one option to request for selection'
+      return
+    end
+
     # todo status validation
     # validate if necessary booking requests with unselected options are available
   end

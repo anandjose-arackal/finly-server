@@ -66,7 +66,7 @@ class TravelRequests::Show < TravelRequests::Base
 
       if travel_manager_view? or admin_view?
         # Request selection, Confirm Booking
-        if travel_request.booking_pending? and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:travel_manager)
+        if (travel_request.booking_pending? or travel_request.processing?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:travel_manager)
           actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:request_selection] = {method: 'patch', type: 9, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:confirm_booking] = {method: 'patch', type: 11, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
@@ -149,7 +149,7 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_add_request?
-      return true if can_add_booking?
+      # return true if can_add_booking?
       personal_view? and (travel_request.open? || self.travel_request.rejected? || self.travel_request.retracted?) and travel_request.user_id == user.id
     end
 

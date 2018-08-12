@@ -25,7 +25,7 @@ class Booking < ActiveRecord::Base
   belongs_to :travel_request_comment
   belongs_to :created_by_user, class_name: 'User'
 
-  has_many :bookings, foreign_key: :parent_booking_id
+  has_many :bookings, foreign_key: :parent_booking_id, dependent: :destroy
   belongs_to :parent_booking, class_name: 'Booking'
 
   has_many :travel_members, dependent: :destroy

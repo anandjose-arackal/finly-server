@@ -10,6 +10,13 @@ class TravelRequests::Bookings::Destroy < TravelRequests::Bookings::Base
     self.booking = booking_presenter.booking
   end
 
+  def validate
+    if self.booking.bookings.confirmed.present?
+      add_message :error, 'Please mark the ticket as cancelled before deleting booking request'
+      return
+    end
+  end
+
   def process
     unless self.booking.destroy
       add_message :error, self.booking.errors.full_messages
