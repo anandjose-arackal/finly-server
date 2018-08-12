@@ -28,6 +28,8 @@ class Location < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
   scope :with_order, -> (order){ where order: order }
 
+  validates :name, presence: true
+
   def as_json(options={})
     {
         id: id,

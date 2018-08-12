@@ -28,8 +28,8 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
     self.booking.assign_attributes(booking_parameters)
     self.booking.created_by_user = user
     if self.booking.valid?
+      old_travel_members.without_id_nil.destroy_all # Jugaad as travel members are being created every time
       self.booking.save
-      # old_travel_members.destroy_all # Jugaad as travel members are being created every time
       add_message :success, 'Successfully Updated Booking'
 
       booking_old_attachments.update_all(booking_id: nil)

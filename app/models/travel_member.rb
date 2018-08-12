@@ -27,4 +27,6 @@ class TravelMember < ActiveRecord::Base
 
   belongs_to :booking
   belongs_to :booking_request
+
+  scope :without_id_nil, -> { where.not id: nil }
 end
