@@ -144,11 +144,11 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_add_booking?
-      travel_manager_view? and travel_request.controlling_user_id == user.id and user.travel_manager?
+      travel_manager_view? and (travel_request.controlling_user_id == user.id || travel_request.controlling_user_id == nil) and user.travel_manager?
     end
 
     def can_add_options?
-      can_add_booking?
+      can_add_booking? and not travel_request.controlling_user_id == nil
     end
 
     def can_add_request?
@@ -164,7 +164,7 @@ class TravelRequests::Show < TravelRequests::Base
       if self.travel_request.open? || self.travel_request.rejected? || self.travel_request.retracted?
         return true if self.travel_request.user_id == self.user.id and personal_view?
       else
-        return true if self.travel_request.controlling_user_id == user.id and travel_request.processing?
+        return true if self.travel_request.controlling_user_id == user.id and travel_manager_view?
         return true if travel_manager_view? and self.travel_request.controlling_user_id.blank?
       end
       false
@@ -178,8 +178,9 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_create_money_requests?
-      return false unless self.travel_request.to_date <= Date.today
+      # return false unless self.travel_request.to_date <= Date.today
       return false if travel_request.reports.present?
+      return false if travel_manager_view?
       true
     end
 
@@ -217,8 +218,8 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def alert_for(booking)
-      highlighted = false
-      message = nil
+      highlighted = true
+      message = 'No bookings or options have been added'
       if travel_request.controlling_user_id == user.id
         if travel_manager_view?
           if travel_request.processing? or travel_request.approved?
@@ -227,7 +228,7 @@ class TravelRequests::Show < TravelRequests::Base
               message = 'No bookings or options have been added'
             end
           elsif travel_request.selection_confirmed?
-            if booking.selected_for_booking.present?
+            if booking.bookings.selected_for_booking.present?
               highlighted = true
               message = 'Option selected. Awaiting booking'
             end
