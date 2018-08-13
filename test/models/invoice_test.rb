@@ -46,11 +46,6 @@
 #  receiving_account_type :string(255)
 #  note                   :text(65535)
 #  remaining_amount_id    :integer
-#  invoice_type_id        :integer
-#  procurement_id         :integer
-#  location_id            :integer
-#  delivery_location_id   :integer
-#  payment_term_id        :integer
 #
 
 require 'test_helper'

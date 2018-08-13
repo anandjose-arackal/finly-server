@@ -23,17 +23,18 @@ class TimeExpenseConfig < ActiveRecord::Base
   validate :rate_exists_for_enabled
   validates :policy_id, presence: true
 
+  def rate
+    return nil if super.nil?
+    Amount.new(value: super.value, currency: policy.base_currency)
+  end
+
   def default_category_name
-    if self.default_category_id
-      return Category.find(default_category_id).name
-    else
-      ""
-    end
+    default_category&.name || ''
   end
 
   def rate_value
     if self.enabled
-      return self.rate.send(self.policy.base_currency.country_code)
+      return self.rate.value
     else
       return nil
     end

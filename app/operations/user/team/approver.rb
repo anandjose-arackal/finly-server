@@ -28,7 +28,22 @@ class User::Team::Approver < User::Team::Base
   end
 
   def process
-    obj = self.mappings.send(params[:type]).policy(self.policy_id).with_purpose(self.purpose_id).amount(self.currency_id, self.amount_value).first.send(params[:type]) rescue nil
+    mapping = self.mappings.send(params[:type]).policy(self.policy_id).with_purpose(self.purpose_id).amount(self.currency_id, self.amount_value).first rescue nil
+
+    # Handling condition where approver is required only if violations exists
+    unless params[:has_violations]
+      case params[:type]
+      when :manager
+        mapping = nil if mapping&.manager_violation_only
+      when :finance_manager
+        mapping = nil if mapping&.finance_violation_only
+      else
+        # Nothing
+      end
+    end
+
+    obj = mapping&.send(params[:type]) rescue nil
+
     return nil unless obj.present?
     # first checking if this user has a delegated user
     # if so, return delegate, otherwise return regular

@@ -43,8 +43,6 @@
 
 
 
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -92,76 +90,77 @@ class Report < ActiveRecord::Base
   validate :controller_has_role
   validates :policy_id, presence: true
 
-  default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
+  default_scope {order(report_status_id: :asc, submitted_at: :desc, created_at: :desc)}
 
-  scope :with_id, ->(id) { where id: id }
-  scope :without_id, ->(id) { where.not id: id }
-  scope :with_policy, ->(policy_id) { where policy_id: policy_id }
-  scope :with_policy_id, ->(policy_id) { where policy_id: policy_id }
-  scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :with_user_id, ->(user_id) { where user_id: user_id }
-  scope :non_archived, -> { where.not archived: false }
-  scope :archived, -> { where archived: true }
-  scope :with_amount, -> { joins :reimbursable_expenses_total }
-  scope :with_reimbursable_expenses_total, -> { joins :reimbursable_expenses_total }
-  scope :with_non_reimbursable_expenses_total, -> { joins :non_reimbursable_expenses_total }
-  scope :with_card_expenses_total, -> { joins :card_expenses_total }
-  scope :with_status_id, ->(id) { where report_status_id: id }
-  scope :open, -> { where report_status_id: ReportStatus.open_id }
-  scope :approved, -> { where report_status_id: ReportStatus.approved_id }
-  scope :closed, -> { where report_status_id: ReportStatus.closed_id }
-  scope :submitted_after, ->(date) { where 'submitted_at > ?', date }
-  scope :settled, -> { where report_status_id: ReportStatus.settled_id }
-  scope :settlement_confirmed, -> { where report_status_id: ReportStatus.settlement_confirmed_id }
-  scope :processing, -> { where report_status_id: ReportStatus.processing_id }
-  scope :processed, -> { where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id] }
-  scope :completed, -> { where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id] }
-  scope :accounted, -> { where accounted: true }
-  scope :owner, ->(user_id) { where user_id: user_id }
-  scope :non_owner, ->(user_id) { where.not user_id: user_id }
-  scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
-  scope :not_open, -> { where.not report_status_id: ReportStatus.open_id }
-  scope :include_user, -> { includes :user }
-  scope :without_payment, -> { where reimbursement_id: nil }
-  scope :pending_settlement, -> { where(report_status_id: ReportStatus.approved_id).where(accounted: false) }
-  scope :with_controlling_user_id, ->(user_id) { where controlling_user_id: user_id }
+  scope :with_id, ->(id) {where id: id}
+  scope :without_id, ->(id) {where.not id: id}
+  scope :with_policy, ->(policy_id) {where policy_id: policy_id}
+  scope :with_policy_id, ->(policy_id) {where policy_id: policy_id}
+  scope :with_user, ->(user_id) {where user_id: user_id}
+  scope :with_user_id, ->(user_id) {where user_id: user_id}
+  scope :non_archived, -> {where.not archived: false}
+  scope :archived, -> {where archived: true}
+  scope :with_amount, -> {joins :reimbursable_expenses_total}
+  scope :with_reimbursable_expenses_total, -> {joins :reimbursable_expenses_total}
+  scope :with_non_reimbursable_expenses_total, -> {joins :non_reimbursable_expenses_total}
+  scope :with_card_expenses_total, -> {joins :card_expenses_total}
+  scope :with_status_id, ->(id) {where report_status_id: id}
+  scope :open, -> {where report_status_id: ReportStatus.open_id}
+  scope :approved, -> {where report_status_id: ReportStatus.approved_id}
+  scope :closed, -> {where report_status_id: ReportStatus.closed_id}
+  scope :submitted_after, ->(date) {where 'submitted_at > ?', date}
+  scope :settled, -> {where report_status_id: ReportStatus.settled_id}
+  scope :settlement_confirmed, -> {where report_status_id: ReportStatus.settlement_confirmed_id}
+  scope :processing, -> {where report_status_id: ReportStatus.processing_id}
+  scope :processing_and_above, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id,ReportStatus.processing_id]}
+  scope :processed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id]}
+  scope :completed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
+  scope :accounted, -> {where accounted: true}
+  scope :owner, ->(user_id) {where user_id: user_id}
+  scope :non_owner, ->(user_id) {where.not user_id: user_id}
+  scope :with_controlling_user_role, -> (role_id) {where controlling_user_role_id: role_id}
+  scope :not_open, -> {where.not report_status_id: ReportStatus.open_id}
+  scope :include_user, -> {includes :user}
+  scope :without_payment, -> {where reimbursement_id: nil}
+  scope :pending_settlement, -> {where(report_status_id: ReportStatus.approved_id).where(accounted: false)}
+  scope :with_controlling_user_id, ->(user_id) {where controlling_user_id: user_id}
 
   # todo - having issues, where amounts are not matching actual expense amounts
-  scope :expenses_total, -> { joins(expenses: :amount).sum(:INR) }
+  scope :expenses_total, -> {joins(expenses: :amount).sum(:INR)}
   # todo - having issues, where amounts are not matching actual reimbursements amounts
   scope :expenses_reimbursable_total, -> do
     # joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.INR')
     ids = pluck(:id)
     Expense.with_report_id(ids).reimbursable.sum_reimbursements
   end
-  scope :group_user_id, -> { group 'reports.user_id' }
-  scope :group_user, -> { group :user }
-  scope :joins_user, -> { joins  :user }
-  scope :include_reimbursable_user_accounts, -> { includes user: [:bank_accounts, :reimbursement_cards] }
-  scope :sort_by_updated_at, -> { unscope(:order).order(updated_at: :desc) }
-  scope :without_associated_processor, -> { where report_processor_group_mapping_id: nil }
+  scope :group_user_id, -> {group 'reports.user_id'}
+  scope :group_user, -> {group :user}
+  scope :joins_user, -> {joins :user}
+  scope :include_reimbursable_user_accounts, -> {includes user: [:bank_accounts, :reimbursement_cards]}
+  scope :sort_by_updated_at, -> {unscope(:order).order(updated_at: :desc)}
+  scope :without_associated_processor, -> {where report_processor_group_mapping_id: nil}
 
-  scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)] ) }
+  scope :unsubmitted, -> {where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)])}
 
-  scope :with_approved_at_range, -> (start_time, end_time) { where('approved_at >= ? and approved_at <= ?', start_time, end_time) }
+  scope :with_approved_at_range, -> (start_time, end_time) {where('approved_at >= ? and approved_at <= ?', start_time, end_time)}
 
   # scope for reports being shown in settlements page
-  scope :settlement_viewable, -> { where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id] }
+  scope :settlement_viewable, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
 
-  scope :processed, -> { where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id] }
-  scope :settled_and_closed, -> { where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id] }
+  scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
+  scope :settled_and_closed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
 
-  scope :filter_status, ->(status_id) { where report_status_id: status_id }
-  scope :filter_user_id, ->(id) { where(user_id: id) }
-  scope :filter_report_id, ->(id) { where(id: id) }
+  scope :filter_status, ->(status_id) {where report_status_id: status_id}
+  scope :filter_user_id, ->(id) {where(user_id: id)}
+  scope :filter_report_id, ->(id) {where(id: id)}
   scope :filter_search, ->(value) do
     # user_ids = self.pluck(:id)
     # user_ids = User.with_id(user_ids).where("name like :value OR email like :value", value: "%#{value}%").pluck(:id)
     reports = arel_table
     where(reports[:name].matches("%#{value}%").or(reports[:id].eq(value)))
   end
-  scope :filter_mapping_id, -> (id) { where report_processor_group_mapping_id: id }
-  scope :pluck_mapping_id, -> { pluck :report_processor_group_mapping_id }
+  scope :filter_mapping_id, -> (id) {where report_processor_group_mapping_id: id}
+  scope :pluck_mapping_id, -> {pluck :report_processor_group_mapping_id}
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
     unless date_from.blank? && date_to.blank?
@@ -198,31 +197,32 @@ class Report < ActiveRecord::Base
       where(reports[:approved_at].gteq(date_from).and(reports[:approved_at].lteq(date_to)))
     end
   end
-  scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
+  scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
 
-  scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
+  scope :sort_for_personal, -> {joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
 
-  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
-  scope :not_destroyable, -> { where.not report_status_id: ReportStatus.ids_for([:open, :rejected, :retracted]) }
-  scope :without_user, -> (user_id) { where.not user_id: user_id }
+  scope :awaiting_approval_of_user, ->(user_id, role_id) {where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id)}
+  scope :not_destroyable, -> {where.not report_status_id: ReportStatus.ids_for([:open, :rejected, :retracted])}
+  scope :without_user, -> (user_id) {where.not user_id: user_id}
 
-  scope :includes_export, -> { includes({expenses:[:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
-                                               :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
-                                               {card_expense: [custom_fields: [:field_configuration]]},
-                                               {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
-                                               {time_expense: [custom_fields: [:field_configuration]]},
-                                               {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
-                                               {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]]) }
+  scope :includes_export, -> {includes({expenses: [:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
+                                                   :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
+                                                   {card_expense: [custom_fields: [:field_configuration]]},
+                                                   {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
+                                                   {time_expense: [custom_fields: [:field_configuration]]},
+                                                   {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
+                                                   {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]])}
 
-  scope :includes_user, -> { includes :user }
-  scope :includes_tracks, -> { includes :tracks }
-  scope :not_settled, -> { where report_processor_group_mapping_id: nil }
-  scope :with_processor_group_mapping, -> (id) { where report_processor_group_mapping_id: id }
+  scope :includes_user, -> {includes :user}
+  scope :includes_tracks, -> {includes :tracks}
+  scope :includes_policy, -> {includes :policy}
+  scope :not_settled, -> {where report_processor_group_mapping_id: nil}
+  scope :with_processor_group_mapping, -> (id) {where report_processor_group_mapping_id: id}
 
   scope :filter_custom_drop_down_selection, ->(drop_down_item_id) do
     drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
     configs = CustomField.with_drop_down_selection(drop_down_selection_ids).includes_parent.with_parent_report
-    report_ids = configs.map { |item| item.parent&.id }
+    report_ids = configs.map {|item| item.parent&.id}
     with_id(report_ids)
   end
 
@@ -348,30 +348,32 @@ class Report < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
-  def total_amount(options=[])
+  def total_amount(types = [], options = {})
     return 0 unless self.expenses.present?
     temp_expenses = self.expenses
-    if options.present?
-      options = [options] unless options.kind_of?(Array)
-      if options.present?
-        options.each do |item|
+    if types.present?
+      types = [types] unless types.kind_of?(Array)
+      if types.present?
+        types.each do |item|
           temp_expenses = temp_expenses.send(item.to_sym) if item.present? and temp_expenses.respond_to?(item.to_sym)
         end
       end
     end
-    precision_value(temp_expenses.with_amount.sum(self.base_currency_code.to_sym))
+    currency_code = options&.dig(:currency_code) || self.base_currency_code
+    precision_value(temp_expenses.with_amount.sum(currency_code.to_sym))
   end
 
-  def reimbursable_expenses
-    total_amount([:reimbursable]) - total_tds_amount
+  def reimbursable_expenses(options = {})
+    total_amount([:reimbursable], options) - total_tds_amount(options)
   end
 
-  def non_reimbursable_expenses
-    total_amount(:non_reimbursable)
+  def non_reimbursable_expenses(options = {})
+    total_amount([:non_reimbursable], options)
   end
 
-  def total_tds_amount
-    self.expenses.with_expense_tax_type_id(ExpenseTaxType.ids_for(:gst_tds, :tds)).sum_tds_amounts
+  def total_tds_amount(options = {})
+    currency_code = options&.dig(:currency_code) || self.base_currency_code
+    self.expenses.with_expense_tax_type_id(ExpenseTaxType.ids_for(:gst_tds, :tds)).sum_tds_amounts(currency_code)
   end
 
   def controlling_user?(user)
@@ -448,6 +450,22 @@ class Report < ActiveRecord::Base
 
   def base_currency_symbol
     self.policy.base_currency.symbol
+  end
+
+  def settlement_currency
+    self.policy.settlement_currency
+  end
+
+  def settlement_currency_id
+    self.policy.settlement_currency_id
+  end
+
+  def settlement_currency_code
+    self.policy.settlement_currency.country_code
+  end
+
+  def settlement_currency_symbol
+    self.policy.settlement_currency.symbol
   end
 
   def only_card_expenses?

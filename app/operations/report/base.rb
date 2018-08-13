@@ -64,10 +64,10 @@ class Report::Base < BaseOperation
       self.actions = load_actions
       self.policies = retrieve_policies
       self.selected_policy = report.versioned_policy
-      self.manager = User::Team::Approver.(report.user, report: report, type: :manager)
-      self.finance_manager = User::Team::Approver.(report.user, report: report, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
       self.violations_present = has_warning? || has_blocking?
+      self.manager = User::Team::Approver.(report.user, report: report, type: :manager, has_violations: self.violations_present)
+      self.finance_manager = User::Team::Approver.(report.user, report: report, type: :finance_manager, has_violations: self.violations_present)
       self.reimbursable_expenses_total = reimbursable_expenses
       self.non_reimbursable_expenses_total = non_reimbursable_expenses
       self.card_expenses_total = report.total_amount(:only_card_expenses)
