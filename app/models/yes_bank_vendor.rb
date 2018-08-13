@@ -57,6 +57,8 @@ class YesBankVendor < ActiveRecord::Base
   # accepts_nested_attributes_for :gstin_certificate_attachment, allow_destroy: true
   # accepts_nested_attributes_for :cancelled_cheque_attachment, allow_destroy: true
 
+  scope :with_ids, -> (ids) {where id: ids}
+
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> { where is_deleted: [false, nil]}
   scope :authorized, -> { where authorized: true}
