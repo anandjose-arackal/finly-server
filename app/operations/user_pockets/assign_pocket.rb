@@ -4,7 +4,7 @@ class UserPockets::AssignPocket < UserPockets::Base
 
   def init
     selected_user_id = params[:id] || params[:selected_user_id]
-    self.selected_user = company.users.find_by(id: selected_user_id)
+    self.selected_user = current_company.users.find_by(id: selected_user_id)
 
     # retrieving all the assignable pockets for this user
     op = UserPockets::AssignablePockets.(user, {selected_user_id: selected_user_id})
