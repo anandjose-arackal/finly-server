@@ -23,6 +23,11 @@ class UserPocket < ActiveRecord::Base
   belongs_to :base_currency, class_name: "Currency"
   belongs_to :company_pocket_template
 
+  # adding associations to payment and Finly Transactions
+  has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
+  has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
+  has_many :finly_transactions, as: :finly_account
+
   validates :user, presence: true
   validates :user_pocket_type, presence: true
 

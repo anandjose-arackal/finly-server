@@ -52,9 +52,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
     # setting the initiating account based on what is sent from the front end
     self.initiating_account = retrieve_initiating_account(payment_param[:initiating_account_type])
-    self.receiving_account = retrieve_receiving_account(params[:receiving_account_type])
+    self.receiving_account = retrieve_receiving_account(payment_param[:receiving_account_type])
 
-    if self.initiating_account.blank?
+    if self.receiving_account.blank?
       add_message :error, "Destination pocket / bank account does not exist"
       return
     end

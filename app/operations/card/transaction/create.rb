@@ -141,8 +141,9 @@ class Card::Transaction::Create < BaseOperation
               return true unless card.card_program.create_expense
 
               # add to cash on hand
-              payment_request = PaymentRequest.(user, nil, CashOnHand.name, :credit, :atm_withdrawal)
-              payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, transaction.transaction_amount_value, reference_resource: self.transaction))
+              atm_pocket = user.user_pockets.atm_withdrawal_pockets.first
+              payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, :atm_withdrawal)
+              payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, atm_pocket, transaction.transaction_amount_value, reference_resource: self.transaction))
               op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
               if op.success?
                 return true
