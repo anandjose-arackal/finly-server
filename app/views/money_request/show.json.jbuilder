@@ -20,8 +20,8 @@ json.travel_request_enabled (current_company.feature_subscription.travel_request
 
 json.card @result.card
 
-json.pending_travel_requests @result.money_request.user.&travel_requests
-json.associated_travel_request @result.money_request.&travel_request
+json.pending_travel_requests @result.money_request.user&.travel_requests, :id, :name
+json.associated_travel_request @result.money_request&.travel_request
 
 json.forwardable_users do
   forwardable_users = @result.forwardable_users
