@@ -209,9 +209,46 @@ class TravelRequests::Show < TravelRequests::Base
         if val[booking.booking_type&.name].nil?
           val[booking.booking_type&.name] = []
         end
-        val[booking.booking_type&.name] << booking
+        booking_json = booking.as_json
+        booking_json[:alert] = alert_for(booking)
+        val[booking.booking_type&.name] << booking_json
       end
       val
+    end
+
+    def alert_for(booking)
+      highlighted = false
+      message = nil
+      if travel_request.controlling_user_id == user.id
+        if travel_manager_view?
+          if travel_request.processing? or travel_request.approved?
+            if booking.options.blank? and booking.confirmed.blank?
+              highlighted = true
+              message = 'No bookings or options have been added'
+            end
+          elsif travel_request.selection_confirmed?
+            if booking.selected_for_booking.present?
+              highlighted = true
+              message = 'Option selected. Awaiting booking'
+            end
+          end
+        else
+          if travel_request.selection_requested?
+            options_count = booking.bookings.options.size
+            if options_count > 0
+              highlighted = true
+              message = "#{options_count} options available for selection"
+            end
+          elsif travel_request.selection_processing?
+            selected_for_booking_count = booking.bookings.selected_for_booking.size
+            if selected_for_booking_count > 0
+              highlighted = true
+              message = 'Selected for booking'
+            end
+          end
+        end
+      end
+      {highlighted: highlighted, message: message}
     end
 
   end
