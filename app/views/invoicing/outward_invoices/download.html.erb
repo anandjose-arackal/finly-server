@@ -42,7 +42,7 @@
     <% end %>
   <% end %>
   <%= @invoice.company.name %>
-  <% if @invoice.present? %>
+  <% if @invoice.location.present? %>
     <%= simple_format @invoice.location.address, {}, wrapper_tag: "div" %>
   <% else %>
     <%= simple_format @invoice.company.collect_company_detail.address, {}, wrapper_tag: "div" %>
