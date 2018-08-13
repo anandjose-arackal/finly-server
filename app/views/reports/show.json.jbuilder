@@ -178,4 +178,5 @@ json.budgets do
 
 end
 
-json.user_travel_requests current_user.travel_requests
+json.pending_travel_requests @result.report.user.travel_requests
+json.associated_travel_request @result.report.travel_request
