@@ -63,6 +63,10 @@ class TravelRequestComment < ActiveRecord::Base
       comment_content += " removed a booking"
     when TravelRequestCommentAction.id_for(:reject_booking_request)
       comment_content += " rejected a booking request"
+    when TravelRequestCommentAction.id_for(:selection_requested)
+      comment_content += " requested selection  of booking options"
+    when TravelRequestCommentAction.id_for(:selection_confirmed)
+      comment_content += " confirmed selection"
     else
       return nil
     end

@@ -66,10 +66,13 @@ class TravelRequests::Show < TravelRequests::Base
 
       if travel_manager_view? or admin_view?
         # Request selection, Confirm Booking
-        if (travel_request.booking_pending? or travel_request.processing?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:travel_manager)
+        if (travel_request.booking_pending? or travel_request.processing? or travel_request.selection_confirmed?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:travel_manager)
           actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:request_selection] = {method: 'patch', type: 9, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:confirm_booking] = {method: 'patch', type: 11, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        end
+        if travel_request.selection_requested? or travel_request.selection_processing?
+          actions[:retract_request_selection] = {method: 'patch', type: 12, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       end
       if manager_view? or admin_view?
@@ -172,6 +175,32 @@ class TravelRequests::Show < TravelRequests::Base
       return false unless self.travel_request.controlling_user_id == self.user.id
       return false unless personal_view?
       true
+    end
+
+    def can_create_money_requests?
+      return false unless self.travel_request.to_date <= Date.today
+      return false if travel_request.reports.present?
+      true
+    end
+
+    def show_money_requests?
+      true
+    end
+
+    def can_create_reports?
+      not TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected, :cancelled).include?(travel_request.status_id)
+    end
+
+    def show_reports?
+      can_create_reports?
+    end
+
+    def reports
+      travel_request.reports
+    end
+
+    def money_requests
+      travel_request.money_requests
     end
 
     def grouped_bookings(destination)

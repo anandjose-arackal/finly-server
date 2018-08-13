@@ -60,6 +60,13 @@ class TravelRequests::Review::ConfirmSelection < TravelRequests::Review::Base
     add_message :error, travel_request.errors.full_messages
   end
 
+  def post_process
+    travel_request.comments.create user_id: user.id,
+                                   action_id: TravelRequestCommentAction.id_for(:selection_confirmed)
+
+    add_message :success, 'Selection has been successfully confirmed'
+  end
+
   protected
 
   def trail_action_id
