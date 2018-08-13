@@ -30,7 +30,7 @@ class AccountManager::Base < BackgroundOperation
           when UserPocketType.id_for(:credit_card)
             return AccountManager::CardTransferPockets::CreditCardPocketsAdapter.new(account)
           else
-
+            # do nothing?
         end
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
