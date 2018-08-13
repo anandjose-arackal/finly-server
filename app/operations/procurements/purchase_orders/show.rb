@@ -52,8 +52,6 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       if op.success?
         self.budgets = op.budget_data
       end
-
-
     end
 
     def get_actions

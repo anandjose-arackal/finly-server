@@ -116,3 +116,7 @@ json.budgets do
     json.budget_amount budget[:budget].budget_amount.as_json
   end
 end
+
+json.custom_fields do
+  json.array! @result.purchase_order.custom_fields
+end

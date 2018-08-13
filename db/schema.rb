@@ -824,17 +824,31 @@ ActiveRecord::Schema.define(version: 20180812102211) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "budget_rule_field_mappings", force: :cascade do |t|
+    t.integer  "budget_rule_id",          limit: 4, null: false
+    t.integer  "field_configuration_id",  limit: 4, null: false
+    t.integer  "field_drop_down_item_id", limit: 4, null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "budget_rule_field_mappings", ["budget_rule_id"], name: "index_budget_rule_field_mappings_on_budget_rule_id", using: :btree
+  add_index "budget_rule_field_mappings", ["field_configuration_id"], name: "index_budget_rule_field_mappings_on_field_configuration_id", using: :btree
+  add_index "budget_rule_field_mappings", ["field_drop_down_item_id"], name: "index_budget_rule_field_mappings_on_field_drop_down_item_id", using: :btree
+
   create_table "budget_rules", force: :cascade do |t|
-    t.integer  "category_id",          limit: 4
-    t.integer  "amount_id",            limit: 4
-    t.integer  "period_id",            limit: 4
-    t.integer  "policy_id",            limit: 4
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.integer  "rule_type_id",         limit: 4
-    t.boolean  "include_reimbursable",           default: true
-    t.boolean  "is_deleted",                     default: false
-    t.integer  "expense_type_id",      limit: 4
+    t.integer  "category_id",               limit: 4
+    t.integer  "amount_id",                 limit: 4
+    t.integer  "period_id",                 limit: 4
+    t.integer  "policy_id",                 limit: 4
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+    t.integer  "rule_type_id",              limit: 4
+    t.boolean  "include_reimbursable",                default: true
+    t.boolean  "is_deleted",                          default: false
+    t.integer  "expense_type_id",           limit: 4
+    t.integer  "with_receipt_amount_id",    limit: 4
+    t.integer  "without_receipt_amount_id", limit: 4
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree
@@ -1865,6 +1879,9 @@ ActiveRecord::Schema.define(version: 20180812102211) do
     t.decimal  "odometer_reading_end",                        precision: 10, scale: 2
     t.integer  "odometer_reading_receipt_start_id", limit: 4
     t.integer  "odometer_reading_receipt_end_id",   limit: 4
+    t.integer  "vehicle_rate_id",                   limit: 4
+    t.integer  "distance_rate_id",                  limit: 4
+    t.integer  "distance_unit_id",                  limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
@@ -2128,6 +2145,9 @@ ActiveRecord::Schema.define(version: 20180812102211) do
     t.integer  "gst_type_id",            limit: 4
     t.integer  "tds_slab_id",            limit: 4
     t.integer  "gst_amount_id",          limit: 4
+    t.datetime "usage_date_start"
+    t.datetime "usage_date_end"
+    t.string   "usage_date_type",        limit: 255
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -2222,7 +2242,7 @@ ActiveRecord::Schema.define(version: 20180812102211) do
     t.integer  "field_type_id",           limit: 4,                   null: false
     t.boolean  "mandatory",                           default: false, null: false
     t.integer  "company_id",              limit: 4,                   null: false
-    t.integer  "configurable_id",         limit: 4,                   null: false
+    t.integer  "configurable_id",         limit: 4
     t.string   "configurable_type",       limit: 255,                 null: false
     t.datetime "created_at",                                          null: false
     t.datetime "updated_at",                                          null: false
@@ -3568,16 +3588,17 @@ ActiveRecord::Schema.define(version: 20180812102211) do
   end
 
   create_table "policies", force: :cascade do |t|
-    t.string   "name",             limit: 255
-    t.integer  "company_id",       limit: 4
-    t.integer  "owner_id",         limit: 4
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.boolean  "default",                        default: false, null: false
-    t.boolean  "is_deleted",                     default: false, null: false
-    t.text     "description",      limit: 65535
-    t.integer  "base_currency_id", limit: 4,     default: 1
-    t.string   "application",      limit: 255
+    t.string   "name",                   limit: 255
+    t.integer  "company_id",             limit: 4
+    t.integer  "owner_id",               limit: 4
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
+    t.boolean  "default",                              default: false, null: false
+    t.boolean  "is_deleted",                           default: false, null: false
+    t.text     "description",            limit: 65535
+    t.integer  "base_currency_id",       limit: 4,     default: 1
+    t.string   "application",            limit: 255
+    t.integer  "settlement_currency_id", limit: 4,     default: 1,     null: false
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
@@ -3600,6 +3621,16 @@ ActiveRecord::Schema.define(version: 20180812102211) do
   add_index "policy_configurations", ["policy_id"], name: "index_policy_configurations_on_policy_id", using: :btree
   add_index "policy_configurations", ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id", using: :btree
   add_index "policy_configurations", ["technical_contact_id"], name: "index_policy_configurations_on_technical_contact_id", using: :btree
+
+  create_table "policy_field_mappings", force: :cascade do |t|
+    t.integer  "field_configuration_id", limit: 4, null: false
+    t.integer  "policy_id",              limit: 4, null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "policy_field_mappings", ["field_configuration_id"], name: "index_policy_field_mappings_on_field_configuration_id", using: :btree
+  add_index "policy_field_mappings", ["policy_id"], name: "index_policy_field_mappings_on_policy_id", using: :btree
 
   create_table "policy_user_mappings", force: :cascade do |t|
     t.integer  "user_id",    limit: 4,                 null: false
@@ -4685,6 +4716,8 @@ ActiveRecord::Schema.define(version: 20180812102211) do
     t.integer  "policy_id",              limit: 4,                 null: false
     t.integer  "purpose_id",             limit: 4
     t.integer  "travel_manager_id",      limit: 4
+    t.boolean  "manager_violation_only"
+    t.boolean  "finance_violation_only"
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id", using: :btree
@@ -4882,6 +4915,21 @@ ActiveRecord::Schema.define(version: 20180812102211) do
   add_index "users", ["invitations_count"], name: "index_users_on_invitations_count", using: :btree
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+
+  create_table "vehicle_rates", force: :cascade do |t|
+    t.string   "vehicle_name",     limit: 255,                 null: false
+    t.integer  "rate_id",          limit: 4,                   null: false
+    t.integer  "distance_unit_id", limit: 4,                   null: false
+    t.integer  "policy_id",        limit: 4
+    t.boolean  "is_deleted",                   default: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+  end
+
+  add_index "vehicle_rates", ["distance_unit_id"], name: "index_vehicle_rates_on_distance_unit_id", using: :btree
+  add_index "vehicle_rates", ["is_deleted"], name: "index_vehicle_rates_on_is_deleted", using: :btree
+  add_index "vehicle_rates", ["policy_id"], name: "index_vehicle_rates_on_policy_id", using: :btree
+  add_index "vehicle_rates", ["rate_id"], name: "index_vehicle_rates_on_rate_id", using: :btree
 
   create_table "vendor_account_transactions", force: :cascade do |t|
     t.integer  "vendor_account_id",   limit: 4
@@ -5191,6 +5239,9 @@ ActiveRecord::Schema.define(version: 20180812102211) do
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
   add_foreign_key "budget_criteria_mappings", "budgets"
+  add_foreign_key "budget_rule_field_mappings", "budget_rules"
+  add_foreign_key "budget_rule_field_mappings", "field_configurations"
+  add_foreign_key "budget_rule_field_mappings", "field_drop_down_items"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"
@@ -5370,6 +5421,8 @@ ActiveRecord::Schema.define(version: 20180812102211) do
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
+  add_foreign_key "policy_field_mappings", "field_configurations"
+  add_foreign_key "policy_field_mappings", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "procurement_charges", "amounts"
@@ -5460,6 +5513,7 @@ ActiveRecord::Schema.define(version: 20180812102211) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "vehicle_rates", "policies"
   add_foreign_key "vendor_account_transactions", "amounts"
   add_foreign_key "vendor_account_transactions", "payments"
   add_foreign_key "vendor_account_transactions", "vendor_accounts"

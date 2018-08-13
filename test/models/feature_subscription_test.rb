@@ -26,6 +26,7 @@
 #  travel_request             :boolean          default(FALSE)
 #  budgeting_system           :boolean          default(FALSE)
 #  em_tax_tracking            :boolean          default(FALSE)
+#  procurement                :boolean          default(FALSE)
 #
 
 require 'test_helper'
