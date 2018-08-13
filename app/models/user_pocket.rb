@@ -24,9 +24,9 @@ class UserPocket < ActiveRecord::Base
   belongs_to :company_pocket_template
 
   # adding associations to payment and Finly Transactions
-  has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
-  has_many :receiving_payments, as: :receiving_account, class_name: "Payment"
-  has_many :finly_transactions, as: :finly_account
+  has_many :initiating_payments, as: :initiating_account, class_name: "Payment", dependent: :destroy
+  has_many :receiving_payments, as: :receiving_account, class_name: "Payment", dependent: :destroy
+  has_many :finly_transactions, as: :finly_account, dependent: :destroy
 
   validates :user, presence: true
   validates :user_pocket_type, presence: true
