@@ -1,6 +1,6 @@
 json.user_count @result.user_count
-json.expenses_total @result.expenses_total
-json.reimbursement_total @result.reimbursement_total
+json.expenses_total @result.expenses_total&.values
+json.reimbursement_total @result.reimbursement_total&.values
 json.details do
   json.array! @result.details do |detail|
     json.user do
