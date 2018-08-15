@@ -63,6 +63,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
     # this is creating the payment request for crediting money to the bank account, if at all they choose to
     init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account})
+
+    destination_pocket_id = params[:destination_pocket_id]
+    self.destination_pocket = UserPocket.find_by id: destination_pocket_id
   end
 
   def authorize
@@ -75,6 +78,11 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     unless validate_date payment_param[:date]
       # above method already adds the respective error message, so just returning
       return false
+    end
+
+    if self.destination_pocket.blank?
+      add_message :error, "Destination pocket / bank account does not exist"
+      return
     end
   end
 
