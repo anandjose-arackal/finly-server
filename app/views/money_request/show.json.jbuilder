@@ -20,18 +20,8 @@ json.travel_request_enabled (current_company.feature_subscription.travel_request
 
 json.card @result.card
 
-json.user_reports current_user.reports
-json.user_travel_requests current_user.travel_requests
-
-json.linked_report do
-  json.id @result.money_request.report&.id
-  json.name @result.money_request.report&.name
-end
-
-json.linked_travel_request do
-  json.id @result.money_request.report&.travel_request&.id
-  json.name @result.money_request.report&.travel_request&.name
-end
+json.pending_travel_requests @result.money_request.user&.travel_requests, :id, :name
+json.associated_travel_request @result.money_request&.travel_request
 
 json.forwardable_users do
   forwardable_users = @result.forwardable_users

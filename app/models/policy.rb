@@ -53,6 +53,7 @@ class Policy < ActiveRecord::Base
   scope :find_from_id, -> (id) {find_by(id: id)}
   scope :with_application, -> (application) {where application: application}
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
+  scope :include_user_mapping, -> { includes :user_mapping }
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules

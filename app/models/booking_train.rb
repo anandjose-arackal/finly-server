@@ -25,10 +25,40 @@
 #
 
 class BookingTrain < ActiveRecord::Base
-  validates :journey_source, presence: true
-  validates :journey_destination, presence: true
-  validates :journey_date, presence: true
+  include SoftDeletable
 
   belongs_to :parent, polymorphic: true
+  belongs_to :cost, class_name: 'Amount', dependent: :destroy
+  belongs_to :from, class_name: 'Location', dependent: :destroy
+  belongs_to :to, class_name: 'Location', dependent: :destroy
+
+  accepts_nested_attributes_for :from
+  accepts_nested_attributes_for :to
+  accepts_nested_attributes_for :cost
+
+  validates :from, presence: true
+  validates :to, presence: true
+  validates :departure_date, presence: true
+  validates :departure_time, presence: true
+
+  def as_json(options={})
+    {
+        id: id,
+        train_number: train_number,
+        pnr: pnr,
+        booking_class: booking_class,
+        from: from,
+        boarding_station: boarding_station,
+        to: to,
+        destination_station: destination_station,
+        departure_date: DateUtils.date_formatted(departure_date),
+        departure_time: DateUtils.time_formatted(departure_time, military_time: true),
+        arrival_date: DateUtils.date_formatted(arrival_date),
+        arrival_time: DateUtils.time_formatted(arrival_time, military_time: true),
+        description: description,
+        seat_number: seat_number,
+        cost: cost
+    }
+  end
 
 end

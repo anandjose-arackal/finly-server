@@ -18,8 +18,30 @@
 #
 
 class BookingRestaurant < ActiveRecord::Base
-  validates :reservation_destination, presence: true
-  validates :reservation_date, presence: true
+  include SoftDeletable
 
   belongs_to :parent, polymorphic: true
+  belongs_to :location, dependent: :destroy
+
+  accepts_nested_attributes_for :location
+
+  validates :location, presence: true
+  validates :restaurant_name, presence: true
+  validates :number_of_guests, presence: true
+  validates :reservation_date, presence: true
+  validates :reservation_time, presence: true
+
+  def as_json(options={})
+    {
+        id: id,
+        restaurant_name: restaurant_name,
+        location: location,
+        restaurant_address: restaurant_address,
+        reservation_date: DateUtils.date_formatted(reservation_date),
+        reservation_time: DateUtils.time_formatted(reservation_time, military_time: true),
+        number_of_guests: number_of_guests,
+        description: description
+    }
+  end
+
 end

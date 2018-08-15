@@ -13,12 +13,12 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
 
   def validate
     unless travel_request.controlling_user_id == user.id
-      add_message :error, "You are not eligible to perform this action"
+      add_message :error, 'You are not eligible to perform this action'
       return
     end
 
     unless travel_request.can_approve? || params[:auto_approve]
-      add_message :error, "Travel Request cannot be approved in this state"
+      add_message :error, 'Travel Request cannot be approved in this state'
       return
     end
   end
@@ -29,8 +29,10 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     next_reviewer_role_id = presenter.role_id
     # this returns the role under which this particular user is viewing the payment request
     current_user_role = User::Team::Review::UserRole.(user, self.travel_request)
-    if next_reviewer.nil? || next_reviewer.travel_manager?
+    if next_reviewer.nil?
       travel_request_status = TravelRequestStatus.id_for(:approved)
+    elsif next_reviewer.travel_manager?
+      travel_request_status = TravelRequestStatus.id_for(:booking_pending)
     else
       travel_request_status = TravelRequestStatus.id_for(:processing)
     end
@@ -65,7 +67,7 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     #
     # Event::EBankPaymentRequest::Approve.(user, travel_request: travel_request)
 
-    add_message :success, "Succesfully approved the travel request"
+    add_message :success, 'Succesfully approved the travel request'
   end
 
 end

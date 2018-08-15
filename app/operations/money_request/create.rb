@@ -1,5 +1,5 @@
 class MoneyRequest::Create < MoneyRequest::Base
-  attr_accessor :policy_id, :for_user
+  attr_accessor :policy_id, :for_user, :default_policy
 
   def authorized_user_types
     :employee
@@ -13,11 +13,12 @@ class MoneyRequest::Create < MoneyRequest::Base
     end
     if policy_id.blank?
       self.policy_id = user.company.default_policy.id
+      self.default_policy = true
     end
   end
 
   def authorize
-    if policy_id.present? and for_user.policies.with_id(policy_id).blank?
+    if policy_id.present? and (for_user.policies.with_id(policy_id).blank? and not default_policy)
       add_message :error, 'User does not belong to the selected policy'
       raise_unauthorized_exception
     end
@@ -51,7 +52,7 @@ class MoneyRequest::Create < MoneyRequest::Base
   private
   def create_params
     return {} unless params[:money_request].present?
-    params[:money_request].permit(:name, :required_by_date, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
+    params[:money_request].permit(:name, :travel_request_id, :required_by_date, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
   end
 
 end

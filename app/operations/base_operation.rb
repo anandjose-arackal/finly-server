@@ -1,6 +1,6 @@
 require 'hooks'
 class BaseOperation
-  include CallbackHandler, MathUtil, HasScope
+  include CallbackHandler, MathUtil, HasScope, OperationValidations
   # todo rename user to resource as User is a model and there can be other models such as AdminUser etc
   attr_accessor :user, :company, :params, :messages, :process_complete, :response
 
@@ -415,6 +415,10 @@ class BaseOperation
 
   def finance_view?
     is_view?(:finance) or is_view? :finance_manager or is_view?(:creditor)
+  end
+
+  def travel_manager_view?
+    is_view?(:travel_manager)
   end
 
   def auditor_view?

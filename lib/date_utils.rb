@@ -43,6 +43,19 @@ class DateUtils
     end
   end
 
+  def self.time_formatted(time, options={})
+    return time if time.blank?
+    if time.is_a?(String)
+      time = parse_datetime time
+    end
+    return time if time.blank?
+    return time unless time.is_a?(Time) or time.is_a?(DateTime) or time.is_a?(ActiveSupport::TimeWithZone)
+    if options&.dig(:military_time)
+      return time.strftime('%H:%M')
+    end
+    time.strftime('%I:%M%P')
+  end
+
   def self.datetime_formatted(datetime)
     return datetime if datetime.blank?
     if datetime.is_a?(String)
@@ -65,6 +78,12 @@ class DateUtils
 
   def self.wday_for(day)
 
+  end
+
+  def self.age(dob)
+    return nil if dob.nil?
+    now = Time.now.to_date
+    now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
 
 end

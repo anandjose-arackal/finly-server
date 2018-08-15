@@ -30,66 +30,50 @@
 #
 
 class TravelRequest < ActiveRecord::Base
+  include SoftDeletable, Sequenced::ActsAsSequenced
 
-  include SoftDeletable
+  acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
 
   belongs_to :user
   belongs_to :policy
-  belongs_to :status, class_name: "TravelRequestStatus"
-  has_one :report
+  belongs_to :status, class_name: 'TravelRequestStatus'
+  has_many :reports
+  has_many :money_requests
+  has_many :bookings
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
   belongs_to :controlling_for_user_role, class_name: 'UserRole'
 
-  has_many :destinations, class_name: "TravelRequestDestination"
-  has_many :travel_request_trails
-  has_many :comments, class_name: "TravelRequestComment"
+  has_many :destinations, class_name: 'TravelRequestDestination'
+  has_many :travel_request_trails, dependent: :destroy
+  has_many :comments, class_name: 'TravelRequestComment', dependent: :destroy
 
   accepts_nested_attributes_for :destinations, allow_destroy: true
 
-  delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?, to: :status
+  delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?,
+           :selection_requested?, :selection_processing?, :selection_rejected?, :selection_confirmed?, :booking_confirmed?, to: :status
 
-  validates :status_id, presence: true, unless: :open?
-  validates :user_id, presence: true, unless: :open?
-  validates :name, presence: true, unless: :open?
+  validates :status_id, presence: true#, unless: :open?
+  validates :user_id, presence: true#, unless: :open?
+  #validates :name, presence: true#, unless: :open?
+  validates :from_date, presence: true
+  validates :to_date, presence: true
+  validate :acceptable_dates?
 
-  default_scope { order(created_at: :desc) }
+  default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
-  scope :with_id, ->(id) { where id: id }
-  scope :not_open, -> {
-    where.not(status_id: TravelRequestStatus.id_for(:open))
-  }
-
-  scope :non_owner, -> (user_id) { where.not user_id: user_id }
-
-  scope :open, -> {
-    where(status_id: TravelRequestStatus.id_for(:open))
-  }
-
-  scope :approved, -> {
-    where(status_id: TravelRequestStatus.id_for(:approved))
-  }
-
-  scope :processing, -> {
-    where(status_id: TravelRequestStatus.id_for(:processing))
-  }
-
-  scope :with_user, -> (user_id) {
-    where user_id: user_id
-  }
-
-  scope :with_policy, -> (policy_id) {
-    where policy_id: policy_id
-  }
-
-  scope :with_controlling_user_role_id, -> (role_id) {
-    where controlling_user_role_id: role_id
-  }
-  scope :with_controlling_user_id, -> (user_id) {
-    where controlling_user_id: user_id
-  }
+  scope :with_id, ->(id) {where id: id}
+  scope :not_open, -> { where.not(status_id: TravelRequestStatus.id_for(:open)) }
+  scope :non_owner, -> (user_id) {where.not user_id: user_id}
+  scope :open, -> { where(status_id: TravelRequestStatus.id_for(:open)) }
+  scope :approved, -> { where(status_id: TravelRequestStatus.id_for(:approved)) }
+  scope :processing, -> { where(status_id: TravelRequestStatus.id_for(:processing)) }
+  scope :with_user, -> (user_id) { where user_id: user_id }
+  scope :with_policy, -> (policy_id) { where policy_id: policy_id }
+  scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
+  scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
 
 
   def can_submit?
@@ -124,6 +108,43 @@ class TravelRequest < ActiveRecord::Base
     open? or retracted? or rejected?
   end
 
-  private
+  def destinations_list
+    names = []
+    self.destinations.each do |destination|
+      name = destination&.location&.name
+      names << name if name.present?
+    end
+    names
+  end
+
+
+  def as_json(options = {})
+    {
+        id: id,
+        trip_id: trip_id,
+        name: name,
+        purpose_of_travel: purpose_of_travel,
+        policy: policy,
+        status: status,
+        user: user,
+        controlling_user: controlling_user,
+        dates: {
+            from: DateUtils.date_formatted(from_date),
+            to: DateUtils.date_formatted(to_date)
+        },
+        destinations: destinations,
+        destinations_list: destinations_list
+    }
+  end
+
+  protected
+
+  def acceptable_dates?
+    return if from_date.blank?
+    return if to_date.blank?
+    unless from_date <= to_date
+      errors.add :from_date, 'cannot be after to date'
+    end
+  end
 
 end
