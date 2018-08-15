@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180812150402) do
+ActiveRecord::Schema.define(version: 20180815073950) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -4275,6 +4275,7 @@ ActiveRecord::Schema.define(version: 20180812150402) do
     t.integer  "travel_booking_approves_to_id", limit: 4
     t.boolean  "manager_violation_only"
     t.boolean  "finance_violation_only"
+    t.integer  "travel_approves_to_id",         limit: 4
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id", using: :btree

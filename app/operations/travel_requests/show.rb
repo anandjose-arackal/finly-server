@@ -178,7 +178,6 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_create_money_requests?
-      # return false unless self.travel_request.to_date <= Date.today
       return false if travel_request.reports.present?
       return false if travel_manager_view?
       true
