@@ -11,7 +11,7 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
 
   def self.call(user_id, params)
     user = user_id
-    if user.present? and user.is_a?(user)
+    if user.present? and user.is_a?(User)
       user_id = user.id
     end
     self.new.perform(user_id, params)
@@ -73,7 +73,6 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
         init_payment_request(:credit, :advance, {amount: amount, initiating_account: nil, receiving_account: self.destination_pocket})
         # now payment request will have the new details of money to be added - so add it to the cash on hand
         op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
-        debugger
         payment = op.payments.first
         # setting the reference resource for the cash on hand payment as the bank transfer payment
         payment.update(reference_resource: self.payment)
