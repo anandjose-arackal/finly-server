@@ -34,7 +34,9 @@
 #  category_id                    :integer
 #  api_initiated                  :boolean          default(FALSE)
 #  original_payment_for_refund_id :integer
+#  destination_pocket_id          :integer
 #
+
 
 
 
@@ -70,6 +72,8 @@ class Payment < ActiveRecord::Base
   belongs_to :payment_order
   belongs_to :payment_status
   belongs_to :payment_purpose
+
+  belongs_to :destination_pocket, class_name: "UserPocket"
 
   belongs_to :initiating_account, polymorphic: true
   belongs_to :receiving_account, polymorphic: true
@@ -393,6 +397,10 @@ class Payment < ActiveRecord::Base
   end
 
   def cash_on_hand_credit?
+    self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
+  end
+
+  def cash_pocket_credit?
     self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
   end
 

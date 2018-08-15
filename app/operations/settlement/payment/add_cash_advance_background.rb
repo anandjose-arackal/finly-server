@@ -66,6 +66,7 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
     if op.success?
       self.payment = op.payments.first
       bank_transaction = self.payment.reload.reference_resource
+      self.payment.update(destination_pocket_id: self.destination_pocket.id) # storing the original receiving account so that once the bank account transaction goes through it can be credited to cash on hand
       # only if the bank transaction has been completed, will the cash on hand be added to the user's account
       # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
       if self.payment_purpose == :cash_advance && bank_transaction&.completed?

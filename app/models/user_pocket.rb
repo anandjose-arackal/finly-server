@@ -51,6 +51,9 @@ class UserPocket < ActiveRecord::Base
   scope :atm_withdrawal_pockets, -> {
     where atm_withdrawal_pocket: true
   }
+  scope :with_user_id, -> (user_ids) {
+    where user_id: user_ids
+  }
 
   def blocked_amount_for_pending_payments(excluded_payment_order_id = nil)
     initiating_account = self

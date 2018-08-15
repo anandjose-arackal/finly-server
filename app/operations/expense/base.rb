@@ -47,7 +47,7 @@ class Expense::Base < BaseOperation
   # common conditions for checking amounts against cash on hand
   def check_coh_availability_update(pocket, params = nil)
     # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
-    if params&.dig(:spent_from_id).present? or (params&.dig(:spent_from_id).nil? and expense.spent_from.present?)
+    if (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) or ((params&.dig(:spent_from_id).nil? or !StringUtils.to_bool(params[:from_cash_on_hand])) and expense.spent_from.present?)
 
       # first check if the expense is being created in non-INR, and if its date is today
       if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
@@ -59,19 +59,19 @@ class Expense::Base < BaseOperation
       amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
       balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
       # if the expense is continuing to be from COH, and only the amount is changing
-      if expense.spent_from.present? && params&.dig(:spent_from_id).present?
+      if expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
         difference = params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
         unless difference <= balance
           add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
           return
         end
         # i.e. if the expense was not originally from COH, and it's currently being made into one
-      elsif !expense.spent_from.present? && params&.dig(:spent_from_id).present?
+      elsif !expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
         unless balance >= amount_val
           add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
           return
         end
-      elsif expense.spent_from.present? && !params&.dig(:spent_from_id).present?
+      elsif expense.spent_from.present? && !(params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
         # nothing to do here ¯\_(ツ)_/¯
       end
     end
@@ -80,8 +80,8 @@ class Expense::Base < BaseOperation
   # ensuring that the an expense can't be both from cash on hand AND reimbursable during updation
   def check_coh_reimbursable_exclusivity_update(params)
     # making sure that a particular expense cannot be both reimbursable and from cash on hand at the same time
-    from_cash_pockets = params&.dig(:spent_from_id).present?
-    from_cash_pockets = from_cash_pockets.blank? ? expense.spent_from&.present? : from_cash_pockets
+    from_cash_pockets = params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])
+    from_cash_pockets = from_cash_pockets.blank? ? (expense.spent_from&.present? or StringUtils.to_bool(params[:from_cash_on_hand])) : from_cash_pockets
     reimbursable = StringUtils.to_bool(params&.dig(:reimbursable))
     reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
     if from_cash_pockets and reimbursable
@@ -91,7 +91,7 @@ class Expense::Base < BaseOperation
 
   # ensuring that the an expense can't be both from cash on hand AND reimbursable during creation
   def check_coh_reimbursable_exclusivity_create(params)
-    if params[:spent_from_id].present? && StringUtils.to_bool(params[:reimbursable])
+    if (params[:spent_from_id].present? or StringUtils.to_bool(params[:from_cash_on_hand])) && StringUtils.to_bool(params[:reimbursable])
       add_message :error, "Expense spent from cash on hand cannot be reimbursable"
     end
   end
