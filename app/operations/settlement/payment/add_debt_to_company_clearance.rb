@@ -8,7 +8,7 @@
 # date: date of the payment
 
 class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
-  attr_accessor :role
+  attr_accessor :role, :destination_pocket
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -33,7 +33,9 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     self.amount = payment_params[:amount]
     self.currency_id = payment_params[:currency_id] || Currency.first.id
     self.note = payment_params[:note]
-    init_payment_request(:debit, :balance_clearance_outside_finly, {amount: self.amount})
+    destination_pocket_id = params[:destination_pocket_id]
+    self.destination_pocket = to_user.user_pockets.cash_pockets_only.find_by(id: destination_pocket_id)
+    init_payment_request(:debit, :balance_clearance_outside_finly, {amount: self.amount, receiving_account: self.destination_pocket})
   end
 
   def authorize
@@ -55,6 +57,11 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     # validating date
     unless validate_date payment_params[:date]
       return false
+    end
+
+    # checking for pocket presence
+    if self.destination_pocket.blank?
+      add_message :error, "Account to debit from not found"
     end
 
   end

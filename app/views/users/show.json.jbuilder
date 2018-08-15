@@ -24,7 +24,7 @@ json.user do
 end
 
 json.user_pockets do
-  json.array!(@result.user.user_pockets) do |pocket|
+  json.array!(@result.selected_user.user_pockets) do |pocket|
     json.name pocket.name
     json.id pocket.id
     adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)

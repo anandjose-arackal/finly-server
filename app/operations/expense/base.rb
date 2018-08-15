@@ -19,7 +19,7 @@ class Expense::Base < BaseOperation
   def check_coh_availability_create(pocket, params = nil)
 
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
-    if params[:spent_from_id].present?
+    if params[:spent_from_id].present? || StringUtils.to_bool(params[:from_cash_on_hand])
 
       # first check if the expense is being created in non-INR, and if its date is today
       if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))

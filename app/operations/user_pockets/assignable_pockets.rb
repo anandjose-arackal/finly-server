@@ -10,7 +10,7 @@ class UserPockets::AssignablePockets < UserPockets::Base
   end
 
   def process
-    pocket_template_ids = user.company.company_pocket_templates
+    pocket_template_ids = user.company.company_pocket_templates.pluck(:id)
     applicable_pocket_templates = pocket_template_ids - self.existing_pockets.pluck(:company_pocket_template_id)
     self.pocket_templates = CompanyPocketTemplate.with_id(applicable_pocket_templates)
   end

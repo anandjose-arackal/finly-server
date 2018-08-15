@@ -101,7 +101,6 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
         }
       end
     end
-
   end
 
   def init_bank_transfer
