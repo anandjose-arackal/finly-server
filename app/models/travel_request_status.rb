@@ -58,6 +58,10 @@ class TravelRequestStatus < ActiveRecord::Base
     self.id == TravelRequestStatus.id_for(:selection_processing)
   end
 
+  def selection_rejected?
+    self.id == TravelRequestStatus.id_for(:selection_rejected)
+  end
+
   def selection_confirmed?
     self.id == TravelRequestStatus.id_for(:selection_confirmed)
   end

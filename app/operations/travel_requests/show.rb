@@ -83,13 +83,13 @@ class TravelRequests::Show < TravelRequests::Base
         end
       end
       # Confirm Selection
-      if travel_request.selection_requested? and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
+      if (travel_request.selection_requested? or travel_request.selection_rejected?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
         actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       end
       # Approve Selection
       if travel_request.selection_processing? and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
-        actions[:approve_selection] = {method: 'patch', type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
-        actions[:reject_selection] = {method: 'patch', type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        actions[:approve_selection] = {method: 'patch', type: 12, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        actions[:reject_selection] = {method: 'patch', type: 13, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       end
       if personal_view?
         # Submit
@@ -101,7 +101,7 @@ class TravelRequests::Show < TravelRequests::Base
           actions[:retract] = {method: 'patch', type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
         # Confirm selection
-        if travel_request.selection_requested? && travel_request.user_id == user.id
+        if travel_request.selection_requested? && travel_request.controlling_user_id == user.id
           actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       end
@@ -157,7 +157,7 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_select_options?
-      (manager_view? or personal_view?) and (travel_request.selection_requested?)
+      (manager_view? or personal_view?) and (travel_request.selection_requested? or travel_request.selection_rejected?)
     end
 
     def editable
@@ -179,7 +179,7 @@ class TravelRequests::Show < TravelRequests::Base
 
     def can_create_money_requests?
       return false if travel_request.reports.present?
-      return false if travel_manager_view?
+      return false unless personal_view?
       true
     end
 
@@ -188,6 +188,7 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_create_reports?
+      return false unless personal_view?
       not TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected, :cancelled).include?(travel_request.status_id)
     end
 
@@ -217,12 +218,12 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def alert_for(booking)
-      highlighted = true
-      message = 'No bookings or options have been added'
+      highlighted = false
+      message = ''
       if travel_request.controlling_user_id == user.id
         if travel_manager_view?
           if travel_request.processing? or travel_request.approved?
-            if booking.options.blank? and booking.confirmed.blank?
+            if booking.bookings.options.blank? and booking.bookings.confirmed.blank?
               highlighted = true
               message = 'No bookings or options have been added'
             end
@@ -235,7 +236,7 @@ class TravelRequests::Show < TravelRequests::Base
         else
           if travel_request.selection_requested?
             options_count = booking.bookings.options.size
-            if options_count > 0
+            if options_count > 0 and booking.bookings.selected_for_booking.size == 0 and booking.bookings.confirmed.size == 0
               highlighted = true
               message = "#{options_count} options available for selection"
             end

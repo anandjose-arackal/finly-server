@@ -18,7 +18,7 @@ class TravelRequests::Review::ConfirmSelection < TravelRequests::Review::Base
       add_message :error, 'You cannot perform this action at the moment'
       return
     end
-    unless self.travel_request.selection_processing? or self.travel_request.selection_requested?
+    unless self.travel_request.selection_processing? or self.travel_request.selection_requested? or self.travel_request.selection_rejected?
       add_message :error,  'You cannot perform this action at the moment'
       return
     end
