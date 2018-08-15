@@ -47,8 +47,13 @@ class TravelRequestBookingsController < ApplicationController
     end
   end
 
-  def approve_option
-
+  def cancel
+    @result = TravelRequests::Bookings::Cancel.(current_user, params)
+    if @result.success?
+      respond response: :success, messages: @result.messages[:success]
+    else
+      respond response: :error, messages: @result.messages[:error]
+    end
   end
 
 end

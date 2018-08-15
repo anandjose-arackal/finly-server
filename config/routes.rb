@@ -2398,6 +2398,7 @@ Rails.application.routes.draw do
       resources :bookings do
         patch 'select_option', to: 'travel_request_bookings#select_option'
         patch 'unselect_option', to: 'travel_request_bookings#unselect_option'
+        patch 'cancel', to: 'travel_request_bookings#cancel'
       end
     end
 

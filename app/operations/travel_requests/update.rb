@@ -28,6 +28,13 @@ class TravelRequests::Update < TravelRequests::Base
       add_message :error, 'Travel request not found'
       return
     end
+    if travel_request_params[:policy_id].present? and
+        travel_request_params[:policy_id]&.to_i != travel_request.policy_id and
+        (not TravelRequestStatus.ids_for(:open, :retracted, :rejected).include?(travel_request.status_id) or
+            travel_request.controlling_user_id != user)
+      add_message :error, 'Travel request policy cannot be updated at the moment'
+      return
+    end
   end
 
   def process
@@ -42,6 +49,7 @@ class TravelRequests::Update < TravelRequests::Base
   end
 
   protected
+
   def strong_params
     params.require(:travel_request).permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date)
   end

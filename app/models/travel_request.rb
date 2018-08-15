@@ -57,7 +57,7 @@ class TravelRequest < ActiveRecord::Base
 
   validates :status_id, presence: true#, unless: :open?
   validates :user_id, presence: true#, unless: :open?
-  validates :name, presence: true#, unless: :open?
+  #validates :name, presence: true#, unless: :open?
   validates :from_date, presence: true
   validates :to_date, presence: true
   validate :acceptable_dates?
