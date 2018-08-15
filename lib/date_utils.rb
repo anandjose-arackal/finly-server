@@ -81,7 +81,7 @@ class DateUtils
   end
 
   def self.age(dob)
-    return 0 if dob.nil?
+    return nil if dob.nil?
     now = Time.now.to_date
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end

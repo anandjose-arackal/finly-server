@@ -195,10 +195,18 @@ class BudgetRule < ActiveRecord::Base
   def no_duplicates
     # checking against all budget rules in the respective policy
     self.policy.budget_rules.exclude_deleted.each do |rule|
-      if not rule.id == self.id and rule.amount_value == self.amount_value and
-          rule.categories.pluck(:id) == self.categories.pluck(:id) and rule.period_id == self.period_id and rule.rule_type_id == self.rule_type_id
-        errors.add(:rules, 'already exists. Please try again.')
-      end
+      next if rule.id == self.id
+      next unless rule.amount_value == self.amount_value
+      rule_category_ids = rule.categories.pluck(:id)
+      category_ids = self.categories.pluck(:id)
+      next unless rule_category_ids.size == category_ids and (rule_category_ids - category_ids).blank?
+      next unless rule.period_id == self.period_id
+      next unless rule.rule_type_id == self.rule_type_id
+      errors.add(:rules, 'already exists. Please try again.')
+      # if not rule.id == self.id and rule.amount_value == self.amount_value and
+      #     rule.categories.pluck(:id) == self.categories.pluck(:id) and rule.period_id == self.period_id and rule.rule_type_id == self.rule_type_id
+      #   errors.add(:rules, 'already exists. Please try again.')
+      # end
     end
   end
 

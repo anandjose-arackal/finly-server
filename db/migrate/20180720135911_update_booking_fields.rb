@@ -27,7 +27,7 @@ class UpdateBookingFields < ActiveRecord::Migration
     add_column :booking_car_rentals, :pickup_city_id, :integer, references: 'Location', index: true, foreign_key: true, null: false
     add_column :booking_car_rentals, :drop_city_id, :integer, references: 'Location', index: true, foreign_key: true, null: false
     add_column :booking_car_rentals, :drop_address, :text
-    add_column :booking_car_rentals, :drop_address, :text
+    # add_column :booking_car_rentals, :drop_address, :text
     add_column :booking_car_rentals, :pickup_datetime, :datetime, index: true
     add_column :booking_car_rentals, :drop_datetime, :datetime, index: true
     add_column :booking_car_rentals, :rental_company, :string

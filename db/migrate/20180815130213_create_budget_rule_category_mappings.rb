@@ -11,5 +11,6 @@ class CreateBudgetRuleCategoryMappings < ActiveRecord::Migration
         rule.budget_rule_category_mappings.create category_id: rule.category_id
       end
     end
+    Purpose.seed_data
   end
 end
