@@ -42,8 +42,9 @@ class Policy::Rules::Base < Policy::Base
                                            {greater_than_amount_attributes: [:value, :currency_id]},
                                            {budget_rule_field_mappings_attributes: [:field_configuration_id, :field_drop_down_item_id]})
     elsif params[:budget_rule]
-      params.require(:budget_rule).permit(:budget_rule_id, :category_id, :period_id, :rule_type_id,
+      params.require(:budget_rule).permit(:budget_rule_id, :period_id, :rule_type_id,
                                           :policy_id, :include_reimbursable,
+                                          {budget_rule_category_mappings_attributes: [:category_id]},
                                           {amount_attributes: [:value, :currency_id]},
                                           {with_receipt_amount_attributes: [:value, :currency_id]},
                                           {without_receipt_amount_attributes: [:value, :currency_id]},

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180815073950) do
+ActiveRecord::Schema.define(version: 20180815130213) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -810,6 +810,16 @@ ActiveRecord::Schema.define(version: 20180815073950) do
 
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
   add_index "branch_locations", ["state_id"], name: "index_branch_locations_on_state_id", using: :btree
+
+  create_table "budget_rule_category_mappings", force: :cascade do |t|
+    t.integer  "budget_rule_id", limit: 4, null: false
+    t.integer  "category_id",    limit: 4, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "budget_rule_category_mappings", ["budget_rule_id"], name: "index_budget_rule_category_mappings_on_budget_rule_id", using: :btree
+  add_index "budget_rule_category_mappings", ["category_id"], name: "index_budget_rule_category_mappings_on_category_id", using: :btree
 
   create_table "budget_rule_field_mappings", force: :cascade do |t|
     t.integer  "budget_rule_id",          limit: 4, null: false
@@ -4790,6 +4800,8 @@ ActiveRecord::Schema.define(version: 20180815073950) do
   add_foreign_key "bookings", "booking_types"
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
+  add_foreign_key "budget_rule_category_mappings", "budget_rules"
+  add_foreign_key "budget_rule_category_mappings", "categories"
   add_foreign_key "budget_rule_field_mappings", "budget_rules"
   add_foreign_key "budget_rule_field_mappings", "field_configurations"
   add_foreign_key "budget_rule_field_mappings", "field_drop_down_items"

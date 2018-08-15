@@ -26,7 +26,9 @@
 class BudgetRule < ActiveRecord::Base
   include SoftDeletable
 
-  belongs_to :category
+  # belongs_to :category
+  has_many :budget_rule_category_mappings
+  has_many :categories, through: :budget_rule_category_mappings
   belongs_to :amount, dependent: :destroy
   belongs_to :period
   belongs_to :policy
@@ -41,11 +43,12 @@ class BudgetRule < ActiveRecord::Base
   accepts_nested_attributes_for :with_receipt_amount
   accepts_nested_attributes_for :without_receipt_amount
   accepts_nested_attributes_for :budget_rule_field_mappings
+  accepts_nested_attributes_for :budget_rule_category_mappings
 
   # delegate :period, to: :period
   delegate :type, to: :rule_type
   delegate :amount_value, to: :amount, allow_nil: true
-  delegate :category_name, to: :category
+  # delegate :category_name, to: :category
 
   default_scope {unscope(:where)}
 
@@ -118,9 +121,12 @@ class BudgetRule < ActiveRecord::Base
       end
       rule_in_words += " per " + period
     end
-    if self.category_id
-      rule_in_words += " belonging to category " + self.category_name
+    if self.categories.present?
+        rule_in_words += " belonging to category " + self.categories.pluck(:name).join(', ')
     end
+    # if self.category_id
+    #   rule_in_words += " for category " + self.category_name
+    # end
     if self.budget_rule_field_mappings.present?
       field_config_map = {}
       self.budget_rule_field_mappings.each do |mapping|
@@ -190,7 +196,7 @@ class BudgetRule < ActiveRecord::Base
     # checking against all budget rules in the respective policy
     self.policy.budget_rules.exclude_deleted.each do |rule|
       if not rule.id == self.id and rule.amount_value == self.amount_value and
-          rule.category_id == self.category_id and rule.period_id == self.period_id and rule.rule_type_id == self.rule_type_id
+          rule.categories.pluck(:id) == self.categories.pluck(:id) and rule.period_id == self.period_id and rule.rule_type_id == self.rule_type_id
         errors.add(:rules, 'already exists. Please try again.')
       end
     end
