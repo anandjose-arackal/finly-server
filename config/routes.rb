@@ -2246,7 +2246,7 @@ Rails.application.routes.draw do
   namespace :api do
     post 'callbacks/successful_vendor_payment', to: 'callbacks#successful_vendor_payment', as: :successful_vendor_payment
     post 'callbacks/invoice_payment_received', to: 'callbacks#invoice_payment_received', as: :invoice_payment_received
-end
+  end
 
   ############# Virtual Bank Accounts and Collect API Start ######################
 
@@ -2350,7 +2350,7 @@ end
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
   get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
-  
+
   post 'add_category', to: 'organization_account#add_category', as: :add_category
   delete 'remove_category', to: 'organization_account#remove_category', as: :remove_category
 
@@ -2407,14 +2407,21 @@ end
 
   resources :travel_requests do
     patch 'review', to: 'travel_requests#review', as: :review
+
+    resources :destinations, controller: 'travel_request_destinations', only: [:create, :update, :destroy]
+    resources :destinations do
+      # resources :booking_requests, controller: 'travel_request_booking_requests', only: [:create, :update, :destroy]
+      resources :bookings, controller: 'travel_request_bookings', only: [:create, :update, :destroy]
+      resources :bookings do
+        patch 'select_option', to: 'travel_request_bookings#select_option'
+        patch 'unselect_option', to: 'travel_request_bookings#unselect_option'
+        patch 'cancel', to: 'travel_request_bookings#cancel'
+      end
+    end
+
+    resources :comments, controller: 'travel_requests_comments', only: [:create]
   end
   post 'bookings/upload_attachment', to: 'bookings#upload_attachment'
-
-  scope :travel_requests do
-    resources :bookings do
-    end
-  end
-
 
   resources :booking_attachments, only: [:create]
 
@@ -2749,7 +2756,6 @@ end
   resources :tds_slabs
 
 
-
   scope :payments do
     resources :companies do
       post 'add_balance', to: 'companies#add_balance', as: :add_balance_payments
@@ -2822,7 +2828,7 @@ end
     get 'users/count', to: 'users#count'
     get 'users/managers', to: 'users#get_managers'
     get 'users/categories', to: 'users#categories'
-    
+
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
     end
@@ -2888,7 +2894,6 @@ end
       # resources :company_branches
 
 
-
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     resources :inventory_line_items
@@ -2926,7 +2931,6 @@ end
   resources :budgets
 
   ## Budget apis end ##
-
 
 
   # The priority is based upon order of creation: first created -> highest priority.

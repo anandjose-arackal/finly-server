@@ -69,6 +69,24 @@ class Report::Violation < Report::Base
 
   def process
 
+    expense_rules = policy.expense_rules.non_deleted
+    budget_rules = policy.budget_rules.non_deleted
+
+    selected_drop_down_items = nil
+
+    # For performance optimization, filtering down budget rules based on selected report custom fields
+    if report.custom_fields.only_drop_downs.present?
+      value_ids = report.custom_fields.only_drop_downs.pluck(:value_id)
+      selected_drop_down_items = FieldDropDownSelection.with_id(value_ids).pluck(:value_id)
+
+      rule_field_mappings = BudgetRuleFieldMapping.where(budget_rule_id: budget_rules.pluck(:id))
+      rule_ids = budget_rules.pluck(:id)
+      budgets_without_field_mappings = rule_ids - rule_field_mappings.pluck(:budget_rule_id)
+      rules_with_relevant_mappings =  rule_field_mappings.where(field_drop_down_item_id: selected_drop_down_items).pluck(:budget_rule_id)
+      budget_rules = budget_rules.with_id((budgets_without_field_mappings + rules_with_relevant_mappings))
+      # relevant_budget_rule_id = budget_rules
+    end
+
     report.expenses.each do |expense|
       # because the incompatible expense violation needs to be calculated irrespective of the
       # existence of a policy
@@ -84,10 +102,12 @@ class Report::Violation < Report::Base
       end
 
       unless no_policy
-        policy.expense_rules.non_deleted.each do |rule|
+        expense_rules.each do |rule|
           check_expense_rule rule, expense
         end
-        policy.budget_rules.non_deleted.each do |rule|
+        budget_rules.each do |rule|
+          # next if rule.field_drop_down_items.present? and selected_drop_down_items.nil?
+          # next unless (selected_drop_down_items - rule.field_drop_down_items.pluck(:id)).size < selected_drop_down_items.size
           check_budget rule, expense
         end
       end
@@ -197,7 +217,7 @@ class Report::Violation < Report::Base
     end
   end
 
-  def available_budget(expense, rule, start_date, end_date, category, field_drop_down_item_ids)
+  def available_budget(expense, rule, start_date, end_date, categories, field_drop_down_item_ids)
     user = expense.user
     report = expense.report
     total_expenses = 0
@@ -227,7 +247,7 @@ class Report::Violation < Report::Base
     end
     # Expenses with different usage_date ranges from expense date
     total_expenses += number_with_precision(expenses.without_usage_date_type.with_date_range(start_date, end_date)
-                                                .filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
+                                                .filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
 
     # Expenses without different usage_date ranges from expense date
     expenses.with_usage_date_type.usage_date_within(start_date, end_date).each do |exp|
@@ -297,19 +317,15 @@ class Report::Violation < Report::Base
           elsif rule.period_id == Period.id_for(:day)
             start_date = end_date = date
           end
-          return if rule.category_id && expense.category_id != rule.category_id
-          if rule.category_id
-            category = rule.category
-          else
-            category = nil
-          end
+          return if rule.categories.present? and not rule.categories.pluck(:id).include?(expense.category_id)
+          categories = rule.categories
           field_drop_down_item_ids = nil
           if rule.budget_rule_field_mappings.present?
             field_drop_down_item_ids = rule.budget_rule_field_mappings.pluck(:field_drop_down_item_id)
           end
-          available_budget, violation_type = available_budget(expense, rule, start_date, end_date, category, field_drop_down_item_ids)
+          available_budget, violation_type = available_budget(expense, rule, start_date, end_date, categories, field_drop_down_item_ids)
           if available_budget < 0
-            type = category ? 'category' : 'total'
+            type = categories.present? ? 'category' : 'total'
             message = rule.rule_in_words(violation: true, violation_type: violation_type, exceeded_by: available_budget.abs)
             violation_type = (rule.type == 'Warning') ? 'budget_warning' : 'budget_blocking'
             self.warning_messages[expense.id][violation_type] << {type: type, message: message}

@@ -40,7 +40,7 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
   def post_process
     # add comments #todo
     travel_request.comments.create user_id: user.id,
-                                         action_id: BankPaymentRequestCommentAction.id_for(:reject),
+                                         action_id: TravelRequestCommentAction.id_for(:reject),
                                          note: self.rejection_note
 
     # Event::EBankPaymentRequest::Reject.(user, travel_request: travel_request)

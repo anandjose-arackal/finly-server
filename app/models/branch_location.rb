@@ -20,6 +20,8 @@
 class BranchLocation < ActiveRecord::Base
   belongs_to :company
   belongs_to :state
+  has_many :company_location_departments
+  has_many :company_departments, through: :company_location_departments
 
 
   def address

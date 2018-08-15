@@ -6,12 +6,12 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
 
   def validate
     unless travel_request.user_id == user.id
-      add_message :error, "Only Owners can retract their report"
+      add_message :error, "Only Owners can retract their travel requests"
       return
     end
 
     unless travel_request.can_retract?
-      add_message :error, "Payment Order cannot be retracted in this state"
+      add_message :error, "Travel Request cannot be retracted in this state"
       return
     end
   end

@@ -1,0 +1,58 @@
+class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
+
+  def authorized_user_types
+    [:admin]
+  end
+
+  def authorize
+    super
+    if not user.company_admin? and user.policy_admin?
+      if travel_request.policy and not user.policy_admin?(travel_request.policy) and not user.company_admin? # that is the money_request has a policy and the user is not policy admin
+        raise_unauthorized_exception
+        return false
+      end
+    end
+  end
+
+  def validate
+    unless travel_request.can_take_control?
+      messages[:error] << 'You cannot take control of a travel request unless it is processing'
+      return
+    end
+  end
+
+  def process
+    memo = (params[:note] or params[:memo] or travel_request.memo)
+    action_for_user_id = travel_request.controlling_for_user_id
+    action_for_user_role_id = travel_request.controlling_for_user_role_id
+
+    if travel_request.update_attributes controlling_user: user,
+                                        controlling_for_user: travel_request.controlling_user,
+                                        controlling_user_role_id: UserRole.id_for(:admin),
+                                        controlling_for_user_role_id: travel_request.controlling_user_role_id
+      travel_request.travel_request_trails.create action_user: user,
+                                   action_user_role_id: UserRole.id_for(:admin),
+                                   modified_user_id: travel_request.controlling_for_user_id,
+                                   modified_user_role_id: travel_request.controlling_for_user_role_id,
+                                   action_id: TravelRequestTrailAction.id_for(:take_control)
+
+      travel_request.travel_request_trails.create action_user: user,
+                                                  action_user_role_id: UserRole.id_for(:admin),
+                                                  action_for_user_id: action_for_user_id,
+                                                  action_for_user_role_id: action_for_user_role_id,
+                                                  action_id: TravelRequestTrailAction.id_for(:approve),
+                                                  modified_user_id: action_for_user_id,
+                                                  modified_user_role_id: action_for_user_role_id
+      # travel_request.comments.create user: user,
+      #                               comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
+      #                               content: params[:take_control_note]
+      return
+    end
+    self.messages = travel_request.errors.full_messages
+  end
+
+  def post_process
+    # Event::EMoneyRequest::TakeControl.(self.user, travel_request: self.travel_request)
+  end
+
+end

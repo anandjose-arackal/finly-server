@@ -19,6 +19,7 @@
 
 
 
+
 # expense_type_id: contains details about whether the budget is scoped to a particular
 # type of expense or not
 # 1 - Manual, 2 - Card, 3 - Distance, 4 - Time, 5 - Per Diem
@@ -26,7 +27,9 @@
 class BudgetRule < ActiveRecord::Base
   include SoftDeletable
 
-  belongs_to :category
+  # belongs_to :category
+  has_many :budget_rule_category_mappings
+  has_many :categories, through: :budget_rule_category_mappings
   belongs_to :amount, dependent: :destroy
   belongs_to :period
   belongs_to :policy
@@ -41,11 +44,12 @@ class BudgetRule < ActiveRecord::Base
   accepts_nested_attributes_for :with_receipt_amount
   accepts_nested_attributes_for :without_receipt_amount
   accepts_nested_attributes_for :budget_rule_field_mappings
+  accepts_nested_attributes_for :budget_rule_category_mappings
 
   # delegate :period, to: :period
   delegate :type, to: :rule_type
   delegate :amount_value, to: :amount, allow_nil: true
-  delegate :category_name, to: :category
+  # delegate :category_name, to: :category
 
   default_scope {unscope(:where)}
 
@@ -61,6 +65,8 @@ class BudgetRule < ActiveRecord::Base
 
   has_paper_trail
 
+  scope :with_id, -> (id){where id: id }
+  scope :without_id, -> (id){where.not id: id }
   scope :warning_rules, -> {where rule_type_id: RuleType.warning_rule_id}
 
   scope :blocking_rules, -> {where rule_type_id: RuleType.blocking_rule_id}
@@ -118,9 +124,12 @@ class BudgetRule < ActiveRecord::Base
       end
       rule_in_words += " per " + period
     end
-    if self.category_id
-      rule_in_words += " belonging to category " + self.category_name
+    if self.categories.present?
+        rule_in_words += " belonging to category " + self.categories.pluck(:name).join(', ')
     end
+    # if self.category_id
+    #   rule_in_words += " for category " + self.category_name
+    # end
     if self.budget_rule_field_mappings.present?
       field_config_map = {}
       self.budget_rule_field_mappings.each do |mapping|
@@ -189,10 +198,18 @@ class BudgetRule < ActiveRecord::Base
   def no_duplicates
     # checking against all budget rules in the respective policy
     self.policy.budget_rules.exclude_deleted.each do |rule|
-      if not rule.id == self.id and rule.amount_value == self.amount_value and
-          rule.category_id == self.category_id and rule.period_id == self.period_id and rule.rule_type_id == self.rule_type_id
-        errors.add(:rules, 'already exists. Please try again.')
-      end
+      next if rule.id == self.id
+      next unless rule.amount_value == self.amount_value
+      rule_category_ids = rule.categories.pluck(:id)
+      category_ids = self.categories.pluck(:id)
+      next unless rule_category_ids.size == category_ids and (rule_category_ids - category_ids).blank?
+      next unless rule.period_id == self.period_id
+      next unless rule.rule_type_id == self.rule_type_id
+      errors.add(:rules, 'already exists. Please try again.')
+      # if not rule.id == self.id and rule.amount_value == self.amount_value and
+      #     rule.categories.pluck(:id) == self.categories.pluck(:id) and rule.period_id == self.period_id and rule.rule_type_id == self.rule_type_id
+      #   errors.add(:rules, 'already exists. Please try again.')
+      # end
     end
   end
 

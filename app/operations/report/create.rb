@@ -74,6 +74,7 @@ class Report::Create < Report::Base
                                          controlling_user: for_user,
                                          controlling_user_role_id: role_id,
                                          policy_id: policy_id,
+                                         travel_request_id: params[:travel_request_id],
                                          name: params[:name]
     if report.save
       report.tracks.create action_user: for_user,

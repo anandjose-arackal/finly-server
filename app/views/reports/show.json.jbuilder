@@ -188,15 +188,5 @@ json.budgets do
 
 end
 
-json.user_travel_requests current_user.travel_requests
-json.user_money_requests current_user.money_requests
-
-json.linked_travel_request do
-  json.id @result.report.travel_request&.id
-  json.name @result.report.travel_request&.name
-end
-
-json.linked_money_request do
-  json.id @result.report.money_request&.id
-  json.name @result.report.money_request&.name
-end
+json.pending_travel_requests @result.report.user.travel_requests, :id, :name
+json.associated_travel_request @result.report.travel_request

@@ -22,9 +22,13 @@ class TravelMember < ActiveRecord::Base
 
   validates :first_name, presence: true
   validates :last_name, presence: true
-  validates :age, presence: true
-  validates :mobile_number, presence: true
+  validates :mobile_number, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}
+  validates :email, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
+  # validates :age, presence: true
+  # validates :mobile_number, presence: true
 
   belongs_to :booking
   belongs_to :booking_request
+
+  scope :without_id_nil, -> { where.not id: nil }
 end
