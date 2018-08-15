@@ -1,6 +1,6 @@
 class UserPockets::Index < UserPockets::Base
 
-  attr_accessor :pockets
+  attr_accessor :pockets,:selected_user
 
   class UserPockets::Index::PocketsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -13,7 +13,15 @@ class UserPockets::Index < UserPockets::Base
   end
 
   def init
-    self.pockets = user.user_pockets
+    selected_user_id = params[:id] || params[:selected_user_id]
+    self.selected_user = user.company.users.find_by(id: selected_user_id)
+    if selected_user.blank?
+      self.selected_user = user
+    end
+  end
+
+  def process
+    self.pockets = self.selected_user.user_pockets
   end
 
   def success
