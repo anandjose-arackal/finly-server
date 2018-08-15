@@ -15,7 +15,24 @@ json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
 json.enforce_policy_enabled @result.money_request.user.enforce_policy_enabled?
-json.destination_pocket @result.money_request.destination_pocket&.as_json
+if @result.money_request.destination_pocket.present?
+  json.destination_pocket do
+    pocket = @result.money_request.destination_pocket
+    json.name pocket.name
+    json.pocket_type do
+      json.id pocket.user_pocket_type.id
+      json.name pocket.user_pocket_type.name
+    end
+    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    json.balance adapter.balance(display_balance: true)
+    currency = pocket.base_currency
+    json.base_currency do
+      json.symbol currency&.symbol
+      json.country_code currency&.country_code
+      json.id currency&.id
+    end
+  end
+end
 
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
 

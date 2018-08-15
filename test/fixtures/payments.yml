@@ -33,10 +33,7 @@
 #  post_operation_payload         :text(65535)
 #  category_id                    :integer
 #  api_initiated                  :boolean          default(FALSE)
-#  scheduled_at                   :date
-#  processed_at                   :date
 #  original_payment_for_refund_id :integer
-#  cost_center_id                 :integer
 #
 
 

@@ -108,7 +108,7 @@ class Settlement::SReport::Approved < Report::Base
     user_pocket_ids = report.expenses.pluck(:spent_from_id).uniq
     user_pockets = report.user.user_pockets.with_id(user_pocket_ids)
     user_pockets.each do |pocket|
-      deduction = self.report.expenses.with_spent_from_id(pocket.id).joins(:amount).sum(pocket.base_currency&.symbol)
+      deduction = self.report.expenses.with_spent_from_id(pocket.id).joins(:amount).sum(pocket.base_currency&.country_code)
       if deduction.present? && deduction > 0
         payment_request = PaymentRequest.(self.report.user, nil, "UserPocket", :debit, :settlement_against_advance)
         payment_request.add_payment_item(PaymentRequest::PaymentItem.(self.report.user, pocket, deduction))

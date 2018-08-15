@@ -35,6 +35,7 @@ class UserPocket < ActiveRecord::Base
 
   delegate :balance_value, to: :balance
 
+  scope :with_id, -> (ids) { where id: ids}
   scope :cash_pockets_only, -> {
     where user_pocket_type_id: UserPocketType.id_for(:cash)
   }
