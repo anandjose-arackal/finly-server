@@ -6,7 +6,7 @@ class MoveCashOnHandToUserPockets < ActiveRecord::Migration
       cash_on_hand = user.cash_on_hand
       coh_balance = cash_on_hand.balance_value
       # this pocket will replace cash on hand as the default account for all transactions
-      pocket = user.user_pockets.build(name: "Cash Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), atm_withdrawal_pocket: true, base_currency_id: Currency.first.id, balance_attributes: {value: coh_balance, currency_id: 1})
+      pocket = user.user_pockets.build(name: "Cash Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), atm_withdrawal_pocket: true, balance_attributes: {value: coh_balance, currency_id: 1})
       pocket.save
 
       # # migrating all payments

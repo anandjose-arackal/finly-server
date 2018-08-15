@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180815130213) do
+ActiveRecord::Schema.define(version: 20180815200059) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1458,6 +1458,17 @@ ActiveRecord::Schema.define(version: 20180815130213) do
   add_index "company_location_departments", ["branch_location_id"], name: "index_company_location_departments_on_branch_location_id", using: :btree
   add_index "company_location_departments", ["company_department_id"], name: "index_company_location_departments_on_company_department_id", using: :btree
 
+  create_table "company_pocket_templates", force: :cascade do |t|
+    t.string   "name",                limit: 255
+    t.integer  "company_id",          limit: 4
+    t.integer  "user_pocket_type_id", limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "company_pocket_templates", ["company_id"], name: "index_company_pocket_templates_on_company_id", using: :btree
+  add_index "company_pocket_templates", ["user_pocket_type_id"], name: "index_company_pocket_templates_on_user_pocket_type_id", using: :btree
+
   create_table "company_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -1988,6 +1999,7 @@ ActiveRecord::Schema.define(version: 20180815130213) do
     t.datetime "usage_date_start"
     t.datetime "usage_date_end"
     t.string   "usage_date_type",        limit: 255
+    t.integer  "spent_from_id",          limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -2825,6 +2837,7 @@ ActiveRecord::Schema.define(version: 20180815130213) do
     t.boolean  "auto_approve"
     t.integer  "money_request_processor_mapping_id", limit: 4
     t.datetime "approved_at"
+    t.integer  "destination_pocket_id",              limit: 4
     t.integer  "travel_request_id",                  limit: 4
   end
 
@@ -3291,6 +3304,7 @@ ActiveRecord::Schema.define(version: 20180815130213) do
     t.integer  "category_id",                    limit: 4
     t.boolean  "api_initiated",                                default: false
     t.integer  "original_payment_for_refund_id", limit: 4
+    t.integer  "destination_pocket_id",          limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -4300,6 +4314,28 @@ ActiveRecord::Schema.define(version: 20180815130213) do
   add_index "user_permissions", ["company_id"], name: "index_user_permissions_on_company_id", using: :btree
   add_index "user_permissions", ["user_id"], name: "index_user_permissions_on_user_id", using: :btree
 
+  create_table "user_pocket_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "user_pockets", force: :cascade do |t|
+    t.string   "name",                       limit: 255
+    t.integer  "balance_id",                 limit: 4
+    t.integer  "user_pocket_type_id",        limit: 4
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.string   "account_code",               limit: 255
+    t.boolean  "atm_withdrawal_pocket",                  default: false
+    t.integer  "user_id",                    limit: 4
+    t.integer  "base_currency_id",           limit: 4
+    t.integer  "company_pocket_template_id", limit: 4
+  end
+
+  add_index "user_pockets", ["balance_id"], name: "index_user_pockets_on_balance_id", using: :btree
+  add_index "user_pockets", ["user_pocket_type_id"], name: "index_user_pockets_on_user_pocket_type_id", using: :btree
+
   create_table "user_profiles", force: :cascade do |t|
     t.integer  "user_id",             limit: 4
     t.string   "avatar_file_name",    limit: 255
@@ -4806,6 +4842,8 @@ ActiveRecord::Schema.define(version: 20180815130213) do
   add_foreign_key "company_kycs", "companies"
   add_foreign_key "company_location_departments", "branch_locations"
   add_foreign_key "company_location_departments", "company_departments"
+  add_foreign_key "company_pocket_templates", "companies"
+  add_foreign_key "company_pocket_templates", "user_pocket_types"
   add_foreign_key "company_tags", "companies"
   add_foreign_key "cost_centers", "companies"
   add_foreign_key "custom_fields", "field_configurations"
