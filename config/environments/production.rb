@@ -107,11 +107,11 @@ Rails.application.configure do
   config.action_mailer.default_url_options = {host: 'www.finly.io'}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-      address: 'smtp.sendgrid.net',
+      address: 'email-smtp.us-east-1.amazonaws.com',
       port: 587,
       domain: 'www.finly.io',
-      user_name: 'apikey',
-      password: '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',
+      user_name: 'AKIAJ5HL7SQUHLBE4ADA',
+      password: 'Am8pl0148u28SWX7YqsAy5vbJNujSx9qIYIitPcmgH1+',
       # ssl:                  true,
       # tls:                  true,
       authentication: :plain,
