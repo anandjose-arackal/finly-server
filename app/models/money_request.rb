@@ -172,6 +172,9 @@ class MoneyRequest < ActiveRecord::Base
   scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC') }
   scope :not_settled, -> { where money_request_processor_mapping_id: nil }
   scope :with_processor_mapping, -> (id) { where money_request_processor_mapping_id: id }
+  scope :with_destination_pocket_id, -> (id) {
+    where destination_pocket_id: id
+  }
 
   accepts_nested_attributes_for :custom_fields
 

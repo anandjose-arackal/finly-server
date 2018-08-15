@@ -68,7 +68,7 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
                 # generate_comment(money_request, mapping, request_comment_action, rejected)
               end
               if self.money_request_processor.process_outside_finly? or self.money_request_processor.bank_transfer?
-                add_cash_on_hand(mapping)
+                add_source_pocket(mapping)
               end
             elsif mapping.payment.failed?
               has_failure = true
@@ -95,7 +95,7 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
     end
   end
 
-  def add_cash_on_hand(mapping)
+  def add_source_pocket(mapping)
     if money_request_processor.bank_transfer?
       purpose = :advance
     else
@@ -103,8 +103,9 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
     end
     user = mapping.user
     amount = mapping.amount.value
-    payment_request = PaymentRequest.(user, nil, CashOnHand.name, :credit, purpose)
-    payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, amount, reference_resource: mapping.payment))
+    destination_pocket = mapping.money_requests.first.destination_pocket
+    payment_request = PaymentRequest.(user, nil, UserPocket.name, :credit, purpose)
+    payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, destination_pocket, amount, reference_resource: mapping.payment))
     AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
   end
 
