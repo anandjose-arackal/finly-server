@@ -990,6 +990,13 @@ class Expense < ActiveRecord::Base
     days
   end
 
+  def from_cash_on_hand
+    if self.spent_from.present?
+      return true
+    end
+    false
+  end
+
   private
 
   # cannot add an expense with future date

@@ -302,6 +302,8 @@ class Payment < ActiveRecord::Base
         name += "Finly Money (Bank Transfer Pocket)"
       when "BankAccount"
         name += "Bank Account (Number: #{self.initiating_account.account_number})"
+      when "UserPocket"
+        name += "#{self.receiving_account.name}"
       else
         name = ""
     end
@@ -329,6 +331,8 @@ class Payment < ActiveRecord::Base
         name += "Finly Money (Bank Transfer Pocket)"
       when "BankAccount"
         name += "Bank Account (Number: #{self.receiving_account.account_number})"
+      when "UserPocket"
+        name += "#{self.receiving_account.name}"
       else
         name = ""
     end

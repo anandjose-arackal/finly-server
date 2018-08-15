@@ -1,8 +1,9 @@
-json.extract! expense, :id, :merchant_name, :date, :note, :user_id, :category_id, :report_id, :expense_status_id, :expense_status_name
+json.extract! expense, :id, :merchant_name, :date, :note, :user_id, :category_id, :report_id, :expense_status_id, :expense_status_name, :from_cash_on_hand
 json.amount expense.amount.value
 json.user_name expense.user.name
 json.category_name expense.category.name
 json.type expense.expense_type_id
+json.spent_from_name expense.spent_from&.name
 json.receipt_url do
   large = nil
   normal = nil

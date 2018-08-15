@@ -49,6 +49,11 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
 
     pocket_id = self.expense_params[:spent_from_id]
     self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
+
+    # todo - jugaad to support mobile app for now
+    if StringUtils.to_bool(expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def validate
