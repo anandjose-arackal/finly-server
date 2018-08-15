@@ -110,7 +110,8 @@ class Settlement::Summary < Settlement::Base
 
   def load_cash_on_hand_summary(user_ids)
     self.cash_on_hand_summary = {
-        card_transfer_wallet: Amount.new(value: CashOnHand.with_user(user_ids).sum_balance, currency_id: self.currency_id)
+        card_transfer_wallet: Amount.new(value: CashOnHand.with_user(user_ids).sum_balance, currency_id: self.currency_id),
+        pockets_count: UserPocket.with_user_id(current_company.users.pluck(:id)).count
     }
   end
 

@@ -39,7 +39,7 @@ class MoneyRequest::Base < BaseOperation
   class MoneyRequest::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_request, :items, :manager, :finance_manager, :status, :total, #:money_request_currency,
                   :required_by_date, :comments, :actions, :policies, :selected_policy, :violations,
-                  :result, :card
+                  :result, :card, :cash_pockets
 
     def init
       self.money_request = params[:money_request]
@@ -54,6 +54,7 @@ class MoneyRequest::Base < BaseOperation
       self.manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :manager)
       self.finance_manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :finance_manager)
       self.card = load_card
+      self.cash_pockets = user.user_pockets.cash_pockets_only
     end
 
     def retrieve_policies

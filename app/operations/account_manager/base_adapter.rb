@@ -38,10 +38,12 @@ class AccountManager::BaseAdapter
     self.errors = []
   end
 
+  # i.e. accounts from which we can credit a particular account
   def creditable_accounts
 
   end
 
+  # i.e. accounts to which we can debit a particular account
   def debitable_accounts
 
   end

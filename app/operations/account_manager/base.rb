@@ -23,6 +23,15 @@ class AccountManager::Base < BackgroundOperation
         return AccountManager::BankAccount::BankAccountYesBankAdapter.new(account)
       when 'VendorPaymentWallet'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(account)
+      when 'UserPocket'
+        case account.user_pocket_type_id
+          when UserPocketType.id_for(:cash)
+            return AccountManager::CashPockets::CashPocketsAdapter.new(account)
+          when UserPocketType.id_for(:credit_card)
+            return AccountManager::CardTransferPockets::CreditCardPocketsAdapter.new(account)
+          else
+            # do nothing?
+        end
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end

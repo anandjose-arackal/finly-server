@@ -158,7 +158,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def init_payment_request
     receiving_user = payment.receiving_user
     amount = payment.amount_value
-    receiving_account = receiving_user.cash_on_hand
+    receiving_account = receiving_user.user_pockets.cash_pockets_only.first # todo - jugaad, needs refactoring
     self.payment_request = ::PaymentRequest.(payment.initiating_user, nil, (receiving_account&.class&.name), :credit, :advance)
     self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount, note: self.payment.note))
   end

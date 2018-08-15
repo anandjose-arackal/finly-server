@@ -13,7 +13,6 @@
 #  action_for_user_role_id :integer
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
-#  is_deleted              :boolean          default(FALSE)
 #
 
 class TravelRequestTrail < ActiveRecord::Base

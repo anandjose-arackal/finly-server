@@ -10,9 +10,6 @@
 #  booking_type_id    :integer
 #  note               :text(65535)
 #  created_by_user_id :integer
-#  travel_request_id  :integer          not null
-#  destination_id     :integer          not null
-#  parent_booking_id  :integer
 #
 
 class Booking < ActiveRecord::Base
