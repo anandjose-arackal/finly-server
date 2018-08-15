@@ -11,4 +11,9 @@ class UserPocketsController < ApplicationController
     @result = UserPockets::AssignPocket.(current_user, params)
     respond_success_failure
   end
+
+  def index
+    @result = UserPockets::Index.(current_user, params)
+    respond
+  end
 end
