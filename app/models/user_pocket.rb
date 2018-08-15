@@ -17,6 +17,8 @@
 
 class UserPocket < ActiveRecord::Base
 
+  include Accountable
+  
   belongs_to :user_pocket_type
   belongs_to :balance, class_name: "Amount"
   belongs_to :user
