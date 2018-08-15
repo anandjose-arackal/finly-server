@@ -69,6 +69,24 @@ class Report::Violation < Report::Base
 
   def process
 
+    expense_rules = policy.expense_rules.non_deleted
+    budget_rules = policy.budget_rules.non_deleted
+
+    selected_drop_down_items = nil
+
+    # For performance optimization, filtering down budget rules based on selected report custom fields
+    if report.custom_fields.only_drop_downs.present?
+      value_ids = report.custom_fields.only_drop_downs.pluck(:value_id)
+      selected_drop_down_items = FieldDropDownSelection.with_id(value_ids).pluck(:value_id)
+
+      rule_field_mappings = BudgetRuleFieldMapping.where(budget_rule_id: budget_rules.pluck(:id))
+      rule_ids = budget_rules.pluck(:id)
+      budgets_without_field_mappings = rule_ids - rule_field_mappings.pluck(:budget_rule_id)
+      rules_with_relevant_mappings =  rule_field_mappings.where(field_drop_down_item_id: selected_drop_down_items).pluck(:budget_rule_id)
+      budget_rules = budget_rules.with_id((budgets_without_field_mappings + rules_with_relevant_mappings))
+      # relevant_budget_rule_id = budget_rules
+    end
+
     report.expenses.each do |expense|
       # because the incompatible expense violation needs to be calculated irrespective of the
       # existence of a policy
@@ -84,10 +102,12 @@ class Report::Violation < Report::Base
       end
 
       unless no_policy
-        policy.expense_rules.non_deleted.each do |rule|
+        expense_rules.each do |rule|
           check_expense_rule rule, expense
         end
-        policy.budget_rules.non_deleted.each do |rule|
+        budget_rules.each do |rule|
+          # next if rule.field_drop_down_items.present? and selected_drop_down_items.nil?
+          # next unless (selected_drop_down_items - rule.field_drop_down_items.pluck(:id)).size < selected_drop_down_items.size
           check_budget rule, expense
         end
       end

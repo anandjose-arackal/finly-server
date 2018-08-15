@@ -64,6 +64,8 @@ class BudgetRule < ActiveRecord::Base
 
   has_paper_trail
 
+  scope :with_id, -> (id){where id: id }
+  scope :without_id, -> (id){where.not id: id }
   scope :warning_rules, -> {where rule_type_id: RuleType.warning_rule_id}
 
   scope :blocking_rules, -> {where rule_type_id: RuleType.blocking_rule_id}

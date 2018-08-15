@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company37::MoneyRequest37::Submit37::PreProcess < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company109::MoneyRequest109::Submit109::PreProcess < Personalizer::Adapters::Base
   # attr_accessor :money_request
   #
   # def init
