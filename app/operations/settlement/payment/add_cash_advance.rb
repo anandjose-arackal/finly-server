@@ -91,6 +91,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       end
     else
       op = Settlement::Payment::AddCashAdvanceBackground.call_async(user.id, params)
+      # op = Settlement::Payment::AddCashAdvanceBackground.call(user.id, params)
       add_message :success, "Cash on hand credit has been initiated. Please check back in some time for the money to reflect"
       return
     end

@@ -18,6 +18,7 @@ json.enforce_policy_enabled @result.money_request.user.enforce_policy_enabled?
 if @result.money_request.destination_pocket.present?
   json.destination_pocket do
     pocket = @result.money_request.destination_pocket
+    json.id pocket.id
     json.name pocket.name
     json.pocket_type do
       json.id pocket.user_pocket_type.id
