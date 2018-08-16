@@ -31,7 +31,7 @@ class TravelRequests::Update < TravelRequests::Base
     if travel_request_params[:policy_id].present? and
         travel_request_params[:policy_id]&.to_i != travel_request.policy_id and
         (not TravelRequestStatus.ids_for(:open, :retracted, :rejected).include?(travel_request.status_id) or
-            travel_request.controlling_user_id != user)
+            travel_request.controlling_user_id != user.id)
       add_message :error, 'Travel request policy cannot be updated at the moment'
       return
     end
