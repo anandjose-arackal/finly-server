@@ -165,11 +165,11 @@ views:
       #  - name: <span class="superscript">Company</span> Money Requests
       #    url: requests
       #    id: requests
-      #  <% # if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      #  <%# if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
       #  - name: <span class="superscript">Company</span> Trips
       #    url: travel_requests
       #    id: travel_requests
-      #  <% # end %>
+      #  <%# end %>
       - name: <span class="superscript">Company</span> Employees
         url: employees
         id: employees
@@ -187,10 +187,7 @@ views:
         url: '#organization_account/params={"view":"auditor"}'
       - name: Company Statements
         url: '#company_statements/params={"view": "auditor"}'
-      <%# if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      # - name: Trips
-      #   url: '#travel_requests/params={"view": "auditor"}'
-      <%# end %>
+
   <% end %>
   <% if current_user.travel_manager? %>
   travel_manager:
