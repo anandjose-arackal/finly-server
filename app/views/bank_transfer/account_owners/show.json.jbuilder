@@ -44,10 +44,13 @@ json.transactions do
   end
 end
 if @result.account_owner.is_a?(YesBankVendor)
-  json.attachment do
-    json.url @result.account_owner.vendor_attachments.first&.attached_file&.url
-    json.thumb @result.account_owner.vendor_attachments.first&.attached_file&.url(:thumb)
-    json.file_type @result.account_owner.vendor_attachments.first&.attached_file_content_type
+  json.attachments do
+    json.array! @result.account_owner.vendor_attachments do |attachment|
+      json.url attachment.attached_file&.url
+      json.thumb attachment.attached_file&.url(:thumb)
+      json.file_type attachment.attached_file_content_type
+      json.attachment_type attachment.attachment_type
+    end
   end
 
   json.vendor_type do
@@ -55,4 +58,3 @@ if @result.account_owner.is_a?(YesBankVendor)
     json.name @result.account_owner.vendor_type&.name
   end
 end
-

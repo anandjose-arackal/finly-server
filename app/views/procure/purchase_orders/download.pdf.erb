@@ -10,9 +10,9 @@
       <img src="<%= @company.configuration.logo.url(:thumb) %>" width="250" height="auto">
     </div>
     <div class="vendor-address">
-      <span class="company-name font-size-14 bold"><%= @result.purchase_order.location&.name %></span>
+      <span class="company-name font-size-14 bold"><%= @result.purchase_order.location.name %></span>
       <span class="address-line-1"></span>
-      <span class="address-line-2"><%= @result.purchase_order.location&.address %></span>
+      <span class="address-line-2"><%= @result.purchase_order.location.address %></span>
     </div>
   </div>
   <div class="document-details">
@@ -32,13 +32,37 @@
           <span class="title">Due Date</span>
           <span class="value"><%= @result.purchase_order.delivery_date&.strftime "%b-%d-%Y" %></span>
         </span>
+      <span class="block">
+          <span class="title">Payment Term</span>
+          <span class="value"><%= @result.purchase_order.payment_term&.name %></span>
+        </span>
     </div>
   </div>
 </div>
 <div class="containers customer-details-container overflow-hidden">
   <div class="customer-details wd-33">
     <div class="main-title width-fit-content">Vendor Details</div>
-    <span class="block">
+    <table class="table-customer-details" style="margin-right: 10px;">
+      <tbody>
+      <tr>
+        <td class="table-title">Name</td>
+        <td class="table-value"><%= @result.purchase_order.vendor.display_name %></td>
+      </tr>
+      <tr>
+        <td class="table-title">Mobile</td>
+        <td class="table-value"><%= @result.purchase_order.vendor.mobile_number %></td>
+      </tr>
+      <tr>
+        <td class="table-title">PAN Number</td>
+        <td class="table-value"><%= @result.purchase_order.vendor.pan %></td>
+      </tr>
+      <tr>
+        <td class="table-title">GSTIN</td>
+        <td class="table-value"><%= @result.purchase_order.vendor.gst %></td>
+      </tr>
+      </tbody>
+    </table>
+    <!-- <span class="block">
         <span class="title">Name</span>
         <span class="value"><%= @result.purchase_order.vendor.name %></span>
       </span>
@@ -53,25 +77,55 @@
     <span class="block">
         <span class="title">GSTIN</span>
         <span class="value"><%= @result.purchase_order.vendor.gst %></span>
-      </span>
+      </span> -->
   </div>
   <div class="billing-address wd-33">
     <div class="main-title width-fit-content">Billing Address</div>
-    <div class="address">
-      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.location&.name %></span>
-      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.location&.address %></span>
-      <span class="city mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.location&.gstin %></span>
-      <span class="state mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.location&.pan %></span>
-    </div>
+    <table class="table-locations" style="margin-right: 10px;">
+      <tbody>
+      <tr>
+        <td colspan="2" class="table-title"><%= @result.purchase_order.location.name %></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="table-value" style="padding-left: 0 !important;"><%= @result.purchase_order.location.address %></td>
+      </tr>
+      <tr>
+        <td class="table-title">GST Number :</td>
+        <td class="table-value"><%= @result.purchase_order.location.gstin %></td>
+      </tr>
+      <tr>
+        <td class="table-title">PAN Number :</td>
+        <td class="table-value"><%= @result.purchase_order.location.pan %></td>
+      </tr>
+      </tbody>
+    </table>
+    <!-- <div class="address">
+      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.location.name %></span>
+      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.location.address %></span>
+      <span class="city mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.location.gstin %></span>
+      <span class="state mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.location.pan %></span>
+    </div> -->
   </div>
   <div class="shipping-address wd-33">
     <div class="main-title width-fit-content">Shipping Address</div>
-    <div class="address">
-      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.delivery_location&.name %></span>
-      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.delivery_location&.address %></span>
-      <span class="city bold mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.delivery_location&.gstin %></span>
-      <span class="state bold mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.delivery_location&.pan %></span>
-    </div>
+    <table class="table-locations">
+      <tbody>
+      <tr>
+        <td colspan="2" class="table-title"><%= @result.purchase_order.delivery_location.name %></td>
+      </tr>
+      <tr>
+        <td colspan="2" class="table-value" style="padding-left: 0 !important;"><%= @result.purchase_order.delivery_location.address %></td>
+      </tr>
+      <tr>
+        <td class="table-title">GST Number :</td>
+        <td class="table-value"><%= @result.purchase_order.delivery_location.gstin %></td>
+      </tr>
+      <tr>
+        <td class="table-title">PAN Number :</td>
+        <td class="table-value"><%= @result.purchase_order.delivery_location.pan %></td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -106,7 +160,7 @@
 <!-- END -->
 
 <div class="containers document-line-items-container overflow-hidden">
-  <div class="main-title width-fit-content">Invoice Items</div>
+  <div class="main-title width-fit-content">Items</div>
   <table class="table-document-items">
     <thead>
     <tr>
@@ -159,13 +213,12 @@
 <!-- <div class="footer">
   <p>Generated by Finly Spend Management - https://www.finly.io</p>
 </div> -->
-<div class="alwaysbreak"></div>
+<!--<div class="page-break"></div>-->
 
-<div class="wrapper-terms">
-  <h3 style="text-align: center;">Terms And Conditions</h3>
-
-  <div class="terms">
-    <%= h @result.purchase_order.procurement_term_text %>
+<div class="terms">
+  <div class="main-title width-fit-content">Terms & Conditions</div>
+  <div class="term-text">
+    <%= simple_format @result.purchase_order.procurement_term_text, {}, wrapper_tag: "div" %>
   </div>
 
 </div>
@@ -173,9 +226,6 @@
 </html>
 
 <style type="text/css">
-  div.alwaysbreak { page-break-before: always; }
-  div.nobreak:before { clear:both; }
-  div.nobreak { page-break-inside: avoid; }
   @media print{
     body{
       font-family: sans-serif;
@@ -218,7 +268,6 @@
       font-weight: 300;
       color: cornflowerblue;
       margin-bottom: 10px;
-      border-bottom: 1px solid #c4c4c4;
       padding-bottom: 4px;
     }
     .title{
@@ -226,7 +275,7 @@
       display: inline-block;
       width: 80px;
       margin-right: 10px;
-      font-weight: 300;
+      font-weight: bold;
       color: #7b7b7b;
       float: left;
       word-break: break-all;
@@ -235,12 +284,29 @@
       font-size: 12px;
       display: inline-block;
       width: calc(100% - 100px);
-      /*margin-right: 20px;*/
-      /*margin-right: 10px;*/
-      font-weight: bold;
+      margin-right: 20px;
+      margin-right: 10px;
+      font-weight: 300;
       color: #7b7b7b;
       float: right;
+      /*word-break: break-all;*/
+    }
+    .table-title{
+      font-size: 12px;
+      width: 85px;
+      font-weight: bold;
+      color: #7b7b7b;
       word-break: break-all;
+      vertical-align: top;
+    }
+    .table-value{
+      font-size: 12px;
+      padding-left: 10px;
+      width: calc(100% - 85px);
+      font-weight: 300;
+      color: #7b7b7b;
+      word-break: break-all;
+      vertical-align: top;
     }
     .footer {
       position: fixed;
@@ -391,8 +457,18 @@
       color: #444;
       width: calc(100% - 100px);
     }
+    .terms .term-text{
+      font-weight: 300;
+      color: #7b7b7b;
+      font-size: 12px;
+    }
   }
   @media screen{
+    .terms .term-text{
+      font-weight: 300;
+      color: #7b7b7b;
+      font-size: 12px;
+    }
     body{
       font-family: sans-serif;
       margin:0;
@@ -434,7 +510,6 @@
       font-weight: 300;
       color: cornflowerblue;
       margin-bottom: 10px;
-      border-bottom: 1px solid #c4c4c4;
       padding-bottom: 4px;
     }
     .title{
@@ -442,7 +517,7 @@
       display: inline-block;
       width: 80px;
       margin-right: 10px;
-      font-weight: 300;
+      font-weight: bold;
       color: #7b7b7b;
       float: left;
     }
@@ -452,9 +527,26 @@
       width: calc(100% - 100px);
       margin-right: 20px;
       margin-right: 10px;
-      font-weight: bold;
+      font-weight: 300;
       color: #7b7b7b;
       float: right;
+    }
+    .table-title{
+      font-size: 12px;
+      width: 85px;
+      font-weight: bold;
+      color: #7b7b7b;
+      word-break: break-all;
+      vertical-align: top;
+    }
+    .table-value{
+      font-size: 12px;
+      padding-left: 10px;
+      width: calc(100% - 85px);
+      font-weight: 300;
+      color: #7b7b7b;
+      word-break: break-all;
+      vertical-align: top;
     }
     .footer {
       position: fixed;
@@ -521,7 +613,7 @@
       margin-top: 20px;
       margin-bottom: 20px;
       text-align: center;
-      /*letter-spacing: 1px;*/
+      letter-spacing: 1px;
       text-transform: uppercase;
       color: #444;
       font-weight: bold;

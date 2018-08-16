@@ -14,3 +14,9 @@ json.currencies do
     json.merge! currency.as_json
   end
 end
+
+json.tds_rates do
+  json.array! @result.tds_rates do |tds_rate|
+    json.extract! tds_rate, :id, :name, :tds
+  end
+end
