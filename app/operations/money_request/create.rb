@@ -45,7 +45,7 @@ class MoneyRequest::Create < MoneyRequest::Base
                                        status_id: MoneyRequestStatus.id_for(:open)
       CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), reset_fields: true, save: true)
     else
-      self.messages = money_request.errors.full_messages
+      self.messages[:error] = money_request.errors.full_messages
     end
   end
 
