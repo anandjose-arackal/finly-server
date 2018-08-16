@@ -27,8 +27,9 @@
 #  auto_approve                       :boolean
 #  money_request_processor_mapping_id :integer
 #  approved_at                        :datetime
-#  travel_request_id                  :integer
+#  destination_pocket_id              :integer
 #
+
 
 
 
@@ -52,6 +53,7 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :policy
   belongs_to :payment
   belongs_to :money_request_processor_mapping
+  belongs_to :destination_pocket, class_name: "UserPocket"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -171,6 +173,9 @@ class MoneyRequest < ActiveRecord::Base
   scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC') }
   scope :not_settled, -> { where money_request_processor_mapping_id: nil }
   scope :with_processor_mapping, -> (id) { where money_request_processor_mapping_id: id }
+  scope :with_destination_pocket_id, -> (id) {
+    where destination_pocket_id: id
+  }
 
   accepts_nested_attributes_for :custom_fields
 
@@ -181,6 +186,7 @@ class MoneyRequest < ActiveRecord::Base
   default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
   validates :policy_id, presence: true
+  # validate :cash_pocket_presence
 
   before_save :handle_name
   before_save :handle_nil_amount
@@ -307,6 +313,14 @@ class MoneyRequest < ActiveRecord::Base
     self.user.company.active_categories.expense_management_only.each do |category|
       amount = Amount.create value: 0, currency_id: Currency.first.id
       self.items.build category_id: category.id, amount_id: amount.id
+    end
+  end
+
+  def cash_pocket_presence
+    if self.payment_mode_id == PaymentMode.id_for(:cash)
+      if self.destination_pocket_id.blank?
+        errors.add(:cash, "money requests cannot be created without a destination account")
+      end
     end
   end
 

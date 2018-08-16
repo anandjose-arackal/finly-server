@@ -2,19 +2,18 @@
 #
 # Table name: booking_restaurants
 #
-#  id                 :integer          not null, primary key
-#  restaurant_name    :string(255)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  parent_id          :integer
-#  parent_type        :string(255)
-#  location_id        :integer          not null
-#  restaurant_address :text(65535)
-#  number_of_guests   :integer
-#  description        :text(65535)
-#  is_deleted         :boolean          default(FALSE)
-#  reservation_date   :date
-#  reservation_time   :time
+#  id                      :integer          not null, primary key
+#  reservation_destination :string(255)
+#  reservation_date        :date
+#  reservation_time        :string(255)
+#  restaurant_name         :string(255)
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  parent_id               :integer
+#  parent_type             :string(255)
+#  restaurant_rating       :string(255)
+#  start_time              :text(65535)
+#  end_time                :text(65535)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

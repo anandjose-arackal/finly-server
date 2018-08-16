@@ -65,6 +65,13 @@ class Expense::Manual::Update < Expense::Manual::Base
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
     end
+
+    pocket_id = self.updated_expense_params[:spent_from_id]
+    self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
+
+    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def authorize
@@ -85,8 +92,13 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
+    if self.updated_expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+      add_message :error, "Could not find pocket from which this expense was spent"
+      return
+    end
+
     # checking if there is enough cash on hand to mark this expense as from cash on hand
-    check_coh_availability_update(updated_expense_params)
+    check_coh_availability_update(self.cash_pocket, updated_expense_params)
 
     # ensuring a particular expense cannot be both reimbursable and from cash on hand
     check_coh_reimbursable_exclusivity_update(updated_expense_params)

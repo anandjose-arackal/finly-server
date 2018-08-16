@@ -1,7 +1,7 @@
 class User::Balances::Show < User::Base
 
   attr_accessor :balances, :current_app, :selected_user, :actions,
-                :wallet_info, :company_credits_info, :card_info, :cash_on_hand_info
+                :wallet_info, :company_credits_info, :card_info, :user_pockets_info
 
   # using *_info is being used to store all balances and eligibility for this particular user
   # so that the APIs are not called repeatedly in multiple places
@@ -15,7 +15,7 @@ class User::Balances::Show < User::Base
     else
       self.selected_user = user
     end
-    self.balances = {company_credits: [], finly_money: [], cards: [], cash_on_hand: []}
+    self.balances = {company_credits: [], finly_money: [], cards: [], user_pockets: []}
     retrieve_balances
   end
 
@@ -37,9 +37,9 @@ class User::Balances::Show < User::Base
         if (selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?) || selected_user.company.bank_reimbursement_enabled?
           set_yes_bank_balances
         end
-        # showing cash on hand balances based on whether they have expense management enabled
+        # showing user pocket balances based on whether they have expense management enabled
         if selected_user.company.expense_management_enabled? && selected_user.expense_management_enabled?
-          set_cash_on_hand_balances
+          set_pocket_balances
         end
       when 'vp'
         if selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?
@@ -106,6 +106,19 @@ class User::Balances::Show < User::Base
         return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account)
       when 'VendorPaymentWallet'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(account)
+      when 'UserPocket'
+        case account.user_pocket_type_id
+          when UserPocketType.id_for(:cash)
+            return AccountManager::CashPockets::CashPocketsAdapter.new(account)
+          when UserPocketType.id_for(:credit_card)
+            return AccountManager::CardTransferPockets::CreditCardPocketsAdapter.new(account)
+          when UserPocketType.id_for(:card_transfer)
+            return AccountManager::CardTransferPockets::CardTransferPocketsAdapter.new(account)
+          when UserPocketType.id_for(:bank_transfer)
+            return AccountManager::BankTransferPockets::BankTransferPocketsAdapter.new(account)
+          else
+            # do nothing?
+        end
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end
@@ -116,7 +129,6 @@ class User::Balances::Show < User::Base
     yes_bank_company_adapter = retrieve_adapter selected_user.company.yes_bank_company_account
     wallet_adapter = retrieve_adapter user.wallet
     bank_wallet_adapter = retrieve_adapter user.bank_wallet
-    cash_on_hand_adapter = retrieve_adapter user.cash_on_hand
 
     self.card_info = {}
     selected_user.cards.each do |card|
@@ -147,11 +159,11 @@ class User::Balances::Show < User::Base
             balance: wallet_adapter.balance
         }
     }
-    self.cash_on_hand_info = {
-        itz_cash: {
-            balance: cash_on_hand_adapter.balance(display_balance: true)
-        }
-    }
+    self.selected_user.user_pockets.each do |pocket|
+      pocket_adapter = retrieve_adapter(pocket)
+      self.user_pockets_info = {} unless self.user_pockets_info.is_a?(Hash)
+      self.user_pockets_info[pocket.id] = pocket_adapter.balance(display_balance: true)
+    end
   end
 
   def set_itz_cash_balances
@@ -218,14 +230,16 @@ class User::Balances::Show < User::Base
     end
   end
 
-  def set_cash_on_hand_balances
-    # adding cash on hand
-    self.balances[:cash_on_hand] = [] if self.balances[:cash_on_hand].blank?
-    self.balances[:cash_on_hand] << {
-        name: "Available Cash On Hand",
-        type: "cash",
-        balance: self.cash_on_hand_info[:itz_cash][:balance]
-    }
+  def set_pocket_balances
+    # adding pocket balances
+    self.balances[:user_pockets] = [] if self.balances[:user_pockets].blank?
+    self.selected_user.user_pockets.each do |pocket|
+      self.balances[:user_pockets] << {
+          name: pocket.name,
+          type: pocket.user_pocket_type&.name&.humanize,
+          balance: self.user_pockets_info[pocket.id]
+      }
+    end
   end
 
   def set_actions

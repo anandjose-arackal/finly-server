@@ -38,6 +38,8 @@ class FinlyTransaction < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount, :opening_balance, :closing_balance
 
+  delegate :amount_value, to: :amount
+
   validates :finly_account_id, presence: true
   validates :finly_account_type, presence: true, :inclusion => {:in => AccountManagerUtils.available_accounts(format: :string)}
   validates :transaction_type_id, presence: true

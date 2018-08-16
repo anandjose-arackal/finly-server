@@ -52,6 +52,14 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     if expense_params[:receipts_attributes] == [nil] or expense_params[:receipts_attributes] == ['']
       expense_params.delete(:receipts_attributes)
     end
+
+    pocket_id = self.expense_params[:spent_from_id]
+    self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
+
+    # todo - jugaad to support mobile app for now
+    if StringUtils.to_bool(expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def validate
@@ -66,6 +74,11 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       return false
     end
 
+    if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+      add_message :error, "Could not find pocket from which this expense was spent"
+      return
+    end
+
     # checking if the report is editable for personal view
     if personal_view? and expense_params[:report_id].present?
       report = user.reports.find_by(id: expense_params[:report_id])
@@ -73,6 +86,9 @@ class Expense::ExTime::Create < Expense::ExTime::Base
         add_message :error, "Expense cannot be added to the report in this state"
       end
     end
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_availability_create(self.pocket, expense_params)
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_create(expense_params)

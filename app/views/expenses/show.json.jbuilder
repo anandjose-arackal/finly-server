@@ -7,6 +7,24 @@ if @result.expense.category.parent.present?
   json.parent_category_id @result.expense.category.parent.id
 end
 
+
+if @result.expense.spent_from.present?
+  json.pocket do
+    json.pocket_name @result.expense.spent_from&.name
+    json.pocket_id @result.expense.spent_from&.id
+    json.pocket_balance @result.expense.spent_from&.name
+  end
+end
+
+json.cash_pockets do
+  json.array!(@result.cash_pockets) do |pocket|
+    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    json.name pocket.name
+    json.balance adapter.balance(display_balance: true)
+    json.id pocket.id
+  end
+end
+
 if @result.expense.report.present?
   json.report_id @result.expense.report_id
 end

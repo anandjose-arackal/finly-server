@@ -551,6 +551,8 @@
 #                                         policy_add_rule POST   /policies/:policy_id/add_rule(.:format)                                                      rules#create
 #                                      policy_remove_rule DELETE /policies/:policy_id/remove_rule(.:format)                                                   rules#destroy
 #                                      policy_description GET    /policies/:policy_id/description(.:format)                                                   policies#show_description
+#                                    policy_vehicle_rates POST   /policies/:policy_id/vehicle_rates(.:format)                                                 vehicle_rates#create
+#                                     policy_vehicle_rate DELETE /policies/:policy_id/vehicle_rates/:id(.:format)                                             vehicle_rates#destroy
 #                                                         GET    /policies(.:format)                                                                          policies#index
 #                                                         POST   /policies(.:format)                                                                          policies#create
 #                                              new_policy GET    /policies/new(.:format)                                                                      policies#new
@@ -612,6 +614,16 @@
 #                                                         PATCH  /companies/:id(.:format)                                                                     companies#update
 #                                                         PUT    /companies/:id(.:format)                                                                     companies#update
 #                                                         DELETE /companies/:id(.:format)                                                                     companies#destroy
+#                                            user_pockets GET    /user_pockets(.:format)                                                                      user_pockets#index
+#                                                         POST   /user_pockets(.:format)                                                                      user_pockets#create
+#                                         new_user_pocket GET    /user_pockets/new(.:format)                                                                  user_pockets#new
+#                                        edit_user_pocket GET    /user_pockets/:id/edit(.:format)                                                             user_pockets#edit
+#                                             user_pocket GET    /user_pockets/:id(.:format)                                                                  user_pockets#show
+#                                                         PATCH  /user_pockets/:id(.:format)                                                                  user_pockets#update
+#                                                         PUT    /user_pockets/:id(.:format)                                                                  user_pockets#update
+#                                                         DELETE /user_pockets/:id(.:format)                                                                  user_pockets#destroy
+#                                                         GET    /assignable_pockets/:selected_user_id(.:format)                                              user_pockets#assignable_pockets
+#                                           assign_pocket POST   /assign_pockets(.:format)                                                                    user_pockets#assign_pocket
 #                organization_account_sidebar_menu_config GET    /organization_account/sidebar_menu_config(.:format)                                          organization_account#sidebar_menu_config
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                                organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                   organization_account#categories
@@ -880,6 +892,7 @@
 #                                                 welcome GET    /welcome(.:format)                                                                           home#welcome
 #                                                   about GET    /about(.:format)                                                                             home#about
 #                                               resources GET    /resources(.:format)                                                                         home#resources
+#                                              currencies GET    /currencies(.:format)                                                                        expenses#currencies
 #                                   autocomplete_merchant GET    /autocomplete/merchant(.:format)                                                             autocomplete#merchant
 #                                       autocomplete_user GET    /autocomplete/user(.:format)                                                                 autocomplete#user
 #                                       autocomplete_card GET    /autocomplete/card(.:format)                                                                 autocomplete#card
@@ -2326,6 +2339,10 @@ Rails.application.routes.draw do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
     resources :locations
   end
+
+  resources :user_pockets
+  get 'assignable_pockets/:selected_user_id', to: 'user_pockets#assignable_pockets'
+  post 'assign_pockets', to: 'user_pockets#assign_pocket', as: :assign_pocket
 
   # get 'organization_account' => 'organization_account#show'
   get 'organization_account/sidebar_menu_config' => 'organization_account#sidebar_menu_config'
