@@ -5,3 +5,4 @@ json.cash_pockets do
     json.set! @result.details_for pocket
   end
 end
+json.custom_fields @result.field_configurations
