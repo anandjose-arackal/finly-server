@@ -31,21 +31,21 @@ class MoneyRequestItem < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
 
-  before_save :handle_category_mapping
+  # before_save :handle_category_mapping
 
-  def handle_category_mapping
-    if self.category_id.present? and self.money_request_item_category_id.blank?
-      self.money_request_item_category_id = self.category_id
-      self.category_id = nil
-    end
-  end
+  # def handle_category_mapping
+  #   if self.category_id.present? and self.money_request_item_category_id.blank?
+  #     self.money_request_item_category_id = self.category_id
+  #     self.category_id = nil
+  #   end
+  # end
 
-  def category
-    self.money_request_item_category
-  end
-
-  def category_id
-    self.money_request_item_category_id
-  end
+  # def category
+  #   self.money_request_item_category
+  # end
+  #
+  # def category_id
+  #   self.money_request_item_category_id
+  # end
 
 end

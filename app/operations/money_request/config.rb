@@ -11,7 +11,7 @@ class MoneyRequest::Config < BaseOperation
   end
 
   def init
-    self.categories = user.company.money_request_item_categories.active
+    self.categories = user.company.categories.active
     self.cash_pockets = user.user_pockets.cash_pockets_only
     self.card = user.cards.first
     self.policy = user.policies.with_id(params[:policy_id])&.first
