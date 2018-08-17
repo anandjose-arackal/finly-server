@@ -189,4 +189,4 @@ json.budgets do
 end
 
 json.pending_travel_requests @result.report.user.travel_requests, :id, :name
-json.associated_travel_request @result.report.travel_request
+json.associated_trip @result.report.travel_request
