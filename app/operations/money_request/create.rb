@@ -43,16 +43,19 @@ class MoneyRequest::Create < MoneyRequest::Base
                                        modified_user_role_id: param[:controlling_user_role_id],
                                        money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
                                        status_id: MoneyRequestStatus.id_for(:open)
-      CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), reset_fields: true, save: true)
+      CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request),
+          reset_fields: true, save: true)
     else
       self.messages[:error] = money_request.errors.full_messages
     end
   end
 
   private
+
   def create_params
     return {} unless params[:money_request].present?
-    params[:money_request].permit(:name, :travel_request_id, :required_by_date, :destination_pocket_id, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
+    params[:money_request].permit(:name, :travel_request_id, :required_by_date, :destination_pocket_id, :policy_id,
+                                  items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
   end
 
 end

@@ -36,7 +36,6 @@ if @result.money_request.destination_pocket.present?
 end
 
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
-
 json.card @result.card
 
 json.user_reports current_user.reports

@@ -2396,6 +2396,7 @@ Rails.application.routes.draw do
 
 
   patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
+  get 'money_requests/config', to: 'money_request#config_details'
   delete 'money_requests/destroy', to: 'money_request#destroy'
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
