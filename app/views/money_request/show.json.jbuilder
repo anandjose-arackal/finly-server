@@ -65,8 +65,12 @@ json.cash_pockets do
     end
   end
 end
-json.pending_travel_requests @result.money_request.user&.travel_requests, :id, :name
-json.associated_travel_request @result.money_request&.travel_request
+travel_desk_enabled = @result.money_request.user.travel_desk_enabled?
+json.show_trips travel_desk_enabled
+if travel_desk_enabled
+  json.pending_travel_requests @result.money_request.user.travel_requests, :id, :name
+  json.associated_trip @result.money_request.travel_request
+end
 
 json.forwardable_users do
   forwardable_users = @result.forwardable_users
