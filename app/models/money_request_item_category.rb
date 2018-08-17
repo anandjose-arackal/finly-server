@@ -4,6 +4,8 @@ class MoneyRequestItemCategory < ActiveRecord::Base
   validates :name, presence: true
   validates :company, presence: true
 
+  scope :active, -> (is_active){ where active: is_active }
+
   def as_json(options={})
     {
         id: id,

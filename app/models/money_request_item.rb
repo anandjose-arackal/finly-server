@@ -36,6 +36,7 @@ class MoneyRequestItem < ActiveRecord::Base
   def handle_category_mapping
     if self.category_id.present? and self.money_request_item_category_id.blank?
       self.money_request_item_category_id = self.category_id
+      self.category_id = nil
     end
   end
 
