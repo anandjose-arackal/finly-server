@@ -87,7 +87,7 @@ end
 
 # For money requests
 json.cash_pockets do
-  json.array!(@result.cash_pockets) do |pocket|
+  json.array!(@result.travel_request.user.user_pockets.cash_pockets_only) do |pocket|
     adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
     json.name pocket.name
     json.balance adapter.balance(display_balance: true)
