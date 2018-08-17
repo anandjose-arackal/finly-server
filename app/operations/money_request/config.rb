@@ -31,6 +31,7 @@ class MoneyRequest::Config < BaseOperation
     params[:categories] = self.categories
     params[:cash_pockets] = self.cash_pockets
     params[:card] = self.card
+    params[:field_configurations] = self.field_configurations
     MoneyRequest::Config::SuccessPresenter.new(user, params, messages)
   end
 
