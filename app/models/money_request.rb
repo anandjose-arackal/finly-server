@@ -189,6 +189,7 @@ class MoneyRequest < ActiveRecord::Base
   # validate :cash_pocket_presence
 
   before_save :handle_name
+  before_save :handle_category_mapping
   before_save :handle_nil_amount
   before_create :create_items
 

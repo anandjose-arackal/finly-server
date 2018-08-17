@@ -74,6 +74,7 @@ class Company < ActiveRecord::Base
   has_many :customers
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+  has_many :money_request_item_categories
 
   has_many :budgets
 
