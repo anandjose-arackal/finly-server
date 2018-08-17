@@ -22,6 +22,17 @@ class Budgets::Update < Budgets::Base
         return
       end
     end
+
+    parent_budget_id = params[:parent_id]
+    parent_budget = user.company.budgets.find_by(id: parent_budget_id)
+    # check to make sure the sum of all child budgets is less than the sum of all parent budgets
+    if parent_budget.present?
+      sum_of_child_budgets = parent_budget.children.joins(:budget_amount).sum(:value)
+      if (sum_of_child_budgets + budget_params&.dig(:budget_amount_attribtues, :value)&.to_f) > parent_budget.budget_amount_value
+        add_message :error, "Sum of child budgets should be less than or equal to parent budget"
+        return
+      end
+    end
   end
 
   def process
