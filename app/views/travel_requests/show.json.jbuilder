@@ -79,6 +79,10 @@ json.money_requests do
         end
       end
 
+      json.custom_fields do
+        json.array! money_request.custom_fields
+      end
+
     end
   end
 end
