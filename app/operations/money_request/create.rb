@@ -35,6 +35,16 @@ class MoneyRequest::Create < MoneyRequest::Base
     if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
       param[:payment_mode_id] = PaymentMode.id_for(:card)
     end
+
+    if param[:items_attributes].present?
+      param[:items_attributes].each do |attribute|
+        if attribute[:category_id].present?
+          attribute[:money_request_item_category_id] = attribute[:category_id]
+          attribute[:category_id] = nil
+        end
+      end
+    end
+
     self.money_request = for_user.money_requests.build param
     if money_request.save
       self.money_request.tracks.create action_user: for_user,
