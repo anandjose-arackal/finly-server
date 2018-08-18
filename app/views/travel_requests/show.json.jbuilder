@@ -75,9 +75,7 @@ json.money_requests do
         end
         json.amount do
           json.value item.amount.value
-          json.currency do
-            json.id item.amount.currency.id
-          end
+          json.currency item.amount.currency
         end
       end
 
