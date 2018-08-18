@@ -54,7 +54,7 @@ class MoneyRequest::Create < MoneyRequest::Base
                                        money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
                                        status_id: MoneyRequestStatus.id_for(:open)
       CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request),
-          reset_fields: true, save: true)
+          custom_fields: params[:custom_fields], reset_fields: true, save: true)
     else
       self.messages[:error] = money_request.errors.full_messages
     end
