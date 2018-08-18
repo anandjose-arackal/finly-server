@@ -35,7 +35,7 @@ class MoneyRequestItem < ActiveRecord::Base
   before_save :handle_category_mapping
 
   validates :money_request_item_category_id, presence: true
-  validates :money_request, presence: true
+  # validates :money_request, presence: true
 
   def handle_category_mapping
     if self.category_id.present? and self.money_request_item_category_id.blank?
