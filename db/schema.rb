@@ -2703,12 +2703,14 @@ ActiveRecord::Schema.define(version: 20180817135952) do
   add_index "money_request_comments", ["user_id"], name: "index_money_request_comments_on_user_id", using: :btree
 
   create_table "money_request_item_categories", force: :cascade do |t|
-    t.integer  "company_id", limit: 4,   null: false
-    t.string   "name",       limit: 255, null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.integer  "company_id", limit: 4,                  null: false
+    t.string   "name",       limit: 255,                null: false
+    t.boolean  "active",                 default: true, null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
   end
 
+  add_index "money_request_item_categories", ["active"], name: "index_money_request_item_categories_on_active", using: :btree
   add_index "money_request_item_categories", ["company_id"], name: "index_money_request_item_categories_on_company_id", using: :btree
   add_index "money_request_item_categories", ["name"], name: "index_money_request_item_categories_on_name", using: :btree
 
