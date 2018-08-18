@@ -140,7 +140,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       end
     end
 
-    if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+    if self.updated_expense_params[:spent_from_id].present? && self.cash_pocket.blank?
       add_message :error, "Could not find pocket from which this expense was spent"
       return
     end
