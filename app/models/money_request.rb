@@ -311,9 +311,9 @@ class MoneyRequest < ActiveRecord::Base
 
   def create_items
     return unless self.items.blank?
-    self.user.company.active_categories.expense_management_only.each do |category|
-      amount = Amount.create value: 0, currency_id: Currency.first.id
-      self.items.build category_id: category.id, amount_id: amount.id
+    self.user.company.money_request_item_categories.active.each do |category|
+      amount = Amount.new(value: 0, currency_id: Currency.first.id)
+      self.items.build money_request_item_category_id: category.id, amount: amount
     end
   end
 

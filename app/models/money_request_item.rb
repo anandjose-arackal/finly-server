@@ -23,7 +23,8 @@ class MoneyRequestItem < ActiveRecord::Base
   scope :active_categories, -> do
 
   end
-  scope :with_category, ->(category_id) {where category_id: category_id}
+  scope :with_category, ->(category_id) {where money_request_item_category_id: category_id}
+  scope :with_money_request_item_category, ->(category_id) {where money_request_item_category_id: category_id}
   scope :with_money_request, ->(id) {where money_request_id: id}
 
   delegate :amount_value, to: :amount
@@ -31,21 +32,24 @@ class MoneyRequestItem < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
 
-  # before_save :handle_category_mapping
+  before_save :handle_category_mapping
 
-  # def handle_category_mapping
-  #   if self.category_id.present? and self.money_request_item_category_id.blank?
-  #     self.money_request_item_category_id = self.category_id
-  #     self.category_id = nil
-  #   end
-  # end
+  validates :money_request_item_category_id, presence: true
+  validates :money_request_id, presence: true
 
-  # def category
-  #   self.money_request_item_category
-  # end
-  #
-  # def category_id
-  #   self.money_request_item_category_id
-  # end
+  def handle_category_mapping
+    if self.category_id.present? and self.money_request_item_category_id.blank?
+      self.money_request_item_category_id = self.category_id
+      self.category_id = nil
+    end
+  end
+
+  def category
+    self.money_request_item_category
+  end
+
+  def category_id
+    self.money_request_item_category_id
+  end
 
 end

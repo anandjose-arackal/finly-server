@@ -374,6 +374,10 @@ class Company < ActiveRecord::Base
       self.categories.create(name: category, expense_management: true, vendor_payments: true)
     end
 
+    Constants::DEFAULT_MONEY_REQUEST_CATEGORIES.each do |category|
+      self.money_request_category_items.create(name: category, active: true)
+    end
+
     self.build_configuration(bank_type: "HDFC").save if self.configuration.blank?
     self.build_account.save if self.account.blank?
 
