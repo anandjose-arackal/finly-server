@@ -46,7 +46,7 @@ class BankTransfer::YesBank::Cancel < BankTransfer::YesBank::Base
     # add a comment saying that it has been cancelled
     bank_payment_request = payment_order.bank_payment_request
     bank_payment_request.comments.create user_id: user.id,
-                                         action_id: BankPaymentRequestCommentAction.id_for(:cancel),
+                                         action_id: TravelRequestCommentAction.id_for(:cancel),
                                          note: self.cancel_note
   end
 

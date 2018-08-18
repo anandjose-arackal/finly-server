@@ -1,5 +1,5 @@
 json.user_count @result.user_count
-json.requests_total @result.request_total
+json.requests_total @result.request_total.values
 json.details do
   json.array! @result.details do |detail|
     json.user detail[:user]

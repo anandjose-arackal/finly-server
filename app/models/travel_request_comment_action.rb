@@ -14,6 +14,6 @@ class TravelRequestCommentAction < ActiveRecord::Base
 
   def self.values
     [:submit, :retract, :approve, :reject, :unapprove, :comment, :take_control, :return_control, :auto_approve,
-     :edit_booking, :add_booking, :remove_booking, :reject_booking_request]
+     :edit_booking, :add_booking, :remove_booking, :reject_booking_request, :selection_requested,:booking_confirmed, :selection_confirmed]
   end
 end

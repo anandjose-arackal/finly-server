@@ -16,6 +16,7 @@ class FieldDropDownSelection < ActiveRecord::Base
   validates :value_id, presence: true
 
   scope :with_value, ->(value_id) { where value_id: value_id }
+  scope :with_id, ->(id) { where id: id }
 
   def as_json(options={})
     {

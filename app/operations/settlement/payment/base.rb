@@ -12,7 +12,7 @@ class Settlement::Payment::Base < Settlement::Base
   def init_payment_request(payment_type, payment_purpose, options = {})
     initiating_account = options[:initiating_account]
     amount = options[:amount]
-    receiving_account = options[:receiving_account] || to_user.cash_on_hand
+    receiving_account = options[:receiving_account]
     self.payment_request = PaymentRequest.(user, initiating_account, (receiving_account&.class&.name), payment_type, payment_purpose)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, amount, note: self.note))
   end

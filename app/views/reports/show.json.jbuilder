@@ -86,6 +86,7 @@ json.expense_sections sorted_expenses do |category|
     json.date expense.date.strftime('%d %b %y')
     json.reimbursable expense.reimbursable
     json.from_cash_on_hand expense.from_cash_on_hand
+    json.spent_from_name expense.spent_from&.name
     json.synced_with_quickbooks expense.synced_with_quickbooks
     json.violations do
       items = @result.violations[expense.id]
@@ -126,6 +127,15 @@ json.expense_sections sorted_expenses do |category|
     json.tds_slab do
       json.id expense.tds_slab&.id
       json.tds expense.tds_slab&.tds
+    end
+
+    # adding pocket information for an expense
+    if expense.spent_from.present?
+      json.pocket do
+        json.pocket_name expense.spent_from&.name
+        json.pocket_id expense.spent_from&.id
+        json.pocket_balance expense.spent_from&.name
+      end
     end
   end
 end
@@ -178,15 +188,5 @@ json.budgets do
 
 end
 
-json.user_travel_requests current_user.travel_requests
-json.user_money_requests current_user.money_requests
-
-json.linked_travel_request do
-  json.id @result.report.travel_request&.id
-  json.name @result.report.travel_request&.name
-end
-
-json.linked_money_request do
-  json.id @result.report.money_request&.id
-  json.name @result.report.money_request&.name
-end
+json.pending_travel_requests @result.report.user.travel_requests, :id, :name
+json.associated_travel_request @result.report.travel_request

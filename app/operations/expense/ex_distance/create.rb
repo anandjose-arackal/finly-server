@@ -66,6 +66,13 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       location[:order] = pos
       pos += 1
     end
+
+    pocket_id = self.expense_params[:spent_from_id]
+    self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
+
+    if StringUtils.to_bool(expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def validate
@@ -87,6 +94,14 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
         messages[:error] << "Expense cannot be added to the report in this state"
       end
     end
+
+    if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+      add_message :error, "Could not find pocket from which this expense was spent"
+      return
+    end
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_availability_create(self.cash_pocket, expense_params)
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_create(expense_params)

@@ -17,7 +17,7 @@ class Statements::AsSpreadsheet < Statements::Base
         'Closing Balance',
         'Status',
         'Transaction ID',
-        'Note'
+        'Note',
     ]
     self.contents = []
     result.scoped_finly_transactions.success.sort_date_asc.all.each do |finly_transaction|

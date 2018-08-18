@@ -10,8 +10,12 @@ class TravelRequests::Destroy < TravelRequests::Base
 
   def init
     travel_request_id = params[:id] || params[:travel_request_id]
-
-    self.travel_requests = TravelRequests::Index.(user, params)&.travel_requests&.with_id(travel_request_id)
+    index_result = TravelRequests::Index.(user, params)
+    unless index_result.success?
+      add_message :error, index_result.messages[:error]
+      return
+    end
+    self.travel_requests = index_result&.travel_requests&.with_id(travel_request_id)
   end
 
   def validate
@@ -21,7 +25,11 @@ class TravelRequests::Destroy < TravelRequests::Base
 
     self.travel_requests.each do |tr|
       unless tr.can_destroy?
-        add_message :error, "Travel request with #{tr.id} can only be deleted once it's retracted or rejected."
+        add_message :error, "Travel request with ID #{tr.trip_id} can only be deleted once it's retracted or rejected."
+        return
+      end
+      unless tr.bookings.blank?
+        add_message :error, "Travel request with ID #{tr.trip_id} can only be delete once all booking requests have been removed"
         return
       end
     end

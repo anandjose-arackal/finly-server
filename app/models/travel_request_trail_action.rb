@@ -12,6 +12,8 @@ class TravelRequestTrailAction < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:submit, :retract, :approve, :reject, :book, :cancel, :retract_booking, :change_booking, :auto_approve]
+    [:submit, :retract, :approve, :reject, :book, :take_control, :cancel,
+     :retract_booking, :change_booking, :auto_approve, :selection_requested,
+     :selection_confirmed, :selection_approved, :selection_rejected, :booking_confirmed]
   end
 end
