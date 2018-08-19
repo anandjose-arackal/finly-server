@@ -34,11 +34,8 @@
 #  usage_date_start       :datetime
 #  usage_date_end         :datetime
 #  usage_date_type        :string(255)
+#  spent_from_id          :integer
 #
-
-
-
-
 
 
 
@@ -60,6 +57,7 @@ class Expense < ActiveRecord::Base
   belongs_to :expense_tax_type
   belongs_to :gst_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
+  belongs_to :spent_from, class_name: "UserPocket"
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
@@ -393,6 +391,9 @@ class Expense < ActiveRecord::Base
     expense_ids = configs.map {|item| item.parent&.id}
     with_id(expense_ids)
   end
+  scope :with_spent_from_id, -> (spent_from_id) {
+    where spent_from_id: spent_from_id
+  }
 
 
   scope :user_budget_expenses, -> (from, to) {
@@ -991,6 +992,13 @@ class Expense < ActiveRecord::Base
       days.pop
     end
     days
+  end
+
+  def from_cash_on_hand
+    if self.spent_from.present?
+      return true
+    end
+    false
   end
 
   private

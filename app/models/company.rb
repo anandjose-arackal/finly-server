@@ -87,6 +87,7 @@ class Company < ActiveRecord::Base
 
   has_many :departments
 
+  has_many :company_pocket_templates
 
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"

@@ -102,8 +102,9 @@ class User::Team::Index < User::Team::Base
         approves_to_association = :has_approves_to
       when UserRole.id_for(:travel_manager)
         manager_association = :has_travel_manager
+        #approves_to_association = :has_approves_travel_to
     end
-    return if manager_association.blank? or approves_to_association.blank?
+    return if manager_association.blank? #or approves_to_association.blank?
     user_ids += UserManagerMapping.send(manager_association, user.id).send('with_purpose', purpose_id).pluck(:user_id)
     user_ids.uniq! if user_ids.present?
     self.response = user.company.users.with_id(user_ids)

@@ -31,7 +31,7 @@ class User::Team::Approver < User::Team::Base
     mapping = self.mappings.send(params[:type]).policy(self.policy_id).with_purpose(self.purpose_id).amount(self.currency_id, self.amount_value).first rescue nil
 
     # Handling condition where approver is required only if violations exists
-    unless params[:has_violations]
+    unless params[:has_violations] or params[:report].blank?
       case params[:type]
       when :manager
         mapping = nil if mapping&.manager_violation_only

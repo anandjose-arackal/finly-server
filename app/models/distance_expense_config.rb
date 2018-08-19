@@ -18,7 +18,7 @@ class DistanceExpenseConfig < ActiveRecord::Base
   belongs_to :period
   belongs_to :policy
 
-  validate :rate_exists_for_enabled
+  # validate :rate_exists_for_enabled
   validates :policy_id, presence: true
 
   accepts_nested_attributes_for :rate

@@ -11,7 +11,11 @@ class TransactionsMsgQueuePoller
     sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
 
     queue_url_base = ENV["sqs_queue_url_base"]
-    queue_name = "TransactionMessageQueue"
+    if Rails.env.production?
+      queue_name = "TransactionMessageQueue"
+    else
+      queue_name = "TestTransactionQueue"
+    end
 
     queue_url = queue_url_base + queue_name
     delimiter = '$'
@@ -21,6 +25,7 @@ class TransactionsMsgQueuePoller
     poller = Aws::SQS::QueuePoller.new(queue_url, {client: sqs_client})
     file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_transaction_poller.log', sync: true)
 
+    puts "Listening...."
     ######################## AWS Code to extract the messages from the queue ###################
 
     poller.poll do |message|

@@ -57,6 +57,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -115,6 +116,7 @@ class User < ActiveRecord::Base
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
   has_many :payment_receivables, foreign_key: :initiating_user_id
+  has_many :user_pockets
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
@@ -510,6 +512,11 @@ class User < ActiveRecord::Base
     self.build_cash_on_hand(balance_attributes: {value: 0, currency_id: Currency.id_for(:INR)}).save
     self.build_bank_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_user_permission(create_beneficiaries: false, company_id: self.company_id).save
+
+    # building a default cash on hand pocket, Card Transfer pocket and Bank Transfer pocket
+    self.user_pockets.build(name: "Cash on Hand Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    self.user_pockets.build(name: "Finly Money - Card Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:card_transfer), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
   end
 
   def strip_whitespace

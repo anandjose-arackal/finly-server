@@ -12,7 +12,7 @@ class BookingType < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:flight, :car_rental, :bus, :train, :hotel, :restaurant]
+    [:flight, :car_rental, :bus, :train, :hotel, :restaurant, :others]
   end
 
   def flight?
@@ -37,6 +37,13 @@ class BookingType < ActiveRecord::Base
 
   def restaurant?
     self.id == BookingType.id_for(:restaurant)
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
   end
 
 end

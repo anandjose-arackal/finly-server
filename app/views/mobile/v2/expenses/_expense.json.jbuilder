@@ -11,6 +11,8 @@ json.status do
   json.name expense.expense_status&.name
 end
 
+json.spent_from_name expense.spent_from&.name
+
 json.amount do
   json.partial! 'api/v1/shared/amount', amount: expense.amount
 end

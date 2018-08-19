@@ -13,7 +13,9 @@ class TravelRequestStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:open, :processing, :retracted, :rejected, :booked, :cancelled, :booking_pending, :change_requested, :completed, :approved]
+    [:open, :processing, :retracted, :rejected, :booked, :cancelled, :booking_pending,
+     :selection_requested, :selection_processing, :selection_confirmed, :selection_rejected,
+     :booking_confirmed, :completed, :approved]
   end
 
   def open?
@@ -47,4 +49,32 @@ class TravelRequestStatus < ActiveRecord::Base
   def completed?
     self.id == TravelRequestStatus.id_for(:completed)
   end
+
+  def selection_requested?
+    self.id == TravelRequestStatus.id_for(:selection_requested)
+  end
+
+  def selection_processing?
+    self.id == TravelRequestStatus.id_for(:selection_processing)
+  end
+
+  def selection_rejected?
+    self.id == TravelRequestStatus.id_for(:selection_rejected)
+  end
+
+  def selection_confirmed?
+    self.id == TravelRequestStatus.id_for(:selection_confirmed)
+  end
+
+  def booking_confirmed?
+    self.id == TravelRequestStatus.id_for(:booking_confirmed?)
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name#&.humanize
+    }
+  end
+
 end

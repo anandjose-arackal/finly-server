@@ -551,6 +551,8 @@
 #                                         policy_add_rule POST   /policies/:policy_id/add_rule(.:format)                                                      rules#create
 #                                      policy_remove_rule DELETE /policies/:policy_id/remove_rule(.:format)                                                   rules#destroy
 #                                      policy_description GET    /policies/:policy_id/description(.:format)                                                   policies#show_description
+#                                    policy_vehicle_rates POST   /policies/:policy_id/vehicle_rates(.:format)                                                 vehicle_rates#create
+#                                     policy_vehicle_rate DELETE /policies/:policy_id/vehicle_rates/:id(.:format)                                             vehicle_rates#destroy
 #                                                         GET    /policies(.:format)                                                                          policies#index
 #                                                         POST   /policies(.:format)                                                                          policies#create
 #                                              new_policy GET    /policies/new(.:format)                                                                      policies#new
@@ -605,6 +607,16 @@
 #                                                         PATCH  /companies/:id(.:format)                                                                     companies#update
 #                                                         PUT    /companies/:id(.:format)                                                                     companies#update
 #                                                         DELETE /companies/:id(.:format)                                                                     companies#destroy
+#                                            user_pockets GET    /user_pockets(.:format)                                                                      user_pockets#index
+#                                                         POST   /user_pockets(.:format)                                                                      user_pockets#create
+#                                         new_user_pocket GET    /user_pockets/new(.:format)                                                                  user_pockets#new
+#                                        edit_user_pocket GET    /user_pockets/:id/edit(.:format)                                                             user_pockets#edit
+#                                             user_pocket GET    /user_pockets/:id(.:format)                                                                  user_pockets#show
+#                                                         PATCH  /user_pockets/:id(.:format)                                                                  user_pockets#update
+#                                                         PUT    /user_pockets/:id(.:format)                                                                  user_pockets#update
+#                                                         DELETE /user_pockets/:id(.:format)                                                                  user_pockets#destroy
+#                                                         GET    /assignable_pockets/:selected_user_id(.:format)                                              user_pockets#assignable_pockets
+#                                           assign_pocket POST   /assign_pockets(.:format)                                                                    user_pockets#assign_pocket
 #                organization_account_sidebar_menu_config GET    /organization_account/sidebar_menu_config(.:format)                                          organization_account#sidebar_menu_config
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                                organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                   organization_account#categories
@@ -873,6 +885,7 @@
 #                                                 welcome GET    /welcome(.:format)                                                                           home#welcome
 #                                                   about GET    /about(.:format)                                                                             home#about
 #                                               resources GET    /resources(.:format)                                                                         home#resources
+#                                              currencies GET    /currencies(.:format)                                                                        expenses#currencies
 #                                   autocomplete_merchant GET    /autocomplete/merchant(.:format)                                                             autocomplete#merchant
 #                                       autocomplete_user GET    /autocomplete/user(.:format)                                                                 autocomplete#user
 #                                       autocomplete_card GET    /autocomplete/card(.:format)                                                                 autocomplete#card
@@ -2353,7 +2366,7 @@ Rails.application.routes.draw do
   namespace :api do
     post 'callbacks/successful_vendor_payment', to: 'callbacks#successful_vendor_payment', as: :successful_vendor_payment
     post 'callbacks/invoice_payment_received', to: 'callbacks#invoice_payment_received', as: :invoice_payment_received
-end
+  end
 
   ############# Virtual Bank Accounts and Collect API Start ######################
 
@@ -2447,13 +2460,17 @@ end
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
   end
 
+  resources :user_pockets
+  get 'assignable_pockets/:selected_user_id', to: 'user_pockets#assignable_pockets'
+  post 'assign_pockets', to: 'user_pockets#assign_pocket', as: :assign_pocket
+
   # get 'organization_account' => 'organization_account#show'
   get 'organization_account/sidebar_menu_config' => 'organization_account#sidebar_menu_config'
   get 'organization_account/policies_list' => 'organization_account#policies_list'
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
   get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
-  
+
   post 'add_category', to: 'organization_account#add_category', as: :add_category
   delete 'remove_category', to: 'organization_account#remove_category', as: :remove_category
 
@@ -2510,14 +2527,21 @@ end
 
   resources :travel_requests do
     patch 'review', to: 'travel_requests#review', as: :review
+
+    resources :destinations, controller: 'travel_request_destinations', only: [:create, :update, :destroy]
+    resources :destinations do
+      # resources :booking_requests, controller: 'travel_request_booking_requests', only: [:create, :update, :destroy]
+      resources :bookings, controller: 'travel_request_bookings', only: [:create, :update, :destroy]
+      resources :bookings do
+        patch 'select_option', to: 'travel_request_bookings#select_option'
+        patch 'unselect_option', to: 'travel_request_bookings#unselect_option'
+        patch 'cancel', to: 'travel_request_bookings#cancel'
+      end
+    end
+
+    resources :comments, controller: 'travel_requests_comments', only: [:create]
   end
   post 'bookings/upload_attachment', to: 'bookings#upload_attachment'
-
-  scope :travel_requests do
-    resources :bookings do
-    end
-  end
-
 
   resources :booking_attachments, only: [:create]
 
@@ -2856,6 +2880,7 @@ end
   resources :cost_centers
   resources :tds_slabs
 
+
   scope :payments do
     resources :companies do
       post 'add_balance', to: 'companies#add_balance', as: :add_balance_payments
@@ -2932,7 +2957,7 @@ end
     get 'users/count', to: 'users#count'
     get 'users/managers', to: 'users#get_managers'
     get 'users/categories', to: 'users#categories'
-    
+
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
     end
@@ -3004,6 +3029,7 @@ end
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
 
       # resources :company_branches
+
 
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count

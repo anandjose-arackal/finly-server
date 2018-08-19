@@ -2,7 +2,8 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
 
   attr_accessor :options, :user_id
   attr_accessor :payment_param, :role, :payment, :payment_purpose, :initiating_account, :receiving_account,
-                :to_user, :amount, :note, :currency_id, :payment_request
+                :to_user, :amount, :note, :currency_id, :payment_request,
+                :destination_pocket
 
   def initialize
 
@@ -10,7 +11,7 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
 
   def self.call(user_id, params)
     user = user_id
-    if user.present? and user.is_a?(user)
+    if user.present? and user.is_a?(User)
       user_id = user.id
     end
     self.new.perform(user_id, params)
@@ -44,10 +45,19 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
     # setting the initiating account based on what is sent from the front end
     self.initiating_account = retrieve_initiating_account(payment_param[:initiating_account_type])
     self.receiving_account = retrieve_receiving_account(payment_param[:receiving_account_type])
+
+    if self.initiating_account.blank?
+      add_message :error, "Destination pocket / bank account does not exist"
+      return
+    end
+
     self.payment_purpose = :cash_advance
 
     # this is creating the payment request for crediting money to the bank account, if at all they choose to
     init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account})
+
+    destination_pocket_id = params[:destination_pocket_id]
+    self.destination_pocket = UserPocket.find_by id: destination_pocket_id
   end
 
   def process
@@ -56,10 +66,12 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
     if op.success?
       self.payment = op.payments.first
       bank_transaction = self.payment.reload.reference_resource
+      self.payment.update(destination_pocket_id: self.destination_pocket.id) # storing the original receiving account so that once the bank account transaction goes through it can be credited to cash on hand
       # only if the bank transaction has been completed, will the cash on hand be added to the user's account
       # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
       if self.payment_purpose == :cash_advance && bank_transaction&.completed?
-        init_payment_request(:credit, :advance, {amount: amount, initiating_account: nil, receiving_account: to_user.cash_on_hand})
+
+        init_payment_request(:credit, :advance, {amount: amount, initiating_account: nil, receiving_account: self.destination_pocket})
         # now payment request will have the new details of money to be added - so add it to the cash on hand
         op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
         payment = op.payments.first
@@ -92,7 +104,8 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
         id = payment_param[:receiving_account_id]
         return to_user.bank_accounts.find_by(id: id)
       when 2, '2' # i.e. outside of Finly
-        return to_user.cash_on_hand
+        id = params[:destination_pocket_id]
+        return to_user.user_pockets.cash_pockets_only.find_by(id: id)
       else
         # do nothing?
     end

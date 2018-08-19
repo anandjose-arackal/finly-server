@@ -10,7 +10,8 @@
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   include MathUtil
   attr_accessor :money_requests, :payment_param, :role, :money_request_amounts,
-                :payment, :payment_purpose, :initiating_account, :receiving_account
+                :payment, :payment_purpose, :initiating_account, :receiving_account,
+                :destination_pocket
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -52,10 +53,19 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     # setting the initiating account based on what is sent from the front end
     self.initiating_account = retrieve_initiating_account(payment_param[:initiating_account_type])
     self.receiving_account = retrieve_receiving_account(payment_param[:receiving_account_type])
+
+    if self.receiving_account.blank?
+      add_message :error, "Destination pocket / bank account does not exist"
+      return
+    end
+
     self.payment_purpose = StringUtils.to_bool(payment_param[:receiving_account_type]) ? :cash_advance : :advance_outside_finly
 
     # this is creating the payment request for crediting money to the bank account, if at all they choose to
     init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account})
+
+    destination_pocket_id = params[:destination_pocket_id]
+    self.destination_pocket = UserPocket.find_by id: destination_pocket_id
   end
 
   def authorize
@@ -68,6 +78,11 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     unless validate_date payment_param[:date]
       # above method already adds the respective error message, so just returning
       return false
+    end
+
+    if self.destination_pocket.blank?
+      add_message :error, "Destination pocket / bank account does not exist"
+      return
     end
   end
 
@@ -84,6 +99,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       end
     else
       op = Settlement::Payment::AddCashAdvanceBackground.call_async(user.id, params)
+      # op = Settlement::Payment::AddCashAdvanceBackground.call(user.id, params)
       add_message :success, "Cash on hand credit has been initiated. Please check back in some time for the money to reflect"
       return
     end
@@ -129,7 +145,8 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         id = payment_param[:receiving_account_id]
         return to_user.bank_accounts.find_by(id: id)
       when 2, '2' # i.e. outside of Finly
-        return to_user.cash_on_hand
+        id = params[:destination_pocket_id]
+        return to_user.user_pockets.cash_pockets_only.find_by(id: id)
       else
         # do nothing?
     end

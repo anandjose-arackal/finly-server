@@ -74,7 +74,10 @@ class User::Balance < User::Base
     end
 
     # Cash In Hand
-    cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(self.user.cash_on_hand)
+    # todo - refactoring this to support the mobile APIs
+    # cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(self.user.cash_on_hand)
+    cash_pocket = self.user.user_pockets.cash_pockets_only.first
+    cash_on_hand_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_pocket)
     self.balances[:current_user][:cash_on_hand] = {type: :cash_on_hand, id: user.id, name: 'Cash On Hand', balance: cash_on_hand_adapter.balance(display_balance: true)} if params[:current_user_cash_in_hand] or params[:current_user_all]
 
     # Pending Cash Advance
@@ -144,7 +147,10 @@ class User::Balance < User::Base
       end
 
       # Cash In Hand
-      cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(self.target_user.cash_on_hand)
+      # cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(self.target_user.cash_on_hand)
+      # todo - refactoring this to support the mobile APIs
+      cash_pocket = self.target_user.user_pockets.cash_pockets_only.first
+      cash_on_hand_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_pocket)
       self.balances[:target_user][:cash_on_hand] = {type: :cash_on_hand, id: target_user.id, name: 'Cash On Hand', balance: cash_on_hand_adapter.balance(display_balance: true)} if params[:target_user_cash_in_hand] or params[:target_user_all]
 
 

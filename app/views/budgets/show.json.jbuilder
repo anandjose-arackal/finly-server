@@ -26,6 +26,41 @@ json.amounts do
   end
 end
 
+json.budget_trail_items do
+  # first will be the list of expenses
+  json.expenses do
+    json.array!(@result.spent_entities[0]) do |expense|
+      json.user_name expense.user&.name
+      json.category_name expense.category&.name
+      json.date expense.date.strftime("%Y-%B-%d")
+      json.amount expense.amount&.value
+    end
+  end
+
+  # list of payments that need to be processed
+  json.payments do
+    json.array!(@result.spent_entities[1]) do |payment|
+      json.vendor payment.receiving_user&.name
+      json.category_name payment.category&.name
+      json.cost_center_name payment.cost_center&.name
+      json.amount payment.amount&.value
+      json.date payment.date.strftime("%Y-%B-%d")
+    end
+  end
+
+  # list of purchase order items
+  json.purchase_order_items do
+    json.array!(@result.spent_entities[2]) do |purchase_order_item|
+      json.name purchase_order_item.description
+      json.cost_center_name purchase_order_item.cost_center&.name
+      json.amount purchase_order_item.total_amount&.value
+      json.date purchase_order_item.purchase_order.delivery_date
+      json.location purchase_order_item.purchase_order.location&.name
+      json.department purchase_order_item.purchase_order.department&.name
+    end
+  end
+end
+
 # json.budget_trail_items do
 #   json.array! @result.budget_trail_items do |item|
 #     json.extract! item, :id, :date

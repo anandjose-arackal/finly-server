@@ -103,25 +103,27 @@ class Settlement::SReport::Approved < Report::Base
       messages[:error] = report.errors.full_messages
     end
 
-    ###### Cash on Hand Deductions ###############
-    cash_on_hand_deduction = 0
-    self.report.expenses.spent_from_cash_on_hand.each do |expense|
-      cash_on_hand_deduction += expense.amount.send(:INR).to_f
-    end
+    ########### Cash Pocket Deductions ###############
 
-    if cash_on_hand_deduction.present? && cash_on_hand_deduction > 0
-      payment_request = PaymentRequest.(self.report.user, nil, "CashOnHand", :debit, :settlement_against_cash_on_hand)
-      payment_request.add_payment_item(PaymentRequest::PaymentItem.(self.report.user, self.report.user.cash_on_hand, cash_on_hand_deduction))
-      op = AccountManager::Payments::PaymentProcessor.(self.report.user, payment_request: payment_request)
-      if op.success?
-        payment = op.payment_order.payments.first
-        payment.update(reference_resource: self.report)
-      else
-        # add a condition here so that if this fails, we are notified or at least initimated in some way
+    user_pocket_ids = report.expenses.pluck(:spent_from_id).uniq
+    user_pockets = report.user.user_pockets.with_id(user_pocket_ids)
+    user_pockets.each do |pocket|
+      deduction = self.report.expenses.with_spent_from_id(pocket.id).joins(:amount).sum(pocket.base_currency&.country_code)
+      if deduction.present? && deduction > 0
+        payment_request = PaymentRequest.(self.report.user, nil, "UserPocket", :debit, :settlement_against_advance)
+        payment_request.add_payment_item(PaymentRequest::PaymentItem.(self.report.user, pocket, deduction))
+        op = AccountManager::Payments::PaymentProcessor.(self.report.user, payment_request: payment_request)
+        if op.success?
+          payment = op.payment_order.payments.first
+          payment.update(reference_resource: self.report)
+        else
+          # add a condition here so that if this fails, we are notified or at least initimated in some way
 
+        end
       end
     end
-    ######### end of cash on hand deduction ########
+
+    ########### end of cash pocket deductions ########
   end
 
   def post_process

@@ -24,6 +24,8 @@
 class Budget < ActiveRecord::Base
   include SoftDeletable
 
+  has_ancestry
+
   belongs_to :user
   belongs_to :company
   belongs_to :period

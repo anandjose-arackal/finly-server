@@ -82,4 +82,5 @@ class UserProfile < ActiveRecord::Base
     address
   end
 
+
 end

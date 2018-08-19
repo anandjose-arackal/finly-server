@@ -16,6 +16,8 @@
 #
 
 class TravelRequestTrail < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :travel_request
   belongs_to :action, class_name: "TravelRequestTrailAction"
   belongs_to :action_user, class_name: "User"
