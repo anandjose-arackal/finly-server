@@ -31,6 +31,7 @@ class MoneyRequest::Create < MoneyRequest::Base
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
     param[:payment_mode_id] = PaymentMode.id_for(:cash)
     param[:policy_id] = self.policy_id
+
     # Money request can only be request through expense cards
     if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
       param[:payment_mode_id] = PaymentMode.id_for(:card)
@@ -60,12 +61,29 @@ class MoneyRequest::Create < MoneyRequest::Base
     end
   end
 
+  def post_process
+    if self.money_request.travel_request.present?
+      set_travel_request_status
+    end
+  end
+
   private
 
   def create_params
     return {} unless params[:money_request].present?
     params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :destination_pocket_id,
                                           items_attributes: [:category_id, :money_request_item_category_id, amount_attributes: [:value, :currency_id]])
+  end
+
+  def set_travel_request_status
+    travel_request = self.money_request.travel_request
+    return unless travel_request.present?
+    case travel_request.status_id
+    when TravelRequestStatus.id_for(:open)
+
+    when TravelRequestStatus.id_for(:booking_confirmed)
+
+    end
   end
 
 end

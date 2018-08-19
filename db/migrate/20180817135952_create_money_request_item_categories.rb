@@ -9,7 +9,7 @@ class CreateMoneyRequestItemCategories < ActiveRecord::Migration
     end
     add_column :money_request_items, :money_request_item_category_id, :integer
     change_column_null :money_request_items, :category_id, true
-    Category.all.active.each do |category|
+    Category.all.each do |category|
       money_request_item = MoneyRequestItemCategory.new name: category.name, company_id: category.company_id
       unless money_request_item.save
         debugger
