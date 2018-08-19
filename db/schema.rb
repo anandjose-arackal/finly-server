@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180814081352) do
+ActiveRecord::Schema.define(version: 20180817141737) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2512,10 +2512,12 @@ ActiveRecord::Schema.define(version: 20180814081352) do
     t.datetime "created_at",                                          null: false
     t.datetime "updated_at",                                          null: false
     t.text     "note",        limit: 65535
+    t.integer  "tax_rate_id", limit: 4
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
   add_index "inventory_line_items", ["company_id"], name: "index_inventory_line_items_on_company_id", using: :btree
+  add_index "inventory_line_items", ["tax_rate_id"], name: "index_inventory_line_items_on_tax_rate_id", using: :btree
 
   create_table "invoice_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
@@ -4395,6 +4397,17 @@ ActiveRecord::Schema.define(version: 20180814081352) do
 
   add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
 
+  create_table "tax_rates", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.decimal  "rate",                    precision: 20, scale: 5
+    t.string   "internal_id", limit: 255
+    t.integer  "company_id",  limit: 4
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "tax_rates", ["company_id"], name: "index_tax_rates_on_company_id", using: :btree
+
   create_table "tds_rates_lists", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.decimal  "tds",                    precision: 10, scale: 5
@@ -5344,6 +5357,7 @@ ActiveRecord::Schema.define(version: 20180814081352) do
   add_foreign_key "individual_kycs", "users"
   add_foreign_key "inventory_line_items", "categories"
   add_foreign_key "inventory_line_items", "companies"
+  add_foreign_key "inventory_line_items", "tax_rates"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"
@@ -5471,6 +5485,7 @@ ActiveRecord::Schema.define(version: 20180814081352) do
   add_foreign_key "reports", "users"
   add_foreign_key "reviewal_levels", "policies"
   add_foreign_key "tally_configurations", "companies"
+  add_foreign_key "tax_rates", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
   add_foreign_key "transcribed_expenses", "amounts"

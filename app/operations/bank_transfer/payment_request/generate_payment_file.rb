@@ -59,5 +59,4 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
 
     add_message :success, "Payment file successfully downloaded"
   end
-
 end

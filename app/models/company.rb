@@ -40,6 +40,7 @@ class Company < ActiveRecord::Base
   has_many :inventory_line_items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
+  has_many :tax_rates
   has_many :invoice_reminders
   has_many :invoice_number_configs
   has_one :feature_subscription, as: :subscribable
