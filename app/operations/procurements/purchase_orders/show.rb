@@ -88,6 +88,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
             method: "PUT"
         }
         actions[:document_editable] = false
+        actions[:download] = true
       end
 
       if purchase_order.processing?

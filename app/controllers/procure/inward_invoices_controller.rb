@@ -10,6 +10,7 @@ class Procure::InwardInvoicesController < ApplicationController
     # else
     #   respond response: :failure, message: @result.messages[:error]
     # end
+    respond
   end
 
   # this action is to create one from scratch
