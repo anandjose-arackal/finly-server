@@ -1,32 +1,22 @@
 default: &default
-#  base_url: "https://staging.itzcash.com"
-  base_url: "http://localhost:3002"
+  base_url: "https://staging.itzcash.com"
   itzcash_account_details:
-#    base: "https://staging.itzcash.com"
-    base: "http://localhost:3002"
-#    path: "myaccount/servlet/ItzCashAccountDetailsServlet"
-    path: "account_details"
+    base: "https://staging.itzcash.com"
+    path: "myaccount/servlet/ItzCashAccountDetailsServlet"
   itzcash_account_details_yse:
-#    path: "user/servlet/NaradaAccountDetailsServlet"
-    path: "account_details"
+    path: "user/servlet/NaradaAccountDetailsServlet"
   itzcash_credit_debit:
-#    path: "user/servlet/NaradaCreditDebitServlet"
-    path: "credit_debit"
+    path: "user/servlet/NaradaCreditDebitServlet"
   itzcash_block_unblock:
-#    path: "user/servlet/NaradaBlockUnblockServlet"
-    path: "card_block_unblock"
+    path: "user/servlet/NaradaBlockUnblockServlet"
   itzcash_corporate_balance:
-#    path: "user/servlet/CorporateBalanceServlet"
-    path: "corporate_balance"
+    path: "user/servlet/CorporateBalanceServlet"
   itzcash_card_restriction:
     path: "user/servlet/NaradaSetTransactionLimitsServlet"
-    path: "card_restriction"
   itzcash_mcc_group_restriction:
-#    path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
-    path: "mcc_group_restriction"
+    path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
   itzcash_company_statement_by_date:
-#    path: "user/servlet/CorporateTransactionStatementByDateRangeServlet"
-    path: "company_statement_by_date"
+    path: "user/servlet/CorporateTransactionStatementByDateRangeServlet"
   itzcash_dmt:
     base: "http://demo.itzcash.com"
     path: "samsso/servlet/RmtMobileAppServlet"
@@ -47,14 +37,13 @@ default: &default
     path: 'api/customer/register'
   yes_bank:
     base: 'https://uatsky.yesbank.in:444'
-#    base: 'http://localhost/yes_bank_api'
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
-  finly_collect:
-    base: 'http://localhost:3002/'
-    path: 'receivables'
 #  finly_collect:
-#    base: 'https://collect-staging.finly.io'
+#    base: 'http://localhost:3002/'
 #    path: 'receivables'
+  finly_collect:
+    base: 'https://collect-staging.finly.io'
+    path: 'receivables'
 
 staging:
   <<: *default

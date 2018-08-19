@@ -5,6 +5,7 @@ json.ending_number card.ending_number
 json.description card.description
 json.balance card.card_balance
 json.eligibility card.card_eligibility
+json.status card.card_status
 if card.disabled_by_user
   json.disabled_by do
     user = card.disabled_by_user
