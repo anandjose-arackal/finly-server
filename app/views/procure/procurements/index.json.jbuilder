@@ -14,6 +14,7 @@ json.array! @result.procurements do |p|
 
   if p.purchase_order.present?
     json.document 'Purchase Order'
+    json.po_number p.purchase_order.po_number
   end
 
   json.status_tags do

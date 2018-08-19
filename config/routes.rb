@@ -3073,6 +3073,7 @@ Rails.application.routes.draw do
 
   ## Procurement APIs start ##########################################
   namespace :procure do
+    get 'procurements/filter_config', to: "procurements#filter_config"
     resources :procurements do
     end
 

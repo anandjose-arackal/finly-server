@@ -12,4 +12,7 @@
 class ProcurementStatusTaggable < ActiveRecord::Base
   belongs_to :procurement
   belongs_to :status_tag
+
+  scope :with_procurement_ids, -> (ids) {where procurement_id: ids}
+  scope :with_status_tag_ids, -> (ids) {where status_tag_id: ids}
 end
