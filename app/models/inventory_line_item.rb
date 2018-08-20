@@ -14,11 +14,13 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  note        :text(65535)
+#  tax_rate_id :integer
 #
 
 class InventoryLineItem < ActiveRecord::Base
   belongs_to :company
   belongs_to :category
+  belongs_to :tax_rate
 
   validates :rate, presence: true
   validates :description, presence: true
@@ -32,6 +34,22 @@ class InventoryLineItem < ActiveRecord::Base
   }
 
   def as_json
-    
+    {
+        id: id,
+        hsn_sac: hsn_sac,
+        category_name: category&.name,
+        category_id: category_id,
+        rate: rate,
+        description: description,
+        discount: discount,
+        sku: sku,
+        tax_amount: self.tax_amount,
+        tax_rate_id: tax_rate_id,
+        tax: tax
+    }
+  end
+
+  def tax_amount
+    self.tax_rate&.rate
   end
 end

@@ -28,6 +28,8 @@ class StatusTag < ActiveRecord::Base
     ]
   end
 
+  scope :with_ids, -> (ids) {where id: ids}
+
   def self.seed_data
     p "Seeding #{self}"
     c = self.count

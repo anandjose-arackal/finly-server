@@ -27,8 +27,10 @@
 #  auto_approve                       :boolean
 #  money_request_processor_mapping_id :integer
 #  approved_at                        :datetime
+#  travel_request_id                  :integer
 #  destination_pocket_id              :integer
 #
+
 
 
 

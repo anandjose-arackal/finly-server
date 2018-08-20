@@ -19,6 +19,7 @@
 #  purchase_order   :boolean
 #  payment          :boolean
 #  expense          :boolean
+#  ancestry         :string(255)
 #
 
 require 'test_helper'

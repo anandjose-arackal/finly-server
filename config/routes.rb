@@ -3033,6 +3033,7 @@ Rails.application.routes.draw do
 
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
+    get 'inventory_item_config', to: 'inventory_line_items#inventory_item_config', as: :inventory_item_config
     resources :inventory_line_items
     resources :payment_terms
     resources :reminders
@@ -3072,6 +3073,7 @@ Rails.application.routes.draw do
 
   ## Procurement APIs start ##########################################
   namespace :procure do
+    get 'procurements/filter_config', to: "procurements#filter_config"
     resources :procurements do
     end
 

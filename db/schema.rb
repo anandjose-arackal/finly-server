@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180817110730) do
+ActiveRecord::Schema.define(version: 20180819170017) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -871,6 +871,12 @@ ActiveRecord::Schema.define(version: 20180817110730) do
 
   add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
 
+  create_table "budget_periods", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "budget_rule_category_mappings", force: :cascade do |t|
     t.integer  "budget_rule_id", limit: 4, null: false
     t.integer  "category_id",    limit: 4, null: false
@@ -1361,22 +1367,20 @@ ActiveRecord::Schema.define(version: 20180817110730) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_branches", force: :cascade do |t|
-    t.integer  "collect_company_detail_id", limit: 4
-    t.string   "name",                      limit: 255
-    t.string   "pan",                       limit: 255
-    t.string   "gst",                       limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.integer  "company_id",                limit: 4
-    t.string   "address_1",                 limit: 255
-    t.string   "address_2",                 limit: 255
-    t.string   "city",                      limit: 255
-    t.integer  "state_id",                  limit: 4
-    t.string   "country",                   limit: 255
-    t.string   "pin",                       limit: 255
+    t.string   "name",       limit: 255
+    t.string   "pan",        limit: 255
+    t.string   "gst",        limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.integer  "company_id", limit: 4
+    t.string   "address_1",  limit: 255
+    t.string   "address_2",  limit: 255
+    t.string   "city",       limit: 255
+    t.integer  "state_id",   limit: 4
+    t.string   "country",    limit: 255
+    t.string   "pin",        limit: 255
   end
 
-  add_index "company_branches", ["collect_company_detail_id"], name: "index_company_branches_on_collect_company_detail_id", using: :btree
   add_index "company_branches", ["company_id"], name: "index_company_branches_on_company_id", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
@@ -2610,10 +2614,12 @@ ActiveRecord::Schema.define(version: 20180817110730) do
     t.datetime "created_at",                                          null: false
     t.datetime "updated_at",                                          null: false
     t.text     "note",        limit: 65535
+    t.integer  "tax_rate_id", limit: 4
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
   add_index "inventory_line_items", ["company_id"], name: "index_inventory_line_items_on_company_id", using: :btree
+  add_index "inventory_line_items", ["tax_rate_id"], name: "index_inventory_line_items_on_tax_rate_id", using: :btree
 
   create_table "invoice_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
@@ -3160,8 +3166,8 @@ ActiveRecord::Schema.define(version: 20180817110730) do
     t.boolean  "auto_approve"
     t.integer  "money_request_processor_mapping_id", limit: 4
     t.datetime "approved_at"
-    t.integer  "destination_pocket_id",              limit: 4
     t.integer  "travel_request_id",                  limit: 4
+    t.integer  "destination_pocket_id",              limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -3419,8 +3425,8 @@ ActiveRecord::Schema.define(version: 20180817110730) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.text     "reminders",               limit: 65535
     t.integer  "payment_term_id",         limit: 4
+    t.text     "reminders",               limit: 65535
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
@@ -3625,12 +3631,12 @@ ActiveRecord::Schema.define(version: 20180817110730) do
     t.text     "post_operation",                 limit: 65535
     t.text     "post_operation_payload",         limit: 65535
     t.integer  "category_id",                    limit: 4
-    t.boolean  "api_initiated",                                default: false
-    t.integer  "original_payment_for_refund_id", limit: 4
-    t.integer  "destination_pocket_id",          limit: 4
     t.date     "scheduled_at"
+    t.boolean  "api_initiated",                                default: false
     t.date     "processed_at"
+    t.integer  "original_payment_for_refund_id", limit: 4
     t.integer  "cost_center_id",                 limit: 4
+    t.integer  "destination_pocket_id",          limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -4509,6 +4515,17 @@ ActiveRecord::Schema.define(version: 20180817110730) do
 
   add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
 
+  create_table "tax_rates", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.decimal  "rate",                    precision: 20, scale: 5
+    t.string   "internal_id", limit: 255
+    t.integer  "company_id",  limit: 4
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "tax_rates", ["company_id"], name: "index_tax_rates_on_company_id", using: :btree
+
   create_table "tds_rates_lists", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.decimal  "tds",                    precision: 10, scale: 5
@@ -5336,30 +5353,32 @@ ActiveRecord::Schema.define(version: 20180817110730) do
   end
 
   create_table "yes_bank_vendors", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.integer  "company_id",      limit: 4
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
-    t.string   "email",           limit: 255
-    t.string   "mobile_number",   limit: 255
+    t.string   "name",              limit: 255
+    t.integer  "company_id",        limit: 4
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.string   "email",             limit: 255
+    t.string   "mobile_number",     limit: 255
     t.boolean  "authorized"
-    t.text     "description",     limit: 65535
-    t.boolean  "is_deleted",                    default: false
-    t.string   "pan",             limit: 255
-    t.string   "tin",             limit: 255
-    t.string   "gst",             limit: 255
+    t.text     "description",       limit: 65535
+    t.boolean  "is_deleted",                      default: false
+    t.string   "pan",               limit: 255
+    t.string   "tin",               limit: 255
+    t.string   "gst",               limit: 255
     t.boolean  "gst_registered"
-    t.string   "state",           limit: 255
-    t.integer  "state_code_id",   limit: 4
-    t.integer  "created_by_id",   limit: 4
-    t.integer  "vendor_type_id",  limit: 4
-    t.string   "address",         limit: 255
-    t.string   "business_name",   limit: 255
-    t.integer  "payment_term_id", limit: 4
-    t.integer  "currency_id",     limit: 4
+    t.string   "state",             limit: 255
+    t.integer  "state_code_id",     limit: 4
+    t.integer  "created_by_id",     limit: 4
+    t.integer  "vendor_type_id",    limit: 4
+    t.string   "address",           limit: 255
+    t.string   "business_name",     limit: 255
+    t.integer  "payment_term_id",   limit: 4
+    t.integer  "currency_id",       limit: 4
+    t.integer  "tds_rates_list_id", limit: 4
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
+  add_index "yes_bank_vendors", ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id", using: :btree
   add_index "yes_bank_vendors", ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id", using: :btree
 
   add_foreign_key "addresses", "states"
@@ -5439,7 +5458,6 @@ ActiveRecord::Schema.define(version: 20180817110730) do
   add_foreign_key "company_agreement_tracks", "agreements"
   add_foreign_key "company_agreement_tracks", "users"
   add_foreign_key "company_balance_histories", "companies"
-  add_foreign_key "company_branches", "collect_company_details"
   add_foreign_key "company_branches", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
@@ -5514,6 +5532,7 @@ ActiveRecord::Schema.define(version: 20180817110730) do
   add_foreign_key "individual_kycs", "users"
   add_foreign_key "inventory_line_items", "categories"
   add_foreign_key "inventory_line_items", "companies"
+  add_foreign_key "inventory_line_items", "tax_rates"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"
@@ -5645,6 +5664,7 @@ ActiveRecord::Schema.define(version: 20180817110730) do
   add_foreign_key "reports", "users"
   add_foreign_key "reviewal_levels", "policies"
   add_foreign_key "tally_configurations", "companies"
+  add_foreign_key "tax_rates", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
   add_foreign_key "transcribed_expenses", "amounts"
@@ -5703,5 +5723,6 @@ ActiveRecord::Schema.define(version: 20180817110730) do
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"
+  add_foreign_key "yes_bank_vendors", "tds_rates_lists"
   add_foreign_key "yes_bank_vendors", "vendor_types"
 end

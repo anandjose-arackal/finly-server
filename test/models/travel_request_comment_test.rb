@@ -15,6 +15,7 @@
 #  action_id          :integer
 #  booking_id         :integer
 #  booking_request_id :integer
+#  is_deleted         :boolean          default(FALSE)
 #
 
 require 'test_helper'

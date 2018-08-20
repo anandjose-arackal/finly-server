@@ -5,7 +5,7 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
   def personalizer
     {
         validate: {
-            after: Personalizer::Process.new([:procure_inward_invoices, :create_from_p_o], :validate, self)
+            after: Personalizer::Process.new([:procurements, :procure_inward_invoices], :validate, self)
         }
     }
   end

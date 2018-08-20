@@ -46,6 +46,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       purchase_order.save
       purchase_order.save
 
+      # Save Custom Fields
+      if params[:custom_fields].present?
+        CustomField::SetFields.(purchase_order, FieldParentType.id_for(:purchase_order), custom_fields: params[:custom_fields], save: true, reset_fields: true)
+      end
+
       unless purchase_order.user == user
         # If updated by anyone other document owner
         purchase_order.trails.create action_user: user,

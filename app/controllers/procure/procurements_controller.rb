@@ -15,4 +15,9 @@ class Procure::ProcurementsController < ApplicationController
     @result = Procurements::Create.(current_user, params)
     respond
   end
+
+  def filter_config
+    @result = Procurements::FilterConfig.(current_user, params)
+    respond
+  end
 end
