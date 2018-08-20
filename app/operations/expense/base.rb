@@ -21,6 +21,9 @@ class Expense::Base < BaseOperation
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
     if params[:spent_from_id].present? || StringUtils.to_bool(params[:from_cash_on_hand])
 
+      # todo - temporary to support mobile APIs
+      params[:spent_from_id] = pocket.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
+
       # first check if the expense is being created in non-INR, and if its date is today
       if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
         add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
@@ -54,6 +57,9 @@ class Expense::Base < BaseOperation
         add_message :error, "Cash pocket expenses that are in a currency different from INR can only be reported on the next day"
         return
       end
+
+      # todo - temporary to support mobile APIs
+      params[:spent_from_id] = pocket.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
 
       cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
       amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
