@@ -61,43 +61,6 @@ json.budget_trail_items do
   end
 end
 
-# json.budget_trail_items do
-#   json.array! @result.budget_trail_items do |item|
-#     json.extract! item, :id, :date
-#     json.amount do
-#       json.value item.amount.value
-#       json.currency do
-#         json.extract! item.amount.currency, :id, :country, :country_code, :symbol
-#       end
-#     end
-#
-#     if item.class.name == 'Expense'
-#       json.status item.expense_status.name.humanize
-#       json.expense_type item.expense_type.name.humanize + " Expense"
-#       json.type "expense"
-#       json.user do
-#         json.extract! item.user, :id, :name, :email, :mobile_number
-#       end
-#
-#     elsif item.class.name == 'Payment'
-#       json.status item.payment_status.name.humanize
-#       json.type "payment"
-#       if item.receiving_user.present?
-#         json.vendor do
-#           json.extract! item.receiving_user, :id, :name, :email, :mobile_number
-#         end
-#       end
-#
-#       if item.initiating_user.present?
-#         json.initiating_user do
-#           json.extract! item.initiating_user, :id, :name, :email, :mobile_number
-#         end
-#       end
-#
-#     end
-#   end
-# end
-
 json.associated_vendors do
   json.array!(budget.budgetable_vendors) do |vendor|
     json.id vendor.id
@@ -137,6 +100,12 @@ end
 
 json.user do
   json.extract! @result.budget.user, :id, :mobile_number, :email
+end
+
+json.sub_budgets do
+  json.array!(budget.children) do |sub_budget|
+
+  end
 end
 
 
