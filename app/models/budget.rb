@@ -48,9 +48,6 @@ class Budget < ActiveRecord::Base
   validates :name, presence: true
   validates :start_date, presence: true
   validates :end_date, presence: true
-  # validates :budgetable_id, presence: true
-  # validates :budgetable_type, presence: true
-  # validates :period_id, presence: true
 
   scope :with_id, -> (ids) {where id: ids}
 
@@ -62,6 +59,42 @@ class Budget < ActiveRecord::Base
   }
   scope :applicable_to_payments, -> {
     where payment: true
+  }
+
+  scope :with_budgetable_vendors, -> (vendor_ids) {
+    vendor_ids = [vendor_ids] unless vendor_ids.is_a?(Array)
+    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "YesBankVendor").where('budget_criteria_mappings.budgetable_id IN (?)', vendor_ids).pluck(:budget_id)
+    where(id: ids)
+  }
+
+  scope :with_budgetable_cost_centers, -> (cost_center_ids) {
+    cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "CostCenter").where('budget_criteria_mappings.budgetable_id IN (?)', cost_center_ids).pluck(:budget_id)
+    where(id: ids)
+  }
+
+  scope :with_budgetable_categories, -> (category_ids) {
+    category_ids = [category_ids] unless category_ids.is_a?(Array)
+    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Category").where('budget_criteria_mappings.budgetable_id IN (?)', category_ids).pluck(:budget_id)
+    where(id: ids)
+  }
+
+  scope :with_budgetable_locations, -> (location_ids) {
+    location_ids = [location_ids] unless location_ids.is_a?(Array)
+    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "BranchLocation").where('budget_criteria_mappings.budgetable_id IN (?)', location_ids).pluck(:budget_id)
+    where(id: ids)
+  }
+
+  scope :with_budgetable_users, -> (user_ids) {
+    user_ids = [user_ids] unless user_ids.is_a?(Array)
+    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "User").where('budget_criteria_mappings.budgetable_id IN (?)', user_ids).pluck(:budget_id)
+    where(id: ids)
+  }
+
+  scope :with_budgetable_departments, -> (department_ids) {
+    department_ids = [department_ids] unless department_ids.is_a?(Array)
+    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Department").where('budget_criteria_mappings.budgetable_id IN (?)', department_ids).pluck(:budget_id)
+    where(id: ids)
   }
 
   # todo - change this to reflect the new structure
