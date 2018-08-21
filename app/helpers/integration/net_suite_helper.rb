@@ -1,0 +1,2 @@
+module Integration::NetSuiteHelper
+end

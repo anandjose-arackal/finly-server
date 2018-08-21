@@ -11,7 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180819170017) do
+ActiveRecord::Schema.define(version: 20180820094646) do
+
+  create_table "accounting_system_configurations", force: :cascade do |t|
+    t.integer  "company_id",        limit: 4,                     null: false
+    t.boolean  "enabled",                         default: false
+    t.string   "accounting_system", limit: 255
+    t.text     "options",           limit: 65535
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+  end
+
+  add_index "accounting_system_configurations", ["accounting_system"], name: "index_accounting_system_configurations_on_accounting_system", using: :btree
+  add_index "accounting_system_configurations", ["company_id"], name: "index_accounting_system_configurations_on_company_id", using: :btree
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -871,12 +883,6 @@ ActiveRecord::Schema.define(version: 20180819170017) do
 
   add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
 
-  create_table "budget_periods", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "budget_rule_category_mappings", force: :cascade do |t|
     t.integer  "budget_rule_id", limit: 4, null: false
     t.integer  "category_id",    limit: 4, null: false
@@ -1367,20 +1373,22 @@ ActiveRecord::Schema.define(version: 20180819170017) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_branches", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.string   "pan",        limit: 255
-    t.string   "gst",        limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "company_id", limit: 4
-    t.string   "address_1",  limit: 255
-    t.string   "address_2",  limit: 255
-    t.string   "city",       limit: 255
-    t.integer  "state_id",   limit: 4
-    t.string   "country",    limit: 255
-    t.string   "pin",        limit: 255
+    t.integer  "collect_company_detail_id", limit: 4
+    t.string   "name",                      limit: 255
+    t.string   "pan",                       limit: 255
+    t.string   "gst",                       limit: 255
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "company_id",                limit: 4
+    t.string   "address_1",                 limit: 255
+    t.string   "address_2",                 limit: 255
+    t.string   "city",                      limit: 255
+    t.integer  "state_id",                  limit: 4
+    t.string   "country",                   limit: 255
+    t.string   "pin",                       limit: 255
   end
 
+  add_index "company_branches", ["collect_company_detail_id"], name: "index_company_branches_on_collect_company_detail_id", using: :btree
   add_index "company_branches", ["company_id"], name: "index_company_branches_on_company_id", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
@@ -3031,12 +3039,25 @@ ActiveRecord::Schema.define(version: 20180819170017) do
   add_index "money_request_comments", ["rejected_to_id"], name: "index_money_request_comments_on_rejected_to_id", using: :btree
   add_index "money_request_comments", ["user_id"], name: "index_money_request_comments_on_user_id", using: :btree
 
+  create_table "money_request_item_categories", force: :cascade do |t|
+    t.integer  "company_id", limit: 4,                  null: false
+    t.string   "name",       limit: 255,                null: false
+    t.boolean  "active",                 default: true, null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "money_request_item_categories", ["active"], name: "index_money_request_item_categories_on_active", using: :btree
+  add_index "money_request_item_categories", ["company_id"], name: "index_money_request_item_categories_on_company_id", using: :btree
+  add_index "money_request_item_categories", ["name"], name: "index_money_request_item_categories_on_name", using: :btree
+
   create_table "money_request_items", force: :cascade do |t|
-    t.integer  "money_request_id", limit: 4, null: false
-    t.integer  "category_id",      limit: 4, null: false
-    t.integer  "amount_id",        limit: 4, null: false
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.integer  "money_request_id",               limit: 4, null: false
+    t.integer  "category_id",                    limit: 4
+    t.integer  "amount_id",                      limit: 4, null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.integer  "money_request_item_category_id", limit: 4
   end
 
   add_index "money_request_items", ["amount_id"], name: "index_money_request_items_on_amount_id", using: :btree
@@ -3425,8 +3446,8 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.integer  "payment_term_id",         limit: 4
     t.text     "reminders",               limit: 65535
+    t.integer  "payment_term_id",         limit: 4
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
@@ -3631,12 +3652,12 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.text     "post_operation",                 limit: 65535
     t.text     "post_operation_payload",         limit: 65535
     t.integer  "category_id",                    limit: 4
-    t.date     "scheduled_at"
     t.boolean  "api_initiated",                                default: false
-    t.date     "processed_at"
     t.integer  "original_payment_for_refund_id", limit: 4
-    t.integer  "cost_center_id",                 limit: 4
     t.integer  "destination_pocket_id",          limit: 4
+    t.date     "scheduled_at"
+    t.date     "processed_at"
+    t.integer  "cost_center_id",                 limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -5381,6 +5402,7 @@ ActiveRecord::Schema.define(version: 20180819170017) do
   add_index "yes_bank_vendors", ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id", using: :btree
   add_index "yes_bank_vendors", ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id", using: :btree
 
+  add_foreign_key "accounting_system_configurations", "companies"
   add_foreign_key "addresses", "states"
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_summary_mail_configs", "periods"
@@ -5458,6 +5480,7 @@ ActiveRecord::Schema.define(version: 20180819170017) do
   add_foreign_key "company_agreement_tracks", "agreements"
   add_foreign_key "company_agreement_tracks", "users"
   add_foreign_key "company_balance_histories", "companies"
+  add_foreign_key "company_branches", "collect_company_details"
   add_foreign_key "company_branches", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
@@ -5561,6 +5584,7 @@ ActiveRecord::Schema.define(version: 20180819170017) do
   add_foreign_key "money_request_comments", "money_requests"
   add_foreign_key "money_request_comments", "payments"
   add_foreign_key "money_request_comments", "users"
+  add_foreign_key "money_request_item_categories", "companies"
   add_foreign_key "money_request_items", "amounts"
   add_foreign_key "money_request_items", "categories"
   add_foreign_key "money_request_items", "money_requests"

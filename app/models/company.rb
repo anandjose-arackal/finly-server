@@ -29,6 +29,7 @@ class Company < ActiveRecord::Base
   has_one :account, class_name: 'CompanyAccount'
   has_one :quickbooks_configuration
   has_one :tally_configuration
+  has_one :accounting_system_configuration
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions
@@ -86,9 +87,7 @@ class Company < ActiveRecord::Base
   has_many :inward_documents # purchase order inward documents
 
   has_many :departments
-
   has_many :company_pocket_templates
-
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
 

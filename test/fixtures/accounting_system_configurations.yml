@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  company_id: 
+  enabled: false
+  configured: false
+  accounting_system: MyText
+  options: MyText
+
+two:
+  company_id: 
+  enabled: false
+  configured: false
+  accounting_system: MyText
+  options: MyText
