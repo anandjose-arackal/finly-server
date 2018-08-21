@@ -1,6 +1,14 @@
 class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:procurements, :purchase_orders], :validate, self)
+        }
+    }
+  end
+
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
@@ -34,7 +42,6 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
 
   def post_process
     add_message :success, 'Successfully submitted purchase order'
-
     Event::EPurchaseOrder::Submit.(user, {purchase_order: purchase_order, workflow_output: workflow_output})
   end
 end

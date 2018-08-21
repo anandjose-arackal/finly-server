@@ -113,6 +113,18 @@ json.sub_budgets do
       json.extract! sub_budget.budget_amount, :id, :value, :currency_id
     end
 
+    json.amounts do
+      json.budget_amount do
+        json.extract! @result.budget.budget_amount, :id, :value
+      end
+      json.spent_amount do
+        json.value @result.spent_amount
+      end
+      json.currency do
+        json.extract! @result.budget.budget_amount.currency, :id, :country, :country_code, :symbol
+      end
+    end
+
     json.associated_vendors do
       json.array!(sub_budget.budgetable_vendors) do |vendor|
         json.id vendor.id
