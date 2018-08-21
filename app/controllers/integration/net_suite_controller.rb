@@ -5,7 +5,6 @@ class Integration::NetSuiteController < ApplicationController
 
   def invoices
     @result = Integrations::NetSuite::Invoices.(current_user, params)
-    debugger
     respond
   end
 
