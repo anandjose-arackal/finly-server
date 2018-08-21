@@ -2410,6 +2410,7 @@ Rails.application.routes.draw do
 
   ######################### TRAVEL REQUESTS API START ##########################
 
+  get 'travel_requests/count', to: 'travel_requests#count'
   resources :travel_requests do
     patch 'review', to: 'travel_requests#review', as: :review
 
