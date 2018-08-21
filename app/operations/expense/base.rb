@@ -151,7 +151,7 @@ class Expense::Base < BaseOperation
       self.vehicle_rates = retrieve_vehicle_rates(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
-      self.cash_pockets = user.user_pockets.cash_pockets_only
+      self.cash_pockets = expense.user.user_pockets.cash_pockets_only
     end
 
     def retrieve_vehicle_rates(expense)
