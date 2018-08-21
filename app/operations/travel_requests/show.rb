@@ -139,6 +139,14 @@ class TravelRequests::Show < TravelRequests::Base
       actions
     end
 
+    def can_view_money_request?(money_request)
+      !TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.travel_request.status_id)
+    end
+
+    def can_edit_money_request?(money_request)
+      TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.travel_request.status_id)
+    end
+
     def can_cancel_booking?
       can_add_booking?
     end
