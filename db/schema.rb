@@ -885,12 +885,6 @@ ActiveRecord::Schema.define(version: 20180821064158) do
 
   add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
 
-  create_table "budget_periods", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "budget_rule_category_mappings", force: :cascade do |t|
     t.integer  "budget_rule_id", limit: 4, null: false
     t.integer  "category_id",    limit: 4, null: false
@@ -1381,20 +1375,22 @@ ActiveRecord::Schema.define(version: 20180821064158) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_branches", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.string   "pan",        limit: 255
-    t.string   "gst",        limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "company_id", limit: 4
-    t.string   "address_1",  limit: 255
-    t.string   "address_2",  limit: 255
-    t.string   "city",       limit: 255
-    t.integer  "state_id",   limit: 4
-    t.string   "country",    limit: 255
-    t.string   "pin",        limit: 255
+    t.integer  "collect_company_detail_id", limit: 4
+    t.string   "name",                      limit: 255
+    t.string   "pan",                       limit: 255
+    t.string   "gst",                       limit: 255
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "company_id",                limit: 4
+    t.string   "address_1",                 limit: 255
+    t.string   "address_2",                 limit: 255
+    t.string   "city",                      limit: 255
+    t.integer  "state_id",                  limit: 4
+    t.string   "country",                   limit: 255
+    t.string   "pin",                       limit: 255
   end
 
+  add_index "company_branches", ["collect_company_detail_id"], name: "index_company_branches_on_collect_company_detail_id", using: :btree
   add_index "company_branches", ["company_id"], name: "index_company_branches_on_company_id", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
@@ -1412,6 +1408,7 @@ ActiveRecord::Schema.define(version: 20180821064158) do
     t.string   "registered_mobile_number",         limit: 255
     t.string   "bank_type",                        limit: 255
     t.integer  "default_card_expense_category_id", limit: 4
+    t.boolean  "darwinbox_sso_enabled",                          default: false
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -3186,8 +3183,8 @@ ActiveRecord::Schema.define(version: 20180821064158) do
     t.boolean  "auto_approve"
     t.integer  "money_request_processor_mapping_id", limit: 4
     t.datetime "approved_at"
-    t.integer  "travel_request_id",                  limit: 4
     t.integer  "destination_pocket_id",              limit: 4
+    t.integer  "travel_request_id",                  limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -3445,8 +3442,8 @@ ActiveRecord::Schema.define(version: 20180821064158) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.integer  "payment_term_id",         limit: 4
     t.text     "reminders",               limit: 65535
+    t.integer  "payment_term_id",         limit: 4
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
@@ -3652,12 +3649,12 @@ ActiveRecord::Schema.define(version: 20180821064158) do
     t.text     "post_operation",                 limit: 65535
     t.text     "post_operation_payload",         limit: 65535
     t.integer  "category_id",                    limit: 4
-    t.date     "scheduled_at"
     t.boolean  "api_initiated",                                default: false
-    t.date     "processed_at"
     t.integer  "original_payment_for_refund_id", limit: 4
-    t.integer  "cost_center_id",                 limit: 4
     t.integer  "destination_pocket_id",          limit: 4
+    t.date     "scheduled_at"
+    t.date     "processed_at"
+    t.integer  "cost_center_id",                 limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -5486,6 +5483,7 @@ ActiveRecord::Schema.define(version: 20180821064158) do
   add_foreign_key "company_agreement_tracks", "agreements"
   add_foreign_key "company_agreement_tracks", "users"
   add_foreign_key "company_balance_histories", "companies"
+  add_foreign_key "company_branches", "collect_company_details"
   add_foreign_key "company_branches", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
