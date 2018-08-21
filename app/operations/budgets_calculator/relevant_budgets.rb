@@ -41,7 +41,7 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
   def process
     case self.object.class.name
       when "PurchaseOrder"
-        self.relevant_budgets = user.company.budgets.applicable_to_purchase_orders
+        relevant_budget_ids = user.company.budgets.applicable_to_purchase_orders.pluck(:id)
       when "Expense", "Report"
         self.relevant_budgets = user.company.budgets.applicable_to_expenses
       when "Payment", "PaymentOrder", "BankPaymentRequest"
