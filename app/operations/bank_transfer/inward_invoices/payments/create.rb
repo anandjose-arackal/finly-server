@@ -2,6 +2,14 @@
 # which will be wrapped within a payment order and can be processed separately
 class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoices::Base
 
+  def personalizer
+    {
+        post_process: {
+            after: Personalizer::Process.new([:bank_transfer, :payments, :create], :post_process, self)
+        }
+    }
+  end
+
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params
