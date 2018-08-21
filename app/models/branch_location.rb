@@ -17,9 +17,11 @@
 #  updated_at            :datetime         not null
 #  contact_name          :string(255)
 #  contact_mobile_number :string(255)
+#  is_deleted            :boolean          default(FALSE), not null
 #
 
 class BranchLocation < ActiveRecord::Base
+  include SoftDeletable
   belongs_to :company
   belongs_to :state
   has_many :company_location_departments

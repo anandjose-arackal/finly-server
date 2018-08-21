@@ -26,6 +26,7 @@
 #  rejected               :integer          default(0)
 #  category_id            :integer
 #  cost_center_id         :integer
+#  is_deleted             :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

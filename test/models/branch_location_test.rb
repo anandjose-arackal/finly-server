@@ -17,6 +17,7 @@
 #  updated_at            :datetime         not null
 #  contact_name          :string(255)
 #  contact_mobile_number :string(255)
+#  is_deleted            :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

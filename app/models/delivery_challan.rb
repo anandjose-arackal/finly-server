@@ -29,9 +29,11 @@
 #  balance_amount_id      :integer
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  is_deleted             :boolean          default(FALSE), not null
 #
 
 class DeliveryChallan < ActiveRecord::Base
+  include SoftDeletable
   belongs_to :company
   belongs_to :user
   belongs_to :procurement

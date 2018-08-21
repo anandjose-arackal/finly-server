@@ -26,6 +26,7 @@
 #  rejected               :integer          default(0)
 #  category_id            :integer
 #  cost_center_id         :integer
+#  is_deleted             :boolean          default(FALSE), not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

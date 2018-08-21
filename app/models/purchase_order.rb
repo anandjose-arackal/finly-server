@@ -39,9 +39,11 @@
 #  policy_id                    :integer
 #  controlling_level_id         :integer
 #  department_id                :integer
+#  is_deleted                   :boolean          default(FALSE), not null
 #
 
 class PurchaseOrder < ActiveRecord::Base
+  include SoftDeletable
   belongs_to :company
   belongs_to :user
   belongs_to :procurement

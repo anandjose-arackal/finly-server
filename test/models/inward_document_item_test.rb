@@ -16,6 +16,7 @@
 #  updated_at             :datetime         not null
 #  comment                :string(255)
 #  previously_delivered   :decimal(20, 5)
+#  is_deleted             :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

@@ -9,9 +9,11 @@
 #  company_id  :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  is_deleted  :boolean          default(FALSE), not null
 #
 
 class TaxRate < ActiveRecord::Base
+  include SoftDeletable
   belongs_to :company
 
   scope :with_name, -> (name) {where name: name}

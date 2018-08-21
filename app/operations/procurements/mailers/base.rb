@@ -1,5 +1,5 @@
 class Procurements::Mailers::Base < BaseOperation
-  attr_accessor :mailer_params, :email_options, :document
+  attr_accessor :mailer_params, :email_options, :document, :attachments
 
   def init
     document_types = %w( purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice )
@@ -19,6 +19,9 @@ class Procurements::Mailers::Base < BaseOperation
 
     self.email_options[:email_subject] = params[:subject]
     self.email_options[:email_body] = params[:body]
+    if params[:attachments].present?
+      self.attachments = self.document.attachments.with_id(params[:attachments])
+    end
   end
 
   def validate
@@ -38,6 +41,7 @@ class Procurements::Mailers::Base < BaseOperation
   def process
     params[:document] = self.document
     params[:email_options] = self.email_options
+    params[:attachments] = self.attachments
     op = Procurements::Mailers::Base::MailerPresenter.new(user, params, messages)
     # ProcurementMailer.delay.send_mail(document, email_options, user)
     ProcurementMailer.delay.send_mail(op)
@@ -52,7 +56,7 @@ class Procurements::Mailers::Base < BaseOperation
   end
 
   class Procurements::Mailers::Base::MailerPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :document, :user, :email_to, :email_bcc_to, :email_subject, :email_body, :company
+    attr_accessor :document, :user, :email_to, :email_bcc_to, :email_subject, :email_body, :company, :attachments
 
     def init
       self.document = params[:document]
@@ -61,6 +65,7 @@ class Procurements::Mailers::Base < BaseOperation
       self.email_to = params[:email_options][:email_to]
       self.email_bcc_to = params[:email_options][:email_bcc_to]
       self.email_subject = params[:email_options][:email_subject]
+      self.attachments = params[:attachments]
       self.company = user.company
     end
   end

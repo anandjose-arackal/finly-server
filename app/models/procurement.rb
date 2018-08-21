@@ -12,9 +12,11 @@
 #  user_id               :integer
 #  company_id            :integer
 #  note                  :text(65535)
+#  is_deleted            :boolean          default(FALSE), not null
 #
 
 class Procurement < ActiveRecord::Base
+  include SoftDeletable
   belongs_to :user
   belongs_to :company
   belongs_to :procurement_track

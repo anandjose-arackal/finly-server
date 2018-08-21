@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180819170017) do
+ActiveRecord::Schema.define(version: 20180821064158) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -610,8 +610,9 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.integer  "total_after_tax_id",     limit: 4
     t.integer  "discount_amount_id",     limit: 4
     t.integer  "balance_amount_id",      limit: 4
-    t.datetime "created_at",                                                  null: false
-    t.datetime "updated_at",                                                  null: false
+    t.datetime "created_at",                                                                  null: false
+    t.datetime "updated_at",                                                                  null: false
+    t.boolean  "is_deleted",                                                  default: false, null: false
   end
 
   add_index "bill_of_supplies", ["balance_amount_id"], name: "index_bill_of_supplies_on_balance_amount_id", using: :btree
@@ -852,10 +853,11 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.integer  "state_id",              limit: 4
     t.string   "country",               limit: 255
     t.string   "pin",                   limit: 255
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
     t.string   "contact_name",          limit: 255
     t.string   "contact_mobile_number", limit: 255
+    t.boolean  "is_deleted",                        default: false, null: false
   end
 
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
@@ -1914,8 +1916,9 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.integer  "total_after_tax_id",     limit: 4
     t.integer  "discount_amount_id",     limit: 4
     t.integer  "balance_amount_id",      limit: 4
-    t.datetime "created_at",                                                  null: false
-    t.datetime "updated_at",                                                  null: false
+    t.datetime "created_at",                                                                  null: false
+    t.datetime "updated_at",                                                                  null: false
+    t.boolean  "is_deleted",                                                  default: false, null: false
   end
 
   add_index "delivery_challans", ["balance_amount_id"], name: "index_delivery_challans_on_balance_amount_id", using: :btree
@@ -1937,8 +1940,9 @@ ActiveRecord::Schema.define(version: 20180819170017) do
   create_table "departments", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.integer  "company_id", limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_deleted",             default: false, null: false
   end
 
   add_index "departments", ["company_id"], name: "index_departments_on_company_id", using: :btree
@@ -2099,8 +2103,9 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.string   "reason_for_transportation", limit: 255
     t.string   "mode",                      limit: 255
     t.string   "vehicle_number",            limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.boolean  "is_deleted",                            default: false, null: false
   end
 
   add_index "e_way_bills", ["amount_id"], name: "index_e_way_bills_on_amount_id", using: :btree
@@ -2611,10 +2616,11 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.decimal  "rate",                      precision: 20, scale: 10
     t.text     "description", limit: 65535
     t.integer  "category_id", limit: 4
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
+    t.datetime "created_at",                                                          null: false
+    t.datetime "updated_at",                                                          null: false
     t.text     "note",        limit: 65535
     t.integer  "tax_rate_id", limit: 4
+    t.boolean  "is_deleted",                                          default: false, null: false
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
@@ -2770,10 +2776,11 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.decimal  "delivered",                          precision: 20, scale: 5
     t.decimal  "accepted",                           precision: 20, scale: 5
     t.decimal  "rejected",                           precision: 20, scale: 5
-    t.datetime "created_at",                                                  null: false
-    t.datetime "updated_at",                                                  null: false
+    t.datetime "created_at",                                                                  null: false
+    t.datetime "updated_at",                                                                  null: false
     t.string   "comment",                limit: 255
     t.decimal  "previously_delivered",               precision: 20, scale: 5
+    t.boolean  "is_deleted",                                                  default: false, null: false
   end
 
   add_index "inward_document_items", ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id", using: :btree
@@ -2791,8 +2798,9 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.string   "transported_name",            limit: 255
     t.string   "transporter_document_number", limit: 255
     t.string   "vehicle_number",              limit: 255
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
+    t.boolean  "is_deleted",                              default: false, null: false
   end
 
   add_index "inward_documents", ["company_id"], name: "index_inward_documents_on_company_id", using: :btree
@@ -3568,12 +3576,13 @@ ActiveRecord::Schema.define(version: 20180819170017) do
 
   create_table "payment_terms", force: :cascade do |t|
     t.text     "name",        limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
     t.integer  "days_after",  limit: 4
     t.text     "description", limit: 65535
     t.integer  "company_id",  limit: 4
     t.boolean  "default"
+    t.boolean  "is_deleted",                default: false, null: false
   end
 
   create_table "payment_trails", force: :cascade do |t|
@@ -3827,8 +3836,9 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.integer  "user_id",                 limit: 4
     t.integer  "parent_commentable_id",   limit: 4
     t.string   "parent_commentable_type", limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.boolean  "is_deleted",                            default: false, null: false
   end
 
   add_index "procurement_comments", ["parent_commentable_type", "parent_commentable_id"], name: "indx_prcurmnt_cmments_on_prnt_cmmentble_typ_n_prnt_cmmentble_id", using: :btree
@@ -3854,9 +3864,10 @@ ActiveRecord::Schema.define(version: 20180819170017) do
   create_table "procurement_terms", force: :cascade do |t|
     t.string   "name",        limit: 255
     t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
     t.integer  "company_id",  limit: 4
+    t.boolean  "is_deleted",                default: false, null: false
   end
 
   add_index "procurement_terms", ["company_id"], name: "index_procurement_terms_on_company_id", using: :btree
@@ -3873,11 +3884,12 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.integer  "procurement_track_id",  limit: 4
     t.integer  "procurement_status_id", limit: 4
     t.integer  "vendor_id",             limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
     t.integer  "user_id",               limit: 4
     t.integer  "company_id",            limit: 4
     t.text     "note",                  limit: 65535
+    t.boolean  "is_deleted",                          default: false, null: false
   end
 
   add_index "procurements", ["company_id"], name: "index_procurements_on_company_id", using: :btree
@@ -3923,13 +3935,14 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.integer  "total_amount_id",        limit: 4
     t.date     "delivery_date"
     t.string   "comment",                limit: 255
-    t.datetime "created_at",                                                              null: false
-    t.datetime "updated_at",                                                              null: false
+    t.datetime "created_at",                                                                  null: false
+    t.datetime "updated_at",                                                                  null: false
     t.integer  "delivered",              limit: 4,                            default: 0
     t.integer  "accepted",               limit: 4,                            default: 0
     t.integer  "rejected",               limit: 4,                            default: 0
     t.integer  "category_id",            limit: 4
     t.integer  "cost_center_id",         limit: 4
+    t.boolean  "is_deleted",                                                  default: false, null: false
   end
 
   add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree
@@ -3971,8 +3984,8 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.integer  "total_after_tax_id",           limit: 4
     t.integer  "discount_amount_id",           limit: 4
     t.integer  "balance_amount_id",            limit: 4
-    t.datetime "created_at",                                                          null: false
-    t.datetime "updated_at",                                                          null: false
+    t.datetime "created_at",                                                                          null: false
+    t.datetime "updated_at",                                                                          null: false
     t.integer  "user_id",                      limit: 4
     t.text     "procurement_term_text",        limit: 65535
     t.integer  "controlling_user_id",          limit: 4
@@ -3982,6 +3995,7 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.integer  "policy_id",                    limit: 4
     t.integer  "controlling_level_id",         limit: 4
     t.integer  "department_id",                limit: 4
+    t.boolean  "is_deleted",                                                          default: false, null: false
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -4520,8 +4534,9 @@ ActiveRecord::Schema.define(version: 20180819170017) do
     t.decimal  "rate",                    precision: 20, scale: 5
     t.string   "internal_id", limit: 255
     t.integer  "company_id",  limit: 4
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
+    t.datetime "created_at",                                                       null: false
+    t.datetime "updated_at",                                                       null: false
+    t.boolean  "is_deleted",                                       default: false, null: false
   end
 
   add_index "tax_rates", ["company_id"], name: "index_tax_rates_on_company_id", using: :btree

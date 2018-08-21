@@ -12,6 +12,7 @@
 #  user_id               :integer
 #  company_id            :integer
 #  note                  :text(65535)
+#  is_deleted            :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

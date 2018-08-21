@@ -26,10 +26,11 @@
 #  rejected               :integer          default(0)
 #  category_id            :integer
 #  cost_center_id         :integer
+#  is_deleted             :boolean          default(FALSE), not null
 #
 
 class PurchaseOrderItem < ActiveRecord::Base
-
+  include SoftDeletable
   validates :inventory_line_item_id, presence: true
   validates :purchase_order_id, presence: true
 

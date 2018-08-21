@@ -2,7 +2,7 @@ class Invoicing::InventoryLineItem::Base < BaseOperation
 
   def pre_validate
     if user.blank? || params.blank?
-      add_message :error, "Invaoid parameters pass, try again"
+      add_message :error, "Invalid parameters pass, try again"
       return
     end
   end

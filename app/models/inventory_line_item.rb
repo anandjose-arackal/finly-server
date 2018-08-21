@@ -15,9 +15,11 @@
 #  updated_at  :datetime         not null
 #  note        :text(65535)
 #  tax_rate_id :integer
+#  is_deleted  :boolean          default(FALSE), not null
 #
 
 class InventoryLineItem < ActiveRecord::Base
+  include SoftDeletable
   belongs_to :company
   belongs_to :category
   belongs_to :tax_rate

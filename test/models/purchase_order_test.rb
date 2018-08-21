@@ -39,6 +39,7 @@
 #  policy_id                    :integer
 #  controlling_level_id         :integer
 #  department_id                :integer
+#  is_deleted                   :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

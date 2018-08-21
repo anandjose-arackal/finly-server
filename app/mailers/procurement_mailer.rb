@@ -37,7 +37,15 @@ class ProcurementMailer < ApplicationMailer
     @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id })
     attachments["purchase_order-#{@document.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
          render_to_string(pdf: "purchase-order-#{@document.po_number}", template: "export/purchase_order", layout: "pdf.html.erb", print_media_type: true)
-      )
+    )
+
+    @data.attachments.each do |attachment|
+      url = attachment.file.path
+      attachments[attachment.file_file_name] = {
+          content: open(url).read
+      }
+    end
+
     mail from: "#{@user.company.name} <noreply@finly.io>", :reply_to => "#{@user.email}", to: @data.email_to,
          bcc: @data.email_bcc_to, subject: @data.email_subject, template_name: 'mail_procurement'
   end

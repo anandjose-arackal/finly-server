@@ -15,6 +15,7 @@
 #  updated_at  :datetime         not null
 #  note        :text(65535)
 #  tax_rate_id :integer
+#  is_deleted  :boolean          default(FALSE), not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
