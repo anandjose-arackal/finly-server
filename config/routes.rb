@@ -2860,10 +2860,18 @@ Rails.application.routes.draw do
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
 
   namespace :integration do
-    get 'tally/check', to: 'tally#check'
-    get 'tally/vouchers', to: 'tally#vouchers'
-    get 'tally/reimbursements', to: 'tally#reimbursements'
-    post 'tally/configuration', to: 'tally#set_configuration'
+    scope :tally do
+      get 'check', to: 'tally#check'
+      get 'vouchers', to: 'tally#vouchers'
+      get 'reimbursements', to: 'tally#reimbursements'
+      post 'configuration', to: 'tally#set_configuration'
+    end
+
+    scope :net_suite do
+      get 'check', to: 'net_suite#check'
+      get 'invoices', to: 'net_suite#invoices'
+    end
+
   end
 
 

@@ -13,6 +13,18 @@
 
 ActiveRecord::Schema.define(version: 20180821064158) do
 
+  create_table "accounting_system_configurations", force: :cascade do |t|
+    t.integer  "company_id",        limit: 4,                     null: false
+    t.boolean  "enabled",                         default: false
+    t.string   "accounting_system", limit: 255
+    t.text     "options",           limit: 65535
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+  end
+
+  add_index "accounting_system_configurations", ["accounting_system"], name: "index_accounting_system_configurations_on_accounting_system", using: :btree
+  add_index "accounting_system_configurations", ["company_id"], name: "index_accounting_system_configurations_on_company_id", using: :btree
+
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
     t.text     "body",          limit: 65535
@@ -5396,6 +5408,7 @@ ActiveRecord::Schema.define(version: 20180821064158) do
   add_index "yes_bank_vendors", ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id", using: :btree
   add_index "yes_bank_vendors", ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id", using: :btree
 
+  add_foreign_key "accounting_system_configurations", "companies"
   add_foreign_key "addresses", "states"
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_summary_mail_configs", "periods"
