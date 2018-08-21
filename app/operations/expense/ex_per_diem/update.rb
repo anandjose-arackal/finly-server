@@ -113,6 +113,18 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     check_coh_reimbursable_exclusivity_update(updated_expense_params)
   end
 
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) || updated_expense_params[:spent_from_id].present?
+      updated_expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(updated_expense_params[:reimbursable])
+      updated_expense_params[:spent_from_id] = nil
+    end
+  end
+
   def process
     # Set custom fields
     custom_fields = {custom_fields: params[:custom_fields]}
