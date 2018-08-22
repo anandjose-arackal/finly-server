@@ -47,7 +47,8 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
         relevant_budget_ids += relevant_budgets.with_budgetable_locations(self.object.location_id).pluck(:id)
         relevant_budget_ids += relevant_budgets.with_budgetable_departments(self.object.department_id).pluck(:id)
         relevant_budget_ids += relevant_budgets.with_budgetable_vendors(self.object.vendor_id).pluck(:id)
-        category_ids = self.object.items.pluck(:category_id)
+        inventory_item_ids = self.object.items.pluck(:inventory_line_item_id)
+        category_ids = InventoryLineItem.where(id: inventory_item_ids).pluck(:category_id)
         relevant_budget_ids += relevant_budgets.with_budgetable_categories(category_ids).pluck(:id)
         self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
       when "Expense", "Report"
