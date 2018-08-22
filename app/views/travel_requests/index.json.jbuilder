@@ -1,1 +1,1 @@
-json.array! @result.travel_requests
+json.array! @result.paginated_travel_requests

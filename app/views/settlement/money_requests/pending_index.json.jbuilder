@@ -6,7 +6,7 @@ json.array! @result.paginated_money_requests do |money_request|
   json.required_by_date DateUtils.date_formatted money_request.required_by_date
   json.user money_request.user
   json.final_approver money_request.final_approver
-  currency = Currency.first
+  currency = money_request.base_currency
   json.total_amount do
     json.partial! 'shared/amount', amount: Amount.new(value: money_request.total_amount, currency: currency)
   end

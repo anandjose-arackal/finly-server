@@ -1,0 +1,15 @@
+<div class="row no-margin">
+  <div class="col-sm-8 col-sm-offset-2">
+    <div>
+      Company Balance: 55,500.00
+    </div>
+    <div class="form-group">
+      <label class="control-form">Amount:</label>
+      <input type="number" name="amount" class="form-control card-funds-amount"/>
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-success btn-confirm-transfer step-2-action" data-action-type="debit_card_to_company_credits">Proceed</button>
+    </div>
+  </div>
+</div>

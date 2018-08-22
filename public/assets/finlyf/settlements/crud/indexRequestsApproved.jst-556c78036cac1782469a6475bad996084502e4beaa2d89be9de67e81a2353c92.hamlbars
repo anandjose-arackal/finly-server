@@ -1,0 +1,20 @@
+<div class="main-header row no-margin">
+  
+  <div class="col-sm-2">Name</div>
+  <div class="col-sm-2">Final Approver</div>
+  <div class="col-sm-2">Required By</div>
+  <div class="col-sm-2">Payment Mode</div>
+  <div class="col-sm-3">Memo</div>
+  <div class="col-sm-1 text-right">Amount</div>
+
+</div>
+
+<div id="items" class="row no-margin">
+  
+</div>
+
+<div class="row no-margin">
+  <div class="col-sm text-center">
+    {{!-- <button class="navbar-btn btn btn-sm load-more" data-page="1"><i class="fa fa-cloud-download"></i>&nbsp;&nbsp;<span>Load More</span></button> --}}
+  </div>
+</div>

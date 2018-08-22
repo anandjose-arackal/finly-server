@@ -2,22 +2,26 @@
 #
 # Table name: booking_car_rentals
 #
-#  id                     :integer          not null, primary key
-#  journey_source         :string(255)
-#  journey_destination    :string(255)
-#  pickup_address         :text(65535)
-#  journey_date           :date
-#  pickup_time            :string(255)
-#  reservation_start_date :date
-#  reservation_end_date   :date
-#  car_type               :string(255)
-#  car_number             :string(255)
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  parent_id              :integer
-#  parent_type            :string(255)
-#  start_time             :text(65535)
-#  end_time               :text(65535)
+#  id              :integer          not null, primary key
+#  pickup_address  :text(65535)
+#  car_type        :string(255)
+#  car_number      :string(255)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  parent_id       :integer
+#  parent_type     :string(255)
+#  pickup_city_id  :integer          not null
+#  drop_city_id    :integer          not null
+#  drop_address    :text(65535)
+#  pickup_datetime :datetime
+#  drop_datetime   :datetime
+#  rental_company  :string(255)
+#  description     :text(65535)
+#  cost_id         :integer
+#  pickup_date     :date
+#  pickup_time     :time
+#  drop_date       :date
+#  drop_time       :time
 #
 
 class BookingCarRental < ActiveRecord::Base
@@ -65,4 +69,17 @@ class BookingCarRental < ActiveRecord::Base
         cost: cost
     }
   end
+
+  def valid_date_range(travel_request)
+    travel_from_date = travel_request.from_date
+    travel_to_date = travel_request.to_date
+    if pickup_datetime < travel_from_date or pickup_datetime > travel_to_date
+      return false
+    end
+    if drop_datetime < travel_from_date or drop_datetime > travel_to_date
+      return false
+    end
+    true
+  end
+
 end

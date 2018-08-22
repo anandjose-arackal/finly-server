@@ -1,0 +1,18 @@
+<div class="row no-margin">
+  <div class="col-sm-12">
+    <h5>Please enter password to <label>{{item.action_type}}</label> user <label>{{item.user.name}}</label></h5>
+  </div>
+</div>
+
+<div class="row no-margin">
+  <div class="col-sm-12">
+    <div class="form-group">
+      <label class="control-label">Password</label>
+      <input type="password" name="password" placeholder="password" class="form-control" />
+    </div>
+
+    <div class="form-group text-center">
+      <button class="btn btn-success btn-confirm-with-pw">Confirm</button>
+    </div>
+  </div>
+</div>
