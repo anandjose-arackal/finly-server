@@ -148,7 +148,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_availability_update(self.cash_pocket, updated_expense_params)
 
-    check_coh_reimbursable_exclusivity_create(updated_expense_params)
+    check_coh_reimbursable_exclusivity_update(updated_expense_params)
   end
 
   def pre_process
