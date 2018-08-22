@@ -40,11 +40,11 @@ class MoneyRequestItem < ActiveRecord::Base
   def amount
     s = super
     return nil if s.nil?
-    currency = Currency.first
-    if money_request.payment_mode_id == PaymentMode.id_for(:cash) and money_request.destination_pocket.present?
-      currency = money_request.destination_pocket.base_currency
+    return s if money_request.nil?
+    if money_request and money_request.payment_mode_id == PaymentMode.id_for(:cash) and money_request.destination_pocket.present?
+      s.currency = money_request.destination_pocket.base_currency
     end
-    Amount.new(value: s.value, currency: currency)
+    s
   end
 
   def handle_category_mapping

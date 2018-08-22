@@ -1,9 +1,9 @@
 class MoneyRequest::Create < MoneyRequest::Base
   attr_accessor :policy_id, :for_user, :default_policy
 
-  def authorized_user_types
-    :employee
-  end
+  # def authorized_user_types
+  #   :employee
+  # end
 
   def init
     self.for_user = (params[:for_user] or user)

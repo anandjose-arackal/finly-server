@@ -223,7 +223,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def editable?
-    self.status_id == MoneyRequestStatus.id_for(:open) || self.status_id == MoneyRequestStatus.id_for(:rejected) || self.status_id == MoneyRequestStatus.id_for(:retracted)
+    self.status_id == MoneyRequestStatus.id_for(:open) || self.status_id == MoneyRequestStatus.id_for(:rejected) || self.status_id == MoneyRequestStatus.id_for(:retracted) || self.status_id == MoneyRequestStatus.id_for(:pending)
   end
 
   def can_submit?
@@ -306,6 +306,14 @@ class MoneyRequest < ActiveRecord::Base
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
 
+  def cash_pocket_presence
+    if self.payment_mode_id == PaymentMode.id_for(:cash)
+      if self.destination_pocket_id.blank?
+        errors.add(:cash, "money requests cannot be created without a destination account")
+      end
+    end
+  end
+
   private
   def handle_name
     if self.name.blank?
@@ -328,13 +336,4 @@ class MoneyRequest < ActiveRecord::Base
       self.items.build money_request_item_category_id: category.id, amount: amount
     end
   end
-
-  def cash_pocket_presence
-    if self.payment_mode_id == PaymentMode.id_for(:cash)
-      if self.destination_pocket_id.blank?
-        errors.add(:cash, "money requests cannot be created without a destination account")
-      end
-    end
-  end
-
 end

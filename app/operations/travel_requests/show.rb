@@ -36,6 +36,13 @@ class TravelRequests::Show < TravelRequests::Base
       travel_request.destinations
     end
 
+    def policies
+      if travel_request.user.enforce_policy_enabled?
+        return travel_request.user.policies.non_default
+      end
+      travel_request.user.policies
+    end
+
     def manager
       if self.manager_user.blank?
         self.manager_user = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :manager)
@@ -165,7 +172,7 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_select_options?
-      (manager_view? or personal_view?) and (travel_request.selection_requested? or travel_request.selection_rejected?)
+      (manager_view? or personal_view?) and (travel_request.selection_requested? or travel_request.selection_rejected?) and travel_request.controlling_user_id == user.id
     end
 
     def editable
@@ -230,7 +237,7 @@ class TravelRequests::Show < TravelRequests::Base
       message = ''
       if travel_request.controlling_user_id == user.id
         if travel_manager_view?
-          if travel_request.processing? or travel_request.approved?
+          if travel_request.processing? or travel_request.approved? or travel_request.booking_pending?
             if booking.bookings.options.blank? and booking.bookings.confirmed.blank?
               highlighted = true
               message = 'No bookings or options have been added'

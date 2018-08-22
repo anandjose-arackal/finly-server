@@ -102,7 +102,7 @@ json.policy policy_name
 json.policy_id policy_id
 # end
 
-json.policies @result.money_request.user.policies do |policy|
+json.policies @result.policies do |policy|
   json.extract! policy, :id, :name
 end
 
