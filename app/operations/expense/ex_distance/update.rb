@@ -110,7 +110,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_pockets_only&.find_by(id: pocket_id)
 
     if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
@@ -149,6 +149,18 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     check_coh_availability_update(self.cash_pocket, updated_expense_params)
 
     check_coh_reimbursable_exclusivity_create(updated_expense_params)
+  end
+
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) || updated_expense_params[:spent_from_id].present?
+      updated_expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(updated_expense_params[:reimbursable])
+      updated_expense_params[:spent_from_id] = nil
+    end
   end
 
   def process

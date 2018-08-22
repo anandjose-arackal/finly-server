@@ -67,7 +67,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_pockets_only&.find_by(id: pocket_id)
 
     if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
@@ -105,8 +105,15 @@ class Expense::Manual::Update < Expense::Manual::Base
   end
 
   def pre_process
-    # storing the custom fields here for the expense
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) || updated_expense_params[:spent_from_id].present?
+      updated_expense_params[:reimbursable] = false
+    end
 
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(updated_expense_params[:reimbursable])
+      updated_expense_params[:spent_from_id] = nil
+    end
   end
 
   def process
