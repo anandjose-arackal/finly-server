@@ -2,6 +2,14 @@
 
 class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
+  def personalizer
+    {
+        init: {
+            after: Personalizer::Process.new([:bank_transfer, :payment_requests, :show], :init, self)
+        }
+    }
+  end
+
   attr_accessor :bank_payment_request
 
   def init
