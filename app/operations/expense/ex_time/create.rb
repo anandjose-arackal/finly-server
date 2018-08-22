@@ -88,10 +88,22 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     end
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
-    check_coh_availability_create(self.pocket, expense_params)
+    check_coh_availability_create(self.cash_pocket, expense_params)
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_create(expense_params)
+  end
+
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(expense_params[:from_cash_on_hand]) || expense_params[:spent_from_id].present?
+      expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(expense_params[:reimbursable])
+      expense_params[:spent_from_id] = nil
+    end
   end
 
   def process

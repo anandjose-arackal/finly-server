@@ -89,6 +89,18 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
 
   end
 
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(expense_params[:from_cash_on_hand]) || expense_params[:spent_from_id].present?
+      expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(expense_params[:reimbursable])
+      expense_params[:spent_from_id] = nil
+    end
+  end
+
   def process
     self.expense = user.expenses.build(expense_params)
 

@@ -22,4 +22,3 @@ json.array! @result.budgets do |budget|
     json.extract! budget.user, :id, :mobile_number, :email
   end
 end
-

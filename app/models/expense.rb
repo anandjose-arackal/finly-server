@@ -492,10 +492,10 @@ class Expense < ActiveRecord::Base
       return self.amount.value
     when ExpenseType.id_for(:distance)
       if distance_expense.vehicle_rate.blank?
-        distance_expense.update(vehicle_rate_id: policy.vehicle_rates&.first&.id)
+        distance_expense.update(vehicle_rate_id: policy&.vehicle_rates&.first&.id)
       end
       if distance_expense&.distance.present?
-        rate = policy.distance_expense_config.rate_value # rescue nil
+        rate = distance_expense.vehicle_rate&.rate&.value # rescue nil
         amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
         return amount
       end
