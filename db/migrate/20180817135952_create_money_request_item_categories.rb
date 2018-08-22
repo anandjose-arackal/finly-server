@@ -12,7 +12,7 @@ class CreateMoneyRequestItemCategories < ActiveRecord::Migration
     Category.all.each do |category|
       money_request_item = MoneyRequestItemCategory.new name: category.name, company_id: category.company_id, active: category.active
       unless money_request_item.save
-        debugger
+        raise money_request_item.errors.full_messages
       end
       MoneyRequestItem.where(category_id: category.id).update_all(money_request_item_category_id: money_request_item.id)
     end

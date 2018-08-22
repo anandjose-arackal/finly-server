@@ -264,7 +264,7 @@ class MoneyRequest < ActiveRecord::Base
 
   def base_currency
     currency = Currency.first
-    if payment_mode_id == PaymentMode.id_for(:cash)
+    if payment_mode_id == PaymentMode.id_for(:cash) and destination_pocket.present?
       currency = destination_pocket.base_currency
     end
     currency

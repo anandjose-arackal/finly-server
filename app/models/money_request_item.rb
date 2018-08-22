@@ -41,7 +41,7 @@ class MoneyRequestItem < ActiveRecord::Base
     s = super
     return nil if s.nil?
     currency = Currency.first
-    if money_request.payment_mode_id == PaymentMode.id_for(:cash)
+    if money_request.payment_mode_id == PaymentMode.id_for(:cash) and money_request.destination_pocket.present?
       currency = money_request.destination_pocket.base_currency
     end
     Amount.new(value: s.value, currency: currency)

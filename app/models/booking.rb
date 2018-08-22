@@ -69,7 +69,6 @@ class Booking < ActiveRecord::Base
   scope :requests, -> {where booking_status_id: BookingStatus.ids_for(:request)}
   scope :options, -> {where booking_status_id: BookingStatus.id_for(:option)}
   scope :rejected, -> {where booking_status_id: BookingStatus.id_for(:rejected)}
-  scope :cancelled, -> {where booking_status_id: BookingStatus.id_for(:cancelled)}
   scope :processing, -> {where booking_status_id: BookingStatus.id_for(:processing)}
   scope :confirmed, -> {where booking_status_id: BookingStatus.id_for(:confirmed)}
   scope :cancelled, -> {where booking_status_id: BookingStatus.id_for(:cancelled)}

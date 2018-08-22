@@ -56,7 +56,6 @@ class MoneyRequest::Index < MoneyRequest::Base
         # self.money_requests = MoneyRequest.from(sql)
         controlling_money_requests = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager)).with_user(team_ids).pluck(:id)
         interacted_money_requests = user.finance_money_requests.pluck(:id)
-        debugger
         self.money_requests = MoneyRequest.with_id(interacted_money_requests + controlling_money_requests)
       when UserRole.id_for(:auditor)
         # todo auditor
