@@ -63,6 +63,8 @@ class PaymentOrder < ActiveRecord::Base
   belongs_to :initiating_user, class_name: 'User'
   belongs_to :currency
 
+  serialize :post_operation_payload, Hash
+
   has_one :bank_payment_request
   has_many :payments, dependent: :destroy
   has_many :payment_order_attachments, dependent: :destroy

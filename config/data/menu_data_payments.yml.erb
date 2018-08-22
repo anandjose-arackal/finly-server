@@ -66,12 +66,35 @@ views:
     admin:
       menus:
         navbar:
-        - name: Individual Payments
-          url: payments
-          id: payments
-        - name: Payment Orders
-          url: orders
-          id: orders
+#        - name: Individual Payments
+#          url: payments
+#          id: payments
+        - name: Procure
+          type: group
+          items:
+          <% if current_user.company.procurement_enabled? %>
+          - name: Procurements
+            id: procurements
+            url: procurements
+          <% end %>
+          - name: Inventory
+            id: inventory
+            url: inventory
+        - name: Invoices
+          url: invoices
+          id: invoices
+        - name: Payment Tickets
+          type: group
+          items:
+          - name: Bulk Payments
+            url: orders
+            id: orders
+          - name: Individual Payments
+            url: payments
+            id: payments
+#        - name: Payment Orders
+#          url: orders
+#          id: orders
         - name: Users
           url: users
           id: users
@@ -105,12 +128,35 @@ views:
     auditor:
       menus:
         navbar:
-        - name: Individual Payments
-          url: payments
-          id: payments
-        - name: Payment Orders
-          url: orders
-          id: orders
+#        - name: Individual Payments
+#          url: payments
+#          id: payments
+        - name: Procure
+          type: group
+          items:
+          <% if current_user.company.procurement_enabled? %>
+          - name: Procurements
+            id: procurements
+            url: procurements
+          <% end %>
+          - name: Inventory
+            id: inventory
+            url: inventory
+        - name: Invoices
+          url: invoices
+          id: invoices
+        - name: Payment Tickets
+          type: group
+          items:
+          - name: Bulk Payments
+            url: orders
+            id: orders
+          - name: Individual Payments
+            url: payments
+            id: payments
+#        - name: Payment Orders
+#          url: orders
+#          id: orders
         - name: Users
           url: users
           id: users
@@ -142,12 +188,32 @@ views:
     reviewer:
       menus:
         navbar:
-        - name: Individual Payments
-          url: payments
-          id: payments
-        - name: Payment Orders
-          url: orders
-          id: orders
+        - name: Procure
+          type: group
+          items:
+          <% if current_user.company.procurement_enabled? %>
+          - name: Procurements
+            id: procurements
+            url: procurements
+          <% end %>
+          - name: Inventory
+            id: inventory
+            url: inventory
+        - name: Invoices
+          url: invoices
+          id: invoices
+        - name: Payment Tickets
+          type: group
+          items:
+          - name: Bulk Payments
+            url: orders
+            id: orders
+          - name: Individual Payments
+            url: payments
+            id: payments
+#        - name: Payment Orders
+#          url: orders
+#          id: orders
 #        - name: Vendors
 #          url: vendors
 #          id: 'vendors'
@@ -160,12 +226,35 @@ views:
     creditor:
       menus:
         navbar:
-        - name: Individual Payments
-          url: payments
-          id: payments
-        - name: Payment Orders
-          url: orders
-          id: orders
+#        - name: Individual Payments
+#          url: payments
+#          id: payments
+        - name: Procure
+          type: group
+          items:
+          <% if current_user.company.procurement_enabled? %>
+          - name: Procurements
+            id: procurements
+            url: procurements
+          <% end %>
+          - name: Inventory
+            id: inventory
+            url: inventory
+        - name: Invoices
+          url: invoices
+          id: invoices
+        - name: Payment Tickets
+          type: group
+          items:
+          - name: Bulk Payments
+            url: orders
+            id: orders
+          - name: Individual Payments
+            url: payments
+            id: payments
+#        - name: Payment Orders
+#          url: orders
+#          id: orders
 #        - name: Vendors
 #          url: vendors
 #          id: 'vendors'
@@ -181,14 +270,37 @@ views:
     initiator:
       menus:
         navbar:
+        - name: Procure
+          type: group
+          items:
+          <% if current_user.company.procurement_enabled? %>
+          - name: Procurements
+            id: procurements
+            url: procurements
+          <% end %>
+          - name: Inventory
+            id: inventory
+            url: inventory
         - name: 'Bulk Payments'
           url: 'orders/new'
-        - name: Individual Payments
-          url: payments
-          id: payments
-        - name: Payment Orders
-          url: orders
-          id: orders
+#        - name: Individual Payments
+#          url: payments
+#          id: payments
+        - name: Invoices
+          url: invoices
+          id: invoices
+        - name: Payment Tickets
+          type: group
+          items:
+          - name: Bulk Payments
+            url: orders
+            id: orders
+          - name: Individual Payments
+            url: payments
+            id: payments
+#        - name: Payment Orders
+#          url: orders
+#          id: orders
 #        - name: Vendors
 #          url: vendors
 #          id: 'vendors'

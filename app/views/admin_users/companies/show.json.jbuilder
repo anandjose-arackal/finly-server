@@ -21,6 +21,7 @@ json.registered_mobile_number @result.company.configuration.registered_mobile_nu
 json.yes_bank_company_balance @result.yes_bank_company_balance
 json.bank_account_reimbursement @result.company.bank_reimbursement_enabled?
 json.invoicing_system @result.company.invoicing_system_enabled?
+json.procurement @result.company.procurement_enabled?
 
 if Rails.env.production?
   json.url "https://www.itzcash.com/finly/servlet/AccountReloadServlet"

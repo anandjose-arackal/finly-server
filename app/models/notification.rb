@@ -70,6 +70,8 @@ class Notification < ActiveRecord::Base
         object = "Cash"
       when "PaymentOrder", "Payment Order"
         object = "Payment Order"
+      when "Purchase Order"
+        object = "Purchase Order"
       else
         # do nothing
     end
@@ -310,6 +312,15 @@ class Notification < ActiveRecord::Base
           else
             # do nothing
         end
+      when "Purchase Order"
+        case action_type_id
+          when NotificationActionType.id_for(:notify_submit)
+            object = " purchase order"
+          # when NotificationActionType.id_for(:notify_cash_withdrawal)
+          #   object = " from your cash in hand"
+          else
+            # do nothing
+        end
       else
         # do nothing
     end
@@ -397,6 +408,13 @@ class Notification < ActiveRecord::Base
         else
           path = "orders/#{self.path_object_id}"
         end
+      when "PurcahseOrder"
+        path_object = PurchaseOrder.unscoped.find_by(id: self.path_object_id)
+        # if path_object.is_deleted?
+        #   path = "procurements"
+        # else
+        path = "procurements/#{self.path_object_id.procurement}"
+        # end
       else
         # do nothing
     end
@@ -420,6 +438,8 @@ class Notification < ActiveRecord::Base
         object = Report.unscoped.find_by(id: object_id)
       when "Money Request"
         object = MoneyRequest.unscoped.find_by(id: object_id)
+      when 'Purchase Order'
+        object = PurchaseOrder.unscoped.find_by(id: object_id)
       else
         return ""
     end
@@ -429,6 +449,7 @@ class Notification < ActiveRecord::Base
     elsif self.action_type_id == NotificationActionType.id_for(:notify_submit)
       return " a" if object_type == "Report"
       return " an" if object_type == "Money Request"
+      return " a" if object_type == "Purchase Order"
     elsif self.user_id == owner.id
       return " your"
     else

@@ -22,6 +22,7 @@ class User::Team::Index < User::Team::Base
   has_scope :filter_expense_management
   has_scope :filter_vendor_payments
   has_scope :yes_bank_account_transfer
+  has_scope :filter_vendor_payments_reviewers
 
   def pre_validate
     unless user.present?

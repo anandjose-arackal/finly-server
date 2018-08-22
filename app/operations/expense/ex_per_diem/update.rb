@@ -58,7 +58,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = user.user_pockets.cash_pockets_only.find_by(id: pocket_id)
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_pockets_only&.find_by(id: pocket_id)
 
     # todo - jugaad to support mobile app for now
     if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
@@ -111,6 +111,18 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_update(updated_expense_params)
+  end
+
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) || updated_expense_params[:spent_from_id].present?
+      updated_expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(updated_expense_params[:reimbursable])
+      updated_expense_params[:spent_from_id] = nil
+    end
   end
 
   def process

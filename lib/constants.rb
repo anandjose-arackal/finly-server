@@ -88,6 +88,7 @@ module Constants
   ###################################################
 
 
+
   if Rails.env.development?
     # url = "http://192.168.81.157:3000/#"
     url = "http://localhost/#"
@@ -291,4 +292,23 @@ module Constants
     YES_BANK_RECEIVING_IFSC = "YESB0000022"
     YES_BANK_COLLECT_IFSC = 'YESB0CMSNOC'
   end
+
+  ################### Encryption Keys for Darwin Box ################
+
+  class Constants::Darwinbox
+    if Rails.env.production?
+      XOR_KEY = ''
+    else
+      XOR_KEY = '666666'
+    end
+
+    if Rails.env.production?
+      SHA512_KEY = ''
+    else
+      SHA512_KEY = '4150fb44a955a5ff0711f9a1c631a3ed'
+    end
+  end
+
+  ###################### END OF Darwin Box ###########################
+
 end

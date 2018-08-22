@@ -59,34 +59,35 @@ class Card < ActiveRecord::Base
   accepts_nested_attributes_for :card_balance
   accepts_nested_attributes_for :card_eligibility
 
-  default_scope { where hotlisted: false }
+  default_scope {where hotlisted: false}
 
-  scope :with_id, -> (id) { where id: id }
-  scope :with_user, -> (user_id) { where user_id: user_id }
-  scope :with_company, -> (company_id) { where company_id: company_id }
-  scope :unassigned, -> { where user_id: nil }
-  scope :active, -> { where active: true }
-  scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
-  scope :reimbursement_cards, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
-  scope :manager_viewable_transactions, -> { where card_program_id: CardProgram.all.with_manager_view_transactions.pluck(:id) }
-  scope :with_card_program, ->(id) { where card_program_id: id }
-  scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
-  scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
-  scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
-  scope :meal_cards, -> { where card_program_id: CardProgram.id_for(:meal) }
-  scope :payroll_cards, -> { where card_program_id: CardProgram.id_for(:payroll) }
-  scope :sum_balance, -> { joins(:card_balance).sum('amounts.value') }
+  scope :with_id, -> (id) {where id: id}
+  scope :with_user, -> (user_id) {where user_id: user_id}
+  scope :with_company, -> (company_id) {where company_id: company_id}
+  scope :unassigned, -> {where user_id: nil}
+  scope :active, -> {where active: true}
+  scope :expense_cards, -> {where card_program_id: CardProgram.id_for(:expense)}
+  scope :reimbursement_cards, -> {where card_program_id: CardProgram.id_for(:reimbursement)}
+  scope :manager_viewable_transactions, -> {where card_program_id: CardProgram.all.with_manager_view_transactions.pluck(:id)}
+  scope :with_card_program, ->(id) {where card_program_id: id}
+  scope :creditable_cards, -> {with_card_program(CardProgram.all.with_manager_credit)}
+  scope :with_non_personal_fund_transfer, -> {with_card_program(CardProgram.all.with_non_personal_fund_transfer)}
+  scope :reimbursable_cards, -> {with_card_program(CardProgram.all.with_reimbursement)}
+  scope :meal_cards, -> {where card_program_id: CardProgram.id_for(:meal)}
+  scope :payroll_cards, -> {where card_program_id: CardProgram.id_for(:payroll)}
+  scope :sum_balance, -> {joins(:card_balance).sum('amounts.value')}
   scope :non_hotlisted, -> {
     # if applied == '1'
     where hotlisted: false
     # end
   }
-  scope :pluck_proxy, -> { pluck :proxy }
-  scope :include_hotlisted, -> { unscope(where: :hotlisted) }
+  scope :pluck_proxy, -> {pluck :proxy}
+  scope :include_hotlisted, -> {unscope(where: :hotlisted)}
 
-  scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
-  scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
-  scope :with_proxy, -> (proxy) { where proxy: proxy }
+  scope :expense_cards_only, -> {where card_program_id: CardProgram.id_for(:expense)}
+  scope :reimbursement_cards_only, -> {where card_program_id: CardProgram.id_for(:reimbursement)}
+  scope :with_proxy, -> (proxy) {where proxy: proxy}
+  scope :with_id_or_proxy, -> (id) {where 'id = ? OR proxy = ?', id, id}
 
   scope :filter_search, -> (term) {
     if term.present?
@@ -118,14 +119,14 @@ class Card < ActiveRecord::Base
     # marking the card by default as either active or inactive
     if result.success?
       case result.status_code
-        when 'A'
-          if result.suspended_status == 'N'
-            self.update(active: true)
-          else
-            self.update(active: false)
-          end
+      when 'A'
+        if result.suspended_status == 'N'
+          self.update(active: true)
         else
           self.update(active: false)
+        end
+      else
+        self.update(active: false)
       end
     end
 
@@ -276,7 +277,7 @@ class Card < ActiveRecord::Base
     status
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         user: user,

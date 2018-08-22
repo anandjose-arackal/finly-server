@@ -34,6 +34,8 @@ json.payment do
       json.item_discounts_total item[:item_discounts_total]
       json.items_net_total item[:items_net_total]
       json.item_amounts_total item[:item_amounts_total]
+      json.invoice_type_id item[:invoice_type_id]
+      json.invoice_type_name item[:invoice_type_name]
       json.invoice_items do
         json.array!(item[:invoice_items]) do |line_item|
           json.discount line_item[:discount]

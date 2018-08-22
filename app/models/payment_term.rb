@@ -10,9 +10,11 @@
 #  description :text(65535)
 #  company_id  :integer
 #  default     :boolean
+#  is_deleted  :boolean          default(FALSE), not null
 #
 
 class PaymentTerm < ActiveRecord::Base
+  include SoftDeletable
 
   belongs_to :company
 

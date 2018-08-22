@@ -13,8 +13,13 @@ class Card::Show < Card::Base
 
   def init
     cards = Card::Index.(user, params)&.cards rescue nil
+    id = (params[:id] or params[:card_id])
     if cards.present?
-      self.card = cards.find_by(id: (params[:id] or params[:card_id]))
+      self.card = cards.with_id_or_proxy(id)&.first
+    end
+    if self.card.present?
+      ItzCash::AccountDetails.(user, card: self.card)
+      self.card.reload
     end
   end
 

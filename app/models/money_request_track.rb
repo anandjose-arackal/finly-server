@@ -23,6 +23,7 @@
 
 
 
+
 class MoneyRequestTrack < ActiveRecord::Base
 
   belongs_to :money_request

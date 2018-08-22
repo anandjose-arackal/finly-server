@@ -29,6 +29,7 @@ class Company < ActiveRecord::Base
   has_one :account, class_name: 'CompanyAccount'
   has_one :quickbooks_configuration
   has_one :tally_configuration
+  has_one :accounting_system_configuration
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions
@@ -40,6 +41,7 @@ class Company < ActiveRecord::Base
   has_many :inventory_line_items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
+  has_many :tax_rates
   has_many :invoice_reminders
   has_many :invoice_number_configs
   has_one :feature_subscription, as: :subscribable
@@ -74,10 +76,18 @@ class Company < ActiveRecord::Base
   has_many :customers
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+  has_many :inward_invoices, class_name: "Invoice"
   has_many :money_request_item_categories
 
   has_many :budgets
+  has_many :procurements
+  has_many :procurement_terms
+  has_many :procurement_attachments
+  has_many :document_number_configs
+  has_many :purchase_orders
+  has_many :inward_documents # purchase order inward documents
 
+  has_many :departments
   has_many :company_pocket_templates
 
   has_many :booking_attachments
@@ -302,6 +312,10 @@ class Company < ActiveRecord::Base
 
   def travel_desk_enabled?
     self.feature_subscription.travel_request
+  end
+
+  def procurement_enabled?
+    self.feature_subscription.procurement
   end
 
   def more_than_one_subscription?

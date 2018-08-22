@@ -20,4 +20,9 @@ class BankTransfer::PaymentsController < ApplicationController
     @result = BankTransfer::Payments::Retry.(current_user, params)
     respond
   end
+
+  def bulk_upload_utr
+    @result = BankTransfer::Payments::BulkUploadUtr.(current_user, params)
+    respond
+  end
 end

@@ -33,30 +33,70 @@ class YesBankVendor < ActiveRecord::Base
   belongs_to :created_by, class_name: "User"
   belongs_to :vendor_type
 
+  belongs_to :currency
+  belongs_to :payment_term
+
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
 
+  # Requirement first shared by olx
+  # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy
+  # has_one :pan_attachment, class_name: "VendorAttachment", dependent: :destroy
+  # has_one :gstin_certificate_attachment, class_name: "VendorAttachment", dependent: :destroy
 
-  has_many :budgets, as: :budgetable
+  has_one :vendor_account, foreign_key: :vendor_id
+
+  has_many :budget_criteria_mappings, as: :budgetable
+  has_many :budgets, through: :budget_criteria_mappings
+
+  has_many :budget_trails, as: :vendor
 
   accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
+  # accepts_nested_attributes_for :pan_attachment, allow_destroy: true
+  # accepts_nested_attributes_for :gstin_certificate_attachment, allow_destroy: true
+  # accepts_nested_attributes_for :cancelled_cheque_attachment, allow_destroy: true
+
+  scope :with_ids, -> (ids) {where id: ids}
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> { where is_deleted: [false, nil]}
   scope :authorized, -> { where authorized: true}
 
   scope :filter_search, -> (term) do
-    vendor_ids = where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    ids = self.pluck(:id)
+    vendor_ids = where(id: ids).where("name like ? OR email like ? OR mobile_number like ? OR description like ? OR business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("account_number like ? OR ifsc like ? OR name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
   end
 
+  scope :filter_name_search, -> (term) {
+    ids = self.pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    where(id: vendor_ids)
+  }
+
+  scope :includes_bank_accounts, -> {
+    includes(:bank_accounts)
+  }
+
+  after_create do
+    if self.vendor_account.blank?
+      self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save
+    end
+  end
+
+  def display_name
+    self.business_name || self.name
+  end
+
   def as_json(options={})
+    display_name = self.business_name || self.name
     {
         id: id,
+        display_name: display_name,
         name: name,
         created_at: created_at,
         email: email,
@@ -70,8 +110,8 @@ class YesBankVendor < ActiveRecord::Base
         gst_registered: gst_registered,
         state: state,
         state_code_id: state_code_id,
+        tds_id: tds_rates_list_id,
         bank_accounts: bank_accounts
     }
   end
-
 end

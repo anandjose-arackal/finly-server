@@ -1,4 +1,12 @@
+budget = @result.budget
 json.extract! @result.budget, :id, :name, :budgetable_id, :budgetable_type
+
+json.applicable_entities do
+  json.purchase_order @result.budget.purchase_order
+  json.payment @result.budget.payment
+  json.expense @result.budget.expense
+end
+
 # json.period do
 #   json.extract! @result.budget.period, :id, :name
 # end
@@ -19,50 +27,145 @@ json.amounts do
 end
 
 json.budget_trail_items do
-  json.array! @result.budget_trail_items do |item|
-    json.extract! item, :id, :date
-    json.amount do
-      json.value item.amount.value
-      json.currency do
-        json.extract! item.amount.currency, :id, :country, :country_code, :symbol
-      end
+  # first will be the list of expenses
+  json.expenses do
+    json.array!(@result.spent_entities[0]) do |expense|
+      json.user_name expense.user&.name
+      json.category_name expense.category&.name
+      json.date expense.date.strftime("%Y-%B-%d")
+      json.amount expense.amount&.value
     end
+  end
 
-    if item.class.name == 'Expense'
-      json.status item.expense_status.name.humanize
-      json.expense_type item.expense_type.name.humanize + " Expense"
-      json.type "expense"
-      json.user do
-        json.extract! item.user, :id, :name, :email, :mobile_number
-      end
+  # list of payments that need to be processed
+  json.payments do
+    json.array!(@result.spent_entities[1]) do |payment|
+      json.vendor payment.receiving_user&.name
+      json.category_name payment.category&.name
+      json.cost_center_name payment.cost_center&.name
+      json.amount payment.amount&.value
+      json.date payment.date.strftime("%Y-%B-%d")
+    end
+  end
 
-    elsif item.class.name == 'Payment'
-      json.status item.payment_status.name.humanize
-      json.type "payment"
-      if item.receiving_user.present?
-        json.vendor do
-          json.extract! item.receiving_user, :id, :name, :email, :mobile_number
-        end
-      end
-
-      if item.initiating_user.present?
-        json.initiating_user do
-          json.extract! item.initiating_user, :id, :name, :email, :mobile_number
-        end
-      end
-
+  # list of purchase order items
+  json.purchase_order_items do
+    json.array!(@result.spent_entities[2]) do |purchase_order_item|
+      json.name purchase_order_item.description
+      json.cost_center_name purchase_order_item.cost_center&.name
+      json.amount purchase_order_item.total_amount&.value
+      json.date purchase_order_item.purchase_order.delivery_date
+      json.location purchase_order_item.purchase_order.location&.name
+      json.department purchase_order_item.purchase_order.department&.name
     end
   end
 end
 
-json.associated_item do
-  json.id @result.budget.budgetable_id
-  json.type @result.budget.budgetable_type
-  json.item @result.budget.budgetable
+json.associated_vendors do
+  json.array!(budget.budgetable_vendors) do |vendor|
+    json.id vendor.id
+    json.name vendor.name
+  end
+end
+json.associated_categories do
+  json.array!(budget.budgetable_categories) do |category|
+    json.id category.id
+    json.name category.name
+  end
+end
+json.associated_cost_centers do
+  json.array!(budget.budgetable_cost_centers) do |cost_center|
+    json.id cost_center.id
+    json.name cost_center.name
+  end
+end
+json.associated_locations do
+  json.array!(budget.budgetable_locations) do |location|
+    json.id location.id
+    json.name location.name
+  end
+end
+json.associated_departments do
+  json.array!(budget.budgetable_departments) do |department|
+    json.id department.id
+    json.name department.name
+  end
+end
+json.associated_users do
+  json.array!(budget.budgetable_users) do |user|
+    json.id user.id
+    json.name user.name
+  end
 end
 
 json.user do
   json.extract! @result.budget.user, :id, :mobile_number, :email
+end
+
+json.sub_budgets do
+  json.array!(budget.children) do |sub_budget|
+    json.extract! sub_budget, :id, :name
+
+    json.start_date sub_budget.start_date&.strftime("%d-%b-%y")
+    json.end_date sub_budget.end_date&.strftime("%d-%b-%y")
+
+    json.budget_amount do
+      json.extract! sub_budget.budget_amount, :id, :value, :currency_id
+    end
+
+    json.amounts do
+      json.budget_amount do
+        json.extract! @result.budget.budget_amount, :id, :value
+      end
+      json.spent_amount do
+        json.value @result.spent_amount
+      end
+      json.currency do
+        json.extract! @result.budget.budget_amount.currency, :id, :country, :country_code, :symbol
+      end
+    end
+
+    json.associated_vendors do
+      json.array!(sub_budget.budgetable_vendors) do |vendor|
+        json.id vendor.id
+        json.name vendor.name
+      end
+    end
+    json.associated_categories do
+      json.array!(sub_budget.budgetable_categories) do |category|
+        json.id category.id
+        json.name category.name
+      end
+    end
+    json.associated_cost_centers do
+      json.array!(sub_budget.budgetable_cost_centers) do |cost_center|
+        json.id cost_center.id
+        json.name cost_center.name
+      end
+    end
+    json.associated_locations do
+      json.array!(sub_budget.budgetable_locations) do |location|
+        json.id location.id
+        json.name location.name
+      end
+    end
+    json.associated_departments do
+      json.array!(sub_budget.budgetable_departments) do |department|
+        json.id department.id
+        json.name department.name
+      end
+    end
+    json.associated_users do
+      json.array!(sub_budget.budgetable_users) do |user|
+        json.id user.id
+        json.name user.name
+      end
+    end
+
+    json.user do
+      json.extract! sub_budget.user, :id, :mobile_number, :email
+    end
+  end
 end
 
 

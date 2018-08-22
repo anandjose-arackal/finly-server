@@ -110,7 +110,21 @@ class NotifierType < ActiveRecord::Base
              {key: :payment_order_bulk_download, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
              {key: :outward_invoice_payment, has_push_notification: true, has_mailer: true,
-              configurable_push_notification: false, configurable_mailer: true}
+              configurable_push_notification: false, configurable_mailer: true},
+
+             # Purchase Order
+             {key: :purchase_order_submit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_order_approve, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_order_reject, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_order_unapprove, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_order_retract, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_order_comment, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true}
             ]
 
   scope :with_name, ->(name) {where name: name}

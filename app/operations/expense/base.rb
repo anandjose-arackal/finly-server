@@ -21,6 +21,9 @@ class Expense::Base < BaseOperation
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
     if params[:spent_from_id].present? || StringUtils.to_bool(params[:from_cash_on_hand])
 
+      # todo - temporary to support mobile APIs
+      params[:spent_from_id] = pocket.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
+
       # first check if the expense is being created in non-INR, and if its date is today
       if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([pocket.base_currency_id, pocket.base_currency_id.to_s].include?(params&.dig(:amount_attributes, :currency_id)))
         add_message :error, "#{pocket.name} expenses that are in a currency different from #{pocket.base_currency.country_code} can only be reported on the next day"
@@ -34,11 +37,14 @@ class Expense::Base < BaseOperation
         when ExpenseType.id_for(:per_diem)
           expense = user.expenses.build(params)
           amount = expense.calculate_amount_value(self.per_diem.configurable)
+        when ExpenseType.id_for(:distance)
+          expense = user.expenses.build(params)
+          amount = expense.calculate_amount_value(nil)
       end
       cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
       balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
       unless balance >= amount
-        add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
+        add_message :error, "You do not have enough balance in your #{pocket.name} account to mark this expense against it"
         return
       end
     end
@@ -49,30 +55,36 @@ class Expense::Base < BaseOperation
     # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
     if (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) or ((params&.dig(:spent_from_id).nil? or !StringUtils.to_bool(params[:from_cash_on_hand])) and expense.spent_from.present?)
 
-      # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([pocket.base_currency_id, pocket.base_currency_id.to_s].include?(params&.dig(:amount_attributes, :currency_id)))
-        add_message :error, "#{pocket.name} expenses that are in a currency different from #{pocket.base_currency.country_code} can only be reported on the next day"
-        return
-      end
+      # # first check if the expense is being created in non-INR, and if its date is today
+      # if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
+      #   add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
+      #   return
+      # end
 
-      cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-      amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
-      balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
-      # if the expense is continuing to be from COH, and only the amount is changing
-      if expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
-        difference = params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
-        unless difference <= balance
-          add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
-          return
+      # todo - temporary to support mobile APIs
+      params[:spent_from_id] = pocket.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
+      params[:spent_from_id] = nil unless (StringUtils.to_bool(params[:from_cash_on_hand]) || params[:spent_from_id].present?) # this is so that if the expense is marked as NOT from COH, it will get updated accordingly from the mobile APIs
+
+      if pocket.present?
+        cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
+        balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
+        # if the expense is continuing to be from COH, and only the amount is changing
+        if expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
+          difference = params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
+          unless difference <= balance
+            add_message :error, "You do not have enough balance in your #{pocket.name} account to mark this expense against it"
+            return
+          end
+          # i.e. if the expense was not originally from COH, and it's currently being made into one
+        elsif !expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
+          unless balance >= amount_val
+            add_message :error, "You do not have enough balance in your #{pocket.name} account app/operations/money_request/base.rb:20to mark this expense against it"
+            return
+          end
+        elsif expense.spent_from.present? && !(params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
+          # nothing to do here ¯\_(ツ)_/¯
         end
-        # i.e. if the expense was not originally from COH, and it's currently being made into one
-      elsif !expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
-        unless balance >= amount_val
-          add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
-          return
-        end
-      elsif expense.spent_from.present? && !(params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
-        # nothing to do here ¯\_(ツ)_/¯
       end
     end
   end
@@ -81,7 +93,7 @@ class Expense::Base < BaseOperation
   def check_coh_reimbursable_exclusivity_update(params)
     # making sure that a particular expense cannot be both reimbursable and from cash on hand at the same time
     from_cash_pockets = params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])
-    from_cash_pockets = from_cash_pockets.blank? ? (expense.spent_from&.present? or StringUtils.to_bool(params[:from_cash_on_hand])) : from_cash_pockets
+    # from_cash_pockets = from_cash_pockets.blank? ? (expense.spent_from&.present? or StringUtils.to_bool(params[:from_cash_on_hand])) : from_cash_pockets
     reimbursable = StringUtils.to_bool(params&.dig(:reimbursable))
     reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
     if from_cash_pockets and reimbursable
@@ -139,7 +151,7 @@ class Expense::Base < BaseOperation
       self.vehicle_rates = retrieve_vehicle_rates(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
-      self.cash_pockets = user.user_pockets.cash_pockets_only
+      self.cash_pockets = expense.user.user_pockets.cash_pockets_only
     end
 
     def retrieve_vehicle_rates(expense)

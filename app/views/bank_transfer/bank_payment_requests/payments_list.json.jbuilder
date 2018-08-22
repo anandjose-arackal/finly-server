@@ -5,6 +5,7 @@ json.payments do
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.amount precision_value payment.amount_value
+    json.payment_amount payment.amount_value
     json.net_amount precision_value payment.amount_value
     json.invoice_amount precision_value payment.invoice_amount
     json.status payment.payment_status_name
@@ -38,6 +39,7 @@ json.payments do
         json.original_amount precision_value invoice.original_amount&.value
       end
       json.invoice do
+        json.id invoice.id
         json.advance invoice.advance
         json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
@@ -56,8 +58,10 @@ json.payments do
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
         json.roundoff_amount invoice.roundoff_amount
+        json.net_payable_amount invoice.balance_due&.value
         json.balance_due invoice.balance_due&.value
         json.taxable_amount precision_value invoice.gross_amount&.value
+        json.editable invoice.unpaid?
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -87,6 +91,12 @@ json.payments do
 
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total
+
+        # paid amount for this invoice
+        json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
+        json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+
+        #
 
         json.invoice_items do
           json.array!(invoice.invoice_items) do |item|
