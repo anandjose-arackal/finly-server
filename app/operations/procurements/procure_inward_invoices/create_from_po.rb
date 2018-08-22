@@ -85,7 +85,8 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
           hsn_sac: item.hsn_sac,
           description: item.description,
           gst_type_id: self.purchase_order.gst_type_id,
-          comment: item.comment
+          comment: item.comment,
+          inventory_line_item_id: item.inventory_line_item_id
       }
     end
     invoice_params = {

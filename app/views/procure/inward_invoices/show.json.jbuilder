@@ -30,7 +30,7 @@
 
 invoice = @result.invoice
 
-json.purchase_order_policy_id invoice.procurement&.purchase_order&.id
+json.purchase_order_policy_id invoice.procurement&.purchase_order&.policy&.id
 json.actions do
   if current_user.vendor_payment_creditor?
     json.make_payment true

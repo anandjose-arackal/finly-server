@@ -39,6 +39,7 @@ class Integrations::NetSuite::Invoices < Integrations::NetSuite::Base
       payment_request.payments.each do |payment|
         invoice = payment.invoice
         invoice.invoice_items.each do |item|
+          tds_applied = (invoice.tds_slab&.tds && invoice.tds_slab&.tds > 0) ? 'Yes' : 'No'
           contents << [
               '',
               (contents.size + 1),
@@ -57,12 +58,12 @@ class Integrations::NetSuite::Invoices < Integrations::NetSuite::Base
               item.quantity,
               item.rate,
               item.inventory_line_item&.tax_rate&.internal_id,
-              (invoice.tds_slab&.tds && invoice.tds_slab&.tds > 0),
+              tds_applied,
               invoice.tds_slab&.name,
               invoice.procurement.purchase_order.department.name,
               invoice.procurement.purchase_order.department.name,
               invoice.procurement.purchase_order.location.name,
-              item.amount&.value
+              item.net_amount&.value
 
           ]
         end
