@@ -73,10 +73,10 @@ class BookingCarRental < ActiveRecord::Base
   def valid_date_range(travel_request)
     travel_from_date = travel_request.from_date
     travel_to_date = travel_request.to_date
-    if pickup_datetime < travel_from_date or pickup_datetime > travel_to_date
+    if pickup_date < travel_from_date or pickup_date > travel_to_date
       return false
     end
-    if drop_datetime < travel_from_date or drop_datetime > travel_to_date
+    if drop_date < travel_from_date or drop_date > travel_to_date
       return false
     end
     true
