@@ -62,39 +62,51 @@ class Budget < ActiveRecord::Base
   }
 
   scope :with_budgetable_vendors, -> (vendor_ids) {
-    vendor_ids = [vendor_ids] unless vendor_ids.is_a?(Array)
-    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "YesBankVendor").where('budget_criteria_mappings.budgetable_id IN (?)', vendor_ids).pluck(:budget_id)
-    where(id: ids)
+    if vendor_ids.present?
+      vendor_ids = [vendor_ids] unless vendor_ids.is_a?(Array)
+      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "YesBankVendor").where('budget_criteria_mappings.budgetable_id IN (?)', vendor_ids).pluck(:budget_id)
+      where(id: ids)
+    end
   }
 
   scope :with_budgetable_cost_centers, -> (cost_center_ids) {
-    cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
-    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "CostCenter").where('budget_criteria_mappings.budgetable_id IN (?)', cost_center_ids).pluck(:budget_id)
-    where(id: ids)
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "CostCenter").where('budget_criteria_mappings.budgetable_id IN (?)', cost_center_ids).pluck(:budget_id)
+      where(id: ids)
+    end
   }
 
   scope :with_budgetable_categories, -> (category_ids) {
-    category_ids = [category_ids] unless category_ids.is_a?(Array)
-    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Category").where('budget_criteria_mappings.budgetable_id IN (?)', category_ids).pluck(:budget_id)
-    where(id: ids)
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Category").where('budget_criteria_mappings.budgetable_id IN (?)', category_ids).pluck(:budget_id)
+      where(id: ids)
+    end
   }
 
   scope :with_budgetable_locations, -> (location_ids) {
-    location_ids = [location_ids] unless location_ids.is_a?(Array)
-    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "BranchLocation").where('budget_criteria_mappings.budgetable_id IN (?)', location_ids).pluck(:budget_id)
-    where(id: ids)
+    if location_ids.present?
+      location_ids = [location_ids] unless location_ids.is_a?(Array)
+      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "BranchLocation").where('budget_criteria_mappings.budgetable_id IN (?)', location_ids).pluck(:budget_id)
+      where(id: ids)
+    end
   }
 
   scope :with_budgetable_users, -> (user_ids) {
-    user_ids = [user_ids] unless user_ids.is_a?(Array)
-    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "User").where('budget_criteria_mappings.budgetable_id IN (?)', user_ids).pluck(:budget_id)
-    where(id: ids)
+    if user_ids.present?
+      user_ids = [user_ids] unless user_ids.is_a?(Array)
+      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "User").where('budget_criteria_mappings.budgetable_id IN (?)', user_ids).pluck(:budget_id)
+      where(id: ids)
+    end
   }
 
   scope :with_budgetable_departments, -> (department_ids) {
-    department_ids = [department_ids] unless department_ids.is_a?(Array)
-    ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Department").where('budget_criteria_mappings.budgetable_id IN (?)', department_ids).pluck(:budget_id)
-    where(id: ids)
+    if department_ids.present?
+      department_ids = [department_ids] unless department_ids.is_a?(Array)
+      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Department").where('budget_criteria_mappings.budgetable_id IN (?)', department_ids).pluck(:budget_id)
+      where(id: ids)
+    end
   }
 
   # todo - change this to reflect the new structure
