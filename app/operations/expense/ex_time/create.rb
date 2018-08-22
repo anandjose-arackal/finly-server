@@ -88,7 +88,7 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     end
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
-    check_coh_availability_create(self.pocket, expense_params)
+    check_coh_availability_create(self.cash_pocket, expense_params)
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_create(expense_params)
