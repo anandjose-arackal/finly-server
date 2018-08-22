@@ -22,7 +22,7 @@ json.destinations do
 end
 
 json.actions @result.actions
-json.policies @result.travel_request.user.policies
+json.policies @result.policies
 json.editable @result.editable
 json.destroyable @result.destroyable
 json.can_select_options @result.can_select_options?

@@ -76,6 +76,7 @@ class TravelRequests::Review::ConfirmSelection < TravelRequests::Review::Base
   def travel_booking_reviewer
     controlling_user = self.travel_request.controlling_user
     purpose_id = Purpose.id_from_application_for(RequestStore.store[:current_app])
+    # todo travel_booking_approves_to to be updated to travel_booking_verifier for confirm selection
     reviewer = controlling_user.team_mapping.with_purpose(purpose_id).policy(self.travel_request.policy_id).default.first&.travel_booking_approves_to
     return reviewer, UserRole.id_for(:manager) if reviewer.present?
     [nil, nil]

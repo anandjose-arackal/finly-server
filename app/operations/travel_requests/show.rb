@@ -36,6 +36,13 @@ class TravelRequests::Show < TravelRequests::Base
       travel_request.destinations
     end
 
+    def policies
+      if travel_request.user.enforce_policy_enabled?
+        return travel_request.user.policies.non_default
+      end
+      travel_request.user.policies
+    end
+
     def manager
       if self.manager_user.blank?
         self.manager_user = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :manager)
