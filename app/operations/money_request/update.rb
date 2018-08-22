@@ -55,10 +55,6 @@ class MoneyRequest::Update < MoneyRequest::Base
       add_message :error, "Money Request cannot be edited at this stage"
       return
     end
-    money_request.cash_pocket_presence
-    if money_request.errors.present?
-      add_message :error, money_request.errors.full_messages
-    end
   end
 
   def authorize

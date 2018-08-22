@@ -190,7 +190,7 @@ class MoneyRequest < ActiveRecord::Base
   default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
   validates :policy_id, presence: true
-  # validate :cash_pocket_presence
+  validate :cash_pocket_presence
 
   before_save :handle_name
   before_save :handle_nil_amount
@@ -307,7 +307,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def cash_pocket_presence
-    if self.payment_mode_id == PaymentMode.id_for(:cash)
+    if self.id.present? and self.payment_mode_id == PaymentMode.id_for(:cash)
       if self.destination_pocket_id.blank?
         errors.add(:cash, "money requests cannot be created without a destination account")
       end
