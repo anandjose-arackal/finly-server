@@ -1,0 +1,36 @@
+<div class="row no-margin">
+  <div class="col-sm-12">
+    <div class="row no-margin">
+      <div class="col-sm-5"><h4>Load Funds in Card from:</h4> </div>
+      {{#if summary.actions.credit_card_from_wallet}}
+      <div class="col-sm-2 no-padding">
+        <label>
+          <input type="radio" name="load_funds_card" class="funds-source" data-transfer-flow="load-finlymoney-card" data-action="credit_card_from_wallet" data-url="{{summary.actions.credit_card_from_wallet}}" >&nbsp;Your Finly Money
+        </label>
+      </div>
+      {{/if}}
+
+      {{#if summary.actions.credit_card_from_card}}
+      <div class="col-sm-2 no-padding">
+        <label>
+          <input type="radio" name="load_funds_card" class="funds-source" data-transfer-flow="load-card-card" data-action="credit_card_from_card" data-url="{{summary.actions.credit_card_from_card}}">&nbsp;Your Card
+        </label>
+      </div>
+      {{/if}}
+
+      {{#if summary.actions.credit_card_from_virtual_account}}
+      <div class="col-sm-2 no-padding">
+        <label>
+          <input type="radio" name="load_funds_card" class="funds-source" data-transfer-flow="load-companybalance-card" data-action="credit_card_from_virtual_account" data-url="{{summary.actions.credit_card_from_virtual_account}}">&nbsp;Company Balance
+        </label>
+      </div>
+      {{/if}}
+    </div> 
+
+    <div class="row no-margin">
+      <div class="col-sm-12 settlement-transfer-flow">
+
+      </div>
+    </div>
+  </div>
+</div>

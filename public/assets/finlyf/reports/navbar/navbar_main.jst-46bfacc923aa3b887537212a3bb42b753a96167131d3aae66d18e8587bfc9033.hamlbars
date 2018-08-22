@@ -1,0 +1,37 @@
+<div class="row no-margin no-padding">
+  <div class="col-sm-6">
+     <ul class="nav navbar-nav">
+      <li><button class="btn-success btn navbar-btn-refresh"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Refresh</button></li>
+      {{#if item.view}}
+        {{#if_eq item.view 'personal'}}
+          <li><button class="btn-primary btn btn-new">New Report</button></li> 
+        {{/if_eq}}
+      {{else}}
+        <li><button class="btn-primary btn btn-new">New Report</button></li> 
+      {{/if}}
+      
+      <li class="btn-group btn-export-options" style="display: none;">
+        <div class="btn-group">
+          <button type="button" class="btn btn-success btn-report-export" data-export-type="csv">Export as CSV</button>
+          <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="#" class="btn-report-export btn-report-export" data-export-type="xls">Export as Excel</a></li>
+            {{!-- <li><a href="#" class="btn-report-export btn-report-export" data-export-type="pdf">Export as PDF</a></li> --}}
+          </ul>
+        </div>
+      </li>
+    </ul>   
+  </div>
+
+  
+
+  <div class="col-sm-6">
+    <ul class="nav navbar-nav navbar-right">
+    </ul>   
+  </div>
+
+
+</div>

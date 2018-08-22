@@ -16,6 +16,7 @@
 #  note        :text(65535)
 #  tax_rate_id :integer
 #  is_deleted  :boolean          default(FALSE), not null
+#  tax_rate_id :integer
 #
 
 class InventoryLineItem < ActiveRecord::Base

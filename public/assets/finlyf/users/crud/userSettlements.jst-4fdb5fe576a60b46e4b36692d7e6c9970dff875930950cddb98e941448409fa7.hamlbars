@@ -1,0 +1,7 @@
+<div class="col-sm-12 user-name" data-item-id="{{item.id}}">
+  {{#if item.name}}
+    {{item.name}}
+  {{else}}
+    {{item.email}}
+  {{/if}}
+</div>

@@ -38,6 +38,9 @@
 #  original_payment_for_refund_id :integer
 #  cost_center_id                 :integer
 #  destination_pocket_id          :integer
+#  scheduled_at                   :date
+#  processed_at                   :date
+#  cost_center_id                 :integer
 #
 
 

@@ -32,6 +32,7 @@ module Constants
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
   DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other']
+  DEFAULT_MONEY_REQUEST_CATEGORIES = ['Accommodation', 'Lodging', 'Local Conveyance', 'Others']
 
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
@@ -85,6 +86,7 @@ module Constants
   #### Date before which statements won't be accurate
   BEGINNING_OF_TIME = '10-03-2017'
   ###################################################
+
 
 
   if Rails.env.development?
@@ -290,4 +292,23 @@ module Constants
     YES_BANK_RECEIVING_IFSC = "YESB0000022"
     YES_BANK_COLLECT_IFSC = 'YESB0CMSNOC'
   end
+
+  ################### Encryption Keys for Darwin Box ################
+
+  class Constants::Darwinbox
+    if Rails.env.production?
+      XOR_KEY = ''
+    else
+      XOR_KEY = '666666'
+    end
+
+    if Rails.env.production?
+      SHA512_KEY = ''
+    else
+      SHA512_KEY = '4150fb44a955a5ff0711f9a1c631a3ed'
+    end
+  end
+
+  ###################### END OF Darwin Box ###########################
+
 end

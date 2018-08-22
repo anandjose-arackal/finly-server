@@ -77,6 +77,7 @@ class Company < ActiveRecord::Base
   has_many :outward_invoices
   has_many :outward_invoice_attachments
   has_many :inward_invoices, class_name: "Invoice"
+  has_many :money_request_item_categories
 
   has_many :budgets
   has_many :procurements
@@ -88,6 +89,7 @@ class Company < ActiveRecord::Base
 
   has_many :departments
   has_many :company_pocket_templates
+
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
 
@@ -384,6 +386,10 @@ class Company < ActiveRecord::Base
     ExportPreference.build_default_preferences(self)
     Constants::DEFAULT_CATEGORIES.each do |category|
       self.categories.create(name: category, expense_management: true, vendor_payments: true)
+    end
+
+    Constants::DEFAULT_MONEY_REQUEST_CATEGORIES.each do |category|
+      self.money_request_item_categories.create(name: category, active: true)
     end
 
     self.build_configuration(bank_type: "HDFC").save if self.configuration.blank?

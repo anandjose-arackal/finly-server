@@ -661,7 +661,7 @@ class User < ActiveRecord::Base
   end
 
   def travel_desk_enabled?
-    self.user_panel_subscription.travel_request
+    self.company.travel_desk_enabled? and self.user_panel_subscription.travel_request
   end
 
   def has_role?(role_id)

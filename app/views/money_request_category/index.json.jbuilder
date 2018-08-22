@@ -1,0 +1,1 @@
+json.array! @result.money_request_item_categories
