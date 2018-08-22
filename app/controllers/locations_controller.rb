@@ -1,4 +1,7 @@
 class LocationsController < ApplicationController
+
+  before_action -> { finly_authorize! :web }
+
   def show
     @result = Company::Locations::Show.(current_user, params)
     respond
@@ -11,6 +14,11 @@ class LocationsController < ApplicationController
 
   def update
     @result = Company::Locations::Update.(current_user, params)
+    respond
+  end
+
+  def index
+    @result = Company::Locations::Index.(current_user, params)
     respond
   end
 end

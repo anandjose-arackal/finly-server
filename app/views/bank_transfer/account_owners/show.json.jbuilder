@@ -1,6 +1,10 @@
 json.account_owner do
   json.extract! @result.account_owner, :id, :name, :email, :mobile_number
   if @result.account_owner.is_a?(YesBankVendor)
+    json.payment_term @result.account_owner.payment_term
+    json.currency @result.account_owner.currency
+    json.business_name @result.account_owner.business_name
+    json.address @result.account_owner.address
     json.authorized @result.account_owner.authorized
     json.description @result.account_owner.description
     json.editable_details (@result.user.permission.create_beneficiaries || @result.user.vendor_payments_admin?)
@@ -40,10 +44,13 @@ json.transactions do
   end
 end
 if @result.account_owner.is_a?(YesBankVendor)
-  json.attachment do
-    json.url @result.account_owner.vendor_attachments.first&.attached_file&.url
-    json.thumb @result.account_owner.vendor_attachments.first&.attached_file&.url(:thumb)
-    json.file_type @result.account_owner.vendor_attachments.first&.attached_file_content_type
+  json.attachments do
+    json.array! @result.account_owner.vendor_attachments do |attachment|
+      json.url attachment.attached_file&.url
+      json.thumb attachment.attached_file&.url(:thumb)
+      json.file_type attachment.attached_file_content_type
+      json.attachment_type attachment.attachment_type
+    end
   end
 
   json.vendor_type do
@@ -51,4 +58,3 @@ if @result.account_owner.is_a?(YesBankVendor)
     json.name @result.account_owner.vendor_type&.name
   end
 end
-

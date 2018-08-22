@@ -29,7 +29,6 @@ class CustomField::SetFields < CustomField::Base
   end
 
   def init
-
     # field_values = { "1": "abc", "2":"asdk"}
     self.field_values = {}
     if params.present? and params[:custom_fields].present?
@@ -50,10 +49,10 @@ class CustomField::SetFields < CustomField::Base
       policy = item.policy
       self.field_configurations = policy.field_configurations.exclude_deleted
     else
-      if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id)
+      if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request), FieldParentType.id_for(:purchase_order)].include?(parent_type_id)
         # For reports and money requests
         self.field_configurations = item.user.company.field_configurations.exclude_deleted
-      elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item)].include?(parent_type_id)
+      elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item), FieldParentType.id_for(:purchase_order)].include?(parent_type_id)
         self.field_configurations = current_company.field_configurations.exclude_deleted
       elsif FieldParentType.expense_ids.include?(parent_type_id)
         # For expenses

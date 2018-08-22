@@ -65,6 +65,9 @@ class Expense < ActiveRecord::Base
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
 
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
+
   has_many :duplicate_expense_mappings, foreign_key: :expense_id, dependent: :destroy
   has_many :duplicate_expenses, through: :duplicate_expense_mappings
   has_many :is_duplicate_expense_mappings, class_name: 'DuplicateExpenseMapping', foreign_key: :duplicate_expense_id, dependent: :destroy
@@ -126,6 +129,8 @@ class Expense < ActiveRecord::Base
     compute_gst_amount
     compute_tds_amount
   end
+
+  after_save :budget_trail_entry
 
   default_scope {order('expenses.created_at DESC')}
 
@@ -1084,4 +1089,17 @@ class Expense < ActiveRecord::Base
     end
   end
 
+
+  def budget_trail_entry
+    # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
+    if ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed]).include?(self.report&.report_status_id)
+      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
+    else
+      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+  end
 end

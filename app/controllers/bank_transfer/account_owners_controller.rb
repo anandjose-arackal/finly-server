@@ -17,4 +17,9 @@ class BankTransfer::AccountOwnersController < ApplicationController
     respond
   end
 
+  def search
+    @result = BankTransfer::AccountOwners::Index.(current_user, params)
+    respond
+  end
+
 end

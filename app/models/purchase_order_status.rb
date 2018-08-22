@@ -1,0 +1,48 @@
+# == Schema Information
+#
+# Table name: purchase_order_statuses
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
+class PurchaseOrderStatus < ActiveRecord::Base
+  include Seedable
+  def self.values
+    %w( open retracted processing approved rejected auto_approved sent_to_vendor closed )
+  end
+
+  def open?
+    self.id == PurchaseOrderStatus.id_for(:open)
+  end
+
+  def retracted?
+    self.id == PurchaseOrderStatus.id_for(:retracted)
+  end
+
+  def rejected?
+    self.id == PurchaseOrderStatus.id_for(:rejected)
+  end
+
+  def processing?
+    self.id == PurchaseOrderStatus.id_for(:processing)
+  end
+
+  def approved?
+    self.id == PurchaseOrderStatus.id_for(:approved)
+  end
+
+  def auto_approved?
+    self.id == PurchaseOrderStatus.id_for(:auto_approved)
+  end
+
+  def sent_to_vendor?
+    self.id == PurchaseOrderStatus.id_for(:sent_to_vendor)
+  end
+
+  def closed?
+    self.id == PurchaseOrderStatus.id_for(:closed)
+  end
+end

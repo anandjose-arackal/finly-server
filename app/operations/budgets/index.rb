@@ -6,7 +6,7 @@ class Budgets::Index < Budgets::Base
   end
 
   def init
-    self.budgets = user.company.budgets
+    self.budgets = user.company.budgets.roots
   end
 
   def success

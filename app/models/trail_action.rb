@@ -1,0 +1,31 @@
+# == Schema Information
+#
+# Table name: trail_actions
+#
+#  id   :integer          not null, primary key
+#  name :string(255)
+#
+
+class TrailAction < ActiveRecord::Base
+  include Seedable
+  def self.values
+    [
+        :create,
+        :update,
+        :retract,
+        :submit,
+        :approve,
+        :approve_and_forward,
+        :auto_approve,
+        :reject,
+        :unapprove,
+        :take_control,
+        :credited,
+        :settled,
+        :settlement_confirmed,
+        :reimbursed,
+        :reimbursement_confirmed,
+        :closed
+    ]
+  end
+end

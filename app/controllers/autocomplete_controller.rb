@@ -24,6 +24,11 @@ class AutocompleteController < ApplicationController
     respond
   end
 
+  def vendors
+    @result = Autocomplete::Vendors.(current_user, params)
+    respond
+  end
+
   def inventory_items
     @result = Invoicing::InventoryLineItem::Search.(current_user, params)
     respond

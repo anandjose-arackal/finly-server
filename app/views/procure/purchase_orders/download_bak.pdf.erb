@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Procure Document</title>
+</head>
+<body>
+<div class="containers document-header-container overflow-hidden">
+  <div class="vendor-details">
+    <div class="vendor-company-logo">
+      <img src="<%= @company.configuration.logo.url(:thumb) %>" width="250" height="auto">
+    </div>
+    <div class="vendor-address">
+      <span class="company-name font-size-14 bold"><%= @result.purchase_order.location&.name %></span>
+      <span class="address-line-1"></span>
+      <span class="address-line-2"><%= @result.purchase_order.location&.address %></span>
+    </div>
+  </div>
+  <div class="document-details">
+    <div class="document-type">
+      <span>Purchase Order</span>
+    </div>
+    <div class="document-details">
+      <span class="block">
+          <span class="title">PO Number</span>
+          <span class="value"><%= @result.purchase_order.po_number %></span>
+        </span>
+      <span class="block">
+          <span class="title">Document Date</span>
+          <span class="value"><%= @result.purchase_order.created_at.strftime "%b-%d-%Y" %></span>
+        </span>
+      <span class="block">
+          <span class="title">Due Date</span>
+          <span class="value"><%= @result.purchase_order.delivery_date&.strftime "%b-%d-%Y" %></span>
+        </span>
+    </div>
+  </div>
+</div>
+<div class="containers customer-details-container overflow-hidden">
+  <div class="customer-details wd-33">
+    <div class="main-title width-fit-content">Vendor Details</div>
+    <span class="block">
+        <span class="title">Name</span>
+        <span class="value"><%= @result.purchase_order.vendor.name %></span>
+      </span>
+    <span class="block">
+        <span class="title">Mobile</span>
+        <span class="value"><%= @result.purchase_order.vendor.mobile_number %></span>
+      </span>
+    <span class="block">
+        <span class="title">PAN Number</span>
+        <span class="value"><%= @result.purchase_order.vendor.pan %></span>
+      </span>
+    <span class="block">
+        <span class="title">GSTIN</span>
+        <span class="value"><%= @result.purchase_order.vendor.gst %></span>
+      </span>
+  </div>
+  <div class="billing-address wd-33">
+    <div class="main-title width-fit-content">Billing Address</div>
+    <div class="address">
+      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.location&.name %></span>
+      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.location&.address %></span>
+      <span class="city mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.location&.gstin %></span>
+      <span class="state mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.location&.pan %></span>
+    </div>
+  </div>
+  <div class="shipping-address wd-33">
+    <div class="main-title width-fit-content">Shipping Address</div>
+    <div class="address">
+      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.delivery_location&.name %></span>
+      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.delivery_location&.address %></span>
+      <span class="city bold mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.delivery_location&.gstin %></span>
+      <span class="state bold mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.delivery_location&.pan %></span>
+    </div>
+  </div>
+</div>
+
+<!-- START -->
+<!-- SHOW THIS ONLY IF THE DOCUMENT TYPE IS 'E-WAY-BILL' -->
+<!-- <div class="containers transportation-details-container overflow-hidden">
+  <div class="main-title width-fit-content">Transportation Details</div>
+  <div class="transportation-details">
+    <span class="block">
+      <span class="title">Transportion Mode</span>
+      <span class="value"></span>
+    </span>
+    <span class="block">
+      <span class="title">Transporter ID</span>
+      <span class="value">33846011381</span>
+    </span>
+    <span class="block">
+      <span class="title">Transport Date</span>
+      <span class="value">27th April 2018</span>
+    </span>
+    <span class="block">
+      <span class="title">Document ID</span>
+      <span class="value">73217303589</span>
+    </span>
+    <span class="block">
+      <span class="title">Vehicle Number</span>
+      <span class="value">BRNJ-8281</span>
+    </span>
+  </div>
+</div> -->
+<!-- SHOW THIS ONLY IF THE DOCUMENT TYPE IS 'E-WAY-BILL' -->
+<!-- END -->
+
+<div class="containers document-line-items-container overflow-hidden">
+  <div class="main-title width-fit-content">Invoice Items</div>
+  <table class="table-document-items">
+    <thead>
+    <tr>
+      <th style="width: 25px;">#</th>
+      <th>Product Description</th>
+      <th>Comment</th>
+      <th>Quantity</th>
+      <th>Rate</th>
+      <th>Discount</th>
+      <th>Tax</th>
+      <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @result.purchase_order.items.each_with_index do |item, index| %>
+      <tr>
+        <td><%= index + 1 %></td>
+        <td><%= item.description %></td>
+        <td><%= item.comment %></td>
+        <td><%= item.quantity %></td>
+        <td><%= item.rate %></td>
+        <td><%= item.discount_amount&.value %></td>
+        <td><%= item.tax_amount&.value %></td>
+        <td><%= item.total_amount&.value %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <table class="table-document-items-summary" style="page-break-inside: avoid;">
+    <tbody>
+    <tr>
+      <td>Total</td>
+      <td>&#8377; &nbsp; <%= @result.purchase_order.total_before_tax&.value %></td>
+    </tr>
+    <tr>
+      <td>Discount</td>
+      <td>&#8377; &nbsp; <%= @result.purchase_order.discount_amount&.value %></td>
+    </tr>
+    <tr>
+      <td>Tax</td>
+      <td>&#8377; &nbsp; <%= @result.purchase_order.tax_amount&.value %></td>
+    </tr>
+    <tr>
+      <td>Balance Due</td>
+      <td>&#8377; &nbsp; <%= @result.purchase_order.balance_amount&.value %></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<!-- <div class="footer">
+  <p>Generated by Finly Spend Management - https://www.finly.io</p>
+</div> -->
+<div class="alwaysbreak"></div>
+
+<div class="wrapper-terms">
+  <h3 style="text-align: center;">Terms And Conditions</h3>
+
+  <div class="terms">
+    <%= h @result.purchase_order.procurement_term_text %>
+  </div>
+
+</div>
+</body>
+</html>
+
+<style type="text/css">
+  div.alwaysbreak { page-break-before: always; }
+  div.nobreak:before { clear:both; }
+  div.nobreak { page-break-inside: avoid; }
+  @media print{
+    body{
+      font-family: sans-serif;
+      margin:0;
+      -webkit-print-color-adjust: exact;
+      position: relative;
+    }
+    .no-border{
+      border: none !important;
+    }
+    .width-fit-content{
+      width: fit-content !important;
+    }
+    .mg-bottom-5{
+      margin-bottom: 5px;
+    }
+    .containers{
+      margin-bottom: 0;
+      padding: 10px;
+    }
+    .containers:last-child{
+      margin-bottom: 0 !important;
+    }
+    .font-size-14{
+      font-size: 14px !important;
+    }
+    .bold{
+      font-weight: bold !important;
+    }
+    .overflow-hidden{
+      overflow: hidden;
+    }
+    .block{
+      display: block;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+    .main-title{
+      font-size: 20px;
+      font-weight: 300;
+      color: cornflowerblue;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #c4c4c4;
+      padding-bottom: 4px;
+    }
+    .title{
+      font-size: 12px;
+      display: inline-block;
+      width: 80px;
+      margin-right: 10px;
+      font-weight: 300;
+      color: #7b7b7b;
+      float: left;
+      word-break: break-all;
+    }
+    .value{
+      font-size: 12px;
+      display: inline-block;
+      width: calc(100% - 100px);
+      /*margin-right: 20px;*/
+      /*margin-right: 10px;*/
+      font-weight: bold;
+      color: #7b7b7b;
+      float: right;
+      word-break: break-all;
+    }
+    .footer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: #eee;
+      text-align: right;
+      height: 25px;
+      border: 1px dashed #c4c4c4;
+      border-radius: 4px;
+    }
+    .footer p{
+      padding: 5px;
+      padding-right: 20px;
+      margin:0;
+      font-weight: 300;
+      font-size: 12px;
+      color: #7b7b7b;
+    }
+    .bank-details .title , .document-header-container .title, .tramsportation-details .title {
+      width: 120px !important;
+    }
+    .bank-details .value , .document-header-container .value , .tramsportation-details .value {
+      width: calc(100% - 140px) !important;
+    }
+    .wd-33{
+      width: 33.33%;
+      float: left;
+      overflow: hidden;
+    }
+    .document-header-container .vendor-details{
+      width: calc(100% - 320px);
+      float: left;
+      overflow: hidden;
+    }
+    .document-header-container .vendor-details .vendor-address{
+      width: 200px;
+      font-weight: 300;
+      color: #888;
+      font-size: 12px;
+    }
+    .document-header-container .vendor-details .vendor-address span{
+      display: block;
+      margin-bottom: 2px;
+    }
+    .address span{
+      display: block;
+      color: #888;
+    }
+    .address{
+      padding-right: 20px;
+      font-size: 12px;
+      word-break: break-all;
+    }
+    .document-header-container .document-details{
+      width: 300px;
+      float: right;
+      overflow: hidden;
+    }
+    .document-header-container .document-details .document-type{
+      padding: 10px;
+      background-color: aliceblue;
+      border-radius: 4px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      /*letter-spacing: 1px;*/
+      text-transform: uppercase;
+      color: #444;
+      font-weight: bold;
+      border: 1px solid #c4c4c4;
+    }
+    .document-header-container{
+
+    }
+    .customer-details-container{
+    }
+    .bank-details{
+      width: 300px;
+      border: 1px dashed #c4c4c4;
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      padding-bottom: 5px;
+    }
+    .bank-account-container{
+      width: calc(100% - 20px);
+    }
+    .document-line-items-container{
+      padding-bottom: 40px;
+    }
+    .document-line-items-container .table-document-items{
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .document-line-items-container .table-document-items thead tr{
+      background-color: #eee;
+    }
+    .document-line-items-container .table-document-items thead th{
+      font-size: 12px;
+      color: #444;
+      font-weight: bold;
+      border: 1px solid #c4c4c4;
+      padding: 5px;
+      text-align: left;
+    }
+    .document-line-items-container .table-document-items thead th:last-child{
+      text-align: right;
+    }
+    .document-line-items-container .table-document-items tbody tr td:last-child{
+      text-align: right;
+    }
+    .document-line-items-container .table-document-items tbody td{
+      font-size: 12px;
+      color: #7b7b7b;
+      font-weight: 300;
+      text-align: right;
+      border: 1px solid #c4c4c4;
+      padding: 5px;
+      text-align: left;
+      word-break: break-all;
+    }
+    .document-line-items-container .table-document-items-summary{
+      width: 220px;
+      float: right;
+      margin-top: 5px;
+      margin-bottom: 40px;
+      border-collapse: collapse;
+    }
+    .document-line-items-container .table-document-items-summary tbody tr td{
+      border: 1px solid #c4c4c4;
+      padding: 5px;
+      color: #7b7b7b;
+      font-size: 12px;
+      word-break: break-all !important;
+    }
+    .document-line-items-container .table-document-items-summary tbody tr td:last-child{
+      width: 100px;
+      font-weight: bold;
+      text-align: right;
+      color: cornflowerblue;
+      font-size: 14px;
+    }
+    .document-line-items-container .table-document-items-summary tbody tr td:first-child{
+      font-weight: bold;
+      text-align: left;
+      color: #444;
+      width: calc(100% - 100px);
+    }
+  }
+  @media screen{
+    body{
+      font-family: sans-serif;
+      margin:0;
+      -webkit-print-color-adjust: exact;
+      position: relative;
+    }
+    .no-border{
+      border: none !important;
+    }
+    .width-fit-content{
+      width: fit-content;
+    }
+    .mg-bottom-5{
+      margin-bottom: 5px;
+    }
+    .containers{
+      margin-bottom: 0;
+      padding: 10px;
+    }
+    .containers:last-child{
+      margin-bottom: 0 !important;
+    }
+    .font-size-14{
+      font-size: 14px !important;
+    }
+    .bold{
+      font-weight: bold !important;
+    }
+    .overflow-hidden{
+      overflow: hidden;
+    }
+    .block{
+      display: block;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+    .main-title{
+      font-size: 20px;
+      font-weight: 300;
+      color: cornflowerblue;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #c4c4c4;
+      padding-bottom: 4px;
+    }
+    .title{
+      font-size: 12px;
+      display: inline-block;
+      width: 80px;
+      margin-right: 10px;
+      font-weight: 300;
+      color: #7b7b7b;
+      float: left;
+    }
+    .value{
+      font-size: 12px;
+      display: inline-block;
+      width: calc(100% - 100px);
+      margin-right: 20px;
+      margin-right: 10px;
+      font-weight: bold;
+      color: #7b7b7b;
+      float: right;
+    }
+    .footer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: #eee;
+      text-align: right;
+      height: 25px;
+      border: 1px dashed #c4c4c4;
+      border-radius: 4px;
+    }
+    .footer p{
+      padding: 5px;
+      padding-right: 20px;
+      margin:0;
+      font-weight: 300;
+      font-size: 12px;
+      color: #7b7b7b;
+    }
+    .bank-details .title , .document-header-container .title, .tramsportation-details .title {
+      width: 120px !important;
+    }
+    .bank-details .value , .document-header-container .value , .tramsportation-details .value {
+      width: calc(100% - 140px) !important;
+    }
+    .wd-33{
+      width: 33.33%;
+      float: left;
+      overflow: hidden;
+    }
+    .document-header-container .vendor-details{
+      width: calc(100% - 250px);
+      float: left;
+      overflow: hidden;
+    }
+    .document-header-container .vendor-details .vendor-address{
+      width: 200px;
+      font-weight: 300;
+      color: #888;
+      font-size: 12px;
+    }
+    .document-header-container .vendor-details .vendor-address span{
+      display: block;
+      margin-bottom: 2px;
+    }
+    .address span{
+      display: block;
+      color: #888;
+    }
+    .address{
+      padding-right: 20px;
+      font-size: 14px;
+    }
+    .document-header-container .document-details{
+      width: 230px;
+      float: right;
+      overflow: hidden;
+    }
+    .document-header-container .document-details .document-type{
+      padding: 10px;
+      background-color: aliceblue;
+      border-radius: 4px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      /*letter-spacing: 1px;*/
+      text-transform: uppercase;
+      color: #444;
+      font-weight: bold;
+      border: 1px solid #c4c4c4;
+    }
+    .document-header-container{
+
+    }
+    .customer-details-container{
+    }
+    .bank-details{
+      width: 300px;
+      border: 1px dashed #c4c4c4;
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      padding-bottom: 5px;
+    }
+    .bank-account-container{
+      width: calc(100% - 20px);
+    }
+    .document-line-items-container{
+      padding-bottom: 40px;
+    }
+    .document-line-items-container .table-document-items{
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .document-line-items-container .table-document-items thead tr{
+      background-color: #eee;
+    }
+    .document-line-items-container .table-document-items thead th{
+      font-size: 12px;
+      color: #444;
+      font-weight: bold;
+      border: 1px solid #c4c4c4;
+      padding: 5px;
+      text-align: left;
+    }
+    .document-line-items-container .table-document-items thead th:last-child{
+      text-align: right;
+    }
+    .document-line-items-container .table-document-items tbody tr td:last-child{
+      text-align: right;
+    }
+    .document-line-items-container .table-document-items tbody td{
+      font-size: 12px;
+      color: #7b7b7b;
+      font-weight: 300;
+      text-align: right;
+      border: 1px solid #c4c4c4;
+      padding: 5px;
+      text-align: left;
+      word-break: break-all;
+    }
+    .document-line-items-container .table-document-items-summary{
+      max-width: 450px;
+      float: right;
+      margin-top: 5px;
+      margin-bottom: 40px;
+      border-collapse: collapse;
+    }
+    .document-line-items-container .table-document-items-summary tbody tr td{
+      border: 1px solid #c4c4c4;
+      padding: 5px;
+      color: #7b7b7b;
+      font-size: 12px;
+    }
+    .document-line-items-container .table-document-items-summary tbody tr td:last-child{
+      width: 215px;
+      font-weight: bold;
+      text-align: right;
+      color: cornflowerblue;
+      font-size: 14px;
+    }
+    .document-line-items-container .table-document-items-summary tbody tr td:first-child{
+      font-weight: bold;
+      text-align: left;
+      color: #444;
+      width: 120px !important;
+      word-break: break-all;
+    }
+    .page-break { display:block; clear:both; page-break-after:always; }
+  }
+</style>

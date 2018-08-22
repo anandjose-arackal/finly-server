@@ -6,6 +6,9 @@ class Company::Locations::Base < Company::Base
   end
 
   def location_params
-    params.require(:location).permit(:id, :name, :gstin, :pan, :address_1, :address_2, :city, :state_id, :country, :pin)
+    params.require(:location).permit(
+        :id, :name, :gstin, :pan, :address_1, :address_2,
+        :city, :state_id, :country, :pin, :contact_name, :contact_mobile_number
+    )
   end
 end
