@@ -76,6 +76,17 @@ class TravelRequest < ActiveRecord::Base
   scope :with_controlling_user_role_id, -> (role_id) {where controlling_user_role_id: role_id}
   scope :with_controlling_user_id, -> (user_id) {where controlling_user_id: user_id}
   scope :filter_user_id, -> (id) {where user_id: id}
+  scope :filter_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      where.not 'from_date >= ? OR to_date <= ?', date_to, date_from
+    end
+  end
   scope :filter_status, -> (status) do
     case status&.to_sym
     when :retracted
