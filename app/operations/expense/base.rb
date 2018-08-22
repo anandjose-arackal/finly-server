@@ -22,8 +22,8 @@ class Expense::Base < BaseOperation
     if params[:spent_from_id].present? || StringUtils.to_bool(params[:from_cash_on_hand])
 
       # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
-        add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([pocket.base_currency_id, pocket.base_currency_id.to_s].include?(params&.dig(:amount_attributes, :currency_id)))
+        add_message :error, "#{pocket.name} expenses that are in a currency different from #{pocket.base_currency.country_code} can only be reported on the next day"
         return
       end
 
@@ -50,8 +50,8 @@ class Expense::Base < BaseOperation
     if (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) or ((params&.dig(:spent_from_id).nil? or !StringUtils.to_bool(params[:from_cash_on_hand])) and expense.spent_from.present?)
 
       # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
-        add_message :error, "Cash pocket expenses that are in a currency different from INR can only be reported on the next day"
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([pocket.base_currency_id, pocket.base_currency_id.to_s].include?(params&.dig(:amount_attributes, :currency_id)))
+        add_message :error, "#{pocket.name} expenses that are in a currency different from #{pocket.base_currency.country_code} can only be reported on the next day"
         return
       end
 

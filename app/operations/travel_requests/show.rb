@@ -172,7 +172,7 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_select_options?
-      (manager_view? or personal_view?) and (travel_request.selection_requested? or travel_request.selection_rejected?)
+      (manager_view? or personal_view?) and (travel_request.selection_requested? or travel_request.selection_rejected?) and travel_request.controlling_user_id == user.id
     end
 
     def editable
@@ -237,7 +237,7 @@ class TravelRequests::Show < TravelRequests::Base
       message = ''
       if travel_request.controlling_user_id == user.id
         if travel_manager_view?
-          if travel_request.processing? or travel_request.approved?
+          if travel_request.processing? or travel_request.approved? or travel_request.booking_pending?
             if booking.bookings.options.blank? and booking.bookings.confirmed.blank?
               highlighted = true
               message = 'No bookings or options have been added'

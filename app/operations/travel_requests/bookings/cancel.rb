@@ -18,8 +18,14 @@ class TravelRequests::Bookings::Cancel < TravelRequests::Bookings::Base
   end
 
   def process
-    unless self.booking.update(booking_status_id: BookingStatus.id_for(:cancelled))
-      self.booking.parent_booking.update(booking_status_id: BookingStatus.id_for(:cancelled))
+    if self.booking.update(booking_status_id: BookingStatus.id_for(:cancelled))
+      if self.booking.parent_booking.present?
+        self.booking.parent_booking.update(booking_status_id: BookingStatus.id_for(:cancelled))
+      end
+      if self.booking.bookings.confirmed.present?
+        self.booking.bookings.confirmed.update_all(booking_status_id: BookingStatus.id_for(:cancelled))
+      end
+    else
       add_message :error, self.booking.errors.full_messages
     end
   end
