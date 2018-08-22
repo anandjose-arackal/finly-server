@@ -35,10 +35,8 @@
 #  usage_date_end         :datetime
 #  usage_date_type        :string(255)
 #  spent_from_id          :integer
+#  custom_conversion_rate :boolean          default(FALSE)
 #
-
-
-
 
 
 

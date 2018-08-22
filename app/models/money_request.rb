@@ -28,7 +28,9 @@
 #  money_request_processor_mapping_id :integer
 #  approved_at                        :datetime
 #  destination_pocket_id              :integer
+#  travel_request_id                  :integer
 #
+
 
 
 

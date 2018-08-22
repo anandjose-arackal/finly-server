@@ -7,7 +7,7 @@ class User::AvailableExpenseTypes::Show < User::Base
   class User::AvailableExpenseTypes::Show::ExpenseTypesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config, :currencies, :cash_on_hand,
-                  :em_tax_tracking, :tds_slabs, :cash_pockets
+                  :em_tax_tracking, :tds_slabs, :cash_pockets, :custom_currency_conversion
 
     def init
       self.distance_config = params[:distance_config]
@@ -20,6 +20,7 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.em_tax_tracking = params[:em_tax_tracking]
       self.tds_slabs = params[:tds_slabs]
       self.cash_pockets = user.user_pockets.cash_pockets_only
+      self.custom_currency_conversion = user.company.feature_subscription.custom_currency_conversion
     end
 
   end

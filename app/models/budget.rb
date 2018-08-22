@@ -9,13 +9,17 @@
 #  end_date         :date
 #  budget_amount_id :integer
 #  spent_amount_id  :integer
-#  budgetable_id    :integer          not null
-#  budgetable_type  :string(255)      not null
+#  budgetable_id    :integer
+#  budgetable_type  :string(255)
 #  is_deleted       :boolean          default(FALSE)
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 #  user_id          :integer
 #  company_id       :integer
+#  purchase_order   :boolean
+#  payment          :boolean
+#  expense          :boolean
+#  ancestry         :string(255)
 #
 
 class Budget < ActiveRecord::Base

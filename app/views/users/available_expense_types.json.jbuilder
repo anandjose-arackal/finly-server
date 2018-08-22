@@ -33,6 +33,8 @@ json.categories do
   end
 end
 
+json.custom_currency_conversion @result.custom_currency_conversion
+
 json.config do
   json.em_tax_tracking @result.em_tax_tracking
 end
