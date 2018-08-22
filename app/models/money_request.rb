@@ -223,7 +223,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def editable?
-    self.status_id == MoneyRequestStatus.id_for(:open) || self.status_id == MoneyRequestStatus.id_for(:rejected) || self.status_id == MoneyRequestStatus.id_for(:retracted)
+    self.status_id == MoneyRequestStatus.id_for(:open) || self.status_id == MoneyRequestStatus.id_for(:rejected) || self.status_id == MoneyRequestStatus.id_for(:retracted) || self.status_id == MoneyRequestStatus.id_for(:pending)
   end
 
   def can_submit?
