@@ -6,7 +6,6 @@
 #  user_id                      :integer
 #  policy_id                    :integer
 #  name                         :string(255)
-#  required_by_date             :date
 #  note                         :text(65535)
 #  status_id                    :integer          not null
 #  controlling_user_id          :integer
@@ -20,8 +19,14 @@
 #  is_deleted                   :boolean          default(FALSE)
 #  rejection_note               :text(65535)
 #  auto_approved                :boolean
-#  report_id                    :integer
-#  money_request_id             :integer
+#  memo                         :text(65535)
+#  from_date                    :date
+#  to_date                      :date
+#  trip_id                      :string(255)
+#  purpose_of_travel            :text(65535)
+#  approved_at                  :datetime
+#  selection_requested_at       :datetime
+#  booking_confirmed_at         :datetime
 #
 
 class TravelRequest < ActiveRecord::Base
@@ -69,6 +74,9 @@ class TravelRequest < ActiveRecord::Base
   scope :with_policy, -> (policy_id) { where policy_id: policy_id }
   scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
+  scope :filter_status, -> (status) do
+
+  end
 
 
   def can_submit?

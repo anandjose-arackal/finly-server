@@ -62,8 +62,8 @@ class MoneyRequest::Create < MoneyRequest::Base
   end
 
   def post_process
-    if self.money_request.travel_request.present?
-      set_travel_request_status
+    if self.money_request.travel_request.present? and TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.money_request.travel_request.status_id)
+      self.money_request.update(status_id: MoneyRequestStatus.id_for(:pending))
     end
   end
 
@@ -73,17 +73,6 @@ class MoneyRequest::Create < MoneyRequest::Base
     return {} unless params[:money_request].present?
     params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :destination_pocket_id,
                                           items_attributes: [:category_id, :money_request_item_category_id, amount_attributes: [:value, :currency_id]])
-  end
-
-  def set_travel_request_status
-    travel_request = self.money_request.travel_request
-    return unless travel_request.present?
-    case travel_request.status_id
-    when TravelRequestStatus.id_for(:open)
-
-    when TravelRequestStatus.id_for(:booking_confirmed)
-
-    end
   end
 
 end

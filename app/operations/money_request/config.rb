@@ -16,7 +16,7 @@ class MoneyRequest::Config < BaseOperation
     self.card = user.cards.first
     self.policy = user.policies.with_id(params[:policy_id])&.first
     if policy.present?
-      self.field_configurations = self.policy.field_configurations
+      self.field_configurations = self.policy.field_configurations.with_parent_type(FieldParentType.id_for(:money_request))
     end
   end
 

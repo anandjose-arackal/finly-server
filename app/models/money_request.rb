@@ -27,8 +27,10 @@
 #  auto_approve                       :boolean
 #  money_request_processor_mapping_id :integer
 #  approved_at                        :datetime
+#  travel_request_id                  :integer
 #  destination_pocket_id              :integer
 #
+
 
 
 
@@ -97,6 +99,7 @@ class MoneyRequest < ActiveRecord::Base
   scope :sum_total, -> { joins(:items).joins({items: :amount}).sum(:value) }
   scope :without_associated_processor, -> { where money_request_processor_mapping_id: nil }
   scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
+  scope :skip_pending, -> { where.not status_id: MoneyRequestStatus.id_for(:pending)}
   scope :without_user, -> (user_id) { where.not user_id: user_id }
 
   scope :awaiting_approval_of_user, ->(user_id, role_id) { where(status_id: MoneyRequestStatus.id_for(:processing))

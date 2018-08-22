@@ -2,18 +2,19 @@
 #
 # Table name: booking_restaurants
 #
-#  id                      :integer          not null, primary key
-#  reservation_destination :string(255)
-#  reservation_date        :date
-#  reservation_time        :string(255)
-#  restaurant_name         :string(255)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  parent_id               :integer
-#  parent_type             :string(255)
-#  restaurant_rating       :string(255)
-#  start_time              :text(65535)
-#  end_time                :text(65535)
+#  id                 :integer          not null, primary key
+#  restaurant_name    :string(255)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  parent_id          :integer
+#  parent_type        :string(255)
+#  location_id        :integer          not null
+#  restaurant_address :text(65535)
+#  number_of_guests   :integer
+#  description        :text(65535)
+#  is_deleted         :boolean          default(FALSE)
+#  reservation_date   :date
+#  reservation_time   :time
 #
 
 class BookingRestaurant < ActiveRecord::Base
@@ -41,6 +42,12 @@ class BookingRestaurant < ActiveRecord::Base
         number_of_guests: number_of_guests,
         description: description
     }
+  end
+
+  def valid_date_range(travel_request)
+    travel_from_date = travel_request.from_date
+    travel_to_date = travel_request.to_date
+    not (reservation_date < travel_from_date or reservation_date > travel_to_date)
   end
 
 end

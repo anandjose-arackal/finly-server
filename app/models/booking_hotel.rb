@@ -2,19 +2,22 @@
 #
 # Table name: booking_hotels
 #
-#  id                      :integer          not null, primary key
-#  reservation_destination :string(255)
-#  reservation_start_date  :date
-#  reservation_time        :string(255)
-#  reservation_end_date    :date
-#  hotel_name              :string(255)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  parent_id               :integer
-#  parent_type             :string(255)
-#  hotel_rating            :string(255)
-#  start_time              :text(65535)
-#  end_time                :text(65535)
+#  id               :integer          not null, primary key
+#  hotel_name       :string(255)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  parent_id        :integer
+#  parent_type      :string(255)
+#  location_id      :integer          not null
+#  description      :text(65535)
+#  hotel_address    :text(65535)
+#  number_of_guests :integer
+#  cost_id          :integer
+#  is_deleted       :boolean          default(FALSE)
+#  checkin_date     :date
+#  checkin_time     :time
+#  checkout_date    :date
+#  checkout_time    :time
 #
 
 class BookingHotel < ActiveRecord::Base
@@ -46,6 +49,18 @@ class BookingHotel < ActiveRecord::Base
         number_of_guests: number_of_guests,
         cost: cost
     }
+  end
+
+  def valid_date_range(travel_request)
+    travel_from_date = travel_request.from_date
+    travel_to_date = travel_request.to_date
+    if checkin_date < travel_from_date or checkin_date > travel_to_date
+      return false
+    end
+    if checkout_date < travel_from_date or checkout_date > travel_to_date
+      return false
+    end
+    true
   end
 
   protected

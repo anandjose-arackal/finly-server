@@ -60,6 +60,15 @@ class TravelRequests::Review::ConfirmBooking < TravelRequests::Review::Base
                                    action_id: TravelRequestCommentAction.id_for(:booking_confirmed)
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
     add_message :success, 'Selection has been successfully requested'
+
+    set_money_request_as_approved
+  end
+
+  def set_money_request_as_approved
+    return if travel_request.money_requests.blank?
+    finance_manager = User::Team::Approver.(travel_request.user, money_request: travel_request.money_requests.first, type: :finance_manager)
+    role_id = finance_manager.present? ? UserRole.id_for(:finance) : nil
+    travel_request.money_requests.update_all(status_id: MoneyRequestStatus.id_for(:approved), controlling_user: finance_manager, controlling_user_role_id: role_id)
   end
 
 end
