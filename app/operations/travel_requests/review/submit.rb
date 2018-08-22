@@ -75,7 +75,5 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
                                    action_id: TravelRequestCommentAction.id_for(:submit)
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
     add_message :success, "Travel request successfully submitted!"
-
-    travel_request.money_requests.update_all(status_id: MoneyRequestStatus.id_for(:processing), controlling_user: nil, controlling_user_role_id: nil)
   end
 end

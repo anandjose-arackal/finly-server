@@ -101,6 +101,7 @@ class MoneyRequest < ActiveRecord::Base
   scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
   scope :skip_pending, -> { where.not status_id: MoneyRequestStatus.id_for(:pending)}
   scope :without_user, -> (user_id) { where.not user_id: user_id }
+  scope :status_pending, -> { where status_id: MoneyRequestStatus.id_for(:pending)}
 
   scope :awaiting_approval_of_user, ->(user_id, role_id) { where(status_id: MoneyRequestStatus.id_for(:processing))
                                                                .where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
@@ -259,6 +260,14 @@ class MoneyRequest < ActiveRecord::Base
     end
     name = status.name
     name[0].upcase + name[1..name.length]
+  end
+
+  def base_currency
+    currency = Currency.first
+    if payment_mode_id == PaymentMode.id_for(:cash)
+      currency = destination_pocket.base_currency
+    end
+    currency
   end
 
   def total_amount

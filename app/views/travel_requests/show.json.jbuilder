@@ -49,7 +49,7 @@ json.money_requests do
       json.can_view @result.can_view_money_request?(money_request)
       json.can_edit @result.can_edit_money_request?(money_request)
 
-      json.submitted_amount money_request.submitted_amount
+      json.submitted_amount Amount.new(value: money_request.total_amount, currency: money_request.base_currency)
       json.processed_amount money_request.processed_amount
       if money_request.destination_pocket.present?
         json.destination_pocket do

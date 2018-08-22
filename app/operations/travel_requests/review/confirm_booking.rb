@@ -67,8 +67,9 @@ class TravelRequests::Review::ConfirmBooking < TravelRequests::Review::Base
   def set_money_request_as_approved
     return if travel_request.money_requests.blank?
     finance_manager = User::Team::Approver.(travel_request.user, money_request: travel_request.money_requests.first, type: :finance_manager)
-    role_id = finance_manager.present? ? UserRole.id_for(:finance) : nil
-    travel_request.money_requests.update_all(status_id: MoneyRequestStatus.id_for(:approved), controlling_user: finance_manager, controlling_user_role_id: role_id)
+    role_id = finance_manager.present? ? UserRole.id_for(:finance_manager) : nil
+    status_id = finance_manager.present? ? MoneyRequestStatus.id_for(:processing) : MoneyRequestStatus.id_for(:approved)
+    travel_request.money_requests.status_pending.update_all(status_id: status_id, controlling_user_id: finance_manager&.id, controlling_user_role_id: role_id)
   end
 
 end

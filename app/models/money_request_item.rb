@@ -37,6 +37,16 @@ class MoneyRequestItem < ActiveRecord::Base
   validates :money_request_item_category_id, presence: true
   # validates :money_request, presence: true
 
+  def amount
+    s = super
+    return nil if s.nil?
+    currency = Currency.first
+    if money_request.payment_mode_id == PaymentMode.id_for(:cash)
+      currency = money_request.destination_pocket.base_currency
+    end
+    Amount.new(value: s.value, currency: currency)
+  end
+
   def handle_category_mapping
     if self.category_id.present? and self.money_request_item_category_id.blank?
       self.money_request_item_category_id = self.category_id
