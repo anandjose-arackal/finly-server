@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180815200059) do
+ActiveRecord::Schema.define(version: 20180817135952) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2702,12 +2702,25 @@ ActiveRecord::Schema.define(version: 20180815200059) do
   add_index "money_request_comments", ["rejected_to_id"], name: "index_money_request_comments_on_rejected_to_id", using: :btree
   add_index "money_request_comments", ["user_id"], name: "index_money_request_comments_on_user_id", using: :btree
 
+  create_table "money_request_item_categories", force: :cascade do |t|
+    t.integer  "company_id", limit: 4,                  null: false
+    t.string   "name",       limit: 255,                null: false
+    t.boolean  "active",                 default: true, null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "money_request_item_categories", ["active"], name: "index_money_request_item_categories_on_active", using: :btree
+  add_index "money_request_item_categories", ["company_id"], name: "index_money_request_item_categories_on_company_id", using: :btree
+  add_index "money_request_item_categories", ["name"], name: "index_money_request_item_categories_on_name", using: :btree
+
   create_table "money_request_items", force: :cascade do |t|
-    t.integer  "money_request_id", limit: 4, null: false
-    t.integer  "category_id",      limit: 4, null: false
-    t.integer  "amount_id",        limit: 4, null: false
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.integer  "money_request_id",               limit: 4, null: false
+    t.integer  "category_id",                    limit: 4
+    t.integer  "amount_id",                      limit: 4, null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.integer  "money_request_item_category_id", limit: 4
   end
 
   add_index "money_request_items", ["amount_id"], name: "index_money_request_items_on_amount_id", using: :btree
@@ -2837,8 +2850,8 @@ ActiveRecord::Schema.define(version: 20180815200059) do
     t.boolean  "auto_approve"
     t.integer  "money_request_processor_mapping_id", limit: 4
     t.datetime "approved_at"
-    t.integer  "destination_pocket_id",              limit: 4
     t.integer  "travel_request_id",                  limit: 4
+    t.integer  "destination_pocket_id",              limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -4908,6 +4921,7 @@ ActiveRecord::Schema.define(version: 20180815200059) do
   add_foreign_key "money_request_comments", "money_requests"
   add_foreign_key "money_request_comments", "payments"
   add_foreign_key "money_request_comments", "users"
+  add_foreign_key "money_request_item_categories", "companies"
   add_foreign_key "money_request_items", "amounts"
   add_foreign_key "money_request_items", "categories"
   add_foreign_key "money_request_items", "money_requests"

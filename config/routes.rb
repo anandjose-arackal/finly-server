@@ -2066,6 +2066,7 @@ Rails.application.routes.draw do
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
+
       patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
       resources :money_requests, only: [:create, :index, :show, :destroy, :update]
       resources :money_requests do
@@ -2396,7 +2397,11 @@ Rails.application.routes.draw do
   post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
 
 
+  post 'money_requests/categories', to: 'money_request_category#create'
+  get 'money_requests/categories', to: 'money_request_category#index'
+  delete 'money_requests/categories/:id', to: 'money_request_category#destroy'
   patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
+  get 'money_requests/config', to: 'money_request#config_details'
   delete 'money_requests/destroy', to: 'money_request#destroy'
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
@@ -2410,6 +2415,7 @@ Rails.application.routes.draw do
 
   ######################### TRAVEL REQUESTS API START ##########################
 
+  get 'travel_requests/count', to: 'travel_requests#count'
   resources :travel_requests do
     patch 'review', to: 'travel_requests#review', as: :review
 

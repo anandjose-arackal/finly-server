@@ -14,6 +14,7 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  note        :text(65535)
+#  tax_rate_id :integer
 #
 
 require 'test_helper'

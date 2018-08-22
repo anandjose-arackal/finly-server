@@ -63,6 +63,11 @@ class MoneyRequestController < ApplicationController
     respond render: :show
   end
 
+  def config_details
+    @result = MoneyRequest::Config.(current_user, params)
+    respond
+  end
+
   protected
   def respond(item=nil)
     if @result.failure?

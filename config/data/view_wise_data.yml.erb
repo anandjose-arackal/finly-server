@@ -75,6 +75,11 @@ views:
       - name: <span class="superscript">Company</span> Expenses
         url: expenses
         id: expenses
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      - name: <span class="superscript">Company</span> Trips
+        url: travel_requests
+        id: travel_requests
+      <% end %>
       - name: <span class="superscript">Company</span> Reports
         url: reports
         id: reports
@@ -84,11 +89,6 @@ views:
       - name: <span class="superscript">Company</span> Money Requests
         url: requests
         id: requests
-      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Company</span> Trips
-        url: travel_requests
-        id: travel_requests
-      <% end %>
       #- name: Requests
       #  type: group
       #  items:
@@ -142,6 +142,11 @@ views:
       - name: <span class="superscript">Company</span> Expenses
         url: expenses
         id: expenses
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      - name: <span class="superscript">Company</span> Trips
+        url: travel_requests
+        id: travel_requests
+      <% end %>
       - name: <span class="superscript">Company</span> Reports
         url: reports
         id: reports
@@ -154,11 +159,6 @@ views:
       - name: <span class="superscript">Company</span> Money Requests
         url: requests
         id: requests
-      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Company</span> Trips
-        url: travel_requests
-        id: travel_requests
-      <% end %>
       #- name: Requests
       #  type: group
       #  items:
@@ -209,6 +209,11 @@ views:
       - name: <span class="superscript">Team</span> Expenses
         url: expenses
         id: expenses
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      - name: <span class="superscript">Team</span> Trips
+        url: travel_requests
+        id: travel_requests
+      <% end %>
       - name: <span class="superscript">Team</span> Reports
         url: reports
         id: reports
@@ -221,11 +226,6 @@ views:
       - name: <span class="superscript">Team</span> Money Requests
         url: requests
         id: requests
-      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Team</span> Trips
-        url: travel_requests
-        id: travel_requests
-      <% end %>
       - name: <span class="superscript">Team</span> Settlements
         url: settlements_dashboard
         id: settlements_dashboard
@@ -248,6 +248,11 @@ views:
       - name: <span class="superscript">Team</span> Expenses
         url: expenses
         id: expenses
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      - name: <span class="superscript">Team</span> Trips
+        url: travel_requests
+        id: travel_requests
+      <% end %>
       - name: <span class="superscript">Team</span> Reports
         url: reports
         id: reports
@@ -260,11 +265,6 @@ views:
       - name: <span class="superscript">Team</span> Money Requests
         url: requests
         id: requests
-      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Team</span> Trips
-        url: travel_requests
-        id: travel_requests
-      <% end %>
       - name: <span class="superscript">Team</span> Members
         url: employees
         id: employees
@@ -298,6 +298,11 @@ views:
       - name: Receipts
         url: receipts
         id: receipts
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      - name: Trips
+        url: travel_requests
+        id: travel_requests
+      <% end %>
       - name: Reports
         url: reports
         id: reports
@@ -310,11 +315,6 @@ views:
       - name: Money Requests
         url: requests
         id: requests
-      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: Trips
-        url: travel_requests
-        id: travel_requests
-      <% end %>
       - name: Settlements
         url: settlements/<%= current_user.id %>
         id: settlements

@@ -87,7 +87,7 @@ class MoneyRequest::Index < MoneyRequest::Base
       get_counts
       if self.money_requests.present?
         self.money_requests = apply_scopes(self.money_requests, params)
-        self.paginated_money_requests = self.money_requests.paginate(page: params[:page], per_page: 30)
+        self.paginated_money_requests = self.money_requests.skip_pending.paginate(page: params[:page], per_page: 30)
       end
     end
 

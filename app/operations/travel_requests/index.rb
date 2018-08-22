@@ -67,12 +67,13 @@ class TravelRequests::Index < TravelRequests::Base
 
     # has_scope :filter_search
     # has_scope :filter_status
-    # has_scope :filter_user_id
-    # has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_user_id
+    has_scope :filter_date, using: [:from, :to], type: :hash
     # has_scope :filter_submitted_date, using: [:from, :to], type: :hash
     # has_scope :filter_approved_date, using: [:from, :to], type: :hash
     # has_scope :filter_policy
     # has_scope :filter_required_by_date
+    has_scope :filter_status
 
     def init
       self.travel_requests = params[:travel_requests]

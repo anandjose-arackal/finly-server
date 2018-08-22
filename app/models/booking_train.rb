@@ -2,21 +2,26 @@
 #
 # Table name: booking_trains
 #
-#  id                    :integer          not null, primary key
-#  journey_source        :string(255)
-#  journey_destination   :string(255)
-#  journey_date          :date
-#  departure_time        :string(255)
-#  train_number          :string(255)
-#  pnr                   :string(255)
-#  created_at            :datetime         not null
-#  updated_at            :datetime         not null
-#  parent_id             :integer
-#  parent_type           :string(255)
-#  booking_class         :string(255)
-#  boarding_station_name :string(255)
-#  start_time            :text(65535)
-#  end_time              :text(65535)
+#  id                  :integer          not null, primary key
+#  train_number        :string(255)
+#  pnr                 :string(255)
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  parent_id           :integer
+#  parent_type         :string(255)
+#  booking_class       :string(255)
+#  from_id             :integer          not null
+#  boarding_station    :string(255)
+#  to_id               :integer          not null
+#  destination_station :string(255)
+#  description         :string(255)
+#  seat_number         :string(255)
+#  cost_id             :integer
+#  is_deleted          :boolean          default(FALSE)
+#  departure_date      :date
+#  departure_time      :time
+#  arrival_date        :date
+#  arrival_time        :time
 #
 
 class BookingTrain < ActiveRecord::Base
@@ -54,6 +59,12 @@ class BookingTrain < ActiveRecord::Base
         seat_number: seat_number,
         cost: cost
     }
+  end
+
+  def valid_date_range(travel_request)
+    travel_from_date = travel_request.from_date
+    travel_to_date = travel_request.to_date
+    not(departure_date < travel_from_date or departure_date > travel_to_date)
   end
 
 end
