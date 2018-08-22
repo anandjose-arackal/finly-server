@@ -43,9 +43,11 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
     case self.object.class.name
       when "PurchaseOrder"
         relevant_budgets = company_budgets.applicable_to_purchase_orders
-        relevant_budgets = relevant_budgets.with_budgetable_locations(self.object.location_id)
-        relevant_budgets = relevant_budgets.with_budgetable_departments(self.object.department_id)
-        self.relevant_budgets = relevant_budgets.with_budgetable_vendors(self.object.vendor_id)
+        relevant_budget_ids = []
+        relevant_budget_ids += relevant_budgets.with_budgetable_locations(self.object.location_id).pluck(:id)
+        relevant_budget_ids += relevant_budgets.with_budgetable_departments(self.object.department_id).pluck(:id)
+        relevant_budget_ids += relevant_budgets.with_budgetable_vendors(self.object.vendor_id).pluck(:id)
+        self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
       when "Expense", "Report"
         self.relevant_budgets = user.company.budgets.applicable_to_expenses
       when "Payment", "PaymentOrder", "BankPaymentRequest"
