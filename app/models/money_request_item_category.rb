@@ -20,6 +20,10 @@ class MoneyRequestItemCategory < ActiveRecord::Base
   scope :with_name, -> (name) {where name: name}
   scope :with_id, -> (id) {where id: id}
 
+  def category_name
+    name
+  end
+
   def as_json(options = {})
     {
         id: id,

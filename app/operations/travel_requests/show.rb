@@ -147,10 +147,12 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_view_money_request?(money_request)
+      return false if travel_manager_view?
       !TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.travel_request.status_id)
     end
 
     def can_edit_money_request?(money_request)
+      return false if travel_manager_view?
       TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.travel_request.status_id)
     end
 
