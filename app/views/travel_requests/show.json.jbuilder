@@ -106,29 +106,29 @@ json.cash_pockets do
 end
 
 json.reports do
-  json.total_reported 0
-  json.data do
-    json.array! @result.reports.each do |report|
-      json.extract! report, :id, :name
-      json.submitted_on DateUtils.date_formatted report.submitted_at
-      json.user do
-        json.extract! report.user, :name
-      end
-      if report.memo
-        if report.memo[21]
-          json.memo report.memo[0, 20] + "..."
-        else
-          json.memo report.memo
-        end
-      end
-      if report.policy
-        json.policy report.policy.name
-      end
-      json.status report.report_status
-      json.total(('%.2f' % report.total_amount))
-      json.currency report.base_currency
+  # json.total_reported 0
+  # json.data do
+  json.array! @result.reports.each do |report|
+    json.extract! report, :id, :name
+    json.submitted_on DateUtils.date_formatted report.submitted_at
+    json.user do
+      json.extract! report.user, :name
     end
+    if report.memo
+      if report.memo[21]
+        json.memo report.memo[0, 20] + "..."
+      else
+        json.memo report.memo
+      end
+    end
+    if report.policy
+      json.policy report.policy.name
+    end
+    json.status report.report_status
+    json.total(('%.2f' % report.total_amount))
+    json.currency report.base_currency
   end
+  # end
 end
 
 
