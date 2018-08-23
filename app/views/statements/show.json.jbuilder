@@ -1,16 +1,18 @@
-json.account_name @result.account_name
-json.opening_balance AmountUtils.format(@result.opening_balance, placeholder: '-')
-json.closing_balance AmountUtils.format(@result.closing_balance, placeholder: '-')
-json.credits_count AmountUtils.format(@result.credits_count, placeholder: '-')
-json.debits_count AmountUtils.format(@result.debits_count, placeholder: '-')
-json.credit_amount AmountUtils.format(@result.credit_amount, placeholder: '-')
-json.debit_amount AmountUtils.format(@result.debit_amount, placeholder: '-')
 if @result.account.is_a?(UserPocket)
   json.base_currency @result.account.base_currency
+  currency = @result.account.base_currency
 else
   # because any other account has INR as the base curency
   json.base_currency Currency.first.as_json
+  currency = Currency.first
 end
+json.account_name @result.account_name
+json.opening_balance AmountUtils.format(@result.opening_balance, placeholder: '-', currency: currency)
+json.closing_balance AmountUtils.format(@result.closing_balance, placeholder: '-', currency: currency)
+json.credits_count AmountUtils.format(@result.credits_count, placeholder: '-', currency: currency)
+json.debits_count AmountUtils.format(@result.debits_count, placeholder: '-', currency: currency)
+json.credit_amount AmountUtils.format(@result.credit_amount, placeholder: '-', currency: currency)
+json.debit_amount AmountUtils.format(@result.debit_amount, placeholder: '-', currency: currency)
 json.summary do
   summary = @result.summary
   json.credits do
@@ -34,9 +36,9 @@ json.finly_transactions do
     else
       debit_amount = finly_transaction.amount.value
     end
-    json.credit_amount AmountUtils.format(credit_amount, placeholder: '-')
-    json.debit_amount AmountUtils.format(debit_amount, placeholder: '-')
-    json.closing_balance AmountUtils.format(finly_transaction.closing_balance&.value, placeholder: '-')
+    json.credit_amount AmountUtils.format(credit_amount, placeholder: '-', currency: currency)
+    json.debit_amount AmountUtils.format(debit_amount, placeholder: '-', currency: currency)
+    json.closing_balance AmountUtils.format(finly_transaction.closing_balance&.value, placeholder: '-', currency: currency)
     json.status StringUtils.titleize(finly_transaction.status.name)
     json.system_messages do
       json.system_messages do
