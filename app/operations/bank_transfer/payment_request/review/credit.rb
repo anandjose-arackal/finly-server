@@ -34,7 +34,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     self.view_role = UserRole.id_for(params[:view].to_sym)
     payment_ids = params[:payment_ids]
     unless payment_ids.is_a?(Array)
-      payment_ids = [payment_ids]
+      payment_ids = payment_ids.split(",")
     end
     self.crediting_payments = self.bank_payment_request.payments.with_id(payment_ids)
     self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
