@@ -51,7 +51,7 @@ class AccountManager::CashPockets::CashPocketsAdapter < AccountManager::BaseAdap
       # extracting all expenses which were marked against this particular pocket
       self.account.user.expenses.unverified.with_spent_from_id(self.account.id).each do |expense|
 
-        unless expense.date == DateUtils.local_date
+        unless expense.date == DateUtils.local_date && expense.amount.currency_id != expense.spent_from&.base_currency&.id
           expenses_against_coh_total += expense.amount.send(expense.spent_from&.base_currency&.country_code&.to_sym).to_f
         end
       end
