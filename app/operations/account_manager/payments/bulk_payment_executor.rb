@@ -2,21 +2,21 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
 
   attr_accessor :crediting_payments, :options, :retry_attempt, :payment_order
 
-  def self.call(payment_order, crediting_payment_ids, options = {})
+  def self.call(payment_order, options = {})
     payment_order_id = payment_order
     if payment_order_id.present? and payment_order_id.is_a?(PaymentOrder)
       payment_order_id = payment_order_id.id
     end
-    self.new.perform(payment_order_id, crediting_payment_ids, options)
+    self.new.perform(payment_order_id, options)
   end
 
-  def perform(payment_order_id, crediting_payment_ids, options, request_store_hash=nil)
+  def perform(payment_order_id, options, request_store_hash=nil)
     load_request_store request_store_hash
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
     self.payment_order = PaymentOrder.unscoped.find_by_id(payment_order_id)
-    self.crediting_payments = self.payment_order.payments.with_id(crediting_payment_ids)
+    self.crediting_payments = self.payment_order.payments.with_id(options[:crediting_payment_ids])
     self.options = options
     self.run
   end
@@ -69,6 +69,7 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
     if self.retry_attempt
       self.crediting_payments = self.crediting_payments.failed
     end
+
 
     self.crediting_payments.each do |payment|
       op = AccountManager::Payments::PaymentExecutor.(payment, options)

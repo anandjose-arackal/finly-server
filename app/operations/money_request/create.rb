@@ -1,5 +1,5 @@
 class MoneyRequest::Create < MoneyRequest::Base
-  attr_accessor :policy_id, :for_user, :default_policy
+  attr_accessor :policy_id, :for_user, :default_policy, :mr_create_params
 
   # def authorized_user_types
   #   :employee
@@ -15,6 +15,7 @@ class MoneyRequest::Create < MoneyRequest::Base
       self.policy_id = user.company.default_policy.id
       self.default_policy = true
     end
+    self.mr_create_params = create_params
   end
 
   def authorize
@@ -24,8 +25,14 @@ class MoneyRequest::Create < MoneyRequest::Base
     end
   end
 
+  def pre_process
+    if [1, '1'].include?(mr_create_params[:payment_mode_id])
+      mr_create_params[:destination_pocket_id] = self.for_user.user_pockets.cash_pockets_only.first.id
+    end
+  end
+
   def process
-    param = create_params
+    param = mr_create_params
     param[:status_id] = MoneyRequestStatus.id_for(:open)
     param[:controlling_user] = self.for_user
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
