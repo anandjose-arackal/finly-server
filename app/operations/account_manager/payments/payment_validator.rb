@@ -110,7 +110,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     self.homogenous_accounts = true
     initiating_account_type = payment_order.payments.first.initiating_account_type
     receiving_account_type = payment_order.payments.first.receiving_account_type
-    payments = crediting_payments.empty? ? payment_order.payments : crediting_payments
+    payments = (crediting_payments.present? && !crediting_payments&.empty?) ? crediting_payments : payment_order.payments
     payments.each do |payment|
       unless payment.receiving_account_type == receiving_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
