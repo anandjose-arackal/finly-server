@@ -106,7 +106,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   private
 
-  def validate_account_consistency(payment_order, crediting_payments)
+  def validate_account_consistency(payment_order, crediting_payments = [])
     self.homogenous_accounts = true
     initiating_account_type = payment_order.payments.first.initiating_account_type
     receiving_account_type = payment_order.payments.first.receiving_account_type
