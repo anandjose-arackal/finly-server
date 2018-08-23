@@ -5,6 +5,12 @@ json.credits_count AmountUtils.format(@result.credits_count, placeholder: '-')
 json.debits_count AmountUtils.format(@result.debits_count, placeholder: '-')
 json.credit_amount AmountUtils.format(@result.credit_amount, placeholder: '-')
 json.debit_amount AmountUtils.format(@result.debit_amount, placeholder: '-')
+if @result.account.is_a?(UserPocket)
+  json.base_currency @result.account.base_currency
+else
+  # because any other account has INR as the base curency
+  json.base_currency Currency.first.as_json
+end
 json.summary do
   summary = @result.summary
   json.credits do
