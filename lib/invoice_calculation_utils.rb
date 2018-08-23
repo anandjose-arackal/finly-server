@@ -84,7 +84,7 @@ class InvoiceCalculationUtils
 
   # this method should take the invoice, payment object and the params object and
   # assign the respective calculated amounts to the invoice object that is passed
-  def calculate_tax_and_discounts(params, payment = nil, invoice = nil, payment_amount = 0)
+  def calculate_tax_and_discounts(params, payment = nil, invoice = nil, payment_amount = nil)
     self.invoice = invoice || payment&.invoice
     if self.invoice.blank?
       return

@@ -24,6 +24,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     else
       reference_number = nil
     end
+
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
     op = YesBankApi::Transfer::BankTransfer.({
         transfer_request: transfer_request,

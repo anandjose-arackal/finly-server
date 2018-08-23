@@ -72,7 +72,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
   def validate
     # Call the payment validator class that validates the payment order
-    op = AccountManager::Payments::PaymentValidator.(payment_order)
+    op = AccountManager::Payments::PaymentValidator.(payment_order, self.crediting_payments)
     unless op.success?
       add_message :error, op.messages[:error]
     end
@@ -94,7 +94,9 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # synchronous or a background operation
     if self.crediting_payments.present?
       if self.background
-        op = AccountManager::Payments::BulkPaymentExecutor.(self.payment_order, self.crediting_payments.pluck(:id), options)
+        options[:crediting_payment_ids] = self.crediting_payments.pluck(:id)
+        # op = AccountManager::Payments::BulkPaymentExecutor.(self.payment_order, options)
+        op = AccountManager::Payments::BulkPaymentExecutor.call_async(self.payment_order, options)
         add_message :success, 'Payments have been scheduled, you can check their status from the order screen'
       end
     else
@@ -162,4 +164,3 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   end
 
 end
-
