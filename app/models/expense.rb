@@ -615,8 +615,8 @@ class Expense < ActiveRecord::Base
 
   def distance_rate_value
     if self.distance_expense?
-      if self.report_id.present?
-        return report.policy.distance_expense_config.rate_value
+      if self.distance_expense&.vehicle_rate&.rate.present?
+        return distance_expense.vehicle_rate.rate.value
       else
         return nil
       end
