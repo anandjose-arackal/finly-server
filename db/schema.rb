@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180824135318) do
+ActiveRecord::Schema.define(version: 20180824152010) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -4980,25 +4980,29 @@ ActiveRecord::Schema.define(version: 20180824135318) do
   add_index "user_pockets", ["user_pocket_type_id"], name: "index_user_pockets_on_user_pocket_type_id", using: :btree
 
   create_table "user_profiles", force: :cascade do |t|
-    t.integer  "user_id",             limit: 4
-    t.string   "avatar_file_name",    limit: 255
-    t.string   "avatar_content_type", limit: 255
-    t.integer  "avatar_file_size",    limit: 4
+    t.integer  "user_id",                limit: 4
+    t.string   "avatar_file_name",       limit: 255
+    t.string   "avatar_content_type",    limit: 255
+    t.integer  "avatar_file_size",       limit: 4
     t.datetime "avatar_updated_at"
     t.boolean  "kyc_verified"
-    t.string   "gcm_sender_id",       limit: 255
-    t.string   "employee_id",         limit: 255
-    t.string   "payroll_id",          limit: 255
-    t.integer  "default_currency_id", limit: 4
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.string   "gcm_sender_id",          limit: 255
+    t.string   "employee_id",            limit: 255
+    t.string   "payroll_id",             limit: 255
+    t.integer  "default_currency_id",    limit: 4
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
     t.date     "date_of_birth"
-    t.string   "gender",              limit: 255
-    t.string   "address_1",           limit: 255
-    t.string   "address_2",           limit: 255
-    t.string   "city",                limit: 255
-    t.integer  "state_id",            limit: 4
-    t.string   "pin_code",            limit: 255
+    t.string   "gender",                 limit: 255
+    t.string   "address_1",              limit: 255
+    t.string   "address_2",              limit: 255
+    t.string   "city",                   limit: 255
+    t.integer  "state_id",               limit: 4
+    t.string   "pin_code",               limit: 255
+    t.string   "signature_file_name",    limit: 255
+    t.string   "signature_content_type", limit: 255
+    t.integer  "signature_file_size",    limit: 4
+    t.datetime "signature_updated_at"
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
