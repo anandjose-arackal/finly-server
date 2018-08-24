@@ -156,14 +156,17 @@ class TravelRequest < ActiveRecord::Base
 
   def summary
     s = {}
-
-    s[:money_request_processed] = money_request_processed || 0
-    s[:expense_claims_submitted] = expense_claims_submitted || 0
-    s[:booking_cost] = booking_cost || 0
-    trip_cost = s[:money_request_processed] + s[:expense_claims_submitted] + s[:booking_cost]
-
-    Amount.new value: trip_cost, currency: Currency.first
-
+    trip_cost = 0
+    base_currency = policy.base_currency
+    zero_amount = Amount.new value: 0, currency: base_currency
+    s[:money_request_processed] = money_request_processed || zero_amount
+    s[:expense_claims_submitted] = expense_claims_submitted || zero_amount
+    s[:booking_cost] = booking_cost || zero_amount
+    trip_cost += s[:money_request_processed].value
+    trip_cost += s[:expense_claims_submitted].value
+    trip_cost += s[:booking_cost].value
+    s[:trip_cost] = Amount.new value: trip_cost, currency: base_currency
+    s
     # money_requests_processed
     # expense_claims_submitted
     # booking_cost
@@ -173,22 +176,25 @@ class TravelRequest < ActiveRecord::Base
   def money_request_processed
     return nil unless money_requests.present?
     amounts = Amount.with_id(money_requests.pluck(:processed_amount_id))
-    total = amounts.present? ? amounts.sum_value : 0
+    total = amounts.sum_value
+    return nil if total == 0
     currency = amounts.first.currency
     Amount.new value: total, currency: currency
   end
 
   def expense_claims_submitted
     return nil unless reports.present?
-    amounts = Amount.with_id(reports.pluck(:processed_amount_id))
-    total = amounts.present? ? amounts.sum_value : 0
+    expenses = Expense.with_report_id(reports.pluck(:id))
+    amounts = Amount.with_id(expenses.pluck(:amount_id))
+    total = amounts.sum_value
+    return nil if total == 0
     currency = amounts.first.currency
     Amount.new value: total, currency: currency
   end
 
   def booking_cost
     return nil if bookings.blank?
-    confirmed_bookings = Booking.with_travel_request_id(travel_request.id).confirmed
+    confirmed_bookings = Booking.with_travel_request_id(id).confirmed
     confirmed_booking_ids = confirmed_bookings.pluck(:id)
     value = BookingFlight.with_parent_booking_id(confirmed_booking_ids).sum_cost +
         BookingTrain.with_parent_booking_id(confirmed_booking_ids).sum_cost +
@@ -215,8 +221,8 @@ class TravelRequest < ActiveRecord::Base
             to: DateUtils.date_formatted(to_date)
         },
         destinations: destinations,
-        destinations_list: destinations_list
-        # summary: summary
+        destinations_list: destinations_list,
+        summary: summary
     }
   end
 
