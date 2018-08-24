@@ -173,7 +173,7 @@ class TravelRequest < ActiveRecord::Base
   def money_request_processed
     return nil unless money_requests.present?
     amounts = Amount.with_id(money_requests.pluck(:processed_amount_id))
-    total = amounts.sum_value
+    total = amounts.present? ? amounts.sum_value : 0
     currency = amounts.first.currency
     Amount.new value: total, currency: currency
   end
@@ -181,7 +181,7 @@ class TravelRequest < ActiveRecord::Base
   def expense_claims_submitted
     return nil unless reports.present?
     amounts = Amount.with_id(reports.pluck(:processed_amount_id))
-    total = amounts.sum_value
+    total = amounts.present? ? amounts.sum_value : 0
     currency = amounts.first.currency
     Amount.new value: total, currency: currency
   end
@@ -215,8 +215,8 @@ class TravelRequest < ActiveRecord::Base
             to: DateUtils.date_formatted(to_date)
         },
         destinations: destinations,
-        destinations_list: destinations_list,
-        summary: summary
+        destinations_list: destinations_list
+        # summary: summary
     }
   end
 
