@@ -51,6 +51,8 @@
 #  location_id            :integer
 #  delivery_location_id   :integer
 #  payment_term_id        :integer
+#  department_id          :integer
+#  sub_department_id      :integer
 #
 
 require 'test_helper'

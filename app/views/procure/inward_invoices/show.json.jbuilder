@@ -45,7 +45,8 @@ end
 
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
-  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id
+  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id
+
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
   else
@@ -174,6 +175,18 @@ json.cost_centers do
   json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
     json.id cost_center.id
     json.name cost_center.name
+  end
+end
+
+json.departments do
+  json.array! @result.departments do |dept|
+    json.extract! dept, :id, :name
+  end
+end
+
+json.sub_departments do
+  json.array! @result.sub_departments do |dept|
+    json.extract! dept, :id, :name
   end
 end
 json.tds_slabs do

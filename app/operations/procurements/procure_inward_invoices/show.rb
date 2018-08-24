@@ -18,12 +18,13 @@ class Procurements::ProcureInwardInvoices::Show < Procurements::ProcureInwardInv
   end
 
   class Procurements::ProcureInwardInvoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :invoice
+    attr_accessor :invoice, :departments, :sub_departments, :cost_centers
 
     def init
+      self.departments = user.company.departments.roots
+      self.sub_departments = user.company.departments.only_sub_departments
+      self.cost_centers = user.company.cost_centers
       self.invoice = params[:invoice]
     end
   end
-
-
 end

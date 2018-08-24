@@ -26,12 +26,14 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets
+    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers, :sub_departments
 
     def init
       self.purchase_order = params[:purchase_order]
       self.actions = get_actions
-      self.departments = user.company.departments
+      self.departments = user.company.departments.roots
+      self.sub_departments = user.company.departments.only_sub_departments
+      self.cost_centers = user.company.cost_centers
 
       # todo has to be scoped to policy the user is a part of
       self.policies = purchase_order.user.policies.with_application(:vp)

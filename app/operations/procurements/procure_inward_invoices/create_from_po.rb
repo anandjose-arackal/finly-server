@@ -99,7 +99,12 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
       gst_type_id: self.purchase_order.gst_type_id,
       location_id: self.purchase_order.location_id,
       delivery_location_id: self.purchase_order.delivery_location_id,
+      department_id: self.purchase_order.department_id,
+      sub_department_id: self.purchase_order.sub_department_id,
+      cost_center_id: self.purchase_order.cost_center_id,
       invoice_items_attributes: invoice_items_attributes
+
+
 
     }
   end

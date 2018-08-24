@@ -51,6 +51,8 @@
 #  location_id            :integer
 #  delivery_location_id   :integer
 #  payment_term_id        :integer
+#  department_id          :integer
+#  sub_department_id      :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -84,6 +86,9 @@ class Invoice < ActiveRecord::Base
   belongs_to :invoice_type, class_name: "InwardInvoiceType"
   belongs_to :gst_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
+
+  belongs_to :department
+  belongs_to :sub_department, class_name: 'Department', foreign_key: :sub_department_id
 
   # because multiple payments can be made against one invoice
   has_many :payments

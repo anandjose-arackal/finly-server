@@ -40,6 +40,8 @@
 #  controlling_level_id         :integer
 #  department_id                :integer
 #  is_deleted                   :boolean          default(FALSE), not null
+#  cost_center_id               :integer
+#  sub_department_id            :integer
 #
 
 class PurchaseOrder < ActiveRecord::Base
@@ -54,6 +56,7 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :procurement_term
   belongs_to :status, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
   belongs_to :department
+  belongs_to :sub_department, class_name: "Department", foreign_key: :sub_department_id
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
@@ -67,6 +70,7 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :balance_amount, class_name: "Amount", autosave: true
   belongs_to :policy
   belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 

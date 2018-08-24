@@ -8,12 +8,18 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  is_deleted :boolean          default(FALSE), not null
+#  ancestry   :string(255)
 #
 
 class Department < ActiveRecord::Base
   include SoftDeletable
+  has_ancestry
   belongs_to :company
 
   has_many :user_department_mappings
   has_many :users, through: :user_department_mappings
+
+  scope :only_sub_departments, -> {
+    where(id: Department.pluck(:ancestry).compact.map { |e| e.split('/') }.flatten.uniq)
+  }
 end
