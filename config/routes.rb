@@ -2644,6 +2644,7 @@ Rails.application.routes.draw do
     patch 'update_role', to: 'users#update_user_role', as: :update_role
     get 'profile', to: 'users#profile', as: :profile
     post 'update_password', to: 'users#update_password', as: :update_password
+    post 'update_signature', to: 'users#update_signature', as: :update_signature
     get 'balance', to: 'users#balance', as: :balance
     get 'balances', to: 'users#balances', as: :balances
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp

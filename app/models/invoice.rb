@@ -53,6 +53,8 @@
 #  payment_term_id        :integer
 #  department_id          :integer
 #  sub_department_id      :integer
+#  policy_id              :integer
+#  controlling_level_id   :integer
 #
 
 #  gst_type_id: 1 - IGST
