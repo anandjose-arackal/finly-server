@@ -210,7 +210,7 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def show_reports?
-      can_create_reports?
+      travel_request.booking_confirmed?
     end
 
     def reports

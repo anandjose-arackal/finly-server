@@ -34,6 +34,9 @@ class BookingCarRental < ActiveRecord::Base
   accepts_nested_attributes_for :drop_city
   accepts_nested_attributes_for :cost
 
+  scope :with_parent_booking_id, ->(id) { where parent_type: 'Booking', parent_id: id }
+  scope :sum_cost, -> { joins(:cost).sum(:value) }
+
   validates :pickup_date, presence: true
   validates :drop_date, presence: true
   validates :pickup_city, presence: true

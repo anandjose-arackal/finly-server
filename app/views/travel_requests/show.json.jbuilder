@@ -35,6 +35,8 @@ json.show_money_requests @result.show_money_requests?
 json.can_create_reports @result.can_create_reports?
 json.show_reports @result.show_reports?
 
+# json.summary @result.travel_request.summary
+
 json.money_requests do
   json.total_submitted 0
   json.total_processed 0
