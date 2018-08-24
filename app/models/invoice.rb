@@ -53,6 +53,8 @@
 #  payment_term_id        :integer
 #  department_id          :integer
 #  sub_department_id      :integer
+#  policy_id              :integer
+#  controlling_level_id   :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -89,6 +91,11 @@ class Invoice < ActiveRecord::Base
 
   belongs_to :department
   belongs_to :sub_department, class_name: 'Department', foreign_key: :sub_department_id
+
+  belongs_to :policy
+  belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+
+  has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
   # because multiple payments can be made against one invoice
   has_many :payments

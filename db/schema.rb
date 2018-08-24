@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180823125049) do
+ActiveRecord::Schema.define(version: 20180824135318) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2778,6 +2778,8 @@ ActiveRecord::Schema.define(version: 20180823125049) do
     t.integer  "payment_term_id",        limit: 4
     t.integer  "department_id",          limit: 4
     t.integer  "sub_department_id",      limit: 4
+    t.integer  "policy_id",              limit: 4
+    t.integer  "controlling_level_id",   limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -4481,6 +4483,7 @@ ActiveRecord::Schema.define(version: 20180823125049) do
     t.string   "associated_entity_type", limit: 255
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
+    t.string   "name",                   limit: 255
   end
 
   add_index "reviewal_levels", ["policy_id"], name: "index_reviewal_levels_on_policy_id", using: :btree
