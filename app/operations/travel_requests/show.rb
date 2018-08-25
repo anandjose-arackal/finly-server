@@ -108,7 +108,7 @@ class TravelRequests::Show < TravelRequests::Base
           actions[:retract] = {method: 'patch', type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
         # Confirm selection
-        if travel_request.selection_requested? && travel_request.controlling_user_id == user.id
+        if (travel_request.selection_requested? or travel_request.selection_rejected?) && travel_request.controlling_user_id == user.id
           actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       end
