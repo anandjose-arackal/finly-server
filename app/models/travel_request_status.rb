@@ -67,7 +67,7 @@ class TravelRequestStatus < ActiveRecord::Base
   end
 
   def booking_confirmed?
-    self.id == TravelRequestStatus.id_for(:booking_confirmed?)
+    self.id == TravelRequestStatus.id_for(:booking_confirmed)
   end
 
   def as_json(options={})

@@ -175,10 +175,12 @@ class TravelRequest < ActiveRecord::Base
 
   def money_request_processed
     return nil unless money_requests.present?
-    amounts = Amount.with_id(money_requests.pluck(:processed_amount_id))
-    total = amounts.sum_value
-    return nil if total == 0
-    currency = amounts.first.currency
+    total = 0
+    money_requests.each do |money_request|
+      total += money_request.total_amount
+    end
+    return nil unless total > 0
+    currency = money_requests.first.base_currency
     Amount.new value: total, currency: currency
   end
 
@@ -186,9 +188,9 @@ class TravelRequest < ActiveRecord::Base
     return nil unless reports.present?
     expenses = Expense.with_report_id(reports.pluck(:id))
     amounts = Amount.with_id(expenses.pluck(:amount_id))
-    total = amounts.sum_value
+    total = amounts.sum(policy.base_currency.country_code.to_sym)
     return nil if total == 0
-    currency = amounts.first.currency
+    currency = policy.base_currency
     Amount.new value: total, currency: currency
   end
 
