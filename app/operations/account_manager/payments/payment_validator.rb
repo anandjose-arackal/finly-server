@@ -12,7 +12,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     self.crediting_payments = crediting_payments
   end
 
-  def self.call(payment_order, crediting_payments)
+  def self.call(payment_order, crediting_payments=[])
     self.new(payment_order, crediting_payments).run
   end
 
