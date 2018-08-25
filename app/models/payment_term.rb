@@ -14,6 +14,7 @@
 #
 
 class PaymentTerm < ActiveRecord::Base
+  include SoftDeletable
 
   belongs_to :company
 

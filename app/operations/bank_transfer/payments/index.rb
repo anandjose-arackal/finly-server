@@ -33,7 +33,7 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_vendor_payments
     has_scope :filter_user_id
-    has_scope :filter_search
+    has_scope :filter_search_index, using: [:beneficiary_type, :receiving_user_id], type: :hash
 
     def init
       self.payments = params[:payments]

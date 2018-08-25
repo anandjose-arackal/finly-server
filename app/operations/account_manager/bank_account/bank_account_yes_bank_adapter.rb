@@ -24,6 +24,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     else
       reference_number = nil
     end
+
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
     op = YesBankApi::Transfer::BankTransfer.({
         transfer_request: transfer_request,
@@ -84,6 +85,10 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       # trigger the webhook callback for this particular payment's credit confirmation
       # setting the parameters for the callback method and executing it
       execute_callback(payment)
+      # if the payment happens to also have an invoice, update the invoice status accordingly
+      if payment.invoice.present?
+        payment.invoice.update_invoice_status
+      end
     end
   end
 

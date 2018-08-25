@@ -40,6 +40,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:approved))
     end
 
+    # the below has been moved to the PaymentProcessor Operation
     # # also set the payment order's status id as either scheduled or as pending
     # if payment_order.scheduled_at.present? && payment_order.scheduled_at > DateUtils.local_date
     #   payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))

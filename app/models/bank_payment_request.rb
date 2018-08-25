@@ -262,6 +262,10 @@ class BankPaymentRequest < ActiveRecord::Base
     self.payment_order.payment_mode.upcase == "CREDITCARD"
   end
 
+  def payments
+    self.payment_order.payments
+  end
+
   private
 
   def generate_name

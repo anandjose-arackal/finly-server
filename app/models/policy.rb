@@ -62,6 +62,7 @@ class Policy < ActiveRecord::Base
   # has_many :field_configurations, as: :configurable
   has_many :policy_field_mappings
   has_many :field_configurations, through: :policy_field_mappings
+  has_many :levels, class_name: 'ReviewalLevel'
 
   validates :company_id, presence: true
   validate :one_default_per_company

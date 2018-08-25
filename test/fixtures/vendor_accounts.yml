@@ -2,40 +2,19 @@
 #
 # Table name: vendor_accounts
 #
-#  id                 :integer          not null, primary key
-#  yes_bank_vendor_id :integer
-#  account_number     :string(255)
-#  ifsc               :string(255)
-#  name               :string(255)
-#  address_1          :string(255)
-#  address_2          :string(255)
-#  address_3          :string(255)
-#  pin_code           :string(255)
-#  country            :string(255)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
+#  id         :integer          not null, primary key
+#  balance_id :integer
+#  vendor_id  :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  yes_bank_vendor_id: 
-  account_number: MyString
-  ifsc: MyString
-  name: MyString
-  address_1: MyString
-  address_2: MyString
-  address_3: MyString
-  pin_code: MyString
-  country: MyString
+  balance_id: 1
+  vendor_id: 1
 
 two:
-  yes_bank_vendor_id: 
-  account_number: MyString
-  ifsc: MyString
-  name: MyString
-  address_1: MyString
-  address_2: MyString
-  address_3: MyString
-  pin_code: MyString
-  country: MyString
+  balance_id: 1
+  vendor_id: 1

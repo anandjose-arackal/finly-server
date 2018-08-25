@@ -57,13 +57,18 @@ class Payment < ActiveRecord::Base
   belongs_to :initiating_user, polymorphic: true
   belongs_to :receiving_user, polymorphic: true
   belongs_to :reference_resource, polymorphic: true
-  belongs_to :original_payment_for_refund, class_name: "Payment"
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
   has_many :money_requests
   has_many :money_request_tracks
   has_many :finly_transactions
+
+  # From Procurement Workflow
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
 
   has_one :payment, as: :reference_resource
 
@@ -229,6 +234,17 @@ class Payment < ActiveRecord::Base
             OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
   }
 
+  scope :filter_search_index, -> (beneficiary_type, receiving_user_id) {
+    case beneficiary_type
+      when 1, '1'
+        where(receiving_user_type: "User", receiving_user_id: receiving_user_id)
+      when 2, '2'
+        where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
+      else
+        where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
+    end
+  }
+
   scope :filter_user_id, -> (user_id) {
     if user_id.present?
       where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
@@ -269,6 +285,10 @@ class Payment < ActiveRecord::Base
 
   scope :vendor_payments_only, -> { where receiving_user_type: 'YesBankVendor' }
 
+  scope :unpaid, -> {
+    where payment_status_id: [PaymentStatus.id_for(:pending_approval), PaymentStatus.id_for(:failed), PaymentStatus.id_for(:pending_credit)]
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   # validates :initiating_user_id, presence: true
@@ -284,11 +304,9 @@ class Payment < ActiveRecord::Base
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
-  before_save do
-    # recalculating the amount or net amount for this particular
-    # payment from the details inside the invoice
+  after_save :budget_trail_entry
 
-  end
+  after_destroy :budget_trail_destroy
 
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
@@ -463,5 +481,18 @@ class Payment < ActiveRecord::Base
         errors.add(:receiving_user_id, "cannot be blank")
       end
     end
+  end
+
+  def budget_trail_entry
+    if self.completed? || self.processing?
+      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
+    else
+      # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
+      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
   end
 end

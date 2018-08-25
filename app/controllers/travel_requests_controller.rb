@@ -12,6 +12,10 @@ class TravelRequestsController < ApplicationController
     respond
   end
 
+  def count
+    @result = TravelRequests::Index.(current_user, params)
+    respond
+  end
 
   def create
     @result = TravelRequests::Create.(current_user, params)

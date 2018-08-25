@@ -21,11 +21,13 @@
 #
 
 class BranchLocation < ActiveRecord::Base
+  include SoftDeletable
   belongs_to :company
   belongs_to :state
   has_many :company_location_departments
   has_many :company_departments, through: :company_location_departments
 
+  has_many :budget_trails, as: :location
 
   def address
     address = ""
@@ -44,5 +46,6 @@ class BranchLocation < ActiveRecord::Base
     if self.pin.present?
       address += (self.pin)
     end
+    address
   end
 end

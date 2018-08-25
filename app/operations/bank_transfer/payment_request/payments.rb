@@ -6,7 +6,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
 
     require 'will_paginate/array'
     
-    attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments
+    attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments, :unpaid_payments
 
     def init
       self.payments = params[:payments]
@@ -23,6 +23,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
       end
       self.ordered_payments = self.payments_verified + self.payments_unverified
       self.paginated_payments = self.ordered_payments.paginate(page: params[:page], per_page: (params[:per_page] || 10))
+      self.unpaid_payments = self.payments.unpaid
     end
 
   end

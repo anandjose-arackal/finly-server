@@ -27,10 +27,9 @@
 #  auto_approve                       :boolean
 #  money_request_processor_mapping_id :integer
 #  approved_at                        :datetime
-#  destination_pocket_id              :integer
 #  travel_request_id                  :integer
+#  destination_pocket_id              :integer
 #
-
 
 
 
@@ -99,7 +98,9 @@ class MoneyRequest < ActiveRecord::Base
   scope :sum_total, -> { joins(:items).joins({items: :amount}).sum(:value) }
   scope :without_associated_processor, -> { where money_request_processor_mapping_id: nil }
   scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
+  scope :skip_pending, -> { where.not status_id: MoneyRequestStatus.id_for(:pending)}
   scope :without_user, -> (user_id) { where.not user_id: user_id }
+  scope :status_pending, -> { where status_id: MoneyRequestStatus.id_for(:pending)}
 
   scope :awaiting_approval_of_user, ->(user_id, role_id) { where(status_id: MoneyRequestStatus.id_for(:processing))
                                                                .where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
@@ -188,7 +189,7 @@ class MoneyRequest < ActiveRecord::Base
   default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
   validates :policy_id, presence: true
-  # validate :cash_pocket_presence
+  validate :cash_pocket_presence
 
   before_save :handle_name
   before_save :handle_nil_amount
@@ -221,7 +222,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def editable?
-    self.status_id == MoneyRequestStatus.id_for(:open) || self.status_id == MoneyRequestStatus.id_for(:rejected) || self.status_id == MoneyRequestStatus.id_for(:retracted)
+    self.status_id == MoneyRequestStatus.id_for(:open) || self.status_id == MoneyRequestStatus.id_for(:rejected) || self.status_id == MoneyRequestStatus.id_for(:retracted) || self.status_id == MoneyRequestStatus.id_for(:pending)
   end
 
   def can_submit?
@@ -260,6 +261,14 @@ class MoneyRequest < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
+  def base_currency
+    currency = Currency.first
+    if payment_mode_id == PaymentMode.id_for(:cash) and destination_pocket.present?
+      currency = destination_pocket.base_currency
+    end
+    currency
+  end
+
   def total_amount
     return precision_value(self.items.with_amount.sum(:value)) if self.items.present?
     0
@@ -296,6 +305,14 @@ class MoneyRequest < ActiveRecord::Base
     "#{user.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
 
+  def cash_pocket_presence
+    if self.id.present? and self.payment_mode_id == PaymentMode.id_for(:cash)
+      if self.destination_pocket_id.blank?
+        errors.add(:cash, "money requests cannot be created without a destination account")
+      end
+    end
+  end
+
   private
   def handle_name
     if self.name.blank?
@@ -312,18 +329,10 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def create_items
-    self.user.company.active_categories.expense_management_only.each do |category|
-      amount = Amount.create value: 0, currency_id: Currency.first.id
-      self.items.build category_id: category.id, amount_id: amount.id
+    return unless self.items.blank?
+    self.user.company.money_request_item_categories.active.each do |category|
+      amount = Amount.new(value: 0, currency_id: Currency.first.id)
+      self.items.build money_request_item_category_id: category.id, amount: amount
     end
   end
-
-  def cash_pocket_presence
-    if self.payment_mode_id == PaymentMode.id_for(:cash)
-      if self.destination_pocket_id.blank?
-        errors.add(:cash, "money requests cannot be created without a destination account")
-      end
-    end
-  end
-
 end

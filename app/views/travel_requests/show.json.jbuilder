@@ -22,7 +22,7 @@ json.destinations do
 end
 
 json.actions @result.actions
-json.policies @result.travel_request.user.policies
+json.policies @result.policies
 json.editable @result.editable
 json.destroyable @result.destroyable
 json.can_select_options @result.can_select_options?
@@ -36,42 +36,100 @@ json.can_create_reports @result.can_create_reports?
 json.show_reports @result.show_reports?
 
 json.money_requests do
-  json.array! @result.money_requests.each do |money_request|
-    json.extract! money_request, :id, :name, :memo, :required_by_date
-    json.status money_request.status
-    json.user do
-      json.extract! money_request.user, :name
+  json.total_submitted 0
+  json.total_processed 0
+  json.data do
+    json.array! @result.money_requests.each do |money_request|
+      json.extract! money_request, :id, :name, :memo, :required_by_date
+      json.status money_request.status
+      json.user do
+        json.extract! money_request.user, :name
+      end
+
+      json.can_view @result.can_view_money_request?(money_request)
+      json.can_edit @result.can_edit_money_request?(money_request)
+
+      json.submitted_amount Amount.new(value: money_request.total_amount, currency: money_request.base_currency)
+      json.processed_amount money_request.processed_amount
+      if money_request.destination_pocket.present?
+        json.destination_pocket do
+          pocket = money_request.destination_pocket
+          json.id pocket.id
+          json.name pocket.name
+          json.pocket_type do
+            json.id pocket.user_pocket_type.id
+            json.name pocket.user_pocket_type.name
+          end
+          adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+          json.balance adapter.balance(display_balance: true)
+          currency = pocket.base_currency
+          json.base_currency do
+            json.symbol currency&.symbol
+            json.country_code currency&.country_code
+            json.id currency&.id
+          end
+        end
+      end
+
+      json.request_items money_request.items do |item|
+        json.category do
+          json.name item.category.name
+          json.id item.category.id
+        end
+        json.amount do
+          json.value item.amount.value
+          json.currency item.amount.currency
+        end
+      end
+
+      json.custom_fields do
+        json.array! money_request.custom_fields
+      end
+
     end
-    json.policy money_request.policy.name if money_request.policy
-    json.submitted_amount money_request.submitted_amount
-    json.processed_amount money_request.processed_amount
-    json.submitted_on DateUtils.date_formatted money_request.submitted_at
+  end
+end
+
+# For money requests
+json.cash_pockets do
+  json.array!(@result.travel_request.user.user_pockets.cash_pockets_only) do |pocket|
+    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    json.name pocket.name
+    json.balance adapter.balance(display_balance: true)
+    json.id pocket.id
+    json.base_currency do
+      json.symbol pocket.base_currency&.symbol
+      json.country_code pocket.base_currency&.country_code
+      json.id pocket.base_currency&.id
+    end
   end
 end
 
 json.reports do
+  # json.total_reported 0
+  # json.data do
   json.array! @result.reports.each do |report|
-      json.extract! report, :id, :name
-      json.submitted_on DateUtils.date_formatted report.submitted_at
-      json.user do
-        json.extract! report.user, :name
+    json.extract! report, :id, :name
+    json.submitted_on DateUtils.date_formatted report.submitted_at
+    json.user do
+      json.extract! report.user, :name
+    end
+    if report.memo
+      if report.memo[21]
+        json.memo report.memo[0, 20] + "..."
+      else
+        json.memo report.memo
       end
-      if report.memo
-        if report.memo[21]
-          json.memo report.memo[0, 20] + "..."
-        else
-          json.memo report.memo
-        end
-      end
-      if report.policy
-        json.policy report.policy.name
-      end
-      json.status report.report_status
-      json.total(('%.2f' % report.total_amount))
-      json.currency report.base_currency
+    end
+    if report.policy
+      json.policy report.policy.name
+    end
+    json.status report.report_status
+    json.total(('%.2f' % report.total_amount))
+    json.currency report.base_currency
   end
+  # end
 end
-
 
 
 json.comments do

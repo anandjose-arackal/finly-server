@@ -33,7 +33,6 @@ class FinlyTransaction < ActiveRecord::Base
   belongs_to :associated_transaction, polymorphic: true
   belongs_to :payment
   belongs_to :company
-  belongs_to :original_payment_for_refund, class_name: "Payment"
   has_many :system_messages, as: :messagable, dependent: :destroy
 
   accepts_nested_attributes_for :amount, :opening_balance, :closing_balance
@@ -48,6 +47,10 @@ class FinlyTransaction < ActiveRecord::Base
   validates :status_id, presence: true
   validates :payment_purpose_id, presence: true
   validates :date, presence: true
+
+  default_scope { order(id: :desc) }
+
+  delegate :credit?, :debit?, to: :transaction_type
 
   scope :with_account, -> (account) { where finly_account: account }
   scope :credits, -> { where transaction_type_id: TransactionType.id_for(:credit) }

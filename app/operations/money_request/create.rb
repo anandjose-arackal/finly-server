@@ -1,13 +1,13 @@
 class MoneyRequest::Create < MoneyRequest::Base
-  attr_accessor :policy_id, :for_user, :default_policy
+  attr_accessor :policy_id, :for_user, :default_policy, :mr_create_params
 
-  def authorized_user_types
-    :employee
-  end
+  # def authorized_user_types
+  #   :employee
+  # end
 
   def init
     self.for_user = (params[:for_user] or user)
-    self.policy_id = params[:policy_id]
+    self.policy_id = params&.dig(:money_request, :policy_id)
     if policy_id.blank? and for_user.enforce_policy_enabled?
       self.policy_id = for_user.policies.non_default.first.id rescue nil
     end
@@ -15,6 +15,7 @@ class MoneyRequest::Create < MoneyRequest::Base
       self.policy_id = user.company.default_policy.id
       self.default_policy = true
     end
+    self.mr_create_params = create_params
   end
 
   def authorize
@@ -24,17 +25,34 @@ class MoneyRequest::Create < MoneyRequest::Base
     end
   end
 
+  def pre_process
+    if [1, '1'].include?(mr_create_params[:payment_mode_id])
+      mr_create_params[:destination_pocket_id] = self.for_user.user_pockets.cash_pockets_only.first.id
+    end
+  end
+
   def process
-    param = create_params
+    param = mr_create_params
     param[:status_id] = MoneyRequestStatus.id_for(:open)
     param[:controlling_user] = self.for_user
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
     param[:payment_mode_id] = PaymentMode.id_for(:cash)
     param[:policy_id] = self.policy_id
+
     # Money request can only be request through expense cards
     if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
       param[:payment_mode_id] = PaymentMode.id_for(:card)
     end
+
+    if param[:items_attributes].present?
+      param[:items_attributes].each do |attribute|
+        if attribute[:category_id].present?
+          attribute[:money_request_item_category_id] = attribute[:category_id]
+          attribute[:category_id] = nil
+        end
+      end
+    end
+
     self.money_request = for_user.money_requests.build param
     if money_request.save
       self.money_request.tracks.create action_user: for_user,
@@ -43,16 +61,25 @@ class MoneyRequest::Create < MoneyRequest::Base
                                        modified_user_role_id: param[:controlling_user_role_id],
                                        money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
                                        status_id: MoneyRequestStatus.id_for(:open)
-      CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), reset_fields: true, save: true)
+      CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request),
+          custom_fields: params[:custom_fields], reset_fields: true, save: true)
     else
       self.messages[:error] = money_request.errors.full_messages
     end
   end
 
+  def post_process
+    if self.money_request.travel_request.present? and TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.money_request.travel_request.status_id)
+      self.money_request.update(status_id: MoneyRequestStatus.id_for(:pending))
+    end
+  end
+
   private
+
   def create_params
     return {} unless params[:money_request].present?
-    params[:money_request].permit(:name, :travel_request_id, :required_by_date, :destination_pocket_id, :policy_id, items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
+    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :destination_pocket_id,
+                                          items_attributes: [:category_id, :money_request_item_category_id, amount_attributes: [:value, :currency_id]])
   end
 
 end

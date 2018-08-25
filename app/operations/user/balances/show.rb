@@ -237,7 +237,8 @@ class User::Balances::Show < User::Base
       self.balances[:user_pockets] << {
           name: pocket.name,
           type: pocket.user_pocket_type&.name&.humanize,
-          balance: self.user_pockets_info[pocket.id]
+          balance: self.user_pockets_info[pocket.id],
+          base_currency: pocket.base_currency
       }
     end
   end

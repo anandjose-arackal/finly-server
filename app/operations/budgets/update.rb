@@ -1,19 +1,37 @@
 class Budgets::Update < Budgets::Base
 
-  def pre_validate
-
-  end
-
   def init
     id = (params[:id] or params[:budget_id])
     self.budget = Budgets::Index.(user, params).budgets.with_id(id).first rescue nil
 
-    self.budget_params = update_budget_params
+    self.budget_params = budget_params
   end
 
   def validate
-    if self.budget.blank?
-      add_message :error, 'Budget not found'
+    budgetables = budget_params[:budget_criteria_mappings_attributes]
+    budgetables.each do |budgetable|
+      unless ["Category", "CostCenter", "YesBankVendor", "Department", "Location", "User"].include?(budgetable[:budgetable_type])
+        add_message :error, "Invalid criteria provided"
+        return
+      end
+    end
+
+    budgetables.each do |budgetable|
+      if budgetable[:budgetable_id].blank?
+        add_message :error, "Criteria ID not provided"
+        return
+      end
+    end
+
+    parent_budget_id = params[:parent_id]
+    parent_budget = user.company.budgets.find_by(id: parent_budget_id)
+    # check to make sure the sum of all child budgets is less than the sum of all parent budgets
+    if parent_budget.present?
+      sum_of_child_budgets = parent_budget.children.joins(:budget_amount).sum(:value)
+      if (sum_of_child_budgets + budget_params&.dig(:budget_amount_attribtues, :value)&.to_f) > parent_budget.budget_amount_value
+        add_message :error, "Sum of child budgets should be less than or equal to parent budget"
+        return
+      end
     end
   end
 
@@ -26,5 +44,6 @@ class Budgets::Update < Budgets::Base
   end
 
   def post_process
+    add_message :error, "Successfully updated budget"
   end
 end

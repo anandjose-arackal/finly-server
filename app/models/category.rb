@@ -21,16 +21,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 class Category < ActiveRecord::Base
   has_ancestry
 
@@ -38,7 +28,8 @@ class Category < ActiveRecord::Base
 
   has_one :quickbooks_category, dependent: :destroy
 
-  has_many :budgets, as: :budgetable
+  has_many :budget_criteria_mappings, as: :budgetable
+  has_many :budgets, through: :budget_criteria_mappings
 
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id}

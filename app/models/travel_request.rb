@@ -55,25 +55,62 @@ class TravelRequest < ActiveRecord::Base
   delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?,
            :selection_requested?, :selection_processing?, :selection_rejected?, :selection_confirmed?, :booking_confirmed?, to: :status
 
-  validates :status_id, presence: true#, unless: :open?
-  validates :user_id, presence: true#, unless: :open?
+  validates :status_id, presence: true #, unless: :open?
+  validates :user_id, presence: true #, unless: :open?
   #validates :name, presence: true#, unless: :open?
   validates :from_date, presence: true
   validates :to_date, presence: true
   validate :acceptable_dates?
 
-  default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
+  default_scope {order(status_id: :asc, submitted_at: :desc, created_at: :desc)}
 
   scope :with_id, ->(id) {where id: id}
-  scope :not_open, -> { where.not(status_id: TravelRequestStatus.id_for(:open)) }
+  scope :not_open, -> {where.not(status_id: TravelRequestStatus.id_for(:open))}
   scope :non_owner, -> (user_id) {where.not user_id: user_id}
-  scope :open, -> { where(status_id: TravelRequestStatus.id_for(:open)) }
-  scope :approved, -> { where(status_id: TravelRequestStatus.id_for(:approved)) }
-  scope :processing, -> { where(status_id: TravelRequestStatus.id_for(:processing)) }
-  scope :with_user, -> (user_id) { where user_id: user_id }
-  scope :with_policy, -> (policy_id) { where policy_id: policy_id }
-  scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
-  scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
+  scope :open, -> {where(status_id: TravelRequestStatus.id_for(:open))}
+  scope :approved, -> {where(status_id: TravelRequestStatus.id_for(:approved))}
+  scope :processing, -> {where(status_id: TravelRequestStatus.id_for(:processing))}
+  scope :with_status_id, ->(id) {where status_id: id}
+  scope :with_user, -> (user_id) {where user_id: user_id}
+  scope :with_policy, -> (policy_id) {where policy_id: policy_id}
+  scope :with_controlling_user_role_id, -> (role_id) {where controlling_user_role_id: role_id}
+  scope :with_controlling_user_id, -> (user_id) {where controlling_user_id: user_id}
+  scope :filter_user_id, -> (id) {where user_id: id}
+  scope :filter_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      where.not 'from_date >= ? OR to_date <= ?', date_to, date_from
+    end
+  end
+  scope :filter_status, -> (status) do
+    case status&.to_sym
+    when :retracted
+      with_status_id TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected)
+    when :processing
+      with_status_id TravelRequestStatus.ids_for(:processing)
+    when :booking_pending
+      with_status_id TravelRequestStatus.ids_for(
+          :booking_pending,
+          :selection_requested,
+          :selection_processing,
+          :selection_confirmed,
+          :selection_rejected
+      )
+    when :booking_confirmed
+      with_status_id TravelRequestStatus.ids_for(:booking_confirmed)
+    when :cancelled
+      with_status_id TravelRequestStatus.ids_for(:cancelled)
+    when :rejected
+      with_status_id TravelRequestStatus.ids_for(:rejected)
+    when :selection_in_progress
+      with_status_id TravelRequestStatus.ids_for(:selection_requested, :selection_processing, :selection_confirmed, :selection_rejected)
+    end
+  end
 
 
   def can_submit?

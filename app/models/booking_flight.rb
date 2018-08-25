@@ -62,4 +62,11 @@ class BookingFlight < ActiveRecord::Base
         booking_class: booking_class
     }
   end
+
+  def valid_date_range(travel_request)
+    travel_from_date = travel_request.from_date
+    travel_to_date = travel_request.to_date
+    not (departure_date < travel_from_date or departure_date > travel_to_date)
+  end
+
 end

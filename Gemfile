@@ -156,6 +156,8 @@ gem 'logstash-logger', '0.26.1'
 
 gem 'ancestry', '3.0.2'
 
+gem 'aasm', '4.12.3'
+
 # adding aws-sdk gem for using their API enabled services
 gem 'aws-sdk'
 

@@ -23,7 +23,8 @@ class Admin::Companies::Base < Admin::Base
                                       :bank_account_reimbursement,
                                       :payroll_card_enabled,
                                       :invoicing_system,
-                                      :em_tax_tracking
+                                      :em_tax_tracking,
+                                      :procurement
                                     ])
   end
 

@@ -5,6 +5,6 @@ json.array!(@result.paginated_money_requests) do |money_request|
     json.extract! money_request.user,  :name
   end
   json.policy money_request.policy.name if money_request.policy
-  json.total(('%.2f' % money_request.total_amount))
+  json.total(Amount.new(value: ('%.2f' % money_request.total_amount), currency: money_request.base_currency))
   json.date money_request.created_at.strftime("%d %b")
 end

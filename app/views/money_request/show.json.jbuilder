@@ -36,7 +36,6 @@ if @result.money_request.destination_pocket.present?
 end
 
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
-
 json.card @result.card
 
 json.user_reports current_user.reports
@@ -65,8 +64,12 @@ json.cash_pockets do
     end
   end
 end
-json.pending_travel_requests @result.money_request.user&.travel_requests, :id, :name
-json.associated_travel_request @result.money_request&.travel_request
+travel_desk_enabled = @result.money_request.user.travel_desk_enabled?
+json.show_trips travel_desk_enabled
+if travel_desk_enabled
+  json.pending_travel_requests @result.money_request.user.travel_requests, :id, :name
+  json.associated_trip @result.money_request.travel_request
+end
 
 json.forwardable_users do
   forwardable_users = @result.forwardable_users
@@ -99,7 +102,7 @@ json.policy policy_name
 json.policy_id policy_id
 # end
 
-json.policies @result.money_request.user.policies do |policy|
+json.policies @result.policies do |policy|
   json.extract! policy, :id, :name
 end
 

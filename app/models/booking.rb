@@ -61,6 +61,7 @@ class Booking < ActiveRecord::Base
   validates :travel_request_id, presence: true
   # validates :booking_request_id, presence: true
   validate :at_least_one_type
+  validate :booking_date_range
 
   scope :with_id, ->(id) {where id: id}
   scope :sort_by_type, -> {order booking_type_id: :asc}
@@ -68,7 +69,6 @@ class Booking < ActiveRecord::Base
   scope :requests, -> {where booking_status_id: BookingStatus.ids_for(:request)}
   scope :options, -> {where booking_status_id: BookingStatus.id_for(:option)}
   scope :rejected, -> {where booking_status_id: BookingStatus.id_for(:rejected)}
-  scope :cancelled, -> {where booking_status_id: BookingStatus.id_for(:cancelled)}
   scope :processing, -> {where booking_status_id: BookingStatus.id_for(:processing)}
   scope :confirmed, -> {where booking_status_id: BookingStatus.id_for(:confirmed)}
   scope :cancelled, -> {where booking_status_id: BookingStatus.id_for(:cancelled)}
@@ -116,6 +116,13 @@ class Booking < ActiveRecord::Base
   end
 
   private
+  def booking_date_range
+    return unless request?
+    unless booking_type_object.valid_date_range(travel_request)
+      errors.add :booking, 'dates cannot be outside the travel dates'
+    end
+  end
+
 
   def at_least_one_type
     case self.booking_type_id
