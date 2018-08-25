@@ -44,10 +44,16 @@ json.tds_slabs do
 end
 
 json.cash_pockets do
-  json.array!(@result.cash_pockets) do |pocket|
-    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+  json.array!(@result.cash_and_credit_pockets) do |pocket|
+    if pocket.cash_pocket?
+      adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    elsif pocket.credit_card_pocket?
+      adapter = AccountManager::CardTransferPockets::CreditCardPocketsAdapter.new(pocket)
+    else
+      adapter = nil
+    end
     json.name pocket.name
-    json.balance adapter.balance(display_balance: true)
+    json.balance adapter&.balance(display_balance: true)
     json.id pocket.id
 
     currency = pocket.base_currency

@@ -19,4 +19,7 @@ class CompanyPocketTemplate < ActiveRecord::Base
     where id: ids
   }
 
+  validates :name, presence: true
+  validates :user_pocket_type, presence: true
+
 end

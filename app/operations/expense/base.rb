@@ -18,6 +18,10 @@ class Expense::Base < BaseOperation
 
   def check_coh_availability_create(pocket, params = nil)
 
+    unless pocket.cash_pocket?
+      return
+    end
+
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
     if params[:spent_from_id].present? || StringUtils.to_bool(params[:from_cash_on_hand])
 
@@ -52,6 +56,11 @@ class Expense::Base < BaseOperation
 
   # common conditions for checking amounts against cash on hand
   def check_coh_availability_update(pocket, params = nil)
+
+    unless pocket.cash_pocket?
+      return
+    end
+
     # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
     if (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) or ((params&.dig(:spent_from_id).nil? or !StringUtils.to_bool(params[:from_cash_on_hand])) and expense.spent_from.present?)
 
@@ -151,7 +160,7 @@ class Expense::Base < BaseOperation
       self.vehicle_rates = retrieve_vehicle_rates(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
-      self.cash_pockets = expense.user.user_pockets.cash_pockets_only
+      self.cash_pockets = expense.user.user_pockets.cash_and_credit_cards
     end
 
     def retrieve_vehicle_rates(expense)
