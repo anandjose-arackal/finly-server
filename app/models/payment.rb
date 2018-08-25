@@ -296,6 +296,10 @@ class Payment < ActiveRecord::Base
 
   scope :vendor_payments_only, -> { where receiving_user_type: 'YesBankVendor' }
 
+  scope :unpaid, -> {
+    where payment_status_id: [PaymentStatus.id_for(:pending_approval), PaymentStatus.id_for(:failed), PaymentStatus.id_for(:pending_credit)]
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   # validates :initiating_user_id, presence: true

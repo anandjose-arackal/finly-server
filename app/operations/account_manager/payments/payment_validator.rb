@@ -5,14 +5,15 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   attr_accessor :payment_order, :receiving_account_adapter, :initiating_account_adapter,
                 :homogenous_accounts, :source_account_adapter, :source_account_name,
-                :receiving_account_name
+                :receiving_account_name, :crediting_payments
 
-  def initialize(payment_order)
+  def initialize(payment_order, crediting_payments = [])
     self.payment_order = payment_order
+    self.crediting_payments = crediting_payments
   end
 
-  def self.call(payment_order)
-    self.new(payment_order).run
+  def self.call(payment_order, crediting_payments)
+    self.new(payment_order, crediting_payments).run
   end
 
   def pre_validate
@@ -26,7 +27,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     end
     # this validation is irrespective of the source and destination of the payment
     # i.e. checking for consistency of initiating and receiving account types etc.
-    unless validate_account_consistency(payment_order)
+    unless validate_account_consistency(payment_order, self.crediting_payments)
       add_message :error, "Receiving and initiating accounts must be homogenous"
       return
     end
@@ -105,11 +106,12 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   private
 
-  def validate_account_consistency(payment_order)
+  def validate_account_consistency(payment_order, crediting_payments = [])
     self.homogenous_accounts = true
     initiating_account_type = payment_order.payments.first.initiating_account_type
     receiving_account_type = payment_order.payments.first.receiving_account_type
-    payment_order.payments.each do |payment|
+    payments = (crediting_payments.present? && !crediting_payments&.empty?) ? crediting_payments : payment_order.payments
+    payments.each do |payment|
       unless payment.receiving_account_type == receiving_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: 'Receiving account type has to be same for all transfers').save

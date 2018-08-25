@@ -34,7 +34,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     self.view_role = UserRole.id_for(params[:view].to_sym)
     payment_ids = params[:payment_ids]
     unless payment_ids.is_a?(Array)
-      payment_ids = [payment_ids]
+      payment_ids = payment_ids&.split(",")
     end
     self.crediting_payments = self.bank_payment_request.payments.with_id(payment_ids)
     self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
@@ -50,6 +50,11 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     requested_amount = self.crediting_payments.joins_amount.sum(:value)
     if requested_amount > initiating_account_adapter.balance
       add_message :error, "You do not have enough money in your account for this transaction"
+      return
+    end
+
+    if self.crediting_payments.empty?
+      add_message :error, "You need to choose at least once payment to process this order"
       return
     end
   end
