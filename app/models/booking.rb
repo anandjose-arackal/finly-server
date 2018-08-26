@@ -113,6 +113,14 @@ class Booking < ActiveRecord::Base
     if self.confirmed?
       data[:attachments] = self.attachments
     end
+    # Jugaad
+    if parent_booking_id.blank? and not options&.dig(:skip_confirmed)
+      if confirmed?
+        data[:confirmed] = self.as_json(skip_confirmed: true)
+      elsif cancelled?
+        data[:cancelled] = [self.as_json(skip_confirmed: true)]
+      end
+    end
     data
   end
 

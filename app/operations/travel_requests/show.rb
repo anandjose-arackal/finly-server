@@ -197,6 +197,8 @@ class TravelRequests::Show < TravelRequests::Base
     def can_create_money_requests?
       return false if travel_request.reports.present?
       return false unless personal_view?
+      return false unless TravelRequestStatus.ids_for(:open, :retracted, :rejected, :booking_confirmed).include?(self.travel_request.status_id)
+      return false if travel_request.to_date and travel_request.to_date < Date.today
       true
     end
 
