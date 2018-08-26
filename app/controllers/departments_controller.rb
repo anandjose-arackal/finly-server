@@ -10,14 +10,22 @@ class DepartmentsController < ApplicationController
   # todo
 
   def create
-
+    @result = Company::Department::Create.(current_user, params)
+    repsond
   end
 
   def show
-
+    @result = Company::Department::Show.(current_user, params)
+    repsond
   end
 
   def update
+    @result = Company::Department::Update.(current_user, params)
+    repsond
+  end
 
+  def destroy
+    @result = Company::Department::Destroy.(current_user, params)
+    repsond
   end
 end
