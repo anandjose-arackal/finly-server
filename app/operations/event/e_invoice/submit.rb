@@ -20,7 +20,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
         self.controlling_users.push(user_selected_reviewer.reviewer)
         users.push(user_selected_reviewer.reviewer)
       else
-        amount = invoice.balance_amount.value
+        amount = invoice.net_amount.value
         reviewers_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
         reviewers = User.with_id(reviewers_ids)
         reviewers.each do |reviewer|

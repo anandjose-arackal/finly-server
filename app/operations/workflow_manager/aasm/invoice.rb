@@ -21,8 +21,10 @@ class WorkflowManager::Aasm::Invoice < WorkflowManager::Aasm::Base
     state :approved
     state :rejected
     state :auto_approved
-    state :sent_to_vendor
     state :closed
+    state :unpaid
+    state :partially_paid
+    state :paid
 
     event :submit do
       transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :approvers_not_present?
