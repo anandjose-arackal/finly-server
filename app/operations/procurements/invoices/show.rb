@@ -58,14 +58,25 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
             url: Rails.application.routes.url_helpers.procure_inward_invoice_path(id: invoice.id),
             method: "DELETE"
         }
+
+        actions[:update] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_inward_invoice_path(id: invoice.id),
+              method: "PUT"
+          }
         actions[:document_editable] = true
       end
 
-      if (invoice.approved? || invoice.auto_approved?) && (user_in_level? || document_owner?)
-        actions[:close] = {
-            url: Rails.application.routes.url_helpers.procure_inward_invoice_close_path(inward_invoice_id: invoice.id),
-            method: "PUT"
-        }
+      if invoice.approved? || invoice.auto_approved?
+        if user_in_level? || document_owner?
+          actions[:close] = {
+              url: Rails.application.routes.url_helpers.procure_inward_invoice_close_path(inward_invoice_id: invoice.id),
+              method: "PUT"
+          }
+        end
+
+        if (user_in_level? && user.vendor_payment_creditor?) || user.vendor_payment_creditor?
+          actions[:make_payment] = true
+        end
 
         actions[:document_editable] = false
         actions[:download] = true
@@ -83,7 +94,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
           }
 
           actions[:update] = {
-              url: Rails.application.routes.url_helpers.procure_inward_invoice_path(id: invoice.id),
+              url: Rails.application.routes.url_helpers.bank_transfer_inward_invoice_path(id: invoice.id),
               method: "PUT"
           }
           action[:document_editable] = true
@@ -98,6 +109,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
           actions[:document_editable] = false
         end
       end
+
 
       actions
     end
