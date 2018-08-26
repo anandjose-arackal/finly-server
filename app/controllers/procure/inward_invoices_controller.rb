@@ -23,4 +23,29 @@ class Procure::InwardInvoicesController < ApplicationController
     respond
   end
 
+  def submit
+    @result = Procurements::Invoices::Submit.(current_user, params)
+    respond
+  end
+
+  def approve
+    @result = Procurements::Invoices::Approve.(current_user, params)
+    respond
+  end
+
+  def reject
+    @result = Procurements::Invoices::Reject.(current_user, params)
+    respond
+  end
+
+  def retract
+    @result = Procurements::Invoices::Retract.(current_user, params)
+    respond
+  end
+
+  def close
+    @result = Procurements::Invoices::Close.(current_user, params)
+    respond
+  end
+
 end

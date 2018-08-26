@@ -10,7 +10,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   # end
 
   def init
-    invoice_id = params[:id] || params[:invoice_id]
+    invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.find_by id: invoice_id
     self.procurement = self.invoice&.procurement
   end
@@ -28,6 +28,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     op = WorkflowManager::Base.(current_user, params)
     unless op.success?
       add_message :error, op.messages[:error]
+      return
     end
 
     # if invoice.auto_approved?

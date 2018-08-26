@@ -33,6 +33,10 @@ invoice = @result.invoice
 json.purchase_order_policy_id invoice.procurement&.purchase_order&.policy&.id
 json.actions @result.actions
 
+json.status do
+  json.extract! invoice.invoice_status, :id, :name
+end
+
 # do
 #   if current_user.vendor_payment_creditor?
 #     json.make_payment true

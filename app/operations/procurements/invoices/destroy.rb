@@ -1,11 +1,11 @@
 class Procurements::Invoices::Destroy < Procurements::Invoices::Base
   # todo
-  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
+  attr_accessor :procurement, :invoice, :invoice_params, :invoice
 
   def init
-    id = params[:id] || params[:purchase_order_id]
+    id = params[:id] || params[:invoice_id]
     self.procurement = user.company.procurements.find_by(id: id)
-    self.purchase_order = self.procurement.purchase_order
+    self.invoice = self.procurement.invoice
     self.invoice_params = set_invoice_parameters
   end
 
@@ -15,13 +15,13 @@ class Procurements::Invoices::Destroy < Procurements::Invoices::Base
       return
     end
 
-    if self.purchase_order.blank?
-      add_message :error, "Purchase order not present"
+    if self.invoice.blank?
+      add_message :error, "Invoice not present"
       return
     end
 
     if self.invoice_params.blank?
-      add_message :error, "Procurement or purchase order not present"
+      add_message :error, "Procurement or invoice not present"
     end
   end
 

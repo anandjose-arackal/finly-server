@@ -28,6 +28,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     op = WorkflowManager::Base.(current_user, params)
     unless op.success?
       add_message :error, op.messages[:error]
+      return
     end
 
     if purchase_order.auto_approved?
