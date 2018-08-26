@@ -48,6 +48,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     def get_actions
       actions = {}
 
+      actions[:policy_editable] = false
+
       if document_owner? && (self.invoice.open? || self.invoice.retracted? || self.invoice.rejected?)
         actions[:submit] = {
             url: Rails.application.routes.url_helpers.procure_inward_invoice_submit_path(inward_invoice_id: invoice.id),
@@ -79,7 +81,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         end
 
         actions[:document_editable] = false
-        actions[:download] = true
+        # actions[:download] = true
       end
 
       if invoice.processing?
