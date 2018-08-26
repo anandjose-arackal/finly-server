@@ -99,7 +99,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
               url: Rails.application.routes.url_helpers.bank_transfer_inward_invoice_path(id: invoice.id),
               method: "PUT"
           }
-          action[:document_editable] = true
+          actions[:document_editable] = true
         end
 
         if document_owner?
