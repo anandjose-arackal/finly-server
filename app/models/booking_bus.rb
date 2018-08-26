@@ -38,6 +38,9 @@ class BookingBus < ActiveRecord::Base
   validates :departure_date, presence: true
   validates :departure_time, presence: true
 
+  scope :with_parent_booking_id, ->(id) { where parent_type: 'Booking', parent_id: id }
+  scope :sum_cost, -> { joins(:cost).sum(:value) }
+
   def as_json(options = {})
     {
         id: id,

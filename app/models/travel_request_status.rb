@@ -18,6 +18,25 @@ class TravelRequestStatus < ActiveRecord::Base
      :booking_confirmed, :completed, :approved]
   end
 
+  def self.values_new
+    [
+        :open,
+        :processing,
+        :retracted,
+        :rejected,
+        :booked,
+        :cancelled,
+        :booking_pending,
+        :selection_requested,
+        :selection_processing,
+        :selection_confirmed,
+        :selection_rejected,
+        :booking_confirmed,
+        :completed,
+        :approved
+    ]
+  end
+
   def open?
     self.id == TravelRequestStatus.id_for(:open)
   end
@@ -67,13 +86,13 @@ class TravelRequestStatus < ActiveRecord::Base
   end
 
   def booking_confirmed?
-    self.id == TravelRequestStatus.id_for(:booking_confirmed?)
+    self.id == TravelRequestStatus.id_for(:booking_confirmed)
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
-        name: name#&.humanize
+        name: name #&.humanize
     }
   end
 
