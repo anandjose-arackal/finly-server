@@ -7,11 +7,6 @@ class Company::Departments::Destroy < Company::Departments::Base
     self.department = user.company.departments.find_by id: department_id
   end
 
-  def validate
-    if self.company.blank?
-      add_message :error, "Company not found"
-    end
-  end
 
   def process
     if self.department.destroy

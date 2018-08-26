@@ -6,12 +6,6 @@ class Company::Departments::Create < Company::Departments::Base
     self.department_params = department_attributes
   end
 
-  def validate
-    if self.company.blank?
-      add_message :error, "Company not found"
-    end
-  end
-
   def process
     self.department = user.company.departments.new(department_params)
     if department.valid?

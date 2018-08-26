@@ -7,12 +7,6 @@ class Company::Departments::Show < Company::Departments::Base
     self.department = user.company.departments.find_by id: department_id
   end
 
-  def validate
-    if self.company.blank?
-      add_message :error, "Company not found"
-    end
-  end
-
   def success
     params[:department] = self.department
     Company::Departments::Show::ShowPresenter.new(user, params, messages)
