@@ -20,7 +20,11 @@ class Department < ActiveRecord::Base
   has_many :users, through: :user_department_mappings
 
   scope :with_ids, -> (id) { where id: id }
+  # scope :only_sub_departments, -> {
+  #   where(id: Department.pluck(:ancestry).compact.map { |e| e.split('/') }.flatten.uniq)
+  # }
+
   scope :only_sub_departments, -> {
-    where(id: Department.pluck(:ancestry).compact.map { |e| e.split('/') }.flatten.uniq)
+    where("departments.ancestry IS NOT NULL")
   }
 end

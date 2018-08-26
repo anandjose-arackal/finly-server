@@ -189,6 +189,7 @@ end
 json.sub_departments do
   json.array! @result.sub_departments do |dept|
     json.extract! dept, :id, :name
+    json.parent_id dept.ancestry&.to_i
   end
 end
 json.tds_slabs do

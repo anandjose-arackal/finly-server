@@ -89,6 +89,13 @@ json.departments do
   end
 end
 
+json.sub_departments do
+  json.array! @result.sub_departments do |dept|
+    json.extract! dept, :id, :name
+    json.parent_id dept.ancestry&.to_i
+  end
+end
+
 json.cost_centers do
   json.array! @result.cost_centers do |cost_center|
     json.extract! cost_center, :id, :name

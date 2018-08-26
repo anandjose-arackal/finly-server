@@ -85,6 +85,3 @@ class ProcurementMailer < ApplicationMailer
     end
   end
 end
-
-
-
