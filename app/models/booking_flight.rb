@@ -37,6 +37,9 @@ class BookingFlight < ActiveRecord::Base
   accepts_nested_attributes_for :to
   accepts_nested_attributes_for :cost
 
+  scope :with_parent_booking_id, ->(id) { where parent_type: 'Booking', parent_id: id }
+  scope :sum_cost, -> { joins(:cost).sum(:value) }
+
   validates :from, presence: true
   validates :to, presence: true
   validates :departure_date, presence: true

@@ -28,15 +28,15 @@ class BookingStatus < ActiveRecord::Base
   end
 
   def confirmed?
-    BookingStatus.id_for(:confirmed)
+    id == BookingStatus.id_for(:confirmed)
   end
 
   def processing?
-    BookingStatus.id_for(:processing)
+    id == BookingStatus.id_for(:processing)
   end
 
   def cancelled?
-    BookingStatus.id_for(:cancelled)
+    id == BookingStatus.id_for(:cancelled)
   end
 
 end
