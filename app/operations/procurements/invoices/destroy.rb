@@ -1,4 +1,4 @@
-class Procurements::ProcureInwardInvoices::Destroy < Procurements::ProcureInwardInvoices::Base
+class Procurements::Invoices::Destroy < Procurements::Invoices::Base
   # todo
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
 

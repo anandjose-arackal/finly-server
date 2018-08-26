@@ -67,6 +67,23 @@ class ProcurementMailer < ApplicationMailer
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
     end
   end
+
+  def send_invoice_mail(presenter)
+    return unless presenter.validate
+    @data = presenter
+    @company = @data.user.company
+    #### variables required for the attachment pdf #########
+    @result = Procurements::Invoices::Show.(@data.user, {invoice_id: @data.invoice.id })
+    if @result.success?
+      @invoice = @data.invoice
+      @curr_user = @data.user
+      ########################################################
+      attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+         render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
+      )
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template'
+    end
+  end
 end
 
 

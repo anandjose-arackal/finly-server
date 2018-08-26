@@ -26,6 +26,7 @@
 #  signature_content_type :string(255)
 #  signature_file_size    :integer
 #  signature_updated_at   :datetime
+#  signature_title        :string(255)
 #
 
 class UserProfile < ActiveRecord::Base

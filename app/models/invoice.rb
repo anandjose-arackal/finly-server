@@ -110,6 +110,9 @@ class Invoice < ActiveRecord::Base
   # From Procurement workflow
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
+
+  has_many :trails, as: :parent
+
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
   accepts_nested_attributes_for :amount
@@ -132,7 +135,8 @@ class Invoice < ActiveRecord::Base
   delegate :gross_amount_value, to: :gross_amount
   delegate :paid_amount, to: :paid_amount
 
-  delegate :unpaid?, :partially_paid?, :paid?, to: :invoice_status
+  delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
+           :approved?, :retracted?, :auto_approved?, :closed?, to: :invoice_status
   delegate :payment?, :advance?, to: :invoice_type
 
 
@@ -254,5 +258,4 @@ class Invoice < ActiveRecord::Base
       self.update_invoice_status
     end
   end
-
 end

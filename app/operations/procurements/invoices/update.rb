@@ -1,4 +1,4 @@
-class Procurements::ProcureInwardInvoices::Update < Procurements::ProcureInwardInvoices::Base
+class Procurements::Invoices::Update < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
 
@@ -51,10 +51,10 @@ class Procurements::ProcureInwardInvoices::Update < Procurements::ProcureInwardI
 
   def success
     params[:invoice] = self.invoice
-    Procurements::ProcureInwardInvoices::CreateFromPO::ShowPresenter.new(user, params, messages)
+    Procurements::Invoices::CreateFromPO::ShowPresenter.new(user, params, messages)
   end
 
-  class Procurements::ProcureInwardInvoices::CreateFromPO::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::Invoices::CreateFromPO::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice
 
     def init

@@ -92,6 +92,7 @@ class PurchaseOrder < ActiveRecord::Base
 
 
   validates :purchase_order_status_id, presence: true
+  # validates :policy_id, presence: true
   # validates :items, presence: true
   scope :document_number_generated_in_finly, -> { where override_po_number: [false, nil] }
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180824152010) do
+ActiveRecord::Schema.define(version: 20180826103150) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -5003,6 +5003,7 @@ ActiveRecord::Schema.define(version: 20180824152010) do
     t.string   "signature_content_type", limit: 255
     t.integer  "signature_file_size",    limit: 4
     t.datetime "signature_updated_at"
+    t.string   "signature_title",        limit: 255
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree

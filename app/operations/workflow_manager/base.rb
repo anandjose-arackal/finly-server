@@ -10,6 +10,8 @@ class WorkflowManager::Base < BaseOperation
     case document_class_name
       when 'PurchaseOrder'
         self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrder.new self.document, violations_present, user
+      when 'Invoice'
+        self.aasm_document = ::WorkflowManager::Aasm::Invoice.new self.document, violations_present, user
       else
         add_message :error, 'Unknown document type'
     end

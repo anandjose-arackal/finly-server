@@ -1,4 +1,4 @@
-class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureInwardInvoices::Base
+class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
 
@@ -57,10 +57,10 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
 
   def success
     params[:invoice] = self.invoice
-    Procurements::ProcureInwardInvoices::CreateFromPO::ShowPresenter.new(user, params, messages)
+    Procurements::Invoices::CreateFromPO::ShowPresenter.new(user, params, messages)
   end
 
-  class Procurements::ProcureInwardInvoices::CreateFromPO::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::Invoices::CreateFromPO::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice
 
     def init
@@ -91,6 +91,7 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
     end
     invoice_params = {
       vendor_id: self.purchase_order.vendor_id,
+      invoice_status_id: ::InwardInvoiceStatus.id_for(:open),
       created_by_user_id: user.id,
       invoice_type_id: ::InwardInvoiceType.id_for(:tax_invoice),
       payment_term_id: self.purchase_order.payment_term_id,
@@ -102,10 +103,8 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
       department_id: self.purchase_order.department_id,
       sub_department_id: self.purchase_order.sub_department_id,
       cost_center_id: self.purchase_order.cost_center_id,
-      invoice_items_attributes: invoice_items_attributes
-
-
-
+      invoice_items_attributes: invoice_items_attributes,
+      policy_id: self.purchase_order.policy_id
     }
   end
 end

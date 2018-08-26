@@ -3155,7 +3155,13 @@ Rails.application.routes.draw do
 
     resources :attachments, only: [:create]
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
-    resources :inward_invoices
+    resources :inward_invoices do
+      put 'submit', to: 'inward_invoices#submit'
+      put 'retract', to: 'inward_invoices#retract'
+      put 'approve', to: 'inward_invoices#approve'
+      put 'reject', to: 'inward_invoices#reject'
+      put 'close', to: 'inward_invoices#close'
+    end
 
     resources :delivery_challans
     resources :e_way_bills

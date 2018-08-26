@@ -31,13 +31,15 @@
 invoice = @result.invoice
 
 json.purchase_order_policy_id invoice.procurement&.purchase_order&.policy&.id
-json.actions do
-  if current_user.vendor_payment_creditor?
-    json.make_payment true
-  end
-  json.editable invoice.unpaid?
-  json.destroyable invoice.unpaid?
-end
+json.actions @result.actions
+
+# do
+#   if current_user.vendor_payment_creditor?
+#     json.make_payment true
+#   end
+#   json.editable invoice.unpaid?
+#   json.destroyable invoice.unpaid?
+# end
 
 if invoice.vendor.present?
   json.vendor invoice.vendor.as_json

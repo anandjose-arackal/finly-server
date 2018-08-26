@@ -11,7 +11,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
 
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
-    self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
+    self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
     self.procurement = self.purchase_order&.procurement
   end
 
