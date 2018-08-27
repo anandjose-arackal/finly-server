@@ -46,8 +46,7 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
           "",
           "",
           "",
-          payment[:note],
-          payment[:initiating_user_email]
+          payment[:note]
       ]
       # Todo Remove the last entry of "payment[:initiating_user_email]", this was specifically built as per Toppr's requirements
     end
@@ -56,7 +55,7 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
 
   def retrieve_icici_headers
     # Todo Remove the last entry of "Initiating User Email", this was specifically built as per Toppr's requirements
-    ["Debit Ac No", "Beneficiary Ac No", "Beneficiary Name", "Amt", "Pay Mod", "Date", "IFSC", "Payable Location", "Print Location", "Bene Mobile No.", "Bene Email ID", "Bene add1", "Bene add2", "Bene add3", "Bene add4", "Add Details 1", "Add Details 2", "Add Details 3", "Add Details 4", "Add Details 5", "Remarks", "Initiating User Email"]
+    ["Debit Ac No", "Beneficiary Ac No", "Beneficiary Name", "Amt", "Pay Mod", "Date", "IFSC", "Payable Location", "Print Location", "Bene Mobile No.", "Bene Email ID", "Bene add1", "Bene add2", "Bene add3", "Bene add4", "Add Details 1", "Add Details 2", "Add Details 3", "Add Details 4", "Add Details 5", "Remarks"]
   end
 
   def retrieve_payment_mode(payment)

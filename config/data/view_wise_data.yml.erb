@@ -209,10 +209,6 @@ views:
       - name: <span class="superscript">Team</span> Expenses
         url: expenses
         id: expenses
-      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Team</span> Trips
-        url: travel_requests
-        id: travel_requests
       <% end %>
       - name: <span class="superscript">Team</span> Reports
         url: reports
