@@ -173,12 +173,16 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     # and if it is or is not, update the flag for this expense accordingly
     if expense.amount.present? && expense.from_cash_on_hand
       pocket = expense.spent_from
-      pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-      if pocket_adapter.balance(display_balance: true) > expense.amount_value
+      if pocket.cash_pocket?
+        pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        if pocket_adapter.balance(display_balance: true) > expense.amount_value
+          expense.update(cash_on_hand_blocked: true)
+        end
+        if pocket_adapter.balance(display_balance: true) < 0
+          expense.update(cash_on_hand_blocked: false)
+        end
+      elsif pocket.credit_card_pocket?
         expense.update(cash_on_hand_blocked: true)
-      end
-      if pocket_adapter.balance(display_balance: true) < 0
-        expense.update(cash_on_hand_blocked: false)
       end
     end
 
