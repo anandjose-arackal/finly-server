@@ -87,13 +87,15 @@ class Report::Expenses::Add < Report::Base
       if expense.cash_on_hand_blocked
         next
       end
-      cash_pocket = expense.spent_from
-      if cash_pocket.present? && cash_pocket.cash_pocket?
-        cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_pocket)
+      pocket = expense.spent_from
+      if pocket.present? && pocket.cash_pocket?
+        cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
         amount = expense.calculate_amount_value(report.policy)
         if cash_pocket_adapter.balance(display_balance: true) >= amount
           expense.update(cash_on_hand_blocked: true)
         end
+      elsif pocket.present? && pocket.credit_card_pocket?
+        expense.update(cash_on_hand_blocked: true)
       end
     end
   end
