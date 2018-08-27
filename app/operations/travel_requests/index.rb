@@ -84,8 +84,8 @@ class TravelRequests::Index < TravelRequests::Base
         else
           self.travel_requests = self.travel_requests.sort_for_manager
         end
-        self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
       end
+      self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
     end
 
   end
