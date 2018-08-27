@@ -8,6 +8,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  is_deleted :boolean          default(FALSE), not null
+#  ancestry   :string(255)
 #
 
 require 'test_helper'

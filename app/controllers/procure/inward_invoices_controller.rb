@@ -4,7 +4,7 @@ class Procure::InwardInvoicesController < ApplicationController
 
   # this action is to create one from a purchase order
   def create_from_po
-    @result = Procurements::ProcureInwardInvoices::CreateFromPO.(current_user, params)
+    @result = Procurements::Invoices::CreateFromPO.(current_user, params)
     # if @result.success?
     #   respond response: :success, message: @result.messages[:success]
     # else
@@ -19,7 +19,32 @@ class Procure::InwardInvoicesController < ApplicationController
   end
 
   def show
-    @result = Procurements::ProcureInwardInvoices::Show.(current_user, params)
+    @result = Procurements::Invoices::Show.(current_user, params)
+    respond
+  end
+
+  def submit
+    @result = Procurements::Invoices::Submit.(current_user, params)
+    respond
+  end
+
+  def approve
+    @result = Procurements::Invoices::Approve.(current_user, params)
+    respond
+  end
+
+  def reject
+    @result = Procurements::Invoices::Reject.(current_user, params)
+    respond
+  end
+
+  def retract
+    @result = Procurements::Invoices::Retract.(current_user, params)
+    respond
+  end
+
+  def close
+    @result = Procurements::Invoices::Close.(current_user, params)
     respond
   end
 

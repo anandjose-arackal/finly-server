@@ -1,15 +1,18 @@
 class WorkflowManager::Base < BaseOperation
-  attr_accessor :document, :aasm_document, :violations_present, :aasm_event, :document_types
+  attr_accessor :document, :aasm_document, :violations_present, :aasm_event, :document_types, :note
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
     self.aasm_event = params[:aasm_event]
+    self.note = params[:note]
 
     document_class_name = self.document.class.name
 
     case document_class_name
       when 'PurchaseOrder'
         self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrder.new self.document, violations_present, user
+      when 'Invoice'
+        self.aasm_document = ::WorkflowManager::Aasm::Invoice.new self.document, violations_present, user
       else
         add_message :error, 'Unknown document type'
     end
@@ -34,10 +37,16 @@ class WorkflowManager::Base < BaseOperation
     end
 
     # Create Trail
-    document.trails.create action_user: user,
+    trail = document.trails.new action_user: user,
                            action_id: TrailAction.id_for(aasm_event),
                            action_level_id: aasm_document.current_level&.id,
                            modified_level_id: aasm_document.next_level&.id
+
+    if self.note.present?
+      trail.note = self.note
+    end
+
+    trail.save
 
     # Return Data to referrer
   end

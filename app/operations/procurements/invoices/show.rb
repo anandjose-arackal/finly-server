@@ -1,0 +1,144 @@
+class Procurements::Invoices::Show < Procurements::Invoices::Base
+  attr_accessor :invoice
+
+  def init
+    invoice_id = params[:id] || params[:invoice_id]
+    self.invoice = Invoice.find_by id: invoice_id
+  end
+
+  def validate
+    unless self.invoice.present?
+      add_message :error, 'Invoice not found'
+    end
+  end
+
+  def success
+    params[:invoice] = self.invoice
+    Procurements::Invoices::Show::ShowPresenter.new(user, params, messages)
+  end
+
+  class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies
+
+    def init
+      self.departments = user.company.departments.roots
+      self.sub_departments = user.company.departments.only_sub_departments
+      self.cost_centers = user.company.cost_centers
+      self.invoice = params[:invoice]
+
+      self.policies = invoice.created_by.policies.with_application(:vp)
+      self.reviewal_chains = []
+
+      self.actions = get_actions
+
+
+      params[:reviewal_document] = invoice
+
+      policies.each do |policy|
+        params[:policy_id] = policy.id
+        chain = {
+            policy_id: policy.id,
+            reviewal_chain: get_reviewal_chain
+        }
+
+        self.reviewal_chains.push(chain)
+      end
+    end
+
+    def get_actions
+      actions = {}
+      actions[:audit_trail] = true
+
+      actions[:policy_editable] = false
+
+      if document_owner? && (self.invoice.open? || self.invoice.retracted? || self.invoice.rejected?)
+        actions[:submit] = {
+            url: Rails.application.routes.url_helpers.procure_inward_invoice_submit_path(inward_invoice_id: invoice.id),
+            method: "PUT"
+        }
+
+        actions[:delete] = {
+            url: Rails.application.routes.url_helpers.procure_inward_invoice_path(id: invoice.id),
+            method: "DELETE"
+        }
+
+        actions[:update] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_inward_invoice_path(id: invoice.id),
+              method: "PUT"
+          }
+        actions[:document_editable] = true
+      end
+
+      if invoice.approved? || invoice.auto_approved?
+        if user_in_level? || document_owner?
+          actions[:close] = {
+              url: Rails.application.routes.url_helpers.procure_inward_invoice_close_path(inward_invoice_id: invoice.id),
+              method: "PUT"
+          }
+        end
+
+        if (user_in_level? && user.vendor_payment_creditor?) || user.vendor_payment_creditor?
+          actions[:make_payment] = true
+        end
+
+        actions[:document_editable] = false
+        # actions[:download] = true
+      end
+
+      if invoice.processing?
+        if user_in_level?
+          actions[:approve] = {
+              url: Rails.application.routes.url_helpers.procure_inward_invoice_approve_path(inward_invoice_id: invoice.id),
+              method: "PUT"
+          }
+          actions[:reject] = {
+              url: Rails.application.routes.url_helpers.procure_inward_invoice_reject_path(inward_invoice_id: invoice.id),
+              method: "PUT"
+          }
+
+          actions[:update] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_inward_invoice_path(id: invoice.id),
+              method: "PUT"
+          }
+          actions[:document_editable] = true
+        end
+
+        if document_owner?
+          actions[:retract] = {
+              url: Rails.application.routes.url_helpers.procure_inward_invoice_retract_path(inward_invoice_id: invoice.id),
+              method: "PUT"
+          }
+
+          actions[:document_editable] = false
+        end
+      end
+
+
+      actions
+    end
+
+    def get_reviewal_chain
+      op = ::ReviewalManager::ReviewalChain.(user, params)
+      op.chain
+    end
+
+    def document_owner?
+      invoice.created_by_user_id == user.id
+    end
+
+    def user_in_level?
+      current_level = invoice.level
+      amount = invoice&.net_amount&.value || 0
+
+      if current_level.present?
+        if current_level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include? user.id
+          return true
+        end
+      end
+
+      false
+    end
+
+
+  end
+end

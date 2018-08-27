@@ -1,11 +1,11 @@
-class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureInwardInvoices::Base
+class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
 
   def personalizer
     {
         validate: {
-            after: Personalizer::Process.new([:procurements, :procure_inward_invoices], :validate, self)
+            after: Personalizer::Process.new([:procurements, :invoices], :validate, self)
         }
     }
   end
@@ -46,6 +46,10 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
       unless procurement.status_tags.include? status_tag
         procurement.status_tags << status_tag
       end
+
+      # Create Trail for it
+      invoice.trails.create action_user: user,
+                                   action_id: TrailAction.id_for(:create)
     else
       add_message :error, self.invoice.errors.full_messages
     end
@@ -57,10 +61,10 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
 
   def success
     params[:invoice] = self.invoice
-    Procurements::ProcureInwardInvoices::CreateFromPO::ShowPresenter.new(user, params, messages)
+    Procurements::Invoices::CreateFromPO::ShowPresenter.new(user, params, messages)
   end
 
-  class Procurements::ProcureInwardInvoices::CreateFromPO::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::Invoices::CreateFromPO::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice
 
     def init
@@ -91,6 +95,7 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
     end
     invoice_params = {
       vendor_id: self.purchase_order.vendor_id,
+      invoice_status_id: ::InwardInvoiceStatus.id_for(:open),
       created_by_user_id: user.id,
       invoice_type_id: ::InwardInvoiceType.id_for(:tax_invoice),
       payment_term_id: self.purchase_order.payment_term_id,
@@ -99,8 +104,11 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
       gst_type_id: self.purchase_order.gst_type_id,
       location_id: self.purchase_order.location_id,
       delivery_location_id: self.purchase_order.delivery_location_id,
-      invoice_items_attributes: invoice_items_attributes
-
+      department_id: self.purchase_order.department_id,
+      sub_department_id: self.purchase_order.sub_department_id,
+      cost_center_id: self.purchase_order.cost_center_id,
+      invoice_items_attributes: invoice_items_attributes,
+      policy_id: self.purchase_order.policy_id
     }
   end
 end

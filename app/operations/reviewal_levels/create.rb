@@ -1,6 +1,15 @@
 class ReviewalLevels::Create < ReviewalLevels::Base
   attr_accessor :reviewal_level_params, :reviewal_level, :policy
 
+  # Sample Params
+  # {
+  #   reviewal_level: {
+  #       policy_id: 1,
+  #       associated_entity_type: 'PurchaseOrder'
+  #
+  #   }
+  # }
+
   def init
     self.reviewal_level_params = reviewal_level_parameters
 
@@ -13,10 +22,18 @@ class ReviewalLevels::Create < ReviewalLevels::Base
     unless self.policy.present?
       add_message :error, 'Policy not found'
     end
+
+    entity_types = %w( PurchaseOrder Invoice )
+
+    unless entity_types.include?(reviewal_level_params[:associated_entity_type])
+      add_message :error, 'Invalid Entity Type'
+    end
   end
 
   def process
-    highest_level = self.policy.levels.order(level_number: :desc).first
+    highest_level = self.policy.levels.
+        with_entity_type(reviewal_level_params[:associated_entity_type]).
+        order(level_number: :desc).first
 
     level_number = 1
 

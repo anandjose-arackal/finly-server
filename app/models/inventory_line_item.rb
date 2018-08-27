@@ -16,6 +16,8 @@
 #  note        :text(65535)
 #  tax_rate_id :integer
 #  is_deleted  :boolean          default(FALSE), not null
+#  item_code   :string(255)
+#  account     :string(255)
 #
 
 class InventoryLineItem < ActiveRecord::Base
@@ -47,7 +49,9 @@ class InventoryLineItem < ActiveRecord::Base
         sku: sku,
         tax_amount: self.tax_amount,
         tax_rate_id: tax_rate_id,
-        tax: tax
+        tax: tax,
+        account: account,
+        item_code: item_code
     }
   end
 

@@ -10,3 +10,12 @@ json.user_delegate do
   json.user_delegate_email current_user.user_delegate&.email
   json.user_delegate_email current_user.user_delegate&.mobile_number
 end
+
+if current_user.profile.signature.present?
+  profile = current_user.profile
+
+  json.signature do
+    json.file_name profile.signature_file_name
+    json.url profile.signature.url
+  end
+end

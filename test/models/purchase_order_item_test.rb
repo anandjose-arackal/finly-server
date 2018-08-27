@@ -27,6 +27,7 @@
 #  category_id            :integer
 #  cost_center_id         :integer
 #  is_deleted             :boolean          default(FALSE), not null
+#  account                :string(255)
 #
 
 require 'test_helper'
