@@ -2,12 +2,13 @@ class User::AvailableExpenseTypes::Show < User::Base
 
   attr_accessor :distance_config, :time_config, :per_diem_config,
                 :policy, :report, :company, :custom_fields_config,
-                :cash_on_hand, :em_tax_tracking, :tds_slabs
+                :cash_on_hand, :em_tax_tracking, :tds_slabs,
+                :cash_pocket
 
   class User::AvailableExpenseTypes::Show::ExpenseTypesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config, :currencies, :cash_on_hand,
-                  :em_tax_tracking, :tds_slabs, :cash_pockets
+                  :em_tax_tracking, :tds_slabs, :cash_and_credit_pockets, :custom_currency_conversion
 
     def init
       self.distance_config = params[:distance_config]
@@ -19,7 +20,8 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.currencies = Currency.all
       self.em_tax_tracking = params[:em_tax_tracking]
       self.tds_slabs = params[:tds_slabs]
-      self.cash_pockets = user.user_pockets.cash_pockets_only
+      self.cash_and_credit_pockets = user.user_pockets.cash_and_credit_cards
+      self.custom_currency_conversion = user.company.feature_subscription.custom_currency_conversion
     end
 
   end
@@ -38,7 +40,8 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.company = user.company
     self.report = user.reports.find_by(id: params[:report_id])
     self.policy = report.policy if report.present?
-    self.cash_on_hand = AccountManager::CashOnHand::CashOnHandAdapter.new(self.user.cash_on_hand).balance(display_balance: true)
+    self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    self.cash_on_hand = AccountManager::CashPockets::CashPocketsAdapter.new(self.cash_pocket).balance(display_balance: true)
     self.em_tax_tracking = user.company.feature_subscription.em_tax_tracking
     if self.em_tax_tracking
       op_tds_slabs_index = TdsSlabs::Index.(user, params)

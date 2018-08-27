@@ -28,7 +28,7 @@ class AccountManager::Base < BackgroundOperation
           when UserPocketType.id_for(:cash)
             return AccountManager::CashPockets::CashPocketsAdapter.new(account)
           when UserPocketType.id_for(:credit_card)
-            return AccountManager::CardTransferPockets::CreditCardPocketsAdapter.new(account)
+            return AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(account)
           else
             # do nothing?
         end

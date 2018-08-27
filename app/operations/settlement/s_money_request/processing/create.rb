@@ -76,7 +76,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
   def process
     self.money_request_processor.save
     if self.money_request_processor.process_via_finly?
-      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type)
+      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type, background: true)
     elsif self.money_request_processor.rejected?
       Settlement::SMoneyRequest::Processing::PostOperation.(self.money_request_processor, {rejected: true}, true)
     end
