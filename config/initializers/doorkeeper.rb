@@ -15,7 +15,7 @@ Doorkeeper.configure do
     u = nil
     scopes = params.dig(:scope)&.split(' ')
     if (params[:username].blank?) || (params[:password].blank? && !(params[:darwinbox_skip_password]))
-      return false
+      u = nil
     else
       if scopes.size == 1 and ['web', 'mobile', 'chrome', 'api'].include?(scopes.first)
         u = User.find_for_database_authentication(:username => params[:username])
