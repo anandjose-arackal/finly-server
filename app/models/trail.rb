@@ -36,7 +36,8 @@ class Trail < ActiveRecord::Base
         action_user: self.action_user&.as_json,
         body: generate_trail_body,
         created_at_date: self.created_at.strftime("%d-%b-%Y"),
-        created_at_time: self.created_at.strftime("%I:%M%p")
+        created_at_time: self.created_at.strftime("%I:%M%p"),
+        note: self.note
     }
   end
 

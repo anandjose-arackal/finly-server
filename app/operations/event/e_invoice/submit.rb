@@ -52,7 +52,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:invoice),
                                              action_type_id: NotificationActionType.id_for(:notify_submit),
-                                             action_user_id: invoice.created_by_id,
+                                             action_user_id: invoice.created_by.id,
                                              object_id: invoice.id,
                                              object_type: "Invoice",
                                              path_object_id: invoice.id,

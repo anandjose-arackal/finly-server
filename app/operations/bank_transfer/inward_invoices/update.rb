@@ -101,6 +101,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
       self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
       self.invoice_current_attachments.update_all(procurement_document_id: inward_invoice.id, procurement_document_type: inward_invoice.class.name)
+
+      # Create trail for procurement
+      if invoice.procurement_id.present?
+        unless invoice.created_by == user
+          invoice.trails.create action_user: user,
+                                action_id: TrailAction.id_for(:update),
+                                action_level: invoice.trails.last.action_level
+        end
+      end
     else
       add_message :error, self.inward_invoice.errors.full_messages
     end

@@ -9,7 +9,7 @@ class Event::EInvoice::Retract < Event::EInvoice::Base
   end
 
   def affected_users
-    users = User::AssociatedUsers::Index.(self.user, document: self.invoice, amount: invoice.balance_amount.value)
+    users = User::AssociatedUsers::Index.(self.user, document: self.invoice, amount: invoice.net_amount.value)
     users.reject { |r| r == self.user}
   end
 
