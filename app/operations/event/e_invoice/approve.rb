@@ -105,7 +105,7 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
     if approver_id.present? and user.id == approver_id
       message = "You have successfully approved the invoice : #{self.invoice.invoice_number}"
     else
-      if approved and user.id == invoice.user.id
+      if approved and user.id == invoice.created_by.id
         if auto_approve
           message = "Congratulations! Your invoice #{invoice.invoice_number} has been auto-approved"
         else

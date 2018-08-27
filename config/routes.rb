@@ -3187,6 +3187,10 @@ Rails.application.routes.draw do
 
   ######## Reviewal Workflow End ##########
 
+  ### Audit Trails ##
+  resources :audit_trails, only: [:index]
+  ### Audit Trails End ##
+
 
 
 
