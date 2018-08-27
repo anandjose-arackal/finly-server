@@ -119,20 +119,15 @@ json.invoice do
   # invoice items
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
-      json.comment item.comment
-      json.rate item.rate
-      json.quantity item.quantity
-      json.tax item.tax
-      json.discount item.discount
-      json.category_id item.category_id
+      json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
+                    :description, :hsn_sac, :inventory_line_item_id
+
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
       json.amount precision_value item.amount&.value
       json.category_name item.category&.name
-      json.id item.id
       json.description item.description
       json.total_amount precision_value item.net_amount&.value
-      json.hsn_sac item.hsn_sac
       json.taxable_amount precision_value item.taxable_amount&.value
     end
   end

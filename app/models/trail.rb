@@ -30,6 +30,16 @@ class Trail < ActiveRecord::Base
     where(parent_id: parent_id, parent_type: parent_type)
   }
 
+  scope :with_parent_type, -> (parent_type) {
+    where(parent_type: parent_type)
+  }
+
+  scope :with_action_user_id, -> (id) {
+    where(action_user_id: id)
+  }
+
+  default_scope { order created_at: :desc }
+
   def as_json(user)
     {
         action_type: self.action.name,

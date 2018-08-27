@@ -103,11 +103,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       self.invoice_current_attachments.update_all(procurement_document_id: inward_invoice.id, procurement_document_type: inward_invoice.class.name)
 
       # Create trail for procurement
-      if invoice.procurement_id.present?
-        unless invoice.created_by == user
-          invoice.trails.create action_user: user,
+      if self.inward_invoice.procurement_id.present?
+        unless inward_invoice.created_by == user
+          inward_invoice.trails.create action_user: user,
                                 action_id: TrailAction.id_for(:update),
-                                action_level: invoice.trails.last.action_level
+                                action_level: inward_invoice.trails.last.action_level
         end
       end
     else

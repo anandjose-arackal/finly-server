@@ -5,7 +5,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
   def personalizer
     {
         validate: {
-            after: Personalizer::Process.new([:procurements, :procure_inward_invoices], :validate, self)
+            after: Personalizer::Process.new([:procurements, :invoices], :validate, self)
         }
     }
   end
@@ -46,6 +46,10 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       unless procurement.status_tags.include? status_tag
         procurement.status_tags << status_tag
       end
+
+      # Create Trail for it
+      invoice.trails.create action_user: user,
+                                   action_id: TrailAction.id_for(:create)
     else
       add_message :error, self.invoice.errors.full_messages
     end

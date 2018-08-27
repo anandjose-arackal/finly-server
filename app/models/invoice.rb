@@ -147,6 +147,8 @@ class Invoice < ActiveRecord::Base
   scope :with_id, -> (id) {where id: id}
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
 
+  scope :with_procurement, -> { where("invoices.procurement_id IS NOT NULL")}
+
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id
   }
