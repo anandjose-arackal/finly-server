@@ -47,6 +47,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
     def get_actions
       actions = {}
+      actions[:audit_trail] = true
 
       actions[:policy_editable] = false
 

@@ -5,13 +5,13 @@ class AuditTrails::Index < AuditTrails::Base
     self.document_type = params[:document_type]
     self.document_id = params[:document_id]
 
+    # WARNING: Make sure all the classes go below belongs_to Company model
+    # Check validation
     document_types = %w( PurchaseOrder Invoice )
 
     if document_types.include?(document_type)
       self.document = document_type.classify.constantize.find_by id: document_id
     end
-
-
   end
 
   def validate

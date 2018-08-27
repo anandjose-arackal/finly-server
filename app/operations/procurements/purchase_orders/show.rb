@@ -59,6 +59,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     def get_actions
       actions = {}
 
+      actions[:audit_trail] = true
       if purchase_order.items.count > 0
         actions[:show_comments] = true
       end
