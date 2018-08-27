@@ -48,7 +48,7 @@ json.cash_pockets do
     if pocket.cash_pocket?
       adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
     elsif pocket.credit_card_pocket?
-      adapter = AccountManager::CardTransferPockets::CreditCardPocketsAdapter.new(pocket)
+      adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
     else
       adapter = nil
     end

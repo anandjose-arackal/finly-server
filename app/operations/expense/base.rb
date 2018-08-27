@@ -28,12 +28,14 @@ class Expense::Base < BaseOperation
       # todo - temporary to support mobile APIs
       params[:spent_from_id] = pocket.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
 
+      # for Manual Expenses ONLY
       # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([pocket.base_currency_id, pocket.base_currency_id.to_s].include?(params&.dig(:amount_attributes, :currency_id)))
-        add_message :error, "#{pocket.name} expenses that are in a currency different from #{pocket.base_currency.country_code} can only be reported on the next day"
-        return
+      if params[:expense_type_id] == ExpenseType.id_for(:manual)
+        if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([pocket.base_currency_id, pocket.base_currency_id.to_s].include?(params&.dig(:amount_attributes, :currency_id)))
+          add_message :error, "#{pocket.name} expenses that are in a currency different from #{pocket.base_currency.country_code} can only be reported on the next day"
+          return
+        end
       end
-
 
       case params[:expense_type_id]
         when ExpenseType.id_for(:manual)
@@ -44,6 +46,13 @@ class Expense::Base < BaseOperation
         when ExpenseType.id_for(:distance)
           expense = user.expenses.build(params)
           amount = expense.calculate_amount_value(nil)
+        when ExpenseType.id_for(:time)
+          expense = user.expenses.build(params)
+          if expense.report.present?
+            amount = expense.calculate_amount_value(expense.report.policy)
+          else
+            amount = 0
+          end
       end
       cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
       balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
@@ -57,7 +66,7 @@ class Expense::Base < BaseOperation
   # common conditions for checking amounts against cash on hand
   def check_coh_availability_update(pocket, params = nil)
 
-    unless pocket.cash_pocket?
+    unless pocket&.cash_pocket?
       return
     end
 

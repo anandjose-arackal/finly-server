@@ -198,11 +198,12 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
         # check if this expense's amount allows for it to be marked against COH
         # and if it is or is not, update the flag for this expense accordingly
         if expense.amount.present? && expense.from_cash_on_hand
-          coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-          if coh_adapter.balance(display_balance: true) > expense.amount_value
+          pocket = expense.spent_from
+          pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+          if pocket_adapter.balance(display_balance: true) > expense.amount_value
             expense.update(cash_on_hand_blocked: true)
           end
-          if coh_adapter.balance(display_balance: true) < 0
+          if pocket_adapter.balance(display_balance: true) < 0
             expense.update(cash_on_hand_blocked: false)
           end
         end

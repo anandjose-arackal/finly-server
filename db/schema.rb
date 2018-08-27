@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180821064158) do
+ActiveRecord::Schema.define(version: 20180822160907) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2264,6 +2264,7 @@ ActiveRecord::Schema.define(version: 20180821064158) do
     t.datetime "usage_date_end"
     t.string   "usage_date_type",        limit: 255
     t.integer  "spent_from_id",          limit: 4
+    t.boolean  "custom_conversion_rate",                              default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -2316,6 +2317,7 @@ ActiveRecord::Schema.define(version: 20180821064158) do
     t.boolean  "budgeting_system",                       default: false
     t.boolean  "em_tax_tracking",                        default: false
     t.boolean  "procurement",                            default: false
+    t.boolean  "custom_currency_conversion",             default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
