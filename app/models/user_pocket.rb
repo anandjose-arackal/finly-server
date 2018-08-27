@@ -36,10 +36,17 @@ class UserPocket < ActiveRecord::Base
   accepts_nested_attributes_for :balance
 
   delegate :balance_value, to: :balance
+  delegate :cash_pocket?, :credit_card_pocket?, :bank_transfer_pocket?, :card_transfer_pocket?, to: :user_pocket_type
 
   scope :with_id, -> (ids) { where id: ids}
   scope :cash_pockets_only, -> {
     where user_pocket_type_id: UserPocketType.id_for(:cash)
+  }
+  scope :credit_card_pockets_only, -> {
+    where user_pocket_type_id: UserPocketType.id_for(:credit_card)
+  }
+  scope :cash_and_credit_cards, -> {
+    where user_pocket_type_id: [UserPocketType.id_for(:cash), UserPocketType.id_for(:credit_card)]
   }
   scope :card_transfer_pockets_only, -> {
     where user_pocket_type_id: UserPocketType.id_for(:card_transfer)

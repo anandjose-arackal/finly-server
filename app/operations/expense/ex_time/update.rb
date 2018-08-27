@@ -60,10 +60,10 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = self.expense&.user&.user_pockets&.cash_pockets_only&.find_by(id: pocket_id)
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
 
     # todo - jugaad to support mobile app for now
-    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
+    if self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
     end
   end
@@ -120,11 +120,6 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    # valid = CustomField::Validate.(self.expense.time_expense)
-    # unless valid.success?
-    #   add_message :error, valid.messages[:error]
-    #   return
-    # end
 
     if expense.update(updated_expense_params)
       if self.destroy_receipts
@@ -177,12 +172,17 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     # check if this expense's amount allows for it to be marked against COH
     # and if it is or is not, update the flag for this expense accordingly
     if expense.amount.present? && expense.from_cash_on_hand
-      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      if coh_adapter.balance(display_balance: true) > expense.amount_value
+      pocket = expense.spent_from
+      if pocket.cash_pocket?
+        pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        if pocket_adapter.balance(display_balance: true) > expense.amount_value
+          expense.update(cash_on_hand_blocked: true)
+        end
+        if pocket_adapter.balance(display_balance: true) < 0
+          expense.update(cash_on_hand_blocked: false)
+        end
+      elsif pocket.credit_card_pocket?
         expense.update(cash_on_hand_blocked: true)
-      end
-      if coh_adapter.balance(display_balance: true) < 0
-        expense.update(cash_on_hand_blocked: false)
       end
     end
 

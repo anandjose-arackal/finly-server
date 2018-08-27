@@ -48,7 +48,6 @@ class Report::Create < Report::Base
 
     # mark the respective expenses that are from cash on hand as blocked
     # so that we can raise the rest as violations inside a report
-    coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
     policy = Policy.find_by(id: self.policy_id)
     unless expenses.is_a?(ActiveRecord::Relation)
       ids = []
@@ -61,9 +60,13 @@ class Report::Create < Report::Base
       if expense.cash_on_hand_blocked
         next
       end
-      amount = expense.calculate_amount_value(policy)
-      if coh_adapter.balance(display_balance: true) >= amount
-        expense.update(cash_on_hand_blocked: true)
+      cash_pocket = expense.spent_from
+      if cash_pocket.present? && cash_pocket.cash_pocket?
+        cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_pocket)
+        amount = expense.calculate_amount_value(report.policy)
+        if cash_pocket_adapter.balance(display_balance: true) >= amount
+          expense.update(cash_on_hand_blocked: true)
+        end
       end
     end
   end

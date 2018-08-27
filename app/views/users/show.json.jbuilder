@@ -27,7 +27,14 @@ json.user_pockets do
   json.array!(@result.selected_user.user_pockets) do |pocket|
     json.name pocket.name
     json.id pocket.id
-    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    case pocket.user_pocket_type_id
+      when UserPocketType.id_for(:cash)
+        adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+      when UserPocketType.id_for(:credit_card)
+        adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
+      else
+        adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    end
     json.balance adapter.balance(display_balance: true)
     currency = pocket.base_currency
     json.base_currency do

@@ -20,7 +20,11 @@ class AccountManager::CreditCardPockets::CreditCardPocketsAdapter < AccountManag
 
   # returning an insanely large number as balance because credit amount is not known and this validation should always pass
   def balance(options = {})
-    9999999999999999999999
+    if options[:display_balance]
+      return "∞"
+    else
+      return 9999999999999999999999
+    end
   end
 
   # returning an insanely large number as balance because credit amount is not known and this validation should always pass
