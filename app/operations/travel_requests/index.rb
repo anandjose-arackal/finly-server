@@ -79,17 +79,13 @@ class TravelRequests::Index < TravelRequests::Base
       self.travel_requests = params[:travel_requests]
       if self.travel_requests.present?
         self.travel_requests = apply_scopes(self.travel_requests, params)
-        self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
+        if personal_view?
+          self.travel_requests = self.travel_requests.sort_for_personal
+        else
+          self.travel_requests = self.travel_requests.sort_for_manager
+        end
       end
-    end
-
-    def status_name(travel_request)
-      return nil if travel_request.blank?
-      if travel_request.processing? and travel_request.controlling_user?(self.user)
-        'Awaiting Approval'
-      else
-        travel_request.status_name
-      end
+      self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
     end
 
   end

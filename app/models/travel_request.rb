@@ -62,7 +62,7 @@ class TravelRequest < ActiveRecord::Base
   validates :to_date, presence: true
   validate :acceptable_dates?
 
-  default_scope {order(status_id: :asc, submitted_at: :desc, created_at: :desc)}
+  # default_scope {order(status_id: :asc, submitted_at: :desc, created_at: :desc)}
 
   scope :with_id, ->(id) {where id: id}
   scope :not_open, -> {where.not(status_id: TravelRequestStatus.id_for(:open))}
@@ -76,6 +76,8 @@ class TravelRequest < ActiveRecord::Base
   scope :with_controlling_user_role_id, -> (role_id) {where controlling_user_role_id: role_id}
   scope :with_controlling_user_id, -> (user_id) {where controlling_user_id: user_id}
   scope :filter_user_id, -> (id) {where user_id: id}
+  scope :sort_for_manager, -> {order(status_id: :asc, submitted_at: :desc, created_at: :desc)}
+  scope :sort_for_personal, -> {order(created_at: :desc)}
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
     unless date_from.blank? && date_to.blank?
@@ -154,6 +156,78 @@ class TravelRequest < ActiveRecord::Base
     names
   end
 
+  def summary
+    s = {}
+    trip_cost = 0
+    base_currency = policy.base_currency
+    zero_amount = Amount.new value: 0, currency: base_currency
+    s[:money_request_processed] = money_request_processed || zero_amount
+    s[:expense_claims_submitted] = expense_claims_submitted || zero_amount
+    s[:booking_cost] = booking_cost || zero_amount
+    trip_cost += s[:money_request_processed].value
+    trip_cost += s[:expense_claims_submitted].value
+    trip_cost += s[:booking_cost].value
+    s[:trip_cost] = Amount.new value: trip_cost, currency: base_currency
+    s
+    # money_requests_processed
+    # expense_claims_submitted
+    # booking_cost
+    # Trip Cost
+  end
+
+  def money_request_processed
+    return nil unless money_requests.present?
+    total = 0
+    money_requests.each do |money_request|
+      total += money_request.total_amount
+    end
+    return nil unless total > 0
+    currency = money_requests.first.base_currency
+    Amount.new value: total, currency: currency
+  end
+
+  def expense_claims_submitted
+    return nil unless reports.present?
+    expenses = Expense.with_report_id(reports.pluck(:id))
+    amounts = Amount.with_id(expenses.pluck(:amount_id))
+    total = amounts.sum(policy.base_currency.country_code.to_sym)
+    return nil if total == 0
+    currency = policy.base_currency
+    Amount.new value: total, currency: currency
+  end
+
+  def booking_cost
+    return nil if bookings.blank?
+    confirmed_bookings = Booking.with_travel_request_id(id).confirmed
+    confirmed_booking_ids = confirmed_bookings.pluck(:id)
+    value = BookingFlight.with_parent_booking_id(confirmed_booking_ids).sum_cost +
+        BookingTrain.with_parent_booking_id(confirmed_booking_ids).sum_cost +
+        BookingBus.with_parent_booking_id(confirmed_booking_ids).sum_cost +
+        BookingHotel.with_parent_booking_id(confirmed_booking_ids).sum_cost +
+        BookingCarRental.with_parent_booking_id(confirmed_booking_ids).sum_cost
+    currency = Currency.first
+    Amount.new value: value, currency: currency
+  end
+
+  def controlling_user?(user)
+    return false if self.controlling_user.blank?
+    self.controlling_user.id == user.id
+  end
+
+  def status_for_user(user)
+    return status.name unless controlling_user?(user)
+    if processing?
+      return 'awaiting_approval'
+    elsif selection_requested?
+      return 'awaiting_selection'
+    elsif selection_processing?
+      return 'awaiting_selection_approval'
+    elsif booking_pending? or selection_confirmed?
+      return 'awaiting_booking'
+    end
+    status.name
+  end
+
 
   def as_json(options = {})
     {
@@ -170,7 +244,8 @@ class TravelRequest < ActiveRecord::Base
             to: DateUtils.date_formatted(to_date)
         },
         destinations: destinations,
-        destinations_list: destinations_list
+        destinations_list: destinations_list,
+        summary: summary
     }
   end
 

@@ -75,6 +75,11 @@ class MoneyRequest::Update < MoneyRequest::Base
         item[:amount_attributes][:value] = 0
       end
     end
+
+    # to support mobile app
+    if [1, '1'].include?(update_param[:payment_mode_id])
+      update_param[:destination_pocket_id] = self.money_request.user&.user_pockets&.cash_pockets_only&.first&.id
+    end
   end
 
   def process
