@@ -1,4 +1,10 @@
-json.travel_request @result.travel_request
+json.travel_request do
+  request_json = @result.travel_request.as_json
+  request_json.merge!({status: {id: @result.travel_request.status_id, name: @result.travel_request.status_for_user(@result.user)}})
+  request_json.each do |key, value|
+    json.set! key, value
+  end
+end
 
 json.manager_name @result.manager&.name
 json.travel_manager_name @result.travel_manager&.name
@@ -34,6 +40,8 @@ json.can_create_money_requests @result.can_create_money_requests?
 json.show_money_requests @result.show_money_requests?
 json.can_create_reports @result.can_create_reports?
 json.show_reports @result.show_reports?
+
+# json.summary @result.travel_request.summary
 
 json.money_requests do
   json.total_submitted 0

@@ -74,6 +74,7 @@ class Booking < ActiveRecord::Base
   scope :cancelled, -> {where booking_status_id: BookingStatus.id_for(:cancelled)}
   scope :selected_for_booking, -> {where booking_status_id: BookingStatus.id_for(:selected_for_booking)}
   scope :without_parent, -> {where parent_booking_id: nil}
+  scope :with_travel_request_id, -> (id) {where travel_request_id: id}
 
   def booking_type_object
     case booking_type_id
@@ -112,10 +113,19 @@ class Booking < ActiveRecord::Base
     if self.confirmed?
       data[:attachments] = self.attachments
     end
+    # Jugaad
+    if parent_booking_id.blank? and not options&.dig(:skip_confirmed)
+      if confirmed?
+        data[:confirmed] = self.as_json(skip_confirmed: true)
+      elsif cancelled?
+        data[:cancelled] = [self.as_json(skip_confirmed: true)]
+      end
+    end
     data
   end
 
   private
+
   def booking_date_range
     return unless request?
     unless booking_type_object.valid_date_range(travel_request)

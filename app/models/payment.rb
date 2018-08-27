@@ -58,6 +58,7 @@ class Payment < ActiveRecord::Base
   belongs_to :initiating_user, polymorphic: true
   belongs_to :receiving_user, polymorphic: true
   belongs_to :reference_resource, polymorphic: true
+  belongs_to :original_payment_for_refund, class_name: "Payment"
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks

@@ -20,7 +20,6 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
 
     # Remove :invoice_attachments from parameters
     self.booking_parameters.delete(:booking_attachments)
-
   end
 
   def process
