@@ -2,7 +2,8 @@ class User::AvailableExpenseTypes::Show < User::Base
 
   attr_accessor :distance_config, :time_config, :per_diem_config,
                 :policy, :report, :company, :custom_fields_config,
-                :cash_on_hand, :em_tax_tracking, :tds_slabs
+                :cash_on_hand, :em_tax_tracking, :tds_slabs,
+                :cash_pocket
 
   class User::AvailableExpenseTypes::Show::ExpenseTypesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -39,7 +40,8 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.company = user.company
     self.report = user.reports.find_by(id: params[:report_id])
     self.policy = report.policy if report.present?
-    self.cash_on_hand = AccountManager::CashOnHand::CashOnHandAdapter.new(self.user.cash_on_hand).balance(display_balance: true)
+    self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    self.cash_on_hand = AccountManager::CashPockets::CashPocketsAdapter.new(self.cash_pocket).balance(display_balance: true)
     self.em_tax_tracking = user.company.feature_subscription.em_tax_tracking
     if self.em_tax_tracking
       op_tds_slabs_index = TdsSlabs::Index.(user, params)

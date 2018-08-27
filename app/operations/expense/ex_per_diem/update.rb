@@ -61,7 +61,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
 
     # todo - jugaad to support mobile app for now
-    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
+    if self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
     end
   end

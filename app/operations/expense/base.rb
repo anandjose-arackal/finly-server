@@ -97,7 +97,7 @@ class Expense::Base < BaseOperation
           # i.e. if the expense was not originally from COH, and it's currently being made into one
         elsif !expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
           unless balance >= amount_val
-            add_message :error, "You do not have enough balance in your #{pocket.name} account app/operations/money_request/base.rb:20to mark this expense against it"
+            add_message :error, "You do not have enough balance in your #{pocket.name} account to mark this expense against it"
             return
           end
         elsif expense.spent_from.present? && !(params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))

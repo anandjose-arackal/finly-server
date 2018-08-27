@@ -63,7 +63,7 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
 
     # todo - jugaad to support mobile app for now
-    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) && self.cash_pocket.blank?
+    if self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
     end
   end
@@ -120,11 +120,6 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    # valid = CustomField::Validate.(self.expense.time_expense)
-    # unless valid.success?
-    #   add_message :error, valid.messages[:error]
-    #   return
-    # end
 
     if expense.update(updated_expense_params)
       if self.destroy_receipts
