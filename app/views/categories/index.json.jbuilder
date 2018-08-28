@@ -2,6 +2,7 @@ json.categories do
   json.array!(@result.categories.roots) do |category|
     json.id category.id
     json.name category.name
+    json.gl_code category.gl_code
     if category.children.present?
       json.sub_categories do
         json.array!(category.children.active) do |sub_category|
