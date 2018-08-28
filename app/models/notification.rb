@@ -72,6 +72,8 @@ class Notification < ActiveRecord::Base
         object = "Payment Order"
       when "Purchase Order"
         object = "Purchase Order"
+      when 'Invoice' # Inward Invoice
+        object = 'Invoice'
       else
         # do nothing
     end
@@ -316,8 +318,13 @@ class Notification < ActiveRecord::Base
         case action_type_id
           when NotificationActionType.id_for(:notify_submit)
             object = " purchase order"
-          # when NotificationActionType.id_for(:notify_cash_withdrawal)
-          #   object = " from your cash in hand"
+          else
+            # do nothing
+        end
+      when "Invoice"
+        case action_type_id
+          when NotificationActionType.id_for(:notify_submit)
+            object = " invoice"
           else
             # do nothing
         end
@@ -337,7 +344,7 @@ class Notification < ActiveRecord::Base
     view = ""
 
     # now depending on the object type, the URL will be loaded
-    if self.object_type == "PaymentOrder" || self.object_type == "Payment Order"
+    if self.object_type == "PaymentOrder" || self.object_type == "Payment Order" || self.object_type == "Purchase Order" || self.object_type == "Invoice"
       case view_role_id
         when 3
           view = "\"reviewer\""
@@ -408,12 +415,19 @@ class Notification < ActiveRecord::Base
         else
           path = "orders/#{self.path_object_id}"
         end
-      when "PurcahseOrder"
-        path_object = PurchaseOrder.unscoped.find_by(id: self.path_object_id)
+      when "Purchase Order"
+        document = PurchaseOrder.unscoped.find_by(id: self.path_object_id)
         # if path_object.is_deleted?
         #   path = "procurements"
         # else
-        path = "procurements/#{self.path_object_id.procurement}"
+        path = "procurements/#{document.procurement.id}"
+        # /params={\"view\":\"initiator\",\"document_type\":\"invoice\",\"document_id\":#{document.procurement.id}"
+        suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id},\"document_type\":\"purchase_order\",\"document_id\":#{document.id}"
+      when 'Invoice'
+        document = Invoice.unscoped.find_by(id: self.path_object_id)
+        path = "procurements/#{document.procurement.id}"
+        # /params={\"view\":\"initiator\",\"document_type\":\"purchase_order\",\"document_id\":#{document.procurement.id}"
+        suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id},\"document_type\":\"invoice\",\"document_id\":#{document.id}"
         # end
       else
         # do nothing
@@ -440,6 +454,8 @@ class Notification < ActiveRecord::Base
         object = MoneyRequest.unscoped.find_by(id: object_id)
       when 'Purchase Order'
         object = PurchaseOrder.unscoped.find_by(id: object_id)
+      when 'Invoice'
+        object = Invoice.unscoped.find_by(id: object_id)
       else
         return ""
     end
@@ -450,6 +466,7 @@ class Notification < ActiveRecord::Base
       return " a" if object_type == "Report"
       return " an" if object_type == "Money Request"
       return " a" if object_type == "Purchase Order"
+      return " an" if object_type == "Invoice"
     elsif self.user_id == owner.id
       return " your"
     else

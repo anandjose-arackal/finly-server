@@ -51,6 +51,10 @@
 #  location_id            :integer
 #  delivery_location_id   :integer
 #  payment_term_id        :integer
+#  department_id          :integer
+#  sub_department_id      :integer
+#  policy_id              :integer
+#  controlling_level_id   :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -85,6 +89,14 @@ class Invoice < ActiveRecord::Base
   belongs_to :gst_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
 
+  belongs_to :department
+  belongs_to :sub_department, class_name: 'Department', foreign_key: :sub_department_id
+
+  belongs_to :policy
+  belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+
+  has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
+
   # because multiple payments can be made against one invoice
   has_many :payments
 
@@ -97,6 +109,9 @@ class Invoice < ActiveRecord::Base
 
   # From Procurement workflow
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+
+
+  has_many :trails, as: :parent
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
@@ -120,7 +135,8 @@ class Invoice < ActiveRecord::Base
   delegate :gross_amount_value, to: :gross_amount
   delegate :paid_amount, to: :paid_amount
 
-  delegate :unpaid?, :partially_paid?, :paid?, to: :invoice_status
+  delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
+           :approved?, :retracted?, :auto_approved?, :closed?, to: :invoice_status
   delegate :payment?, :advance?, to: :invoice_type
 
 
@@ -130,6 +146,8 @@ class Invoice < ActiveRecord::Base
 
   scope :with_id, -> (id) {where id: id}
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
+
+  scope :with_procurement, -> { where("invoices.procurement_id IS NOT NULL")}
 
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id
@@ -242,5 +260,4 @@ class Invoice < ActiveRecord::Base
       self.update_invoice_status
     end
   end
-
 end

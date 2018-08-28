@@ -15,7 +15,8 @@ class PaymentFiles::Config
         {name: 'ICICI Bank', key: :icici_bank, operation: PaymentFiles::Formats::IciciBank::Process, validator: PaymentFiles::Formats::IciciBank::ValidateConfig},
         {name: 'Karnataka Bank', key: :karnataka_bank, operation: PaymentFiles::Formats::KarnatakaBank::Process, validator: PaymentFiles::Formats::KarnatakaBank::ValidateConfig},
         {name: 'Kotak Mahindra Bank', key: :kotak_mahindra_bank, operation: PaymentFiles::Formats::KotakMahindraBank::Process, validator: PaymentFiles::Formats::KotakMahindraBank::ValidateConfig},
-        {name: 'Citi', key: :citi, operation: PaymentFiles::Formats::Citi::Process, validator: PaymentFiles::Formats::Citi::ValidateConfig}
+        {name: 'Citi', key: :citi, operation: PaymentFiles::Formats::Citi::Process, validator: PaymentFiles::Formats::Citi::ValidateConfig},
+        {name: 'Toppr', key: :toppr, operation: PaymentFiles::Formats::Toppr::Process, validator: PaymentFiles::Formats::Toppr::ValidateConfig}
     ]
   end
 

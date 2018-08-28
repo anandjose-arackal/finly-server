@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company2::Procurements2::ProcureInwardInvoices2::Validate < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company2::Procurements2::Invoices2::Validate < Personalizer::Adapters::Base
   attr_accessor :purchase_order
   def init
     self.purchase_order = op_instance.purchase_order

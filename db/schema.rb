@@ -1952,6 +1952,7 @@ ActiveRecord::Schema.define(version: 20180828130124) do
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.boolean  "is_deleted",             default: false, null: false
+    t.string   "ancestry",   limit: 255
   end
 
   add_index "departments", ["company_id"], name: "index_departments_on_company_id", using: :btree
@@ -2632,6 +2633,8 @@ ActiveRecord::Schema.define(version: 20180828130124) do
     t.text     "note",        limit: 65535
     t.integer  "tax_rate_id", limit: 4
     t.boolean  "is_deleted",                                          default: false, null: false
+    t.string   "item_code",   limit: 255
+    t.string   "account",     limit: 255
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
@@ -2674,6 +2677,7 @@ ActiveRecord::Schema.define(version: 20180828130124) do
     t.integer  "inventory_line_item_id", limit: 4
     t.text     "item_info",              limit: 65535
     t.string   "comment",                limit: 255
+    t.string   "account",                limit: 255
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -2770,6 +2774,10 @@ ActiveRecord::Schema.define(version: 20180828130124) do
     t.integer  "location_id",            limit: 4
     t.integer  "delivery_location_id",   limit: 4
     t.integer  "payment_term_id",        limit: 4
+    t.integer  "department_id",          limit: 4
+    t.integer  "sub_department_id",      limit: 4
+    t.integer  "policy_id",              limit: 4
+    t.integer  "controlling_level_id",   limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3967,6 +3975,7 @@ ActiveRecord::Schema.define(version: 20180828130124) do
     t.integer  "category_id",            limit: 4
     t.integer  "cost_center_id",         limit: 4
     t.boolean  "is_deleted",                                                  default: false, null: false
+    t.string   "account",                limit: 255
   end
 
   add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree
@@ -4020,6 +4029,8 @@ ActiveRecord::Schema.define(version: 20180828130124) do
     t.integer  "controlling_level_id",         limit: 4
     t.integer  "department_id",                limit: 4
     t.boolean  "is_deleted",                                                          default: false, null: false
+    t.integer  "cost_center_id",               limit: 4
+    t.integer  "sub_department_id",            limit: 4
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -4470,6 +4481,7 @@ ActiveRecord::Schema.define(version: 20180828130124) do
     t.string   "associated_entity_type", limit: 255
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
+    t.string   "name",                   limit: 255
   end
 
   add_index "reviewal_levels", ["policy_id"], name: "index_reviewal_levels_on_policy_id", using: :btree
@@ -4966,25 +4978,30 @@ ActiveRecord::Schema.define(version: 20180828130124) do
   add_index "user_pockets", ["user_pocket_type_id"], name: "index_user_pockets_on_user_pocket_type_id", using: :btree
 
   create_table "user_profiles", force: :cascade do |t|
-    t.integer  "user_id",             limit: 4
-    t.string   "avatar_file_name",    limit: 255
-    t.string   "avatar_content_type", limit: 255
-    t.integer  "avatar_file_size",    limit: 4
+    t.integer  "user_id",                limit: 4
+    t.string   "avatar_file_name",       limit: 255
+    t.string   "avatar_content_type",    limit: 255
+    t.integer  "avatar_file_size",       limit: 4
     t.datetime "avatar_updated_at"
     t.boolean  "kyc_verified"
-    t.string   "gcm_sender_id",       limit: 255
-    t.string   "employee_id",         limit: 255
-    t.string   "payroll_id",          limit: 255
-    t.integer  "default_currency_id", limit: 4
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.string   "gcm_sender_id",          limit: 255
+    t.string   "employee_id",            limit: 255
+    t.string   "payroll_id",             limit: 255
+    t.integer  "default_currency_id",    limit: 4
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
     t.date     "date_of_birth"
-    t.string   "gender",              limit: 255
-    t.string   "address_1",           limit: 255
-    t.string   "address_2",           limit: 255
-    t.string   "city",                limit: 255
-    t.integer  "state_id",            limit: 4
-    t.string   "pin_code",            limit: 255
+    t.string   "gender",                 limit: 255
+    t.string   "address_1",              limit: 255
+    t.string   "address_2",              limit: 255
+    t.string   "city",                   limit: 255
+    t.integer  "state_id",               limit: 4
+    t.string   "pin_code",               limit: 255
+    t.string   "signature_file_name",    limit: 255
+    t.string   "signature_content_type", limit: 255
+    t.integer  "signature_file_size",    limit: 4
+    t.datetime "signature_updated_at"
+    t.string   "signature_title",        limit: 255
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree

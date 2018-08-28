@@ -22,6 +22,38 @@ class TdsRatesList < ActiveRecord::Base
     end
   end
 
+  # For Olx
+  # DEFAULTS = [
+  #     {
+  #         name: "TDS On Contractor - Individual",
+  #         tds: "1"
+  #     },
+  #     {
+  #         name: "TDS On Contractor - Company",
+  #         tds: "2"
+  #     },
+  #     {
+  #         name: "TDS On Professional Fees - Company",
+  #         tds: "10"
+  #     },
+  #     {
+  #         name: "TDS On Rent -Company",
+  #         tds: "10"
+  #     },
+  #     {
+  #         name: "TDS On Rent - Individual",
+  #         tds: "10"
+  #     },
+  #     {
+  #         name: "TDS On Professional Fees - Individual",
+  #         tds: "10"
+  #     },
+  #     {
+  #         name: "TDS On Commission",
+  #         tds: "5"
+  #     }
+  # ]
+
   DEFAULTS = [
       {
           name: "Interest on securities",

@@ -1,5 +1,4 @@
 # action to update a particular user's details.
-
 class User::Configuration::UpdateDetails < BaseOperation
   attr_accessor :details_params, :changes
 
