@@ -3,6 +3,7 @@ if LogStasher.enabled?
     # This block is run in application_controller context,
     # so you have access to all controller methods
     fields[:request_params] = params
+    fields[:client_ip] = request.remote_ip
     user = current_user rescue nil
     if user.present?
       fields[:user_id] = user&.id
