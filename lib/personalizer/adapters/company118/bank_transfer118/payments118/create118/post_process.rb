@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company90::BankTransfer90::Payments90::Create90::PostProcess < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company118::BankTransfer118::Payments118::Create118::PostProcess < Personalizer::Adapters::Base
   attr_accessor :bank_payment_request
   def init
     self.bank_payment_request = op_instance.bank_payment_request

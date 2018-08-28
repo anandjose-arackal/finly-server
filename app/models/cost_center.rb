@@ -22,6 +22,7 @@ class CostCenter < ActiveRecord::Base
 
   has_many :budget_trails
 
+  scope :with_name, -> (name) {where name: name}
   scope :with_application, -> (app) {
     where application: app
   }

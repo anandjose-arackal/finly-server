@@ -13,8 +13,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def validate
     unless self.purchase_order.present?
-
       add_message :error, 'Purchase Order not found'
+    end
+
+    unless self.purchase_order_params[:policy_id].present?
+      add_message :error, 'Policy cannot be blank'
     end
   end
 
