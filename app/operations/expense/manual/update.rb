@@ -70,7 +70,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
 
     if self.cash_pocket.blank?
-      self.cash_pocket = self.expense&.user&.user_pockets.cash_pockets_only.first
+      self.cash_pocket = self.expense&.user&.user_pockets&.cash_pockets_only&.first
     end
   end
 
