@@ -35,7 +35,9 @@
 #  usage_date_end         :datetime
 #  usage_date_type        :string(255)
 #  spent_from_id          :integer
+#  custom_conversion_rate :boolean          default(FALSE)
 #
+
 
 
 
@@ -312,7 +314,9 @@ class Expense < ActiveRecord::Base
                                                                       ExpenseType.id_for(:time),
                                                                       ExpenseType.id_for(:per_diem)])}
   scope :only_reimbursable_expenses, -> {where(reimbursable: true)}
-  scope :spent_from_cash_on_hand, -> {where(from_cash_on_hand: true)}
+  scope :spent_from_cash_on_hand, -> {
+    where.not(spent_from_id: nil)
+  }
   scope :blocked_against_cash_on_hand, -> {where cash_on_hand_blocked: true}
 
   scope :with_id, ->(ids) {where id: ids}

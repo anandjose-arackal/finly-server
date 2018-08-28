@@ -106,7 +106,8 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
        "Cost Center ID",
        "Invoice Number",
        "Invoice Date (dd-mm-yyyy)",
-       "Due Date (dd-mm-yyyy)"
+       "Due Date (dd-mm-yyyy)",
+       "Narration"
     ]
   end
 

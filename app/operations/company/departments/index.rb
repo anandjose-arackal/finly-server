@@ -12,17 +12,11 @@ class Company::Departments::Index < Company::Departments::Base
   end
 
 
-  def validate
-    if self.company.blank?
-      add_message :error, "Company not found"
-    end
-  end
-
   def process
     if user.company_admin? || user.vendor_payment_admin?
-      self.departments = self.company.departments
+      self.departments = self.company.departments.roots
     else
-      self.departments = user.departments
+      self.departments = user.departments.roots
     end
   end
 

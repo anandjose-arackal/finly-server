@@ -40,6 +40,8 @@
 #  controlling_level_id         :integer
 #  department_id                :integer
 #  is_deleted                   :boolean          default(FALSE), not null
+#  cost_center_id               :integer
+#  sub_department_id            :integer
 #
 
 require 'test_helper'

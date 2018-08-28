@@ -56,6 +56,11 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
 
   def post_process
     add_message :success, "Payment order created"
+
+    # Set status to unpaid if done via a procurement
+    if inward_invoice.procurement_id.present?
+      inward_invoice.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+    end
   end
 
   def success

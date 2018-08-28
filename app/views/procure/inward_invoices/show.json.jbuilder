@@ -31,13 +31,19 @@
 invoice = @result.invoice
 
 json.purchase_order_policy_id invoice.procurement&.purchase_order&.policy&.id
-json.actions do
-  if current_user.vendor_payment_creditor?
-    json.make_payment true
-  end
-  json.editable invoice.unpaid?
-  json.destroyable invoice.unpaid?
+json.actions @result.actions
+
+json.status do
+  json.extract! invoice.invoice_status, :id, :name
 end
+
+# do
+#   if current_user.vendor_payment_creditor?
+#     json.make_payment true
+#   end
+#   json.editable invoice.unpaid?
+#   json.destroyable invoice.unpaid?
+# end
 
 if invoice.vendor.present?
   json.vendor invoice.vendor.as_json
@@ -45,7 +51,8 @@ end
 
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
-  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id
+  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id
+
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
   else
@@ -112,20 +119,15 @@ json.invoice do
   # invoice items
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
-      json.comment item.comment
-      json.rate item.rate
-      json.quantity item.quantity
-      json.tax item.tax
-      json.discount item.discount
-      json.category_id item.category_id
+      json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
+                    :description, :hsn_sac, :inventory_line_item_id
+
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
       json.amount precision_value item.amount&.value
       json.category_name item.category&.name
-      json.id item.id
       json.description item.description
       json.total_amount precision_value item.net_amount&.value
-      json.hsn_sac item.hsn_sac
       json.taxable_amount precision_value item.taxable_amount&.value
     end
   end
@@ -176,6 +178,19 @@ json.cost_centers do
     json.name cost_center.name
   end
 end
+
+json.departments do
+  json.array! @result.departments do |dept|
+    json.extract! dept, :id, :name
+  end
+end
+
+json.sub_departments do
+  json.array! @result.sub_departments do |dept|
+    json.extract! dept, :id, :name
+    json.parent_id dept.ancestry&.to_i
+  end
+end
 json.tds_slabs do
   json.array!(current_company.tds_slabs) do |tds_slab|
     json.id tds_slab.id
@@ -193,6 +208,24 @@ json.attachments do
   end
 end
 
+json.reviewal_chains do
+  json.array! @result.reviewal_chains do |chain|
+    json.policy_id chain[:policy_id]
+    json.reviewal_chain do
+      json.array! chain[:reviewal_chain] do |item|
+        json.level_number item[:level_number]
+        json.level_id item[:level_id]
+        json.selected_reviewer item[:selected_reviewer]&.as_json
+        json.reviewers do
+          json.array! item[:reviewers] do |reviewer|
+            json.extract! reviewer, :id, :exception, :threshold
+            json.reviewer_details reviewer.reviewer.as_json
+          end
+        end
+      end
+    end
+  end
+end
 
 json.comments do
   json.array! invoice.comments do |comment|

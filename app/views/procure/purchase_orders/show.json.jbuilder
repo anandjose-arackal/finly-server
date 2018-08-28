@@ -1,6 +1,6 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
-              :payment_term_id, :procurement_term_text, :policy_id, :department_id
+              :payment_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id
 json.vendor @result.purchase_order.vendor.as_json
 
 json.actions @result.actions
@@ -86,6 +86,19 @@ end
 json.departments do
   json.array! @result.departments do |department|
     json.extract! department, :id, :name
+  end
+end
+
+json.sub_departments do
+  json.array! @result.sub_departments do |dept|
+    json.extract! dept, :id, :name
+    json.parent_id dept.ancestry&.to_i
+  end
+end
+
+json.cost_centers do
+  json.array! @result.cost_centers do |cost_center|
+    json.extract! cost_center, :id, :name
   end
 end
 
