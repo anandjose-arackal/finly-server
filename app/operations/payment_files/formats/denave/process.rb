@@ -34,14 +34,14 @@ class PaymentFiles::Formats::Denave::Process < PaymentFiles::Formats::BaseFormat
         next if name.nil?
         amount = expense.amount.value
         if ['Internet', 'Mobile', 'Bike', 'Car'].include? name
-          report_map[name]= {}  if report_map[name].nil?
-          report_map[name][month_year] = 0  if report_map[name][month_year].nil?
+          report_map[name] = {} if report_map[name].nil?
+          report_map[name][month_year] = 0 if report_map[name][month_year].nil?
           report_map[name][month_year] += amount
 
-          report_map[name]['total'] = 0  if report_map[name]['total'].nil?
+          report_map[name]['total'] = 0 if report_map[name]['total'].nil?
           report_map[name]['total'] += amount
         else
-          report_map[name]= 0  if report_map[name].nil?
+          report_map[name] = 0 if report_map[name].nil?
           report_map[name] += amount
         end
       end
@@ -89,6 +89,7 @@ class PaymentFiles::Formats::Denave::Process < PaymentFiles::Formats::BaseFormat
         conveyence_total += (details['Car']&.dig(month) || 0)
       end
       content_to_add << conveyence_total
+      total_expense += conveyence_total || 0
       content_to_add << 2000
       internet_total = 0
       self.months.each do |month|
@@ -96,6 +97,7 @@ class PaymentFiles::Formats::Denave::Process < PaymentFiles::Formats::BaseFormat
         internet_total += details['Internet']&.dig(month) || 0
       end
       content_to_add << internet_total
+      total_expense += internet_total || 0
       content_to_add << 1500
       mobile_total = 0
       self.months.each do |month|
@@ -103,12 +105,18 @@ class PaymentFiles::Formats::Denave::Process < PaymentFiles::Formats::BaseFormat
         mobile_total += details['Mobile']&.dig(month) || 0
       end
       content_to_add << mobile_total
+      total_expense += mobile_total || 0
       content_to_add << nil
       content_to_add << details['Team Motivational']
+      total_expense += details['Team Motivational'] || 0
       content_to_add << details["Team Synergy"]
+      total_expense += details["Team Synergy"] || 0
       content_to_add << details["Tour  (Conveyance)"]
+      total_expense += details["Tour  (Conveyance)"] || 0
       content_to_add << details["Tour (Food)"]
+      total_expense += details["Tour (Food)"] || 0
       content_to_add << details["Tour (Lodging)"]
+      total_expense += details["Tour (Lodging)"] || 0
       content_to_add << total_expense
       content_to_add << nil
       content_to_add << nil
@@ -142,7 +150,7 @@ class PaymentFiles::Formats::Denave::Process < PaymentFiles::Formats::BaseFormat
     #       payment[:note],
     #       payment[:initiating_user_email]
     #   ]
-      # Todo Remove the last entry of "payment[:initiating_user_email]", this was specifically built as per Toppr's requirements
+    # Todo Remove the last entry of "payment[:initiating_user_email]", this was specifically built as per Toppr's requirements
     # end
     self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
   end
