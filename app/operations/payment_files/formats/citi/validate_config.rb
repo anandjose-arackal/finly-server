@@ -1,4 +1,4 @@
-class PaymentFiles::Formats::Citi::ValidateConfig < BaseOperation
+  class PaymentFiles::Formats::Citi::ValidateConfig < BaseOperation
 
   attr_accessor :config, :options
 

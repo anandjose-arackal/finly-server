@@ -34,6 +34,6 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
   private
 
   def category_params
-    params.require(:category).permit(:name, :expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items, :parent_id)
+    params.require(:category).permit(:name, :gl_code,  :expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items, :parent_id)
   end
 end
