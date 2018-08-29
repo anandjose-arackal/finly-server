@@ -25,7 +25,8 @@ class Procurements::Invoices::Retract < Procurements::Invoices::Base
   end
 
   def post_process
-    Event::EInvoice::Retract.(user, invoice: invoice, workflow_output: workflow_output)
+    # todo-olx
+    # Event::EInvoice::Retract.(user, invoice: invoice, workflow_output: workflow_output)
     add_message :success, 'Successfully Retracted Invoice'
   end
 end
