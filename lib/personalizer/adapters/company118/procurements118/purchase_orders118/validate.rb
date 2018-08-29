@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company90::Procurements90::PurchaseOrders90::Validate < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company118::Procurements118::PurchaseOrders118::Validate < Personalizer::Adapters::Base
   attr_accessor :purchase_order, :budgets
   def init
     self.purchase_order = op_instance.purchase_order

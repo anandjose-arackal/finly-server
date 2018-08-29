@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company90::BankTransfer90::PaymentRequests90::Show90::Init < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company118::BankTransfer118::PaymentRequests118::Show118::Init < Personalizer::Adapters::Base
   attr_accessor :bank_payment_request
   def init
     id = params[:id] || params[:payment_request_id]
