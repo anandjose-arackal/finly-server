@@ -58,7 +58,7 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
           note: mapping.note,
       }
     end
-    self.response = PaymentFiles::Generate.(user, payment_file: payment_params)
+    self.response = PaymentFiles::Generate.(user, payment_file: payment_params, resources: self.group_mappings)
   end
 
 end

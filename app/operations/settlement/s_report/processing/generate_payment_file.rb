@@ -55,7 +55,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
           note: mapping.note,
       }
     end
-    self.response = PaymentFiles::Generate.(user, payment_file: payment_params)
+    self.response = PaymentFiles::Generate.(user, payment_file: payment_params, resources: self.group_mappings)
   end
 
 end

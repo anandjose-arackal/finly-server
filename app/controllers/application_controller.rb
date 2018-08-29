@@ -269,8 +269,7 @@ class ApplicationController < ActionController::Base
   end
 
   def whitelisted?(ip, type_id)
-    return true if WhitelistedIp.with_type(type_id).with_ip(ip).present?
-    false
+    WhitelistedIp.with_type(type_id).with_ip(ip).present?
   end
 
   def block_foreign_hosts(type_id)

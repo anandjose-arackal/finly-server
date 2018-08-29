@@ -1,4 +1,4 @@
-class PaymentFiles::Generate < BaseOperation
+  class PaymentFiles::Generate < BaseOperation
   attr_accessor :file_format, :adapter, :payment_file_params
 
   def authorized_user_types

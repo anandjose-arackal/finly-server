@@ -1,5 +1,5 @@
 json.array!(@result.paginated_reports) do |report|
-  json.extract! report, :id, :name
+  json.extract! report, :id, :name, :travel_request
   json.user do
     json.extract! report.user, :name
   end
