@@ -185,12 +185,11 @@ json.budgets do
     json.spent_amount item[:spent_amount]
     json.associated_item item[:associated_item]
   end
-
 end
 
 travel_desk_enabled = @result.report.user.travel_desk_enabled?
 json.show_trips travel_desk_enabled
 if travel_desk_enabled
-  json.pending_travel_requests @result.report.user.travel_requests, :id, :name
+  json.pending_travel_requests @result.report.user.travel_requests.reportable, :id, :name
   json.associated_trip @result.report.travel_request
 end

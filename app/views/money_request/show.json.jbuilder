@@ -38,8 +38,7 @@ end
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
 json.card @result.card
 
-json.user_reports current_user.reports
-json.user_travel_requests current_user.travel_requests
+json.user_travel_requests @result.money_request.user.travel_requests.money_requestable
 
 # json.linked_report do
 #   json.id @result.money_request.report&.id

@@ -78,6 +78,8 @@ class TravelRequest < ActiveRecord::Base
   scope :filter_user_id, -> (id) {where user_id: id}
   scope :sort_for_manager, -> {order(status_id: :asc, submitted_at: :desc, created_at: :desc)}
   scope :sort_for_personal, -> {order(created_at: :desc)}
+  scope :money_requestable, -> { where('to_date >= ?', Date.today).where(status_id: TravelRequestStatus.id_for(:booking_confirmed)) }
+  scope :reportable, -> { where(status_id: TravelRequestStatus.id_for(:booking_confirmed)) }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
     unless date_from.blank? && date_to.blank?
