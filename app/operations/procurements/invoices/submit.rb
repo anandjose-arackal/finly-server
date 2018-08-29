@@ -42,7 +42,8 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def post_process
+    # todo-olx
+    # Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output})
     add_message :success, 'Successfully submitted invoice'
-    Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output})
   end
 end

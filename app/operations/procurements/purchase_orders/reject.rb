@@ -24,7 +24,8 @@ class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
   end
 
   def post_process
-    Event::EPurchaseOrder::Reject.(user, purchase_order: purchase_order, workflow_output: workflow_output)
+    # todo-olx
+    # Event::EPurchaseOrder::Reject.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Rejected Purchase Order'
   end
 end
