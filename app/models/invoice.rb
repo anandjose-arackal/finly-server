@@ -162,13 +162,17 @@ class Invoice < ActiveRecord::Base
   scope :invoice_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
-    where('date >= ? && date <= ?', Date.parse(from), Date.parse(to))
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('date >= ? && date <= ?', from, to)
   }
 
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
-    where('due_date >= ? && due_date <= ?', Date.parse(from), Date.parse(to))
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('due_date >= ? && due_date <= ?', from, to)
   }
 
   scope :created_at_desc, -> { order(created_at: :desc) }
