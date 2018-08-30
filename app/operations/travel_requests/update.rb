@@ -1,6 +1,14 @@
 class TravelRequests::Update < TravelRequests::Base
   attr_accessor :travel_request, :travel_request_parameters
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:travel_request, :update], :post_validate, self)
+        }
+    }
+  end
+
   def pre_validate
     user_present? and params_present?
   end
