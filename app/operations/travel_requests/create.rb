@@ -1,6 +1,14 @@
 class TravelRequests::Create < TravelRequests::Base
   attr_accessor :travel_request_parameters, :travel_request, :for_user
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:travel_request, :create], :post_validate, self)
+        }
+    }
+  end
+
   def pre_validate
     user_present? and params_present?
   end
