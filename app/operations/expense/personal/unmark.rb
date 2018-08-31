@@ -38,13 +38,15 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
   def post_process
     # if the expense is a card expense add the amount to cash on hand
     if selected_expense.card_expense?
+      # deduct cash on hand
       # add the amount to cash on hand
-      self.payment_request = PaymentRequest.(user, nil, CashOnHand.name, :debit, :personal_expense)
-      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, selected_expense.amount_value))
+      atm_pocket = user.user_pockets.atm_withdrawal_pockets.first
+      self.payment_request = PaymentRequest.(user, nil, UserPocket.name, :debit, :personal_expense)
+      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, atm_pocket, selected_expense.amount_value))
       op = AccountManager::Payments::PaymentProcessor.(user, payment_request: self.payment_request)
       unless op.success?
         add_message :error, op.messages[:error]
-        selected_expense.update(personal: true)
+        selected_expense.update(personal: false)
         return
       end
     end
