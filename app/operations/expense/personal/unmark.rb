@@ -46,7 +46,7 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
       op = AccountManager::Payments::PaymentProcessor.(user, payment_request: self.payment_request)
       unless op.success?
         add_message :error, op.messages[:error]
-        selected_expense.update(personal: false)
+        selected_expense.update(personal: true)
         return
       end
     end
