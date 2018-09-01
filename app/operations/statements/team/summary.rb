@@ -245,7 +245,7 @@ class Statements::Team::Summary < Statements::Team::Base
       when :user_name
         return user.name
       when :user_email
-        return user.email
+        return user.email || ""
       when :user_mobile_number
         return user.mobile_number
       when :accounts_net_advance
