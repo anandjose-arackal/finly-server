@@ -439,7 +439,8 @@ class Statements::Team::Summary < Statements::Team::Base
         end
       when :cash_on_hand
         unless ACCOUNT_MAP[user][:cash_on_hand]&.dig(:object).present?
-          ACCOUNT_MAP[user][:cash_on_hand] = {object: user.cash_on_hand}
+          cash_pocket = user.user_pockets.cash_pockets_only.first
+          ACCOUNT_MAP[user][:cash_on_hand] = {object: cash_pocket}
         end
         case type
           when :object
