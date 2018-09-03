@@ -126,6 +126,13 @@ class Expense::Manual::Update < Expense::Manual::Base
       add_message :error, set_fields.messages[:error]
       return
     end
+    # validating the custom fields here
+    valid = CustomField::Validate.(self.expense.manual_expense)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return false
+    end
+
     if expense.update(updated_expense_params)
       if self.destroy_receipts
         expense.receipts.each do |receipt|
