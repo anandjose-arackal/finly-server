@@ -81,7 +81,8 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
 
     # calculating the total of all expenses that are marked as from cash on hand
     self.total_amount_from_coh = 0
-    coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+    cash_pocket = user.user_pockets.cash_pockets_only.first
+    cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_pocket)
 
     for key, value in self.multiple_expenses
       # Setting errors for the current expense
@@ -96,7 +97,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
         self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages
       end
 
-      if self.total_amount_from_coh > coh_adapter.balance(display_balance: true)
+      if self.total_amount_from_coh > cash_pocket_adapter.balance(display_balance: true)
         # add error message saying this expense cannot be from COH
         self.errors_by_expenses[key][:error] += ["You do not have enough balance in your Cash on Hand to mark this expense against it"]
       end

@@ -89,6 +89,8 @@ class Export::Report::Base < Export::Base
           else
             data_arr << ''
           end
+        when ExportField.id_for(:expense_type)
+          data_arr << expense.expense_type&.exportable_name
         else
           data_arr << ''
       end
