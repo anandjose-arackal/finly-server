@@ -20,4 +20,5 @@ class UserMailerPreview < ActionMailer::Preview
     token = EmailAuthorization.first.token
     UserMailer.agreements_mail(user, token)
   end
+
 end

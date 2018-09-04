@@ -43,7 +43,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
 
   def post_process
     # todo-olx
-    # add_message :success, 'Successfully submitted purchase order'
+    add_message :success, 'Successfully submitted purchase order'
     Event::EPurchaseOrder::Submit.(user, {purchase_order: purchase_order, workflow_output: workflow_output})
   end
 end

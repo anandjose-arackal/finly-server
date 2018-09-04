@@ -47,7 +47,7 @@ class Integrations::NetSuite::Invoices < Integrations::NetSuite::Base
               item.description,
               'Indian Rupee',
               invoice.invoice_number,
-              current_company.accounting_system_configuration.options[:account],
+              item.inventory_line_item&.item_code,
               item.comment,
               1,
               Date.today.strftime('%d/%m/%y'),
@@ -61,7 +61,7 @@ class Integrations::NetSuite::Invoices < Integrations::NetSuite::Base
               tds_applied,
               invoice.tds_slab&.name,
               invoice.procurement.purchase_order.department&.name,
-              invoice.procurement.purchase_order.department&.name,
+              invoice.procurement.purchase_order.cost_center&.name,
               invoice.procurement.purchase_order.location&.name,
               item.rate
 
