@@ -14,14 +14,14 @@ class Event::EInvoice::Retract < Event::EInvoice::Base
   end
 
   def notification_affected_users
-    users = User::AssociatedUsers::Index.(self.user, document: self.invoice, amount: invoice.balance_amount.value)
+    users = User::AssociatedUsers::Index.(self.user, document: self.invoice, amount: invoice.net_amount.value)
     users.reject { |r| r == self.user}
   end
 
   def set_notification(user)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:invoice),
                                              action_type_id: NotificationActionType.id_for(:notify_retract),
-                                             action_user_id: invoice.created_by_id,
+                                             action_user_id: invoice.created_by.id,
                                              object_id: invoice.id,
                                              object_type: "Invoice",
                                              path_object_id: invoice.id,

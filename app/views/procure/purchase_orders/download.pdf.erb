@@ -220,7 +220,26 @@
   <div class="term-text">
     <%= simple_format @result.purchase_order.procurement_term_text, {}, wrapper_tag: "div" %>
   </div>
+</div>
 
+<div class="approval-flow">
+  <ul>
+    <% approved_users = [] %>
+
+    <% @result.purchase_order.trails.each do |trail| %>
+      <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
+        <% unless approved_users.include?(trail.action_user) %>
+          <% approved_users.push(trail.action_user) %>
+          <li>
+            <div class="text center"><%= trail.action_user.name %></div>
+            <div class="text-center">
+              <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
+            </div>
+          </li>
+        <% end %>
+      <% end %>
+    <% end %>
+  </ul>
 </div>
 </body>
 </html>
@@ -462,6 +481,23 @@
       color: #7b7b7b;
       font-size: 12px;
     }
+
+    .approval-flow ul{
+      padding: 0;
+      margin: 0;
+      display: table;
+      table-layout: fixed;
+
+      width:100%;
+      height:100px;
+
+    }
+    .approval-flow ul li{
+      list-style: none;
+      display: table-cell;
+
+      text-align: center;
+    }
   }
   @media screen{
     .terms .term-text{
@@ -697,5 +733,21 @@
       word-break: break-all;
     }
     .page-break { display:block; clear:both; page-break-after:always; }
+    .approval-flow ul{
+      padding: 0;
+      margin: 0;
+      display: table;
+      table-layout: fixed;
+
+      width:100%;
+      height:100px;
+
+    }
+    .approval-flow ul li{
+      list-style: none;
+      display: table-cell;
+
+      text-align: center;
+    }
   }
 </style>
