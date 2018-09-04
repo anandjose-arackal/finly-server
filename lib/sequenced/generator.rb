@@ -65,7 +65,7 @@ module Sequenced
 
     private
     def base_relation
-      record.class.base_class.unscoped
+      record.class.base_class.unscoped.where(company_id: record.company_id)
     end
 
     def find_last_record
