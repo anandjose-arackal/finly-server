@@ -22,6 +22,7 @@
 #  policy_id                    :integer
 #  payment_file_downloaded      :boolean          default(FALSE)
 #  auto_approved                :boolean
+#  api_initiated                :boolean          default(FALSE)
 #
 
 class BankPaymentRequest < ActiveRecord::Base
@@ -259,6 +260,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def credit_card?
     self.payment_order.payment_mode.upcase == "CREDITCARD"
+  end
+
+  def payments
+    self.payment_order.payments
   end
 
   private

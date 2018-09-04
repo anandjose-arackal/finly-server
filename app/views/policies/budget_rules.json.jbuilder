@@ -13,3 +13,5 @@ json.blocking_rules do
 end
 
 json.policy_admin current_user.policy_admin?(@result.policy)
+
+json.policy_custom_fields @result.policy_custom_fields

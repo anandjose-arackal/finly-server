@@ -49,12 +49,8 @@
 #  otp_attempts           :integer          default(0)
 #  user_delegate_id       :integer
 #  delegation_enabled     :boolean
+#  gl_config              :text(65535)
 #
-
-
-
-
-
 
 
 
@@ -76,6 +72,8 @@ class User < ActiveRecord::Base
 
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
+
+  serialize :gl_config
 
   belongs_to :company
   belongs_to :otp_request_type
@@ -120,6 +118,7 @@ class User < ActiveRecord::Base
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
   has_many :payment_receivables, foreign_key: :initiating_user_id
+  has_many :user_pockets
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
@@ -186,12 +185,19 @@ class User < ActiveRecord::Base
   has_many :outward_invoices
   has_many :outward_invoice_attachments
 
+  has_many :user_department_mappings
+  has_many :departments, through: :user_department_mappings
+
   #Budgets
+
+  # many-to-many mapping between user and budget
+  has_many :budget_criteria_mappings, as: :budgetable
+  has_many :budgets, through: :budget_criteria_mappings
+
   has_many :owned_budgets, class_name: 'Budget'
-  has_many :budgets, as: :budgetable
-  # has_many :budgets, as: :budgetable
 
-
+  has_many :procurements
+  has_many :level_reviewer_mappings
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
@@ -214,9 +220,9 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}
-  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
-  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
-  validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
+  validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
   validates :user_panel_subscription, presence: true
 
@@ -233,6 +239,10 @@ class User < ActiveRecord::Base
   scope :only_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
+  scope :filter_vendor_payments_reviewers, -> (flag) {
+    # passed argument is only for has scope, no effect here
+    with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
+  }
   scope :only_finance_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   scope :only_vendor_payment_creditors, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
   # scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
@@ -504,6 +514,11 @@ class User < ActiveRecord::Base
     self.build_cash_on_hand(balance_attributes: {value: 0, currency_id: Currency.id_for(:INR)}).save
     self.build_bank_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_user_permission(create_beneficiaries: false, company_id: self.company_id).save
+
+    # building a default cash on hand pocket, Card Transfer pocket and Bank Transfer pocket
+    self.user_pockets.build(name: "Cash on Hand", user_pocket_type_id: UserPocketType.id_for(:cash), atm_withdrawal_pocket: true, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    # self.user_pockets.build(name: "Finly Money - Card Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:card_transfer), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
   end
 
   def strip_whitespace
@@ -647,7 +662,7 @@ class User < ActiveRecord::Base
   end
 
   def travel_desk_enabled?
-    self.user_panel_subscription.travel_request
+    self.company.travel_desk_enabled? and self.user_panel_subscription.travel_request
   end
 
   def has_role?(role_id)
@@ -771,6 +786,11 @@ class User < ActiveRecord::Base
     end
     # if none of the above conditions are satisfied
     false
+  end
+
+  def vehicle_rates_list
+    policies = self.policies
+    VehicleRate.with_policy_id(policies.pluck(:id))
   end
 
   # returns the list of per diems that the user has access to

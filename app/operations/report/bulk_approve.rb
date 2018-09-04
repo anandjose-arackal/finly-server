@@ -137,7 +137,8 @@ class Report::BulkApprove < BaseOperation
         # Process reports
         for key, value in multiple_reports
           report = value[:report]
-          presenter = User::Team::Review::NextReviewer.(report)
+          has_violations = (value[:violations][:warning].present? or value[:violations][:blocking].present?)
+          presenter = User::Team::Review::NextReviewer.(report, has_violations: has_violations)
           manager = presenter.user
           to_user_role_id = presenter.role_id
           status = ReportStatus.processing_id

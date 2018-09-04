@@ -36,7 +36,7 @@ json.array! @result.paginated_money_requests do |money_request|
     end
   end
 
-  currency = Currency.first
+  currency = money_request.base_currency
   json.total_amount do
     json.partial! 'shared/amount', amount: Amount.new(value: money_request.total_amount, currency: currency)
   end

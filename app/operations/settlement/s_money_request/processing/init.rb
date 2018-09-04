@@ -80,25 +80,26 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
     end
     user_ids = self.money_requests.pluck(:user_id).uniq
     users_map = User.with_id(user_ids).index_by(&:id)
-    request_total_hash = {}#self.money_requests.group_user.sum_total
-    user_ids.each do |user_id|
-      request_ids = self.money_requests.with_user(user_id).pluck(:id)
-      amount = MoneyRequestItem.with_money_request(request_ids).sum_amount
-      request_total_hash[user_id] = amount
-    end
-
     self.user_money_requests = []
-    self.request_total = 0
+    self.request_total = {}
     self.user_count = 0
-    request_total_hash.each do |user_id, total|
-      self.user_count += 1
-      self.request_total += total
-      user_money_requests << {
-          user: users_map[user_id],
-          request_total: total,
-          money_requests: self.money_requests.with_user(user_id),
-          has_errors: false
-      }
+
+    user_ids.each do |user_id|
+      destination_pocket_ids = self.money_requests.pluck(:destination_pocket_id).uniq
+      destination_pocket_ids.each do |pocket_id|
+        request_ids = self.money_requests.with_user(user_id).with_destination_pocket_id(pocket_id).pluck(:id)
+        amount = MoneyRequestItem.with_money_request(request_ids).sum_amount
+        pocket = UserPocket.find_by(id: pocket_id)
+        self.user_count += 1
+        self.request_total[pocket.base_currency&.country_code] = Amount.new(value: 0, currency_id: pocket.base_currency_id) if self.request_total[pocket.base_currency&.country_code].blank?
+        self.request_total[pocket.base_currency&.country_code].value += amount
+        user_money_requests << {
+            user: users_map[user_id],
+            request_total: Amount.new(value: amount, currency_id: pocket.base_currency_id),
+            money_requests: self.money_requests.with_destination_pocket_id(pocket_id).with_user(user_id),
+            has_errors: false
+        }
+      end
     end
   end
 

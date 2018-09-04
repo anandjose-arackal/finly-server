@@ -2,20 +2,28 @@
 #
 # Table name: user_manager_mappings
 #
-#  id                     :integer          not null, primary key
-#  user_id                :integer
-#  manager_id             :integer
-#  finance_manager_id     :integer
-#  approves_to_id         :integer
-#  approves_finance_to_id :integer
-#  greater_than_amount_id :integer
-#  default                :boolean          default(FALSE), not null
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  policy_id              :integer          not null
-#  purpose_id             :integer
-#  travel_manager_id      :integer
+#  id                            :integer          not null, primary key
+#  user_id                       :integer
+#  manager_id                    :integer
+#  finance_manager_id            :integer
+#  approves_to_id                :integer
+#  approves_finance_to_id        :integer
+#  greater_than_amount_id        :integer
+#  default                       :boolean          default(FALSE), not null
+#  created_at                    :datetime         not null
+#  updated_at                    :datetime         not null
+#  policy_id                     :integer          not null
+#  purpose_id                    :integer
+#  travel_manager_id             :integer
+#  manager_violation_only        :boolean
+#  finance_violation_only        :boolean
+#  travel_booking_selector_id    :integer
+#  travel_booking_approves_to_id :integer
+#  travel_approves_to_id         :integer
 #
+
+
+
 
 
 
@@ -29,10 +37,14 @@ class UserManagerMapping < ActiveRecord::Base
   belongs_to :finance_manager, class_name: 'User'
   belongs_to :approves_to, class_name: 'User'
   belongs_to :approves_finance_to, class_name: 'User'
-  belongs_to :travel_manager, class_name: "User"
+  belongs_to :travel_manager, class_name: 'User'
+  # belongs_to :travel_selector, class_name: 'User'
+  belongs_to :travel_approves_to, class_name: 'User'
   belongs_to :greater_than_amount, class_name: 'Amount'
   belongs_to :policy
-  belongs_to :purpose, class_name: "Purpose"
+  belongs_to :purpose, class_name: 'Purpose'
+  belongs_to :travel_booking_selector, class_name: 'User'
+  belongs_to :travel_booking_approves_to, class_name: 'User'
 
   accepts_nested_attributes_for :greater_than_amount
 

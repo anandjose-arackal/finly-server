@@ -1,5 +1,5 @@
 class Settlement::UserSummary < Settlement::Base
-  attr_accessor :selected_user, :actions, :balances
+  attr_accessor :selected_user, :actions, :balances, :user_pockets
 
   def pre_validate
     unless user.present?
@@ -11,26 +11,33 @@ class Settlement::UserSummary < Settlement::Base
     load_selected_user
     return if has_errors?
     load_balances
+    load_pockets
   end
 
   def success
     params[:selected_user] = selected_user
     params[:actions] = actions
     params[:balances] = balances
+    params[:user_pockets] = self.user_pockets
     Settlement::UserSummary::Presenter.new(user, params, messages)
   end
 
   class Settlement::UserSummary::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :selected_user, :actions, :balances
+    attr_accessor :selected_user, :actions, :balances, :user_pockets
     def init
       self.selected_user = params[:selected_user]
       self.balances = params[:balances]
       self.actions = params[:actions]
+      self.user_pockets = params[:user_pockets]
     end
 
   end
 
   private
+
+  def load_pockets
+    self.user_pockets = self.selected_user.user_pockets
+  end
 
   def load_selected_user
     if personal_view?

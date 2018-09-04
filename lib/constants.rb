@@ -7,6 +7,8 @@ module Constants
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
   VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
 
+  ENDING_NUMBERS = /\d+$/
+
   OTP_RESEND_INTERVAL = 60
 
   # todo - needs to be edited once we get the account details.
@@ -19,7 +21,7 @@ module Constants
   end
 
   # todo - to be removed once companies are done mirating from HDFC to RBL
-  MIGRATING_COMPANIES = [37, 5]
+  MIGRATING_COMPANIES = [51, 48, 81]
 
   PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
@@ -30,6 +32,7 @@ module Constants
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
   DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other']
+  DEFAULT_MONEY_REQUEST_CATEGORIES = ['Accommodation', 'Lodging', 'Local Conveyance', 'Others']
 
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
@@ -61,7 +64,9 @@ module Constants
 
   WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
 
-  CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+  # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+  # using the below one because the above one's monthly quota was crossed
+  CURRENCY_LAYER_ACCESS_KEY = "5ca7968931344d3315596dc05a7249d1"
 
   # PayU Payment Gateway URL
   if Rails.env.production?
@@ -73,7 +78,7 @@ module Constants
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io anushrut.khare@finly.io venky.d@finly.io kartik.k@finly.io)
+    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io anushrut.khare@finly.io venky.d@finly.io kartik.k@finly.io abhinandan.k@finly.io)
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end
@@ -81,6 +86,7 @@ module Constants
   #### Date before which statements won't be accurate
   BEGINNING_OF_TIME = '10-03-2017'
   ###################################################
+
 
 
   if Rails.env.development?
@@ -286,4 +292,23 @@ module Constants
     YES_BANK_RECEIVING_IFSC = "YESB0000022"
     YES_BANK_COLLECT_IFSC = 'YESB0CMSNOC'
   end
+
+  ################### Encryption Keys for Darwin Box ################
+
+  class Constants::Darwinbox
+    if Rails.env.production?
+      XOR_KEY = ''
+    else
+      XOR_KEY = '666666'
+    end
+
+    if Rails.env.production?
+      SHA512_KEY = ''
+    else
+      SHA512_KEY = '4150fb44a955a5ff0711f9a1c631a3ed'
+    end
+  end
+
+  ###################### END OF Darwin Box ###########################
+
 end

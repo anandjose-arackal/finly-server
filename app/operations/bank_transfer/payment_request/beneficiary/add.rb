@@ -137,6 +137,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
               tax_type_id: order_details[:tax_type_id],
               discount_type_id: order_details[:discount_type_id],
               tds_type_id: order_details[:tds_type_id],
+              invoice_type_id: order_details[:invoice_type_id],
               gst_type_id: order_details[:gst_type_id],
               discount: order_details[:discount],
               tax: order_details[:tax],
@@ -158,13 +159,14 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
       ba = BankAccount.find_by(id: id)
       return ba
     else
-      ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
+      ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
+                                           name: order_details[:name]&.strip,
                                            company_id: self.company_id)
       vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
 
       self.unauthorized_vendors_presence = false
       if ba.nil?
-        ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
+        ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
                                 account_owner: vendor, company_id: self.company_id, default_account: true)
 
         # setting unauthorized vendors as true so that after creation, the approval flow is mandated

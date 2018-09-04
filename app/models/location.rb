@@ -11,19 +11,35 @@
 #  address        :text(65535)
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
-#  maps_id        :string(255)
 #  order          :integer
+#  maps_id        :string(255)
+#  is_deleted     :boolean          default(FALSE)
 #
 
 class Location < ActiveRecord::Base
+  include SoftDeletable
 
   belongs_to :locatable, polymorphic: true
 
   default_scope { order(order: :asc) }
 
-  validates :order, presence: true
+  # validates :order, presence: true
 
   scope :with_id, -> (id) { where id: id }
   scope :with_order, -> (order){ where order: order }
+
+  validates :name, presence: true
+
+  def as_json(options={})
+    {
+        id: id,
+        latitude: latitude,
+        longitude: longitude,
+        name: name,
+        address: address,
+        maps_id: maps_id,
+        order: order
+    }
+  end
 
 end

@@ -150,8 +150,16 @@ gem 'hooks', '0.4.1'
 gem 'bullet', '5.4.2', :group => 'development'
 
 gem 'logstasher', '1.2.2'
+gem 'lograge', '0.10.0'
+gem 'sidekiq-logstash', '0.3.0'
+gem 'logstash-logger', '0.26.1'
 
 gem 'ancestry', '3.0.2'
+
+gem 'aasm', '4.12.3'
+
+# adding aws-sdk gem for using their API enabled services
+gem 'aws-sdk'
 
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'

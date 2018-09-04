@@ -7,7 +7,7 @@
 #  field_type_id           :integer          not null
 #  mandatory               :boolean          default(FALSE), not null
 #  company_id              :integer          not null
-#  configurable_id         :integer          not null
+#  configurable_id         :integer
 #  configurable_type       :string(255)      not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
@@ -18,10 +18,10 @@
 #  global                  :boolean          default(TRUE)
 #  external_reference_type :string(255)
 #  external_reference_id   :integer
-#  field_parent_type_id    :integer          not null
 #  parent_id               :integer
 #  parent_type             :string(255)
 #  root_field              :boolean          default(TRUE)
+#  field_key               :string(255)
 #
 
 require 'test_helper'

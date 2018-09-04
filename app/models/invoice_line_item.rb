@@ -23,6 +23,8 @@
 #  parent_id              :string(255)
 #  inventory_line_item_id :integer
 #  item_info              :text(65535)
+#  comment                :string(255)
+#  account                :string(255)
 #
 
 class InvoiceLineItem < ActiveRecord::Base
@@ -35,6 +37,7 @@ class InvoiceLineItem < ActiveRecord::Base
   belongs_to :parent, polymorphic: true
   belongs_to :taxable_amount, class_name: "Amount"
   belongs_to :inventory_line_item
+  belongs_to :gst_type
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

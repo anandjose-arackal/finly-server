@@ -29,6 +29,7 @@ class Company < ActiveRecord::Base
   has_one :account, class_name: 'CompanyAccount'
   has_one :quickbooks_configuration
   has_one :tally_configuration
+  has_one :accounting_system_configuration
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions
@@ -40,6 +41,7 @@ class Company < ActiveRecord::Base
   has_many :inventory_line_items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
+  has_many :tax_rates
   has_many :invoice_reminders
   has_many :invoice_number_configs
   has_one :feature_subscription, as: :subscribable
@@ -49,6 +51,7 @@ class Company < ActiveRecord::Base
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
   has_many :web_hooks
   has_many :web_hook_tracks
+  has_many :invoice_attachments
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
@@ -63,6 +66,7 @@ class Company < ActiveRecord::Base
   has_many :card_upgrade_requests
   has_many :individual_kycs
   has_many :yes_bank_vendors
+  has_many :vendor_types
   has_many :bank_accounts
   has_many :quickbooks_departments
   has_many :report_processor_groups
@@ -72,9 +76,19 @@ class Company < ActiveRecord::Base
   has_many :customers
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+  has_many :inward_invoices, class_name: "Invoice"
+  has_many :money_request_item_categories
 
   has_many :budgets
+  has_many :procurements
+  has_many :procurement_terms
+  has_many :procurement_attachments
+  has_many :document_number_configs
+  has_many :purchase_orders
+  has_many :inward_documents # purchase order inward documents
 
+  has_many :departments
+  has_many :company_pocket_templates
 
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
@@ -264,6 +278,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.reimbursement_card_enabled
   end
 
+  def em_tax_tracking_enabled?
+    self.feature_subscription.em_tax_tracking
+  end
+
   def payroll_card_enabled?
     self.feature_subscription.payroll_card_enabled
   end
@@ -294,6 +312,10 @@ class Company < ActiveRecord::Base
 
   def travel_desk_enabled?
     self.feature_subscription.travel_request
+  end
+
+  def procurement_enabled?
+    self.feature_subscription.procurement
   end
 
   def more_than_one_subscription?
@@ -364,6 +386,10 @@ class Company < ActiveRecord::Base
     ExportPreference.build_default_preferences(self)
     Constants::DEFAULT_CATEGORIES.each do |category|
       self.categories.create(name: category, expense_management: true, vendor_payments: true)
+    end
+
+    Constants::DEFAULT_MONEY_REQUEST_CATEGORIES.each do |category|
+      self.money_request_item_categories.create(name: category, active: true)
     end
 
     self.build_configuration(bank_type: "HDFC").save if self.configuration.blank?

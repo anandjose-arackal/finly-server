@@ -52,6 +52,14 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     if expense_params[:receipts_attributes] == [nil] or expense_params[:receipts_attributes] == ['']
       expense_params.delete(:receipts_attributes)
     end
+
+    pocket_id = self.expense_params[:spent_from_id]
+    self.cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id)
+
+    # todo - jugaad to support mobile app for now
+    if self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def validate
@@ -66,6 +74,11 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       return false
     end
 
+    if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+      add_message :error, "Could not find pocket from which this expense was spent"
+      return
+    end
+
     # checking if the report is editable for personal view
     if personal_view? and expense_params[:report_id].present?
       report = user.reports.find_by(id: expense_params[:report_id])
@@ -75,7 +88,22 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     end
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_availability_create(self.cash_pocket, expense_params)
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_create(expense_params)
+  end
+
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(expense_params[:from_cash_on_hand]) || expense_params[:spent_from_id].present?
+      expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(expense_params[:reimbursable])
+      expense_params[:spent_from_id] = nil
+    end
   end
 
   def process
@@ -108,10 +136,10 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       report = user.reports.find_by(id: expense_params[:report_id])
       amount = expense.amount
       if amount.nil?
-        amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
+        amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: expense.report.policy.base_currency_id}
         amount = Amount.create(amount_params)
       else
-        amount.update(value: expense.calculate_amount_value(report.policy))
+        amount.update(value: expense.calculate_amount_value(report.policy), currency_id: expense.report.policy.base_currency_id)
       end
       expense.update_attributes(amount_id: amount.id)
 
@@ -126,12 +154,17 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     # check if this expense's amount allows for it to be marked against COH
     # and if it is or is not, update the flag for this expense accordingly
     if expense.amount.present? && expense.from_cash_on_hand
-      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      if coh_adapter.balance(display_balance: true) > expense.amount_value
+      pocket = expense.spent_from
+      if pocket.cash_pocket?
+        pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        if pocket_adapter.balance(display_balance: true) > expense.amount_value
+          expense.update(cash_on_hand_blocked: true)
+        end
+        if pocket_adapter.balance(display_balance: true) < 0
+          expense.update(cash_on_hand_blocked: false)
+        end
+      elsif pocket.credit_card_pocket?
         expense.update(cash_on_hand_blocked: true)
-      end
-      if coh_adapter.balance(display_balance: true) < 0
-        expense.update(cash_on_hand_blocked: false)
       end
     end
 

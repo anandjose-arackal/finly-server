@@ -13,9 +13,12 @@
 #  action_for_user_role_id :integer
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  is_deleted              :boolean          default(FALSE)
 #
 
 class TravelRequestTrail < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :travel_request
   belongs_to :action, class_name: "TravelRequestTrailAction"
   belongs_to :action_user, class_name: "User"

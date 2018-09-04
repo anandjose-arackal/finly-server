@@ -245,7 +245,7 @@ class Statements::Team::Summary < Statements::Team::Base
       when :user_name
         return user.name
       when :user_email
-        return user.email
+        return user.email || ""
       when :user_mobile_number
         return user.mobile_number
       when :accounts_net_advance
@@ -439,7 +439,8 @@ class Statements::Team::Summary < Statements::Team::Base
         end
       when :cash_on_hand
         unless ACCOUNT_MAP[user][:cash_on_hand]&.dig(:object).present?
-          ACCOUNT_MAP[user][:cash_on_hand] = {object: user.cash_on_hand}
+          cash_pocket = user.user_pockets.cash_pockets_only.first
+          ACCOUNT_MAP[user][:cash_on_hand] = {object: cash_pocket}
         end
         case type
           when :object

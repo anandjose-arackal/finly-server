@@ -2,14 +2,14 @@ class Personalizer::Adapters::Company2::ExportTemplates2::Config
 
   def self.templates
     {
-        tally: {
-            class: Personalizer::Adapters::Company2::ExportTemplates2::Tally,
-            name: 'Tally',
-            description: 'Tally exportable format. Exports expenses',
+        sap: {
+            class: Personalizer::Adapters::Company2::ExportTemplates2::SapTemplate,
+            name: 'SAP',
+            description: 'SAP exportable format. Exports expenses',
             formats: [
-                {name: 'Export as XML', extension: 'xml'},
+                {name: 'Export as CSV', extension: 'csv'},
+                {name: 'Export as XLS', extension: 'xls'}
             ]
-            # formats: [:xls, :csv]
         }
     }
   end

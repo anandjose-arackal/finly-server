@@ -7,7 +7,8 @@ class AccountManagerUtils
       {class: ItzCashCompanyAccount, name: 'Company Credits', code: 'ITA'},
       {class: YesBankCompanyAccount, name: 'Bank Transfer Credits', code: 'YBA'},
       {class: CashOnHand, name: 'Cash on Hand', code: 'COH'},
-      {class: BankAccount, name: 'Bank Account', code: 'BAC'}
+      {class: BankAccount, name: 'Bank Account', code: 'BAC'},
+      {class: UserPocket, name: "User Pocket", code: "USP"}
   ]
 
   def self.available_accounts(options = {})
@@ -38,9 +39,24 @@ class AccountManagerUtils
       class_string = account.class.name
     end
     account_name = nil
-    ACCOUNTS.each do |account|
-      if account[:class].to_s == class_string
-        account_name = account[:name]
+    ACCOUNTS.each do |finly_account|
+      if finly_account[:class].to_s == class_string
+        account_owner = nil
+        if account.is_a?(Object)
+          case account.class.name
+            when UserWallet.name, VendorPaymentWallet.name, CashOnHand.name, Card.name, UserPocket.name
+              account_owner = account.user.name
+            when BankAccount.name
+               account_owner = account.account_owner.name
+            else
+              account_owner = nil
+          end
+        end
+        if account_owner.present?
+          account_name = "#{account_owner.to_s}'s " + finly_account[:name]
+        else
+          account_name = finly_account[:name]
+        end
         break
       end
     end

@@ -19,6 +19,7 @@
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  date                        :datetime
+#  sequence_number             :integer
 #
 
 class FinlyTransaction < ActiveRecord::Base
@@ -36,6 +37,8 @@ class FinlyTransaction < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount, :opening_balance, :closing_balance
 
+  delegate :amount_value, to: :amount
+
   validates :finly_account_id, presence: true
   validates :finly_account_type, presence: true, :inclusion => {:in => AccountManagerUtils.available_accounts(format: :string)}
   validates :transaction_type_id, presence: true
@@ -44,6 +47,10 @@ class FinlyTransaction < ActiveRecord::Base
   validates :status_id, presence: true
   validates :payment_purpose_id, presence: true
   validates :date, presence: true
+
+  default_scope { order(id: :desc) }
+
+  delegate :credit?, :debit?, to: :transaction_type
 
   scope :with_account, -> (account) { where finly_account: account }
   scope :credits, -> { where transaction_type_id: TransactionType.id_for(:credit) }
@@ -74,6 +81,8 @@ class FinlyTransaction < ActiveRecord::Base
   scope :sort_date_desc, -> { unscope(:order).order(date: :desc, id: :desc) }
   scope :limit_to_one, -> { limit 1 }
 
+  after_save :set_sequence_number
+
   before_create do
     ref_id = payment&.reference_id
     if ref_id.blank?
@@ -82,8 +91,15 @@ class FinlyTransaction < ActiveRecord::Base
     self.transaction_reference_id = ref_id
   end
 
-  default_scope { order(id: :desc) }
+  default_scope { order(sequence_number: :desc) }
 
   delegate :credit?, :debit?, to: :transaction_type
+
+  def set_sequence_number
+    if sequence_number.blank?
+      self.sequence_number = id * 10
+      save
+    end
+  end
 
 end

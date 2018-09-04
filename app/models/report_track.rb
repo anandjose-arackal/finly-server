@@ -18,6 +18,7 @@
 #
 
 
+
 class ReportTrack < ActiveRecord::Base
   belongs_to :report
   belongs_to :report_status
@@ -29,7 +30,7 @@ class ReportTrack < ActiveRecord::Base
   belongs_to :payment
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
 
-  default_scope { order('created_at ASC') }
+  default_scope { order('report_tracks.created_at ASC') }
 
   scope :created_before, ->(time) { where 'created_at < ?', time }
   scope :without_take_control_action, -> { where.not report_tracking_action_id: ReportTrackingAction.id_for(:take_control) }

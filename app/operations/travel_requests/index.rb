@@ -37,20 +37,20 @@ class TravelRequests::Index < TravelRequests::Base
         end
       when UserRole.id_for(:manager)
         team_ids = User::Team::Index.(user, params)&.pluck(:id)
-        controlling_travel_request_query = user.controlling_travel_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids)
-        interacted_travel_requests_query= user.manager_travel_requests
-        sql = MoneyRequest.connection.unprepared_statement {
-          "((#{controlling_travel_request_query.to_sql}) UNION (#{interacted_travel_requests_query.to_sql})) AS travel_requests"
-        }
-        self.travel_requests = TravelRequest.from(sql)
-      when UserRole.id_for(:finance_manager)
+        controlling_travel_request_query = user.controlling_travel_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids).pluck(:id)
+        interacted_travel_requests_query= user.manager_travel_requests.pluck(:id)
+        # sql = MoneyRequest.connection.unprepared_statement {
+        #   "((#{controlling_travel_request_query.to_sql}) UNION (#{interacted_travel_requests_query.to_sql})) AS travel_requests"
+        # }
+        self.travel_requests = TravelRequest.with_id((controlling_travel_request_query + interacted_travel_requests_query))
+      when UserRole.id_for(:travel_manager)
         team_ids = User::Team::Index.(user, params)&.pluck(:id)
-        controlling_travel_request_query = user.controlling_travel_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:travel_manager)).with_user(team_ids)
-        interacted_travel_requests_query = user.travel_manager_travel_requests
-        sql = TravelRequest.connection.unprepared_statement {
-          "((#{controlling_travel_request_query.to_sql}) UNION (#{interacted_travel_requests_query.to_sql})) AS travel_requests"
-        }
-        self.money_requests = TravelRequest.from(sql)
+        controlling_travel_request_query = user.controlling_travel_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:travel_manager)).with_user(team_ids).pluck(:id)
+        interacted_travel_requests_query = user.travel_manager_travel_requests.pluck(:id)
+        # sql = TravelRequest.connection.unprepared_statement {
+        #   "((#{controlling_travel_request_query.to_sql}) UNION (#{interacted_travel_requests_query.to_sql})) AS travel_requests"
+        # }
+        self.travel_requests = TravelRequest.with_id((controlling_travel_request_query + interacted_travel_requests_query))
       else
         self.travel_requests = user.travel_requests
     end
@@ -67,28 +67,25 @@ class TravelRequests::Index < TravelRequests::Base
 
     # has_scope :filter_search
     # has_scope :filter_status
-    # has_scope :filter_user_id
-    # has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_user_id
+    has_scope :filter_date, using: [:from, :to], type: :hash
     # has_scope :filter_submitted_date, using: [:from, :to], type: :hash
     # has_scope :filter_approved_date, using: [:from, :to], type: :hash
     # has_scope :filter_policy
     # has_scope :filter_required_by_date
+    has_scope :filter_status
 
     def init
       self.travel_requests = params[:travel_requests]
       if self.travel_requests.present?
         self.travel_requests = apply_scopes(self.travel_requests, params)
-        self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
+        if personal_view?
+          self.travel_requests = self.travel_requests.sort_for_personal
+        else
+          self.travel_requests = self.travel_requests.sort_for_manager
+        end
       end
-    end
-
-    def status_name(travel_request)
-      return nil if travel_request.blank?
-      if travel_request.processing? and travel_request.controlling_user?(self.user)
-        'Awaiting Approval'
-      else
-        travel_request.status_name
-      end
+      self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
     end
 
   end

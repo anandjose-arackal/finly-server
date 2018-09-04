@@ -30,13 +30,13 @@ class Admin::KycProcesses::Users::Export::KycsAsZip < Admin::KycProcesses::Users
     self.individual_kycs&.each do |kyc|
       file_name_prefix = "#{kyc.user.id}"
       if kyc.user.cards.present?
-        file_name_prefix = "#{kyc.user.cards.first.proxy}"
+        file_name_prefix = "#{kyc.user.cards.last&.proxy}"
       end
       if kyc.combined_kyc.present?
-        self.files << {name: "#{file_name_prefix}.jpg", path: kyc.combined_kyc.path(:normal)}
+        self.files << {name: "#{file_name_prefix}.jpg", url: kyc.combined_kyc.url(:normal)}
       else
-        self.files << {name: "#{file_name_prefix}_1.jpg", path: kyc.kyc_file_1.path(:normal)} if kyc.kyc_file_1.present?
-        self.files << {name: "#{file_name_prefix}_2.jpg", path: kyc.kyc_file_2.path(:normal)} if kyc.kyc_file_2.present?
+        self.files << {name: "#{file_name_prefix}_1.jpg", url: kyc.kyc_file_1.url(:normal)} if kyc.kyc_file_1.present?
+        self.files << {name: "#{file_name_prefix}_2.jpg", url: kyc.kyc_file_2.url(:normal)} if kyc.kyc_file_2.present?
       end
     end
   end

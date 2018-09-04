@@ -12,6 +12,7 @@
 #  value_type             :string(255)
 #  dependent_parent_id    :integer
 #  dependent_parent_type  :string(255)
+#  field_key              :string(255)
 #
 
 class CustomField < ActiveRecord::Base
@@ -26,13 +27,14 @@ class CustomField < ActiveRecord::Base
   # validate :validate_field
 
   validates :field_configuration_id, presence: true
-  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem']}
+  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem', 'PurchaseOrder']}
   validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiselectSelection']}
 
-  scope :only_drop_downs, -> { where value_type: "FieldDropDownSelection" }
+  scope :only_drop_downs, -> { where value_type: 'FieldDropDownSelection' }
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
   scope :includes_parent, -> { includes :parent }
   scope :expenses, -> { where parent_type: ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense'] }
+  scope :with_parent_report, -> { where parent_type: ['Report'] }
   scope :with_drop_down_selection, -> (drop_down_selection_id) { where value_type: 'FieldDropDownSelection', value_id: drop_down_selection_id }
   scope :with_parent, -> (parent_id, parent_type) { where parent_id: parent_id, parent_type: parent_type}
   scope :with_multi_select_selection, -> (multiselect_selection_id) {
@@ -58,6 +60,10 @@ class CustomField < ActiveRecord::Base
     drop_down_field_config_ids = FieldConfiguration.where(id: field_config_ids, field_type_id: FieldType.id_for(:drop_down)).pluck(:id)
     where(field_configuration_id: drop_down_field_config_ids)
   }
+
+  scope :with_field_key, ->(key) { where field_key: key }
+
+  before_save :set_field_key
 
   def set_value(value, save = true)
     if value.blank?
@@ -195,6 +201,10 @@ class CustomField < ActiveRecord::Base
         json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
     end
     json
+  end
+
+  def set_field_key
+    self.field_key = self.field_configuration.field_key
   end
 
 end

@@ -18,6 +18,11 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
   end
 
   def validate
+    if self.payment.blank?
+      add_message :error, "Payment not found"
+      return
+    end
+
     unless payment.failed?
       add_message :error, "Only failed payments can be retried"
       return
@@ -35,10 +40,7 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
 
   def process
     # simple call the retry operation in Account Manager and wait for the result
-    op = AccountManager::Payments::RetryPayment.(self.payment, params)
-    unless op.success?
-      add_message :error, op.messages[:error]
-    end
+    op = AccountManager::Payments::RetryPaymentBackground.call_async(self.payment.id, params)
   end
 
   def post_process

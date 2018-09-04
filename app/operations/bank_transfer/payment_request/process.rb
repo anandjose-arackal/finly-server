@@ -150,6 +150,13 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << 'IFSC cannot be blank'
       end
 
+      # check for format of the IFSC
+      pattern = Regexp.new(Constants::VALID_IFSC)
+      unless ifsc =~ pattern
+        self.valid = false
+        self.error_messages << "Invalid IFSC"
+      end
+
       # adding all invoice specific validations here for the payment
       unless validate_date invoice_date
         self.valid = false

@@ -25,27 +25,17 @@ class Budgets::Show < Budgets::Base
   def success
     params[:budget] = self.budget
     Budgets::Show::ShowPresenter.new(user, params, messages)
-
   end
 
   class Budgets::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :budget, :budget_trail_items, :spent_amount
+    attr_accessor :budget, :budget_trail_items, :spent_amount, :spent_entities
 
 
     def init
       self.budget = params[:budget]
-
-      if budget.budgetable_type == 'User'
-        op = ::BudgetsProcessor::Calculate::User.(user, {budget: budget, get_items: true})
-      elsif budget.budgetable_type == 'Category'
-        op = ::BudgetsProcessor::Calculate::Category.(user, {budget: budget, get_items: true})
-      elsif budget.budgetable_type == 'YesBankVendor'
-        op = ::BudgetsProcessor::Calculate::YesBankVendor.(user, {budget: budget, get_items: true})
-      elsif budget.budgetable_type == 'FieldDropDownItem'
-        op = ::BudgetsProcessor::Calculate::FieldDropDownItem.(user, {budget: budget, get_items: true})
-      end
-      self.spent_amount = op.result[:spent_amount]
-      self.budget_trail_items = op.result[:budget_trail_items] rescue []
+      processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(self.budget)
+      self.spent_amount = processor_instance.spent_amount
+      self.spent_entities = processor_instance.spent_entities
     end
   end
 

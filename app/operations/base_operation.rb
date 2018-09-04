@@ -1,6 +1,6 @@
 require 'hooks'
 class BaseOperation
-  include CallbackHandler, MathUtil, HasScope
+  include CallbackHandler, MathUtil, HasScope, OperationValidations
   # todo rename user to resource as User is a model and there can be other models such as AdminUser etc
   attr_accessor :user, :company, :params, :messages, :process_complete, :response
 
@@ -378,9 +378,9 @@ class BaseOperation
     if user.present?
       user_types.each do |user_type|
         if (user_type == :employee and user.employee?) or (user_type == :manager and user.manager?) or
-            (user_type == :finance_manager and user.finance_manager?) or(user_type == :policy_admin and user.policy_admin?) or
+            (user_type == :finance_manager and user.finance_manager?) or (user_type == :policy_admin and user.policy_admin?) or
             (user_type == :company_admin and user.company_admin?) or (user_type == :admin and user.admin?) or (user_type == :superadmin and user.superadmin?) or
-            (user_type == :auditor and user.auditor?) or
+            (user_type == :auditor and user.auditor?) or (user_type == :travel_manager && user.travel_manager?) or
             (user_type == :vendor_payments_admin && user.vendor_payments_admin?) or (user_type == :reviewer && user.vendor_payments_reviewer?) or (user_type == :creditor && user.vendor_payments_creditor?) or
             (user_type == :vendor_payments_admin && user.vendor_payments_admin?) or (user_type == :vendor_payments_reviewer && user.vendor_payments_reviewer?) or (user_type == :vendor_payments_creditor && user.vendor_payments_creditor?) or
             (user_type == :vendor_payments_initiator && user.vendor_payments_initiator?)
@@ -415,6 +415,10 @@ class BaseOperation
 
   def finance_view?
     is_view?(:finance) or is_view? :finance_manager or is_view?(:creditor)
+  end
+
+  def travel_manager_view?
+    is_view?(:travel_manager)
   end
 
   def auditor_view?

@@ -1,5 +1,7 @@
 class CreateCustomerAccountForAllCustomers < ActiveRecord::Migration
   def change
+    add_column :customers, :is_deleted, :boolean, default: false
+
     customers = Customer.all
     for customer in customers
       next if customer.customer_account.is_a?(CustomerAccount)

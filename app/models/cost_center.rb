@@ -17,6 +17,12 @@ class CostCenter < ActiveRecord::Base
 
   belongs_to :company
 
+  has_many :budget_criteria_mappings, as: :budgetable
+  has_many :budgets, through: :budget_criteria_mappings
+
+  has_many :budget_trails
+
+  scope :with_name, -> (name) {where name: name}
   scope :with_application, -> (app) {
     where application: app
   }

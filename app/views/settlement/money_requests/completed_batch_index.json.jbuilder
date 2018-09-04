@@ -35,7 +35,7 @@ json.array! @result.paginated_money_request_processors do |processor|
           json.approved_on DateUtils.date_formatted(money_request.approved_at)
           json.user money_request.user
           json.final_approver money_request.final_approver
-          currency = Currency.first
+          currency = money_request.base_currency
           json.total_amount do
             json.partial! 'shared/amount', amount: Amount.new(value: money_request.total_amount, currency: currency)
           end

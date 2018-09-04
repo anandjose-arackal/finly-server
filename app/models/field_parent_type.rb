@@ -21,11 +21,23 @@ class FieldParentType < ActiveRecord::Base
       invoice: 8,
       invoice_line_item: 9,
       outward_invoice: 10,
-      outward_invoice_line_item: 11
+      outward_invoice_line_item: 11,
+      purchase_order: 12,
+      inventory_line_item: 13
   }
 
+  scope :with_name, -> (name) { where name: name }
   def self.id_for(sym)
     TYPES[sym]
+  end
+
+  def self.seed_data
+    c = self.count
+    TYPES.each do |name, id|
+      if c == 0 or self.with_name(name).blank?
+        self.create name: name
+      end
+    end
   end
 
   def self.expense_ids

@@ -37,4 +37,19 @@ class BankTransfer::VendorsController < ApplicationController
     respond
   end
 
+  def bank_accounts
+    @result = BankTransfer::Vendors::BankAccounts.(current_user, params)
+    respond
+  end
+
+  def index
+    @result = BankTransfer::Vendors::Index.(current_user, params)
+    respond
+  end
+
+  def new_vendor_config
+    @result = BankTransfer::Vendors::NewVendorConfig.(current_user, params)
+    respond
+  end
+
 end

@@ -3,21 +3,31 @@
 # Table name: travel_request_destinations
 #
 #  id                :integer          not null, primary key
-#  name              :string(255)
-#  source            :string(255)
 #  travel_request_id :integer
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  location_id       :integer
 #
 
 class TravelRequestDestination < ActiveRecord::Base
-  validates :name, presence: true
-  validates :source, presence: true
-  validates :travel_request_id, presence: true
 
+  belongs_to :location, dependent: :destroy
   belongs_to :travel_request
+  # has_many :booking_requests, dependent: :destroy
+  has_many :bookings, foreign_key: :destination_id, dependent: :destroy
 
-  has_many :booking_requests
+  validates :travel_request_id, presence: true
+  validates :location, presence: true
 
-  accepts_nested_attributes_for :booking_requests, allow_destroy: true
+  accepts_nested_attributes_for :location
+
+  scope :with_id, ->(id) {where id: id}
+
+  def as_json(options = {})
+    {
+        id: id,
+        location: location
+    }
+  end
+
 end

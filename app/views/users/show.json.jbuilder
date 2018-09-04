@@ -23,6 +23,28 @@ json.user do
   json.bank_transfer_enabled @result.selected_user.bank_transfer_enabled?
 end
 
+json.user_pockets do
+  json.array!(@result.selected_user.user_pockets) do |pocket|
+    json.name pocket.name
+    json.id pocket.id
+    case pocket.user_pocket_type_id
+      when UserPocketType.id_for(:cash)
+        adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+      when UserPocketType.id_for(:credit_card)
+        adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
+      else
+        adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    end
+    json.balance adapter.balance(display_balance: true)
+    currency = pocket.base_currency
+    json.base_currency do
+      json.symbol currency&.symbol
+      json.country_code currency&.country_code
+      json.id currency&.id
+    end
+  end
+end
+
 json.user_delegate do
   json.user_delegate_id @result.selected_user.user_delegate&.id
   json.user_delegate_name @result.selected_user.user_delegate&.name

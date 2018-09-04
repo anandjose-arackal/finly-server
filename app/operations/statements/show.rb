@@ -18,6 +18,9 @@ class Statements::Show < Statements::Base
 
     statement_type = params[:statement_type]&.to_sym
     account_type = params[:account_type]&.to_sym
+
+    pocket_id = params[:user_pocket_id] # in case the statements are being requested for a user's pocket
+
     case statement_type
       when :company
         case account_type
@@ -44,6 +47,8 @@ class Statements::Show < Statements::Base
             self.account = sel_user.bank_wallet
           when :cash_on_hand
             self.account = sel_user.cash_on_hand
+          when :user_pocket
+            self.account = sel_user.user_pockets.find_by(id: pocket_id)
         end
       when :card
         user_presenter = User::Index.(user, params)
@@ -161,7 +166,7 @@ class Statements::Show < Statements::Base
 
     def account_name
       account_name = AccountManagerUtils.name_for self.account
-      if [UserWallet.name, CashOnHand.name, Card.name].include? self.account.class.name
+      if [UserWallet.name, CashOnHand.name, Card.name, UserPocket.name].include? self.account.class.name
         if user == self.account.user
           account_name = "Your #{account_name}"
         else
@@ -194,8 +199,14 @@ class Statements::Show < Statements::Base
           end
         when PaymentPurpose.id_for(:corporate_balance_load)
           merchant = 'Corporate Balance Load'
+        when PaymentPurpose.id_for(:corporate_balance_refund)
+          refund_payment = finly_transaction.payment
+          original_payment = refund_payment.original_payment_for_refund
+          original_beneficiary = original_payment&.receiving_user&.name
+          merchant = "Refund for #{original_beneficiary}'s payment. Payment ID: #{original_payment.id}" if original_beneficiary.present?
         when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
-            PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly)
+            PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly),
+            PaymentPurpose.id_for(:cash_advance)
           if finly_transaction.payment.blank?
             if finly_transaction.associated_transaction.class.name == CompanyTransaction.name
               merchant = finly_transaction.associated_transaction.merchant_name
@@ -203,24 +214,18 @@ class Statements::Show < Statements::Base
           else
             if finly_transaction.payment.initiating_account == finly_transaction.finly_account and finly_transaction.payment.receiving_account.present?
               merchant = prefix
-              if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
-                merchant += "#{finly_transaction.payment.receiving_account&.user&.name}'s "
-              end
-              if [BankAccount].include? finly_transaction.payment.receiving_account.class
-                merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
-              end
               merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
             elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account and finly_transaction.payment.initiating_account.present?
               merchant = prefix
-              if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
-                merchant += "#{finly_transaction.payment.initiating_account&.user&.name}'s "
-              end
-              if [BankAccount].include? finly_transaction.payment.receiving_account.class
-                merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
-              end
               merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
             end
           end
+        when PaymentPurpose.id_for(:corporate_account_reload), PaymentPurpose.id_for(:payment_receivable), PaymentPurpose.id_for(:invoice), PaymentPurpose.id_for(:finly_money_reload)
+          merchant = "Virtual Account: "
+          if finly_transaction.associated_transaction&.virtual_account&.name.present?
+            merchant += "#{finly_transaction.associated_transaction&.virtual_account&.name} - "
+          end
+          merchant += finly_transaction.associated_transaction&.virtual_account&.account_number
       end
       merchant
     end

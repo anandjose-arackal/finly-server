@@ -1,147 +1,150 @@
-json.extract! @result.travel_request, :id, :name, :policy_id, :required_by_date,
-              :note,
-              :user_id, :controlling_user_id,
-              :controlling_for_user_id, :controlling_user_role, :controlling_for_user_role,
-              :submitted_at, :created_at, :updated_at
-
-json.policy do
-  json.id @result.travel_request.policy_id
-  json.name @result.travel_request.policy&.name
-end
-json.status do
-  json.extract! @result.travel_request.status, :id, :name
+json.travel_request do
+  request_json = @result.travel_request.as_json
+  request_json.merge!({status: {id: @result.travel_request.status_id, name: @result.travel_request.status_for_user(@result.user)}})
+  request_json.each do |key, value|
+    json.set! key, value
+  end
 end
 
-json.editable @result.editable
-
-json.destroyable @result.destroyable
+json.manager_name @result.manager&.name
+json.travel_manager_name @result.travel_manager&.name
+json.controlling_user_name @result.travel_request&.controlling_user&.name
+json.owner do
+  owner = @result.travel_request.user
+  json.first_name owner.first_name
+  json.last_name owner.last_name
+  json.gender owner.profile.gender
+  json.age DateUtils.age(owner.profile.date_of_birth)
+  json.salutation owner.profile.salutation_status
+  json.email owner.email
+  json.mobile_number owner.mobile_number
+end
 
 json.destinations do
   json.array! @result.destinations do |destination|
-    json.extract! destination, :id, :name, :source
-    json.booking_requests do
-      json.array! destination.booking_requests do |booking_request|
-        json.extract! booking_request, :id, :booking_type_id, :note
-        json.booking_type_name booking_request.booking_type.name
-        if booking_request.flight?
-          json.booking_flight do
-            json.extract! booking_request.booking_flight, :id, :journey_date, :journey_destination, :journey_source, :booking_class, :stops
+    json.extract! destination, :id, :location
+    json.booking @result.grouped_bookings(destination)
+  end
+end
+
+json.actions @result.actions
+json.policies @result.policies
+json.editable @result.editable
+json.destroyable @result.destroyable
+json.can_select_options @result.can_select_options?
+json.can_add_request @result.can_add_request?
+json.can_add_options @result.can_add_options?
+json.can_add_booking @result.can_add_booking?
+json.can_cancel_booking @result.can_cancel_booking?
+json.can_create_money_requests @result.can_create_money_requests?
+json.show_money_requests @result.show_money_requests?
+json.can_create_reports @result.can_create_reports?
+json.show_reports @result.show_reports?
+
+# json.summary @result.travel_request.summary
+
+json.money_requests do
+  json.total_submitted 0
+  json.total_processed 0
+  json.data do
+    json.array! @result.money_requests.each do |money_request|
+      json.extract! money_request, :id, :name, :memo, :required_by_date
+      json.status money_request.status
+      json.user do
+        json.extract! money_request.user, :name
+      end
+
+      json.can_view @result.can_view_money_request?(money_request)
+      json.can_edit @result.can_edit_money_request?(money_request)
+
+      json.submitted_amount Amount.new(value: money_request.total_amount, currency: money_request.base_currency)
+      json.processed_amount money_request.processed_amount
+      if money_request.destination_pocket.present?
+        json.destination_pocket do
+          pocket = money_request.destination_pocket
+          json.id pocket.id
+          json.name pocket.name
+          json.pocket_type do
+            json.id pocket.user_pocket_type.id
+            json.name pocket.user_pocket_type.name
           end
-        end
-
-        if booking_request.bus?
-          json.booking_bus do
-            json.extract! booking_request.booking_bus, :id, :journey_source, :journey_destination, :journey_date, :booking_class
-          end
-        end
-
-        if booking_request.train?
-          json.booking_train do
-            json.extract! booking_request.booking_train, :id, :journey_source, :journey_destination, :journey_date, :booking_class
-          end
-        end
-
-        if booking_request.car_rental?
-          json.booking_car_rental do
-            json.extract! booking_request.booking_car_rental, :id, :journey_source, :journey_destination, :journey_date,
-                          :pickup_address, :pickup_time, :reservation_start_date, :reservation_end_date, :car_type
-          end
-        end
-
-        if booking_request.hotel?
-          json.booking_hotel do
-            json.extract! booking_request.booking_hotel, :id, :reservation_destination,
-                          :reservation_start_date, :reservation_end_date, :hotel_name, :hotel_rating
-          end
-        end
-
-        if booking_request.restaurant?
-          json.booking_restaurant do
-            json.extract! booking_request.booking_restaurant, :id, :reservation_destination, :reservation_date,
-                          :reservation_time, :restaurant_name, :restaurant_rating
-          end
-        end
-        json.travel_members do
-          json.array! booking_request.travel_members do |travel_member|
-            json.extract! travel_member,:id, :title, :first_name, :middle_name, :last_name,
-                          :child, :age, :email, :mobile_number, :gender
-          end
-        end
-        json.bookings do
-          json.array! booking_request.bookings do |booking|
-            json.extract! booking, :id, :booking_type_id, :note
-            json.booking_type_name booking.booking_type.name
-            # json.booking_status booking&.booking_status.name&.humanize
-
-            if booking.flight?
-              json.booking_flight do
-                json.extract! booking.booking_flight, :id, :departure_date, :journey_destination,
-                :journey_source, :journey_date, :booking_class, :stops, :ticket_number, :pnr, :airline
-              end
-            end
-
-            if booking.bus?
-              json.booking_bus do
-                json.extract! booking.booking_bus, :id, :journey_source, :journey_destination, :journey_date, :booking_class, :boarding_point
-              end
-            end
-
-            if booking.train?
-              json.booking_train do
-                json.extract! booking.booking_train, :id, :journey_source, :journey_destination, :journey_date,
-                :booking_class, :boarding_station_name, :pnr, :train_number
-              end
-            end
-            if booking.car_rental?
-              json.booking_car_rental do
-                json.extract! booking.booking_car_rental, :id, :journey_source, :journey_destination, :journey_date,
-                              :pickup_address, :pickup_time, :reservation_start_date, :reservation_end_date, :car_type, :car_number
-              end
-            end
-
-            if booking.hotel?
-              json.booking_hotel do
-                json.extract! booking.booking_hotel, :id, :reservation_destination,
-                              :reservation_start_date, :reservation_end_date, :hotel_name, :reservation_time, :hotel_rating
-              end
-            end
-
-            if booking.restaurant?
-              json.booking_restaurant do
-                json.extract! booking.booking_restaurant, :id, :reservation_destination, :reservation_date,
-                              :reservation_time, :restaurant_name, :restaurant_rating
-              end
-            end
-
-            json.attachments do
-              json.array! booking.attachments do |attachment|
-                json.extract! attachment, :id, :description
-                json.file_name attachment.attachment_file_name
-                json.file_size (attachment.attachment_file_size / 1024).round(2).to_s + " KB"
-                json.url attachment.attachment.url
-              end
-            end
-
-            json.travel_members do
-              json.array! booking.travel_members do |travel_member|
-                json.extract! travel_member,:id, :title, :first_name, :middle_name, :last_name,
-                              :child, :age, :email, :mobile_number, :gender
-              end
-            end
+          adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+          json.balance adapter.balance(display_balance: true)
+          currency = pocket.base_currency
+          json.base_currency do
+            json.symbol currency&.symbol
+            json.country_code currency&.country_code
+            json.id currency&.id
           end
         end
       end
+
+      json.request_items money_request.items do |item|
+        json.category do
+          json.name item.category.name
+          json.id item.category.id
+        end
+        json.amount do
+          json.value item.amount.value
+          json.currency item.amount.currency
+        end
+      end
+
+      json.custom_fields do
+        json.array! money_request.custom_fields
+      end
+
     end
   end
 end
 
-json.booking_types do
-  json.array! @result.booking_types do |booking_type|
-    json.extract! booking_type, :id, :name
+# For money requests
+json.cash_pockets do
+  json.array!(@result.travel_request.user.user_pockets.cash_pockets_only) do |pocket|
+    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    json.name pocket.name
+    json.balance adapter.balance(display_balance: true)
+    json.id pocket.id
+    json.base_currency do
+      json.symbol pocket.base_currency&.symbol
+      json.country_code pocket.base_currency&.country_code
+      json.id pocket.base_currency&.id
+    end
   end
 end
 
+json.reports do
+  # json.total_reported 0
+  # json.data do
+  json.array! @result.reports.each do |report|
+    json.extract! report, :id, :name
+    json.submitted_on DateUtils.date_formatted report.submitted_at
+    json.user do
+      json.extract! report.user, :name
+    end
+    if report.memo
+      if report.memo[21]
+        json.memo report.memo[0, 20] + "..."
+      else
+        json.memo report.memo
+      end
+    end
+    if report.policy
+      json.policy report.policy.name
+    end
+    json.status report.report_status
+    json.total(('%.2f' % report.total_amount))
+    json.currency report.base_currency
+  end
+  # end
+end
 
-json.actions @result.actions
 
-json.policies current_company.policies
+json.comments do
+  json.array!(@result.travel_request.comments) do |comment|
+    json.content comment.retrieve_content(current_user)
+    json.user_name comment.user&.name
+    json.timestamp comment.created_at.strftime('%d %b %Y')
+    json.initials comment.user&.initials
+  end
+end

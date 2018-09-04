@@ -49,7 +49,8 @@ class PaymentPurpose < ActiveRecord::Base
         :unblocked_after_conflict_resolution,
         :failed_transaction_reversal,
         :opening_balance_load,
-        :collect_funds_withdrawal
+        :collect_funds_withdrawal,
+        :settlement_against_advance
     ]
   end
 end

@@ -44,6 +44,13 @@ class Expense::Manual::Create < Expense::Manual::Base
     if expense_params[:receipts_attributes] == [nil] or expense_params[:receipts_attributes] == ['']
       expense_params.delete(:receipts_attributes)
     end
+
+    pocket_id = self.expense_params[:spent_from_id]
+    self.cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id)
+
+    if self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def validate
@@ -61,8 +68,13 @@ class Expense::Manual::Create < Expense::Manual::Base
       end
     end
 
+    if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+      add_message :error, "Could not find pocket from which this expense was spent"
+      return
+    end
+
     # checking if the user has enough cash on hand balance to mark this expense against it
-    check_coh_availability_create(expense_params)
+    check_coh_availability_create(self.cash_pocket, expense_params)
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_create(expense_params)
@@ -71,8 +83,13 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def pre_process
     # if the expense is from cash on hand, mark it as non-reimbursable by default
-    if StringUtils.to_bool(expense_params[:from_cash_on_hand])
+    if StringUtils.to_bool(expense_params[:from_cash_on_hand]) || expense_params[:spent_from_id].present?
       expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(expense_params[:reimbursable])
+      expense_params[:spent_from_id] = nil
     end
   end
 
@@ -98,6 +115,13 @@ class Expense::Manual::Create < Expense::Manual::Base
       Receipt::ReceiptEmails::ProcessEmail.call_async(user, receipt_email_id: self.expense.receipt_email.id)
     end
 
+    # calculate the equivalent amount in all currencies in the amounts table
+    if expense.date == DateUtils.local_date
+      expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+    else
+      expense.update_other_currencies
+    end
+
     Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
 
     # add comment in report if expense is added within report
@@ -118,13 +142,6 @@ class Expense::Manual::Create < Expense::Manual::Base
       expense.receipts.update_all(to_be_transcribed: false)
     end
 
-    # calculate the equivalent amount in all currencies in the amounts table
-    if expense.date == DateUtils.local_date
-      expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
-    else
-      expense.update_other_currencies
-    end
-
     add_message :success, 'Expense created'
   end
 
@@ -134,7 +151,6 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   protected
-
   def validate_custom_fields
     if self.expense.valid?
       set_fields = set_custom_fields false

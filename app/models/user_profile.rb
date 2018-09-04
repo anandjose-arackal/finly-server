@@ -2,34 +2,47 @@
 #
 # Table name: user_profiles
 #
-#  id                  :integer          not null, primary key
-#  user_id             :integer
-#  avatar_file_name    :string(255)
-#  avatar_content_type :string(255)
-#  avatar_file_size    :integer
-#  avatar_updated_at   :datetime
-#  kyc_verified        :boolean
-#  gcm_sender_id       :string(255)
-#  employee_id         :string(255)
-#  payroll_id          :string(255)
-#  default_currency_id :integer
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  date_of_birth       :date
-#  gender              :string(255)
-#  address_1           :string(255)
-#  address_2           :string(255)
-#  city                :string(255)
-#  state_id            :integer
-#  pin_code            :string(255)
+#  id                     :integer          not null, primary key
+#  user_id                :integer
+#  avatar_file_name       :string(255)
+#  avatar_content_type    :string(255)
+#  avatar_file_size       :integer
+#  avatar_updated_at      :datetime
+#  kyc_verified           :boolean
+#  gcm_sender_id          :string(255)
+#  employee_id            :string(255)
+#  payroll_id             :string(255)
+#  default_currency_id    :integer
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  date_of_birth          :date
+#  gender                 :string(255)
+#  address_1              :string(255)
+#  address_2              :string(255)
+#  city                   :string(255)
+#  state_id               :integer
+#  pin_code               :string(255)
+#  signature_file_name    :string(255)
+#  signature_content_type :string(255)
+#  signature_file_size    :integer
+#  signature_updated_at   :datetime
+#  signature_title        :string(255)
 #
 
 class UserProfile < ActiveRecord::Base
+  include Attachable
   belongs_to :user
   belongs_to :default_currency, class_name: 'Currency'
   belongs_to :state
 
   has_attached_file :avatar, styles: {large: '2160x2160>', normal: '1080x1080>', thumb: '500x500>'}
+
+
+  has_attached_file :signature, styles: lambda { |a| a.instance.style_format(a) }
+  validates_attachment :signature, content_type: {
+      # content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+      content_type: %w(image/jpg image/jpeg image/png image/gif)
+  }
 
   # validates :user_id, presence: true
   # validates :date_of_birth, presence: true
@@ -81,5 +94,6 @@ class UserProfile < ActiveRecord::Base
 
     address
   end
+
 
 end

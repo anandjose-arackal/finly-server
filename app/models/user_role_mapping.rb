@@ -2,27 +2,23 @@
 #
 # Table name: user_role_mappings
 #
-#  id           :integer          not null, primary key
-#  user_id      :integer          not null
-#  user_role_id :integer          not null
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  purpose_id   :integer
+#  id                    :integer          not null, primary key
+#  user_id               :integer          not null
+#  user_role_id          :integer          not null
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  purpose_id            :integer
+#  company_department_id :integer
+#  branch_location_id    :integer
 #
-
-
-
-
-
-
-
-
 
 
 class UserRoleMapping < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :user_role
+  belongs_to :company_department
+  belongs_to :branch_location
   belongs_to :purpose, class_name: "Purpose"
 
   scope :role, ->(role_id) { where user_role_id: role_id }

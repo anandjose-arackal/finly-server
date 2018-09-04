@@ -58,6 +58,12 @@ class UsersController < ApplicationController
     end
   end
 
+  def update_signature
+    # For uploading user signature which will be digitally signed in purchase order
+    @result = User::Configuration::UpdateSignature.(current_user, params)
+    respond
+  end
+
   def update_password
     update_password_op = User::Configuration::UpdatePassword.new(current_user, params)
     @result = update_password_op.run

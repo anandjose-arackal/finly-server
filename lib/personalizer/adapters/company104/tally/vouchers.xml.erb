@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+   <HEADER>
+      <TALLYREQUEST>Import Data</TALLYREQUEST>
+   </HEADER>
+   <BODY>
+      <IMPORTDATA>
+         <REQUESTDESC>
+            <REPORTNAME>Vouchers</REPORTNAME>
+            <STATICVARIABLES>
+               <SVCURRENTCOMPANY><%= html_escape configuration.company_name %></SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+         </REQUESTDESC>
+         <REQUESTDATA>
+            <TALLYMESSAGE xmlns:UDF="TallyUDF">
+            <% Personalizer::Adapters::Company104::Tally::TallyTemplate.validate expenses %>
+            <% request = Personalizer::Adapters::Company104::Tally::TallyTemplate.generate_request_for expenses,configuration %>
+            <% if request.present? %>
+            <% request.each do |report_id, vouchers| %>
+            <% vouchers.each do |name, details| %>
+              <% next if name == :cost_center %>
+              <VOUCHER VCHTYPE="<%= name %>" ACTION="Create">
+                 <VOUCHERTYPENAME><%= name %></VOUCHERTYPENAME>
+                 <DATE><%= details[:date] %></DATE>
+                 <NARRATION></NARRATION>
+                 <COSTCENTRENAME><%= vouchers[:cost_center] %></COSTCENTRENAME>
+                 <EFFECTIVEDATE><%= details[:date] %></EFFECTIVEDATE>
+              <% details[:transactions].each do |ledger_name, amount| %>
+                 <ALLLEDGERENTRIES.LIST>
+                    <LEDGERNAME><%= html_escape ledger_name %></LEDGERNAME>
+                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                    <ISDEEMEDPOSITIVE><%= amount >= 0 ? 'No' : 'Yes' %></ISDEEMEDPOSITIVE>
+                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                    <AMOUNT><%= amount %></AMOUNT>
+                 </ALLLEDGERENTRIES.LIST>
+              <% end %>
+              </VOUCHER>
+            <% end %>
+            <% end %>
+            <% end %>
+
+
+            </TALLYMESSAGE>
+         </REQUESTDATA>
+      </IMPORTDATA>
+   </BODY>
+</ENVELOPE>

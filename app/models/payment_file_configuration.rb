@@ -14,8 +14,8 @@ class PaymentFileConfiguration < ActiveRecord::Base
   belongs_to :company
 
   validates :company_id, presence: true
-  validates :file_format, inclusion: {in: [nil, 'custom', 'yes_bank', 'icici_bank', 'karnataka_bank', 'kotak_mahindra_bank']}
-
+  validates :file_format, inclusion: {in: PaymentFiles::Config.available_keys}
+  
   serialize :options, Hash
 
 end

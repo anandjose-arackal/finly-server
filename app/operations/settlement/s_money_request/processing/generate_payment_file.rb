@@ -46,6 +46,7 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
     payment_params = []
     self.group_mappings.include_for_payment_file&.each do |mapping|
       payment_params << {
+          beneficiary_account_name: mapping.processor_accountable.name,
           beneficiary_account_number: mapping.processor_accountable.account_number,
           receiving_user_name: mapping.user.name,
           amount: mapping.amount.value,
@@ -57,7 +58,7 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
           note: mapping.note,
       }
     end
-    self.response = PaymentFiles::Generate.(user, payment_file: payment_params)
+    self.response = PaymentFiles::Generate.(user, payment_file: payment_params, resources: self.group_mappings)
   end
 
 end

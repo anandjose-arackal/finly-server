@@ -44,8 +44,8 @@ Rails.application.configure do
       address:              'smtp.sendgrid.net',
       port:                 587,
       domain:               'localhost',
-      user_name:            'vivekagb',
-      password:             'idAr5APhk61X',
+      user_name:            'apikey',
+      password:             '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',
       # ssl:                  true,
       # tls:                  true,
       authentication:       :plain,
@@ -78,4 +78,18 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
+  # config.paperclip_defaults = {
+  #     storage: :s3,
+  #     s3_region: ENV["aws_region_name"],
+  #     s3_credentials: {
+  #         s3_host_name: ENV["s3_host_name"],
+  #         bucket: ENV["s3_attachment_bucket_name"],
+  #         s3_region: ENV["aws_region_name"],
+  #         access_key_id: ENV["aws_access_key_id"],
+  #         secret_access_key: ENV["aws_secret_access_key"]
+  #     }
+  # }
+  #########################################################################################
 end

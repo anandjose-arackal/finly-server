@@ -58,6 +58,14 @@ class Expense::ExTime::Update < Expense::ExTime::Base
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
     end
+
+    pocket_id = self.updated_expense_params[:spent_from_id]
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
+
+    # todo - jugaad to support mobile app for now
+    if self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def authorize
@@ -84,7 +92,22 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     end
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_availability_update(self.cash_pocket, updated_expense_params)
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_update(updated_expense_params)
+  end
+
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) || updated_expense_params[:spent_from_id].present?
+      updated_expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(updated_expense_params[:reimbursable])
+      updated_expense_params[:spent_from_id] = nil
+    end
   end
 
   def process
@@ -97,11 +120,6 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    # valid = CustomField::Validate.(self.expense.time_expense)
-    # unless valid.success?
-    #   add_message :error, valid.messages[:error]
-    #   return
-    # end
 
     if expense.update(updated_expense_params)
       if self.destroy_receipts
@@ -133,7 +151,7 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     # if the expense has an associated amount, update the amount
     if expense.amount.present? && expense.report.present?
       amount = expense.amount
-      amount.update(value: expense.calculate_amount_value(expense.report.policy))
+      amount.update(value: expense.calculate_amount_value(expense.report.policy), currency_id: expense.report.policy.base_currency_id)
     end
 
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
@@ -154,12 +172,17 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     # check if this expense's amount allows for it to be marked against COH
     # and if it is or is not, update the flag for this expense accordingly
     if expense.amount.present? && expense.from_cash_on_hand
-      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      if coh_adapter.balance(display_balance: true) > expense.amount_value
+      pocket = expense.spent_from
+      if pocket.cash_pocket?
+        pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        if pocket_adapter.balance(display_balance: true) > expense.amount_value
+          expense.update(cash_on_hand_blocked: true)
+        end
+        if pocket_adapter.balance(display_balance: true) < 0
+          expense.update(cash_on_hand_blocked: false)
+        end
+      elsif pocket.credit_card_pocket?
         expense.update(cash_on_hand_blocked: true)
-      end
-      if coh_adapter.balance(display_balance: true) < 0
-        expense.update(cash_on_hand_blocked: false)
       end
     end
 

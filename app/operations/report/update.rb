@@ -15,8 +15,12 @@ class Report::Update < Report::Base
 
   def init
     super
+    if self.report.blank?
+      id = (params[:id] or params[:report_id])
+      self.report = user.controlling_reports.with_id(id).first rescue nil
+    end
     self.update_param = {}
-    self.update_param = self.params.permit(:name, :policy_id, :memo)
+    self.update_param = self.params.permit(:name, :policy_id, :memo, :travel_request_id)
     if self.update_param[:policy_id].present? and ([0, '0', 'nil'].include?(self.update_param[:policy_id]))
       self.update_param[:policy_id] = nil
     end
@@ -27,19 +31,19 @@ class Report::Update < Report::Base
   end
 
   def authorize
-    unless user == report.user
-      messages[:error] << 'Only report owners can update report'
-      raise_unauthorized_exception
-    end
+    # unless user == report.user
+    #   messages[:error] << 'Only report owners can update report'
+    #   raise_unauthorized_exception
+    # end
     unless user == report.controlling_user
-      messages[:error] << 'Only report owners can update report'
+      messages[:error] << 'You cannot edit the report at this stage'
       raise_unauthorized_exception
     end
   end
 
   def validate
-    unless report.retracted? or report.open? or report.rejected?
-      messages[:error] << 'Cannot update report unless retracted'
+    unless report.retracted? or report.open? or report.rejected? or report.processing?
+      messages[:error] << 'You cannot edit the report at this stage'
     end
   end
 
@@ -95,7 +99,7 @@ class Report::Update < Report::Base
   def calculate_amounts
     report.expenses.each do |expense|
       if expense.distance_expense? || expense.time_expense? || expense.per_diem_expense?
-        expense.amount.update(value: expense.calculate_amount_value(report.policy))
+        expense.amount.update(value: expense.calculate_amount_value(report.policy), currency_id: expense.report.policy.base_currency_id)
       end
     end
   end

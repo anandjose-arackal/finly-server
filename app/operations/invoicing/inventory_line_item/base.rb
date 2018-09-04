@@ -2,13 +2,13 @@ class Invoicing::InventoryLineItem::Base < BaseOperation
 
   def pre_validate
     if user.blank? || params.blank?
-      add_message :error, "Invaoid parameters pass, try again"
+      add_message :error, "Invalid parameters pass, try again"
       return
     end
   end
 
   def inventory_item_params
-    params.require(:inventory_item).permit(:rate, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note)
+    params.require(:inventory_item).permit(:rate, :tax_rate_id, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note, :item_code, :account)
   end
 
   class Invoicing::InventoryLineItem::Base::ItemPresenter < BaseOperation::BasePresenter::SuccessPresenter

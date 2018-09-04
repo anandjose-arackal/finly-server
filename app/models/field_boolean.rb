@@ -12,5 +12,7 @@ class FieldBoolean < ActiveRecord::Base
   has_one :custom_field, as: :value
   has_one :field_configuration, as: :default_value
 
-  validates :value, presence: true
+  # cannot apply this validation as false is considered 'not present'
+  # validates :value, presence: true
+  validates :value, :inclusion => {:in => [false, true]}
 end

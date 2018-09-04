@@ -10,7 +10,7 @@
 
 class PaymentStatus < ActiveRecord::Base
 
-  VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5, cancelled: 6, processing: 7, pending_approval: 8, possible_failure: 9}
+  VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5, cancelled: 6, processing: 7, pending_approval: 8, possible_failure: 9, pending_credit: 10}
 
   scope :with_name, ->(name) { where name: name }
 
@@ -49,6 +49,10 @@ class PaymentStatus < ActiveRecord::Base
 
   def processing?
     self.id == PaymentStatus.id_for(:processing)
+  end
+
+  def possible_failure?
+    self.id == PaymentStatus.id_for(:possible_failure)
   end
 
 end

@@ -14,6 +14,10 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  note        :text(65535)
+#  tax_rate_id :integer
+#  is_deleted  :boolean          default(FALSE), not null
+#  item_code   :string(255)
+#  account     :string(255)
 #
 
 require 'test_helper'

@@ -24,6 +24,18 @@
 #  deleted_to_split       :boolean          default(FALSE)
 #  from_cash_on_hand      :boolean          default(FALSE)
 #  cash_on_hand_blocked   :boolean
+#  expense_tax_type_id    :integer
+#  gst_percentage         :decimal(10, )
+#  tds_percentage         :decimal(10, )
+#  tds_amount_id          :integer
+#  gst_type_id            :integer
+#  tds_slab_id            :integer
+#  gst_amount_id          :integer
+#  usage_date_start       :datetime
+#  usage_date_end         :datetime
+#  usage_date_type        :string(255)
+#  spent_from_id          :integer
+#  custom_conversion_rate :boolean          default(FALSE)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

@@ -1,0 +1,129 @@
+# this operation will add all payments to the bank payment request passed and
+# once done will initiate the payments one by one in the background itself
+
+# Accepts: BankPaymentRequest object and individual payments hash
+
+class BankTransfer::Payments::ApiPayments::InitiatePaymentBackground < BackgroundOperation
+
+  attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
+                :company_id
+
+  def self.call(user, options = {})
+    self.new.perform(user, options)
+  end
+
+  def perform(user, options, request_store_hash = nil)
+    load_request_store request_store_hash
+    if options.present? and options.is_a?(Hash)
+      options = options.with_indifferent_access
+    end
+    self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
+    self.payments_attributes = options[:payments_attributes]
+    self.options = options
+    self.run
+  end
+
+  def initialize
+    # self.payment_order = payment_order
+    # self.options = options
+  end
+
+  def pre_validate
+    if self.bank_payment_request.blank?
+      add_message :error, "Payment order not found"
+    end
+  end
+
+  def init
+    self.company_id = self.bank_payment_request.owner.company_id
+    self.user = self.bank_payment_request.owner
+    self.payment_mode = self.bank_payment_request.payment_mode
+    # here assign attributes to the existing bank payment request object which can be saved later
+    payment_params = []
+    self.payments_attributes.each do |payment|
+      bank_account = retrieve_bank_account(payment)
+      payment_params << {
+          payment_type_id: PaymentType.id_for(:credit),
+          application: "vp",
+          receiving_user_type: bank_account.account_owner.class.name,
+          receiving_user_id: bank_account.account_owner_id,
+          initiating_user_type: "User",
+          initiating_user_id: user.id,
+          initiating_account_type: YesBankCompanyAccount.name,
+          initiating_account_id: user.company.yes_bank_company_account.id,
+          receiving_account_type: "BankAccount",
+          receiving_account_id: bank_account.id,
+          payment_status_id: PaymentStatus.id_for(:pending_approval),
+          payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+          payment_mode: self.payment_mode,
+          amount_attributes: {
+              value: payment[:amount],
+              currency_id: Currency.first.id
+          },
+          note: payment[:note],
+          date: DateUtils.local_date,
+          api_initiated: true
+      }
+    end
+    self.bank_payment_request.payment_order.payments.build(payment_params)
+    # now create the bank payment request object and save it so that it can be executed next
+    self.bank_payment_request.save
+  end
+
+  def validate
+
+  end
+
+  def process
+    # now that we have the bank payment request and the payments saved and ready to execute,
+    # we can call the payment order executor that will credit each payment one by one
+    payment_order = self.bank_payment_request.payment_order
+    op = BankTransfer::YesBank::Execute.call(payment_order.initiating_user, payment_order_id: payment_order.id)
+    if op.success?
+      # mark the bank payment request as credited, and add a trail
+      # update the bank_payment_request to credited
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
+                                  controlling_for_user_id: nil, controlling_for_user_role_id: nil)
+      # create a trail to show that the BPR was credited
+      bank_payment_request.bank_payment_request_trails.create action_user: user,
+                                                              action_user_role_id: UserRole.id_for(:initiator),
+                                                              action_id: BankPaymentRequestTrailAction.id_for(:credit),
+                                                              modified_user_id: nil,
+                                                              modified_user_role_id: nil
+      bank_payment_request.comments.build(user_id: user.id, action_id: BankPaymentRequestCommentAction.id_for(:credit)).save
+
+    else
+      add_message :error, op.messages[:error]
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
+      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:failed))
+      payment_order.payments.each do |payment|
+        payment.system_messages.create(content: op.messages[:error].to_sentence,
+                                       system_message_type_id: SystemMessageType.id_for(:error))
+      end
+      return
+    end
+  end
+
+  private
+
+  def retrieve_bank_account(order_details)
+    if order_details[:account_id].present?
+      id = order_details[:account_id]
+      ba = BankAccount.find_by(id: id)
+      return ba
+    else
+      ba = BankAccount.non_deleted.find_by(account_number: order_details[:account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
+                                           company_id: self.company_id, name: params[:name]&.strip,
+                                           account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
+      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
+      ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
+      if ba.nil?
+        ba = BankAccount.create(name: order_details[:name], account_number: order_details[:account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
+                                account_owner: vendor, company_id: self.company_id, default_account: true)
+
+      end
+      return ba
+    end
+  end
+
+end

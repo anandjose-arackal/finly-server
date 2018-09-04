@@ -9,11 +9,34 @@
 #
 
 class BookingStatus < ActiveRecord::Base
-
   include Seedable
 
   def self.values
-    [:processing, :confirmed, :cancelled] # todo write migration to seed
-
+    [:request, :rejected, :option, :selected_for_booking, :processing, :confirmed, :cancelled]
   end
+
+  def request?
+    id == BookingStatus.id_for(:request)
+  end
+
+  def option?
+    id ==  BookingStatus.id_for(:option)
+  end
+
+  def selected_for_booking?
+    id == BookingStatus.id_for(:selected_for_booking)
+  end
+
+  def confirmed?
+    id == BookingStatus.id_for(:confirmed)
+  end
+
+  def processing?
+    id == BookingStatus.id_for(:processing)
+  end
+
+  def cancelled?
+    id == BookingStatus.id_for(:cancelled)
+  end
+
 end

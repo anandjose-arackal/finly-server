@@ -10,9 +10,40 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
   config.logstasher.enabled = true
+  config.logstasher.field_renaming = {
+      error: :exception,
+  }
+
+  config.lograge.enabled = true
+  # config.lograge.keep_original_rails_log = true
+  # config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/lograge_#{Rails.env}.log"
+  config.lograge.custom_options = lambda do |event|
+    {
+        exception: event.payload[:exception], # ["ExceptionClass", "the message"]
+        exception_object: event.payload[:exception_object] # the exception instance
+    }
+  end
+
+
+  config.lograge.custom_payload do |controller|
+    user = controller.current_user
+    hash = {params: controller.params}
+    hash[:current_app] = (controller.current_app rescue nil)
+    hash[:current_device] = (controller.current_device rescue nil)
+    if user.present?
+      hash[:user_id] = user&.id
+      hash[:user_name] = (user&.name rescue nil)
+      hash[:user_email] = user&.email
+      hash[:user_mobile_number] = user&.mobile_number
+      hash[:company_name] = (controller.current_company&.name rescue nil)
+      hash[:company_id] = (controller.current_company&.id rescue nil)
+      hash[:current_view] = (controller.params&.dig(:view) rescue nil)
+    end
+    hash
+  end
 
   # Full error reports are disabled and caching is turned on.
-  config.consider_all_requests_local       = false
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
@@ -51,7 +82,7 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :debug
+  config.log_level = :info
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]
@@ -69,21 +100,38 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+
   ################### SETTINGS FOR SENDGRID ##########################
-  config.action_mailer.default_url_options = { host: "www.finly.io" }
+  config.action_mailer.default_url_options = {host: 'www.finly.io'}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              'mail2.itzcash.com',
-    port:                 25,
-    domain:               'www.finly.io'
-#    user_name:            'finly@itzcash.com',
-    # password:             '',
-    # ssl:                  true,
-    # tls:                  true,
-#    authentication:       :none,
-    # enable_starttls_auto: true,
-    # :openssl_verify_mode  => 'none'
+      address: 'email-smtp.us-east-1.amazonaws.com',
+      port: 587,
+      domain: 'www.finly.io',
+      user_name: 'AKIAJ5HL7SQUHLBE4ADA',
+      password: 'Am8pl0148u28SWX7YqsAy5vbJNujSx9qIYIitPcmgH1+',
+      # ssl:                  true,
+      # tls:                  true,
+      authentication: :plain,
+      enable_starttls_auto: true,
+      :openssl_verify_mode => 'none'
   }
+
+  #   config.action_mailer.delivery_method = :smtp
+  #   config.action_mailer.smtp_settings = {
+  #     address:              'mail2.itzcash.com',
+  #     port:                 25,
+  #     domain:               'www.finly.io'
+  # #    user_name:            'finly@itzcash.com',
+  #     # password:             '',
+  #     # ssl:                  true,
+  #     # tls:                  true,
+  # #    authentication:       :none,
+  #     # enable_starttls_auto: true,
+  #     # :openssl_verify_mode  => 'none'
+  #   }
 
 
   #####################################################################
@@ -106,6 +154,24 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.paperclip_defaults = {:url => "/images/:class/:attachment/:id_partition/:style/:filename",
-                               :path => "/images/:class/:attachment/:id_partition/:style/:filename"}
+  # config.paperclip_defaults = {:url => "/images/:class/:attachment/:id_partition/:style/:filename",
+  #                              :path => "/images/:class/:attachment/:id_partition/:style/:filename"}
+
+  ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
+  config.paperclip_defaults = {
+      storage: :s3,
+      s3_region: ENV["aws_region_name"],
+      s3_credentials: {
+          s3_host_name: ENV["s3_host_name"],
+          bucket: ENV["s3_attachment_bucket_name"],
+          s3_region: ENV["aws_region_name"],
+          access_key_id: ENV["aws_access_key_id"],
+          secret_access_key: ENV["aws_secret_access_key"]
+      },
+      :s3_protocol => :https,
+      :s3_headers => {
+          :content_disposition => 'attachment'
+      }
+  }
+  #########################################################################################
 end

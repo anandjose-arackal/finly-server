@@ -4,7 +4,15 @@
 # auto_approve : optional - set to true if the report is to be auto-approved. i.e. if there is no reporting manager
 
 class Report::Approve < Report::Base
-  attr_accessor :auto_approve, :auto_submit
+  attr_accessor :auto_approve, :auto_submit, :has_violations
+
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:report, :approve], :pre_process, self)
+        }
+    }
+  end
 
   def authorized_user_types
     return nil if params.present? and (params[:auto_approve] or params[:auto_submit] )
@@ -47,9 +55,9 @@ class Report::Approve < Report::Base
     violations = Report::Violation.(user, report: report)
     violations_present = false
     violations.each do |key, value|
-      if value['expense_blocking'].present? or value['budget_blocking'].present?
-        violations_present = true
-      end
+      blocking_violations_present ||= (value['expense_blocking'].present? or value['budget_blocking'].present?)
+      self.has_violations ||= (blocking_violations_present or  value['budget_warning'].present? or value['expense_warning'].present?)
+      break if blocking_violations_present
     end
     if violations_present
       add_message :error, 'Reports with blocking violations cannot be approved'
@@ -57,7 +65,7 @@ class Report::Approve < Report::Base
   end
 
   def process
-    presenter = User::Team::Review::NextReviewer.(report)
+    presenter = User::Team::Review::NextReviewer.(report, has_violations: self.has_violations)
     manager = presenter.user
     to_user_role_id = presenter.role_id
     status = ReportStatus.processing_id

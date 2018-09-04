@@ -164,4 +164,14 @@ class ExpensesController < ApplicationController
     respond
   end
 
+  def expense_edit_config
+    @result = Expense::ExpenseEditConfig.(current_user, params)
+    respond
+  end
+
+  def currencies
+    @result = User::AvailableExpenseTypes::Show.(current_user, params)
+    respond
+  end
+
 end

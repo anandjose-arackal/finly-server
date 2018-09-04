@@ -2,30 +2,33 @@ class TransactionsMsgQueuePoller
 
   def self.run
 
-    username = ENV["MSG_QUEUE_USERNAME"]
-    password = ENV["MSG_QUEUE_PASSWORD"]
 
-    if Rails.env == 'production'
-      mq_server_address = ENV["MSG_QUEUE_ADDRESS_PRODUCTION"]
-    elsif Rails.env == 'itzcash_uat'
-      mq_server_address = ENV["MSG_QUEUE_ADDRESS_UAT"]
+    ####################### Initializing the client and other details for pulling messages from AWS Queue #########
+    region_name = ENV["aws_region_name"]
+    access_key_id = ENV["aws_access_key_id"]
+    secret_access_key = ENV["aws_secret_access_key"]
+
+    sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
+
+    queue_url_base = ENV["sqs_queue_url_base"]
+    if Rails.env.production?
+      queue_name = "TransactionMessageQueue"
     else
-      mq_server_address = ENV["MSG_QUEUE_ADDRESS_TESTING"]
+      queue_name = "TestTransactionQueue"
     end
 
+    queue_url = queue_url_base + queue_name
     delimiter = '$'
 
     # initializing the log file that will hold the errors if necessary
     error_logger = Logger.new("#{Rails.root}/log/transactions_msg_queue_errors.log")
+    poller = Aws::SQS::QueuePoller.new(queue_url, {client: sqs_client})
+    file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_transaction_poller.log', sync: true)
 
-    client = Stomp::Connection.new(username, password, mq_server_address, 61613, true)
-    client.subscribe("/queue/FinlyQueue")
+    puts "Listening...."
+    ######################## AWS Code to extract the messages from the queue ###################
 
-    puts "Subscribed!"
-
-    loop do
-      message = client.receive
-
+    poller.poll do |message|
       puts message.body
 
       data = message.body.split(delimiter)
@@ -107,6 +110,8 @@ class TransactionsMsgQueuePoller
           success: success
       }
 
+      log_params = trans_params.deep_dup
+
       trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
       trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
 
@@ -120,6 +125,16 @@ class TransactionsMsgQueuePoller
         error.backtrace.each do |line|
           error_logger.error "\t #{line}"
         end
+
+        stack_trace = error.message
+        error.backtrace.each do |line|
+          stack_trace += "\n#{line}"
+        end
+        log_params[:operation_success] = false
+        log_params[:failure_reason] = 'Card Transaction Create crashed'
+        log_params[:stacktrace] = stack_trace
+        file_logger.warn(log_params)
+
         rescued = true
       end
 
@@ -130,17 +145,48 @@ class TransactionsMsgQueuePoller
       if !rescued && @result&.success? && @result&.transaction.nil? and success
         begin
           trans = CardTransaction.new(trans_params)
-          unless trans.save
+          if trans.save
+
+            log_params[:operation_success] = true
+            log_params[:failure_reason] = 'CardTransaction created separately as Card::Transaction::Create did not create it'
+            file_logger.warn(log_params)
+
+          else
             error_logger.error("Following transaction could not be created: #{message.body} because of following errors: #{trans.errors.full_messages}")
+
+            log_params[:operation_success] = false
+            log_params[:failure_reason] = "CardTransaction could not be created with the reason : #{trans.errors.full_messages}"
+            file_logger.warn(log_params)
+
           end
         rescue => error
           error_logger.error("Following transaction could not be created : #{message.body} because of following errors: #{error.message}")
           error.backtrace.each do |line|
             error_logger.error "\t #{line}"
           end
+
+          stack_trace = error.message
+          error.backtrace.each do |line|
+            stack_trace += "\n#{line}"
+          end
+          log_params[:operation_success] = false
+          log_params[:failure_reason] = "CardTransaction Create failed with a crash"
+          log_params[:stacktrace] = stack_trace
+          file_logger.warn(log_params)
+
         end
       elsif @result&.failure?
         error_logger.error("Following transaction : #{message.body} couldn't be created because of the following errors: #{@result.messages[:error].to_sentence}")
+
+        log_params[:operation_success] = false
+        log_params[:failure_reason] = "CardTransaction could not be created with the reason : #{@result.messages[:error].to_sentence}"
+        file_logger.warn(log_params)
+
+      elsif @result&.success? and @result&.transaction.present?
+
+        log_params[:operation_success] = true
+        file_logger.info(log_params)
+
       end
     end
 

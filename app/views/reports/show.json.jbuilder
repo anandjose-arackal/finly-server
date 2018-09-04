@@ -21,6 +21,8 @@ json.synced_with_quickbooks !!@result.report.synced_with_quickbooks?
 json.show_sync_button (@result.report.processed? && is_admin_view)
 json.controlling_user @result.report.controlling_user&.name
 
+json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
+
 policy_id = nil
 policy_name = nil
 if @result.report.policy
@@ -71,7 +73,8 @@ json.expense_sections sorted_expenses do |category|
   json.extract! category, :section_name, :section_total
   json.expenses category[:expenses] do |expense|
     json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id, :category_name,
-                           :distance_value, :distance_rate_value, :time_value, :time_rate_value
+                  :distance_value, :distance_rate_value, :time_value, :time_rate_value,
+                  :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type, :usage_date_start, :usage_date_end
     if expense.note
       if expense.note.length < 29
         json.note expense.note
@@ -83,6 +86,7 @@ json.expense_sections sorted_expenses do |category|
     json.date expense.date.strftime('%d %b %y')
     json.reimbursable expense.reimbursable
     json.from_cash_on_hand expense.from_cash_on_hand
+    json.spent_from_name expense.spent_from&.name
     json.synced_with_quickbooks expense.synced_with_quickbooks
     json.violations do
       items = @result.violations[expense.id]
@@ -96,16 +100,16 @@ json.expense_sections sorted_expenses do |category|
     json.potential_duplicate expense.has_duplicate_expenses?
     json.custom_fields do
       case expense.expense_type_id
-        when ExpenseType.id_for(:manual)
-          json.array! expense.manual_expense.custom_fields
-        when ExpenseType.id_for(:card)
-          json.array! expense.card_expense.custom_fields
-        when ExpenseType.id_for(:distance)
-          json.array! expense.distance_expense.custom_fields
-        when ExpenseType.id_for(:time)
-          json.array! expense.time_expense.custom_fields
-        when ExpenseType.id_for(:per_diem)
-          json.array! expense.per_diem_expense.custom_fields
+      when ExpenseType.id_for(:manual)
+        json.array! expense.manual_expense.custom_fields
+      when ExpenseType.id_for(:card)
+        json.array! expense.card_expense.custom_fields
+      when ExpenseType.id_for(:distance)
+        json.array! expense.distance_expense.custom_fields
+      when ExpenseType.id_for(:time)
+        json.array! expense.time_expense.custom_fields
+      when ExpenseType.id_for(:per_diem)
+        json.array! expense.per_diem_expense.custom_fields
       end
     end
     json.receipts do
@@ -117,6 +121,20 @@ json.expense_sections sorted_expenses do |category|
           json.original receipt.image.url
           json.thumb receipt.image.url(:thumb)
         end
+      end
+    end
+
+    json.tds_slab do
+      json.id expense.tds_slab&.id
+      json.tds expense.tds_slab&.tds
+    end
+
+    # adding pocket information for an expense
+    if expense.spent_from.present?
+      json.pocket do
+        json.pocket_name expense.spent_from&.name
+        json.pocket_id expense.spent_from&.id
+        json.pocket_balance expense.spent_from&.name
       end
     end
   end
@@ -167,5 +185,11 @@ json.budgets do
     json.spent_amount item[:spent_amount]
     json.associated_item item[:associated_item]
   end
+end
 
+travel_desk_enabled = @result.report.user.travel_desk_enabled?
+json.show_trips travel_desk_enabled
+if travel_desk_enabled
+  json.user_travel_requests @result.report.user.travel_requests.reportable, :id, :name, :trip_id
+  json.associated_trip @result.report.travel_request
 end

@@ -22,9 +22,10 @@
 #  payment_purpose_id        :integer          not null
 #  currency_id               :integer          not null
 #  application               :string(255)
+#  payment_mode              :string(255)
 #  post_operation            :text(65535)
 #  post_operation_payload    :text(65535)
-#  payment_mode              :string(255)
+#  api_initiated             :boolean          default(FALSE)
 #
 
 class PaymentOrder < ActiveRecord::Base
@@ -61,6 +62,8 @@ class PaymentOrder < ActiveRecord::Base
   belongs_to :amount_processed, class_name: 'Amount'
   belongs_to :initiating_user, class_name: 'User'
   belongs_to :currency
+
+  serialize :post_operation_payload, Hash
 
   has_one :bank_payment_request
   has_many :payments, dependent: :destroy

@@ -24,6 +24,10 @@
 #  current_account_connected  :boolean
 #  invoicing_system           :boolean          default(FALSE)
 #  travel_request             :boolean          default(FALSE)
+#  budgeting_system           :boolean          default(FALSE)
+#  em_tax_tracking            :boolean          default(FALSE)
+#  procurement                :boolean          default(FALSE)
+#  custom_currency_conversion :boolean          default(FALSE)
 #
 
 require 'test_helper'

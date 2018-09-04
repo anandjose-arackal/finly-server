@@ -29,12 +29,14 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
   def validate
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list
-    self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
-      ba = current_company.bank_accounts.find_by(account_number: account_params[:account_number], account_owner_type: "YesBankVendor")
-      if ba.present?
-        self.vendor = ba.account_owner
-        # removing this particular bank account from the list of bank accounts being created
-        vendor_parameters[:bank_accounts_attributes].delete_at(index)
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
+        ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], account_owner_type: "YesBankVendor")
+        if ba.present?
+          self.vendor = ba.account_owner
+          # removing this particular bank account from the list of bank accounts being created
+          vendor_parameters[:bank_accounts_attributes].delete_at(index)
+        end
       end
     end
   end
@@ -43,14 +45,16 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
     # setting the first account as default if none of them are marked as default
     # todo - temporary fix, will be taken in the front end later
     default = false
-    self.vendor_parameters[:bank_accounts_attributes].each do |param|
-      if [true].include?(StringUtils.to_bool param[:default_account])
-        default = true
+    if self.vendor_parameters[:bank_accounts_attributes].present?
+      self.vendor_parameters[:bank_accounts_attributes].each do |param|
+        if [true].include?(StringUtils.to_bool param[:default_account])
+          default = true
+        end
       end
-    end
-    unless default
-      if vendor_parameters[:bank_accounts_attributes]&.first.present?
-        vendor_parameters[:bank_accounts_attributes]&.first[:default_account] = '1'
+      unless default
+        if vendor_parameters[:bank_accounts_attributes]&.first.present?
+          vendor_parameters[:bank_accounts_attributes]&.first[:default_account] = '1'
+        end
       end
     end
 
@@ -65,10 +69,12 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
 
   def process
     if self.vendor.present? && vendor.is_a?(YesBankVendor)
-      self.vendor_parameters[:bank_accounts_attributes].each do |account_params|
-        bank_account = self.vendor.bank_accounts.build(account_params)
-        unless bank_account.save
-          add_message :error, bank_account.errors.full_messages
+      if self.vendor_parameters[:bank_accounts_attributes].present?
+        self.vendor_parameters[:bank_accounts_attributes].each do |account_params|
+          bank_account = self.vendor.bank_accounts.build(account_params)
+          unless bank_account.save
+            add_message :error, bank_account.errors.full_messages
+          end
         end
       end
       # also mark the vendor as authorized now

@@ -6,10 +6,10 @@
 class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
   attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options,
-                :background
+                :background, :crediting_payments
 
   def pre_validate
-    if params&.dig(:payment_request).blank? && params&.dig(:payment_order).blank?
+    if params&.dig(:payment_request).blank? && params&.dig(:payment_order).blank? && params&.dig(:crediting_payments).blank?
       add_message :error, 'Payment Request not found'
       return
     end
@@ -18,17 +18,22 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         add_message :error, params[:payment_request].errors.full_messages
       end
     end
+
+    if params&.dig(:crediting_payments).present?
+      if params&.dig(:crediting_payments).empty?
+        add_message :error, "Crediting payments cannot be empty"
+      end
+    end
   end
 
   def init
-
     # create the payment order object and associated payments, if the payment request is present
     self.payment_request = params[:payment_request]
     if payment_request.present?
       self.company = Company.find_by(id: company_id)
       self.options = {}
       self.options[:bank_transfer_type] = params[:bank_transfer_type]
-      self.background = payment_request.background
+      self.background = params[:background]
     end
 
     # setting the company id based on whether it's a user or an AdminUser
@@ -60,11 +65,14 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       add_message :error, payment_order.errors.full_messages
       return
     end
+
+    # initializing the crediting payments if they are present
+    self.crediting_payments = params[:crediting_payments]
   end
 
   def validate
     # Call the payment validator class that validates the payment order
-    op = AccountManager::Payments::PaymentValidator.(payment_order)
+    op = AccountManager::Payments::PaymentValidator.(payment_order, self.crediting_payments)
     unless op.success?
       add_message :error, op.messages[:error]
     end
@@ -84,28 +92,37 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   def process
     # now the actual execution of the payment order, based on whether it's
     # synchronous or a background operation
-    unless payment_order.save
-      add_message :error, payment_order.errors.full_messages
-      return
-    end
-    # if payment order has been scheduled for execution right away, process it right now
-    if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
-      # if the order is not background, perform it using the regular call method in payment executor
+    if self.crediting_payments.present?
       if self.background
-      #   # call the payment executor that runs the payments in the background
-      #   # passing the payment id here because async operation can retrieve the object
-        result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order.id, options)
+        options[:crediting_payment_ids] = self.crediting_payments.pluck(:id)
+        # op = AccountManager::Payments::BulkPaymentExecutor.(self.payment_order, options)
+        op = AccountManager::Payments::BulkPaymentExecutor.call_async(self.payment_order, options)
         add_message :success, 'Payments have been scheduled, you can check their status from the order screen'
-      else
-        # Process the order synchronously
-        result = AccountManager::Payments::PaymentOrderExecutor.(payment_order, options)
-        if result.success?
-          add_message :success, 'Payment processed successfully'
+      end
+    else
+      unless payment_order.save
+        add_message :error, payment_order.errors.full_messages
+        return
+      end
+      # if payment order has been scheduled for execution right away, process it right now
+      if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
+        # if the order is not background, perform it using the regular call method in payment executor
+        if self.background
+          #   # call the payment executor that runs the payments in the background
+          #   # passing the payment id here because async operation can retrieve the object
+          result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order.id, options)
+          add_message :success, 'Payments have been scheduled, you can check their status from the order screen'
         else
-          # overriding this for testing
-          # payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
-          # payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:completed))
-          add_message :error, result.messages[:error]
+          # Process the order synchronously
+          result = AccountManager::Payments::PaymentOrderExecutor.(payment_order, options)
+          if result.success?
+            add_message :success, 'Payment processed successfully'
+          else
+            # overriding this for testing
+            # payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+            # payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:completed))
+            add_message :error, result.messages[:error]
+          end
         end
       end
     end
@@ -147,4 +164,3 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   end
 
 end
-

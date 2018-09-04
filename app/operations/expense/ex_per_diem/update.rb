@@ -56,6 +56,14 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
     end
+
+    pocket_id = self.updated_expense_params[:spent_from_id]
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
+
+    # todo - jugaad to support mobile app for now
+    if self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def authorize
@@ -93,11 +101,28 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
       end
     end
 
+    if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+      add_message :error, "Could not find pocket from which this expense was spent"
+      return
+    end
+
     # checking if the user has enough cash on hand balance to mark this expense against it
-    check_coh_availability_update(updated_expense_params)
+    check_coh_availability_update(self.cash_pocket, updated_expense_params)
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_reimbursable_exclusivity_update(updated_expense_params)
+  end
+
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if StringUtils.to_bool(updated_expense_params[:from_cash_on_hand]) || updated_expense_params[:spent_from_id].present?
+      updated_expense_params[:reimbursable] = false
+    end
+
+    # conversely if the expense is marked as reimbursable, automatically make it not from any cash pocket
+    if StringUtils.to_bool(updated_expense_params[:reimbursable])
+      updated_expense_params[:spent_from_id] = nil
+    end
   end
 
   def process
@@ -145,9 +170,9 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     # if the expense has an associated amount, update the amount
     if expense.amount.present?
       amount = expense.amount
-      amount.update(value: expense.calculate_amount_value(per_diem.configurable))
+      amount.update(value: expense.calculate_amount_value(per_diem.configurable), currency_id: expense.report.policy.base_currency_id)
     else
-      amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency: Currency.first)
+      amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency_id: expense.report.policy.base_currency_id)
       expense.update(amount: amount)
     end
 

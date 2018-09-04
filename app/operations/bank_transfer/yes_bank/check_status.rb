@@ -41,7 +41,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def process
     params = {
         request_reference_number: bank_transaction.unique_request_number,
-        company_id: bank_transaction.company_id
+        company_id: bank_transaction.company_id,
+        unique_request_number: bank_transaction.unique_request_number,
+        transfer_type: bank_transaction.transfer_type
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
@@ -99,6 +101,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     # trigger event for sending mailer to the receiver of the payment
     if self.payment.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
+      execute_callback(self.payment)
+    elsif payment.failed?
+      execute_callback(self.payment)
     end
   end
 
@@ -112,15 +117,20 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     if op.success?
+      refund_payment = op.payment_order.payments.first
       self.bank_transaction.update(refunded: true)
-      # add system message indicating that this is a refund
+      refund_payment&.update(original_payment_for_refund_id: self.payment.id)
     else
       # op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
 
-    # also update the status of the payment order from here
+    if self.payment.invoice.present?
+      self.payment.invoice.update_invoice_status
+    end
+    # also update the status and processed amount of the payment order from here
     self.payment.payment_order.update_order_status
+    self.payment.payment_order.update_processed_amount
   end
 
   def handle_successful_transaction
@@ -137,17 +147,27 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if self.payment.note.blank? || self.payment.note == 'Reimbursement processed. Awaiting credit confirmation'
       self.payment.update(note: "Payment credit confirmed")
     end
+
+    # updating the status of the invoice against successful credit of this
+    if self.payment.invoice.present?
+      self.payment.invoice.update_invoice_status
+    end
+
     # marking the payment order as completed if all the payments in it are completed
     if self.payment.payment_order&.payments&.pluck(:payment_status_id)&.uniq == [PaymentStatus.id_for(:completed)]
       self.payment.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
     end
+
+    # update the status of the payment order after this
+    self.payment.payment_order.update_order_status
+
     self.payment.system_messages.destroy_all # deleting the previous system messages
   end
 
   def init_payment_request
     receiving_user = payment.receiving_user
     amount = payment.amount_value
-    receiving_account = receiving_user.cash_on_hand
+    receiving_account = receiving_user.user_pockets.cash_pockets_only.first # todo - jugaad, needs refactoring
     self.payment_request = ::PaymentRequest.(payment.initiating_user, nil, (receiving_account&.class&.name), :credit, :advance)
     self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount, note: self.payment.note))
   end
@@ -158,6 +178,28 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     reports.each do |report|
       report.update(report_status_id: ReportStatus.id_for(:approved), reimbursement_id: nil)
     end
+  end
+
+  def execute_callback(payment)
+    post_params = {
+        payment_id: payment.id,
+        payment_amount: payment.amount_value,
+        note: payment.note,
+        status: payment.payment_status&.name,
+        receiving_account: {
+            receiving_account_type: "BankAccount",
+            receiving_account_id: payment.receiving_account&.id,
+            receiving_account_number: payment.receiving_account&.account_number,
+            receiving_account_ifsc: payment.receiving_account&.ifsc
+        },
+        bank_reference_number: payment.reference_resource&.bank_reference_number
+    }
+    if payment.failed?
+      post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence
+    end
+    # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
+    company = payment.initiating_user&.company
+    op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
   end
 
 end

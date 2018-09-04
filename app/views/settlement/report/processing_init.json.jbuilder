@@ -1,6 +1,6 @@
 json.user_count @result.user_count
-json.expenses_total @result.expenses_total
-json.reimbursement_total @result.reimbursement_total
+json.expenses_total @result.expenses_total&.values
+json.reimbursement_total @result.reimbursement_total&.values
 json.details do
   json.array! @result.details do |detail|
     json.user do
@@ -28,7 +28,7 @@ json.details do
           json.mobile_number final_approver&.mobile_number
         end
         json.expenses_total report.total_amount
-        json.reimbursement_total report.total_amount([:reimbursable])
+        json.reimbursement_total report.reimbursable_expenses
       end
     end
     json.bank_accounts detail[:bank_accounts]

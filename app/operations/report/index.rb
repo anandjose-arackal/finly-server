@@ -36,20 +36,26 @@ class Report::Index < Report::Base
         end
       when UserRole.id_for(:manager)
         team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
-        controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
-        interacted_reports_query= user.manager_reports
-        sql = Report.connection.unprepared_statement {
-          "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
-        }
-        self.reports = Report.from([Arel.sql(sql)])
+        # controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
+        # interacted_reports_query= user.manager_reports
+        # sql = Report.connection.unprepared_statement {
+        #   "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
+        # }
+        # self.reports = Report.from([Arel.sql(sql)])
+        controlling_reports = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids).pluck(:id)
+        interacted_reports = user.manager_reports.pluck(:id)
+        self.reports = Report.with_id(controlling_reports + interacted_reports)
       when UserRole.id_for(:finance_manager)
         team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
-        controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)
-        interacted_reports_query = user.finance_reports
-        sql = Report.connection.unprepared_statement {
-          "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
-        }
-        self.reports = Report.from([Arel.sql(sql)])
+        # controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)
+        # interacted_reports_query = user.finance_reports
+        # sql = Report.connection.unprepared_statement {
+        #   "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
+        # }
+        # self.reports = Report.from([Arel.sql(sql)])
+        controlling_reports = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids).pluck(:id)
+        interacted_reports = user.finance_reports.pluck(:id)
+        self.reports = Report.with_id(controlling_reports + interacted_reports)
       when UserRole.id_for(:auditor)
         # todo auditor
       else
@@ -81,8 +87,12 @@ class Report::Index < Report::Base
     has_scope :filter_submitted_date, using: [:from, :to], type: :hash
     has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
+    has_scope :filter_custom_drop_down_selection, type: :array
+    has_scope :filter_category
+    has_scope :filter_group, type: :array
 
     def init
+      ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
       self.reports = params[:reports]
       get_counts
       if self.reports.present?

@@ -11,12 +11,14 @@
 #  description                :text(65535)
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  company_id                 :integer
 #
 
 class InvoiceAttachment < ActiveRecord::Base
   include Attachable
 
   belongs_to :invoice
+  belongs_to :company
 
   # CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
 
@@ -24,4 +26,6 @@ class InvoiceAttachment < ActiveRecord::Base
 
   has_attached_file :attached_file, styles: lambda { |a| a.instance.style_format(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :attached_file, content_type: CONTENT_TYPES
+
+  scope :without_parent, -> { where invoice_id: nil }
 end

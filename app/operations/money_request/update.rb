@@ -19,14 +19,23 @@ class MoneyRequest::Update < MoneyRequest::Base
     if self.update_param[:policy_id].blank? or ([0, '0', 'nil'].include?(self.update_param[:policy_id]))
       self.update_param[:policy_id] = nil
     end
+    if self.update_param[:items_attributes].present?
+      self.update_param[:items_attributes].each do |attribute|
+        if attribute[:category_id].present?
+          attribute[:money_request_item_category_id] = attribute[:category_id]
+          attribute[:category_id] = nil
+        end
+      end
+    end
+
     # Assign IDs to existing mapping and its amount so duplicate entries are
     # not created in accepts_nested_attributes_for
     if self.update_param[:items_attributes].present?
       item_attributes = self.update_param[:items_attributes]
       items = self.money_request.items
       item_attributes.each do |item|
-        next unless item[:category_id].present?
-        mapping = items.with_category(item[:category_id]).first rescue nil
+        next unless item[:money_request_item_category_id].present?
+        mapping = items.with_money_request_item_category(item[:money_request_item_category_id]).first rescue nil
         next unless mapping.present?
         item[:id] = mapping.id
         if item[:amount_attributes].present?
@@ -66,6 +75,11 @@ class MoneyRequest::Update < MoneyRequest::Base
         item[:amount_attributes][:value] = 0
       end
     end
+
+    # to support mobile app
+    if [1, '1'].include?(update_param[:payment_mode_id])
+      update_param[:destination_pocket_id] = self.money_request.user&.user_pockets&.cash_pockets_only&.first&.id
+    end
   end
 
   def process
@@ -75,6 +89,7 @@ class MoneyRequest::Update < MoneyRequest::Base
       if params[:custom_fields].present? or original_policy_id != updated_policy_id
         CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), custom_fields: params[:custom_fields], save: true, reset_fields: true)
       end
+
     else
       messages[:error] = money_request.errors.full_messages
     end
@@ -112,8 +127,8 @@ class MoneyRequest::Update < MoneyRequest::Base
   end
 
   def update_params
-    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :payment_mode_id,
-            items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
+    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :destination_pocket_id,
+            items_attributes: [:category_id, :money_request_item_category_id, amount_attributes: [:value, :currency_id]])
   end
 
 end

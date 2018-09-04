@@ -2,41 +2,43 @@
 #
 # Table name: payments
 #
-#  id                      :integer          not null, primary key
-#  amount_id               :integer          not null
-#  date                    :date             not null
-#  payment_type_id         :integer          not null
-#  initiating_user_id      :integer
-#  receiving_user_id       :integer
-#  note                    :text(65535)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  initiating_account_id   :integer
-#  initiating_account_type :string(255)
-#  receiving_account_id    :integer
-#  receiving_account_type  :string(255)
-#  payment_order_id        :integer
-#  payment_status_id       :integer          not null
-#  initiating_user_type    :string(255)
-#  receiving_user_type     :string(255)
-#  payment_purpose_id      :integer
-#  reference_resource_id   :integer
-#  reference_resource_type :string(255)
-#  application             :string(255)
-#  payment_mode            :string(255)
-#  reference_id            :string(255)      not null
-#  retry_count             :integer          default(0)
-#  invoice_id              :integer
-#  parent_type             :string(255)
-#  parent_id               :integer
-#  post_operation          :text(65535)
-#  post_operation_payload  :text(65535)
-#  category_id             :integer
+#  id                             :integer          not null, primary key
+#  amount_id                      :integer          not null
+#  date                           :date             not null
+#  payment_type_id                :integer          not null
+#  initiating_user_id             :integer
+#  receiving_user_id              :integer
+#  note                           :text(65535)
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  initiating_account_id          :integer
+#  initiating_account_type        :string(255)
+#  receiving_account_id           :integer
+#  receiving_account_type         :string(255)
+#  payment_order_id               :integer
+#  payment_status_id              :integer          not null
+#  initiating_user_type           :string(255)
+#  receiving_user_type            :string(255)
+#  payment_purpose_id             :integer
+#  reference_resource_id          :integer
+#  reference_resource_type        :string(255)
+#  application                    :string(255)
+#  payment_mode                   :string(255)
+#  reference_id                   :string(255)      not null
+#  retry_count                    :integer          default(0)
+#  invoice_id                     :integer
+#  parent_type                    :string(255)
+#  parent_id                      :integer
+#  post_operation                 :text(65535)
+#  post_operation_payload         :text(65535)
+#  category_id                    :integer
+#  api_initiated                  :boolean          default(FALSE)
+#  original_payment_for_refund_id :integer
+#  destination_pocket_id          :integer
+#  scheduled_at                   :date
+#  processed_at                   :date
+#  cost_center_id                 :integer
 #
-
-
-
-
 
 
 
@@ -58,12 +60,19 @@ class Payment < ActiveRecord::Base
   belongs_to :initiating_user, polymorphic: true
   belongs_to :receiving_user, polymorphic: true
   belongs_to :reference_resource, polymorphic: true
+  belongs_to :original_payment_for_refund, class_name: "Payment"
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
   has_many :money_requests
   has_many :money_request_tracks
   has_many :finly_transactions
+
+  # From Procurement Workflow
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
 
   has_one :payment, as: :reference_resource
 
@@ -75,6 +84,8 @@ class Payment < ActiveRecord::Base
   belongs_to :payment_order
   belongs_to :payment_status
   belongs_to :payment_purpose
+
+  belongs_to :destination_pocket, class_name: "UserPocket"
 
   belongs_to :initiating_account, polymorphic: true
   belongs_to :receiving_account, polymorphic: true
@@ -115,6 +126,7 @@ class Payment < ActiveRecord::Base
                                                              PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
   scope :with_category, -> (ids) {where category_id: ids}
+  scope :with_invoice, -> (ids) { where invoice_id: ids }
   scope :sum_amounts, -> { with_amount.sum(:value) }
   scope :joins_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
@@ -226,6 +238,17 @@ class Payment < ActiveRecord::Base
             OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
   }
 
+  scope :filter_search_index, -> (beneficiary_type, receiving_user_id) {
+    case beneficiary_type
+      when 1, '1'
+        where(receiving_user_type: "User", receiving_user_id: receiving_user_id)
+      when 2, '2'
+        where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
+      else
+        where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
+    end
+  }
+
   scope :filter_user_id, -> (user_id) {
     if user_id.present?
       where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
@@ -266,6 +289,10 @@ class Payment < ActiveRecord::Base
 
   scope :vendor_payments_only, -> { where receiving_user_type: 'YesBankVendor' }
 
+  scope :unpaid, -> {
+    where payment_status_id: [PaymentStatus.id_for(:pending_approval), PaymentStatus.id_for(:failed), PaymentStatus.id_for(:pending_credit)]
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   # validates :initiating_user_id, presence: true
@@ -275,17 +302,15 @@ class Payment < ActiveRecord::Base
   validate :initiating_account_presence
   validate :receiving_account_presence
 
-  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, to: :payment_status
+  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, to: :payment_status
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
-  before_save do
-    # recalculating the amount or net amount for this particular
-    # payment from the details inside the invoice
+  after_save :budget_trail_entry
 
-  end
+  after_destroy :budget_trail_destroy
 
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
@@ -306,6 +331,8 @@ class Payment < ActiveRecord::Base
         name += "Finly Money (Bank Transfer Pocket)"
       when "BankAccount"
         name += "Bank Account (Number: #{self.initiating_account.account_number})"
+      when "UserPocket"
+        name += "#{self.receiving_account.name}"
       else
         name = ""
     end
@@ -333,6 +360,8 @@ class Payment < ActiveRecord::Base
         name += "Finly Money (Bank Transfer Pocket)"
       when "BankAccount"
         name += "Bank Account (Number: #{self.receiving_account.account_number})"
+      when "UserPocket"
+        name += "#{self.receiving_account.name}"
       else
         name = ""
     end
@@ -396,6 +425,10 @@ class Payment < ActiveRecord::Base
     self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
   end
 
+  def cash_pocket_credit?
+    self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
+  end
+
   def retriable?
     self.failed?
   end
@@ -415,7 +448,7 @@ class Payment < ActiveRecord::Base
     unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly, :failed_transaction_reversal,
                                    :personal_expense, :atm_withdrawal, :card_transaction, :advance, :corporate_balance_load,
                                    :corporate_balance_refund, :cash_advance, :balance_clearance_against_cash_on_hand, :settlement_against_cash_on_hand,
-                                   :advance_against_report_unapproval, :cash_on_hand_reversal]).include?(self.payment_purpose_id)
+                                   :advance_against_report_unapproval, :cash_on_hand_reversal, :settlement_against_advance]).include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end
@@ -452,5 +485,18 @@ class Payment < ActiveRecord::Base
         errors.add(:receiving_user_id, "cannot be blank")
       end
     end
+  end
+
+  def budget_trail_entry
+    if self.completed? || self.processing?
+      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
+    else
+      # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
+      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
   end
 end

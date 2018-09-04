@@ -1,9 +1,28 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
-                                    :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks
+                                    :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
+                                    :expense_tax_type_id, :gst_type_id, :gst_percentage, :tds_slab_id, :usage_date_type, :usage_date_start, :usage_date_end
 
 if @result.expense.category.parent.present?
   json.parent_category_name @result.expense.category.parent.name
   json.parent_category_id @result.expense.category.parent.id
+end
+
+
+if @result.expense.spent_from.present?
+  json.pocket do
+    json.pocket_name @result.expense.spent_from&.name
+    json.pocket_id @result.expense.spent_from&.id
+    json.pocket_balance @result.expense.spent_from&.name
+  end
+end
+
+json.cash_pockets do
+  json.array!(@result.cash_pockets) do |pocket|
+    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+    json.name pocket.name
+    json.balance adapter.balance(display_balance: true)
+    json.id pocket.id
+  end
 end
 
 if @result.expense.report.present?
@@ -15,7 +34,11 @@ json.distance do
     json.type @result.expense.distance_expense&.type
     json.value @result.expense.distance_value
     json.maps_distance_value @result.expense.maps_distance_value
-    json.rate_value @result.expense.distance_rate_value
+
+    json.vehicle_rate @result.expense.distance_expense.vehicle_rate
+    json.distance_rate @result.expense.distance_expense.distance_rate
+    json.distance_unit @result.expense.distance_expense.distance_unit
+
     json.odometer_reading_start @result.expense.distance_expense&.odometer_reading_start
     json.odometer_reading_end @result.expense.distance_expense&.odometer_reading_end
     json.odometer_reading_receipt_start @result.start_receipt
@@ -28,6 +51,8 @@ json.time do
   json.rate_value @result.expense.time_rate_value
 end
 
+json.vehicle_rates @result.vehicle_rates
+
 json.per_diem do
   json.name @result.expense.per_diem_name
   json.rate_value @result.expense.per_diem_rate_value
@@ -39,6 +64,15 @@ json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
 
 json.amount do
   json.partial! 'shared/amount', amount: @result.expense.original_amount
+end
+json.reimbursable_amount do
+  json.partial! 'shared/amount', amount: @result.expense&.reimbursable_amount
+end
+
+json.tds_slab do
+  json.id @result.expense.tds_slab&.id
+  json.name @result.expense.tds_slab&.name
+  json.tds @result.expense.tds_slab&.tds
 end
 
 json.converted_amount do
@@ -134,3 +168,13 @@ end
 
 json.is_split @result.expense.is_split?
 json.split_count @result.expense.split_count
+
+# Tax Tracking Configuration
+
+em_tax_tracking = @result.expense.user.company.feature_subscription.em_tax_tracking
+json.config do
+  json.em_tax_tracking em_tax_tracking
+end
+
+
+

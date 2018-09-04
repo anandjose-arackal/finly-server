@@ -10,6 +10,7 @@
 #  description :text(65535)
 #  company_id  :integer
 #  default     :boolean
+#  is_deleted  :boolean          default(FALSE), not null
 #
 
 require 'test_helper'

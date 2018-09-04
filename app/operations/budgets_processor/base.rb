@@ -9,6 +9,9 @@ class BudgetsProcessor::Base < BaseOperation
 
   def process
     budgets.each do |budget|
+      # todo Discuss with sreeram
+      next if Date.today < budget.start_date || Date.today > budget.end_date
+
       if budget.budgetable_type == 'User'
         op = ::BudgetsProcessor::Calculate::User.(user, {budget: budget})
       elsif budget.budgetable_type == 'Category'
@@ -17,6 +20,8 @@ class BudgetsProcessor::Base < BaseOperation
         op = ::BudgetsProcessor::Calculate::YesBankVendor.(user, {budget: budget})
       elsif budget.budgetable_type == 'FieldDropDownItem'
         op = ::BudgetsProcessor::Calculate::FieldDropDownItem.(user, {budget: budget})
+      elsif budget.budgetable_type == 'CostCenter'
+        op = ::BudgetsProcessor::Calculate::CostCenter.(user, {budget: budget})
       end
 
       self.budget_details.push(op.result)

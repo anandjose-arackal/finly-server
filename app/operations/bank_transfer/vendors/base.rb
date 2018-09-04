@@ -30,9 +30,11 @@ class BankTransfer::Vendors::Base < BaseOperation
   protected
 
   def vendor_attributes
-    params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description, :pan, :tin, :gst, :state, :state_code_id, :gst_registered,
+    params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description, :pan, :tin, :gst, :state, :state_code_id, :gst_registered, :vendor_type_id,
+                                   :business_name, :address, :payment_term_id, :currency_id, :tds_rates_list_id,
                                    bank_accounts_attributes: [:account_number, :ifsc, :name, :default_account, :address_1, :address_2, :address_3, :pin_code, :country],
-                                   vendor_attachments_attributes: [:attached_file, :remove_file])
+                                   vendor_attachments_attributes: [:attached_file, :attachment_type, :remove_file],
+    )
   end
 end
 

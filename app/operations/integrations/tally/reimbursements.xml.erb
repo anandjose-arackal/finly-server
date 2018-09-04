@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+   <HEADER>
+      <TALLYREQUEST>Import Data</TALLYREQUEST>
+   </HEADER>
+   <BODY>
+      <IMPORTDATA>
+         <REQUESTDESC>
+            <REPORTNAME>Vouchers</REPORTNAME>
+            <STATICVARIABLES>
+               <SVCURRENTCOMPANY><%= html_escape configuration.company_name %></SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+         </REQUESTDESC>
+         <REQUESTDATA>
+            <TALLYMESSAGE xmlns:UDF="TallyUDF">
+            <% payments.each do |payment| %>
+               <VOUCHER VCHTYPE="Payment" ACTION="Create">
+                 <VOUCHERTYPENAME>Payment</VOUCHERTYPENAME>
+                 <DATE><%= payment.date.strftime('%Y%m%d') %></DATE>
+                 <NARRATION></NARRATION>
+                 <EFFECTIVEDATE><%= payment.date.strftime('%Y%m%d') %></EFFECTIVEDATE>
+                 <ALLLEDGERENTRIES.LIST>
+                    <LEDGERNAME><%= html_escape payment.receiving_user.name %></LEDGERNAME>
+                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                    <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                    <AMOUNT>-<%= payment.amount.value %></AMOUNT>
+                 </ALLLEDGERENTRIES.LIST>
+                 <ALLLEDGERENTRIES.LIST>
+                    <LEDGERNAME>BANK</LEDGERNAME>
+                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                    <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                    <AMOUNT><%= payment.amount.value %></AMOUNT>
+                 </ALLLEDGERENTRIES.LIST>
+              </VOUCHER>
+            <% end %>
+            </TALLYMESSAGE>
+         </REQUESTDATA>
+      </IMPORTDATA>
+   </BODY>
+</ENVELOPE>
