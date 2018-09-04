@@ -24,7 +24,7 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
     # adding PO Item because both will be considered for the
     budgetable_entities << "PurchaseOrderItem" if self.budget.purchase_order
     budgetable_entities << "Payment" if self.budget.payment
-    spent_amount = BudgetTrail.within_date(budget.start_date, budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments_or_sub_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_budgetable_entities(budgetable_entities).joins_amount.sum(:value)
+    spent_amount = BudgetTrail.within_date(budget.start_date, budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_budgetable_entities(budgetable_entities).joins_amount.sum(:value)
   end
 
   # i.e. these are the entities that have consumed this particular budget
@@ -45,7 +45,7 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
     payments = Payment.with_id(payment_ids)
     expense_ids = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments_or_sub_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_entity_type("Expense").pluck(:entity_id)
     expenses = Expense.with_id(expense_ids)
-    purchase_order_item_ids = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments_or_sub_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_entity_type("PurchaseOrderItem").pluck(:entity_id)
+    purchase_order_item_ids = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_entity_type("PurchaseOrderItem").pluck(:entity_id)
     purchase_order_items = PurchaseOrderItem.with_id(purchase_order_item_ids)
     [expenses, payments, purchase_order_items]
   end
