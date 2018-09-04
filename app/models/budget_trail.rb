@@ -42,6 +42,11 @@ class BudgetTrail < ActiveRecord::Base
       where(user_id: user_ids)
     end
   }
+
+  scope :with_departments, -> (department_ids) {
+    where department_id: department_ids
+  }
+
   scope :with_departments_or_sub_departments, -> (department_ids) {
     unless department_ids.empty?
       ids = where(department_id: department_ids).pluck(:id)
