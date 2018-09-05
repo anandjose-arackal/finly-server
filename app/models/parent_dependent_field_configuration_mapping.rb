@@ -12,5 +12,7 @@
 
 class ParentDependentFieldConfigurationMapping < ActiveRecord::Base
 
+  belongs_to :parent, polymorphic: true
+  belongs_to :dependent_field_configuration, class_name: "FieldConfiguration"
 
 end

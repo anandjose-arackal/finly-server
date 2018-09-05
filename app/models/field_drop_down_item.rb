@@ -15,8 +15,8 @@ class FieldDropDownItem < ActiveRecord::Base
 
   belongs_to :field_configuration
 
-
-  has_many :dependent_field_configurations, class_name: "FieldConfiguration", as: :parent
+  has_many :parent_dependent_field_configuration_mappings, foreign_key: :parent_id
+  has_many :dependent_field_configurations, through: :parent_dependent_field_configuration_mappings
 
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings
