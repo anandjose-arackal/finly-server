@@ -50,9 +50,11 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         self.reviewal_chains.push(chain)
       end
 
-      op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
-      if op.success?
-        self.budgets = op.budget_data
+      if purchase_order.items.present?
+        op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
+        if op.success?
+          self.budgets = op.budget_data
+        end
       end
     end
 
@@ -87,10 +89,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
               url: Rails.application.routes.url_helpers.procure_configs_send_mail_path,
               method: "POST"
           }
-          actions[:close] = {
-              url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
-              method: "PUT"
-          }
+          # actions[:close] = {
+          #     url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
+          #     method: "PUT"
+          # }
           actions[:document_editable] = false
         end
         actions[:download] = true

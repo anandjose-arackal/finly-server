@@ -69,12 +69,12 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         actions[:document_editable] = true
       end
 
-      if invoice.approved? || invoice.auto_approved?
+      if invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?
         if user_in_level? || document_owner?
-          actions[:close] = {
-              url: Rails.application.routes.url_helpers.procure_inward_invoice_close_path(inward_invoice_id: invoice.id),
-              method: "PUT"
-          }
+          # actions[:close] = {
+          #     url: Rails.application.routes.url_helpers.procure_inward_invoice_close_path(inward_invoice_id: invoice.id),
+          #     method: "PUT"
+          # }
         end
 
         if (user_in_level? && user.vendor_payment_creditor?) || user.vendor_payment_creditor?

@@ -10,9 +10,18 @@
       <img src="<%= @company.configuration.logo.url(:thumb) %>" width="250" height="auto">
     </div>
     <div class="vendor-address">
-      <span class="company-name font-size-14 bold"><%= @result.purchase_order.location.name %></span>
+      <!--<span class="company-name font-size-14 bold"><%#= @result.purchase_order.location.name %></span>-->
       <span class="address-line-1"></span>
-      <span class="address-line-2"><%= @result.purchase_order.location.address %></span>
+      <span class="address-line-2">
+        <%#= @result.purchase_order.location.address %>
+        Business Office:<br/>
+        DLF Corporate Park,<br/>
+        Ground Floor, Tower 3A, <br />
+        DLF City, Phase III,<br />
+        M.G. Road, Gurgaon, 122001<br />
+        CIN 074900HR2009PTC053732
+
+      </span>
     </div>
   </div>
   <div class="document-details">
@@ -226,7 +235,7 @@
   <ul>
     <% approved_users = [] %>
 
-    <% @result.purchase_order.trails.each do |trail| %>
+    <% @result.purchase_order.trails.unscoped.each do |trail| %>
       <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
         <% unless approved_users.include?(trail.action_user) %>
           <% approved_users.push(trail.action_user) %>
@@ -481,7 +490,9 @@
       color: #7b7b7b;
       font-size: 12px;
     }
-
+    .approval-flow{
+      padding-top: 20px;
+    }
     .approval-flow ul{
       padding: 0;
       margin: 0;
@@ -733,6 +744,10 @@
       word-break: break-all;
     }
     .page-break { display:block; clear:both; page-break-after:always; }
+
+    .approval-flow{
+      padding-top: 20px;
+    }
     .approval-flow ul{
       padding: 0;
       margin: 0;
