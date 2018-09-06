@@ -133,6 +133,7 @@ class Expense::Manual::Update < Expense::Manual::Base
       return false
     end
 
+
     if expense.update(updated_expense_params)
       if self.destroy_receipts
         expense.receipts.each do |receipt|
