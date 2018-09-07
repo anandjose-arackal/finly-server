@@ -27,6 +27,7 @@ class Procurements::Create < Procurements::Base
       when 'purchase_order'
         op = Procurements::PurchaseOrders::Create.(user, params)
       when 'tax_invoice', 'proforma_invoice'
+        op = Procurements::Invoices::Create.(user, params)
         # do nothing!
         # tax invoice / proforma invoice will be created
       else

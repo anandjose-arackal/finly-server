@@ -53,6 +53,6 @@ class InvoiceLineItem < ActiveRecord::Base
   validates :rate, presence: true
 
   def tax
-    self.tax_rate.rate || self.tax
+    self.tax_rate&.rate || super
   end
 end

@@ -60,7 +60,7 @@ class PurchaseOrderItem < ActiveRecord::Base
 
 
   def tax
-    self.tax_rate.rate || self.tax
+    self.tax_rate&.rate || super
   end
 
   private
