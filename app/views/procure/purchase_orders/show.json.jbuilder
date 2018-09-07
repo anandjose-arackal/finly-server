@@ -37,7 +37,7 @@ end
 json.items do
   json.array! @result.purchase_order.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
-                  :rate, :tax, :tds, :discount, :delivery_date, :comment
+                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
     json.tax_amount do
       json.value item.tax_amount&.value
       json.id item.tax_amount&.id
@@ -133,3 +133,10 @@ end
 json.custom_fields do
   json.array! @result.purchase_order.custom_fields
 end
+
+json.tax_rates do
+  json.array! @result.tax_rates do |tax_rate|
+    json.merge! tax_rate.as_json
+  end
+end
+

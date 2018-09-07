@@ -19,4 +19,12 @@ class TaxRate < ActiveRecord::Base
   scope :with_name, -> (name) {where name: name}
   scope :with_rate, -> (rate) {where rate: rate}
   scope :with_internal_id, -> (ids) {where internal_id: ids}
+
+  def as_json
+    {
+        name: self.name,
+        rate: self.rate,
+        internal_id: self.internal_id,
+    }
+  end
 end

@@ -28,6 +28,7 @@
 #  cost_center_id         :integer
 #  is_deleted             :boolean          default(FALSE), not null
 #  account                :string(255)
+#  tax_rate_id            :integer
 #
 
 require 'test_helper'
