@@ -25,11 +25,13 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
 
   def process
     case role_id
-      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
-        self.payment_orders = user.company.payment_orders
-      else
-        # i.e. personal view
-        self.payment_orders = user.payment_orders
+    when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+      company_not_open = user.company.payment_orders.not_open.pluck(:id)
+      personal_orders = user.payment_orders.pluck(:id)
+      self.payment_orders = PaymentOrder.where(id: (company_not_open + personal_orders))
+    else
+      # i.e. personal view
+      self.payment_orders = user.payment_orders
     end
   end
 

@@ -84,26 +84,27 @@ class PaymentOrder < ActiveRecord::Base
   accepts_nested_attributes_for :payments
   accepts_nested_attributes_for :payment_order_attachments
 
-  scope :with_purpose_id, -> (id) { where payment_purpose_id: id }
-  scope :without_purpose_id, -> (id) { where.not payment_purpose_id: id }
-  scope :with_id, -> (id) { where id: id }
+  scope :with_purpose_id, -> (id) {where payment_purpose_id: id}
+  scope :without_purpose_id, -> (id) {where.not payment_purpose_id: id}
+  scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {
     if id.present?
       where.not(id: id)
     end
   }
-  scope :with_status, ->(status_id) { where payment_order_status_id: status_id }
-  scope :scheduled, -> { with_status(PaymentOrderStatus.id_for(:scheduled)) }
-  scope :scheduled_on_or_before, -> (date) { where('scheduled_at <= ?', date).where(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled)) }
-  scope :completed, -> { where payment_order_status_id: PaymentOrderStatus.id_for(:completed)}
-  scope :joins_amount_requested, -> { joins :amount_requested }
-  scope :total_amount_requested, -> { joins_amount_requested.sum(:value) }
-  scope :with_company_id, ->(company_id) { where company_id: company_id }
+  scope :with_status, ->(status_id) {where payment_order_status_id: status_id}
+  scope :scheduled, -> {with_status(PaymentOrderStatus.id_for(:scheduled))}
+  scope :scheduled_on_or_before, -> (date) {where('scheduled_at <= ?', date).where(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))}
+  scope :completed, -> {where payment_order_status_id: PaymentOrderStatus.id_for(:completed)}
+  scope :joins_amount_requested, -> {joins :amount_requested}
+  scope :total_amount_requested, -> {joins_amount_requested.sum(:value)}
+  scope :with_company_id, ->(company_id) {where company_id: company_id}
   scope :with_application, -> (application) {where application: application}
+  scope :not_open, -> {where.not(payment_order_status_id: PaymentOrderStatus.id_for(:open))}
   scope :with_initiating_account_type, -> (receiving_account_type) {
     where initiating_account_type: receiving_account_type
   }
-  scope :with_initiating_user_id, -> (user_id){
+  scope :with_initiating_user_id, -> (user_id) {
     where initiating_user_id: user_id
   }
 
@@ -111,13 +112,13 @@ class PaymentOrder < ActiveRecord::Base
     where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
   }
 
-  scope :from_company_account, -> (enabled){
+  scope :from_company_account, -> (enabled) {
     if ['1', 1].include?(enabled)
       where initiating_account_type: ["ItzCashCompanyAccount", "YesBankCompanyAccount"]
     end
   }
 
-  scope :vendor_payments, -> (enabled){
+  scope :vendor_payments, -> (enabled) {
     if enabled == 1 || enabled == '1'
       where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
     end
@@ -145,7 +146,7 @@ class PaymentOrder < ActiveRecord::Base
   delegate :amount_processed_value, to: :amount_processed
 
   # Avoid showing orders created for ATM withdrawals and Personal Expenses
-  default_scope { order(created_at: :desc).without_purpose_id(PaymentPurpose.ids_for([:personal_expense, :atm_withdrawal, :reissue_transfer])) }
+  default_scope {order(created_at: :desc).without_purpose_id(PaymentPurpose.ids_for([:personal_expense, :atm_withdrawal, :reissue_transfer]))}
 
   # method for total of all the payments in this particular payment order
   def request_total
@@ -181,10 +182,10 @@ class PaymentOrder < ActiveRecord::Base
 
   def payment_order_status_name
     case self.payment_order_status_id
-      when PaymentOrderStatus.id_for(:processing)
-        return "Transaction successful. Awaiting confirmation"
-      else
-        self.payment_order_status.name.humanize
+    when PaymentOrderStatus.id_for(:processing)
+      return "Transaction successful. Awaiting confirmation"
+    else
+      self.payment_order_status.name.humanize
     end
   end
 
@@ -196,14 +197,14 @@ class PaymentOrder < ActiveRecord::Base
   def initiating_account_name
     initiating_account = self.initiating_account
     case initiating_account.class.name
-      when "ItzCashCompanyAccount"
-        return "Company Credits (Card Transfer Pocket)"
-      when "UserWallet"
-        return "#{initiating_account.user.first_name}'s Finly Money (Card Transfer Pocket)"
-      when "VendorPaymentWallet"
-        return "#{initiating_account.user.first_name}'s Finly Money (Bank Transfer Pocket)"
-      else
-        return ""
+    when "ItzCashCompanyAccount"
+      return "Company Credits (Card Transfer Pocket)"
+    when "UserWallet"
+      return "#{initiating_account.user.first_name}'s Finly Money (Card Transfer Pocket)"
+    when "VendorPaymentWallet"
+      return "#{initiating_account.user.first_name}'s Finly Money (Bank Transfer Pocket)"
+    else
+      return ""
     end
   end
 

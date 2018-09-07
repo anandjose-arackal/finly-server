@@ -151,7 +151,7 @@
       else
         # If ID is not present, create new user mapping
         if updated_params.present?
-          updated_params[:user_id] = updating_user.id
+          updated_params[:user_id] = updating_user.ide
           updated_params['greater_than_amount_attributes']['currency_id'] = currency_id
           self.updating_records << self.mappings.build(update_params(updated_params))
         end
