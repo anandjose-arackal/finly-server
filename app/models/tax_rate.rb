@@ -22,6 +22,7 @@ class TaxRate < ActiveRecord::Base
 
   def as_json
     {
+        id: id,
         name: self.name,
         rate: self.rate,
         internal_id: self.internal_id,
