@@ -3,7 +3,7 @@
 # report_id: id of the report that needs to be destroyed
 
 class Report::Destroy < Report::Base
-  attr_accessor :reports
+  attr_accessor :reports, :report_expenses
 
   def authorized_user_types
     [:employee]
@@ -45,6 +45,14 @@ class Report::Destroy < Report::Base
 
   end
 
+  def pre_process
+    report_expense_ids = []
+    self.reports.each do |report|
+      report_expense_ids += report.expenses.pluck(:id)
+    end
+    self.report_expenses = user.expenses.with_id(report_expense_ids)
+  end
+
   def process
     self.reports.each do |report|
       unless report.destroy
@@ -55,6 +63,9 @@ class Report::Destroy < Report::Base
   end
 
   def post_process
+    # marking all the report's expenses as unreported
+    self.report_expenses.update_all(expense_status_id: ExpenseStatus.id_for(:unreported))
+
     add_message :success, 'Report deleted'
   end
 

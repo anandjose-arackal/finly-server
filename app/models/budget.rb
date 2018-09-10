@@ -109,6 +109,11 @@ class Budget < ActiveRecord::Base
     end
   }
 
+  scope :contains_date, -> (date) {
+    where('start_date <= ? AND end_date >= ?', date, date)
+  }
+
+
   # todo - change this to reflect the new structure
   # scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
   # scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}

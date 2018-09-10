@@ -50,9 +50,11 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         self.reviewal_chains.push(chain)
       end
 
-      op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
-      if op.success?
-        self.budgets = op.budget_data
+      if purchase_order.items.present?
+        op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
+        if op.success?
+          self.budgets = op.budget_data
+        end
       end
     end
 
@@ -81,16 +83,18 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         actions[:document_editable] = true
       end
 
-      if (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)
-        actions[:send_mail] = {
-            url: Rails.application.routes.url_helpers.procure_configs_send_mail_path,
-            method: "POST"
-        }
-        actions[:close] = {
-            url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
-            method: "PUT"
-        }
-        actions[:document_editable] = false
+      if purchase_order.approved? || purchase_order.auto_approved?
+        if user_in_level? || document_owner?
+          actions[:send_mail] = {
+              url: Rails.application.routes.url_helpers.procure_configs_send_mail_path,
+              method: "POST"
+          }
+          # actions[:close] = {
+          #     url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
+          #     method: "PUT"
+          # }
+          actions[:document_editable] = false
+        end
         actions[:download] = true
       end
 

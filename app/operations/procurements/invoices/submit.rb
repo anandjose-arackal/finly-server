@@ -1,13 +1,13 @@
 class Procurements::Invoices::Submit < Procurements::Invoices::Base
   attr_accessor :invoice, :procurement, :invoice_params
 
-  # def personalizer
-  #   {
-  #       validate: {
-  #           after: Personalizer::Process.new([:procurements, :invoices], :validate, self)
-  #       }
-  #   }
-  # end
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:procurements, :invoices, :submit], :validate, self)
+        }
+    }
+  end
 
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
@@ -43,7 +43,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
 
   def post_process
     # todo-olx
-    # Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output})
+    Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output})
     add_message :success, 'Successfully submitted invoice'
   end
 end

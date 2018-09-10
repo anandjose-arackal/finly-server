@@ -6,7 +6,7 @@ class Budgets::Index < Budgets::Base
   end
 
   def init
-    self.budgets = user.company.budgets.roots
+    self.budgets = user.company.budgets.roots.contains_date(Date.today)
   end
 
   def success
