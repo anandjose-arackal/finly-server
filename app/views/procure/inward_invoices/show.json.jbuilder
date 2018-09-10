@@ -120,7 +120,7 @@ json.invoice do
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
-                    :description, :hsn_sac, :inventory_line_item_id
+                    :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
@@ -237,5 +237,11 @@ json.comments do
 
       json.id comment.user&.id
     end
+  end
+end
+
+json.tax_rates do
+  json.array! @result.tax_rates do |tax_rate|
+    json.merge! tax_rate.as_json
   end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180903113950) do
+ActiveRecord::Schema.define(version: 20180907062539) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2682,6 +2682,7 @@ ActiveRecord::Schema.define(version: 20180903113950) do
     t.text     "item_info",              limit: 65535
     t.string   "comment",                limit: 255
     t.string   "account",                limit: 255
+    t.integer  "tax_rate_id",            limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -3980,6 +3981,7 @@ ActiveRecord::Schema.define(version: 20180903113950) do
     t.integer  "cost_center_id",         limit: 4
     t.boolean  "is_deleted",                                                  default: false, null: false
     t.string   "account",                limit: 255
+    t.integer  "tax_rate_id",            limit: 4
   end
 
   add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree

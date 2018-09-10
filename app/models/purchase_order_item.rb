@@ -28,6 +28,7 @@
 #  cost_center_id         :integer
 #  is_deleted             :boolean          default(FALSE), not null
 #  account                :string(255)
+#  tax_rate_id            :integer
 #
 
 class PurchaseOrderItem < ActiveRecord::Base
@@ -35,6 +36,7 @@ class PurchaseOrderItem < ActiveRecord::Base
   validates :inventory_line_item_id, presence: true
   validates :purchase_order_id, presence: true
 
+  belongs_to :tax_rate
   belongs_to :purchase_order
   belongs_to :inventory_line_item
   belongs_to :tax_amount, class_name: "Amount"
@@ -55,6 +57,11 @@ class PurchaseOrderItem < ActiveRecord::Base
 
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
+
+
+  def tax
+    self.tax_rate&.rate || super
+  end
 
   private
 

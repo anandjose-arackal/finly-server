@@ -35,7 +35,6 @@ class Procurements::Invoices::Approve < Procurements::Invoices::Base
   end
 
   def post_process
-    # todo-olx
     Event::EInvoice::Approve.(user, invoice: invoice, workflow_output: workflow_output)
     add_message :success, 'Successfully Approved Invoice'
   end
