@@ -27,7 +27,8 @@ class Procurements::Create < Procurements::Base
       when 'purchase_order'
         op = Procurements::PurchaseOrders::Create.(user, params)
       when 'tax_invoice', 'proforma_invoice'
-        op = Procurements::Invoices::Create.(user, params)
+        add_message :error, 'Invalid document type provided'
+        # op = Procurements::Invoices::Create.(user, params)
         # do nothing!
         # tax invoice / proforma invoice will be created
       else
@@ -37,6 +38,8 @@ class Procurements::Create < Procurements::Base
     end
     if op.success?
       add_message :success, 'Successfully created new procurement'
+    else
+      add_message :error, op.messages[:error]
     end
   end
 
