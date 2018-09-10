@@ -75,7 +75,6 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
   def allow_mailer(user, configuration)
     # val = super(user, configuration)
     # val and (user.manager_summary_mail_configs.reports.blank? or report.user == user)
-    # todo clarify what this is
     true
   end
 

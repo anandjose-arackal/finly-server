@@ -68,6 +68,8 @@ class ProcurementMailer < ApplicationMailer
     end
   end
 
+
+  # Automatically sent for invoice actions
   def send_invoice_mail(presenter)
     return unless presenter.validate
     @data = presenter
@@ -78,10 +80,10 @@ class ProcurementMailer < ApplicationMailer
       @invoice = @data.invoice
       @curr_user = @data.user
       ########################################################
-      attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
-      )
-      mail to: presenter.to, subject: presenter.subject, template_name: 'template'
+      # attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+      #    render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
+      # )
+      mail to: presenter.to, subject: presenter.subject, template_name: 'template_invoice'
     end
   end
 end

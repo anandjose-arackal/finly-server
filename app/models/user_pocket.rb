@@ -32,7 +32,7 @@ class UserPocket < ActiveRecord::Base
 
   validates :user, presence: true
   validates :user_pocket_type, presence: true
-  validates :base_currency_id, presence: true
+  # validates :base_currency_id, presence: true
 
   accepts_nested_attributes_for :balance
 

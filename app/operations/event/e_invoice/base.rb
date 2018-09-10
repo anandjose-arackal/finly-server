@@ -127,7 +127,7 @@ class Event::EInvoice::Base < Event::SetNotifier
       self.event_id = params[:event_id]
       self.action_name = params[:action_name]
       self.comment_body = params[:comment_body]
-      self.view_url = generate_url.html_safe
+      self.view_url = generate_url
       self.company = user.company
       # if params[:action_url_token]
       #   self.action_url_token = params[:action_url_token]
@@ -138,7 +138,15 @@ class Event::EInvoice::Base < Event::SetNotifier
     end
 
     def generate_url
-      suffix = "/params={\"document_type\":\"invoice\",\"document_id\":\"#{invoice.id}\"}"
+      #Determine view - Temporary, as views will be eliminated
+
+      if invoice.created_by.id == user.id
+        view = 'initiator'
+      else
+        view = 'reviewer'
+      end
+
+      suffix = "/params={\"view\":\"#{view}\",\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}"
       # path = "reports/#{report.id}"
       path = "procurements/#{invoice.procurement.id}"
       url = Constants::BASE_URL_VP + path + suffix
