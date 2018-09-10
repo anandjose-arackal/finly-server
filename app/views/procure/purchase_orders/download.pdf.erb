@@ -190,10 +190,10 @@
         <td><%= item.description %></td>
         <td><%= item.comment %></td>
         <td><%= item.quantity %></td>
-        <td><%= item.rate %></td>
-        <td><%= item.discount_amount&.value %></td>
-        <td><%= item.tax_amount&.value %></td>
-        <td><%= item.total_amount&.value %></td>
+        <td>&#8377;<%= item.rate %></td>
+        <td>&#8377;<%= item.discount_amount&.value %></td>
+        <td>&#8377;<%= item.tax_amount&.value %></td>
+        <td>&#8377;<%= item.total_amount&.value %></td>
       </tr>
     <% end %>
     </tbody>

@@ -190,10 +190,10 @@
         <td><%= item.description %></td>
         <td><%= item.comment %></td>
         <td><%= item.quantity %></td>
-        <td><%= item.rate %></td>
-        <td><%= item.discount_amount&.value %></td>
-        <td><%= item.tax_amount&.value %></td>
-        <td><%= item.total_amount&.value %></td>
+        <td>&#8377;<%= item.rate %></td>
+        <td>&#8377;<%= item.discount_amount&.value %></td>
+        <td>&#8377;<%= item.tax_amount&.value %></td>
+        <td>&#8377;<%= item.total_amount&.value %></td>
       </tr>
     <% end %>
     </tbody>
@@ -240,8 +240,8 @@
         <% unless approved_users.include?(trail.action_user) %>
           <% approved_users.push(trail.action_user) %>
           <li>
-            <div class="text center"><%= trail.action_user.name %></div>
-            <div class="text-center">
+            <div class="text center" style="font-size: 13px; color: #454545;"><%= trail.action_user.name %></div>
+            <div class="text-center" style="font-size: 12px; color: #888;">
               <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
             </div>
           </li>
