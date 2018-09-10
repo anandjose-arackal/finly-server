@@ -46,6 +46,7 @@ end
 if @result.account_owner.is_a?(YesBankVendor)
   json.attachments do
     json.array! @result.account_owner.vendor_attachments do |attachment|
+      json.id attachment.id
       json.url attachment.attached_file&.url
       json.thumb attachment.attached_file&.url(:thumb)
       json.file_type attachment.attached_file_content_type

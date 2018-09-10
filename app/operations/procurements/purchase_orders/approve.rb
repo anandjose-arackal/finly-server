@@ -35,7 +35,6 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   end
 
   def post_process
-    # todo-olx
     Event::EPurchaseOrder::Approve.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Approved Purchase Order'
   end

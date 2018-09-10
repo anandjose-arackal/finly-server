@@ -21,10 +21,15 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies, :tax_rates
 
     def init
-      self.departments = user.company.departments.roots
-      self.sub_departments = user.company.departments.only_sub_departments
-      self.cost_centers = user.company.cost_centers
       self.invoice = params[:invoice]
+      self.departments = user.company.departments.roots
+
+      if invoice.created_by.departments.present?
+        self.sub_departments = invoice.created_by.departments.only_sub_departments
+      else
+        self.sub_departments = invoice.created_by.company.departments.only_sub_departments
+      end
+      self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
       self.policies = invoice.created_by.policies.with_application(:vp)

@@ -3,11 +3,10 @@ class BankTransfer::Vendors::UploadAttachments < BankTransfer::Vendors::Base
   attr_accessor :vendor, :attachment_params, :vendor_attachment
 
   def init
-    id = params[:id] || params[:yes_bank_vendor_id]
+    id = params[:id] || params[:vendor_id] || params[:yes_bank_vendor_id]
     self.attachment_params = attachment_attributes
     self.vendor = YesBankVendor.find_by(id: id)
-
-    self.vendor_attachment = vendor.vendor_attachments.find_by id: attachment_params[:id]
+    self.vendor_attachment = vendor.vendor_attachments.find_by attachment_type: attachment_params[:attachment_type]
   end
 
   def validate
@@ -20,7 +19,7 @@ class BankTransfer::Vendors::UploadAttachments < BankTransfer::Vendors::Base
     if vendor_attachment.present?
       self.vendor_attachment.assign_attributes(attachment_params)
     else
-      self.vendor_attachment = vendor.vendor_attachment.build(attachment_params)
+      self.vendor_attachment = vendor.vendor_attachments.build(attachment_params)
     end
 
     if vendor_attachment.valid?
@@ -36,6 +35,6 @@ class BankTransfer::Vendors::UploadAttachments < BankTransfer::Vendors::Base
   end
 
   def attachment_attributes
-    params.require(:vendor_attachment).permit(:id, :attachment_file, :attachment_type)
+    params.require(:vendor_attachment).permit(:attached_file, :attachment_type)
   end
 end
