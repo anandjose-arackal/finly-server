@@ -19,10 +19,10 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
   end
 
   def process
-    self.purchase_order = procurement.build_purchase_order(purchase_order_params)
-    self.purchase_order.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
-    self.purchase_order.user = user
-    self.purchase_order.company = user.company
+    self.invoice = procurement.invoices.build(invoice_params)
+    self.invoice.invoice_status_id = InwardInvoiceStatus.id_for(:open)
+    self.invoice.created_by = user
+    self.invoice.company = user.company
     self.purchase_order.controlling_user = user
     if self.vendor.payment_term_id.present?
       self.purchase_order.payment_term_id = self.vendor.payment_term_id
