@@ -7,7 +7,7 @@
 <div class="containers document-header-container overflow-hidden">
   <div class="vendor-details">
     <div class="vendor-company-logo">
-      <img src="<%= @company.configuration.logo.url(:thumb) %>" width="250" height="auto">
+      <img src="<%= @company.configuration.logo.url(:thumb) %>" width="150" height="auto">
     </div>
     <div class="vendor-address">
       <!--<span class="company-name font-size-14 bold"><%#= @result.purchase_order.location.name %></span>-->
@@ -235,7 +235,7 @@
   <ul>
     <% approved_users = [] %>
 
-    <% @result.purchase_order.trails.unscoped.each do |trail| %>
+    <% @result.purchase_order.trails.each do |trail| %>
       <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
         <% unless approved_users.include?(trail.action_user) %>
           <% approved_users.push(trail.action_user) %>
