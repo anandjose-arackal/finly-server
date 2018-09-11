@@ -31,8 +31,10 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
 
     from_date = params&.dig(:filter_date, :from)
     from_date = from_date || (Date.today - 1.month.ago)
+    from_date = Date.parse(from_date) if from_date.class.name == 'String'
     to_date = params&.dig(:filter_date, :to)
     to_date = to_date || (Date.today)
+    to_date = Date.parse(to_date) if to_date.class.name == 'String'
     finly_transactions = FinlyTransaction.where(company_id: 67).with_date_range(from_date, to_date)
 
     finly_transactions.success.sort_date_asc.all.each do |finly_transaction|
