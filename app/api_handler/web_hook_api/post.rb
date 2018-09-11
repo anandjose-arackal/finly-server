@@ -51,4 +51,14 @@ class WebHookApi::Post < BaseHandler
     end
   end
 
+  def success
+    params[:response] = self.response
+    super
+  end
+
+  def failure
+    params[:response] = self.response
+    super
+  end
+
 end

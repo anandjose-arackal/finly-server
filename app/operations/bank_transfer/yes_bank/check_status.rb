@@ -200,6 +200,15 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
     company = payment.initiating_user&.company
     op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
+    # creating the webhook track based on the response of the particular operation
+    if company.web_hooks.present?
+      callback_track = CallbackTrack.new(company: company, entity: payment, request: post_params.to_s)
+      if op.success?
+        callback_track.update(success: true, response: (op.body rescue nil))
+      else
+        callback_track.update(success: false, response: (op.body rescue nil))
+      end
+    end
   end
 
 end
