@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180911030249) do
+ActiveRecord::Schema.define(version: 20180911034039) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -973,12 +973,12 @@ ActiveRecord::Schema.define(version: 20180911030249) do
 
   create_table "callback_tracks", force: :cascade do |t|
     t.integer  "company_id",  limit: 4
-    t.string   "request",     limit: 255
-    t.string   "response",    limit: 255
+    t.text     "request",     limit: 65535
+    t.text     "response",    limit: 16777215
     t.integer  "entity_id",   limit: 4
     t.string   "entity_type", limit: 255
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.boolean  "success"
   end
 
@@ -2694,6 +2694,7 @@ ActiveRecord::Schema.define(version: 20180911030249) do
     t.text     "item_info",              limit: 65535
     t.string   "comment",                limit: 255
     t.string   "account",                limit: 255
+    t.integer  "tax_rate_id",            limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -4000,6 +4001,7 @@ ActiveRecord::Schema.define(version: 20180911030249) do
     t.integer  "cost_center_id",         limit: 4
     t.boolean  "is_deleted",                                                  default: false, null: false
     t.string   "account",                limit: 255
+    t.integer  "tax_rate_id",            limit: 4
   end
 
   add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree

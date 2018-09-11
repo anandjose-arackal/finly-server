@@ -62,6 +62,7 @@ class Webhook::Process < Webhook::Base
   protected
   def process_web_hook_track(web_hook_track)
     op = WebHookApi::Post.(user, web_hook_track: web_hook_track)
+    self.response = op.params[:response] # this currently only handles one callback, have to generalize it for multiple callbacks
   end
 
   def generate_header_params(web_hook)

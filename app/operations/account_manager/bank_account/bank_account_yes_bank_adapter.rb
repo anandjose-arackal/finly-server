@@ -122,9 +122,9 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
     callback_track = CallbackTrack.new(company: company, entity: payment, request: post_params.to_s)
     if op.success?
-      callback_track.update(success: true, response: op.params[:response])
+      callback_track.update(success: true, response: (op.body rescue nil))
     else
-      callback_track.update(success: false, response: op.params[:response])
+      callback_track.update(success: false, response: (op.body rescue nil))
     end
   end
 
