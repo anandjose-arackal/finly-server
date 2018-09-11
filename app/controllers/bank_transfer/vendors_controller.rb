@@ -52,4 +52,9 @@ class BankTransfer::VendorsController < ApplicationController
     respond
   end
 
+  def upload_attachments
+    @result = BankTransfer::Vendors::UploadAttachments.(current_user, params)
+    respond
+  end
+
 end

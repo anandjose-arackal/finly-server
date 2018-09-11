@@ -3006,6 +3006,7 @@ Rails.application.routes.draw do
     post 'vendors/import', to: 'vendors#import', as: :import
     get 'vendors/new_vendor_config', to: 'vendors#new_vendor_config', as: :new_vendor_config
     resources :vendors do
+      put 'upload_attachments', to: 'vendors#upload_attachments'
       get 'show_transfers', to: 'vendors#show_transfers'
       get 'bank_accounts', to: 'vendors#bank_accounts'
     end

@@ -62,6 +62,7 @@ json.role do
 end
 
 json.mapping @result.mapping.each do |mapping|
+
   json.company_default mapping[:company_default]
   if mapping[:policy]
     json.policy do

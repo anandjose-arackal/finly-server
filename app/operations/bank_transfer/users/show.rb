@@ -26,12 +26,12 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
 
   def process
     case role_id
-      when UserRole.id_for(:admin)
-        team = BankTransfer::Users::Index.(user, params).users rescue []
-        id = params[:id] || params[:user_id]
-        self.selected_user = team.find_by(id: id)
-      else
-        self.selected_user = user
+    when UserRole.id_for(:admin)
+      team = BankTransfer::Users::Index.(user, params).users rescue []
+      id = params[:id] || params[:user_id]
+      self.selected_user = team.find_by(id: id)
+    else
+      self.selected_user = user
     end
   end
 
@@ -52,14 +52,15 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
       self.actions = load_actions
       # todo - temporary, will be updated to all policies later - as of now only the default company policy
       self.policy = selected_user.company.policies.default.first
-      self.policies = selected_user.company.all_policies
+      self.policies = selected_user.policies
       self.mapping = retrieve_mappings
-      self.roles = {admin: selected_user.vendor_payment_admin?,
-                    finance_manager: selected_user.vendor_payment_finance?,
-                    manager: selected_user.vendor_payment_manager?,
-                    initiator: selected_user.vendor_payment_initiator?,
-                    auditor: selected_user.auditor?
-                    }
+      self.roles = {
+          admin: selected_user.vendor_payment_admin?,
+          finance_manager: selected_user.vendor_payment_finance?,
+          manager: selected_user.vendor_payment_manager?,
+          initiator: selected_user.vendor_payment_initiator?,
+          auditor: selected_user.auditor?
+      }
       self.managers = selected_user.company.users.only_vendor_payment_reviewers
       self.finance_managers = selected_user.company.users.only_vendor_payment_creditors
     end

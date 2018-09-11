@@ -16,6 +16,7 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
       self.payment_order_ids = op.payment_orders.pluck(:id)
     else
       add_message :error, op.messages[:error]
+      return
     end
     self.payments = Payment.with_payment_order_id(payment_order_ids)
   end
