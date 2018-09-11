@@ -15,7 +15,13 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
     unless self.vendor.present?
       add_message :error, 'Vendor not found'
+      return
     end
+
+    unless self.vendor.bank_accounts.present?
+      add_message :error, "Vendor doesn't have a bank account, please add one before proceeding"
+    end
+
   end
 
   def process

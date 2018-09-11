@@ -791,6 +791,7 @@
 #                                        user_update_role PATCH  /users/:user_id/update_role(.:format)                                                                           users#update_user_role
 #                                            user_profile GET    /users/:user_id/profile(.:format)                                                                               users#profile
 #                                    user_update_password POST   /users/:user_id/update_password(.:format)                                                                       users#update_password
+#                                   user_update_signature POST   /users/:user_id/update_signature(.:format)                                                                      users#update_signature
 #                                            user_balance GET    /users/:user_id/balance(.:format)                                                                               users#balance
 #                                           user_balances GET    /users/:user_id/balances(.:format)                                                                              users#balances
 #                          user_verify_reset_password_otp GET    /users/:user_id/verify_reset_otp(.:format)                                                                      users#verify_reset_password_otp
@@ -1434,6 +1435,11 @@
 #                                         procure_payment GET    /procure/payments/:id(.:format)                                                                                 procure/payments#show
 #                                     procure_attachments POST   /procure/attachments(.:format)                                                                                  procure/attachments#create
 #                                  procure_create_from_po POST   /procure/inward_invoices/create_from_po(.:format)                                                               procure/inward_invoices#create_from_po
+#                           procure_inward_invoice_submit PUT    /procure/inward_invoices/:inward_invoice_id/submit(.:format)                                                    procure/inward_invoices#submit
+#                          procure_inward_invoice_retract PUT    /procure/inward_invoices/:inward_invoice_id/retract(.:format)                                                   procure/inward_invoices#retract
+#                          procure_inward_invoice_approve PUT    /procure/inward_invoices/:inward_invoice_id/approve(.:format)                                                   procure/inward_invoices#approve
+#                           procure_inward_invoice_reject PUT    /procure/inward_invoices/:inward_invoice_id/reject(.:format)                                                    procure/inward_invoices#reject
+#                            procure_inward_invoice_close PUT    /procure/inward_invoices/:inward_invoice_id/close(.:format)                                                     procure/inward_invoices#close
 #                                 procure_inward_invoices GET    /procure/inward_invoices(.:format)                                                                              procure/inward_invoices#index
 #                                                         POST   /procure/inward_invoices(.:format)                                                                              procure/inward_invoices#create
 #                              new_procure_inward_invoice GET    /procure/inward_invoices/new(.:format)                                                                          procure/inward_invoices#new
@@ -1488,6 +1494,7 @@
 #                                                         PATCH  /reviewal_levels/:id(.:format)                                                                                  reviewal_levels#update
 #                                                         PUT    /reviewal_levels/:id(.:format)                                                                                  reviewal_levels#update
 #                                                         DELETE /reviewal_levels/:id(.:format)                                                                                  reviewal_levels#destroy
+#                                            audit_trails GET    /audit_trails(.:format)                                                                                         audit_trails#index
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -2999,6 +3006,8 @@ Rails.application.routes.draw do
     post 'vendors/import', to: 'vendors#import', as: :import
     get 'vendors/new_vendor_config', to: 'vendors#new_vendor_config', as: :new_vendor_config
     resources :vendors do
+      put 'upload_attachments', to: 'vendors#upload_attachments'
+      put 'remove_attachment', to: 'vendors#remove_attachment'
       get 'show_transfers', to: 'vendors#show_transfers'
       get 'bank_accounts', to: 'vendors#bank_accounts'
     end

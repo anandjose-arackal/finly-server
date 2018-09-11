@@ -42,14 +42,15 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
     company_budgets = user.company.budgets
     case self.object.class.name
       when "PurchaseOrder"
-        relevant_budgets = company_budgets.applicable_to_purchase_orders
+        relevant_budgets = company_budgets.applicable_to_purchase_orders.contains_date(self.object.delivery_date)
         relevant_budget_ids = []
-        relevant_budget_ids += relevant_budgets.with_budgetable_locations(self.object.location_id).pluck(:id)
-        relevant_budget_ids += relevant_budgets.with_budgetable_departments(self.object.department_id).pluck(:id)
-        relevant_budget_ids += relevant_budgets.with_budgetable_vendors(self.object.vendor_id).pluck(:id)
+        # relevant_budget_ids += relevant_budgets.with_budgetable_locations(self.object.location_id).pluck(:id)
+        department_ids = [self.object.department_id, self.object.sub_department_id]
+        relevant_budget_ids = relevant_budgets.with_budgetable_departments(department_ids).pluck(:id)
+        # relevant_budget_ids = relevant_budgets.with_budgetable_vendors(self.object.vendor_id).pluck(:id)
         inventory_item_ids = self.object.items.pluck(:inventory_line_item_id)
         category_ids = InventoryLineItem.where(id: inventory_item_ids).pluck(:category_id)
-        relevant_budget_ids += relevant_budgets.with_budgetable_categories(category_ids).pluck(:id)
+        relevant_budget_ids = relevant_budgets.with_id(relevant_budget_ids).with_budgetable_categories(category_ids).pluck(:id)
         self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
       when "Expense", "Report"
         self.relevant_budgets = user.company.budgets.applicable_to_expenses

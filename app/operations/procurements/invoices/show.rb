@@ -18,13 +18,19 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   end
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies
+    attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies, :tax_rates
 
     def init
-      self.departments = user.company.departments.roots
-      self.sub_departments = user.company.departments.only_sub_departments
-      self.cost_centers = user.company.cost_centers
       self.invoice = params[:invoice]
+      self.departments = user.company.departments.roots
+
+      if invoice.created_by.departments.present?
+        self.sub_departments = invoice.created_by.departments.only_sub_departments
+      else
+        self.sub_departments = invoice.created_by.company.departments.only_sub_departments
+      end
+      self.cost_centers = user.company.cost_centers
+      self.tax_rates = user.company.tax_rates
 
       self.policies = invoice.created_by.policies.with_application(:vp)
       self.reviewal_chains = []
@@ -69,12 +75,12 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         actions[:document_editable] = true
       end
 
-      if invoice.approved? || invoice.auto_approved?
+      if invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?
         if user_in_level? || document_owner?
-          actions[:close] = {
-              url: Rails.application.routes.url_helpers.procure_inward_invoice_close_path(inward_invoice_id: invoice.id),
-              method: "PUT"
-          }
+          # actions[:close] = {
+          #     url: Rails.application.routes.url_helpers.procure_inward_invoice_close_path(inward_invoice_id: invoice.id),
+          #     method: "PUT"
+          # }
         end
 
         if (user_in_level? && user.vendor_payment_creditor?) || user.vendor_payment_creditor?

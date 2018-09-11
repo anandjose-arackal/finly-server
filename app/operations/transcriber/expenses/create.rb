@@ -116,11 +116,11 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
         add_message :error, set_fields.messages[:error]
         return false
       end
-      valid = CustomField::Validate.(self.expense.manual_expense)
-      unless valid.success?
-        add_message :error, valid.messages[:error]
-        return false
-      end
+      # valid = CustomField::Validate.(self.expense.manual_expense)
+      # unless valid.success?
+      #   add_message :error, valid.messages[:error]
+      #   return false
+      # end
       # self.expense.manual_expense.custom_fields.destroy_all
     else
       add_message :error, self.expense.errors.full_messages

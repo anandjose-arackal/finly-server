@@ -99,6 +99,7 @@ class CustomField::SetFields < CustomField::Base
     #   end
     # end
 
+
     if self.reset
       # in this case we can reset the custom fields by destroying all existing custom fields and recreating them
       # from the field configurations set
@@ -155,6 +156,7 @@ class CustomField::SetFields < CustomField::Base
     all_field_values = merged_custom_field_values
     acceptable_dropdown_values = identify_acceptable_dropdown_values all_field_values
 
+
     current_ids = self.item.custom_fields.pluck(:field_configuration_id)
     configs_to_create = []
     config_ids_to_destroy = []
@@ -167,7 +169,7 @@ class CustomField::SetFields < CustomField::Base
         acceptable_dropdown_values.each do |value|
           # If the custom field configuration is a dropdown and
           # the value matches the dependent field configuration criteria, add it to required custom fields
-          if value.to_s == config.parent_id.to_s
+          if config.parent_drop_down_items.pluck(:id).include?(value.to_i)
             required = true
           end
         end
@@ -223,7 +225,8 @@ class CustomField::SetFields < CustomField::Base
           # If root field, add the value to acceptable dropdown values
           acceptable_value = true
         else
-          if acceptable_dropdown_values.include?(config.parent_id.to_s)
+          if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.pluck(:id).include?(drop_down_value)}
+          # if acceptable_dropdown_values.include?(config.parent_id.to_s)
             acceptable_value = true
           end
         end

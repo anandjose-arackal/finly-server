@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180826103150) do
+ActiveRecord::Schema.define(version: 20180905042809) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -929,18 +929,19 @@ ActiveRecord::Schema.define(version: 20180826103150) do
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
 
   create_table "budget_trails", force: :cascade do |t|
-    t.integer  "entity_id",      limit: 4
-    t.string   "entity_type",    limit: 255
-    t.integer  "category_id",    limit: 4
-    t.integer  "cost_center_id", limit: 4
-    t.integer  "location_id",    limit: 4
-    t.integer  "vendor_id",      limit: 4
-    t.integer  "amount_id",      limit: 4
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
-    t.integer  "user_id",        limit: 4
-    t.integer  "department_id",  limit: 4
+    t.integer  "entity_id",         limit: 4
+    t.string   "entity_type",       limit: 255
+    t.integer  "category_id",       limit: 4
+    t.integer  "cost_center_id",    limit: 4
+    t.integer  "location_id",       limit: 4
+    t.integer  "vendor_id",         limit: 4
+    t.integer  "amount_id",         limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "user_id",           limit: 4
+    t.integer  "department_id",     limit: 4
     t.date     "date"
+    t.integer  "sub_department_id", limit: 4
   end
 
   create_table "budgets", force: :cascade do |t|
@@ -3484,6 +3485,14 @@ ActiveRecord::Schema.define(version: 20180826103150) do
   add_index "outward_invoices", ["payment_term_id"], name: "index_outward_invoices_on_payment_term_id", using: :btree
   add_index "outward_invoices", ["tax_amount_id"], name: "index_outward_invoices_on_tax_amount_id", using: :btree
   add_index "outward_invoices", ["user_id"], name: "index_outward_invoices_on_user_id", using: :btree
+
+  create_table "parent_dependent_field_configuration_mappings", force: :cascade do |t|
+    t.integer  "parent_id",                        limit: 4
+    t.string   "parent_type",                      limit: 255
+    t.integer  "dependent_field_configuration_id", limit: 4
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+  end
 
   create_table "payment_file_configurations", force: :cascade do |t|
     t.string   "file_format", limit: 255

@@ -39,11 +39,15 @@ class FieldConfiguration < ActiveRecord::Base
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
   has_many :multiselect_items, class_name: 'FieldMultiselectItem'
   has_many :custom_fields
+  belongs_to :parent, polymorphic: true
   belongs_to :default_value, polymorphic: true
   belongs_to :external_reference, polymorphic: true
-  belongs_to :parent, polymorphic: true
+
   has_many :policy_field_mappings
   has_many :policies, through: :policy_field_mappings
+
+  has_many :parent_dependent_field_configuration_mappings, foreign_key: :dependent_field_configuration_id
+  has_many :parent_drop_down_items, through: :parent_dependent_field_configuration_mappings, source: :parent, source_type: "FieldDropDownItem"
 
   validates :field_name, presence: true
   validates :enabled, presence: true

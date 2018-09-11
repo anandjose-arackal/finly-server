@@ -70,7 +70,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
 
     if self.cash_pocket.blank?
-      self.cash_pocket = self.expense&.user&.user_pockets.cash_pockets_only.first
+      self.cash_pocket = self.expense&.user&.user_pockets&.cash_pockets_only&.first
     end
   end
 
@@ -126,6 +126,14 @@ class Expense::Manual::Update < Expense::Manual::Base
       add_message :error, set_fields.messages[:error]
       return
     end
+    # validating the custom fields here
+    valid = CustomField::Validate.(self.expense.manual_expense)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return false
+    end
+
+
     if expense.update(updated_expense_params)
       if self.destroy_receipts
         expense.receipts.each do |receipt|

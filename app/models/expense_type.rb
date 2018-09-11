@@ -11,6 +11,7 @@
 
 
 
+
 class ExpenseType < ActiveRecord::Base
 
   validates :name, presence: true
@@ -65,6 +66,14 @@ class ExpenseType < ActiveRecord::Base
 
   def per_diem?
     self.id == ExpenseType.id_for(:per_diem)
+  end
+
+  def exportable_name
+    if self.manual?
+      return "Cash Expense"
+    else
+      return "#{self.name} Expense"
+    end
   end
 
 end

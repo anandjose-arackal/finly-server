@@ -90,7 +90,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           description: item.description,
           gst_type_id: self.purchase_order.gst_type_id,
           comment: item.comment,
-          inventory_line_item_id: item.inventory_line_item_id
+          inventory_line_item_id: item.inventory_line_item_id,
+          tax_rate_id: item.tax_rate_id
       }
     end
     invoice_params = {

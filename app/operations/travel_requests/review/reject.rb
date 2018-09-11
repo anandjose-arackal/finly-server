@@ -47,5 +47,4 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
 
     add_message :success, "Payment Request successfully rejected"
   end
-
 end

@@ -52,4 +52,14 @@ class BankTransfer::VendorsController < ApplicationController
     respond
   end
 
+  def upload_attachments
+    @result = BankTransfer::Vendors::UploadAttachments.(current_user, params)
+    respond
+  end
+
+  def remove_attachment
+    @result = BankTransfer::Vendors::RemoveAttachment.(current_user, params)
+    respond
+  end
+
 end

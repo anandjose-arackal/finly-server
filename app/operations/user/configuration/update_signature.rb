@@ -30,7 +30,7 @@ class User::Configuration::UpdateSignature < BaseOperation
 
   private
   def signature_params
-    params.require(:user).permit(:signature)
+    params.require(:user).permit(:signature, :signature_title)
   end
 
 end
