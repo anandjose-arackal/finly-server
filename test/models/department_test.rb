@@ -2,13 +2,14 @@
 #
 # Table name: departments
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  company_id :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  is_deleted :boolean          default(FALSE), not null
-#  ancestry   :string(255)
+#  id             :integer          not null, primary key
+#  name           :string(255)
+#  company_id     :integer
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  is_deleted     :boolean          default(FALSE), not null
+#  ancestry       :string(255)
+#  cost_center_id :integer
 #
 
 require 'test_helper'

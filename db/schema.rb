@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180905042809) do
+ActiveRecord::Schema.define(version: 20180911030249) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -970,6 +970,19 @@ ActiveRecord::Schema.define(version: 20180905042809) do
   add_index "budgets", ["period_id"], name: "index_budgets_on_period_id", using: :btree
   add_index "budgets", ["spent_amount_id"], name: "index_budgets_on_spent_amount_id", using: :btree
   add_index "budgets", ["user_id"], name: "index_budgets_on_user_id", using: :btree
+
+  create_table "callback_tracks", force: :cascade do |t|
+    t.integer  "company_id",  limit: 4
+    t.string   "request",     limit: 255
+    t.string   "response",    limit: 255
+    t.integer  "entity_id",   limit: 4
+    t.string   "entity_type", limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.boolean  "success"
+  end
+
+  add_index "callback_tracks", ["company_id"], name: "index_callback_tracks_on_company_id", using: :btree
 
   create_table "card_assign_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -1948,15 +1961,17 @@ ActiveRecord::Schema.define(version: 20180905042809) do
   add_index "delivery_challans", ["vendor_id"], name: "index_delivery_challans_on_vendor_id", using: :btree
 
   create_table "departments", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.integer  "company_id", limit: 4
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.boolean  "is_deleted",             default: false, null: false
-    t.string   "ancestry",   limit: 255
+    t.string   "name",           limit: 255
+    t.integer  "company_id",     limit: 4
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.boolean  "is_deleted",                 default: false, null: false
+    t.string   "ancestry",       limit: 255
+    t.integer  "cost_center_id", limit: 4
   end
 
   add_index "departments", ["company_id"], name: "index_departments_on_company_id", using: :btree
+  add_index "departments", ["cost_center_id"], name: "index_departments_on_cost_center_id", using: :btree
 
   create_table "desktop_users", force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
@@ -5499,6 +5514,7 @@ ActiveRecord::Schema.define(version: 20180905042809) do
   add_foreign_key "budgets", "companies"
   add_foreign_key "budgets", "periods"
   add_foreign_key "budgets", "users"
+  add_foreign_key "callback_tracks", "companies"
   add_foreign_key "card_assign_request_tracks", "card_assign_requests"
   add_foreign_key "card_assign_requests", "admin_review_workflows"
   add_foreign_key "card_assign_requests", "card_programs"
@@ -5551,6 +5567,7 @@ ActiveRecord::Schema.define(version: 20180905042809) do
   add_foreign_key "delivery_challans", "procurements"
   add_foreign_key "delivery_challans", "users"
   add_foreign_key "departments", "companies"
+  add_foreign_key "departments", "cost_centers"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
   add_foreign_key "document_items", "inventory_line_items"
