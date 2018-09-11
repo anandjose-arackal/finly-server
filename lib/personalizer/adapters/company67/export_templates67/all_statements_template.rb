@@ -28,6 +28,8 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
         'Report Name'
     ]
     self.contents = []
+    user_ids = Company.find(67).users.pluck(:id)
+    user_pocket_ids = UserPocket.where(user_id: user_ids).where(name: 'Cash on Hand').pluck(:id)
 
     from_date = params&.dig(:filter_date, :from)
     from_date = from_date || (Date.today - 1.month.ago)
@@ -45,8 +47,8 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
       else
         debit_amount = finly_transaction.amount.value
       end
-      if finly_transaction.payment_purpose&.name == 'settlement_against_cash_on_hand' && finly_transaction.payment.reference_resource_type == "Report"
-        finly_transaction.payment.reference_resource.expenses.spent_from_cash_on_hand.each do |expense|
+      if ['settlement_against_cash_on_hand', 'settlement_against_advance'].include?(finly_transaction.payment_purpose&.name) && finly_transaction.payment.reference_resource_type == "Report"
+        finly_transaction.payment.reference_resource.expenses.with_spent_from_id(user_pocket_ids).each do |expense|
           contents << [
               DateUtils.date_formatted(finly_transaction.date),
               finly_transaction.transaction_type.name.humanize,
