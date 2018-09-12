@@ -23,7 +23,8 @@ class FieldParentType < ActiveRecord::Base
       outward_invoice: 10,
       outward_invoice_line_item: 11,
       purchase_order: 12,
-      inventory_line_item: 13
+      inventory_line_item: 13,
+      purchase_order_item: 14
   }
 
   scope :with_name, -> (name) { where name: name }
