@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Procure Document</title>
+  <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
 </head>
 <body>
 <div class="containers document-header-container overflow-hidden">
@@ -190,10 +191,10 @@
         <td><%= item.description %></td>
         <td><%= item.comment %></td>
         <td><%= item.quantity %></td>
-        <td>&#8377;<%= item.rate %></td>
-        <td>&#8377;<%= item.discount_amount&.value %></td>
-        <td>&#8377;<%= item.tax_amount&.value %></td>
-        <td>&#8377;<%= item.total_amount&.value %></td>
+        <td><i class="fa fa-inr"><%= item.rate %></td>
+        <td><i class="fa fa-inr"><%= item.discount_amount&.value %></td>
+        <td><i class="fa fa-inr"><%= item.tax_amount&.value %></td>
+        <td><i class="fa fa-inr"><%= item.total_amount&.value %></td>
       </tr>
     <% end %>
     </tbody>
@@ -202,19 +203,19 @@
     <tbody>
     <tr>
       <td>Total</td>
-      <td>&#8377; &nbsp; <%= @result.purchase_order.total_before_tax&.value %></td>
+      <td><i class="fa fa-inr"><%= @result.purchase_order.total_before_tax&.value %></td>
     </tr>
     <tr>
       <td>Discount</td>
-      <td>&#8377; &nbsp; <%= @result.purchase_order.discount_amount&.value %></td>
+      <td><i class="fa fa-inr"><%= @result.purchase_order.discount_amount&.value %></td>
     </tr>
     <tr>
       <td>Tax</td>
-      <td>&#8377; &nbsp; <%= @result.purchase_order.tax_amount&.value %></td>
+      <td><i class="fa fa-inr"><%= @result.purchase_order.tax_amount&.value %></td>
     </tr>
     <tr>
       <td>Balance Due</td>
-      <td>&#8377; &nbsp; <%= @result.purchase_order.balance_amount&.value %></td>
+      <td><i class="fa fa-inr"><%= @result.purchase_order.balance_amount&.value %></td>
     </tr>
     </tbody>
   </table>
@@ -235,7 +236,7 @@
   <ul>
     <% approved_users = [] %>
 
-    <% @result.purchase_order.trails.each do |trail| %>
+    <% @result.purchase_order.trails.natural_order.each do |trail| %>
       <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
         <% unless approved_users.include?(trail.action_user) %>
           <% approved_users.push(trail.action_user) %>
