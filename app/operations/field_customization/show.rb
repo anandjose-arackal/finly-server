@@ -18,7 +18,7 @@ class FieldCustomization::Show < BaseOperation
       klass = Object.const_get(klass_name)
       next if klass.blank? or not klass.respond_to?(:field_configuration_for)
       configurations[field_configuration_key] = {}
-      fields.each do |field|
+      klass.customizable_options.each do |field, dummy|
         configurations[field_configuration_key][field] = klass.field_configuration_for(field, user.company)
       end
     end

@@ -47,7 +47,6 @@ module FieldCustomizer
         end
       end
 
-
       def field_configuration_for(field, scoped_attr = nil)
         options = customizable_options[field]
         return nil if options.blank?

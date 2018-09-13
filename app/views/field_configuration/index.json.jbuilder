@@ -1,0 +1,1 @@
+json.configuration @result.configurations
