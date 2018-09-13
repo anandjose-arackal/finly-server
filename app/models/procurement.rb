@@ -16,7 +16,7 @@
 #
 
 class Procurement < ActiveRecord::Base
-  include SoftDeletable
+  include SoftDeletable, FindByOrderedIds
   belongs_to :user
   belongs_to :company
   belongs_to :procurement_track
@@ -38,4 +38,17 @@ class Procurement < ActiveRecord::Base
   default_scope { order(updated_at: :desc) }
 
   scope :with_ids, -> (ids) {where id: ids}
+  scope :order_by_controlling_user, ->(user_id) {
+    if user_id.present?
+      ids = pluck(:id)
+      filtered_ids = PurchaseOrder.with_procurement_id(ids).with_controlling_user_id(user_id).pluck(:id)
+      ordered_ids = filtered_ids + (ids - filtered_ids)
+      find_ordered(ordered_ids)
+    end
+  }
+
+  def awaiting_action?(user)
+    user and purchase_order.controlling_user_id == user.id
+  end
+
 end

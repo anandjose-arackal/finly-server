@@ -100,6 +100,8 @@ class PurchaseOrder < ActiveRecord::Base
   scope :with_id, -> (id) {where id: id}
   scope :with_user_id, -> (user_ids) { where user_id: user_ids }
   scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
+  scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
+  scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
 
   # Used for generating document number
   scope :valid, -> {
