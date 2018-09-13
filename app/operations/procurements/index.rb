@@ -102,11 +102,12 @@ class Procurements::Index < Procurements::Base
   end
 
   class Procurements::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :procurements
+    attr_accessor :procurements, :paginated_procurements
 
     def init
       self.procurements = params[:procurements]
       apply_filter
+      self.paginated_procurements = self.procurements.order_by_controlling_user(user.id)
     end
 
     def apply_filter
