@@ -37,6 +37,8 @@ class InventoryLineItem < ActiveRecord::Base
     where category_id: category_id
   }
 
+  after_save :budget_trail_entry
+
   def as_json
     {
         id: id,
@@ -57,5 +59,14 @@ class InventoryLineItem < ActiveRecord::Base
 
   def tax_amount
     self.tax_rate&.rate
+  end
+
+  private
+
+  def budget_trail_entry
+    purchase_order_items = PurchaseOrderItem.with_inventory_line_item(self.id)
+    purchase_order_items.each do |item|
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+    end
   end
 end
