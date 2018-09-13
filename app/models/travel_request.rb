@@ -30,9 +30,14 @@
 #
 
 class TravelRequest < ActiveRecord::Base
-  include SoftDeletable, Sequenced::ActsAsSequenced
+  include SoftDeletable,
+          Sequenced::ActsAsSequenced,
+          FieldCustomizer::CustomizableValidation
 
   acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
+
+  customizable_validate :from_date, presence: true
+  customizable_validate :to_date, presence: false
 
   belongs_to :user
   belongs_to :policy
@@ -45,6 +50,7 @@ class TravelRequest < ActiveRecord::Base
   belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
   belongs_to :controlling_for_user_role, class_name: 'UserRole'
+  belongs_to :company
 
   has_many :destinations, class_name: 'TravelRequestDestination'
   has_many :travel_request_trails, dependent: :destroy
@@ -58,8 +64,8 @@ class TravelRequest < ActiveRecord::Base
   validates :status_id, presence: true #, unless: :open?
   validates :user_id, presence: true #, unless: :open?
   #validates :name, presence: true#, unless: :open?
-  validates :from_date, presence: true
-  validates :to_date, presence: true
+  # validates :from_date, presence: true
+  # validates :to_date, presence: true
   validate :acceptable_dates?
 
   # default_scope {order(status_id: :asc, submitted_at: :desc, created_at: :desc)}
