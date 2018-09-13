@@ -36,6 +36,7 @@ class TravelRequest < ActiveRecord::Base
 
   acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
 
+  field_customization_key :travel_request
   customizable_validate :from_date, presence: true
   customizable_validate :to_date, presence: false
 
