@@ -113,6 +113,12 @@ json.sub_budgets do
       json.extract! sub_budget.budget_amount, :id, :value, :currency_id
     end
 
+    processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+    json.spent_amount do
+      spent_amount = processor_instance.spent_amount
+      json.spent_amount spent_amount
+    end
+
     json.amounts do
       json.budget_amount do
         json.extract! @result.budget.budget_amount, :id, :value
