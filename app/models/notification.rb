@@ -319,6 +319,7 @@ class Notification < ActiveRecord::Base
           when NotificationActionType.id_for(:notify_submit)
             object = " purchase order"
           else
+            object = " purchase order"
             # do nothing
         end
       when "Invoice"
@@ -326,6 +327,7 @@ class Notification < ActiveRecord::Base
           when NotificationActionType.id_for(:notify_submit)
             object = " invoice"
           else
+            object = " invoice"
             # do nothing
         end
       else
