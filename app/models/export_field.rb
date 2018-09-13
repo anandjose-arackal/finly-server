@@ -15,6 +15,7 @@
 
 
 
+
 class ExportField < ActiveRecord::Base
 
   scope :with_id, ->(id) { where id: id }

@@ -41,4 +41,8 @@ class YesBankCompanyAccount < ActiveRecord::Base
     }
   end
 
+  scope :sum_balances, -> {
+    joins(:balance).sum(:value)
+  }
+
 end

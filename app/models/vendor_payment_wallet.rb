@@ -29,6 +29,7 @@ class VendorPaymentWallet < ActiveRecord::Base
   scope :having_balance_value, -> { joins_balance.where('value > 0') }
   scope :with_user, ->(id) { where user_id: id }
   scope :sum_balance, -> { joins_balance.sum('amounts.value') }
+  scope :sum_balances, -> { sum_balance }
 
   delegate :balance_value, to: :balance
 
