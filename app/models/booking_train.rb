@@ -67,7 +67,9 @@ class BookingTrain < ActiveRecord::Base
   def valid_date_range(travel_request)
     travel_from_date = travel_request.from_date
     travel_to_date = travel_request.to_date
-    not(departure_date < travel_from_date or departure_date > travel_to_date)
+    return false if travel_from_date and departure_date < travel_from_date
+    return false if travel_to_date and departure_date > travel_to_date
+    true
   end
 
 end

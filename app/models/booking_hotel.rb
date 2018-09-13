@@ -57,10 +57,10 @@ class BookingHotel < ActiveRecord::Base
   def valid_date_range(travel_request)
     travel_from_date = travel_request.from_date
     travel_to_date = travel_request.to_date
-    if checkin_date < travel_from_date or checkin_date > travel_to_date
+    if (travel_from_date and checkin_date < travel_from_date) or (travel_to_date and checkin_date > travel_to_date)
       return false
     end
-    if checkout_date < travel_from_date or checkout_date > travel_to_date
+    if (travel_from_date and checkout_date < travel_from_date) or (travel_to_date and checkout_date > travel_to_date)
       return false
     end
     true
