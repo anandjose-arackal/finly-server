@@ -18,7 +18,7 @@
 #  discount_amount_id     :integer
 #  total_amount_id        :integer
 #  delivery_date          :date
-#  comment                :string(255)
+#  comment                :text(65535)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  delivered              :integer          default(0)
