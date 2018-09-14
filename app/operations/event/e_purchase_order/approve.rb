@@ -8,7 +8,7 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
 
   def init
     super
-    self.approving_user = self.purchase_order.trails.last.action_user
+    self.approving_user = self.purchase_order.trails.natural_order.last.action_user
     self.approved = (purchase_order.approved? or purchase_order.closed?) if purchase_order.present?
     #todo add it to params
     self.auto_approve = params[:auto_approve]

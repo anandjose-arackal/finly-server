@@ -55,6 +55,10 @@ class PurchaseOrderItem < ActiveRecord::Base
     where(id: ids)
   }
 
+  scope :with_inventory_line_item, -> (inventory_line_item_id) {
+    where inventory_line_item_id: inventory_line_item_id
+  }
+
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
