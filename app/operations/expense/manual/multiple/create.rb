@@ -91,16 +91,22 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
       # Adding model level validation errors
       if value[:expense].valid?
         if value[:expense].from_cash_on_hand
-          self.total_amount_from_coh += value[:expense].amount_value
+          if value[:expense].date == Date.today && value[:expense].amount.currency_id != Currency.first.id
+            # do nothing?
+          else
+            self.total_amount_from_coh += value[:expense].amount_value
+          end
         end
       else
         self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages
       end
 
+
       if self.total_amount_from_coh > cash_pocket_adapter.balance(display_balance: true)
         # add error message saying this expense cannot be from COH
         self.errors_by_expenses[key][:error] += ["You do not have enough balance in your Cash on Hand to mark this expense against it"]
       end
+
 
       valid = CustomField::Validate.(value[:expense].manual_expense)
       unless valid.success?
@@ -164,8 +170,12 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
       end
 
       # marking this expense as blocked against cash on hand, because it's a manual expense
-      expense.update(cash_on_hand_blocked: true)
-      ##########--------------------------############
+      if expense.date == Date.today && expense.amount.currency_id != Currency.first.id
+        # do nothing
+      else
+        expense.update(cash_on_hand_blocked: true)
+      end
+      ###################--------------------------###################
 
       # calculate the equivalent amount in all currencies in the amounts table
       if expense.date == DateUtils.local_date

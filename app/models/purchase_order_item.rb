@@ -18,7 +18,7 @@
 #  discount_amount_id     :integer
 #  total_amount_id        :integer
 #  delivery_date          :date
-#  comment                :string(255)
+#  comment                :text(65535)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  delivered              :integer          default(0)
@@ -53,6 +53,10 @@ class PurchaseOrderItem < ActiveRecord::Base
 
   scope :with_id, -> (ids) {
     where(id: ids)
+  }
+
+  scope :with_inventory_line_item, -> (inventory_line_item_id) {
+    where inventory_line_item_id: inventory_line_item_id
   }
 
   after_save :budget_trail_entry

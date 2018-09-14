@@ -40,6 +40,10 @@ class Trail < ActiveRecord::Base
 
   default_scope { order created_at: :desc }
 
+  scope :natural_order, -> {
+      reorder :created_at
+  }
+
   def as_json(user)
     {
         action_type: self.action.name,

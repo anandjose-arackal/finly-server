@@ -1184,6 +1184,8 @@
 #                                                         DELETE /bank_transfer/account_owners/:id(.:format)                                                                     bank_transfer/account_owners#destroy
 #                                    bank_transfer_import POST   /bank_transfer/vendors/import(.:format)                                                                         bank_transfer/vendors#import
 #                         bank_transfer_new_vendor_config GET    /bank_transfer/vendors/new_vendor_config(.:format)                                                              bank_transfer/vendors#new_vendor_config
+#                 bank_transfer_vendor_upload_attachments PUT    /bank_transfer/vendors/:vendor_id/upload_attachments(.:format)                                                  bank_transfer/vendors#upload_attachments
+#                  bank_transfer_vendor_remove_attachment PUT    /bank_transfer/vendors/:vendor_id/remove_attachment(.:format)                                                   bank_transfer/vendors#remove_attachment
 #                     bank_transfer_vendor_show_transfers GET    /bank_transfer/vendors/:vendor_id/show_transfers(.:format)                                                      bank_transfer/vendors#show_transfers
 #                      bank_transfer_vendor_bank_accounts GET    /bank_transfer/vendors/:vendor_id/bank_accounts(.:format)                                                       bank_transfer/vendors#bank_accounts
 #                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                                                bank_transfer/vendors#index
@@ -3141,6 +3143,7 @@ Rails.application.routes.draw do
   ## Procurement APIs start ##########################################
   namespace :procure do
     get 'procurements/filter_config', to: "procurements#filter_config"
+    get 'procurements/count', to: 'procurements#count'
     resources :procurements do
     end
 
