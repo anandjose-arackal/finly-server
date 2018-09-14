@@ -107,6 +107,7 @@ class Procurements::Index < Procurements::Base
     def init
       self.procurements = params[:procurements]
       apply_filter
+      self.procurements = procurements.paginate(page: params[:page], per_page: params[:per_page])
     end
 
     def apply_filter
