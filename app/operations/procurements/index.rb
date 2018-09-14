@@ -108,6 +108,7 @@ class Procurements::Index < Procurements::Base
       self.procurements = params[:procurements]
       apply_filter
       self.paginated_procurements = self.procurements.order_by_controlling_user(user.id)
+      self.paginated_procurements = self.paginated_procurements.paginate(page: params[:page], per_page: params[:per_page])
     end
 
     def apply_filter
