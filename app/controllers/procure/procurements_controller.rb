@@ -6,6 +6,11 @@ class Procure::ProcurementsController < ApplicationController
     respond
   end
 
+  def count
+    @result = Procurements::Count.(current_user, params)
+    respond
+  end
+
   def show
     @result = Procurements::Show.(current_user, params)
     respond
