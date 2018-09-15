@@ -103,7 +103,7 @@ class Expense < ActiveRecord::Base
   validates :category_id, presence: true
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
-  validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', nil]}
+  validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', 'usage', '', nil]}
   validate :validate_usage_dates
   validate :no_future_date
   validate :valid_expense_type
@@ -992,7 +992,7 @@ class Expense < ActiveRecord::Base
   def usage_days
     return nil unless usage_date_type.present?
     days = (usage_date_start.to_date..usage_date_end.to_date).to_a
-    unless usage_date_end.to_date == usage_date_start.to_date
+    if (usage_date_type == 'hotel') and usage_date_end.to_date == usage_date_start.to_date
       days.pop
     end
     days
