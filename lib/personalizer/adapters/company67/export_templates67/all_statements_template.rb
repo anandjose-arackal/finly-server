@@ -73,6 +73,10 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
         end
         next
       end
+      expense_ids = nil
+      if finly_transaction.payment&.reimbursed_reports.present?
+        expense_ids = Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id)).pluck(:id)&.join(',')
+      end
       contents << [
           DateUtils.date_formatted(finly_transaction.date),
           finly_transaction.transaction_type.name.humanize,
@@ -86,7 +90,9 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
           finly_transaction.payment&.note,
           finly_transaction.payment&.reimbursed_reports&.pluck(:id)&.join(','),
           finly_transaction.finly_account_type,
-          (finly_transaction.finly_account.user.name rescue nil)
+          (finly_transaction.finly_account.user.name rescue nil),
+          nil,
+          expense_ids
       ]
     end
   end
