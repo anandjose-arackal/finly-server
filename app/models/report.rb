@@ -35,8 +35,6 @@
 #
 
 
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -106,7 +104,7 @@ class Report < ActiveRecord::Base
   scope :settled, -> {where report_status_id: ReportStatus.settled_id}
   scope :settlement_confirmed, -> {where report_status_id: ReportStatus.settlement_confirmed_id}
   scope :processing, -> {where report_status_id: ReportStatus.processing_id}
-  scope :processing_and_above, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id,ReportStatus.processing_id]}
+  scope :processing_and_above, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id, ReportStatus.processing_id]}
   scope :processed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id]}
   scope :completed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
   scope :accounted, -> {where accounted: true}
@@ -144,7 +142,9 @@ class Report < ActiveRecord::Base
   scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
   scope :settled_and_closed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
 
-  scope :filter_status, ->(status_id) {where report_status_id: status_id}
+  scope :filter_status, ->(status_id) do
+    where report_status_id: status_id
+  end
   scope :filter_user_id, ->(id) {where(user_id: id)}
   scope :filter_report_id, ->(id) {where(id: id)}
   scope :filter_search, ->(value) do

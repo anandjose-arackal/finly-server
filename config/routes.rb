@@ -2568,7 +2568,7 @@ Rails.application.routes.draw do
   get 'money_requests/categories', to: 'money_request_category#index'
   delete 'money_requests/categories/:id', to: 'money_request_category#destroy'
   patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
-  get 'money_requests/config', to: 'money_request#config_details'
+  get 'money_requests/:id/config', to: 'money_request#config_details'
   delete 'money_requests/destroy', to: 'money_request#destroy'
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do

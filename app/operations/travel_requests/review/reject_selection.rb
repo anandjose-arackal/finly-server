@@ -37,6 +37,11 @@ class TravelRequests::Review::RejectSelection < TravelRequests::Review::Base
                                                   action_id: TravelRequestTrailAction.id_for(:selection_rejected),
                                                   modified_user_id: selector&.id,
                                                   modified_user_role_id: controlling_user_role_id
+
+      travel_request.money_requests.status_pending.update_all(
+          controlling_user: travel_request.controlling_user,
+          controlling_user_role_id: travel_request.controlling_user_role_id
+      )
     else
       add_message :error, travel_request.errors.full_messages
     end

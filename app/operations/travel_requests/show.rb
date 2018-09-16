@@ -152,7 +152,8 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_edit_money_request?(money_request)
-      return false unless personal_view?
+      # return false unless personal_view?
+      return false unless money_request.controlling_user == user
       TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.travel_request.status_id)
     end
 
