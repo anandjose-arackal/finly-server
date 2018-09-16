@@ -23,6 +23,11 @@ class Expense::Personal::Mark < Expense::Base
     unless selected_expense.unreported?
       add_message :error, "This expense cannot be marked as personal"
     end
+
+    if selected_expense.personal
+      add_message :error, "This expense is already marked as personal"
+      return
+    end
   end
 
   def authorize

@@ -86,6 +86,7 @@ class Company < ActiveRecord::Base
   has_many :document_number_configs
   has_many :purchase_orders
   has_many :inward_documents # purchase order inward documents
+  has_many :field_customizations, as: :scopable
 
   has_many :departments
   has_many :company_pocket_templates

@@ -95,11 +95,13 @@ class PurchaseOrder < ActiveRecord::Base
   validates :purchase_order_status_id, presence: true
   # validates :policy_id, presence: true
   # validates :items, presence: true
-  scope :document_number_generated_in_finly, -> { where override_po_number: [false, nil] }
+  scope :document_number_generated_in_finly, -> {where override_po_number: [false, nil]}
 
   scope :with_id, -> (id) {where id: id}
-  scope :with_user_id, -> (user_ids) { where user_id: user_ids }
-  scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
+  scope :with_user_id, -> (user_ids) {where user_id: user_ids}
+  scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
+  scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
+  scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
 
   # Used for generating document number
   scope :valid, -> {
@@ -126,7 +128,6 @@ class PurchaseOrder < ActiveRecord::Base
   private
 
 
-
   def calculate_line_items
     total_before_tax_amount = 0
     total_after_tax_amount = 0
@@ -149,7 +150,7 @@ class PurchaseOrder < ActiveRecord::Base
         # Exclusive of tax
         item_amount = (item_quantity * item_rate)
         item_discount_amount = item_amount * item_discount / 100
-        item_taxable_amount =  item_amount - item_discount_amount
+        item_taxable_amount = item_amount - item_discount_amount
         item_tax_amount = item_taxable_amount * item_tax / 100
         item_total_amount = item_taxable_amount + item_tax_amount
 
@@ -178,7 +179,6 @@ class PurchaseOrder < ActiveRecord::Base
         else
           item.total_amount = Amount.new(value: item_total_amount, currency_id: 1)
         end
-
 
 
         # end
@@ -228,11 +228,11 @@ class PurchaseOrder < ActiveRecord::Base
     #     BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
     #   end
     # else
-      # i.e. if the purchase order changed statuses to something other than the above, it will destroy
-      # all the line item entries in the budget trail model for this particular purchase order
-      # self.items.each do |item|
-      #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
-      # end
+    # i.e. if the purchase order changed statuses to something other than the above, it will destroy
+    # all the line item entries in the budget trail model for this particular purchase order
+    # self.items.each do |item|
+    #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+    # end
     # end
     self.items.each do |item|
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)

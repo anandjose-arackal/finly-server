@@ -21,7 +21,8 @@
 #
 
 class BookingHotel < ActiveRecord::Base
-  include SoftDeletable
+  include SoftDeletable,
+          FieldCustomizer::CustomizableValidation
 
   belongs_to :parent, polymorphic: true
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
@@ -29,6 +30,12 @@ class BookingHotel < ActiveRecord::Base
 
   accepts_nested_attributes_for :location
   accepts_nested_attributes_for :cost
+
+  # As front end calls this comment and not description, have to give an alias for validation purpose
+  alias_attribute :comment, :description
+
+  field_customization_key :booking_hotel
+  customizable_validate :comment, presence: false
 
   validates :location, presence: true
   validates :checkin_date, presence: true
@@ -57,10 +64,10 @@ class BookingHotel < ActiveRecord::Base
   def valid_date_range(travel_request)
     travel_from_date = travel_request.from_date
     travel_to_date = travel_request.to_date
-    if checkin_date < travel_from_date or checkin_date > travel_to_date
+    if (travel_from_date and checkin_date < travel_from_date) or (travel_to_date and checkin_date > travel_to_date)
       return false
     end
-    if checkout_date < travel_from_date or checkout_date > travel_to_date
+    if (travel_from_date and checkout_date < travel_from_date) or (travel_to_date and checkout_date > travel_to_date)
       return false
     end
     true

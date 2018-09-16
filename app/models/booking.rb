@@ -128,6 +128,7 @@ class Booking < ActiveRecord::Base
 
   def booking_date_range
     return unless request?
+    return unless booking_type_object.valid?
     unless booking_type_object.valid_date_range(travel_request)
       errors.add :booking, 'dates cannot be outside the travel dates'
     end
