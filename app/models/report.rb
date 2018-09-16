@@ -142,8 +142,13 @@ class Report < ActiveRecord::Base
   scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
   scope :settled_and_closed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
 
-  scope :filter_status, ->(status_id) do
-    where report_status_id: status_id
+  scope :filter_status, ->(status_id, user_id) do
+    case status_id
+    when 99, '99'
+      where(controlling_user_id: user_id).where.not(report_status_id: ReportStatus.ids_for(:retracted, :open, :rejected))
+    else
+      where report_status_id: status_id
+    end
   end
   scope :filter_user_id, ->(id) {where(user_id: id)}
   scope :filter_report_id, ->(id) {where(id: id)}

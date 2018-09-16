@@ -74,7 +74,7 @@ class MoneyRequest::Index < MoneyRequest::Base
     attr_accessor :money_requests, :counts, :paginated_money_requests
 
     has_scope :filter_search
-    has_scope :filter_status
+    # has_scope :filter_status
     has_scope :filter_user_id
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_submitted_date, using: [:from, :to], type: :hash
@@ -87,6 +87,9 @@ class MoneyRequest::Index < MoneyRequest::Base
       get_counts
       if self.money_requests.present?
         self.money_requests = apply_scopes(self.money_requests, params)
+        if params[:filter_status].present?
+          self.money_requests = self.money_requests.filter_status(params[:filter_status], user.id)
+        end
         self.paginated_money_requests = self.money_requests.skip_pending.paginate(page: params[:page], per_page: 30)
       end
     end
