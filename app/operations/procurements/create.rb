@@ -8,12 +8,21 @@ class Procurements::Create < Procurements::Base
   def validate
     if params[:document_type].blank?
       add_message :error, 'Please provide document type to create procurement'
+      return
     end
+
+    document_types = %w( purchase_order invoice )
+    unless document_types.include?(params[:document_type])
+      add_message :error, 'Invalid document type provided'
+    end
+
+
   end
 
   def process
     self.procurement = user.procurements.build(procurement_params)
     self.procurement.company = user.company
+    self.procurement.procurement_type = params[:document_type]
 
     self.procurement.procurement_status_id = ProcurementStatus.id_for(:draft)
 
@@ -26,8 +35,8 @@ class Procurements::Create < Procurements::Base
     case params[:document_type]
       when 'purchase_order'
         op = Procurements::PurchaseOrders::Create.(user, params)
-      when 'tax_invoice', 'proforma_invoice'
-        add_message :error, 'Invalid document type provided'
+      when 'invoice', 'proforma_invoice'
+        # add_message :error, 'Invalid document type provided'
         op = Procurements::Invoices::Create.(user, params)
         # do nothing!
         # tax invoice / proforma invoice will be created

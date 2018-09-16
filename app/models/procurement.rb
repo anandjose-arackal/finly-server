@@ -13,6 +13,7 @@
 #  company_id            :integer
 #  note                  :text(65535)
 #  is_deleted            :boolean          default(FALSE), not null
+#  procurement_type      :string(255)
 #
 
 class Procurement < ActiveRecord::Base
@@ -48,7 +49,11 @@ class Procurement < ActiveRecord::Base
   }
 
   def awaiting_action?(user)
-    user and purchase_order.controlling_user_id == user.id
+    if purchase_order.present?
+      user and purchase_order.controlling_user_id == user.id
+    else
+      invoices.first.controlling_user_id == user.id
+    end
   end
 
 end
