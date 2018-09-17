@@ -38,7 +38,7 @@ class TravelRequest < ActiveRecord::Base
 
   field_customization_key :travel_request
   customizable_validate :from_date, presence: true
-  customizable_validate :to_date, presence: false
+  customizable_validate :to_date, presence: true
   customizable_validate :purpose_of_travel, presence: false
 
   belongs_to :user

@@ -40,7 +40,8 @@ class BookingBus < ActiveRecord::Base
   validates :departure_time, presence: true
 
   # As front end calls this comment and not description, have to give an alias for validation purpose
-  alias_attribute :comment, :description
+  # alias_attribute :comment, :description
+  validates :comment, presence: true
 
   field_customization_key :booking_bus
   customizable_validate :comment, presence: false

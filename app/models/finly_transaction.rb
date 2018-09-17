@@ -48,7 +48,7 @@ class FinlyTransaction < ActiveRecord::Base
   validates :payment_purpose_id, presence: true
   validates :date, presence: true
 
-  default_scope { order(id: :desc) }
+  default_scope { order(sequence_number: :desc) }
 
   delegate :credit?, :debit?, to: :transaction_type
 

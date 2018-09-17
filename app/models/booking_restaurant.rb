@@ -36,7 +36,8 @@ class BookingRestaurant < ActiveRecord::Base
   alias_attribute :comment, :description
 
   field_customization_key :booking_restaurant
-  customizable_validate :comment, presence: false
+  # customizable_validate :comment, presence: false
+  validates :comment, presence: true
 
   def as_json(options={})
     {
