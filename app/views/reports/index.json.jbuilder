@@ -13,6 +13,7 @@ json.array!(@result.paginated_reports) do |report|
   if report.policy
     json.policy report.policy.name
   end
+  json.controlling_user report.controlling_user
   json.status @result.status_name(report)
   json.total(('%.2f' % report.total_amount))
   json.currency_id report.base_currency_id

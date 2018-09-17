@@ -54,7 +54,10 @@ class TravelRequests::Review::RetractBooking < TravelRequests::Review::Base
 
   def post_process
     add_message :success, "Travel booking successfully retracted"
-
+    travel_request.money_requests.status_pending.update_all(
+        controlling_user_id: travel_request.controlling_user_id,
+        controlling_user_role_id: travel_request.controlling_user_role_id
+    )
     # add comments and trigger mailer
   end
 

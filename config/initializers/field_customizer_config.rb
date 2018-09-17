@@ -1,0 +1,1 @@
+FIELD_CUSTOMIZER_KEY_MAP = {}.with_indifferent_access

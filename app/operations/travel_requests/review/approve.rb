@@ -64,6 +64,11 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     end
     self.travel_request.comments.create user_id: user.id,
                                          action_id: action_id
+
+    travel_request.money_requests.status_pending.update_all(
+        controlling_user_id: travel_request.controlling_user_id,
+        controlling_user_role_id: travel_request.controlling_user_role_id
+    )
     #
     # Event::EBankPaymentRequest::Approve.(user, travel_request: travel_request)
 

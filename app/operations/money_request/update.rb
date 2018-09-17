@@ -8,12 +8,13 @@ class MoneyRequest::Update < MoneyRequest::Base
   def pre_validate
     required_by_date = params[:money_request][:required_by_date] rescue nil
     if required_by_date.present? and Date.parse(required_by_date) < DateUtils.local_date
-      messages[:error] << 'Invalid Required By Date'
+      messages[:error] << 'Required by date cannot be older than the current date'
     end
   end
 
   def init
     super
+    return unless self.money_request.present?
     self.update_param = {}
     self.update_param = update_params
     if self.update_param[:policy_id].blank? or ([0, '0', 'nil'].include?(self.update_param[:policy_id]))

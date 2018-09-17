@@ -54,7 +54,7 @@ class MoneyRequest::Base < BaseOperation
       self.manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :manager)
       self.finance_manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :finance_manager)
       self.card = load_card
-      self.cash_pockets = user.user_pockets.cash_pockets_only
+      self.cash_pockets = money_request.user.user_pockets.cash_pockets_only
     end
 
     def retrieve_policies
@@ -82,6 +82,7 @@ class MoneyRequest::Base < BaseOperation
         if admin_view? and self.money_request.can_take_control? and not self.money_request.controlling_user?(user)
           actions[:take_control] = true
         elsif self.money_request.processing? and self.money_request.controlling_user?(user)
+          actions[:editable] = true
           if self.money_request.payment_mode_card?
             actions[:approve_and_credit] = true
             actions[:approve_and_forward_to] = true

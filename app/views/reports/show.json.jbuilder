@@ -3,6 +3,7 @@ json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
 json.status @result.status_name(@result.report)
 json.status_name @result.status_name(@result.report)
+json.controlling_user @result.report.controlling_user
 manager = (@result.manager.name rescue '')
 json.manager_name manager
 finance_manager = (@result.finance_manager.name rescue '')
@@ -74,7 +75,9 @@ json.expense_sections sorted_expenses do |category|
   json.expenses category[:expenses] do |expense|
     json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id, :category_name,
                   :distance_value, :distance_rate_value, :time_value, :time_rate_value,
-                  :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type, :usage_date_start, :usage_date_end
+                  :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
+    json.usage_date_start DateUtils.date_formatted expense.usage_date_start
+    json.usage_date_end DateUtils.date_formatted expense.usage_date_end
     if expense.note
       if expense.note.length < 29
         json.note expense.note

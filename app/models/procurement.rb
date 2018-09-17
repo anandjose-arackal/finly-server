@@ -36,7 +36,7 @@ class Procurement < ActiveRecord::Base
 
   has_many :status_tags, through: :procurement_status_taggables, dependent: :destroy
 
-  default_scope { order(updated_at: :desc) }
+  default_scope {order(created_at: :desc)}
 
   scope :with_ids, -> (ids) {where id: ids}
   scope :order_by_controlling_user, ->(user_id) {
