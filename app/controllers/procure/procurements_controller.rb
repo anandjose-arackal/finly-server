@@ -8,7 +8,7 @@ class Procure::ProcurementsController < ApplicationController
 
   def count
     @result = Procurements::Count.(current_user, params)
-    respond
+    render json: @result.count.as_json
   end
 
   def show
