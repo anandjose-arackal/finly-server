@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company104::Report104::Approve104::PreProcess < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company114::Report114::Retract114::PreProcess < Personalizer::Adapters::Base
   attr_accessor :report
 
   # Ensure that if it is approved by all managers, the report cannot be retracted
