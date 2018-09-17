@@ -44,8 +44,8 @@ class BookingCarRental < ActiveRecord::Base
   alias_attribute :comment, :description
 
   field_customization_key :booking_car_rental
-  customizable_validate :comment, presence: false
-
+  # customizable_validate :comment, presence: false
+  validates :comment, presence: true
   validates :pickup_date, presence: true
   validates :drop_date, presence: true
   validates :pickup_city, presence: true

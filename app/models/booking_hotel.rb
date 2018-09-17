@@ -35,7 +35,8 @@ class BookingHotel < ActiveRecord::Base
   alias_attribute :comment, :description
 
   field_customization_key :booking_hotel
-  customizable_validate :comment, presence: false
+  # customizable_validate :comment, presence: false
+  validates :comment, presence: true
 
   validates :location, presence: true
   validates :checkin_date, presence: true

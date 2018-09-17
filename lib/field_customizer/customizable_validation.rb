@@ -67,9 +67,10 @@ module FieldCustomizer
         end
 
         scoped_attr = self
+        debugger
         scope.each do |attr|
           unless scoped_attr.respond_to?(attr)
-            raise "ActsAsCustomizable: Attribute #{attr} not found for field #{field} in class #{scoped_attr.name}"
+            raise "ActsAsCustomizable: Attribute #{attr} not found for field #{field} in class #{scoped_attr.class.name}"
           end
           scoped_attr = scoped_attr.send(attr)
         end

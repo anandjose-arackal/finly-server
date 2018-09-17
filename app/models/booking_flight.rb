@@ -49,8 +49,8 @@ class BookingFlight < ActiveRecord::Base
   validates :departure_date, presence: true
 
   field_customization_key :booking_flight
-  customizable_validate :comment, presence: false
-
+  # customizable_validate :comment, presence: false
+  validates :comment, presence: true
 
   def as_json(options={})
     {
