@@ -5,6 +5,14 @@
 class Report::Retract < Report::Base
   attr_accessor :from_user, :prev_status
 
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:report, :retract], :pre_process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     :employee
   end
