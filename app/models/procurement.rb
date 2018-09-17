@@ -46,4 +46,9 @@ class Procurement < ActiveRecord::Base
       find_ordered(ordered_ids)
     end
   }
+
+  def awaiting_action?(user)
+    user and purchase_order.controlling_user_id == user.id
+  end
+
 end

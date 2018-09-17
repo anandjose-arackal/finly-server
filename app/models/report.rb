@@ -85,6 +85,7 @@ class Report < ActiveRecord::Base
   default_scope {order(report_status_id: :asc, submitted_at: :desc, created_at: :desc)}
 
   scope :with_id, ->(id) {where id: id}
+  scope :filter_id, ->(id) {with_id(id)}
   scope :without_id, ->(id) {where.not id: id}
   scope :with_policy, ->(policy_id) {where policy_id: policy_id}
   scope :with_policy_id, ->(policy_id) {where policy_id: policy_id}
