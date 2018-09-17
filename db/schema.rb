@@ -2400,6 +2400,25 @@ ActiveRecord::Schema.define(version: 20180914060254) do
   add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", using: :btree
   add_index "field_configurations", ["field_type_id"], name: "index_field_configurations_on_field_type_id", using: :btree
 
+  create_table "field_customizations", force: :cascade do |t|
+    t.string   "class_name",    limit: 255,                 null: false
+    t.string   "field_name",    limit: 255,                 null: false
+    t.boolean  "enabled",                   default: false, null: false
+    t.boolean  "presence",                  default: false, null: false
+    t.boolean  "show_in_pdf",               default: false, null: false
+    t.integer  "scopable_id",   limit: 4,                   null: false
+    t.string   "scopable_type", limit: 255,                 null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+  end
+
+  add_index "field_customizations", ["class_name"], name: "index_field_customizations_on_class_name", using: :btree
+  add_index "field_customizations", ["enabled"], name: "index_field_customizations_on_enabled", using: :btree
+  add_index "field_customizations", ["field_name"], name: "index_field_customizations_on_field_name", using: :btree
+  add_index "field_customizations", ["presence"], name: "index_field_customizations_on_presence", using: :btree
+  add_index "field_customizations", ["scopable_type", "scopable_id"], name: "index_field_customizations_on_scopable_type_and_scopable_id", using: :btree
+  add_index "field_customizations", ["show_in_pdf"], name: "index_field_customizations_on_show_in_pdf", using: :btree
+
   create_table "field_date_times", force: :cascade do |t|
     t.datetime "value",      null: false
     t.datetime "created_at", null: false

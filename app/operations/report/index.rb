@@ -81,7 +81,8 @@ class Report::Index < Report::Base
     attr_accessor :reports, :counts, :paginated_reports
 
     has_scope :filter_search
-    has_scope :filter_status
+    has_scope :filter_id
+    # has_scope :filter_status
     has_scope :filter_user_id
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_submitted_date, using: [:from, :to], type: :hash
@@ -97,6 +98,9 @@ class Report::Index < Report::Base
       get_counts
       if self.reports.present?
         self.reports = apply_scopes(self.reports, params)
+        if params[:filter_status].present?
+          self.reports = self.reports.filter_status(params[:filter_status], user.id)
+        end
         self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30)
       end
     end

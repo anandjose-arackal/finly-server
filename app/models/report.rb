@@ -35,8 +35,6 @@
 #
 
 
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -87,6 +85,7 @@ class Report < ActiveRecord::Base
   default_scope {order(report_status_id: :asc, submitted_at: :desc, created_at: :desc)}
 
   scope :with_id, ->(id) {where id: id}
+  scope :filter_id, ->(id) {with_id(id)}
   scope :without_id, ->(id) {where.not id: id}
   scope :with_policy, ->(policy_id) {where policy_id: policy_id}
   scope :with_policy_id, ->(policy_id) {where policy_id: policy_id}
@@ -106,7 +105,7 @@ class Report < ActiveRecord::Base
   scope :settled, -> {where report_status_id: ReportStatus.settled_id}
   scope :settlement_confirmed, -> {where report_status_id: ReportStatus.settlement_confirmed_id}
   scope :processing, -> {where report_status_id: ReportStatus.processing_id}
-  scope :processing_and_above, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id,ReportStatus.processing_id]}
+  scope :processing_and_above, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id, ReportStatus.processing_id]}
   scope :processed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id]}
   scope :completed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
   scope :accounted, -> {where accounted: true}
@@ -144,7 +143,14 @@ class Report < ActiveRecord::Base
   scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
   scope :settled_and_closed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
 
-  scope :filter_status, ->(status_id) {where report_status_id: status_id}
+  scope :filter_status, ->(status_id, user_id) do
+    case status_id
+    when 99, '99'
+      where(controlling_user_id: user_id).where.not(report_status_id: ReportStatus.ids_for(:retracted, :open, :rejected))
+    else
+      where report_status_id: status_id
+    end
+  end
   scope :filter_user_id, ->(id) {where(user_id: id)}
   scope :filter_report_id, ->(id) {where(id: id)}
   scope :filter_search, ->(value) do

@@ -60,6 +60,7 @@ class ExpenseRule < ActiveRecord::Base
 
   # Amount currency is always picked up from base currency of the policy
   def greater_than_amount
+    return super if super.nil?
     Amount.new(value: super.value, currency_id: self.policy.base_currency_id)
   end
 
