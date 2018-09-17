@@ -55,9 +55,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       actions = {}
       actions[:audit_trail] = true
 
-      actions[:policy_editable] = false
 
       if document_owner? && (self.invoice.open? || self.invoice.retracted? || self.invoice.rejected?)
+        actions[:policy_editable] = get_policy_editable
         actions[:submit] = {
             url: Rails.application.routes.url_helpers.procure_inward_invoice_submit_path(inward_invoice_id: invoice.id),
             method: "PUT"
@@ -107,6 +107,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
               method: "PUT"
           }
           actions[:document_editable] = true
+          actions[:policy_editable] = false
         end
 
         if document_owner?
@@ -130,6 +131,14 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
     def document_owner?
       invoice.created_by_user_id == user.id
+    end
+
+    def get_policy_editable
+      if invoice.procurement&.purchase_order.present?
+        false
+      else
+        true
+      end
     end
 
     def user_in_level?

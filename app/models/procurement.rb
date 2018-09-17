@@ -48,6 +48,19 @@ class Procurement < ActiveRecord::Base
     end
   }
 
+  scope :order_by_controlling_level, ->(user_id) {
+    if user_id.present?
+
+      level_ids = LevelReviewerMapping.with_reviewer_id(user_id).pluck(:level_id)
+
+      filtered_ids = PurchaseOrder.with_procurement_id(ids).with_controlling_level_ids(level_ids).pluck(:id)
+      filtered_ids += Invoice.with_procurement_id(ids).with_controlling_level_ids(level_ids).pluck(:id)
+
+      ordered_ids = filtered_ids + (ids - filtered_ids)
+      find_ordered(ordered_ids)
+    end
+  }
+
   def awaiting_action?(user)
     if purchase_order.present?
       user and purchase_order.controlling_user_id == user.id

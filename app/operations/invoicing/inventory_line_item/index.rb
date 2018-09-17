@@ -11,7 +11,8 @@ class Invoicing::InventoryLineItem::Index < Invoicing::InventoryLineItem::Base
 
     def init
       self.inventory_line_items = apply_scopes(params[:inventory_line_items], params)
-      self.paginated_line_items = self.inventory_line_items.paginate(page: params[:page], per_page: 30)
+      per_page = params[:per_page] || 30
+      self.paginated_line_items = self.inventory_line_items.paginate(page: params[:page], per_page: per_page)
     end
   end
 
