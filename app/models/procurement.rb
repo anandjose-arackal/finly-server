@@ -62,10 +62,26 @@ class Procurement < ActiveRecord::Base
   }
 
   def awaiting_action?(user)
-    if purchase_order.present?
-      user and purchase_order.controlling_user_id == user.id
+    # Ideal method:
+    # First check if controlling user is present and return
+    # If not, then check for controlling level and see if current user is present inside controlling level
+    # Do it for both PO & Invoices
+    if purchase_order.present? && !(invoices.length > 0)
+      if user
+        purchase_order.level&.reviewers&.include? user
+      else
+        false
+      end
     else
-      invoices.first.controlling_user_id == user.id
+      awaiting_action = false
+      invoices.each do |invoice|
+        if invoice.level&.reviewers&.include? user
+          awaiting_action = true
+          break
+        end
+      end
+
+      awaiting_action
     end
   end
 

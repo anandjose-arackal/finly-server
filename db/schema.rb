@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180915220305) do
+ActiveRecord::Schema.define(version: 20180917034738) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -686,12 +686,12 @@ ActiveRecord::Schema.define(version: 20180915220305) do
     t.text     "pickup_address",  limit: 65535
     t.string   "car_type",        limit: 255
     t.string   "car_number",      limit: 255
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
     t.integer  "parent_id",       limit: 4
     t.string   "parent_type",     limit: 255
-    t.integer  "pickup_city_id",  limit: 4,     null: false
-    t.integer  "drop_city_id",    limit: 4,     null: false
+    t.integer  "pickup_city_id",  limit: 4,                     null: false
+    t.integer  "drop_city_id",    limit: 4,                     null: false
     t.text     "drop_address",    limit: 65535
     t.datetime "pickup_datetime"
     t.datetime "drop_datetime"
@@ -702,6 +702,7 @@ ActiveRecord::Schema.define(version: 20180915220305) do
     t.time     "pickup_time"
     t.date     "drop_date"
     t.time     "drop_time"
+    t.boolean  "is_deleted",                    default: false
   end
 
   add_index "booking_car_rentals", ["parent_type", "parent_id"], name: "index_booking_car_rentals_on_parent_type_and_parent_id", using: :btree
