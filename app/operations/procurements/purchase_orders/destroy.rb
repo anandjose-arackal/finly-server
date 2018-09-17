@@ -8,8 +8,8 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
   end
 
   def validate
-    unless PurchaseOrderStatus.ids_for([:open]).include? purchase_order.status.id
-      add_message :error, "You can't purchase order at this state."
+    unless PurchaseOrderStatus.ids_for([:open, :retracted, :rejected]).include? purchase_order.status.id
+      add_message :error, "You can't delete purchase order at this state."
     end
   end
 
