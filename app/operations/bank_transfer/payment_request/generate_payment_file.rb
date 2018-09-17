@@ -43,12 +43,26 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
             receiving_user_mobile_number: payment.receiving_user.mobile_number,
             amount: payment.amount_value,
             date: Date.today.strftime("%d-%^b-%Y"),
-            note: payment.note,
+            note: generate_payment_note(payment),
             payment_mode: payment.payment_mode
         }
       end
     end
     self.response =   PaymentFiles::Generate.(user, {payment_file: data, resources: self.bank_payment_requests})
+  end
+
+  def generate_payment_note(payment)
+    # generates payment note from invoice line items's description
+    note = ""
+    payment.invoice&.invoice_items&.each do |item|
+      unless note.blank?
+        note += ", "
+      end
+      note += item.description
+    end
+
+    note
+
   end
 
   def post_process
