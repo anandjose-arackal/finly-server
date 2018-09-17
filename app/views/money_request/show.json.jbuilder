@@ -4,6 +4,7 @@ json.required_by_date required_by_date
 json.user_name @result.money_request.user.name
 json.user_id @result.money_request.user.id
 json.user_initial @result.money_request.user.name.split(' ').first[0] + ((@result.money_request.user.name.split(' ')[1][0] rescue nil) || @result.money_request.user.name.split(' ').first[1])
+json.controlling_user @result.money_request.controlling_user
 json.status @result.status_name(@result.money_request)
 json.status_name @result.status_name(@result.money_request)
 manager_name = @result.manager.name rescue ''

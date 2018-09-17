@@ -3,6 +3,7 @@ json.user_name @result.report.user.name
 json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.report.user.name.split(' ')[1][0] rescue nil) or @result.report.user.name.split(' ').first[1])
 json.status @result.status_name(@result.report)
 json.status_name @result.status_name(@result.report)
+json.controlling_user @result.report.controlling_user
 manager = (@result.manager.name rescue '')
 json.manager_name manager
 finance_manager = (@result.finance_manager.name rescue '')

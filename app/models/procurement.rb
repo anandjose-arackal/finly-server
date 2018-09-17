@@ -35,7 +35,7 @@ class Procurement < ActiveRecord::Base
 
   has_many :status_tags, through: :procurement_status_taggables, dependent: :destroy
 
-  default_scope { order(updated_at: :desc) }
+  default_scope {order(created_at: :desc)}
 
   scope :with_ids, -> (ids) {where id: ids}
   scope :order_by_controlling_user, ->(user_id) {
@@ -46,9 +46,4 @@ class Procurement < ActiveRecord::Base
       find_ordered(ordered_ids)
     end
   }
-
-  def awaiting_action?(user)
-    user and purchase_order.controlling_user_id == user.id
-  end
-
 end

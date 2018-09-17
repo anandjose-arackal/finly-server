@@ -1,0 +1,2 @@
+module FieldConfigurationHelper
+end

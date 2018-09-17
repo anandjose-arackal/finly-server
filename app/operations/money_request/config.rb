@@ -8,9 +8,20 @@ class MoneyRequest::Config < BaseOperation
       add_message :error, 'Policy not found'
       return
     end
+    if params&.dig(:travel_request_id).blank?
+      add_message :error, 'Request not found'
+      return
+    end
   end
 
   def init
+    result = TravelRequest::Show.(user, {id: params[:travel_request_id], view: params[:view]})
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    travel_request = result.travel_request
+    user = travel_request.user
     self.categories = user.company.money_request_item_categories.active
     self.cash_pockets = user.user_pockets.cash_pockets_only
     self.card = user.cards.first
