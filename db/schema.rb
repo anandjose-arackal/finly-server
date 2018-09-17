@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180913074403) do
+ActiveRecord::Schema.define(version: 20180917034738) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -454,17 +454,6 @@ ActiveRecord::Schema.define(version: 20180913074403) do
   add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
-  create_table "balance_tally_ledgers", force: :cascade do |t|
-    t.date     "date"
-    t.integer  "api_balance_id",            limit: 4
-    t.integer  "finly_database_balance_id", limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-  end
-
-  add_index "balance_tally_ledgers", ["api_balance_id"], name: "index_balance_tally_ledgers_on_api_balance_id", using: :btree
-  add_index "balance_tally_ledgers", ["finly_database_balance_id"], name: "index_balance_tally_ledgers_on_finly_database_balance_id", using: :btree
-
   create_table "bank_accounts", force: :cascade do |t|
     t.integer  "yes_bank_vendor_id", limit: 4
     t.string   "account_number",     limit: 255
@@ -696,12 +685,12 @@ ActiveRecord::Schema.define(version: 20180913074403) do
     t.text     "pickup_address",  limit: 65535
     t.string   "car_type",        limit: 255
     t.string   "car_number",      limit: 255
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
     t.integer  "parent_id",       limit: 4
     t.string   "parent_type",     limit: 255
-    t.integer  "pickup_city_id",  limit: 4,     null: false
-    t.integer  "drop_city_id",    limit: 4,     null: false
+    t.integer  "pickup_city_id",  limit: 4,                     null: false
+    t.integer  "drop_city_id",    limit: 4,                     null: false
     t.text     "drop_address",    limit: 65535
     t.datetime "pickup_datetime"
     t.datetime "drop_datetime"
@@ -712,6 +701,7 @@ ActiveRecord::Schema.define(version: 20180913074403) do
     t.time     "pickup_time"
     t.date     "drop_date"
     t.time     "drop_time"
+    t.boolean  "is_deleted",                    default: false
   end
 
   add_index "booking_car_rentals", ["parent_type", "parent_id"], name: "index_booking_car_rentals_on_parent_type_and_parent_id", using: :btree
@@ -2410,6 +2400,25 @@ ActiveRecord::Schema.define(version: 20180913074403) do
   add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", using: :btree
   add_index "field_configurations", ["field_type_id"], name: "index_field_configurations_on_field_type_id", using: :btree
 
+  create_table "field_customizations", force: :cascade do |t|
+    t.string   "class_name",    limit: 255,                 null: false
+    t.string   "field_name",    limit: 255,                 null: false
+    t.boolean  "enabled",                   default: false, null: false
+    t.boolean  "presence",                  default: false, null: false
+    t.boolean  "show_in_pdf",               default: false, null: false
+    t.integer  "scopable_id",   limit: 4,                   null: false
+    t.string   "scopable_type", limit: 255,                 null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+  end
+
+  add_index "field_customizations", ["class_name"], name: "index_field_customizations_on_class_name", using: :btree
+  add_index "field_customizations", ["enabled"], name: "index_field_customizations_on_enabled", using: :btree
+  add_index "field_customizations", ["field_name"], name: "index_field_customizations_on_field_name", using: :btree
+  add_index "field_customizations", ["presence"], name: "index_field_customizations_on_presence", using: :btree
+  add_index "field_customizations", ["scopable_type", "scopable_id"], name: "index_field_customizations_on_scopable_type_and_scopable_id", using: :btree
+  add_index "field_customizations", ["show_in_pdf"], name: "index_field_customizations_on_show_in_pdf", using: :btree
+
   create_table "field_date_times", force: :cascade do |t|
     t.datetime "value",      null: false
     t.datetime "created_at", null: false
@@ -3993,24 +4002,24 @@ ActiveRecord::Schema.define(version: 20180913074403) do
     t.string   "description",            limit: 255
     t.string   "hsn_sac",                limit: 255
     t.integer  "quantity",               limit: 4
-    t.decimal  "rate",                               precision: 20, scale: 5
-    t.decimal  "tax",                                precision: 20, scale: 5
-    t.decimal  "tds",                                precision: 20, scale: 5
-    t.decimal  "discount",                           precision: 20, scale: 5
+    t.decimal  "rate",                                 precision: 20, scale: 5
+    t.decimal  "tax",                                  precision: 20, scale: 5
+    t.decimal  "tds",                                  precision: 20, scale: 5
+    t.decimal  "discount",                             precision: 20, scale: 5
     t.integer  "tax_amount_id",          limit: 4
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "discount_amount_id",     limit: 4
     t.integer  "total_amount_id",        limit: 4
     t.date     "delivery_date"
-    t.string   "comment",                limit: 255
-    t.datetime "created_at",                                                                  null: false
-    t.datetime "updated_at",                                                                  null: false
-    t.integer  "delivered",              limit: 4,                            default: 0
-    t.integer  "accepted",               limit: 4,                            default: 0
-    t.integer  "rejected",               limit: 4,                            default: 0
+    t.text     "comment",                limit: 65535
+    t.datetime "created_at",                                                                    null: false
+    t.datetime "updated_at",                                                                    null: false
+    t.integer  "delivered",              limit: 4,                              default: 0
+    t.integer  "accepted",               limit: 4,                              default: 0
+    t.integer  "rejected",               limit: 4,                              default: 0
     t.integer  "category_id",            limit: 4
     t.integer  "cost_center_id",         limit: 4
-    t.boolean  "is_deleted",                                                  default: false, null: false
+    t.boolean  "is_deleted",                                                    default: false, null: false
     t.string   "account",                limit: 255
     t.integer  "tax_rate_id",            limit: 4
   end
