@@ -22,6 +22,7 @@
 #  pickup_time     :time
 #  drop_date       :date
 #  drop_time       :time
+#  is_deleted      :boolean          default(FALSE)
 #
 
 class BookingCarRental < ActiveRecord::Base

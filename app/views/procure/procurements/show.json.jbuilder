@@ -1,6 +1,6 @@
-json.extract! @result.procurement, :id, :name, :note
+json.extract! @result.procurement, :id, :name, :note, :procurement_type
 
-if @result.purchase_order.vendor.present?
+if @result.vendor.present?
   json.vendor @result.vendor.as_json
 end
 

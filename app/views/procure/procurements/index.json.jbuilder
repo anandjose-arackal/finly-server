@@ -1,5 +1,5 @@
 json.array! @result.paginated_procurements do |p|
-  json.extract! p, :id, :name
+  json.extract! p, :id, :name, :note, :procurement_type
   json.awaiting_action p.awaiting_action?(@result.user)
   if p.vendor.present?
     json.vendor do

@@ -31,12 +31,17 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       return
     end
 
-    # if invoice.auto_approved?
-    #   old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
-    #   status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
-    #   self.procurement.status_tags.delete(old_status_tag)
-    #   self.procurement.status_tags << status_tag
-    # end
+    if invoice.auto_approved?
+      old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_processing))
+      status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_approved))
+      self.procurement.status_tags.delete(old_status_tag)
+      self.procurement.status_tags << status_tag
+    else
+      status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_processing))
+      unless self.procurement.status_tags.include? status_tag
+        self.procurement.status_tags << status_tag
+      end
+    end
 
     self.workflow_output = op.workflow_output
   end

@@ -14,6 +14,6 @@
 #   json.category_id 21
 #   json.description item[:description]
 # end
-json.array!(@result.inventory_line_items) do |item|
+json.array!(@result.paginated_line_items) do |item|
   json.merge! item.as_json
 end
