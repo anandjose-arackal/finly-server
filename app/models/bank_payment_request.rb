@@ -27,7 +27,8 @@
 
 class BankPaymentRequest < ActiveRecord::Base
 
-  include SoftDeletable
+  include SoftDeletable,
+          FindByOrderedIds
 
   belongs_to :status, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, dependent: :destroy
@@ -48,57 +49,83 @@ class BankPaymentRequest < ActiveRecord::Base
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
-  default_scope { order(created_at: :desc) }
+  default_scope {order(created_at: :desc)}
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
   delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
-  scope :non_owner, -> (user_id) { where.not owner_id: user_id }
-  scope :with_controlling_user, -> (user_id) { where controlling_user_id: user_id }
-  scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
-  scope :with_user, -> (user_id) { where owner_id: user_id }
-  scope :not_open, -> { where.not status_id: BankPaymentRequestStatus.id_for(:open) }
-  scope :with_id, -> (id) { where id: id }
-  scope :without_id, -> (id) { where.not id: id }
-  scope :approved, -> { where status_id: BankPaymentRequestStatus.id_for(:approved) }
+  scope :non_owner, -> (user_id) {where.not owner_id: user_id}
+  scope :with_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+  scope :with_controlling_user_role, -> (role_id) {where controlling_user_role_id: role_id}
+  scope :with_user, -> (user_id) {where owner_id: user_id}
+  scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
+  scope :with_id, -> (id) {where id: id}
+  scope :without_id, -> (id) {where.not id: id}
+  scope :approved, -> {where status_id: BankPaymentRequestStatus.id_for(:approved)}
   scope :filter_status_id, -> (status_id) {
     case status_id
-      when 1, '1' # i.e. open
-        where status_id: BankPaymentRequestStatus.id_for(:open)
-      when 2, '2' # i.e. processing
-        where status_id: BankPaymentRequestStatus.id_for(:processing)
-      when 3, '3' # i.e. retracted
-        where status_id: BankPaymentRequestStatus.id_for(:retracted)
-      when 4, '4' # i.e. rejected
-        where status_id: BankPaymentRequestStatus.id_for(:rejected)
-      when 5, '5' # i.e. approved
-        where status_id: BankPaymentRequestStatus.id_for(:approved)
-      when 6, '6' # i.e. credited
-        where status_id: BankPaymentRequestStatus.id_for(:credited)
-      when 7, '7' # i.e. failed
-        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
-      when 8, '8' # i.e. scheduled
-        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
-      when 9, '9' # i.e. pending
-        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
-      when '10', 10 # i.e awaiting approval from current user
-        case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
-          when UserRole.id_for(:admin)
-            where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
-          else
-            where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
-        end
+    when 1, '1' # i.e. open
+      where status_id: BankPaymentRequestStatus.id_for(:open)
+    when 2, '2' # i.e. processing
+      where status_id: BankPaymentRequestStatus.id_for(:processing)
+    when 3, '3' # i.e. retracted
+      where status_id: BankPaymentRequestStatus.id_for(:retracted)
+    when 4, '4' # i.e. rejected
+      where status_id: BankPaymentRequestStatus.id_for(:rejected)
+    when 5, '5' # i.e. approved
+      where status_id: BankPaymentRequestStatus.id_for(:approved)
+    when 6, '6' # i.e. credited
+      where status_id: BankPaymentRequestStatus.id_for(:credited)
+    when 7, '7' # i.e. failed
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+    when 8, '8' # i.e. scheduled
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
+    when 9, '9' # i.e. pending
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+    when '10', 10 # i.e awaiting approval from current user
+      case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
+      when UserRole.id_for(:admin)
+        where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
       else
-        # do nothing?
+        where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
+      end
+    else
+      # do nothing?
     end
   }
 
-  scope :include_for_data_retrieval, -> { includes(payment_order: {payments: [{receiving_account: :account_owner},
-                                                   :initiating_user,
-                                                    {payment_order: [bank_payment_request: [:status, :controlling_user]]},
-                                                   {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
-                                                   :amount]}) }
+  scope :order_by_controlling_user, ->(user_id, manager = false) {
+    if user_id.present?
+      ids = pluck(:id)
+      controlling_requests = where(controlling_user_id: user_id)
+      if manager
+        controlling_requests = controlling_requests.where(status_id: BankPaymentRequestStatus.id_for(:processing))
+      end
+      controlling_ids = controlling_requests.pluck(:id)
+      ordered_ids = controlling_ids + (ids - controlling_ids)
+      find_ordered(ordered_ids)
+    end
+  }
+
+  scope :order_by, ->(type, user_id = nil) {
+    case type
+    when :created_at
+      reorder(created_at: :desc)
+    when :manager_controlling_user
+      order_by_controlling_user(user_id, true)
+    when :controlling_user
+      order_by_controlling_user(user_id)
+    when :submitted_at
+      reorder(submitted_at: :desc)
+    end
+  }
+
+  scope :include_for_data_retrieval, -> {includes(payment_order: {payments: [{receiving_account: :account_owner},
+                                                                             :initiating_user,
+                                                                             {payment_order: [bank_payment_request: [:status, :controlling_user]]},
+                                                                             {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
+                                                                             :amount]})}
 
   scope :filter_date, -> (date_from, date_to) {
     date_from = "1990-01-01" if date_from.blank?
@@ -116,13 +143,13 @@ class BankPaymentRequest < ActiveRecord::Base
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
-  scope :filter_controlling_user, -> (user_id) { where controlling_user_id: user_id }
+  scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
 
-  scope :processing, -> { where status_id: BankPaymentRequestStatus.id_for(:processing) }
+  scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
-  scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
+  scope :includes_details, -> {includes(:status, :owner, :requested_amount)}
 
-  scope :include_attachments, -> { includes(payment_order: [:payment_order_attachments, payments: [invoice: [:invoice_attachments]]]) }
+  scope :include_attachments, -> {includes(payment_order: [:payment_order_attachments, payments: [invoice: [:invoice_attachments]]])}
 
   scope :filter_custom_drop_down_selection, -> (drop_down_item_id) {
     drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
@@ -149,8 +176,8 @@ class BankPaymentRequest < ActiveRecord::Base
     where owner_id: owner_id
   }
 
-  scope :non_approved, -> { where.not(status_id: BankPaymentRequestStatus.id_for(:approved)) }
-  scope :creditable, -> { where status_id: BankPaymentRequestStatus.ids_for(:approved) }
+  scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
+  scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved)}
 
   attr_accessor :cache_users
 
@@ -233,12 +260,12 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def beneficiary_type
     case self.payment_order.payments.first&.receiving_user&.class&.name
-      when "User"
-        return 1 # i.e. 1 is users
-      when "YesBankVendor"
-        return 2 # i.e. 2 is vendors
-      else
-        return 2 # i.e. it's vendors by default
+    when "User"
+      return 1 # i.e. 1 is users
+    when "YesBankVendor"
+      return 2 # i.e. 2 is vendors
+    else
+      return 2 # i.e. it's vendors by default
     end
   end
 

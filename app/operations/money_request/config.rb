@@ -15,7 +15,7 @@ class MoneyRequest::Config < BaseOperation
   end
 
   def init
-    result = TravelRequest::Show.(user, {id: params[:travel_request_id], view: params[:view]})
+    result = TravelRequests::Show.(user, {id: params[:travel_request_id], view: params[:view]})
     unless result.success?
       add_message :error, result.messages[:error]
       return
