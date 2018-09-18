@@ -101,6 +101,11 @@ class Report::Index < Report::Base
         if params[:filter_status].present?
           self.reports = self.reports.filter_status(params[:filter_status], user.id)
         end
+        if personal_view?
+          self.reports = self.reports.order_by(:created_at).order_by(:controlling_user, user.id)
+        else
+          self.reports = self.reports.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
+        end
         self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30)
       end
     end
