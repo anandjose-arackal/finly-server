@@ -34,4 +34,8 @@ class LevelReviewerMapping < ActiveRecord::Base
     where('threshold <= ?', amount)
   }
 
+  scope :with_reviewer_id, -> (ids){
+    where reviewer_id: ids
+  }
+
 end

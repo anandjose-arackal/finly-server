@@ -24,7 +24,7 @@ class Procurements::Show < Procurements::Base
 
       # Procurement Documents
       self.purchase_order = self.procurement.purchase_order
-      self.vendor = self.purchase_order.vendor
+      self.vendor = get_vendor
       self.invoices = self.procurement.invoices
       self.inward_documents = self.procurement.inward_documents
       self.bill_of_supplies = self.procurement.bill_of_supplies
@@ -53,6 +53,20 @@ class Procurements::Show < Procurements::Base
         end
       end
       actions
+    end
+
+    def get_vendor
+      case procurement.procurement_type
+        #todo write migration for all existing procurements
+        when 'purchase_order'
+          vendor = self.procurement.purchase_order.vendor
+        when 'invoice'
+          vendor = self.procurement.invoices.first.vendor
+        else
+          return nil
+      end
+
+      vendor
     end
 
     def document_owner?
