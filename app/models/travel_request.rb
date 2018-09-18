@@ -32,7 +32,8 @@
 class TravelRequest < ActiveRecord::Base
   include SoftDeletable,
           Sequenced::ActsAsSequenced,
-          FieldCustomizer::CustomizableValidation
+          FieldCustomizer::CustomizableValidation,
+          FindByOrderedIds
 
   acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
 
@@ -123,7 +124,31 @@ class TravelRequest < ActiveRecord::Base
       with_status_id TravelRequestStatus.ids_for(:selection_requested, :selection_processing, :selection_confirmed, :selection_rejected)
     end
   end
+  scope :order_by_controlling_user, ->(user_id, manager=false) {
+    if user_id.present?
+      ids = pluck(:id)
+      controlling_money_requests = where(controlling_user_id: user_id)
+      if manager
+        controlling_money_requests = controlling_money_requests.where(status_id: MoneyRequestStatus.id_for(:processing))
+      end
+      controlling_ids = controlling_money_requests.pluck(:id)
+      ordered_ids = controlling_ids + (ids - controlling_ids)
+      find_ordered(ordered_ids)
+    end
+  }
 
+  scope :order_by, ->(type, user_id=nil){
+    case type
+    when :created_at
+      reorder(created_at: :desc)
+    when :manager_controlling_user
+      order_by_controlling_user(user_id, true)
+    when :controlling_user
+      order_by_controlling_user(user_id)
+    when :submitted_at
+      reorder(submitted_at: :desc)
+    end
+  }
 
   def can_submit?
     open? || retracted? || rejected?
