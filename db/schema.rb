@@ -336,7 +336,6 @@ ActiveRecord::Schema.define(version: 20180917034738) do
     t.decimal  "ZMW",                   precision: 20, scale: 5
     t.decimal  "ZWL",                   precision: 20, scale: 5
     t.boolean  "is_deleted",                                      default: false
-    t.decimal  "MYR",                   precision: 20, scale: 5
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
