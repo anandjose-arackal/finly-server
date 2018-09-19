@@ -17,3 +17,5 @@ json.users do
     json.merge! user.as_json
   end
 end
+
+json.actions @result.actions

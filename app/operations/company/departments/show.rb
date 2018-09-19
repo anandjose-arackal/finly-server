@@ -13,7 +13,7 @@ class Company::Departments::Show < Company::Departments::Base
   end
 
   class Company::Departments::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :department, :sub_departments, :users, :parent_department
+    attr_accessor :department, :sub_departments, :users, :parent_department, :actions
 
     def init
       self.department = params[:department]
@@ -25,6 +25,15 @@ class Company::Departments::Show < Company::Departments::Base
       end
 
       self.users = user.company.users.with_id(user_ids.uniq)
+
+
+      self.actions = {
+          create_department: get_create_department
+      }
+    end
+
+    def get_create_department
+      parent_department.blank?
     end
   end
 end
