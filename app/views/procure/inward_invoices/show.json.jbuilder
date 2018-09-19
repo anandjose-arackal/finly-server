@@ -51,7 +51,8 @@ end
 
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
-  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id
+  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
+                :billing_address, :shipping_address
 
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
