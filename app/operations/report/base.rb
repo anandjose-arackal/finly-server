@@ -113,8 +113,12 @@ class Report::Base < BaseOperation
 
     def expenses_category_sorted
       categorized_expenses = []
-      self.categories.each do |category|
-        item_expenses = self.expenses.with_category(category.id)
+      self.categories.roots.each do |category|
+        cat_ids = [category.id]
+        if category.children.present?
+          cat_ids += category.children.pluck(:id)
+        end
+        item_expenses = self.expenses.with_category(cat_ids)
         if item_expenses.present?
           item_name = category.name
           item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
