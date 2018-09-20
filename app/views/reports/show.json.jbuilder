@@ -78,6 +78,9 @@ json.expense_sections sorted_expenses do |category|
                   :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
     json.usage_date_start DateUtils.date_formatted expense.usage_date_start
     json.usage_date_end DateUtils.date_formatted expense.usage_date_end
+    if expense.category.parent.present?
+      json.sub_category expense.category.name
+    end
     if expense.note
       if expense.note.length < 29
         json.note expense.note
