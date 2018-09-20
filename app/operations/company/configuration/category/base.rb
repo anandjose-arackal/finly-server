@@ -27,6 +27,20 @@ class Company::Configuration::Category::Base < BaseOperation
       self.categories = params[:categories]
     end
 
+    def mobile_optimized_categories
+      cat = []
+      self.categories.roots.each do |category|
+        if category.children.present?
+          category.children.each do |c|
+            cat << {id: c.id, name: "#{category.name } - #{c.name}", active: c.active}
+          end
+        else
+          cat << {id: category.id, name: category.name, active: category.active}
+        end
+      end
+      cat
+    end
+
   end
 
 end

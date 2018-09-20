@@ -1,1 +1,1 @@
-json.array! @result.categories, :id, :name, :active
+json.array! @result.mobile_optimized_categories
