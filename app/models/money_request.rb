@@ -39,8 +39,12 @@
 
 
 
+
 class MoneyRequest < ActiveRecord::Base
-  include OperationCallbacks, MathUtil, SoftDeletable
+  include OperationCallbacks,
+          MathUtil,
+          SoftDeletable,
+          FindByOrderedIds
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :status, class_name: 'MoneyRequestStatus'
@@ -115,7 +119,15 @@ class MoneyRequest < ActiveRecord::Base
   scope :via_cash_only, -> { where payment_mode_id: PaymentMode.id_for(:cash) }
   scope :via_card_only, -> { where payment_mode_id: PaymentMode.id_for(:card) }
 
-  scope :filter_status, ->(status_id) { where status_id: status_id }
+  # scope :filter_status, ->(status_id) { where status_id: status_id }
+  scope :filter_status, ->(status_id, user_id) do
+    case status_id
+    when 99, '99'
+      where(controlling_user_id: user_id).where.not(status_id: MoneyRequestStatus.ids_for(:retracted, :open, :rejected))
+    else
+      where status_id: status_id
+    end
+  end
   scope :filter_user_id, ->(id) { where(user_id: id) }
   scope :filter_request_id, ->(id) { where(id: id) }
   scope :filter_search, ->(value) do
@@ -180,6 +192,32 @@ class MoneyRequest < ActiveRecord::Base
   scope :with_processor_mapping, -> (id) { where money_request_processor_mapping_id: id }
   scope :with_destination_pocket_id, -> (id) {
     where destination_pocket_id: id
+  }
+
+  scope :order_by_controlling_user, ->(user_id, manager=false) {
+    if user_id.present?
+      ids = pluck(:id)
+      controlling_money_requests = where(controlling_user_id: user_id)
+      if manager
+        controlling_money_requests = controlling_money_requests.where(status_id: MoneyRequestStatus.id_for(:processing))
+      end
+      controlling_ids = controlling_money_requests.pluck(:id)
+      ordered_ids = controlling_ids + (ids - controlling_ids)
+      find_ordered(ordered_ids)
+    end
+  }
+
+  scope :order_by, ->(type, user_id=nil){
+    case type
+    when :created_at
+      reorder(created_at: :desc)
+    when :manager_controlling_user
+      order_by_controlling_user(user_id, true)
+    when :controlling_user
+      order_by_controlling_user(user_id)
+    when :submitted_at
+      reorder(submitted_at: :desc)
+    end
   }
 
   accepts_nested_attributes_for :custom_fields

@@ -13,6 +13,7 @@
 #  company_id            :integer
 #  note                  :text(65535)
 #  is_deleted            :boolean          default(FALSE), not null
+#  procurement_type      :string(255)
 #
 
 require 'test_helper'

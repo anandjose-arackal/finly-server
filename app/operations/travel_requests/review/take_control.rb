@@ -52,6 +52,10 @@ class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
   end
 
   def post_process
+    travel_request.money_requests.status_pending.update_all(
+        controlling_user_id: travel_request.controlling_user_id,
+        controlling_user_role_id: travel_request.controlling_user_role_id
+    )
     # Event::EMoneyRequest::TakeControl.(self.user, travel_request: self.travel_request)
   end
 

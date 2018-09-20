@@ -18,7 +18,8 @@
 #
 
 class BookingRestaurant < ActiveRecord::Base
-  include SoftDeletable
+  include SoftDeletable,
+          FieldCustomizer::CustomizableValidation
 
   belongs_to :parent, polymorphic: true
   belongs_to :location, dependent: :destroy
@@ -30,6 +31,13 @@ class BookingRestaurant < ActiveRecord::Base
   validates :number_of_guests, presence: true
   validates :reservation_date, presence: true
   validates :reservation_time, presence: true
+
+  # As front end calls this comment and not description, have to give an alias for validation purpose
+  alias_attribute :comment, :description
+
+  field_customization_key :booking_restaurant
+  # customizable_validate :comment, presence: false
+  validates :comment, presence: true
 
   def as_json(options={})
     {
@@ -47,7 +55,9 @@ class BookingRestaurant < ActiveRecord::Base
   def valid_date_range(travel_request)
     travel_from_date = travel_request.from_date
     travel_to_date = travel_request.to_date
-    not (reservation_date < travel_from_date or reservation_date > travel_to_date)
+    return false if travel_from_date and reservation_date < travel_from_date
+    return false if travel_to_date and reservation_date > travel_to_date
+    true
   end
 
 end

@@ -22,9 +22,13 @@
 #  pickup_time     :time
 #  drop_date       :date
 #  drop_time       :time
+#  is_deleted      :boolean          default(FALSE)
 #
 
 class BookingCarRental < ActiveRecord::Base
+  include SoftDeletable,
+          FieldCustomizer::CustomizableValidation
+
   belongs_to :parent, polymorphic: true
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
   belongs_to :pickup_city, class_name: 'Location', dependent: :destroy
@@ -37,6 +41,12 @@ class BookingCarRental < ActiveRecord::Base
   scope :with_parent_booking_id, ->(id) { where parent_type: 'Booking', parent_id: id }
   scope :sum_cost, -> { joins(:cost).sum(:value) }
 
+  # As front end calls this comment and not description, have to give an alias for validation purpose
+  alias_attribute :comment, :description
+
+  field_customization_key :booking_car_rental
+  # customizable_validate :comment, presence: false
+  validates :comment, presence: true
   validates :pickup_date, presence: true
   validates :drop_date, presence: true
   validates :pickup_city, presence: true
@@ -78,10 +88,10 @@ class BookingCarRental < ActiveRecord::Base
   def valid_date_range(travel_request)
     travel_from_date = travel_request.from_date
     travel_to_date = travel_request.to_date
-    if pickup_date < travel_from_date or pickup_date > travel_to_date
+    if (travel_from_date and pickup_date < travel_from_date) or (travel_to_date and pickup_date > travel_to_date)
       return false
     end
-    if drop_date < travel_from_date or drop_date > travel_to_date
+    if (travel_from_date and drop_date < travel_from_date) or (travel_to_date and drop_date > travel_to_date)
       return false
     end
     true

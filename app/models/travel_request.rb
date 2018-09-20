@@ -30,9 +30,17 @@
 #
 
 class TravelRequest < ActiveRecord::Base
-  include SoftDeletable, Sequenced::ActsAsSequenced
+  include SoftDeletable,
+          Sequenced::ActsAsSequenced,
+          FieldCustomizer::CustomizableValidation,
+          FindByOrderedIds
 
   acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
+
+  field_customization_key :travel_request
+  customizable_validate :from_date, presence: true
+  customizable_validate :to_date, presence: true
+  customizable_validate :purpose_of_travel, presence: false
 
   belongs_to :user
   belongs_to :policy
@@ -45,6 +53,7 @@ class TravelRequest < ActiveRecord::Base
   belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
   belongs_to :controlling_for_user_role, class_name: 'UserRole'
+  belongs_to :company
 
   has_many :destinations, class_name: 'TravelRequestDestination'
   has_many :travel_request_trails, dependent: :destroy
@@ -58,8 +67,8 @@ class TravelRequest < ActiveRecord::Base
   validates :status_id, presence: true #, unless: :open?
   validates :user_id, presence: true #, unless: :open?
   #validates :name, presence: true#, unless: :open?
-  validates :from_date, presence: true
-  validates :to_date, presence: true
+  # validates :from_date, presence: true
+  # validates :to_date, presence: true
   validate :acceptable_dates?
 
   # default_scope {order(status_id: :asc, submitted_at: :desc, created_at: :desc)}
@@ -115,7 +124,31 @@ class TravelRequest < ActiveRecord::Base
       with_status_id TravelRequestStatus.ids_for(:selection_requested, :selection_processing, :selection_confirmed, :selection_rejected)
     end
   end
+  scope :order_by_controlling_user, ->(user_id, manager=false) {
+    if user_id.present?
+      ids = pluck(:id)
+      controlling_money_requests = where(controlling_user_id: user_id)
+      if manager
+        controlling_money_requests = controlling_money_requests.where(status_id: MoneyRequestStatus.id_for(:processing))
+      end
+      controlling_ids = controlling_money_requests.pluck(:id)
+      ordered_ids = controlling_ids + (ids - controlling_ids)
+      find_ordered(ordered_ids)
+    end
+  }
 
+  scope :order_by, ->(type, user_id=nil){
+    case type
+    when :created_at
+      reorder(created_at: :desc)
+    when :manager_controlling_user
+      order_by_controlling_user(user_id, true)
+    when :controlling_user
+      order_by_controlling_user(user_id)
+    when :submitted_at
+      reorder(submitted_at: :desc)
+    end
+  }
 
   def can_submit?
     open? || retracted? || rejected?

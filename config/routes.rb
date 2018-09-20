@@ -2691,6 +2691,8 @@ Rails.application.routes.draw do
   get 'expense_filters', to: 'expense_types_configuration#expense_filters'
   get 'report_filters', to: 'expense_types_configuration#report_filters'
 
+  get 'field_configurations', to: 'field_configuration#index'
+
   scope :settlements do
     scope :reports do
       get 'pending', to: 'settlement/report#pending_index'
@@ -3143,6 +3145,7 @@ Rails.application.routes.draw do
   ## Procurement APIs start ##########################################
   namespace :procure do
     get 'procurements/filter_config', to: "procurements#filter_config"
+    get 'procurements/count', to: 'procurements#count'
     resources :procurements do
     end
 

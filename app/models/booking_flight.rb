@@ -25,7 +25,8 @@
 #
 
 class BookingFlight < ActiveRecord::Base
-  include SoftDeletable
+  include SoftDeletable,
+          FieldCustomizer::CustomizableValidation
 
   belongs_to :parent, polymorphic: true
   belongs_to :booking_class, class_name: 'BookingFlightClass'
@@ -40,11 +41,16 @@ class BookingFlight < ActiveRecord::Base
   scope :with_parent_booking_id, ->(id) { where parent_type: 'Booking', parent_id: id }
   scope :sum_cost, -> { joins(:cost).sum(:value) }
 
+  # As front end calls this comment and not description, have to give an alias for validation purpose
+  alias_attribute :comment, :description
+
   validates :from, presence: true
   validates :to, presence: true
   validates :departure_date, presence: true
-  # validates :departure_time, presence: true
 
+  field_customization_key :booking_flight
+  # customizable_validate :comment, presence: false
+  validates :comment, presence: true
 
   def as_json(options={})
     {
@@ -69,7 +75,9 @@ class BookingFlight < ActiveRecord::Base
   def valid_date_range(travel_request)
     travel_from_date = travel_request.from_date
     travel_to_date = travel_request.to_date
-    not (departure_date < travel_from_date or departure_date > travel_to_date)
+    return false if travel_from_date and departure_date < travel_from_date
+    return false if travel_to_date and departure_date > travel_to_date
+    true
   end
 
 end

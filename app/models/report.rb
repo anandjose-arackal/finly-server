@@ -36,10 +36,10 @@
 
 
 
-
 class Report < ActiveRecord::Base
   include MathUtil
-  include SoftDeletable
+  include SoftDeletable,
+          FindByOrderedIds
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :user
@@ -87,6 +87,7 @@ class Report < ActiveRecord::Base
   default_scope {order(report_status_id: :asc, submitted_at: :desc, created_at: :desc)}
 
   scope :with_id, ->(id) {where id: id}
+  scope :filter_id, ->(id) {with_id(id)}
   scope :without_id, ->(id) {where.not id: id}
   scope :with_policy, ->(policy_id) {where policy_id: policy_id}
   scope :with_policy_id, ->(policy_id) {where policy_id: policy_id}
@@ -106,7 +107,7 @@ class Report < ActiveRecord::Base
   scope :settled, -> {where report_status_id: ReportStatus.settled_id}
   scope :settlement_confirmed, -> {where report_status_id: ReportStatus.settlement_confirmed_id}
   scope :processing, -> {where report_status_id: ReportStatus.processing_id}
-  scope :processing_and_above, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id,ReportStatus.processing_id]}
+  scope :processing_and_above, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id, ReportStatus.processing_id]}
   scope :processed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id]}
   scope :completed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
   scope :accounted, -> {where accounted: true}
@@ -144,7 +145,14 @@ class Report < ActiveRecord::Base
   scope :processed, -> {where report_status_id: [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.closed_id, ReportStatus.settlement_confirmed_id]}
   scope :settled_and_closed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
 
-  scope :filter_status, ->(status_id) {where report_status_id: status_id}
+  scope :filter_status, ->(status_id, user_id) do
+    case status_id
+    when 99, '99'
+      where(controlling_user_id: user_id).where.not(report_status_id: ReportStatus.ids_for(:retracted, :open, :rejected))
+    else
+      where report_status_id: status_id
+    end
+  end
   scope :filter_user_id, ->(id) {where(user_id: id)}
   scope :filter_report_id, ->(id) {where(id: id)}
   scope :filter_search, ->(value) do
@@ -194,6 +202,32 @@ class Report < ActiveRecord::Base
   scope :filter_policy, -> (policy_id) {where(policy_id: policy_id)}
 
   scope :sort_for_personal, -> {joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
+
+  scope :order_by_controlling_user, ->(user_id, manager=false) {
+    if user_id.present?
+      ids = pluck(:id)
+      controlling_reports = where(controlling_user_id: user_id)
+      if manager
+        controlling_reports = controlling_reports.where(report_status_id: ReportStatus.id_for(:processing))
+      end
+      controlling_ids = controlling_reports.pluck(:id)
+      ordered_ids = controlling_ids + (ids - controlling_ids)
+      find_ordered(ordered_ids)
+    end
+  }
+
+  scope :order_by, ->(type, user_id=nil){
+    case type
+    when :created_at
+      reorder(created_at: :desc)
+    when :manager_controlling_user
+      order_by_controlling_user(user_id, true)
+    when :controlling_user
+      order_by_controlling_user(user_id)
+    when :submitted_at
+      reorder(submitted_at: :desc)
+    end
+  }
 
   scope :awaiting_approval_of_user, ->(user_id, role_id) {where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id)}
   scope :not_destroyable, -> {where.not report_status_id: ReportStatus.ids_for([:open, :rejected, :retracted])}

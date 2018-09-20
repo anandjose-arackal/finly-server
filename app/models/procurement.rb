@@ -13,6 +13,7 @@
 #  company_id            :integer
 #  note                  :text(65535)
 #  is_deleted            :boolean          default(FALSE), not null
+#  procurement_type      :string(255)
 #
 
 class Procurement < ActiveRecord::Base
@@ -35,7 +36,7 @@ class Procurement < ActiveRecord::Base
 
   has_many :status_tags, through: :procurement_status_taggables, dependent: :destroy
 
-  default_scope { order(updated_at: :desc) }
+  default_scope {order(created_at: :desc)}
 
   scope :with_ids, -> (ids) {where id: ids}
   scope :order_by_controlling_user, ->(user_id) {
@@ -47,8 +48,41 @@ class Procurement < ActiveRecord::Base
     end
   }
 
+  scope :order_by_controlling_level, ->(user_id) {
+    if user_id.present?
+
+      level_ids = LevelReviewerMapping.with_reviewer_id(user_id).pluck(:level_id)
+
+      filtered_ids = PurchaseOrder.with_procurement_id(ids).with_controlling_level_ids(level_ids).pluck(:id)
+      filtered_ids += Invoice.with_procurement_id(ids).with_controlling_level_ids(level_ids).pluck(:id)
+
+      ordered_ids = filtered_ids + (ids - filtered_ids)
+      find_ordered(ordered_ids)
+    end
+  }
+
   def awaiting_action?(user)
-    user and purchase_order.controlling_user_id == user.id
+    # Ideal method:
+    # First check if controlling user is present and return
+    # If not, then check for controlling level and see if current user is present inside controlling level
+    # Do it for both PO & Invoices
+    if purchase_order.present? && !(invoices.length > 0)
+      if user
+        purchase_order.level&.reviewers&.include? user
+      else
+        false
+      end
+    else
+      awaiting_action = false
+      invoices.each do |invoice|
+        if invoice.level&.reviewers&.include? user
+          awaiting_action = true
+          break
+        end
+      end
+
+      awaiting_action
+    end
   end
 
 end

@@ -64,8 +64,8 @@ class BudgetRule < ActiveRecord::Base
 
   has_paper_trail
 
-  scope :with_id, -> (id){where id: id }
-  scope :without_id, -> (id){where.not id: id }
+  scope :with_id, -> (id) {where id: id}
+  scope :without_id, -> (id) {where.not id: id}
   scope :warning_rules, -> {where rule_type_id: RuleType.warning_rule_id}
 
   scope :blocking_rules, -> {where rule_type_id: RuleType.blocking_rule_id}
@@ -124,7 +124,16 @@ class BudgetRule < ActiveRecord::Base
       rule_in_words += " per " + period
     end
     if self.categories.present?
-        rule_in_words += " belonging to category " + self.categories.pluck(:name).join(', ')
+      rule_in_words += " belonging to category "
+      self.categories.each do |category|
+        if category.parent.present?
+          rule_in_words += "#{category.parent.name} - "
+        end
+        rule_in_words += "#{category.name}"
+        unless self.categories.last == category
+          rule_in_words += ','
+        end
+      end
     end
     # if self.category_id
     #   rule_in_words += " for category " + self.category_name
@@ -168,7 +177,7 @@ class BudgetRule < ActiveRecord::Base
         rule_in_words += " with receipt"
       end
       if self.without_receipt_amount_id and (not options&.dig(:violation) or (options[:violation_type] == :without_receipt))
-        if with_receipt_presence  and not options&.dig(:violation)
+        if with_receipt_presence and not options&.dig(:violation)
           rule_in_words += ' and'
         end
         rule_in_words += " #{self.without_receipt_amount.currency.symbol}#{self.without_receipt_amount.value.to_s} #{self.without_receipt_amount.currency.country_code}"

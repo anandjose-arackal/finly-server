@@ -181,13 +181,13 @@ end
 
 json.departments do
   json.array! @result.departments do |dept|
-    json.extract! dept, :id, :name
+    json.extract! dept, :id, :name, :cost_center_id
   end
 end
 
 json.sub_departments do
   json.array! @result.sub_departments do |dept|
-    json.extract! dept, :id, :name
+    json.extract! dept, :id, :name, :cost_center_id
     json.parent_id dept.ancestry&.to_i
   end
 end
@@ -237,6 +237,12 @@ json.comments do
 
       json.id comment.user&.id
     end
+  end
+end
+
+json.policies do
+  json.array! @result.policies do |policy|
+    json.extract! policy, :id, :name
   end
 end
 
