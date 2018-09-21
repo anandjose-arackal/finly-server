@@ -491,14 +491,14 @@ class Expense < ActiveRecord::Base
   end
 
   # this method is to calculate the amount values for the various time/distance/per diem expenses
-  def calculate_amount_value(policy)
+  def calculate_amount_value(policy=nil)
     case self.expense_type_id
     when ExpenseType.id_for(:manual)
       return self.amount.value
     when ExpenseType.id_for(:card)
       return self.amount.value
     when ExpenseType.id_for(:distance)
-      if distance_expense.vehicle_rate.blank?
+      if distance_expense.vehicle_rate.blank? and policy.present?
         distance_expense.update(vehicle_rate_id: policy&.vehicle_rates&.first&.id)
       end
       if distance_expense&.distance.present?

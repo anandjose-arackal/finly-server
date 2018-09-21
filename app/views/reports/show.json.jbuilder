@@ -73,11 +73,17 @@ json.has_custom_fields @result.has_custom_fields?
 json.expense_sections sorted_expenses do |category|
   json.extract! category, :section_name, :section_total
   json.expenses category[:expenses] do |expense|
-    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id, :category_name,
+    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id,
                   :distance_value, :distance_rate_value, :time_value, :time_rate_value,
                   :expense_tax_type, :gst_percentage, :tds_percentage, :reimbursable_amount, :usage_date_type#, :usage_date_start, :usage_date_end
     json.usage_date_start DateUtils.date_formatted expense.usage_date_start
     json.usage_date_end DateUtils.date_formatted expense.usage_date_end
+    if expense.category.parent.present?
+      json.category_name expense.category.parent.name
+      json.sub_category expense.category.name
+    else
+      json.category_name expense.category.name
+    end
     if expense.note
       if expense.note.length < 29
         json.note expense.note
