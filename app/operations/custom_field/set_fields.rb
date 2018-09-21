@@ -45,7 +45,7 @@ class CustomField::SetFields < CustomField::Base
     # if self.reset
 
     # If policy has been set, fetch all the custom fields from the policy, else retrieve it from organisation account
-    if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id) and item.policy.present?
+    if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request), FieldParentType.id_for(:travel_request)].include?(parent_type_id) and item.policy.present?
       policy = item.policy
       self.field_configurations = policy.field_configurations.exclude_deleted
     else

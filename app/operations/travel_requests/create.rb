@@ -35,11 +35,16 @@ class TravelRequests::Create < TravelRequests::Base
   def validate
     unless self.travel_request.valid?
       add_message :error, self.travel_request.errors.full_messages
+      return
     end
+    validate_custom_fields
+    return if has_errors?
   end
 
   def process
-    travel_request.save
+    unless travel_request.save
+      add_message :error, travel_request.errors.full_messages
+    end
   end
 
   def post_process
@@ -52,8 +57,30 @@ class TravelRequests::Create < TravelRequests::Base
   end
 
   protected
+
   def strong_params
     params.permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date)
+  end
+
+  def validate_custom_fields
+    set_fields = set_custom_fields false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.travel_request)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+  end
+
+  def set_custom_fields(save)
+    custom_fields = {custom_fields: (params[:custom_fields] or params[:travel_request][:custom_fields])}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), custom_fields)
   end
 
   class TravelRequests::Create::CreatePresenter < BaseOperation::BasePresenter::SuccessPresenter
