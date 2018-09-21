@@ -479,6 +479,7 @@
 #                                                         GET    /admin_users/card_assign_requests/export(.:format)                                                              admin_users/card_assign_requests#export
 #                                                         GET    /admin_users/card_assign_requests/export/kycs(.:format)                                                         admin_users/card_assign_requests#download_kycs
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                                                admin_users/card_assign_requests#edit
+#                                 admin_users_bulk_assign POST   /admin_users/cards/bulk_assign(.:format)                                                                        admin_users/cards#bulk_assign
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                                       admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                                          admin_users/users#admin_menus
 #                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                                              api/callbacks#successful_vendor_payment
@@ -844,6 +845,7 @@
 #                                            groups_teams GET    /groups_teams(.:format)                                                                                         expense_types_configuration#groups_teams
 #                                         expense_filters GET    /expense_filters(.:format)                                                                                      expense_types_configuration#expense_filters
 #                                          report_filters GET    /report_filters(.:format)                                                                                       expense_types_configuration#report_filters
+#                                    field_configurations GET    /field_configurations(.:format)                                                                                 field_configuration#index
 #                                                 pending GET    /settlements/reports/pending(.:format)                                                                          settlement/report#pending_index
 #                                           pending_count GET    /settlements/reports/pending/count(.:format)                                                                    settlement/report#pending_count
 #                                                         GET    /settlements/reports/processing(.:format)                                                                       settlement/report#processing_index
@@ -1403,6 +1405,7 @@
 #                                                         PUT    /budgets/:id(.:format)                                                                                          budgets#update
 #                                                         DELETE /budgets/:id(.:format)                                                                                          budgets#destroy
 #                      procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                   procure/procurements#filter_config
+#                              procure_procurements_count GET    /procure/procurements/count(.:format)                                                                           procure/procurements#count
 #                                    procure_procurements GET    /procure/procurements(.:format)                                                                                 procure/procurements#index
 #                                                         POST   /procure/procurements(.:format)                                                                                 procure/procurements#create
 #                                 new_procure_procurement GET    /procure/procurements/new(.:format)                                                                             procure/procurements#new
@@ -2401,6 +2404,8 @@ Rails.application.routes.draw do
     get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
     get 'card_assign_requests/export/kycs(.:format)' => 'card_assign_requests#download_kycs'
     get 'card_assign_requests/edit' => 'card_assign_requests#edit'
+
+    post 'cards/bulk_assign', to: 'cards#bulk_assign', as: :bulk_assign
 
     post 'call_center/search', to: 'call_center/users#search', as: :search
   end
