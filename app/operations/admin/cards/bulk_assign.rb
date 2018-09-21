@@ -26,8 +26,6 @@ class Admin::Cards::BulkAssign < Admin::Base
         result_hash[i] = 3
         next
       end
-
-
     end
   end
 
@@ -53,7 +51,7 @@ class Admin::Cards::BulkAssign < Admin::Base
       card_serial = row[import_fields[:card_serial]]
       card_type = row[import_fields[:card_type]]
 
-      if [1,2,3,4,5].include?(card_type)
+      if [1, 2, 3, 4, 5].include?(card_type)
         result_hash[i] = "Invalid card type. Try again"
         next
       end
@@ -94,7 +92,7 @@ class Admin::Cards::BulkAssign < Admin::Base
       self.content[i-2] << self.result_hash[i]
     end
   end
-  
+
   def success
     # generaing response CSV
     self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content}}, messages)
@@ -111,14 +109,23 @@ class Admin::Cards::BulkAssign < Admin::Base
   end
 
   def mobile_number_blank?(row)
-
+    if row[import_fields[:mobile_number]].blank?
+      return true
+    end
+    false
   end
 
   def card_type_blank? (row)
-
+    if row[import_fields[:card_type]].blank?
+      return true
+    end
+    false
   end
 
   def card_serial_blank?(row)
-
+    if row[import_fields[:card_serial]].blank?
+      return true
+    end
+    false
   end
 end
