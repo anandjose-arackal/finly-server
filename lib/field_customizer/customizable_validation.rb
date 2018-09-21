@@ -73,6 +73,7 @@ module FieldCustomizer
           end
           scoped_attr = scoped_attr.send(attr)
         end
+        scoped_attr
       end
     end
   end
