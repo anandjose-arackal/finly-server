@@ -1404,6 +1404,8 @@
 #                                                         PATCH  /budgets/:id(.:format)                                                                                          budgets#update
 #                                                         PUT    /budgets/:id(.:format)                                                                                          budgets#update
 #                                                         DELETE /budgets/:id(.:format)                                                                                          budgets#destroy
+#                                      sample_import_file GET    /budgets/sample_import_file(.:format)                                                                           budgets#sample_import_file
+#                                           budget_import POST   /budgets/import(.:format)                                                                                       budgets#import
 #                      procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                   procure/procurements#filter_config
 #                              procure_procurements_count GET    /procure/procurements/count(.:format)                                                                           procure/procurements#count
 #                                    procure_procurements GET    /procure/procurements(.:format)                                                                                 procure/procurements#index
@@ -3141,10 +3143,13 @@ Rails.application.routes.draw do
 
   get 'ping', to: 'ping#ping'
 
-  ## Budget apis start ##
-  resources :budgets
+  ######## Budget apis start ######
 
-## Budget apis end ##
+  resources :budgets
+  get 'budgets/sample_import_file', to: 'budgets#sample_import_file', as: :sample_import_file
+  post 'budgets/import', to: 'budgets#import', as: :budget_import
+
+  ######## Budget apis end #########
 
 
   ## Procurement APIs start ##########################################

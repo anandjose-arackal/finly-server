@@ -93,7 +93,7 @@ class Budgets::Import < Budgets::Base
       end
 
       budget = company.budgets.build(name: budget_name, start_date: start_date, end_date: end_date,
-                                     expense: expense, payment:p payment, purchase_order: purchase_order,
+                                     expense: expense, payment: payment, purchase_order: purchase_order,
                                      amounts_attributes: {value: budget_amount, currency_id: 1},
                                      budget_criteria_mappings_attributes: budget_criteria_mappings)
 
