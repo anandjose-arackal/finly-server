@@ -46,6 +46,8 @@ class TravelRequests::Update < TravelRequests::Base
   end
 
   def process
+    self.travel_request.assign_attributes(travel_request_parameters)
+
     # Set custom fields
     custom_fields = {custom_fields: params[:custom_fields]}
     custom_fields[:save] = false
@@ -62,7 +64,6 @@ class TravelRequests::Update < TravelRequests::Base
       return false
     end
 
-    self.travel_request.assign_attributes(travel_request_parameters)
     unless travel_request.save
       add_message :error, self.travel_request.errors.full_messages
     end
