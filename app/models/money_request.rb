@@ -44,6 +44,7 @@ class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks,
           MathUtil,
           SoftDeletable,
+          FieldCustomizer::CustomizableValidation,
           FindByOrderedIds
 
   has_many :email_authorizations, as: :authorizable
@@ -230,6 +231,10 @@ class MoneyRequest < ActiveRecord::Base
 
   validates :policy_id, presence: true
   validate :cash_pocket_presence
+
+  field_customization_key :money_request
+  customizable_validate :memo, presence: false, scope: [:user, :company]
+  customizable_validate :required_by_date, presence: false, scope: [:user, :company]
 
   before_save :handle_name
   before_save :handle_nil_amount
