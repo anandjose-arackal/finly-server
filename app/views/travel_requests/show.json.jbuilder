@@ -28,7 +28,11 @@ json.destinations do
 end
 
 json.actions @result.actions
-json.policies @result.policies
+json.policies @result.policies.each do |policy|
+  json.id policy.id
+  json.name policy.name
+  json.custom_fields @result.custom_fields_for(policy)
+end
 json.editable @result.editable
 json.destroyable @result.destroyable
 json.can_select_options @result.can_select_options?
@@ -147,4 +151,8 @@ json.comments do
     json.timestamp comment.created_at.strftime('%d %b %Y')
     json.initials comment.user&.initials
   end
+end
+
+json.custom_fields do
+  json.array! @result.travel_request.custom_fields
 end
