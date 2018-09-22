@@ -50,7 +50,7 @@ class Booking < ActiveRecord::Base
   accepts_nested_attributes_for :travel_members, allow_destroy: true
 
   delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type
-  delegate :request?, :option?, :confirmed?, :processing?, :cancelled?, :rejected?, to: :booking_status
+  delegate :request?, :option?, :confirmed?, :processing?, :selected_for_booking?, :cancelled?, :rejected?, to: :booking_status
 
   accepts_nested_attributes_for :travel_members, allow_destroy: true
 

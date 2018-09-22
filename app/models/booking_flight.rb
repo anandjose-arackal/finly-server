@@ -50,7 +50,17 @@ class BookingFlight < ActiveRecord::Base
 
   field_customization_key :booking_flight
   # customizable_validate :comment, presence: false
-  validates :comment, presence: true
+  #
+  before_validation do
+    debugger
+  end
+  validate :comment_presence
+
+  def comment_presence
+    if comment.blank? and parent.booking_request?
+      errors.add :comment, 'cannot be blank'
+    end
+  end
 
   def as_json(options={})
     {
