@@ -172,7 +172,7 @@ class CustomField::SetFields < CustomField::Base
           # If the custom field configuration is a dropdown and
           # the value matches the dependent field configuration criteria, add it to required custom fields
           if config.parent_drop_down_items.pluck(:id).include?(value.to_i)
-            if current_ids.blank? or current_ids.include?(config.id)
+            if current_ids.blank? or not current_ids.include?(config.id)
               required = true
             end
           end
