@@ -257,6 +257,7 @@ class Report::Violation < Report::Base
       else
         # If the usage date is partially/completely overlapping with budget date, then (add number of overlapping days with budget)*(cost per date)
         usage_days = exp.usage_days
+        next if usage_days.nil?
         total_number_of_days = usage_days.count
         number_of_overlapping_days = ([end_date, usage_days.last].min.to_date - [start_date, usage_days.first].max.to_date).to_i + 1
         cost_per_date = exp.amount.send(base_currency_code.to_sym) / total_number_of_days

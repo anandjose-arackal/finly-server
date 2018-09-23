@@ -105,7 +105,7 @@ class CustomField::SetFields < CustomField::Base
       # from the field configurations set
       required_ids = self.field_configurations.pluck(:id)
       existing_ids = self.item.custom_fields.pluck(:field_configuration_id)
-      configs_to_create = process_custom_field_changes&.first # because configs to create will be returned by the method that calculates what all need to be created
+      configs_to_create, _ = process_custom_field_changes # because configs to create will be returned by the method that calculates what all need to be created
       config_ids_to_destroy = existing_ids - required_ids
     else
       configs_to_create, config_ids_to_destroy = process_custom_field_changes
@@ -164,13 +164,17 @@ class CustomField::SetFields < CustomField::Base
       required = false
       if config.root_field
         # Root fields have to be present
-        required = true
+        if current_ids.blank? or current_ids.include?(config.id)
+          required = true
+        end
       else
         acceptable_dropdown_values.each do |value|
           # If the custom field configuration is a dropdown and
           # the value matches the dependent field configuration criteria, add it to required custom fields
           if config.parent_drop_down_items.pluck(:id).include?(value.to_i)
-            required = true
+            if current_ids.blank? or current_ids.include?(config.id)
+              required = true
+            end
           end
         end
       end

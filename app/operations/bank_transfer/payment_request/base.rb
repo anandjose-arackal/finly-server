@@ -7,10 +7,8 @@ class BankTransfer::PaymentRequest::Base < BaseOperation
   end
 
   def pre_validate
-    if user.blank? || params.blank?
-      add_message :error, "Invalid parameters, try again"
-      return
-    end
+    return unless user_present?
+    params_present?
   end
 
   def init
