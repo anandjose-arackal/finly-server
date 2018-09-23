@@ -39,7 +39,7 @@ json.can_select_options @result.can_select_options?
 json.can_add_request @result.can_add_request?
 json.can_add_options @result.can_add_options?
 json.can_add_booking @result.can_add_booking?
-json.can_mark_as_unavailable true
+json.can_mark_as_unavailable @result.can_add_options?
 json.can_cancel_booking @result.can_cancel_booking?
 json.can_create_money_requests @result.can_create_money_requests?
 json.show_money_requests @result.show_money_requests?
