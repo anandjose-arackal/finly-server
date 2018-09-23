@@ -42,3 +42,9 @@ json.currencies do
     json.id currency.id
   end
 end
+travel_desk_enabled = @result.report.user.travel_desk_enabled?
+json.show_trips travel_desk_enabled
+if travel_desk_enabled
+  json.user_travel_requests @result.report.user.travel_requests.reportable, :id, :name, :trip_id
+  json.associated_trip @result.report.travel_request
+end

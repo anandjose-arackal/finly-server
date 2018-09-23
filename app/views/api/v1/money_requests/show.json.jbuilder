@@ -50,3 +50,10 @@ end
 json.custom_fields do
   json.array! @result.money_request.custom_fields
 end
+
+travel_desk_enabled = @result.money_request.user.travel_desk_enabled?
+json.show_trips travel_desk_enabled
+if travel_desk_enabled
+  json.pending_travel_requests @result.money_request.user.travel_requests, :id, :name
+  json.associated_trip @result.money_request.travel_request
+end
