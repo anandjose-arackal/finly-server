@@ -32,13 +32,13 @@ class Booking < ActiveRecord::Base
 
   has_many :attachments, class_name: 'BookingAttachment', dependent: :destroy
 
-  has_one :booking_car_rental, as: :parent, dependent: :destroy
-  has_one :booking_bus, as: :parent, dependent: :destroy
-  has_one :booking_flight, as: :parent, dependent: :destroy
-  has_one :booking_hotel, as: :parent, dependent: :destroy
-  has_one :booking_restaurant, as: :parent, dependent: :destroy
-  has_one :booking_train, as: :parent, dependent: :destroy
-  has_one :booking_other, as: :parent, dependent: :destroy
+  has_one :booking_car_rental, dependent: :destroy
+  has_one :booking_bus, dependent: :destroy
+  has_one :booking_flight, dependent: :destroy
+  has_one :booking_hotel, dependent: :destroy
+  has_one :booking_restaurant, dependent: :destroy
+  has_one :booking_train, dependent: :destroy
+  has_one :booking_other, dependent: :destroy
 
   accepts_nested_attributes_for :booking_car_rental, allow_destroy: true
   accepts_nested_attributes_for :booking_bus, allow_destroy: true

@@ -18,6 +18,7 @@
 #  checkin_time     :time
 #  checkout_date    :date
 #  checkout_time    :time
+#  booking_id       :integer
 #
 
 require 'test_helper'

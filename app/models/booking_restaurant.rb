@@ -15,13 +15,15 @@
 #  is_deleted         :boolean          default(FALSE)
 #  reservation_date   :date
 #  reservation_time   :time
+#  booking_id         :integer
 #
 
 class BookingRestaurant < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation
 
-  belongs_to :parent, polymorphic: true
+  # belongs_to :parent, polymorphic: true
+  belongs_to :booking
   belongs_to :location, dependent: :destroy
 
   accepts_nested_attributes_for :location
@@ -36,8 +38,8 @@ class BookingRestaurant < ActiveRecord::Base
   alias_attribute :comment, :description
 
   field_customization_key :booking_restaurant
-  # customizable_validate :comment, presence: false
-  validates :comment, presence: true
+  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company]
+  # validates :comment, presence: true
 
   def as_json(options={})
     {
