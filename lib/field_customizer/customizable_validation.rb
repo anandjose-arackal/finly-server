@@ -39,6 +39,17 @@ module FieldCustomizer
         define_method validation_method_name do
           options = self.class.field_configuration_for(field, field_configuration_scope_for(field))
           return unless options
+          condition = options[:if]
+          if condition.present?
+            if condition.is_a?(Symbol)
+              unless self.respond_to?(condition)
+                raise "Method #{condition} not found for class #{self.class.name}"
+              end
+              return unless self.send(condition)
+            else
+              return unless condition
+            end
+          end
           return unless options[:enabled]
           return unless options[:presence]
           if self.send(field).blank?

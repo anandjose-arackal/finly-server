@@ -30,7 +30,7 @@ class BookingFlight < ActiveRecord::Base
           FieldCustomizer::CustomizableValidation
 
   # belongs_to :parent, polymorphic: true
-  belongs_to :booking
+  belongs_to :booking, inverse_of: :booking_flight
   belongs_to :booking_class, class_name: 'BookingFlightClass'
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
   belongs_to :from, class_name: 'Location', dependent: :destroy
@@ -43,6 +43,7 @@ class BookingFlight < ActiveRecord::Base
   scope :with_parent_booking_id, ->(id) { where booking_id: id }
   scope :sum_cost, -> { joins(:cost).sum(:value) }
 
+  delegate :request?, to: :booking
 
   validates :from, presence: true
   validates :to, presence: true
@@ -52,10 +53,9 @@ class BookingFlight < ActiveRecord::Base
   alias_attribute :comment, :description
 
   field_customization_key :booking_flight
-  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company]
+  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company], if: :request?
   # validates :comment, presence: true
-  #
-  before_validation {debugger}
+
 
   def comment_presence
     if comment.blank? and parent.booking_request?

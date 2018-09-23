@@ -23,7 +23,7 @@ class BookingRestaurant < ActiveRecord::Base
           FieldCustomizer::CustomizableValidation
 
   # belongs_to :parent, polymorphic: true
-  belongs_to :booking
+  belongs_to :booking, inverse_of: :booking_restaurant
   belongs_to :location, dependent: :destroy
 
   accepts_nested_attributes_for :location

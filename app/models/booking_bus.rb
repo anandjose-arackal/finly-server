@@ -27,7 +27,7 @@ class BookingBus < ActiveRecord::Base
           FieldCustomizer::CustomizableValidation
 
   # belongs_to :parent, polymorphic: true
-  belongs_to :booking
+  belongs_to :booking, inverse_of: :booking_bus
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
   belongs_to :from, class_name: 'Location', dependent: :destroy
   belongs_to :to, class_name: 'Location', dependent: :destroy

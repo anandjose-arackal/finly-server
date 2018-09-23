@@ -6,6 +6,7 @@ class ChangeBookingAssociations < ActiveRecord::Migration
     add_column :booking_car_rentals, :booking_id, :integer, references: "Booking", foreign_key: true, index: true
     add_column :booking_hotels, :booking_id, :integer, references: "Booking", foreign_key: true, index: true
     add_column :booking_restaurants, :booking_id, :integer, references: "Booking", foreign_key: true, index: true
+    add_column :booking_others, :booking_id, :integer, references: "Booking", foreign_key: true, index: true
 
     BookingFlight.all.each do |b|
       b.update(booking_id: b.parent_id)
@@ -23,6 +24,9 @@ class ChangeBookingAssociations < ActiveRecord::Migration
       b.update(booking_id: b.parent_id)
     end
     BookingRestaurant.all.each do |b|
+      b.update(booking_id: b.parent_id)
+    end
+    BookingOther.all.each do |b|
       b.update(booking_id: b.parent_id)
     end
   end

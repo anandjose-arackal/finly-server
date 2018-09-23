@@ -1,4 +1,5 @@
 class TravelRequests::Bookings::MarkAsUnavailable < TravelRequests::Bookings::Base
+  attr_accessor :selected_for_booking
 
   attr_accessor :booking
 
@@ -13,17 +14,17 @@ class TravelRequests::Bookings::MarkAsUnavailable < TravelRequests::Bookings::Ba
       return
     end
     self.booking = booking_presenter.booking
+    self.selected_for_booking = self.booking.bookings.selected_for_booking
   end
 
   def validate
-    unless self.booking.selected_for_booking?
+    if self.selected_for_booking.blank?
       add_message :error, 'Only selected options can be marked as unavailable'
-      return
     end
   end
 
   def process
-    self.booking.update(booking_status_id: BookingStatus.id_for(:unavailable))
+    self.selected_for_booking.update_all(booking_status_id: BookingStatus.id_for(:unavailable))
   end
 
 end
