@@ -37,7 +37,7 @@ class BookingHotel < ActiveRecord::Base
   alias_attribute :comment, :description
 
   field_customization_key :booking_hotel
-  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company]
+  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company], if: :request?
   # validates :comment, presence: true
 
   validates :location, presence: true
