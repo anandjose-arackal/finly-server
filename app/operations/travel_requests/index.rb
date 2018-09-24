@@ -87,7 +87,10 @@ class TravelRequests::Index < TravelRequests::Base
 
     def init
       self.travel_requests = params[:travel_requests]
-      return unless self.travel_requests.present?
+      unless self.travel_requests.present?
+        self.paginated_travel_requests = self.travel_requests
+        return
+      end
       self.travel_requests = apply_scopes(self.travel_requests, params)
       if travel_requests.present?
         if personal_view?

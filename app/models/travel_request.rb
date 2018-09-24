@@ -58,8 +58,10 @@ class TravelRequest < ActiveRecord::Base
   has_many :destinations, class_name: 'TravelRequestDestination'
   has_many :travel_request_trails, dependent: :destroy
   has_many :comments, class_name: 'TravelRequestComment', dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   accepts_nested_attributes_for :destinations, allow_destroy: true
+  accepts_nested_attributes_for :custom_fields, allow_destroy: true
 
   delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?,
            :selection_requested?, :selection_processing?, :selection_rejected?, :selection_confirmed?, :booking_confirmed?, to: :status
