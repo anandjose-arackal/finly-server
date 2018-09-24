@@ -53,7 +53,7 @@ class Procure::PurchaseOrdersController < ApplicationController
   end
 
   def remind
-    @result = Procurements::PurchaseOrders::Close.(current_user, params)
+    @result = Procurements::PurchaseOrders::Remind.(current_user, params)
     respond
   end
 

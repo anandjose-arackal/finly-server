@@ -1,4 +1,4 @@
-class Procurements::PurchaseOrders::Retract < Procurements::PurchaseOrders::Base
+class Procurements::PurchaseOrders::Remind < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params
 
   def init

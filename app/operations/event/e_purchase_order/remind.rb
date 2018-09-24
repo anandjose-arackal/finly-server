@@ -1,5 +1,5 @@
-class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
-  attr_accessor :approved, :approving_user, :auto_approve,
+class Event::EPurchaseOrder::Remind < Event::EPurchaseOrder::Base
+  attr_accessor :approved, :auto_approve,
                 :controlling_users
 
   def action_name
@@ -8,7 +8,6 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
 
   def init
     super
-    self.approving_user = self.purchase_order.trails.natural_order.last.action_user
     self.approved = (purchase_order.approved? || purchase_order.closed? || purchase_order.auto_approved?) if purchase_order.present?
     self.auto_approve = params[:auto_approve]
 
@@ -32,19 +31,12 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
       else
         # User selected reviewer is not present in list of users satisfying current level's threshold criteria
         # select all the threshold satifying reviewers
-        user.company.users.with_id(controlling_user_ids).each do |user|
+        user.company.users.with_id(controlling_users_ids).each do |user|
           self.controlling_users.push(user)
         end
       end
     else
       controlling_users = []
-    end
-  end
-
-  def validate
-    super
-    unless self.approving_user.present? or auto_approve
-      add_message :error, 'User not found'
     end
   end
 

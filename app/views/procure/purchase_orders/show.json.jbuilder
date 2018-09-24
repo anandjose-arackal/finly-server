@@ -141,3 +141,10 @@ json.tax_rates do
   end
 end
 
+json.locations do
+  json.array! @result.locations do |location|
+    json.extract! location, :id, :name, :gstin, :pan
+    json.address location.address
+  end
+end
+

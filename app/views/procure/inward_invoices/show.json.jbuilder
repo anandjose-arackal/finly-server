@@ -252,3 +252,10 @@ json.tax_rates do
     json.merge! tax_rate.as_json
   end
 end
+
+json.locations do
+  json.array! @result.locations do |location|
+    json.extract! location, :id, :name, :gstin, :pan
+    json.address location.address
+  end
+end

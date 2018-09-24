@@ -31,7 +31,7 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
       else
         # User selected reviewer is not present in list of users satisfying current level's threshold criteria
         # select all the threshold satifying reviewers
-        user.company.users.with_id(controlling_user_ids).each do |user|
+        user.company.users.with_id(controlling_users_ids).each do |user|
           self.controlling_users.push(user)
         end
       end
