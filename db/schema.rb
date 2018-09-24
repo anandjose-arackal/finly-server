@@ -772,6 +772,7 @@ ActiveRecord::Schema.define(version: 20180922154201) do
     t.text     "description",     limit: 65535
     t.integer  "cost_id",         limit: 4
     t.boolean  "is_deleted",                    default: false
+    t.integer  "booking_id",      limit: 4
   end
 
   add_index "booking_others", ["parent_type", "parent_id"], name: "index_booking_others_on_parent_type_and_parent_id", using: :btree
