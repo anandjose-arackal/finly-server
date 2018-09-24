@@ -63,7 +63,7 @@ module FieldCustomizer
         return nil if options.blank?
         return nil if scoped_attr.nil?
         customization_options = FieldCustomization.with_scope(scoped_attr).with_class_name(self.name).with_field_name(field)
-        options.merge! customization_options&.first.options if customization_options.present?
+        return options.merge customization_options&.first.options if customization_options.present?
         options
       end
     end
