@@ -94,7 +94,7 @@ class User < ActiveRecord::Base
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
-  has_many :reports, dependent: :destroy
+  has_many :reports, inverse_of: :user, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
   has_many :report_tracks, class_name: 'ReportTrack', foreign_key: :action_user_id
   has_many :interacted_reports, -> { distinct }, source: :report, through: :report_tracks
@@ -132,7 +132,7 @@ class User < ActiveRecord::Base
   has_many :medical_cards, -> { where(card_program_id: CardProgram.id_for(:medical)) }, class_name: 'Card'
   has_many :expense_cards, -> { where(card_program_id: CardProgram.id_for(:expense)) }, class_name: 'Card'
   has_many :card_transactions, dependent: :destroy
-  has_many :money_requests
+  has_many :money_requests, inverse_of: :user
 
   has_many :booking_attachments
 

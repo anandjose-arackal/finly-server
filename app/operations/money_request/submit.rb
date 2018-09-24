@@ -21,6 +21,10 @@ class MoneyRequest::Submit < MoneyRequest::Base
   end
 
   def validate
+    unless money_request.valid?
+      add_message :error, money_request.errors.full_messages
+      return
+    end
     # checking money_request status
     unless money_request.can_submit?
       messages[:error] << 'Cannot submit this money_request'

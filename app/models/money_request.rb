@@ -50,7 +50,7 @@ class MoneyRequest < ActiveRecord::Base
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :status, class_name: 'MoneyRequestStatus'
-  belongs_to :user
+  belongs_to :user, inverse_of: :money_requests
   belongs_to :card
   belongs_to :loaded_by, class_name: 'User'
   belongs_to :controlling_user, class_name: 'User'
