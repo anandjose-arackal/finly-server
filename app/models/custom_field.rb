@@ -182,7 +182,7 @@ class CustomField < ActiveRecord::Base
             mandatory: field_configuration.mandatory,
             options: options,
             root_field: self.field_configuration.root_field,
-            dependent_field_configuration_ids: dependent_field_configuration_ids,
+            dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
             has_dependent_cf: has_dependent_cf
             }
     case self.field_configuration.field_type_id
