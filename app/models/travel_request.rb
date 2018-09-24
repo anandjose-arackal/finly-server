@@ -132,7 +132,9 @@ class TravelRequest < ActiveRecord::Base
       ids = pluck(:id)
       controlling_money_requests = where(controlling_user_id: user_id)
       if manager
-        controlling_money_requests = controlling_money_requests.where(status_id: MoneyRequestStatus.id_for(:processing))
+        controlling_money_requests = controlling_money_requests.where(status_id: TravelRequestStatus.ids_for(:processing, :booking_pending,
+                                                                                                             :selection_requested, :selection_processing,
+                                                                                                             :selection_confirmed))
       end
       controlling_ids = controlling_money_requests.pluck(:id)
       ordered_ids = controlling_ids + (ids - controlling_ids)
