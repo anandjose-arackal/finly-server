@@ -45,6 +45,8 @@ class BookingBus < ActiveRecord::Base
   alias_attribute :comment, :description
   # validates :comment, presence: true
 
+  delegate :request?, to: :booking
+
   field_customization_key :booking_bus
   customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company], if: :request?
 
