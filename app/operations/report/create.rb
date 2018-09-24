@@ -79,6 +79,7 @@ class Report::Create < Report::Base
                                          policy_id: policy_id,
                                          travel_request_id: params[:travel_request_id],
                                          name: params[:name]
+    report.skip_customizable_validation = true # As validation breaks the creation and loading of report, prevent it during creation
     if report.save
       report.tracks.create action_user: for_user,
                            action_user_role_id: role_id,
