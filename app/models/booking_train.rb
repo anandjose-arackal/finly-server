@@ -46,7 +46,7 @@ class BookingTrain < ActiveRecord::Base
   alias_attribute :comment, :description
 
   field_customization_key :booking_train
-  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company]
+  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company], if: :request?
   # validates :comment, presence: true
 
   validates :from, presence: true

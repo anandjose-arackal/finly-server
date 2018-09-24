@@ -46,7 +46,7 @@ class BookingBus < ActiveRecord::Base
   # validates :comment, presence: true
 
   field_customization_key :booking_bus
-  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company]
+  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company], if: :request?
 
   scope :with_parent_booking_id, ->(id) { where parent_type: 'Booking', parent_id: id }
   scope :sum_cost, -> { joins(:cost).sum(:value) }
