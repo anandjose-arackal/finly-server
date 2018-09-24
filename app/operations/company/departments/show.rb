@@ -13,12 +13,27 @@ class Company::Departments::Show < Company::Departments::Base
   end
 
   class Company::Departments::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :department, :sub_departments, :users
+    attr_accessor :department, :sub_departments, :users, :parent_department, :actions
 
     def init
       self.department = params[:department]
+      self.parent_department = self.department.parent
       self.sub_departments = self.department.children
-      self.users = self.departments.users
+      user_ids = self.department.users.pluck(:id)
+      self.sub_departments.each do |sub_dept|
+        user_ids += sub_dept.users.pluck(:id)
+      end
+
+      self.users = user.company.users.with_id(user_ids.uniq)
+
+
+      self.actions = {
+          create_department: get_create_department
+      }
+    end
+
+    def get_create_department
+      parent_department.blank?
     end
   end
 end

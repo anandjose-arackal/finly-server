@@ -3161,6 +3161,7 @@ Rails.application.routes.draw do
       put 'reject', to: 'purchase_orders#reject'
       put 'close', to: 'purchase_orders#close'
       get 'download_pdf', to: 'purchase_orders#download', as: :download
+      put 'remind', to: 'purchase_orders#remind'
     end
 
     resources :inward_documents do
