@@ -67,6 +67,7 @@ class TravelRequest < ActiveRecord::Base
            :selection_requested?, :selection_processing?, :selection_rejected?, :selection_confirmed?, :booking_confirmed?, to: :status
 
   validates :status_id, presence: true #, unless: :open?
+  validates :policy, presence: true
   validates :user_id, presence: true #, unless: :open?
   #validates :name, presence: true#, unless: :open?
   # validates :from_date, presence: true

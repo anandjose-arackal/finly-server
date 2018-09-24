@@ -23,12 +23,12 @@ class TravelRequests::Create < TravelRequests::Base
     self.travel_request_parameters[:company_id] = user.company_id
     #self.travel_request_parameters[:policy_id] = current_company.policies.default.first.id
 
-    if self.travel_request_parameters[:policy_id].blank? and for_user.enforce_policy_enabled?
-      self.travel_request_parameters[:policy_id] = for_user.policies.non_default&.first&.id
-    end
-    if self.travel_request_parameters[:policy_id].blank?
-      self.travel_request_parameters[:policy_id] = user.company.default_policy.id
-    end
+    # if self.travel_request_parameters[:policy_id].blank? and for_user.enforce_policy_enabled?
+    #   self.travel_request_parameters[:policy_id] = for_user.policies.non_default&.first&.id
+    # end
+    # if self.travel_request_parameters[:policy_id].blank?
+    #   self.travel_request_parameters[:policy_id] = user.company.default_policy.id
+    # end
     self.travel_request = self.for_user.travel_requests.build(travel_request_parameters)
   end
 
