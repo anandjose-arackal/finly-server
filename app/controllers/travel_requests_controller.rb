@@ -51,6 +51,11 @@ class TravelRequestsController < ApplicationController
     end
   end
 
+  def configuration
+    @result = TravelRequests::Config::Show.(current_user, params)
+    respond
+  end
+
   private
 
   def review_handler(type)

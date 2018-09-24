@@ -45,7 +45,7 @@ class CustomField::SetFields < CustomField::Base
     # if self.reset
 
     # If policy has been set, fetch all the custom fields from the policy, else retrieve it from organisation account
-    if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id) and item.policy.present?
+    if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request), FieldParentType.id_for(:travel_request)].include?(parent_type_id) and item.policy.present?
       policy = item.policy
       self.field_configurations = policy.field_configurations.exclude_deleted
     else
@@ -62,7 +62,6 @@ class CustomField::SetFields < CustomField::Base
         end
         self.field_configurations = user.company.field_configurations.exclude_deleted
       end
-
     end
 
     # Retrieve configurations which are set only for items
@@ -156,10 +155,10 @@ class CustomField::SetFields < CustomField::Base
     all_field_values = merged_custom_field_values
     acceptable_dropdown_values = identify_acceptable_dropdown_values all_field_values
 
-
     current_ids = self.item.custom_fields.pluck(:field_configuration_id)
     configs_to_create = []
     config_ids_to_destroy = []
+    required_configs = {}
     self.field_configurations.enabled.each do |config|
       required = false
       if config.root_field
@@ -179,21 +178,17 @@ class CustomField::SetFields < CustomField::Base
         end
       end
 
+      required_configs[config.id] = config if required
+    end
 
-      if required
-        if current_ids.include?(config.id)
-          # do nothing?
-        else
-          # Create
-          configs_to_create << config
-        end
-      else
-        if current_ids.include?(config.id)
-          # Destroy
-          config_ids_to_destroy << config.id
-        end
+    config_ids_to_destroy = current_ids - required_configs.keys
+
+    required_configs.each do |id, config|
+      unless current_ids.include?(id)
+        configs_to_create << config
       end
     end
+
     [configs_to_create, config_ids_to_destroy]
   end
 
@@ -230,7 +225,7 @@ class CustomField::SetFields < CustomField::Base
           acceptable_value = true
         else
           if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.pluck(:id).include?(drop_down_value)}
-          # if acceptable_dropdown_values.include?(config.parent_id.to_s)
+            # if acceptable_dropdown_values.include?(config.parent_id.to_s)
             acceptable_value = true
           end
         end

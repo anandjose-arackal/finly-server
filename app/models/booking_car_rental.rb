@@ -23,13 +23,15 @@
 #  drop_date       :date
 #  drop_time       :time
 #  is_deleted      :boolean          default(FALSE)
+#  booking_id      :integer
 #
 
 class BookingCarRental < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation
 
-  belongs_to :parent, polymorphic: true
+  # belongs_to :parent, polymorphic: true
+  belongs_to :booking, inverse_of: :booking_car_rental
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
   belongs_to :pickup_city, class_name: 'Location', dependent: :destroy
   belongs_to :drop_city, class_name: 'Location', dependent: :destroy
@@ -45,8 +47,7 @@ class BookingCarRental < ActiveRecord::Base
   alias_attribute :comment, :description
 
   field_customization_key :booking_car_rental
-  # customizable_validate :comment, presence: false
-  validates :comment, presence: true
+  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company]
   validates :pickup_date, presence: true
   validates :drop_date, presence: true
   validates :pickup_city, presence: true

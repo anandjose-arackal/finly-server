@@ -2583,6 +2583,7 @@ Rails.application.routes.draw do
   ######################### TRAVEL REQUESTS API START ##########################
 
   get 'travel_requests/count', to: 'travel_requests#count'
+  get 'travel_requests/config', to: 'travel_requests#configuration'
   resources :travel_requests do
     patch 'review', to: 'travel_requests#review', as: :review
 
@@ -2594,6 +2595,7 @@ Rails.application.routes.draw do
         patch 'select_option', to: 'travel_request_bookings#select_option'
         patch 'unselect_option', to: 'travel_request_bookings#unselect_option'
         patch 'cancel', to: 'travel_request_bookings#cancel'
+        patch 'mark_as_unavailable', to: 'travel_request_bookings#mark_as_unavailable'
       end
     end
 
