@@ -52,6 +52,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def remind
+    @result = Procurements::PurchaseOrders::Close.(current_user, params)
+    respond
+  end
+
   def download
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     @purchase_order = @result.purchase_order

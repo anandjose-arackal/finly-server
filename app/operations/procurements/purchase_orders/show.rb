@@ -124,6 +124,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
               url: Rails.application.routes.url_helpers.procure_purchase_order_retract_path(purchase_order_id: purchase_order.id),
               method: "PUT"
           }
+          action[:remind] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_remind_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
           actions[:document_editable] = false
         end
       end
