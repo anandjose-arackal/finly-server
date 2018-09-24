@@ -111,6 +111,7 @@ class Expense < ActiveRecord::Base
   validate :valid_expense_type
   validate :valid_amount_value
   validate :at_least_one_type
+  validate :spent_from_check
 
   # i.e. an expense associated with a report can't be destroyed
   before_destroy do
@@ -1089,6 +1090,13 @@ class Expense < ActiveRecord::Base
     if usage_date_type.present? and usage_date_start.blank?
       errors.add :usage_dates, 'have not been defined'
       return
+    end
+  end
+
+  def spent_from_check
+    return if reimbursable
+    if spent_from.blank?
+      errors.add :spent_from, 'is not selected'
     end
   end
 
