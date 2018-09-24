@@ -36,6 +36,8 @@ class BookingHotel < ActiveRecord::Base
   # As front end calls this comment and not description, have to give an alias for validation purpose
   alias_attribute :comment, :description
 
+  delegate :request?, to: :booking
+
   field_customization_key :booking_hotel
   customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company], if: :request?
   # validates :comment, presence: true
