@@ -9,7 +9,7 @@ class EmailProcessor
 
     user = User.find_by_email(@email.from[:email])
     to_email = @email.to[:email]
-    if to_email == 'specialresponse@finly.io' # && user.id == 651
+    if to_email == Constants::SPECIAL_RESPONSE_EMAIL # && user.id == 651
         # pass the special response file to the respective operation
       if @email.attachments.any?
         attachment = @email.attachments.first
