@@ -11,7 +11,7 @@ class ReportAutoSubmit < ActiveJob::Base
       interval = :monthly
     elsif today.friday?
       interval = :weekly
-    elsif today.day == 15
+    elsif today.day == 16 || today.beginning_of_month
       interval = :fortnightly
     end
 
