@@ -844,6 +844,7 @@
 #                                            groups_teams GET    /groups_teams(.:format)                                                                                         expense_types_configuration#groups_teams
 #                                         expense_filters GET    /expense_filters(.:format)                                                                                      expense_types_configuration#expense_filters
 #                                          report_filters GET    /report_filters(.:format)                                                                                       expense_types_configuration#report_filters
+#                                    field_configurations GET    /field_configurations(.:format)                                                                                 field_configuration#index
 #                                                 pending GET    /settlements/reports/pending(.:format)                                                                          settlement/report#pending_index
 #                                           pending_count GET    /settlements/reports/pending/count(.:format)                                                                    settlement/report#pending_count
 #                                                         GET    /settlements/reports/processing(.:format)                                                                       settlement/report#processing_index
@@ -1403,6 +1404,7 @@
 #                                                         PUT    /budgets/:id(.:format)                                                                                          budgets#update
 #                                                         DELETE /budgets/:id(.:format)                                                                                          budgets#destroy
 #                      procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                   procure/procurements#filter_config
+#                              procure_procurements_count GET    /procure/procurements/count(.:format)                                                                           procure/procurements#count
 #                                    procure_procurements GET    /procure/procurements(.:format)                                                                                 procure/procurements#index
 #                                                         POST   /procure/procurements(.:format)                                                                                 procure/procurements#create
 #                                 new_procure_procurement GET    /procure/procurements/new(.:format)                                                                             procure/procurements#new

@@ -30,6 +30,7 @@ class AutoSubmitConfig < ActiveRecord::Base
   scope :monthly, -> { where period_id: [Period.id_for(:day), Period.id_for(:week), Period.id_for(:month)] }
   scope :quarterly, -> { where period_id: [Period.id_for(:day), Period.id_for(:week), Period.id_for(:month), Period.id_for(:quarter)] }
   scope :yearly, -> { where period_id: [Period.id_for(:day), Period.id_for(:week), Period.id_for(:month), Period.id_for(:quarter), Period.id_for(:year)] }
+  scope :fortnightly, -> { where period_id: [Period.id_for(:day), Period.id_for(:week)] }
   scope :user_level, -> { where submitable_type: 'User' }
   scope :includes_submitable, -> { includes :submitable }
 end
