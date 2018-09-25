@@ -11,6 +11,7 @@
 #  description     :text(65535)
 #  cost_id         :integer
 #  is_deleted      :boolean          default(FALSE)
+#  booking_id      :integer
 #
 
 class BookingOther < ActiveRecord::Base

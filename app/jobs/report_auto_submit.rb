@@ -11,6 +11,8 @@ class ReportAutoSubmit < ActiveJob::Base
       interval = :monthly
     elsif today.friday?
       interval = :weekly
+    elsif today.day == 15
+      interval = :fortnightly
     end
 
     # Handling it for user level auto submit configuration

@@ -19,6 +19,7 @@
 #  departure_time :time
 #  arrival_date   :date
 #  arrival_time   :time
+#  booking_id     :integer
 #
 
 class BookingBus < ActiveRecord::Base

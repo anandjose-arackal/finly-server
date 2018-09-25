@@ -15,6 +15,7 @@
 #  is_deleted         :boolean          default(FALSE)
 #  reservation_date   :date
 #  reservation_time   :time
+#  booking_id         :integer
 #
 
 class BookingRestaurant < ActiveRecord::Base
