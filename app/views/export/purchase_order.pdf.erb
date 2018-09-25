@@ -97,7 +97,13 @@
         <td colspan="2" class="table-title"><%= @result.purchase_order.location.name %></td>
       </tr>
       <tr>
-        <td colspan="2" class="table-value" style="padding-left: 0 !important;"><%= @result.purchase_order.location.address %></td>
+        <td colspan="2" class="table-value" style="padding-left: 0 !important;">
+          <% if @result.purchase_order.billing_address.present? %>
+            <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
+          <% else %>
+            <%= @result.purchase_order.location.address %>
+          <% end %>
+        </td>
       </tr>
       <tr>
         <td class="table-title">GST Number :</td>
@@ -124,7 +130,13 @@
         <td colspan="2" class="table-title"><%= @result.purchase_order.delivery_location.name %></td>
       </tr>
       <tr>
-        <td colspan="2" class="table-value" style="padding-left: 0 !important;"><%= @result.purchase_order.delivery_location.address %></td>
+        <td colspan="2" class="table-value" style="padding-left: 0 !important;">
+          <% if @result.purchase_order.shipping_address.present? %>
+            <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
+          <% else %>
+            <%= @result.purchase_order.delivery_location.address %>
+          <% end %>
+        </td>
       </tr>
       <tr>
         <td class="table-title">GST Number :</td>
@@ -457,7 +469,7 @@
       border: 1px solid #c4c4c4;
       padding: 5px;
       text-align: left;
-      word-break: break-all;
+      word-break: break-word;
     }
     .document-line-items-container .table-document-items-summary{
       width: 220px;
@@ -715,7 +727,7 @@
       border: 1px solid #c4c4c4;
       padding: 5px;
       text-align: left;
-      word-break: break-all;
+      /*word-break: break-all;*/
     }
     .document-line-items-container .table-document-items-summary{
       max-width: 450px;

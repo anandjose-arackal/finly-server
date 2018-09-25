@@ -27,7 +27,7 @@ class CustomField < ActiveRecord::Base
   # validate :validate_field
 
   validates :field_configuration_id, presence: true
-  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem', 'PurchaseOrder']}
+  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem', 'PurchaseOrder', 'TravelRequest']}
   validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiselectSelection']}
 
   scope :only_drop_downs, -> { where value_type: 'FieldDropDownSelection' }
@@ -182,7 +182,7 @@ class CustomField < ActiveRecord::Base
             mandatory: field_configuration.mandatory,
             options: options,
             root_field: self.field_configuration.root_field,
-            dependent_field_configuration_ids: dependent_field_configuration_ids,
+            dependent_field_configuration_ids: dependent_field_configuration_ids&.uniq,
             has_dependent_cf: has_dependent_cf
             }
     case self.field_configuration.field_type_id

@@ -27,6 +27,10 @@ class Report::Submit < Report::Base
   end
 
   def validate
+    unless report.valid?
+      add_message :error, report.errors.full_messages
+      return
+    end
     # checking report status
     unless report.can_submit?
       add_message :error, 'Cannot submit this report'

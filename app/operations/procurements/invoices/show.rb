@@ -18,12 +18,14 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   end
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies, :tax_rates
+    attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
+                  :tax_rates, :locations
 
     def init
       self.invoice = params[:invoice]
       self.departments = user.company.departments.roots
 
+      self.locations = user.company.locations
       if invoice.created_by.departments.present?
         self.sub_departments = invoice.created_by.departments.only_sub_departments
       else

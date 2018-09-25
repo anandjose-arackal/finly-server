@@ -39,27 +39,27 @@ user:
   <% if current_user.vendor_payments_admin? %>
   - id: admin
     name: Admin
-    default_url: 'orders'
+    default_url: <%= default_url %>
   <% end %>
   <% if current_user.auditor? %>
   - id: auditor
     name: Auditor
-    default_url: 'orders'
+    default_url: <%= default_url %>
   <% end %>
   <% if current_user.vendor_payments_creditor? %>
   - id: creditor
     name: 'Creditor'
-    default_url: 'orders'
+    default_url: <%= default_url %>
   <% end %>
   <% if current_user.vendor_payments_reviewer? %>
   - id: reviewer
     name: 'Reviewer'
-    default_url: 'orders'
+    default_url: <%= default_url %>
   <% end %>
   <% if current_user.vendor_payment_initiator? %>
   - id: initiator
     name: 'Initiator'
-    default_url: 'orders'
+    default_url: <%= default_url %>
   <% end %>
 views:
   <% if current_user.vendor_payments_admin? %>

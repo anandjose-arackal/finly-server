@@ -47,6 +47,23 @@ class TravelRequests::Update < TravelRequests::Base
 
   def process
     self.travel_request.assign_attributes(travel_request_parameters)
+
+    # Set custom fields
+    custom_fields = {custom_fields: params[:custom_fields]}
+    custom_fields[:save] = false
+    # custom_fields[:reset_fields] = true
+    set_fields = CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), custom_fields)
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    # validating the custom fields here
+    valid = CustomField::Validate.(self.travel_request)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return false
+    end
+
     unless travel_request.save
       add_message :error, self.travel_request.errors.full_messages
     end

@@ -48,4 +48,9 @@ class Procure::InwardInvoicesController < ApplicationController
     respond
   end
 
+  def destroy
+    @result = Procurements::Invoices::Destroy.(current_user, params)
+    respond
+  end
+
 end

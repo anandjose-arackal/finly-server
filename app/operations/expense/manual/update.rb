@@ -127,12 +127,14 @@ class Expense::Manual::Update < Expense::Manual::Base
       return
     end
     # validating the custom fields here
-    valid = CustomField::Validate.(self.expense.manual_expense)
-    unless valid.success?
-      add_message :error, valid.messages[:error]
-      return false
+    # todo - in android workflow the dependent custom fields is breaking, so need to prevent validation in the app
+    unless RequestStore.store[:request]&.path&.include?('/mobile/v0')
+      valid = CustomField::Validate.(self.expense.manual_expense)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return false
+      end
     end
-
 
     if expense.update(updated_expense_params)
       if self.destroy_receipts
@@ -217,7 +219,7 @@ class Expense::Manual::Update < Expense::Manual::Base
                            category_name: expense.category_name,
                            receipt: expense.receipts.count,
                            from_cash_on_hand: expense.from_cash_on_hand
-                          }
+    }
   end
 
 end

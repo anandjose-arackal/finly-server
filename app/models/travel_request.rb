@@ -58,13 +58,16 @@ class TravelRequest < ActiveRecord::Base
   has_many :destinations, class_name: 'TravelRequestDestination'
   has_many :travel_request_trails, dependent: :destroy
   has_many :comments, class_name: 'TravelRequestComment', dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   accepts_nested_attributes_for :destinations, allow_destroy: true
+  accepts_nested_attributes_for :custom_fields, allow_destroy: true
 
   delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?,
            :selection_requested?, :selection_processing?, :selection_rejected?, :selection_confirmed?, :booking_confirmed?, to: :status
 
   validates :status_id, presence: true #, unless: :open?
+  validates :policy, presence: true
   validates :user_id, presence: true #, unless: :open?
   #validates :name, presence: true#, unless: :open?
   # validates :from_date, presence: true
@@ -129,7 +132,9 @@ class TravelRequest < ActiveRecord::Base
       ids = pluck(:id)
       controlling_money_requests = where(controlling_user_id: user_id)
       if manager
-        controlling_money_requests = controlling_money_requests.where(status_id: MoneyRequestStatus.id_for(:processing))
+        controlling_money_requests = controlling_money_requests.where(status_id: TravelRequestStatus.ids_for(:processing, :booking_pending,
+                                                                                                             :selection_requested, :selection_processing,
+                                                                                                             :selection_confirmed))
       end
       controlling_ids = controlling_money_requests.pluck(:id)
       ordered_ids = controlling_ids + (ids - controlling_ids)

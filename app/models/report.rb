@@ -36,13 +36,15 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable,
+          FieldCustomizer::CustomizableValidation,
           FindByOrderedIds
 
   has_many :email_authorizations, as: :authorizable
-  belongs_to :user
+  belongs_to :user, inverse_of: :reports
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
   belongs_to :controlling_user, class_name: 'User'
@@ -83,6 +85,10 @@ class Report < ActiveRecord::Base
   validate :has_expenses
   validate :controller_has_role
   validates :policy_id, presence: true
+
+  field_customization_key :report
+  customizable_validate :memo, presence: false, scope: [:user, :company]
+
 
   default_scope {order(report_status_id: :asc, submitted_at: :desc, created_at: :desc)}
 

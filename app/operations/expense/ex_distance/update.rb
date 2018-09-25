@@ -207,9 +207,9 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     # if the expense has an associated amount, update the amount
-    if expense.amount.present? && expense.report.present?
+    if expense.amount.present? #&& expense.report.present?
       amount = expense.amount
-      amount.update(value: expense.calculate_amount_value(expense.report.policy), currency_id: expense.report.policy.base_currency_id)
+      amount.update(value: expense.calculate_amount_value, currency_id: expense.distance_expense.vehicle_rate&.rate&.currency_id)
     end
 
 

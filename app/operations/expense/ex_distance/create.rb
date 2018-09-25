@@ -148,26 +148,27 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       end
     end
     # if the expense is part of a report, calculate the associated amount
-    if expense_params[:report_id].present?
-      report = user.reports.find_by(id: expense_params[:report_id])
-      amount = expense.amount
-      if amount.nil?
-        amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: report.policy.base_currency_id}
-        amount = Amount.create(amount_params)
-      else
-        amount.update(value: expense.calculate_amount_value(report.policy), currency_id: report.policy.base_currency_id)
-      end
-      expense.update_attributes(amount_id: amount.id)
+    # if expense_params[:report_id].present?
+    #   report = user.reports.find_by(id: expense_params[:report_id])
+    amount = expense.amount
+    currency_id = expense.distance_expense.vehicle_rate&.rate&.currency_id
+    if amount.nil?
+      amount_params = {value: expense.calculate_amount_value, currency_id: currency_id}
+      amount = Amount.create(amount_params)
+    else
+      amount.update(value: expense.calculate_amount_value, currency_id: currency_id)
+    end
+    expense.update_attributes(amount_id: amount.id)
 
-      if expense.amount.present?
-        # calculate the equivalent amount in all currencies in the amounts table
-        if expense.date == DateUtils.local_date
-          expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
-        else
-          expense.update_other_currencies
-        end
+    if expense.amount.present?
+      # calculate the equivalent amount in all currencies in the amounts table
+      if expense.date == DateUtils.local_date
+        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+      else
+        expense.update_other_currencies
       end
     end
+    # end
 
     # check if this expense's amount allows for it to be marked against COH
     # and if it is or is not, update the flag for this expense accordingly
@@ -195,6 +196,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
   end
 
   protected
+
   def validate_custom_fields
     if self.expense.valid?
       set_fields = set_custom_fields false
