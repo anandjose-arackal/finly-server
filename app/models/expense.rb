@@ -109,8 +109,10 @@ class Expense < ActiveRecord::Base
   validate :at_least_one_type
   validate :spent_from_check
 
+  alias_attribute :purpose, :note
+
   field_customization_key :expense
-  customizable_validate :note, presence: false, scope: [:user, :company]
+  customizable_validate :purpose, presence: false, scope: [:user, :company]
 
   # i.e. an expense associated with a report can't be destroyed
   before_destroy do
