@@ -1096,6 +1096,7 @@ class Expense < ActiveRecord::Base
 
   def spent_from_check
     return if reimbursable
+    return unless manual?
     if spent_from.blank?
       errors.add :spent_from, 'is not selected'
     end
