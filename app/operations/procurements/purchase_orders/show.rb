@@ -26,12 +26,14 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers, :sub_departments, :tax_rates
+    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
+                  :sub_departments, :tax_rates, :locations
 
     def init
       self.purchase_order = params[:purchase_order]
       self.actions = get_actions
       self.departments = user.company.departments.roots
+      self.locations = user.company.locations
 
       if purchase_order.user.departments.present?
         self.sub_departments = purchase_order.user.departments.only_sub_departments
@@ -122,6 +124,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         if document_owner?
           actions[:retract] = {
               url: Rails.application.routes.url_helpers.procure_purchase_order_retract_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+          actions[:remind] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_remind_path(purchase_order_id: purchase_order.id),
               method: "PUT"
           }
           actions[:document_editable] = false

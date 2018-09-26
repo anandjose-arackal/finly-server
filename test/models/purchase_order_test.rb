@@ -42,6 +42,8 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  cost_center_id               :integer
 #  sub_department_id            :integer
+#  billing_address              :text(65535)
+#  shipping_address             :text(65535)
 #
 
 require 'test_helper'

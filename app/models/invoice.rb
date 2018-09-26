@@ -59,6 +59,8 @@
 #  controlling_user_role_id     :integer
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
+#  billing_address              :text(65535)
+#  shipping_address             :text(65535)
 #
 
 #  gst_type_id: 1 - IGST

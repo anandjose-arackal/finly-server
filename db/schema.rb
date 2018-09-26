@@ -2827,6 +2827,8 @@ ActiveRecord::Schema.define(version: 20180922154201) do
     t.integer  "controlling_user_role_id",     limit: 4
     t.integer  "controlling_for_user_id",      limit: 4
     t.integer  "controlling_for_user_role_id", limit: 4
+    t.text     "billing_address",              limit: 65535
+    t.text     "shipping_address",             limit: 65535
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -4090,6 +4092,8 @@ ActiveRecord::Schema.define(version: 20180922154201) do
     t.boolean  "is_deleted",                                                          default: false, null: false
     t.integer  "cost_center_id",               limit: 4
     t.integer  "sub_department_id",            limit: 4
+    t.text     "billing_address",              limit: 65535
+    t.text     "shipping_address",             limit: 65535
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
