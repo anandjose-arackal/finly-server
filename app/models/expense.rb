@@ -1011,7 +1011,7 @@ class Expense < ActiveRecord::Base
 
   def check_spent_from?
     return false if reimbursable
-    return false unless manual?
+    return false if card?
     true
   end
 
