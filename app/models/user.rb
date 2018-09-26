@@ -88,7 +88,7 @@ class User < ActiveRecord::Base
   has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
   has_many :tags, class_name: 'UserTag', dependent: :destroy
-  has_many :expenses, dependent: :destroy
+  has_many :expenses, inverse_of: :user, dependent: :destroy
   has_many :receipts, dependent: :destroy
   has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy

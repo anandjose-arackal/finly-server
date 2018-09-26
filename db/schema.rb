@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180925131103) do
+ActiveRecord::Schema.define(version: 20180926091743) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2401,6 +2401,7 @@ ActiveRecord::Schema.define(version: 20180925131103) do
     t.string   "parent_type",             limit: 255
     t.boolean  "root_field",                          default: true
     t.string   "field_key",               limit: 255
+    t.integer  "sequence_number",         limit: 4
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
