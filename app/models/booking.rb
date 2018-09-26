@@ -28,6 +28,8 @@ class Booking < ActiveRecord::Base
   has_many :bookings, foreign_key: :parent_booking_id, dependent: :destroy
   belongs_to :parent_booking, class_name: 'Booking'
 
+  has_many :custom_fields, as: :parent, dependent: :destroy
+
   has_many :travel_members, dependent: :destroy
 
   has_many :attachments, class_name: 'BookingAttachment', dependent: :destroy
@@ -109,6 +111,7 @@ class Booking < ActiveRecord::Base
       data[:selected_for_booking] = self.bookings.selected_for_booking
       data[:confirmed] = self.bookings.confirmed&.first
       data[:cancelled] = self.bookings.cancelled
+      data[:custom_fields] = self.custom_fields
     end
     if self.confirmed?
       data[:attachments] = self.attachments

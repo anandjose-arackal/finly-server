@@ -25,7 +25,8 @@ class FieldParentType < ActiveRecord::Base
       purchase_order: 12,
       inventory_line_item: 13,
       purchase_order_item: 14,
-      travel_request: 15
+      travel_request: 15,
+      booking_request: 16
   }
 
   scope :with_name, -> (name) { where name: name }

@@ -31,7 +31,10 @@ json.actions @result.actions
 json.policies @result.policies.each do |policy|
   json.id policy.id
   json.name policy.name
-  json.custom_fields @result.custom_fields_for(policy)
+  json.custom_fields @result.custom_fields_for(policy, :travel_request)
+end
+json.booking_requests_config do
+  json.custom_fields @result.custom_fields_for(@result.travel_request.policy, :booking_request)
 end
 json.editable @result.editable
 json.destroyable @result.destroyable

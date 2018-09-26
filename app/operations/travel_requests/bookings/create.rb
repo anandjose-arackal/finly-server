@@ -69,7 +69,10 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
       booking.parent_booking = self.parent_booking
       booking.travel_request = self.travel_request
       booking.created_by_user = user
-
+      if booking.request?
+        validate_custom_fields(booking)
+        return if has_errors?
+      end
       if booking.valid?
       else
         add_message :error, booking.errors.full_messages
@@ -86,7 +89,9 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
       booking.parent_booking = self.parent_booking
       booking.travel_request = self.travel_request
       booking.created_by_user = user
-
+      if booking.request?
+        set_custom_fields(booking, false)
+      end
       if booking.valid?
         booking.save
         add_message :success, 'Successfully Added Booking'
@@ -94,6 +99,29 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
       else
         add_message :error, booking.errors.full_messages
       end
+    end
+  end
+
+  protected
+
+  def set_custom_fields(booking, save)
+    custom_fields = {custom_fields: (params[:custom_fields] or params&.dig(:booking, :custom_fields))}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(booking, FieldParentType.id_for(:booking_request), custom_fields)
+  end
+
+  def validate_custom_fields(booking)
+    set_fields = set_custom_fields booking, false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(booking)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
     end
   end
 
