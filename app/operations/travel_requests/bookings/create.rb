@@ -25,7 +25,9 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
     end
     self.booking_parameters = []
     self.request_params.each do |param|
-      self.booking_parameters << booking_params(param)
+      booking_param = booking_params(param)
+      booking_param[:custom_fields] = param[:custom_fields]
+      self.booking_parameters << booking_param
     end
 
     if params&.dig(:parent_booking_id).present?
@@ -65,7 +67,7 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
 
     self.booking_parameters.each do |booking_param|
       # Extracting booking attachments from params
-      booking = self.destination.bookings.build(booking_param.except(:booking_attachments))
+      booking = self.destination.bookings.build(booking_param.except(:booking_attachments, :custom_fields))
       booking.parent_booking = self.parent_booking
       booking.travel_request = self.travel_request
       booking.created_by_user = user
@@ -85,7 +87,7 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
       booking_param = booking_params param
       # Extracting booking attachments from params
       booking_attachments = user.company.booking_attachments.with_id(param[:booking_attachments])
-      booking = self.destination.bookings.build(booking_param)
+      booking = self.destination.bookings.build(booking_param.except(:custom_fields))
       booking.parent_booking = self.parent_booking
       booking.travel_request = self.travel_request
       booking.created_by_user = user
