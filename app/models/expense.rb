@@ -39,19 +39,14 @@
 #
 
 
-
-
-
-
-
-
 class Expense < ActiveRecord::Base
-  include SoftDeletable
-  include MathUtil
+  include SoftDeletable,
+          FieldCustomizer::CustomizableValidation,
+          MathUtil
 
   belongs_to :amount
   belongs_to :expense_status
-  belongs_to :user
+  belongs_to :user, inverse_of: :expenses
   belongs_to :expense_type
   belongs_to :category
   belongs_to :report
@@ -113,6 +108,9 @@ class Expense < ActiveRecord::Base
   validate :valid_amount_value
   validate :at_least_one_type
   validate :spent_from_check
+
+  field_customization_key :expense
+  customizable_validate :note, presence: false, scope: [:user, :company]
 
   # i.e. an expense associated with a report can't be destroyed
   before_destroy do
@@ -494,7 +492,7 @@ class Expense < ActiveRecord::Base
   end
 
   # this method is to calculate the amount values for the various time/distance/per diem expenses
-  def calculate_amount_value(policy=nil)
+  def calculate_amount_value(policy = nil)
     case self.expense_type_id
     when ExpenseType.id_for(:manual)
       return self.amount.value

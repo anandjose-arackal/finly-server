@@ -2,6 +2,10 @@ class UserPockets::AssignPocket < UserPockets::Base
 
   attr_accessor :assignable_pocket_templates, :selected_user, :assignable_pocket, :base_currency_id
 
+  def authorized_user_types
+    [:company_admin]
+  end
+
   def init
     selected_user_id = params[:id] || params[:selected_user_id]
     self.selected_user = current_company.users.find_by(id: selected_user_id)
@@ -14,6 +18,7 @@ class UserPockets::AssignPocket < UserPockets::Base
       self.assignable_pocket = self.assignable_pocket_templates.find_by(id: assignable_pocket_id)
     else
       add_message :error, op.messages[:error]
+      return
     end
 
     self.base_currency_id = params[:base_currency_id]
