@@ -43,7 +43,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Create.(user, params)
       unless document_reviewer_mappings_op.success?
-        add_message :error, "Couldn't set reviewer for the level "
+        add_message :error, document_reviewer_mappings_op.messages[:error]
         return
       end
 
