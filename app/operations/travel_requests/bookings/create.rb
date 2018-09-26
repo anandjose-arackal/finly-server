@@ -92,7 +92,7 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
       booking.travel_request = self.travel_request
       booking.created_by_user = user
       if booking.request?
-        set_custom_fields(booking, booking_param[:custom_fields], false)
+        set_custom_fields(booking, param[:custom_fields], false)
       end
       if booking.valid?
         booking.save
