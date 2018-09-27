@@ -39,7 +39,9 @@ class VehicleRate < ActiveRecord::Base
         vehicle_name: vehicle_name,
         rate: rate,
         distance_unit: distance_unit,
-        policy: policy
+        policy: policy,
+        default_category: policy.distance_expense_config.default_category,
+        enforce_category: policy.distance_expense_config.enforce_category
     }
   end
 
