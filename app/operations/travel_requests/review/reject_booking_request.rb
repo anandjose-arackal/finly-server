@@ -10,11 +10,9 @@ class TravelRequests::Review::RejectBookingRequest < TravelRequests::Bookings::B
     self.booking = show_presenter.booking
     self.destination = show_presenter.destination
     self.travel_request = show_presenter.travel_request
-    # todo clear existing options selections if selected
   end
 
   def validate
-    # todo validate if booking is an option and can be selected
     if booking.rejected?
       add_message :error, 'The selected request has already been rejected'
       return
@@ -23,10 +21,14 @@ class TravelRequests::Review::RejectBookingRequest < TravelRequests::Bookings::B
       add_message :error, 'You cannot reject this request'
       return
     end
+    if params[:reject_reason].blank?
+      add_message :error, 'Please provide a reason for rejection'
+      return
+    end
   end
 
   def process
-    self.booking.update(booking_status_id: BookingStatus.id_for(:rejected))
+    self.booking.update(booking_status_id: BookingStatus.id_for(:rejected), reject_reason: params[:reject_reason])
   end
 
 end

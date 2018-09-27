@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180927061344) do
+ActiveRecord::Schema.define(version: 20180927081402) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -857,6 +857,7 @@ ActiveRecord::Schema.define(version: 20180927061344) do
     t.integer  "travel_request_id",  limit: 4,     null: false
     t.integer  "destination_id",     limit: 4,     null: false
     t.integer  "parent_booking_id",  limit: 4
+    t.text     "reject_reason",      limit: 65535
   end
 
   add_index "bookings", ["booking_request_id"], name: "index_bookings_on_booking_request_id", using: :btree
