@@ -19,5 +19,5 @@ class Expense::ExTime::Base < Expense::Base
     p.permit!
 
   end
-  
+
 end

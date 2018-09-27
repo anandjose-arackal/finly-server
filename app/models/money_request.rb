@@ -232,8 +232,10 @@ class MoneyRequest < ActiveRecord::Base
   validates :policy_id, presence: true
   validate :cash_pocket_presence
 
+  alias_attribute :purpose, :memo
+
   field_customization_key :money_request
-  customizable_validate :memo, presence: false, scope: [:user, :company]
+  customizable_validate :purpose, presence: false, scope: [:user, :company]
   customizable_validate :required_by_date, presence: false, scope: [:user, :company]
 
   before_save :handle_name

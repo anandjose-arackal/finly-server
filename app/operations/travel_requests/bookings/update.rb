@@ -26,6 +26,24 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
     old_travel_members = self.booking.travel_members
     self.booking.assign_attributes(booking_parameters)
     self.booking.created_by_user = user
+
+    if self.booking.request?
+      # Set custom fields
+      custom_fields = {custom_fields: (params[:custom_fields] || params&.dig(:booking, :custom_fields))}
+      custom_fields[:save] = false
+      # custom_fields[:reset_fields] = true
+      set_fields = CustomField::SetFields.(self.booking, FieldParentType.id_for(:booking_request), custom_fields)
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
+      # validating the custom fields here
+      valid = CustomField::Validate.(self.booking)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return false
+      end
+    end
     if self.booking.valid?
       old_travel_members.without_id_nil.destroy_all # Jugaad as travel members are being created every time
       self.booking.save
