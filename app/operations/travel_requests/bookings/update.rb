@@ -29,7 +29,7 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
 
     if self.booking.request?
       # Set custom fields
-      custom_fields = {custom_fields: params[:custom_fields]}
+      custom_fields = {custom_fields: (params[:custom_fields] || params&.dig(:booking, :custom_fields))}
       custom_fields[:save] = false
       # custom_fields[:reset_fields] = true
       set_fields = CustomField::SetFields.(self.booking, FieldParentType.id_for(:booking_request), custom_fields)
@@ -44,7 +44,6 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
         return false
       end
     end
-
     if self.booking.valid?
       old_travel_members.without_id_nil.destroy_all # Jugaad as travel members are being created every time
       self.booking.save
