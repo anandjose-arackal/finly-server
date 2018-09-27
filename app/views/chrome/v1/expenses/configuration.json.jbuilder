@@ -1,7 +1,7 @@
 json.custom_fields @result&.custom_fields_config&.dig(:manual_expense)
 
 json.categories do
-  cat_result = Company::Configuration::Category::Index.(user, params)
+  cat_result = Company::Configuration::Category::Index.(@result.user, @result.params)
   if cat_result.success?
     categories = cat_result.mobile_optimized_categories
   else
