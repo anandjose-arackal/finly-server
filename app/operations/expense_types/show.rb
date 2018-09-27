@@ -57,6 +57,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     if policy.distance_expense_config.enabled
       self.distance_config = {
           enabled: true,
+          enforce_category: policy.distance_expense_config.enforce_category,
           default_category_id: policy.distance_expense_config.default_category_id,
           default_category_name: policy.distance_expense_config.default_category_name,
           vehicle_rates: policy.vehicle_rates
@@ -64,6 +65,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     else
       self.distance_config = {
           enabled: false,
+          enforce_category: policy.distance_expense_config.enforce_category,
           rate_per_km: policy.distance_expense_config.rate_value,
           default_category_id: policy.distance_expense_config.default_category_id,
           default_category_name: policy.distance_expense_config.default_category_name
