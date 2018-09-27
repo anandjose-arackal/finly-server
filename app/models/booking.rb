@@ -107,7 +107,7 @@ class Booking < ActiveRecord::Base
         travel_members: travel_members,
     }
     data[booking_type&.name] = booking_type_object
-    if self.request? or self.confirmed?
+    if self.request? or self.confirmed? or self.rejected?
       data[:options] = self.bookings.options
       data[:selected_for_booking] = self.bookings.selected_for_booking
       data[:confirmed] = self.bookings.confirmed&.first
