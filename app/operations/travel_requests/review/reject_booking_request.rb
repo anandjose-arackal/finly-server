@@ -19,7 +19,7 @@ class TravelRequests::Review::RejectBookingRequest < TravelRequests::Bookings::B
       add_message :error, 'The selected request has already been rejected'
       return
     end
-    if booking.request?
+    unless booking.request?
       add_message :error, 'You cannot reject this request'
       return
     end
