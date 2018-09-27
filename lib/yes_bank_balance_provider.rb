@@ -1,7 +1,7 @@
 class YesBankBalanceProvider
   include Sidekiq::Worker
 
-  LOGGER = Logger.new(STDOUT)
+  # LOGGER = Logger.new(STDOUT)
 
   def perform(response_handle, company_id)
     queue = Struct.new(:queue).new(response_handle)
