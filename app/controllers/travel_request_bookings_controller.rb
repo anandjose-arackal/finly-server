@@ -65,4 +65,13 @@ class TravelRequestBookingsController < ApplicationController
     end
   end
 
+  def reject_booking_request
+    @result = TravelRequests::Review::RejectBookingRequest.(current_user, params)
+    if @result.success?
+      respond response: :success, messages: @result.messages[:success]
+    else
+      respond response: :error, messages: @result.messages[:error]
+    end
+  end
+
 end

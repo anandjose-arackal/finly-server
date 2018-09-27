@@ -1,7 +1,7 @@
 json.distance_config do
   json.enabled @result.distance_config[:enabled]
   json.vehicle_rates @result.distance_config[:vehicle_rates]
-  json.default_category_id @result.distance_config[:default_category_id]
+  # json.default_category_id @result.distance_config[:default_category_id]
 end
 json.time_config do
   json.enabled @result.time_config[:enabled]

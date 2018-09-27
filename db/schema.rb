@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180926091743) do
+ActiveRecord::Schema.define(version: 20180927061344) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -1990,13 +1990,14 @@ ActiveRecord::Schema.define(version: 20180926091743) do
   end
 
   create_table "distance_expense_configs", force: :cascade do |t|
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "distance_unit_id",    limit: 4
-    t.integer  "policy_id",           limit: 4, null: false
+    t.integer  "policy_id",           limit: 4,                 null: false
+    t.boolean  "enforce_category",              default: false
   end
 
   create_table "distance_expense_types", force: :cascade do |t|

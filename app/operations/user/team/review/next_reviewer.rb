@@ -5,6 +5,14 @@
 class User::Team::Review::NextReviewer < BaseOperation
   attr_accessor :obj, :next_approver, :role_id
 
+  def personalizer
+    {
+        post_process: {
+            before: Personalizer::Process.new([:user, :team, :review, :next_reviewer], :post_process, self)
+        }
+    }
+  end
+
   def self.call(obj, params = {})
     self.new(obj, params).run
   end

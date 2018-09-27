@@ -86,8 +86,10 @@ class Report < ActiveRecord::Base
   validate :controller_has_role
   validates :policy_id, presence: true
 
+  alias_attribute :purpose, :memo
+
   field_customization_key :report
-  customizable_validate :memo, presence: false, scope: [:user, :company]
+  customizable_validate :purpose, presence: false, scope: [:user, :company]
 
 
   default_scope {order(report_status_id: :asc, submitted_at: :desc, created_at: :desc)}

@@ -96,7 +96,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
         end
       end
       if not self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).nil? and not
-          self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).present?
+      self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).present?
         self.updated_expense_params[:distance_expense_attributes].delete(:maps_distance_attributes)
       end
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
@@ -178,7 +178,13 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     #   return
     # end
 
-    if expense.update(updated_expense_params)
+    expense.assign_attributes(updated_expense_params)
+
+    if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
+      self.expense.category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
+    end
+
+    if expense.save
       expense.distance_expense.locations.with_id(locations_marked_for_destruction).destroy_all if self.locations_marked_for_destruction.present?
       if self.destroy_receipts
         expense.receipts.each do |receipt|

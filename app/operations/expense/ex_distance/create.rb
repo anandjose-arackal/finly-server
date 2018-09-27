@@ -123,6 +123,10 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
   def process
     self.expense = user.expenses.build(expense_params)
 
+    if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
+      self.expense.category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
+    end
+
     # Create custom fields only for validations. Fields will be saved later
     validate_custom_fields
     return if has_errors?

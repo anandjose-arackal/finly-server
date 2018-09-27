@@ -2598,6 +2598,7 @@ Rails.application.routes.draw do
         patch 'unselect_option', to: 'travel_request_bookings#unselect_option'
         patch 'cancel', to: 'travel_request_bookings#cancel'
         patch 'mark_as_unavailable', to: 'travel_request_bookings#mark_as_unavailable'
+        patch 'reject', to: 'travel_request_bookings#reject_booking_request'
       end
     end
 

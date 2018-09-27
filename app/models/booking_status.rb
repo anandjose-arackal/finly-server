@@ -39,4 +39,8 @@ class BookingStatus < ActiveRecord::Base
     id == BookingStatus.id_for(:cancelled)
   end
 
+  def rejected?
+    id == BookingStatus.id_for(:rejected)
+  end
+
 end
