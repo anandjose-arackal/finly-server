@@ -1,8 +1,6 @@
 class Procurements::Index < Procurements::Base
   attr_accessor :procurements
 
-  has_scope :filter_status_tags
-
   def init
 
   end
@@ -69,6 +67,9 @@ class Procurements::Index < Procurements::Base
   class Procurements::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurements, :paginated_procurements
 
+    has_scope :filter_status_tags, type: :array
+    has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number
+
     def init
       self.procurements = params[:procurements]
       apply_filter
@@ -77,20 +78,27 @@ class Procurements::Index < Procurements::Base
     end
 
     def apply_filter
-      if params[:filter_status_tags].present? && params[:filter_status_tags].is_a?(Array)
-        all_status_tag_ids = StatusTag.all.pluck(:id)
-        status_tag_ids = all_status_tag_ids & params[:filter_status_tags].map(&:to_i)
-
-        procurement_status_taggables = ProcurementStatusTaggable.with_status_tag_ids(status_tag_ids).with_procurement_ids(procurements.pluck(:id))
-
-        filter_procurement_ids = procurement_status_taggables.pluck(:procurement_id)
-
-        self.procurements = self.procurements.with_ids(filter_procurement_ids)
+      if params[:search_type].present? && params[:search_query].present?
+        set_scope
+        self.procurements = apply_scopes(self.procurements, params)
       end
     end
 
     def awaiting_action?(procurement)
 
+    end
+    
+    def set_scope
+      case params[:search_type]
+        when 'vendor_name'
+          params[:filter_vendor_name] = params[:search_query]
+        when 'invoice_number'
+          params[:filter_invoice_number] = params[:search_query]
+        when 'po_number'
+          params[:filter_po_number] = params[:search_query]
+        else
+          # do nothing
+      end
     end
 
   end

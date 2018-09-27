@@ -61,6 +61,35 @@ class Procurement < ActiveRecord::Base
     end
   }
 
+  scope :filter_po_number, -> (po_number){
+    filtered_ids = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
+  scope :filter_invoice_number, -> (invoice_number){
+    filtered_ids = Invoice.with_procurement.filter_invoice_number(invoice_number).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
+  scope :filter_vendor_name, -> (name) {
+    vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
+
+    procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
+    procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
+
+    where(id: procurement_ids)
+  }
+
+  scope :filter_status_tags, -> (ids){
+    all_status_tag_ids = StatusTag.all.pluck(:id)
+    status_tag_ids = all_status_tag_ids & ids.map(&:to_i)
+
+    procurement_status_taggables = ProcurementStatusTaggable.with_status_tag_ids(status_tag_ids).with_procurement_ids(pluck(:id))
+    filter_procurement_ids = procurement_status_taggables.pluck(:procurement_id)
+
+    where(id: filter_procurement_ids)
+  }
+
   def awaiting_action?(user)
     # Ideal method:
     # First check if controlling user is present and return
