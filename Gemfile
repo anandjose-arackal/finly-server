@@ -26,6 +26,8 @@ gem 'oj', '~> 2.18.1'
 gem 'figaro', '1.1.1'
 gem 'puma', '3.11.2'
 
+gem 'resque', '1.27.4'
+
 gem 'crono', '1.0.3'
 gem 'haml'
 gem 'sinatra', require: nil

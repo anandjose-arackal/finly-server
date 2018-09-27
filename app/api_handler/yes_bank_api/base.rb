@@ -20,7 +20,7 @@ class YesBankApi::Base < BaseHandler
     if Rails.env.production?
       values = Finly::SecureStorage::Connector.read('core/yes_bank')
     else
-      path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
+      path = "#{Rails.root}/config/yes_bank_config.yml"
       values = YAML.load_file(path)
     end
 

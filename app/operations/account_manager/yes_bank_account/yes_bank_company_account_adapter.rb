@@ -1,3 +1,4 @@
+require 'resque'
 class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountManager::BaseAdapter
 
   attr_accessor :errors, :yes_bank_account, :company
@@ -62,22 +63,43 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     # can either be an operation or a specific call with
     # a model call
     self.company = self.account.company
-    if (self.company.vendor_payments_enabled? && !self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && !self.company.current_account_connected?)
-      payment_order = options[:payment_order]
-      balance = self.account.balance_value
-      blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
-      return (balance - blocked_amount_for_payments)
-    elsif self.company.current_account_connected?
-      op = YesBankApi::Balance::GetBalance.(self.company)
+    # if (self.company.vendor_payments_enabled? && !self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && !self.company.current_account_connected?)
+    #   payment_order = options[:payment_order]
+    #   balance = self.account.balance_value
+    #   blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
+    #   return (balance - blocked_amount_for_payments)
+    # elsif self.company.current_account_connected?
+      handle= self.object_id
+      YesBankBalanceProvider.perform_async(handle, self.company.id)
+      timeout = 30
+      loop do
+        begin
+          Timeout.timeout(timeout) do
+            result = Resque.reserve(handle)
+            next if result.blank?
+            args = result.args.first
+            success = args['success']
+            message = args['message']
+            return 0 unless success
+            balance = args['balance']
+            payment_order = options[:payment_order]
+            blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
+            return (balance - blocked_amount_for_payments)
+          end
+        rescue Timeout::Error
+          return 0
+        end
+      # end
+      # op = YesBankApi::Balance::GetBalance.(self.company)
       # return the balance given by the API
-      if op.success?
-        payment_order = options[:payment_order]
-        balance = op.balance&.to_d
-        blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
-        return (balance - blocked_amount_for_payments)
-      else
-        return 0
-      end
+      # if op.success?
+      #   payment_order = options[:payment_order]
+      #   balance = op.balance&.to_d
+      #   blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
+      #   return (balance - blocked_amount_for_payments)
+      # else
+      #   return 0
+      # end
     end
   end
 
