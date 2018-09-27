@@ -114,6 +114,9 @@ class Booking < ActiveRecord::Base
       data[:cancelled] = self.bookings.cancelled
       data[:custom_fields] = self.custom_fields
     end
+    if self.rejected?
+      data[:reject_reason] = self.reject_reason
+    end
     if self.confirmed?
       data[:attachments] = self.attachments
     end
