@@ -37,7 +37,7 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
   def process
     if mappings_params[:document_reviewer_mappings].present?
       mappings_params[:document_reviewer_mappings].each do |mapping_params|
-        reviewer_id = mapping_params[:reviewer_id]
+        reviewer_id = mapping_params[:reviewer_id].to_i
 
         # reviewer = user.company.users.find_by id: reviewer_id
 
