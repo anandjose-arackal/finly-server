@@ -26,4 +26,17 @@ json.array! @result.paginated_procurements do |p|
     end
   end
 
+  po = p.purchase_order
+  if po.present?
+    json.po_number po.po_number
+    json.po_status po.status.name
+    json.po_amount po.balance_amount
+  end
+
+  invoice = p.invoices.last
+  if invoice.present?
+    json.invoice_number invoice.invoice_number
+    json.invoice_status invoice.invoice_status.name
+    json.invoice_amount invoice.net_amount
+  end
 end
