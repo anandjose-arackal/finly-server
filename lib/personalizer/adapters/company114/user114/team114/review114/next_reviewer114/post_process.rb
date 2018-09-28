@@ -9,7 +9,7 @@ class Personalizer::Adapters::Company114::User114::Team114::Review114::NextRevie
     shrikant_mundada = User.find_by_email('sgmundada@metalmanauto.com')
 
 
-    if obj.is_a?(MoneyRequest) and role_id == UserRole.id_for(:manager) and response == pravin_joshi
+    if (obj.is_a?(MoneyRequest) or obj.is_a?(TravelRequest)) and role_id == UserRole.id_for(:manager) and response == pravin_joshi
       self.op_instance.response = shrikant_mundada
     end
   end
