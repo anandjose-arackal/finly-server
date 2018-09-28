@@ -162,6 +162,8 @@ class Invoice < ActiveRecord::Base
   scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
   scope :with_procurement, -> { where("invoices.procurement_id IS NOT NULL")}
+  scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+
 
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id
@@ -193,6 +195,9 @@ class Invoice < ActiveRecord::Base
   scope :created_at_asc, -> { order(created_at: :asc) }
 
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
+
+  # scope :with_invoice_number, -> (invoice_number) {where 'invoice_number like ?', invoice_number}
+  scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
 
   after_create :set_defaults
 
