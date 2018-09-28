@@ -7,6 +7,8 @@ gem 'wkhtmltopdf-binary', '0.12.3.1'
 gem 'nokogiri', '1.6.8'
 gem 'autoprefixer-rails', '6.5.0.1'
 
+gem 'parslet'
+
 # adding gems for activeMQ
 gem 'daemons', '1.2.4'
 gem 'stomp', '1.4.3'

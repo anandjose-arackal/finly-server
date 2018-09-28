@@ -18,7 +18,7 @@ module Sequenced
       @config = UniqueIdentifier.with_company_id(record.company_id).with_purpose_id(Purpose.id_for(options[:purpose]))&.first
       @start_at ||= @config&.sequence_start
       @min_sequence_length = @config&.sequence_start&.length || 1
-      @prefix = @config&.prefix || ''
+      process_prefix
     end
 
     def set
@@ -66,6 +66,11 @@ module Sequenced
     private
     def base_relation
       record.class.base_class.unscoped.where(company_id: record.company_id)
+    end
+
+    def process_prefix
+      @prefix = @config&.prefix || ''
+
     end
 
     def find_last_record
