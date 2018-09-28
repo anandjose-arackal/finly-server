@@ -19,13 +19,7 @@ class Personalizer::Adapters::Company10::ExportTemplates10::AllStatementsTemplat
         'Note',
         'Report IDs',
         'Account',
-        'Employee',
-        'Report ID',
-        'Expense ID',
-        'Expense Merchant',
-        'Expense Narration',
-        'Expense Date',
-        'Report Name'
+        'Employee'
     ]
     self.contents = []
     user_ids = Company.find(10).users.pluck(:id)
@@ -46,10 +40,6 @@ class Personalizer::Adapters::Company10::ExportTemplates10::AllStatementsTemplat
       else
         debit_amount = finly_transaction.amount.value
       end
-      expense_ids = nil
-      if finly_transaction.payment&.reimbursed_reports.present?
-        expense_ids = Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id)).pluck(:id)&.join(',')
-      end
       contents << [
           DateUtils.date_formatted(finly_transaction.date),
           finly_transaction.transaction_type.name.humanize,
@@ -63,9 +53,7 @@ class Personalizer::Adapters::Company10::ExportTemplates10::AllStatementsTemplat
           finly_transaction.payment&.note,
           finly_transaction.payment&.reimbursed_reports&.pluck(:id)&.join(','),
           finly_transaction.finly_account_type,
-          (finly_transaction.finly_account.user.name rescue nil),
-          nil,
-          expense_ids
+          (finly_transaction.finly_account.user.name rescue nil)
       ]
     end
   end
