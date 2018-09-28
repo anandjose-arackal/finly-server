@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180927081402) do
+ActiveRecord::Schema.define(version: 20180928033800) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -4970,23 +4970,25 @@ ActiveRecord::Schema.define(version: 20180927081402) do
   add_index "user_login_tracks", ["user_id"], name: "index_user_login_tracks_on_user_id", using: :btree
 
   create_table "user_manager_mappings", force: :cascade do |t|
-    t.integer  "user_id",                       limit: 4
-    t.integer  "manager_id",                    limit: 4
-    t.integer  "finance_manager_id",            limit: 4
-    t.integer  "approves_to_id",                limit: 4
-    t.integer  "approves_finance_to_id",        limit: 4
-    t.integer  "greater_than_amount_id",        limit: 4
-    t.boolean  "default",                                 default: false, null: false
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
-    t.integer  "policy_id",                     limit: 4,                 null: false
-    t.integer  "purpose_id",                    limit: 4
-    t.integer  "travel_manager_id",             limit: 4
+    t.integer  "user_id",                            limit: 4
+    t.integer  "manager_id",                         limit: 4
+    t.integer  "finance_manager_id",                 limit: 4
+    t.integer  "approves_to_id",                     limit: 4
+    t.integer  "approves_finance_to_id",             limit: 4
+    t.integer  "greater_than_amount_id",             limit: 4
+    t.boolean  "default",                                      default: false, null: false
+    t.datetime "created_at",                                                   null: false
+    t.datetime "updated_at",                                                   null: false
+    t.integer  "policy_id",                          limit: 4,                 null: false
+    t.integer  "purpose_id",                         limit: 4
+    t.integer  "travel_manager_id",                  limit: 4
     t.boolean  "manager_violation_only"
     t.boolean  "finance_violation_only"
-    t.integer  "travel_booking_selector_id",    limit: 4
-    t.integer  "travel_booking_approves_to_id", limit: 4
-    t.integer  "travel_approves_to_id",         limit: 4
+    t.integer  "travel_booking_selector_id",         limit: 4
+    t.integer  "travel_booking_approves_to_id",      limit: 4
+    t.integer  "travel_approves_to_id",              limit: 4
+    t.boolean  "approves_to_violation_only",                   default: false
+    t.boolean  "approves_finance_to_violation_only",           default: false
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id", using: :btree

@@ -37,6 +37,10 @@ class User::Team::Approver < User::Team::Base
         mapping = nil if mapping&.manager_violation_only
       when :finance_manager
         mapping = nil if mapping&.finance_violation_only
+      when :approves_to
+        mapping = nil if mapping&.approves_to_violation_only
+      when :approves_finance_to
+        mapping = nil if mapping&.approves_finance_to_violation_only
       else
         # Nothing
       end
