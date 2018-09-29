@@ -25,7 +25,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     params[:document] = self.purchase_order
     params[:aasm_event] = 'submit'
     params[:violation_present] = false
-    op = WorkflowManager::Base.(current_user, params)
+    op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
       return

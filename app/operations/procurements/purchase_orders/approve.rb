@@ -18,7 +18,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
     params[:document] = self.purchase_order
     params[:aasm_event] = 'approve'
     params[:violation_present] = false #todo Check violations
-    op = WorkflowManager::Base.(current_user, params)
+    op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
       return
