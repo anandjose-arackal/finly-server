@@ -1,22 +1,24 @@
 class ExpressionEvaluator::Parser < Parslet::Parser
 
   # Single character rules
-  rule(:text) {match['[^a-zA-Z0-9/-,\]'].repeat(1)}
+  rule(:non_curly_text) {match(/^[^{}]/).repeat(1)}
+  rule(:non_paren_text) {match(/^[^()]/).repeat(1)}
   rule(:text?) {text.maybe}
-  rule(:string) {match['a-z'].repeat(1)}
+  rule(:method_format) {match['a-zA-Z0-9_-'].repeat(1)}
   rule(:space) {match('\s').repeat(1)}
   rule(:space?) {space.maybe}
   rule(:curly_open) {str('{') >> space?}
+  rule(:dot) {str('.') >> space?}
   rule(:curly_close) {space? >> str('}')}
   rule(:lparen) {str('(') >> space?}
   rule(:rparen) {space? >> str(')')}
 
   # Grammar parts
-  rule(:params) {lparen >> text.as(:args) >> rparen}
-  rule(:function) {string.as(:method) >> params}
+  rule(:params) {lparen >> non_paren_text.as(:args) >> rparen}
+  rule(:function) {(method_format.as(:method) >> params.maybe >> dot.maybe).repeat(1)}
   rule(:equation) {curly_open >> function >> curly_close}
 
-  rule(:expression) {(text.as(:text) | equation.as(:equation)).repeat(0)}
+  rule(:expression) {(non_curly_text.as(:text) | equation.as(:equation)).repeat(0)}
   root :expression
 
 end

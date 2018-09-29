@@ -1,2 +1,0 @@
-class ExpressionEvaluator::Context
-end
