@@ -8,12 +8,15 @@
 #  admin      :boolean          default(FALSE), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  is_deleted :boolean          default(FALSE), not null
 #
+
 
 
 
 class PolicyUserMapping < ActiveRecord::Base
   include PolicyVersion
+  include SoftDeletable
 
   belongs_to :user
   belongs_to :policy
