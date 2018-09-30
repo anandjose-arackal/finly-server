@@ -58,7 +58,7 @@ json.array! @result.budgets do |budget|
   end
 
   json.sub_budgets do
-    json.array!(budget.children) do |sub_budget|
+    json.array!(budget.budget_children) do |sub_budget|
       json.extract! sub_budget, :id, :name
 
       json.start_date sub_budget.start_date&.strftime("%d-%b-%y")

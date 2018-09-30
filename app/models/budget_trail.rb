@@ -38,7 +38,7 @@ class BudgetTrail < ActiveRecord::Base
 
   scope :joins_amount, -> { joins(:amount) }
   scope :with_users, -> (user_ids) {
-    unless user_ids.empty?
+    unless user_ids.blank?
       where(user_id: user_ids)
     end
   }
@@ -48,24 +48,25 @@ class BudgetTrail < ActiveRecord::Base
   }
 
   scope :with_departments_or_sub_departments, -> (department_ids) {
-    unless department_ids.empty?
-      ids = where(department_id: department_ids).pluck(:id)
-      ids += where(sub_department_id: department_ids).pluck(:id)
+    unless department_ids.blank?
+      # ids = where(department_id: department_ids).pluck(:id)
+      # ids += where(sub_department_id: department_ids).pluck(:id)
+      ids = where('department_id IN (?) OR sub_department_id IN (?)', department_ids, department_ids).pluck(:id)
       where(id: ids)
     end
   }
   scope :with_locations, -> (location_ids) {
-    unless location_ids.empty?
+    unless location_ids.blank?
       where(location_id: location_ids)
     end
   }
   scope :with_vendors, -> (vendor_ids) {
-    unless vendor_ids.empty?
+    unless vendor_ids.blank?
       where(vendor_id: vendor_ids)
     end
   }
   scope :with_categories, -> (category_ids) {
-    unless category_ids.empty?
+    unless category_ids.blank?
       where(category_id: category_ids)
     end
   }

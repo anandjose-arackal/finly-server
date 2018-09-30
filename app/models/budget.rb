@@ -26,6 +26,8 @@ class Budget < ActiveRecord::Base
   include SoftDeletable
 
   has_ancestry
+  has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
+
 
   belongs_to :user
   belongs_to :company
@@ -111,6 +113,31 @@ class Budget < ActiveRecord::Base
 
   scope :contains_date, -> (date) {
     where('start_date <= ? AND end_date >= ?', date, date)
+  }
+
+  scope :include_details, -> {
+    includes([
+                 :budget_criteria_mappings,
+                 :budgetable_vendors,
+                 :budgetable_cost_centers,
+                 :budgetable_categories,
+                 :budgetable_locations,
+                 :budgetable_users,
+                 :budgetable_departments,
+                 :user,
+                 :budget_amount,
+                 budget_children: [
+                     :budget_criteria_mappings,
+                     :budgetable_vendors,
+                     :budgetable_cost_centers,
+                     :budgetable_categories,
+                     :budgetable_locations,
+                     :budgetable_users,
+                     :budgetable_departments,
+                     :user,
+                     :budget_amount
+                 ]
+             ])
   }
 
 
