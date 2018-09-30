@@ -146,7 +146,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       purchase_order.user_id == user.id
     end
 
-    def user_in_level?
+    def user_in_level? # todo put document level reviewer mapping here
       current_level = purchase_order.level
       amount = purchase_order&.balance_amount&.value || 0
 

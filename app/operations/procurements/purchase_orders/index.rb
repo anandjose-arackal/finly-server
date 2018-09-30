@@ -21,22 +21,22 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
           end
         end
       end
+
+      # Find all the purchase order with controlling level from above
+      purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
+      # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
+      purchase_order_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+      other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+
+      purchase_order_ids -= other_reviewer_po_ids
+
+      self.purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids).with_status_ids(PurchaseOrderStatus.id_for(:processing))
+
+      all_level_ids = self.purchase_orders.pluck(:controlling_level_id)
+
+      self.purchase_orders = self.purchase_orders.with_controlling_level_ids(level_ids & all_level_ids)
     end
-
-    # Find all the purchase order with controlling level from above
-    purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
-
-    # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
-    purchase_order_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('PurchaseOrder').
-                                                                                   pluck(:document_reviewer_mappable_id)
-
-    # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
-    other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
-
-    purchase_order_ids -= other_reviewer_po_ids
-
-    self.purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids).with_status_ids(PurchaseOrderStatus.id_for(:processing))
-
   end
 
   def success

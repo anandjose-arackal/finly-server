@@ -50,6 +50,7 @@ class Procurement < ActiveRecord::Base
 
   scope :order_by_controlling_level, ->(user_id) {
     if user_id.present?
+      ids = pluck(:id)
 
       level_ids = LevelReviewerMapping.with_reviewer_id(user_id).pluck(:level_id)
 
@@ -108,7 +109,13 @@ class Procurement < ActiveRecord::Base
     # Do it for both PO & Invoices
     if purchase_order.present? && !(invoices.length > 0)
       if user
-        purchase_order.level&.reviewers&.include? user
+        # Find document level reviewer mappings
+        dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
+        if dlrm.present?
+          dlrm.pluck(:reviewer_id).include? user.id
+        else
+          purchase_order.level&.reviewers&.include? user
+        end
       else
         false
       end

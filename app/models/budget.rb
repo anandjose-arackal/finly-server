@@ -117,7 +117,7 @@ class Budget < ActiveRecord::Base
 
   scope :include_details, -> {
     includes([
-                 :budget_criteria_mappings,
+                 # :budget_criteria_mappings,
                  :budgetable_vendors,
                  :budgetable_cost_centers,
                  :budgetable_categories,
@@ -127,7 +127,7 @@ class Budget < ActiveRecord::Base
                  :user,
                  :budget_amount,
                  budget_children: [
-                     :budget_criteria_mappings,
+                     # :budget_criteria_mappings,
                      :budgetable_vendors,
                      :budgetable_cost_centers,
                      :budgetable_categories,

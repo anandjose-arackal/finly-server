@@ -12,6 +12,16 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   def validate
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
+      return
+    end
+
+    unless purchase_order.level.present?
+      add_message :error, 'Cannot take action against Purchase Order at this state'
+      return
+    end
+
+    unless awaiting_action_from?
+      add_message :error, 'You cannot approve this Purchase Order at this state'
     end
   end
 
@@ -24,12 +34,12 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       add_message :error, op.messages[:error]
       return
     end
-
     if purchase_order.approved? || purchase_order.auto_approved?
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+
     end
 
     self.workflow_output = op.workflow_output
@@ -38,5 +48,16 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   def post_process
     Event::EPurchaseOrder::Approve.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Approved Purchase Order'
+  end
+
+  def awaiting_action_from?
+    dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
+    level = purchase_order.level
+
+    if dlrm.present?
+      dlrm.pluck(:reviewer_id).include? user.id
+    else
+      level.reviewers.include? user
+    end
   end
 end

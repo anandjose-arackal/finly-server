@@ -89,7 +89,7 @@ class YesBankVendor < ActiveRecord::Base
   end
 
   def display_name
-    self.business_name || self.name
+    self.business_name.blank? ? self.name : self.business_name
   end
 
   def as_json(options={})
