@@ -3155,7 +3155,7 @@ Rails.application.routes.draw do
     end
 
 
-
+    put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
