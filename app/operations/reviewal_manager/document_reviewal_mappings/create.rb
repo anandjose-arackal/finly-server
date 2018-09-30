@@ -49,7 +49,6 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
 
         if level.present? && reviewer.present?
           amount = get_document_amount
-
           reviewer_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
 
           unless reviewer_ids.include?(reviewer.id)
@@ -79,6 +78,7 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
   end
 
   private
+
 
   def mappings_parameters
     params.permit(document_reviewer_mappings: [:level_id, :reviewer_id])

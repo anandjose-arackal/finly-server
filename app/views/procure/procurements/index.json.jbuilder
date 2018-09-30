@@ -1,11 +1,7 @@
 json.array! @result.paginated_procurements do |p|
   json.extract! p, :id, :name, :note, :procurement_type
   json.awaiting_action p.awaiting_action?(@result.user)
-  if p.vendor.present?
-    json.vendor do
-      json.extract! p.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
-    end
-  end
+
 
   json.user do
     json.extract! p.user, :id, :name, :email, :mobile_number
@@ -29,14 +25,28 @@ json.array! @result.paginated_procurements do |p|
   po = p.purchase_order
   if po.present?
     json.po_number po.po_number
-    json.po_status po.status.name
+    json.po_status po.status&.name
     json.po_amount po.balance_amount
   end
 
   invoice = p.invoices.last
   if invoice.present?
     json.invoice_number invoice.invoice_number
-    json.invoice_status invoice.invoice_status.name
+    json.invoice_status invoice.invoice_status&.name
     json.invoice_amount invoice.net_amount
+  end
+
+  vendor = po.present? ? po.vendor : invoice&.vendor
+  if vendor.present?
+    json.vendor vendor.as_json
+  end
+
+  if po.present? || invoice.present?
+    department = po&.department || invoice&.department
+    sub_department = po&.sub_department || invoice&.sub_department
+    cost_center = po&.cost_center || invoice&.cost_center
+    json.department department&.name
+    json.sub_department sub_department&.name
+    json.cost_center cost_center&.name
   end
 end
