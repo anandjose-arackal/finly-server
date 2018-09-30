@@ -36,6 +36,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+
     end
 
     self.workflow_output = op.workflow_output
