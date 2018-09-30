@@ -27,16 +27,17 @@ class Procurements::Index < Procurements::Base
 
     # If reviewer or awaiting reviewal
     if user.vendor_payments_reviewer?
-      level_ids = []
-      policies = user.company.policies.with_application(:vp)
-      policies.each do |policy|
-        levels = policy.levels
-        levels.each do |level|
-          if level.reviewers.pluck(:id).include? user.id
-            level_ids.push(level.id)
-          end
-        end
-      end
+      level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+
+      # policies = user.company.policies.with_application(:vp)
+      # policies.each do |policy|
+      #   levels = policy.levels
+      #   levels.each do |level|
+      #     if level.reviewers.pluck(:id).include? user.id
+      #       level_ids.push(level.id)
+      #     end
+      #   end
+      # end
 
       # For PO
       # procurement_ids.push(user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:procurement_id))
@@ -68,7 +69,7 @@ class Procurements::Index < Procurements::Base
       procurement_ids.push(user.company.purchase_orders.pluck(:procurement_id))
     end
 
-    self.procurements = user.company.procurements.with_ids(procurement_ids.uniq)
+    self.procurements = user.company.procurements.with_ids(procurement_ids.uniq).include_details
 
   end
 
