@@ -2,6 +2,11 @@ class Procure::PurchaseOrdersController < ApplicationController
   before_action :set_tokens_in_header, only: [:download]
   before_action -> { finly_authorize! :web }
 
+  def index
+    @result = Procurements::PurchaseOrders::Index.(current_user, params)
+    respond
+  end
+
   def show
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     respond
@@ -39,6 +44,11 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def approve
     @result = Procurements::PurchaseOrders::Approve.(current_user, params)
+    respond
+  end
+
+  def bulk_approve
+    @result = Procurements::PurchaseOrders::BulkApprove.(current_user, params)
     respond
   end
 
