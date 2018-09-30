@@ -22,7 +22,7 @@ class Procurements::Index < Procurements::Base
 
     # Find own procurements
     if user.vendor_payments_initiator?
-      procurement_ids.push(user.company.purchase_orders.with_user_id(user.id).pluck(:procurement_id))
+      procurement_ids += user.company.purchase_orders.with_user_id(user.id).pluck(:procurement_id)
     end
 
     # If reviewer or awaiting reviewal
@@ -46,7 +46,7 @@ class Procurements::Index < Procurements::Base
       # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
       other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
       purchase_order_ids -= other_reviewer_po_ids
-      procurement_ids.push(user.company.purchase_orders.with_id(purchase_order_ids).pluck(:procurement_id))
+      procurement_ids += user.company.purchase_orders.with_id(purchase_order_ids).pluck(:procurement_id)
 
       # For Invoice
       # procurement_ids.push(user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:procurement_id))
@@ -55,18 +55,18 @@ class Procurements::Index < Procurements::Base
       # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
       other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
       invoice_ids -= other_reviewer_invoice_ids
-      procurement_ids.push(user.company.inward_invoices.with_id(invoice_ids).pluck(:procurement_id))
+      procurement_ids += user.company.inward_invoices.with_id(invoice_ids).pluck(:procurement_id)
     end
 
 
     # If creditor: find approved, unpaid, partially paid, paid invoices and their procurements
     invoice_status_ids = [InwardInvoiceStatus.id_for(:approved), InwardInvoiceStatus.id_for(:unpaid), InwardInvoiceStatus.id_for(:partially_paid), InwardInvoiceStatus.id_for(:paid)]
-    procurement_ids.push user.company.inward_invoices.with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)
+    procurement_ids += user.company.inward_invoices.with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)
 
 
     # If admin, select all procurements
     if user.vendor_payment_admin?
-      procurement_ids.push(user.company.purchase_orders.pluck(:procurement_id))
+      procurement_ids += user.company.purchase_orders.pluck(:procurement_id)
     end
 
     self.procurements = user.company.procurements.with_ids(procurement_ids.uniq).include_details
