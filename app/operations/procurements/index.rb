@@ -39,11 +39,24 @@ class Procurements::Index < Procurements::Base
       end
 
       # For PO
-      procurement_ids.push(user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:procurement_id))
+      # procurement_ids.push(user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:procurement_id))
+
+      purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
+      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+      other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+      purchase_order_ids -= other_reviewer_po_ids
+      procurement_ids.push(user.company.purchase_orders.with_id(purhcase_order_ids).pluck(:procurement_id))
 
       # For Invoice
-      procurement_ids.push(user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:procurement_id))
+      # procurement_ids.push(user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:procurement_id))
+
+      invoice_ids = user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:id)
+      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+      other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
+      invoice_ids -= other_reviewer_invoice_ids
+      procurement_ids.push(user.company.invoices.with_id(invoice_ids).pluck(:procurement_id))
     end
+
 
     # If creditor: find approved, unpaid, partially paid, paid invoices and their procurements
     invoice_status_ids = [InwardInvoiceStatus.id_for(:approved), InwardInvoiceStatus.id_for(:unpaid), InwardInvoiceStatus.id_for(:partially_paid), InwardInvoiceStatus.id_for(:paid)]
