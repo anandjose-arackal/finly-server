@@ -61,12 +61,12 @@ class Procurement < ActiveRecord::Base
     end
   }
 
-  scope :filter_po_number, -> (po_number){
+  scope :filter_po_number, -> (po_number) {
     filtered_ids = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
     where id: filtered_ids
   }
 
-  scope :filter_invoice_number, -> (invoice_number){
+  scope :filter_invoice_number, -> (invoice_number) {
     filtered_ids = Invoice.with_procurement.filter_invoice_number(invoice_number).pluck(:procurement_id)
     where id: filtered_ids
   }
@@ -80,7 +80,7 @@ class Procurement < ActiveRecord::Base
     where(id: procurement_ids)
   }
 
-  scope :filter_status_tags, -> (ids){
+  scope :filter_status_tags, -> (ids) {
     all_status_tag_ids = StatusTag.all.pluck(:id)
     status_tag_ids = all_status_tag_ids & ids.map(&:to_i)
 
@@ -88,6 +88,17 @@ class Procurement < ActiveRecord::Base
     filter_procurement_ids = procurement_status_taggables.pluck(:procurement_id)
 
     where(id: filter_procurement_ids)
+  }
+
+  scope :include_details, -> {
+    includes(
+        {invoices: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}]},
+        {
+            purchase_order: [:cost_center, :department, :sub_department, :vendor,
+                             {balance_amount: [:currency]}, :status, {level: :reviewers}]
+        },
+        :status_tags, :user
+    )
   }
 
   def awaiting_action?(user)
