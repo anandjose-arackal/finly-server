@@ -74,7 +74,9 @@ class Procurements::Index < Procurements::Base
       self.procurements = params[:procurements]
       apply_filter
       self.paginated_procurements = self.procurements.order_by_controlling_level(user.id)
-      self.paginated_procurements = self.paginated_procurements.paginate(page: params[:page], per_page: params[:per_page])
+      page = params[:page] || 1
+      per_page = params[:per_page] || 30
+      self.paginated_procurements = self.paginated_procurements.paginate(page: page, per_page: per_page)
     end
 
     def apply_filter
@@ -85,7 +87,6 @@ class Procurements::Index < Procurements::Base
     end
 
     def awaiting_action?(procurement)
-
     end
     
     def set_scope
