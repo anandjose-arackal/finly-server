@@ -50,6 +50,7 @@ class Procurement < ActiveRecord::Base
 
   scope :order_by_controlling_level, ->(user_id) {
     if user_id.present?
+      ids = pluck(:id)
 
       level_ids = LevelReviewerMapping.with_reviewer_id(user_id).pluck(:level_id)
 

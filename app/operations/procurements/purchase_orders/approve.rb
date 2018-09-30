@@ -12,6 +12,16 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   def validate
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
+      return
+    end
+
+    unless purchase_order.level.present?
+      add_message :error, 'Cannot take action against Purchase Order at this state'
+      return
+    end
+
+    unless awaiting_action_from?
+      add_message :error, 'You cannot approve this Purchase Order at this state'
     end
   end
 
@@ -38,5 +48,16 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   def post_process
     Event::EPurchaseOrder::Approve.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Approved Purchase Order'
+  end
+
+  def awaiting_action_from?
+    dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
+    level = purchase_order.level
+
+    if dlrm.present?
+      dlrm.pluck(:reviewer_id).include? user.id
+    else
+      level.reviewers.include? user
+    end
   end
 end
