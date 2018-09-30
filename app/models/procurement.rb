@@ -94,7 +94,7 @@ class Procurement < ActiveRecord::Base
     includes(
         {invoices: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}]},
         {
-            purchase_order: [:cost_center, :department, :sub_department, :vendor,
+            purchase_order: [:cost_center, :department, :sub_department, {vendor: :bank_accounts},
                              {balance_amount: [:currency]}, :status, {level: :reviewers}]
         },
         :status_tags, :user
