@@ -71,7 +71,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   # if the amounts are left as blank, they're assumed to be 0
   def pre_process
-    update_param[:items_attributes].each do |item|
+    update_param[:items_attributes]&.each do |item|
       unless item[:amount_attributes][:value].present?
         item[:amount_attributes][:value] = 0
       end
