@@ -54,7 +54,7 @@ class Procurements::Index < Procurements::Base
       # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
       other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
       invoice_ids -= other_reviewer_invoice_ids
-      procurement_ids.push(user.company.invoices.with_id(invoice_ids).pluck(:procurement_id))
+      procurement_ids.push(user.company.inward_invoices.with_id(invoice_ids).pluck(:procurement_id))
     end
 
 
