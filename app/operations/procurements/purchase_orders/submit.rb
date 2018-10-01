@@ -25,7 +25,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     params[:document] = self.purchase_order
     params[:aasm_event] = 'submit'
     params[:violation_present] = false
-    op = WorkflowManager::Base.(current_user, params)
+    op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
       return
@@ -36,6 +36,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+
     end
 
     self.workflow_output = op.workflow_output

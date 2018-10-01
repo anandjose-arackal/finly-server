@@ -70,7 +70,7 @@ module Sequenced
 
     def process_prefix
       @prefix = @config&.prefix || ''
-      @prefix = ExpressionEvaluator::Transformer.(@prefix)
+      @prefix = ExpressionEvaluator::Transformer.(@prefix) unless @prefix.blank?
     end
 
     def find_last_record

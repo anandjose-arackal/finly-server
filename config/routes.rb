@@ -700,7 +700,8 @@
 #                                                         DELETE /money_request/:id(.:format)                                                                                    money_request#destroy
 #                                    darwinbox_create_sso POST   /oauth/sso_login(.:format)                                                                                      darwinbox_sso/token#create
 #                                   travel_requests_count GET    /travel_requests/count(.:format)                                                                                travel_requests#count
-#                                   travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                                            travel_requests#review
+#                                  travel_requests_config GET    /travel_requests/config(.:format)                                                                                   travel_requests#configuration
+# travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                                            travel_requests#review
 #                             travel_request_destinations POST   /travel_requests/:travel_request_id/destinations(.:format)                                                      travel_request_destinations#create
 #                              travel_request_destination PATCH  /travel_requests/:travel_request_id/destinations/:id(.:format)                                                  travel_request_destinations#update
 #                                                         PUT    /travel_requests/:travel_request_id/destinations/:id(.:format)                                                  travel_request_destinations#update
@@ -711,7 +712,7 @@
 #                                                         DELETE /travel_requests/:travel_request_id/destinations/:destination_id/bookings/:id(.:format)                         travel_request_bookings#destroy
 #        travel_request_destination_booking_select_option PATCH  /travel_requests/:travel_request_id/destinations/:destination_id/bookings/:booking_id/select_option(.:format)   travel_request_bookings#select_option
 #      travel_request_destination_booking_unselect_option PATCH  /travel_requests/:travel_request_id/destinations/:destination_id/bookings/:booking_id/unselect_option(.:format) travel_request_bookings#unselect_option
-#               travel_request_destination_booking_cancel PATCH  /travel_requests/:travel_request_id/destinations/:destination_id/bookings/:booking_id/cancel(.:format)          travel_request_bookings#cancel
+#               travel_request_destination_booking_cancel PATCH  /travel_requests/:travel_request_id/destinations/:destination_id/bookings/:booking_id/cancel(.:format)          travel_request_bookings#cancel#  travel_request_destination_booking_mark_as_unavailable PATCH  /travel_requests/:travel_request_id/destinations/:destination_id/bookings/:booking_id/mark_as_unavailable(.:format) travel_request_bookings#mark_as_unavailable
 #                                                         GET    /travel_requests/:travel_request_id/destinations/:destination_id/bookings(.:format)                             bookings#index
 #                                                         POST   /travel_requests/:travel_request_id/destinations/:destination_id/bookings(.:format)                             bookings#create
 #                  new_travel_request_destination_booking GET    /travel_requests/:travel_request_id/destinations/:destination_id/bookings/new(.:format)                         bookings#new
@@ -843,9 +844,9 @@
 #                       expense_type_configuration_update PATCH  /expense_type_configurations(.:format)                                                                          expense_types_configuration#update
 #                                            groups_teams GET    /groups_teams(.:format)                                                                                         expense_types_configuration#groups_teams
 #                                         expense_filters GET    /expense_filters(.:format)                                                                                      expense_types_configuration#expense_filters
-#                                          report_filters GET    /report_filters(.:format)                                                                                       expense_types_configuration#report_filters
+#                                          report_filters GET    /report_filters(.:format)                                                                                       expense_types_configuration#report_filters#                                    field_configurations GET    /field_configurations(.:format)                                                                                     field_configuration#index
 #                                    field_configurations GET    /field_configurations(.:format)                                                                                 field_configuration#index
-#                                                 pending GET    /settlements/reports/pending(.:format)                                                                          settlement/report#pending_index
+#             pending GET    /settlements/reports/pending(.:format)                                                                          settlement/report#pending_index
 #                                           pending_count GET    /settlements/reports/pending/count(.:format)                                                                    settlement/report#pending_count
 #                                                         GET    /settlements/reports/processing(.:format)                                                                       settlement/report#processing_index
 #                                                   count GET    /settlements/reports/processing/count(.:format)                                                                 settlement/report#processing_count
@@ -1403,8 +1404,7 @@
 #                                                         PATCH  /budgets/:id(.:format)                                                                                          budgets#update
 #                                                         PUT    /budgets/:id(.:format)                                                                                          budgets#update
 #                                                         DELETE /budgets/:id(.:format)                                                                                          budgets#destroy
-#                      procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                   procure/procurements#filter_config
-#                              procure_procurements_count GET    /procure/procurements/count(.:format)                                                                           procure/procurements#count
+#                      procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                   procure/procurements#filter_config#                              procure_procurements_count GET    /procure/procurements/count(.:format)                                                                           procure/procurements#count
 #                                    procure_procurements GET    /procure/procurements(.:format)                                                                                 procure/procurements#index
 #                                                         POST   /procure/procurements(.:format)                                                                                 procure/procurements#create
 #                                 new_procure_procurement GET    /procure/procurements/new(.:format)                                                                             procure/procurements#new
@@ -3155,7 +3155,7 @@ Rails.application.routes.draw do
     end
 
 
-
+    put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'

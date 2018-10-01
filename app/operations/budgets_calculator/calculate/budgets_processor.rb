@@ -1,52 +1,59 @@
 class BudgetsCalculator::Calculate::BudgetsProcessor
 
-  attr_accessor :budget, :entity, :company_users,
-                :trail_hash
+  attr_accessor :budget, :entity, :trail_hash
 
   def initialize(budget = nil)
     self.budget = budget
-    # extracting the company's users because this will tell us the entries
-    # to consider from the BudgetTrail model
-    self.company_users = self.budget&.company&.users
   end
 
   # this method will return the totality of the amount spent against this particular budget
   def spent_amount
-    categories = self.budget.budgetable_categories
-    cost_centers = self.budget.budgetable_cost_centers
-    departments = self.budget.budgetable_departments
-    locations = self.budget.budgetable_locations
-    vendors = self.budget.budgetable_vendors
-    users = self.budget.budgetable_users
+    criterial_mapping = self.budget.budget_criteria_mappings.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
+    category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
+    cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
+    department_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Department'}&.first&.dig('budgetable_id_list')&.split(',')
+    location_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'BranchLocation'}&.first&.dig('budgetable_id_list')&.split(',')
+    vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
+    user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
+
     # now choosing the entities to which we can apply the budget
     budgetable_entities = []
     budgetable_entities << "Expense" if self.budget.expense
     # adding PO Item because both will be considered for the
     budgetable_entities << "PurchaseOrderItem" if self.budget.purchase_order
     budgetable_entities << "Payment" if self.budget.payment
-    spent_amount = BudgetTrail.within_date(budget.start_date, budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_budgetable_entities(budgetable_entities).joins_amount.sum(:value)
+    BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_vendors(vendor_ids)
+                       .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
+                       .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
+                       .with_budgetable_entities(budgetable_entities).joins_amount.sum(:value)
   end
 
   # i.e. these are the entities that have consumed this particular budget
   # will return an array of arrays, that contain expenses, payments, and purchase orders respectively
   def spent_entities
-    categories = self.budget.budgetable_categories
-    cost_centers = self.budget.budgetable_cost_centers
-    departments = self.budget.budgetable_departments
-    locations = self.budget.budgetable_locations
-    vendors = self.budget.budgetable_vendors
-    users = self.budget.budgetable_users
+    criterial_mapping = self.budget.budget_criteria_mappings.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
+    category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
+    cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
+    department_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Department'}&.first&.dig('budgetable_id_list')&.split(',')
+    location_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'BranchLocation'}&.first&.dig('budgetable_id_list')&.split(',')
+    vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
+    user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
+
+    trails = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_vendors(vendor_ids)
+                 .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
+                 .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
+                 .select('entity_type, GROUP_CONCAT(DISTINCT entity_id SEPARATOR ",") AS entity_id_list').group(:entity_type).as_json
     budgetable_entities = []
     budgetable_entities << "Expense" if self.budget.expense
     # adding PO as well as PO Item because both will be considered for the
     budgetable_entities << "PurchaseOrderItem" if self.budget.purchase_order
     budgetable_entities << "Payment" if self.budget.payment
-    payment_ids = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments_or_sub_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_entity_type("Payment").pluck(:entity_id)
+    payment_ids = trails.select {|mapping| mapping['entity_type'] == 'Payment'}&.first&.dig('entity_id_list')&.split(',')
     payments = Payment.with_id(payment_ids)
-    expense_ids = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments_or_sub_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_entity_type("Expense").pluck(:entity_id)
+    expense_ids = trails.select {|mapping| mapping['entity_type'] == 'Expense'}&.first&.dig('entity_id_list')&.split(',')
     expenses = Expense.with_id(expense_ids)
-    purchase_order_item_ids = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_users(self.company_users.pluck(:id)).with_vendors(vendors.pluck(:id)).with_departments(departments.pluck(:id)).with_locations(locations.pluck(:id)).with_categories(categories.pluck(:id)).with_cost_centers(cost_centers.pluck(:id)).with_users(users.pluck(:id)).with_entity_type("PurchaseOrderItem").pluck(:entity_id)
-    purchase_order_items = PurchaseOrderItem.with_id(purchase_order_item_ids)
+    purchase_order_item_ids = trails.select {|mapping| mapping['entity_type'] == 'PurchaseOrderItem'}&.first&.dig('entity_id_list')&.split(',')
+    purchase_order_items = PurchaseOrderItem.with_id(purchase_order_item_ids).include_details
     [expenses, payments, purchase_order_items]
   end
 
