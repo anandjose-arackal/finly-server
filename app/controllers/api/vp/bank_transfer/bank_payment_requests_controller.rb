@@ -6,6 +6,9 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
 
   def create
     @result = BankTransfer::PaymentRequest::Create.(current_user, params)
+    if @result.success? and @result.bank_payment_request.present?
+      @result = BankTransfer::PaymentRequest::Review::Submit.(current_user, {bank_payment_request_id: @result.bank_payment_request.id})
+    end
     respond
   end
 
