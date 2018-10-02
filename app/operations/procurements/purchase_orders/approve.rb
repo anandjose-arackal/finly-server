@@ -57,6 +57,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
     if dlrm.present?
       dlrm.pluck(:reviewer_id).include? user.id
     else
+      # todo IMPORTANT
       level.reviewers.include? user
     end
   end

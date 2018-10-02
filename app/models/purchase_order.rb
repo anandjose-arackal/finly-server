@@ -110,9 +110,19 @@ class PurchaseOrder < ActiveRecord::Base
 
   # Used for generating document number
   scope :valid, -> {
-    ids = pluck(:id)
-    ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
-    where(id: ids)
+    status_ids = [
+        PurchaseOrderStatus.id_for(:processing),
+        PurchaseOrderStatus.id_for(:rejected),
+        PurchaseOrderStatus.id_for(:retracted),
+        PurchaseOrderStatus.id_for(:approved),
+        PurchaseOrderStatus.id_for(:auto_approved),
+        PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:closed)
+    ]
+    where purchase_order_status_id: PurchaseOrderStatus.id_for(status_ids)
+    # ids = pluck(:id)
+    # ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
+    # where(id: ids)
   }
 
   before_save :calculate_line_items
