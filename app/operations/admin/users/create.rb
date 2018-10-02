@@ -63,7 +63,7 @@ class Admin::Users::Create < Admin::Users::Base
     end
   end
 
-  private
+  protected
 
   def user_params
     params.require(:user).permit(:email, :password, :password_confirmation, :invitation_token, :mobile_number, :first_name,

@@ -30,4 +30,16 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
     respond
   end
 
+  def create
+
+  end
+
+  def update
+
+  end
+
+  def deactivate
+
+  end
+
 end
