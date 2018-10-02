@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180928033800) do
+ActiveRecord::Schema.define(version: 20180930092441) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -336,6 +336,7 @@ ActiveRecord::Schema.define(version: 20180928033800) do
     t.decimal  "ZMW",                   precision: 20, scale: 5
     t.decimal  "ZWL",                   precision: 20, scale: 5
     t.boolean  "is_deleted",                                      default: false
+    t.decimal  "MYR",                   precision: 20, scale: 5
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
@@ -453,17 +454,6 @@ ActiveRecord::Schema.define(version: 20180928033800) do
   add_index "balance_sheets", ["approved_reports_total_id"], name: "index_balance_sheets_on_approved_reports_total_id", using: :btree
   add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
-
-  create_table "balance_tally_ledgers", force: :cascade do |t|
-    t.date     "date"
-    t.integer  "api_balance_id",            limit: 4
-    t.integer  "finly_database_balance_id", limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-  end
-
-  add_index "balance_tally_ledgers", ["api_balance_id"], name: "index_balance_tally_ledgers_on_api_balance_id", using: :btree
-  add_index "balance_tally_ledgers", ["finly_database_balance_id"], name: "index_balance_tally_ledgers_on_finly_database_balance_id", using: :btree
 
   create_table "bank_accounts", force: :cascade do |t|
     t.integer  "yes_bank_vendor_id", limit: 4
@@ -2313,6 +2303,30 @@ ActiveRecord::Schema.define(version: 20180928033800) do
   add_index "expenses", ["report_id"], name: "index_expenses_on_report_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
 
+  create_table "export_config_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "export_config_types", ["name"], name: "index_export_config_types_on_name", using: :btree
+
+  create_table "export_configs", force: :cascade do |t|
+    t.integer  "company_id",            limit: 4,                  null: false
+    t.integer  "export_config_type_id", limit: 4,                  null: false
+    t.integer  "field_reference_id",    limit: 4
+    t.string   "field_reference_type",  limit: 255
+    t.integer  "order",                 limit: 4
+    t.string   "field_name",            limit: 255
+    t.boolean  "spreadsheet",                       default: true
+    t.boolean  "pdf",                               default: true
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "export_configs", ["company_id"], name: "index_export_configs_on_company_id", using: :btree
+  add_index "export_configs", ["export_config_type_id"], name: "index_export_configs_on_export_config_type_id", using: :btree
+
   create_table "export_fields", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -3750,7 +3764,6 @@ ActiveRecord::Schema.define(version: 20180928033800) do
     t.date     "scheduled_at"
     t.date     "processed_at"
     t.integer  "cost_center_id",                 limit: 4
-    t.string   "transaction_reference_id",       limit: 255
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -5651,6 +5664,8 @@ ActiveRecord::Schema.define(version: 20180928033800) do
   add_foreign_key "expenses", "expense_types"
   add_foreign_key "expenses", "reports"
   add_foreign_key "expenses", "users"
+  add_foreign_key "export_configs", "companies"
+  add_foreign_key "export_configs", "export_config_types"
   add_foreign_key "export_preferences", "companies"
   add_foreign_key "export_preferences", "export_fields"
   add_foreign_key "feedbacks", "feedback_types"

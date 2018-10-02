@@ -54,11 +54,204 @@ class ExportManager::Adapters::ProcurementAdapter < ExportManager::Adapters::Bas
          ]
 
   def init_list
+    Procurement.limit(10)
+  end
+
+  def vendor_name(entry)
 
   end
 
-  def custom_field_value_for(field_configuration)
+  def vendor_business_name(entry)
 
   end
+
+  def vendor_mobile_number(entry)
+
+  end
+
+  def vendor_state_code(entry)
+
+  end
+
+  def vendor_pan(entry)
+
+  end
+
+  def vendor_tds_rate(entry)
+
+  end
+
+  def vendor_tds_description(entry)
+
+  end
+
+  def vendor_type(entry)
+
+  end
+
+  def vendor_description(entry)
+
+  end
+
+  def vendor_address(entry)
+
+  end
+
+  def vendor_custom_fields(entry)
+
+  end
+
+  def policy(entry)
+
+  end
+
+  def department(entry)
+
+  end
+
+  def sub_department(entry)
+
+  end
+
+  def cost_center(entry)
+
+  end
+
+  def po_number(entry)
+
+  end
+
+  def po_payment_term(entry)
+
+  end
+
+  def po_delivery_date(entry)
+
+  end
+
+  def po_submitted_on(entry)
+
+  end
+
+  def po_approved_on(entry)
+
+  end
+
+  def po_sent_on(entry)
+
+  end
+
+  def po_base_value(entry)
+
+  end
+
+  def po_cgst(entry)
+
+  end
+
+  def po_sgst(entry)
+
+  end
+
+  def po_igst(entry)
+
+  end
+
+  def po_line_items_count(entry)
+
+  end
+
+  def po_purchase_address(entry)
+
+  end
+
+  def po_delivery_address(entry)
+
+  end
+
+  def po_custom_fields(entry)
+
+  end
+
+  def inwards_status(entry)
+
+  end
+
+  def last_inward_received_on(entry)
+
+  end
+
+  def invoice_number(entry)
+
+  end
+
+  def invoice_payment_term(entry)
+
+  end
+
+  def invoice_delivery_date(entry)
+
+  end
+
+  def invoice_submitted_on(entry)
+
+  end
+
+  def invoice_approved_on(entry)
+
+  end
+
+  def invoice_sent_on(entry)
+
+  end
+
+  def invoice_base_value(entry)
+
+  end
+
+  def invoice_cgst(entry)
+
+  end
+
+  def invoice_sgst(entry)
+
+  end
+
+  def invoice_igst(entry)
+
+  end
+
+  def invoice_tds_type(entry)
+
+  end
+
+  def invoice_tds_amount(entry)
+
+  end
+
+  def invoice_total_amount_after_tds(entry)
+
+  end
+
+  def invoice_payable_amount(entry)
+
+  end
+
+  def invoice_line_items_count(entry)
+
+  end
+
+  def invoice_purchase_address(entry)
+
+  end
+
+  def invoice_delivery_address(entry)
+
+  end
+
+  def invoice_custom_fields(entry)
+
+  end
+
 
 end

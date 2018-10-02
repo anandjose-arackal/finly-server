@@ -1,6 +1,8 @@
-Dir["#{__dir__}/adapters/*.rb"].each { |file| require file }
+Dir["#{__dir__}/adapters/*.rb"].each {|file| require file}
 class ExportManager::Processor < BaseOperation
   attr_accessor :adapter
+
+  DEFAULT_CONFIG = {spreadsheet: true, pdf: true}
 
   def pre_validate
     user_present? and params_present?
@@ -12,7 +14,7 @@ class ExportManager::Processor < BaseOperation
   end
 
   def init
-    self.adapter = adapter_for(params)
+    self.adapter = init_adapter
   end
 
   def validate
@@ -23,17 +25,18 @@ class ExportManager::Processor < BaseOperation
   end
 
   def process
-
+    self.response = self.adapter.generate
   end
 
   protected
 
-  def adapter_for(params)
-    adapter = ExportManager::Adapters::BaseAdapter::ADAPTERS[params[:type]]
+  def init_adapter
+    adapter = ExportManager::Adapters::BaseAdapter::ADAPTERS[self.params[:type]]
     if adapter.present?
-      return adapter.new(params)
+      return adapter.new(user, params)
     end
     nil
   end
+
 
 end
