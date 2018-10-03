@@ -52,7 +52,20 @@ class InvoiceLineItem < ActiveRecord::Base
   validates :quantity, presence: true
   validates :rate, presence: true
 
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
+
   def tax
     self.tax_rate&.rate || super
+  end
+
+  private
+
+  def budget_trail_entry
+    BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(self)
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
   end
 end

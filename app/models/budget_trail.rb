@@ -16,6 +16,7 @@
 #  department_id     :integer
 #  date              :date
 #  sub_department_id :integer
+#  procurement_id    :integer
 #
 
 class BudgetTrail < ActiveRecord::Base
@@ -29,6 +30,7 @@ class BudgetTrail < ActiveRecord::Base
   belongs_to :department
   belongs_to :sub_department, class_name: "Department"
   belongs_to :user
+  belongs_to :procurement
 
   accepts_nested_attributes_for :amount
 
@@ -55,6 +57,7 @@ class BudgetTrail < ActiveRecord::Base
       where(id: ids)
     end
   }
+
   scope :with_locations, -> (location_ids) {
     unless location_ids.blank?
       where(location_id: location_ids)

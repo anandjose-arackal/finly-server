@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180928033800) do
+ActiveRecord::Schema.define(version: 20181003152425) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -962,6 +962,7 @@ ActiveRecord::Schema.define(version: 20180928033800) do
     t.integer  "department_id",     limit: 4
     t.date     "date"
     t.integer  "sub_department_id", limit: 4
+    t.integer  "procurement_id",    limit: 4
   end
 
   create_table "budgets", force: :cascade do |t|
