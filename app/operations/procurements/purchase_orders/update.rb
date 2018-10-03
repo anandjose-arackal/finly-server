@@ -1,6 +1,6 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
-                :po_current_attachments, :document_reviewer_mappings_params
+                :po_current_attachments, :document_reviewer_mappings_params, :document_number
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -9,6 +9,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.document_reviewer_mappings_params = purchase_order_params[:document_reviewer_mappings]
     purchase_order_params.delete(:document_reviewer_mappings)
+
+    self.document_number = purchase_order_params[:po_number]
+    purchase_order_params.delete(:po_number)
   end
 
   def validate
@@ -36,7 +39,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
 
-
       # For setting level specific reviewers from reviewal chain for a document
       params[:reviewal_document] = self.purchase_order
       params[:document_reviewer_mappings] = document_reviewer_mappings_params
@@ -63,6 +65,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
 
       # Create track
+
+      if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
+        document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
+
+        if document_number_op.success?
+          self.purchase_order.update(po_number: document_number_op.document_number)
+        end
+      end
 
     else
       add_message :error, purchase_order.errors.full_messages
