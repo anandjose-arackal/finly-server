@@ -19,7 +19,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
-                  :tax_rates, :locations
+                  :tax_rates, :locations, :budgets
 
     def init
       self.invoice = params[:invoice]
@@ -39,6 +39,12 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       self.actions = get_actions
 
+      if self.invoice.items.present?
+        op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
+        if op.success?
+          self.budgets = op.budget_data
+        end
+      end
 
       params[:reviewal_document] = invoice
 

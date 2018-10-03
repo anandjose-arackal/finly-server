@@ -59,6 +59,10 @@ class InvoiceLineItem < ActiveRecord::Base
     self.tax_rate&.rate || super
   end
 
+  scope :with_id, -> (id) {
+    where id: id
+  }
+
   private
 
   def budget_trail_entry

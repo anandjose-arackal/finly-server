@@ -59,6 +59,18 @@ json.budget_trail_items do
       json.department purchase_order_item.purchase_order.department&.name
     end
   end
+
+  # list of invoice line items
+  json.invoice_line_items do
+    json.array!(@result.spent_entities[3]) do |invoice_line_item|
+      json.name invoice_line_item.description
+      json.cost_center_name invoice_line_item.parent.cost_center&.name
+      json.amount invoice_line_item.net_amount&.value
+      json.date invoice_line_item.parent.date.strftime("%Y-%B-%d")
+      json.location invoice_line_item.parent.location&.name
+      json.department invoice_line_item.parent.department&.name
+    end
+  end
 end
 
 json.associated_vendors do

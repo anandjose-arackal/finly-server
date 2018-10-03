@@ -113,6 +113,7 @@ class Invoice < ActiveRecord::Base
   has_many :payments
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
+  has_many :items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
 
   # Attachments created for procurement
