@@ -31,15 +31,30 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
   end
 
   def create
-
+    @result = User::Create.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def update
-
+    @result = User::Update.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def deactivate
-
+    @result = User::Deactivate.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
 end
