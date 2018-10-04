@@ -4,8 +4,6 @@ class RemunanceSso::TokenController < Oauth::TokenController
     unless pre_process
       return
     end
-    # @user = User.find 18 # temporary override for this user
-    # render_json 'oauth/token/create_sso.json.jbuilder', response.status
 
     # extracting the email from the params
     data = params[:data]

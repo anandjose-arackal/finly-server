@@ -34,8 +34,10 @@ Doorkeeper.configure do
             u = nil
           end
         end
-      elsif u && StringUtils.to_bool(params[:sso_skip_password])
+      elsif u && (!StringUtils.to_bool(params[:sso_skip_password]))
         u = nil
+      elsif u && StringUtils.to_bool(params[:sso_skip_password])
+        # do nothing
       else
         u = nil
       end
