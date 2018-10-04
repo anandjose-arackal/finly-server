@@ -2304,6 +2304,7 @@ Rails.application.routes.draw do
       namespace :v1 do
         post 'auth', to: 'token#create'
         delete 'auth', to: 'token#destroy'
+        patch 'users/deactivate/:id', to: 'users#deactivate_user'
         resources :users, only: [:create, :show, :index, :update]
         resources :cards, only: [:index, :show]
         resources :cards do

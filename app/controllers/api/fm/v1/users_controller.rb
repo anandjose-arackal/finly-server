@@ -1,6 +1,6 @@
 class Api::Fm::V1::UsersController < ApiApplicationController
 
-  before_action -> { finly_authorize! :api,}
+  before_action -> { finly_authorize! :api}
 
   def create
     formatted_params = RequestFormatter::ApiParser::FmParser::V1::Users::Create.(current_user, params).formatted_request
