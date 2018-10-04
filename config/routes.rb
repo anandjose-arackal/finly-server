@@ -2578,10 +2578,13 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
-  ############ Darwinbox SSO LOGIN APIs START ####################
+  ############ Darwinbox SSO LOGIN APIs START #################################
   post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
-  ######################################################
+  #############################################################################
 
+  ############ Remunance SSO LOGIN APIs START #################################
+  post 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
+  ##############################################################################
 
   ######################### TRAVEL REQUESTS API START ##########################
 
