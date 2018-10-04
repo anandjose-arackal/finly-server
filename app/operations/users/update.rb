@@ -1,6 +1,19 @@
-class User::Update < Admin::Users::Update
+class Users::Update < Admin::Users::Update
 
   attr_accessor :user_params
+
+  class Users::Update::UpdatedUserPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :updated_user
+
+    def init
+      self.updated_user = params[:updated_user]
+    end
+  end
+
+  def user_model
+    User
+  end
 
   def authorized_user_types
     [:company_admin]
@@ -25,6 +38,11 @@ class User::Update < Admin::Users::Update
 
   def post_process
     add_message :success, "User successfully updated"
+  end
+
+  def success
+    params[:updated_user] = self.selected_user
+    Users::Update::UpdatedUserPresenter.new(user, params, messages)
   end
 
   private

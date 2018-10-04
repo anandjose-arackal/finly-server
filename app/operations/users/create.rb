@@ -1,5 +1,9 @@
 # Used to create users without invitation
-class User::Create < Admin::Users::Create
+class Users::Create < Admin::Users::Create
+
+  def user_model
+    User
+  end
 
   def authorized_user_types
     [:company_admin]
@@ -14,6 +18,8 @@ class User::Create < Admin::Users::Create
     # set dummy password for this user that will be reset on OTP verification
     self.new_user_params[:password] = "dummypassword"
     self.new_user_params[:password_confirmation] = "dummypassword"
+
+    self.new_user_params.permit!
   end
 
   def process
@@ -42,19 +48,20 @@ class User::Create < Admin::Users::Create
     user_params[:profile_attributes] = params.permit(:date_of_birth, :gender, :address_1,
                                                      :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id)
 
+    user_params[:role_mapping_attributes] = []
     # setting roles for expense management
     expense_role_params = params[:expense_management_roles]
     user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:admin), purpose_id: Purpose.id_for(:expense_management)} if expense_role_params&.dig(:admin)
     user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:finance_manager), purpose_id: Purpose.id_for(:expense_management)} if expense_role_params&.dig(:finance_manager)
     user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:manager), purpose_id: Purpose.id_for(:expense_management)} if expense_role_params&.dig(:manager)
-    user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:employee)} # because initiator role will be there irrespective
+    user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:employee), purpose_id: Purpose.id_for(:expense_management)} # because initiator role will be there irrespective
 
     # setting roles for vendor payments
     vendor_payment_role_params = params[:vendor_payments_roles]
     user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:admin), purpose_id: Purpose.id_for(:vendor_payments)} if vendor_payment_role_params&.dig(:admin)
     user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:creditor), purpose_id: Purpose.id_for(:vendor_payments)} if vendor_payment_role_params&.dig(:creditor)
     user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:reviewer), purpose_id: Purpose.id_for(:vendor_payments)} if vendor_payment_role_params&.dig(:reviewer)
-    user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:initiator)} # because initiator role will be there irrespective
+    user_params[:role_mapping_attributes] << {user_role_id: UserRole.id_for(:initiator), purpose_id: Purpose.id_for(:vendor_payments)} # because initiator role will be there irrespective
 
     # adding user panel subscription based on what is passed in the front end
     user_params[:user_panel_subscription_attributes] = {expense_management: !!params[:expense_management],
@@ -64,6 +71,5 @@ class User::Create < Admin::Users::Create
 
     user_params
   end
-
 
 end

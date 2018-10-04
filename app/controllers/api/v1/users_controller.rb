@@ -1,7 +1,7 @@
 class  Api::V1::UsersController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :mobile}
+  before_action -> { finly_authorize! :mobile, :api}
 
 
   respond_to :json
@@ -31,7 +31,7 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
   end
 
   def create
-    @result = User::Create.(current_user, params)
+    @result = Users::Create.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -40,7 +40,7 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
   end
 
   def update
-    @result = User::Update.(current_user, params)
+    @result = Users::Update.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -49,7 +49,7 @@ class  Api::V1::UsersController < Api::V1::BaseApiController
   end
 
   def deactivate
-    @result = User::Deactivate.(current_user, params)
+    @result = Users::Deactivate.(current_user, params)
     if @result.success?
       respond response: :success
     else

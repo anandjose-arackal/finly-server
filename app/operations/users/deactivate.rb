@@ -1,4 +1,4 @@
-class User::Deactivate < User::Base
+class Users::Deactivate < Users::Base
 
   attr_accessor :selected_user
 
