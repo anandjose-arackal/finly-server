@@ -1,7 +1,10 @@
-class ExportManager::Adapters::ProcurementAdapter < ExportManager::Adapters::BaseAdapter
+class ExportManager::Master::Procurement::Provider < ExportManager::Master::BaseMaster
 
-  handle :procurement
-  fields [
+  register_handle :procurement
+  register_generator ExportManager::Generator::Spreadsheet
+  register_processor ExportManager::Processor::Email
+  validate :input
+  register_fields [
              vendor_name: {spreadsheet: true, pdf: true},
              vendor_business_name: {spreadsheet: true, pdf: true},
              vendor_mobile_number: {spreadsheet: true, pdf: true},
@@ -53,7 +56,7 @@ class ExportManager::Adapters::ProcurementAdapter < ExportManager::Adapters::Bas
              invoice_custom_fields: {spreadsheet: true, pdf: true}
          ]
 
-  def init_list
+  def input
     Procurement.limit(10)
   end
 
@@ -252,6 +255,5 @@ class ExportManager::Adapters::ProcurementAdapter < ExportManager::Adapters::Bas
   def invoice_custom_fields(entry)
 
   end
-
 
 end

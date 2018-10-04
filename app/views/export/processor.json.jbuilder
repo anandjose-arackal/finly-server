@@ -1,0 +1,1 @@
+json.download_url @result.file_url
