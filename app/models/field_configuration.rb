@@ -22,6 +22,7 @@
 #  parent_type             :string(255)
 #  root_field              :boolean          default(TRUE)
 #  field_key               :string(255)
+#  sequence_number         :integer
 #
 
 class FieldConfiguration < ActiveRecord::Base
