@@ -1,7 +1,7 @@
 class ExportManager::Master::BaseMaster
   cattr_accessor :key, :fields, :generators, :processor, :config, :validations
 
-  attr_accessor :user, :params, :input, :errors
+  attr_accessor :user, :params, :input, :messages
 
   MASTERS = {
       test: 'ExportManager::Master::Test::Provider',
@@ -47,11 +47,11 @@ class ExportManager::Master::BaseMaster
   end
 
   def valid?
-    self.errors = []
+    clear_messages
     self.validations&.each do |method|
       self.send method
     end
-    self.errors.blank?
+    self.messages[:error].blank?
   end
 
   # Input is the what is used for generating the
@@ -59,13 +59,18 @@ class ExportManager::Master::BaseMaster
     # To be written by every adapter
   end
 
-  def add_error(message)
-    self.errors = [] if errors.blank?
-    return if message.blank?
-    unless message.is_a?(Array)
+  def clear_messages
+    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
+  end
 
+  def add_message(type, message)
+    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
+    clear_messages if self.messages.blank?
+    if message.is_a?(Array)
+      messages[type].concat message
+    elsif message.is_a?(String)
+      messages[type] << message
     end
-    self.errors << message
   end
 
 end

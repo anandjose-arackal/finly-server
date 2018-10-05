@@ -62,8 +62,8 @@ class ExportManager::Master::Procurement::Provider < ExportManager::Master::Base
 
   def input
     result = Procurements::Index.(user, params)
-    unless result.success?
-      add_error result.messages[:error]
+    if result.success?
+      add_message :error, result.messages[:error]
       return
     end
     result.procurements

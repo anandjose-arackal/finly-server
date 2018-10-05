@@ -45,7 +45,7 @@ class ExportManager::RequestHandler < BaseOperation
     end
     m = self.master.new(user, params)
     unless m.valid?
-      add_message :error, m.messages[:error]
+      add_message :error, m.errors
       return
     end
 
