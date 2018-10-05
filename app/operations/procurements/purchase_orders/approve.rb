@@ -39,7 +39,6 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
-
     end
 
     self.workflow_output = op.workflow_output
@@ -57,8 +56,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
     if dlrm.present?
       dlrm.pluck(:reviewer_id).include? user.id
     else
-      # todo IMPORTANT
-      level.reviewers.include? user
+      level.level_reviewer_mappings.with_threshold(self.purchase_order.balance_amount.value).pluck(:reviewer_id).include? user.id
     end
   end
 end
