@@ -44,16 +44,18 @@
 #  sub_department_id            :integer
 #  billing_address              :text(65535)
 #  shipping_address             :text(65535)
+#  is_template                  :boolean          default(FALSE)
+#  template_name                :string(255)      default("0")
 #
 
 class PurchaseOrder < ActiveRecord::Base
-  include SoftDeletable
+  include SoftDeletable, Templatable
   belongs_to :company
   belongs_to :user
   belongs_to :procurement
-  belongs_to :location, class_name: "BranchLocation"
-  belongs_to :delivery_location, class_name: "BranchLocation"
-  belongs_to :vendor, class_name: "YesBankVendor"
+  belongs_to :location, class_name: 'BranchLocation'
+  belongs_to :delivery_location, class_name: 'BranchLocation'
+  belongs_to :vendor, class_name: 'YesBankVendor'
   belongs_to :payment_term
   belongs_to :procurement_term
   belongs_to :status, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
@@ -128,6 +130,24 @@ class PurchaseOrder < ActiveRecord::Base
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
+
+  template_config do
+    enable
+    include_associations [:policy, :level, :custom_fields, :location, :delivery_location, :vendor, :payment_term, :procurement_term, :status, :department, :sub_department, :cost_center]
+    clone [:extra_charges, :items, :document_level_reviewer_mappings, :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount]
+    nullify :procurement_id
+    nullify :po_number
+    nullify :is_template
+    nullify :template_name
+    nullify :controlling_user_id
+    nullify :controlling_for_user_id
+    nullify :controlling_user_role_id
+    nullify :controlling_for_user_role_id
+    nullify :purchase_order_status_id
+    nullify :user_id
+  end
+
+  template_merge :procurement_id
 
   def all_items_shipped?
     shipped = true
