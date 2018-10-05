@@ -38,6 +38,7 @@ public/system/vendor_attachments/*
 /Sample transactions
 /sample_bank_transfer.xls
 config/data/bypass_authorized_users.yml
+public/system/temporary_files/
 
 /yes_bank_api_call_logs
 .vagrant/

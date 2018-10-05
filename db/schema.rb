@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180930092441) do
+ActiveRecord::Schema.define(version: 20181004154813) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -4127,6 +4127,7 @@ ActiveRecord::Schema.define(version: 20180930092441) do
   add_index "purchase_orders", ["company_id"], name: "index_purchase_orders_on_company_id", using: :btree
   add_index "purchase_orders", ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id", using: :btree
   add_index "purchase_orders", ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id", using: :btree
+  add_index "purchase_orders", ["gst_type_id"], name: "fk_rails_a50fbe2826", using: :btree
   add_index "purchase_orders", ["location_id"], name: "index_purchase_orders_on_location_id", using: :btree
   add_index "purchase_orders", ["payment_term_id"], name: "index_purchase_orders_on_payment_term_id", using: :btree
   add_index "purchase_orders", ["policy_id"], name: "index_purchase_orders_on_policy_id", using: :btree
@@ -5785,6 +5786,7 @@ ActiveRecord::Schema.define(version: 20180930092441) do
   add_foreign_key "purchase_order_items", "inventory_line_items"
   add_foreign_key "purchase_order_items", "purchase_orders"
   add_foreign_key "purchase_orders", "companies"
+  add_foreign_key "purchase_orders", "gst_types"
   add_foreign_key "purchase_orders", "payment_terms"
   add_foreign_key "purchase_orders", "policies"
   add_foreign_key "purchase_orders", "procurement_terms"

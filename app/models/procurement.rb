@@ -127,8 +127,19 @@ class Procurement < ActiveRecord::Base
           break
         end
       end
-
       awaiting_action
+    end
+  end
+
+  def vendor
+    type_entity.vendor
+  end
+
+  def type_entity
+    if procurement_type == 'purchase_order'
+      purchase_order
+    elsif procurement_type == 'invoice'
+      invoices&.first
     end
   end
 

@@ -9,7 +9,8 @@ class ExportManager::Processor::Email < ExportManager::Processor::Base
 
   def run
     params[:master] = master
-    params[:generator] = generator
+    params[:generator_class] = generator.class.name
+    params[:generator_options] = generator.options
     ExportManager::Processor::Email::BackgroundProcessor.new(user.id, params)
     add_message :success, 'The export will be sent via email within 5 minutes'
     ExportManager::Presenter::SuccessPresenter.new(user, params, messages)
@@ -20,7 +21,12 @@ class ExportManager::Processor::Email < ExportManager::Processor::Base
 
     def init
       self.master = params[:master]
-      self.generator = params[:generator]
+      generator_class = Object.const_get(params[:generator_class])
+      self.generator = generator_class.new(user, params, master, params[:generator_options])
+    end
+
+    def process
+      self.file_url = generator.run
     end
 
   end

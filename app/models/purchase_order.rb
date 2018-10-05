@@ -60,6 +60,7 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :department
   belongs_to :sub_department, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center
+  belongs_to :gst_type
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'

@@ -4,7 +4,8 @@ class ExportManager::Master::BaseMaster
   attr_accessor :user, :params, :input, :errors
 
   MASTERS = {
-      test: 'ExportManager::Master::Test::Provider'
+      test: 'ExportManager::Master::Test::Provider',
+      procurement: 'ExportManager::Master::Procurement::Provider'
   }.with_indifferent_access
 
   DEFAULT_CONFIG = {spreadsheet: true, pdf: true}
@@ -56,6 +57,15 @@ class ExportManager::Master::BaseMaster
   # Input is the what is used for generating the
   def input
     # To be written by every adapter
+  end
+
+  def add_error(message)
+    self.errors = [] if errors.blank?
+    return if message.blank?
+    unless message.is_a?(Array)
+
+    end
+    self.errors << message
   end
 
 end
