@@ -185,6 +185,8 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     # end
     beneficiary_name = beneficiary_name.gsub(/[^0-9A-Za-z]/, '')
     beneficiary_name = beneficiary_name[0..30]&.strip
+
+    beneficiary_ifsc = transfer_request.ifsc&.match(Constants::VALID_IFSC).to_s rescue ""
     self.template = liquid_template.render(
         'UNIQUE_REFERENCE_NUMBER' => transfer_request.generate_unique_reference,
         'APP_ID' => application_id,
@@ -192,7 +194,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         'ACCOUNT_NUMBER' => account_number,
         'BENEFICIARY_NAME' => beneficiary_name,
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number&.strip,
-        'BENEFICIARY_IFSC' => transfer_request.ifsc&.strip,
+        'BENEFICIARY_IFSC' => beneficiary_ifsc,
         'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,
         'TRANSFER_AMOUNT' => transfer_request.transfer_amount,
