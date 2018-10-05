@@ -1,6 +1,6 @@
 class Sso::TokenController < Oauth::TokenController
 
-  attr_accessor :token
+  attr_accessor :company_token
 
   def create
     unless pre_process
@@ -12,8 +12,8 @@ class Sso::TokenController < Oauth::TokenController
     if data.blank?
       return
     end
-    self.token = params[:token]
-    if self.token.blank?
+    self.company_token = params[:token]
+    if self.company_token.blank?
       return
     end
 
@@ -68,7 +68,7 @@ class Sso::TokenController < Oauth::TokenController
   end
 
   def sso_keys
-    sso_key = SsoKey.find_by(token: self.token)
+    sso_key = SsoKey.find_by(token: self.company_token)
     if sso_key.blank?
       return {}
     else
