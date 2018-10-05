@@ -78,7 +78,7 @@ class Sso::TokenController < Oauth::TokenController
 
   def extract_email_from_encrypted_data(data)
     base64_decrypted = Base64.decode64(data)
-    xor_decoded = XorEncryptorDecryptor.encrypt_decrypt(base64_decrypted, sso_keys[:xor_key])
+    xor_decoded = XorEncryptorDecryptor.encrypt_decrypt(base64_decrypted, sso_keys[:xor_key].to_s)
     base64_decoded_again = Base64.decode64(xor_decoded)
     parsed_payload = JSON.parse(base64_decoded_again)
     email = parsed_payload["email"]
@@ -88,7 +88,7 @@ class Sso::TokenController < Oauth::TokenController
   end
 
   def sha512_encrypted_email(email, timestamp)
-    key = sso_keys[:sha512_key] # extracting the encryption key for this particular company
+    key = sso_keys[:sha512_key].to_s # extracting the encryption key for this particular company
     concatenated_string = email.to_s + key.to_s + timestamp.to_s
     encrypted_string = Digest::SHA512.hexdigest(concatenated_string)
   end
