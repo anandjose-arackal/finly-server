@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181004151437) do
+ActiveRecord::Schema.define(version: 20181005035740) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -4587,6 +4587,7 @@ ActiveRecord::Schema.define(version: 20181004151437) do
     t.integer  "company_id", limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.string   "token",      limit: 255
   end
 
   add_index "sso_keys", ["company_id"], name: "index_sso_keys_on_company_id", using: :btree

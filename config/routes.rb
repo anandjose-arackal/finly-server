@@ -699,8 +699,7 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                                                        money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                                                        money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                                                        money_request#destroy
-#                                    darwinbox_create_sso POST   /oauth/sso_login(.:format)                                                                                          darwinbox_sso/token#create
-#                                    remunance_create_sso POST   /remunance/oauth/sso_login(.:format)                                                                                remunance_sso/token#create
+#                                              create_sso POST   /oauth/sso_login(.:format)                                                                                          sso/token#create
 #                                   travel_requests_count GET    /travel_requests/count(.:format)                                                                                    travel_requests#count
 #                                  travel_requests_config GET    /travel_requests/config(.:format)                                                                                   travel_requests#configuration
 #                                   travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                                                travel_requests#review
@@ -2585,14 +2584,19 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
-  ############ Darwinbox SSO LOGIN APIs START #################################
-  post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
-  #############################################################################
 
-  ############ Remunance SSO LOGIN APIs START #################################
-  # post 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
-  get 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
-  ##############################################################################
+  ######################## SSO LOGIN START #############################
+  post 'oauth/sso_login', to: 'sso/token#create', as: :create_sso
+  ######################################################################
+
+  # ############ Darwinbox SSO LOGIN APIs START #################################
+  # post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
+  # #############################################################################
+  #
+  # ############ Remunance SSO LOGIN APIs START #################################
+  # # post 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
+  # get 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
+  # ##############################################################################
 
   ######################### TRAVEL REQUESTS API START ##########################
 
