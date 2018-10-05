@@ -28,6 +28,7 @@ class Template::Create < Template::Base
     self.template = self.resource.amoeba_dup
     self.template.is_template = true
     self.template.template_name = params[:template_name]
+    self.template.user = user
     unless params[:skip_save]
       unless self.template.save
         add_message :error, self.template.errors.full_messages
