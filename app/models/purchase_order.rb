@@ -132,7 +132,6 @@ class PurchaseOrder < ActiveRecord::Base
   after_destroy :budget_trail_destroy
 
   template_config do
-    enable
     include_associations [:policy, :level, :custom_fields, :location, :delivery_location, :vendor, :payment_term, :procurement_term, :status, :department, :sub_department, :cost_center]
     clone [:extra_charges, :items, :document_level_reviewer_mappings, :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount]
     nullify :procurement_id
@@ -147,7 +146,7 @@ class PurchaseOrder < ActiveRecord::Base
     nullify :user_id
   end
 
-  template_merge :procurement_id
+  template_merge :procurement_id, :user_id
 
   def all_items_shipped?
     shipped = true

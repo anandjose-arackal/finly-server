@@ -187,6 +187,7 @@ class User < ActiveRecord::Base
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+  has_many :purchase_orders
 
   has_many :user_department_mappings
   has_many :departments, through: :user_department_mappings

@@ -41,9 +41,9 @@ class Template::Apply < Template::Base
         return
       end
     end
-    # if old_resource.present?
-    #   old_resource.destroy
-    # end
+    if old_resource.present?
+      old_resource.destroy
+    end
   end
 
   def success
