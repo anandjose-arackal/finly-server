@@ -69,4 +69,8 @@ class UserPocket < ActiveRecord::Base
     Payment.scheduled.with_initiating_account_type("UserPocket").with_initiating_account_id(initiating_account.id).without_id(payment_ids).joins(:amount).sum(:value)
   end
 
+  def can_claim_reimbursement
+    cash_pocket?
+  end
+
 end

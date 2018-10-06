@@ -88,7 +88,7 @@ class Expense::Base < BaseOperation
         amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
         balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
         # if the expense is continuing to be from COH, and only the amount is changing
-        if expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
+        if expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) && params&.dig(:amount_attributes, :value).present?
           difference = params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
           unless difference <= balance
             add_message :error, "You do not have enough balance in your #{pocket.name} account to mark this expense against it"

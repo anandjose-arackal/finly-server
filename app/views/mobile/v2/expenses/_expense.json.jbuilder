@@ -17,7 +17,7 @@ if expense.spent_from.present?
   json.pocket do
     json.pocket_name expense.spent_from&.name
     json.pocket_id expense.spent_from&.id
-    json.pocket_balance expense.spent_from&.name
+    json.can_claim_reimbursement expense.spent_from&.can_claim_reimbursement
   end
 end
 
