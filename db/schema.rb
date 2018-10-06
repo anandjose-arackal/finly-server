@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180927081402) do
+ActiveRecord::Schema.define(version: 20181006064102) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -3000,6 +3000,7 @@ ActiveRecord::Schema.define(version: 20180927081402) do
     t.boolean  "exception",                                      default: false
     t.datetime "created_at",                                                     null: false
     t.datetime "updated_at",                                                     null: false
+    t.boolean  "is_deleted",                                     default: false, null: false
   end
 
   add_index "level_reviewer_mappings", ["level_id"], name: "index_level_reviewer_mappings_on_level_id", using: :btree
@@ -3850,6 +3851,7 @@ ActiveRecord::Schema.define(version: 20180927081402) do
     t.boolean  "admin",                default: false, null: false
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false
+    t.boolean  "is_deleted",           default: false, null: false
   end
 
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
@@ -3985,6 +3987,7 @@ ActiveRecord::Schema.define(version: 20180927081402) do
     t.text     "note",                  limit: 65535
     t.boolean  "is_deleted",                          default: false, null: false
     t.string   "procurement_type",      limit: 255
+    t.string   "transaction_id",        limit: 255
   end
 
   add_index "procurements", ["company_id"], name: "index_procurements_on_company_id", using: :btree
@@ -4545,9 +4548,10 @@ ActiveRecord::Schema.define(version: 20180927081402) do
     t.integer  "level_number",           limit: 4
     t.integer  "policy_id",              limit: 4
     t.string   "associated_entity_type", limit: 255
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
     t.string   "name",                   limit: 255
+    t.boolean  "is_deleted",                         default: false, null: false
   end
 
   add_index "reviewal_levels", ["policy_id"], name: "index_reviewal_levels_on_policy_id", using: :btree
@@ -4970,23 +4974,25 @@ ActiveRecord::Schema.define(version: 20180927081402) do
   add_index "user_login_tracks", ["user_id"], name: "index_user_login_tracks_on_user_id", using: :btree
 
   create_table "user_manager_mappings", force: :cascade do |t|
-    t.integer  "user_id",                       limit: 4
-    t.integer  "manager_id",                    limit: 4
-    t.integer  "finance_manager_id",            limit: 4
-    t.integer  "approves_to_id",                limit: 4
-    t.integer  "approves_finance_to_id",        limit: 4
-    t.integer  "greater_than_amount_id",        limit: 4
-    t.boolean  "default",                                 default: false, null: false
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
-    t.integer  "policy_id",                     limit: 4,                 null: false
-    t.integer  "purpose_id",                    limit: 4
-    t.integer  "travel_manager_id",             limit: 4
+    t.integer  "user_id",                            limit: 4
+    t.integer  "manager_id",                         limit: 4
+    t.integer  "finance_manager_id",                 limit: 4
+    t.integer  "approves_to_id",                     limit: 4
+    t.integer  "approves_finance_to_id",             limit: 4
+    t.integer  "greater_than_amount_id",             limit: 4
+    t.boolean  "default",                                      default: false, null: false
+    t.datetime "created_at",                                                   null: false
+    t.datetime "updated_at",                                                   null: false
+    t.integer  "policy_id",                          limit: 4,                 null: false
+    t.integer  "purpose_id",                         limit: 4
+    t.integer  "travel_manager_id",                  limit: 4
     t.boolean  "manager_violation_only"
     t.boolean  "finance_violation_only"
-    t.integer  "travel_booking_selector_id",    limit: 4
-    t.integer  "travel_booking_approves_to_id", limit: 4
-    t.integer  "travel_approves_to_id",         limit: 4
+    t.integer  "travel_booking_selector_id",         limit: 4
+    t.integer  "travel_booking_approves_to_id",      limit: 4
+    t.integer  "travel_approves_to_id",              limit: 4
+    t.boolean  "approves_to_violation_only",                   default: false
+    t.boolean  "approves_finance_to_violation_only",           default: false
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id", using: :btree

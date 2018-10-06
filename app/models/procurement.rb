@@ -14,10 +14,14 @@
 #  note                  :text(65535)
 #  is_deleted            :boolean          default(FALSE), not null
 #  procurement_type      :string(255)
+#  transaction_id        :string(255)
 #
 
 class Procurement < ActiveRecord::Base
-  include SoftDeletable, FindByOrderedIds
+  include SoftDeletable, FindByOrderedIds, Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
+
   belongs_to :user
   belongs_to :company
   belongs_to :procurement_track

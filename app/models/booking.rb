@@ -13,6 +13,7 @@
 #  travel_request_id  :integer          not null
 #  destination_id     :integer          not null
 #  parent_booking_id  :integer
+#  reject_reason      :text(65535)
 #
 
 class Booking < ActiveRecord::Base

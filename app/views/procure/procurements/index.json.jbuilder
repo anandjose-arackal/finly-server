@@ -1,6 +1,9 @@
 json.array! @result.paginated_procurements do |p|
-  json.extract! p, :id, :name, :note, :procurement_type
+  json.extract! p, :id, :name, :note, :procurement_type, :transaction_id
   json.awaiting_action p.awaiting_action?(@result.user)
+
+  json.created_at p.created_at.strftime "%d %b %Y"
+  json.updated_at p.last_updated_at.strftime "%d %b %Y"
 
 
   json.user do
