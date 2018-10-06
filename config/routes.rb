@@ -3096,6 +3096,8 @@ Rails.application.routes.draw do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
 
+    resources :transactions, only: [:index]
+
     get 'categories/invoice', to: 'categories#invoice_categories'
     get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'
 
