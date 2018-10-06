@@ -1,4 +1,4 @@
-class Procurements::PurchaseOrders::Template::Index < Procurements::PurchaseOrders::Template::Base
+class Procurements::PurchaseOrders::Templates::Index < Procurements::PurchaseOrders::Templates::Base
   attr_accessor :purchase_orders
 
   def pre_validate
@@ -11,10 +11,10 @@ class Procurements::PurchaseOrders::Template::Index < Procurements::PurchaseOrde
 
   def success
     params[:purchase_orders] = self.purchase_orders
-    Procurements::PurchaseOrders::Template::Index::SuccessPresenter.new(user, params, messages)
+    Procurements::PurchaseOrders::Templates::Index::SuccessPresenter.new(user, params, messages)
   end
 
-  class Procurements::PurchaseOrders::Template::Index::SuccessPresenter < BaseOperation::BasePresenter
+  class Procurements::PurchaseOrders::Templates::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_orders
 
     def init

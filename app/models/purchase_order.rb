@@ -142,7 +142,7 @@ class PurchaseOrder < ActiveRecord::Base
     nullify :controlling_for_user_id
     nullify :controlling_user_role_id
     nullify :controlling_for_user_role_id
-    nullify :purchase_order_status_id
+    set :purchase_order_status_id => 1
     nullify :user_id
   end
 

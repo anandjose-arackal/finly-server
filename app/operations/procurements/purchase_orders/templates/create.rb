@@ -1,4 +1,4 @@
-class Procurements::PurchaseOrders::Template::Create < Procurements::PurchaseOrders::Template::Base
+class Procurements::PurchaseOrders::Templates::Create < Procurements::PurchaseOrders::Templates::Base
   attr_accessor :purchase_order, :template
 
   def pre_validate
@@ -7,7 +7,7 @@ class Procurements::PurchaseOrders::Template::Create < Procurements::PurchaseOrd
   end
 
   def init
-    result = Procurements::PurchaseOrder::Show.(user, params)
+    result = Procurements::PurchaseOrders::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
@@ -23,7 +23,7 @@ class Procurements::PurchaseOrders::Template::Create < Procurements::PurchaseOrd
   end
 
   def process
-    result = Template::Create.(user, resource: self.purchase_order)
+    result = ::Template::Create.(user, resource: self.purchase_order, template_name: params[:template_name])
     unless result.success?
       add_message :error, result.messages[:error]
       return
@@ -33,10 +33,10 @@ class Procurements::PurchaseOrders::Template::Create < Procurements::PurchaseOrd
 
   def success
     params[:template] = self.template
-    Procurements::PurchaseOrders::Template::Create::SuccessPresenter.new(user, params, messages)
+    Procurements::PurchaseOrders::Templates::Create::SuccessPresenter.new(user, params, messages)
   end
 
-  class Procurements::PurchaseOrders::Template::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::PurchaseOrders::Templates::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :template
 
     def init

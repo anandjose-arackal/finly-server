@@ -1,8 +1,8 @@
-class Procurements::PurchaseOrders::Template::Destroy < Procurements::PurchaseOrders::Template::Base
+class Procurements::PurchaseOrders::Templates::Destroy < Procurements::PurchaseOrders::Templates::Base
   attr_accessor :template
 
   def init
-    result = Procurements::PurchaseOrders::Template::Show.(user, params)
+    result = Procurements::PurchaseOrders::Templates::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return

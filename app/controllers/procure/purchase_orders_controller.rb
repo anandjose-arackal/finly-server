@@ -90,4 +90,31 @@ class Procure::PurchaseOrdersController < ApplicationController
       }
     end
   end
+
+  # Templates
+  def template_create
+    @result = Procurements::PurchaseOrders::Templates::Create.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
+  def template_index
+    @result = Procurements::PurchaseOrders::Templates::Index.(current_user, params)
+    respond
+  end
+
+  def template_show
+    @result = Procurements::PurchaseOrders::Templates::Show.(current_user, params)
+    respond
+  end
+
+  def template_update
+    @result = Procurements::PurchaseOrders::Templates::Update.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
+  def template_destroy
+    @result = Procurements::PurchaseOrders::Templates::Destroy.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
 end

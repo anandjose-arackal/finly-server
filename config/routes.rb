@@ -3156,6 +3156,13 @@ Rails.application.routes.draw do
 
 
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
+
+    get 'purchase_orders/templates', to: 'purchase_orders#template_index'
+    get 'purchase_orders/templates/:id', to: 'purchase_orders#template_show'
+    # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
+    patch 'purchase_orders/templates/:id', to: 'purchase_orders#template_update'
+    delete 'purchase_orders/templates/:id', to: 'purchase_orders#template_destroy'
+
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
@@ -3165,7 +3172,10 @@ Rails.application.routes.draw do
       put 'close', to: 'purchase_orders#close'
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
+      post 'save_as_template', to: 'purchase_orders#template_create'
+      post 'apply_template', to: 'purchase_orders#template_apply'
     end
+
 
     resources :inward_documents do
 
