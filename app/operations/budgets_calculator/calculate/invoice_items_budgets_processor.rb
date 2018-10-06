@@ -26,7 +26,7 @@ class BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor < BudgetsCalcul
         id: trail_id,
         procurement_id: invoice_item.parent.procurement_id,
         entity: invoice_item,
-        category_id: invoice_item.inventory_line_item.category_id,
+        category_id: invoice_item.inventory_line_item&.category_id,
         cost_center_id: invoice_item.parent.cost_center_id,
         user_id: invoice_item.parent.created_by_user_id,
         location_id: invoice_item.parent.location_id,
