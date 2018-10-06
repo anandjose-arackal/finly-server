@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :policies
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
-    self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
+    self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
   end
 
   def validate
