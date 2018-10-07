@@ -63,7 +63,6 @@ class Procurements::Index < Procurements::Base
     invoice_status_ids = [InwardInvoiceStatus.id_for(:approved), InwardInvoiceStatus.id_for(:unpaid), InwardInvoiceStatus.id_for(:partially_paid), InwardInvoiceStatus.id_for(:paid)]
     procurement_ids += user.company.inward_invoices.with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)
 
-
     # If admin, select all procurements
     if user.vendor_payment_admin?
       procurement_ids += user.company.purchase_orders.pluck(:procurement_id)

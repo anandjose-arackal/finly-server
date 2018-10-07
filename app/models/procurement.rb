@@ -20,7 +20,7 @@
 class Procurement < ActiveRecord::Base
   include SoftDeletable, FindByOrderedIds, Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
+  acts_as_sequenced column: :transaction_id, purpose: :procurement, editable: false
 
   belongs_to :user
   belongs_to :company
@@ -134,6 +134,22 @@ class Procurement < ActiveRecord::Base
 
       awaiting_action
     end
+  end
+
+  def documents
+    data = []
+    data.push self.purchase_order if self.purchase_order.present?
+
+    invoices = self.invoices&.to_a
+    data += invoices
+    data += self.inward_documents&.to_a
+    data += self.payments&.to_a
+
+    invoices.each do |invoice|
+      data += invoice.payments
+    end
+
+    data.sort_by!{ |doc| doc.created_at}.reverse!
   end
 
 end

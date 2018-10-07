@@ -3,14 +3,12 @@ json.array! @result.paginated_procurements do |p|
   json.awaiting_action p.awaiting_action?(@result.user)
 
   json.created_at p.created_at.strftime "%d %b %Y"
-  json.updated_at p.last_updated_at.strftime "%d %b %Y"
+  # json.updated_at p.last_updated_at.strftime "%d %b %Y"
 
 
   json.user do
     json.extract! p.user, :id, :name, :email, :mobile_number
   end
-
-  json.created_at p.created_at.strftime("%d %m %Y")
 
   if p.purchase_order.present?
     json.document 'Purchase Order'
@@ -51,5 +49,9 @@ json.array! @result.paginated_procurements do |p|
     json.department department&.name
     json.sub_department sub_department&.name
     json.cost_center cost_center&.name
+  end
+
+  p.documents.each do |document|
+    json.merge! document.overview_json
   end
 end
