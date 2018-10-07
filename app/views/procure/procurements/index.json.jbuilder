@@ -10,6 +10,9 @@ json.array! @result.paginated_procurements do |p|
     json.extract! p.user, :id, :name, :email, :mobile_number
   end
 
+  json.status_tag_details p.status_tag_details
+
+
   if p.purchase_order.present?
     json.document 'Purchase Order'
     json.po_number p.purchase_order.po_number
