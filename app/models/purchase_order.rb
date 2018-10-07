@@ -140,8 +140,18 @@ class PurchaseOrder < ActiveRecord::Base
     shipped
   end
 
-  private
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.po_number,
+        amount: self.balance_amount&.value,
+        document_status: self.status&.name,
+        document_owner: self.user&.name,
+        document_type: self.class.name
+    }
+  end
 
+  private
 
   def calculate_line_items
     total_before_tax_amount = 0

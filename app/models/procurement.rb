@@ -136,6 +136,65 @@ class Procurement < ActiveRecord::Base
     end
   end
 
+  def status_tags_details
+    tag_ids = self.status_tags.pluck(:id)
+
+    data = {
+        purchase_order: {},
+        invoice: {},
+        shipment: {},
+        payment: {}
+    }
+
+    if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
+      data[:purchase_order][:status] = 'complete'
+    elsif tag_id.include? StatusTag.id_for(:po_processing)
+      data[:purchase_order][:status] = 'processing'
+      data[:status_message] = 'PO Processing'
+      data[:status_text] = 'PO Approval is Pending'
+    else
+      data[:purchase_order][:status] = 'init'
+      data[:status_message] = 'PO Processing'
+      data[:status_text] = 'PO Approval is Pending'
+    end
+
+    if tag_ids.include? StatusTag.id_for(:invoice_approved)
+      data[:invoice][:status] = 'complete'
+    elsif (tag_id.include? StatusTag.id_for(:invoice_processing)) || (tag_ids.include? StatusTag.id_for(:invoice_received))
+      data[:invoice][:status] = 'processing'
+      data[:status_message] = 'Invoice Processing'
+      data[:status_text] = 'Invoice Approval is Pending'
+    else
+      data[:invoice][:status] = 'init'
+      data[:status_message] = 'Invoice Processing'
+      data[:status_text] = 'Invoice Approval is Pending'
+    end
+
+    if tag_ids.include?(StatusTag.id_for(:shipment_received))
+      data[:shipment][:status] = 'complete'
+    elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
+      data[:shipment][:status] = 'processing'
+      data[:status_message] = 'Awaiting Shipment'
+      data[:status_text] = 'Shipment Pending'
+    else
+      data[:shipment][:status] = 'init'
+      data[:status_message] = 'Awaiting Shipment'
+      data[:status_text] = 'Shipment Pending'
+    end
+
+    if tag_ids.include?(StatusTag.id_for(:payment_processed))
+      data[:payment][:status] = 'complete'
+    elsif tag_ids.include?(StatusTag.id_for(:payment_processing))
+      data[:payment][:status] = 'processing'
+    else
+      data[:payment][:status] = 'init'
+    end
+  end
+
+  def last_updated_at
+    self.documents.map(&:updated_at).sort!.reverse!.first
+  end
+
   def documents
     data = []
     data.push self.purchase_order if self.purchase_order.present?
@@ -143,7 +202,7 @@ class Procurement < ActiveRecord::Base
     invoices = self.invoices&.to_a
     data += invoices
     data += self.inward_documents&.to_a
-    data += self.payments&.to_a
+    # data += self.payments&.to_a
 
     invoices.each do |invoice|
       data += invoice.payments

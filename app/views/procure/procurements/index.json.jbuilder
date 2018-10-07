@@ -3,7 +3,7 @@ json.array! @result.paginated_procurements do |p|
   json.awaiting_action p.awaiting_action?(@result.user)
 
   json.created_at p.created_at.strftime "%d %b %Y"
-  # json.updated_at p.last_updated_at.strftime "%d %b %Y"
+  json.updated_at p.last_updated_at&.strftime "%d %b %Y"
 
 
   json.user do
@@ -51,7 +51,9 @@ json.array! @result.paginated_procurements do |p|
     json.cost_center cost_center&.name
   end
 
-  p.documents.each do |document|
-    json.merge! document.overview_json
+  json.documents do
+    json.array! p.documents do |document|
+      json.merge! document.procurement_index_details
+    end
   end
 end

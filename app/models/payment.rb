@@ -442,6 +442,17 @@ class Payment < ActiveRecord::Base
     self.payment_order.company_id
   end
 
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.id,
+        amount: self.amount.value,
+        document_owner: self.initiating_user&.name,
+        document_status: self.payment_status&.name,
+        document_type: self.class.name
+    }
+  end
+
   private
 
   def initiating_account_presence
