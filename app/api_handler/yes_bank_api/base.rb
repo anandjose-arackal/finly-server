@@ -231,16 +231,20 @@ class YesBankApi::Base < BaseHandler
         #     }
         # }
     rescue Faraday::ResourceNotFound
-      file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'}))
+      if Rails.env.production?
+        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'}))
+      end
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
-    rescue Exception => e
-      stack_trace = e.message
-      e.backtrace.each do |line|
-        stack_trace += "\n#{line}"
-      end
-      file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
+    # rescue Exception => e
+    #   stack_trace = e.message
+    #   e.backtrace.each do |line|
+    #     stack_trace += "\n#{line}"
+    #   end
+    #   if Rails.env.production?
+    #     file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
+    #   end
     end
   end
 

@@ -16,6 +16,7 @@
 #  department_id     :integer
 #  date              :date
 #  sub_department_id :integer
+#  procurement_id    :integer
 #
 
 require 'test_helper'
