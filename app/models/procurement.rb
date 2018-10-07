@@ -150,12 +150,17 @@ class Procurement < ActiveRecord::Base
       data[:payment][:status] = 'complete'
       data[:status_message] = 'Transaction Complete'
       data[:status_text] = 'Complete. No Pending Actions'
+      data[:status_type] = 'payment'
     elsif tag_ids.include?(StatusTag.id_for(:payment_processing))
       data[:payment][:status] = 'processing'
       data[:status_message] = 'Payment Processing'
       data[:status_text] = 'Payment Processing'
+      data[:status_type] = 'payment'
     else
       data[:payment][:status] = 'init'
+      data[:status_message] = 'Payment Processing'
+      data[:status_text] = 'Awaiting Payment'
+      data[:status_type] = 'payment'
     end
 
     if tag_ids.include?(StatusTag.id_for(:shipment_received))
@@ -164,10 +169,12 @@ class Procurement < ActiveRecord::Base
       data[:shipment][:status] = 'processing'
       data[:status_message] = 'Awaiting Shipment'
       data[:status_text] = 'Shipment Pending'
+      data[:status_type] = 'shipment'
     else
       data[:shipment][:status] = 'init'
       data[:status_message] = 'Awaiting Shipment'
       data[:status_text] = 'Shipment Pending'
+      data[:status_type] = 'shipment'
     end
 
     if tag_ids.include? StatusTag.id_for(:invoice_approved)
@@ -176,10 +183,12 @@ class Procurement < ActiveRecord::Base
       data[:invoice][:status] = 'processing'
       data[:status_message] = 'Invoice Processing'
       data[:status_text] = 'Invoice Approval is Pending'
+      data[:status_type] = 'invoice'
     else
       data[:invoice][:status] = 'init'
       data[:status_message] = 'Invoice Processing'
       data[:status_text] = 'Invoice Approval is Pending'
+      data[:status_type] = 'invoice'
     end
 
     if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
@@ -188,10 +197,12 @@ class Procurement < ActiveRecord::Base
       data[:purchase_order][:status] = 'processing'
       data[:status_message] = 'PO Processing'
       data[:status_text] = 'PO Approval is Pending'
+      data[:status_type] = 'purchase_order'
     else
       data[:purchase_order][:status] = 'init'
       data[:status_message] = 'PO Processing'
       data[:status_text] = 'PO Approval is Pending'
+      data[:status_type] = 'purchase_order'
     end
 
     data
