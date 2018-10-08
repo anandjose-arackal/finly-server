@@ -18,7 +18,7 @@ class Invoicing::Invoice::Base < BaseOperation
   end
 
   def invoice_params
-    params.require(:invoice).permit(:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
+    params.require(:invoice).permit(:tax, :gst_type_id, :tds, :tds_slab_id, :category_id,
                                      :tax_type_id, :discount, :date, :discount_type_id, :due_date, :payment_term_id,
                                      :invoice_number, :inclusive_of_taxes, :outward_invoice_type_id,
                                      original_amount_attributes: [:value, :currency_id],

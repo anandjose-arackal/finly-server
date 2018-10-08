@@ -43,6 +43,7 @@
 #  outward_invoice_type_id :integer          default(1)
 #  terms                   :text(65535)
 #  location_id             :integer
+#  tds_slab_id             :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -76,6 +77,7 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :outward_invoice_type
   belongs_to :location, class_name: "BranchLocation"
   belongs_to :gst_type
+  belongs_to :tds_slab, class_name: "TdsRatesList"
 
   # has_one :virtual_bank_account, as: :parent
   belongs_to :virtual_account, class_name: "VirtualBankAccount"

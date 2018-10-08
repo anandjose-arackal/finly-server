@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181005035740) do
+ActiveRecord::Schema.define(version: 20181008100854) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -3536,6 +3536,7 @@ ActiveRecord::Schema.define(version: 20181005035740) do
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
     t.integer  "location_id",             limit: 4
+    t.integer  "tds_slab_id",             limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
