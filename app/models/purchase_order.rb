@@ -107,6 +107,7 @@ class PurchaseOrder < ActiveRecord::Base
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
   scope :filter_po_number, -> (po_number) {where('purchase_orders.po_number LIKE ?', "%#{po_number}%")}
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+  scope :with_po_number, -> (po_number) {where po_number: po_number}
 
   # Used for generating document number
   scope :valid, -> {
