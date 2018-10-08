@@ -63,6 +63,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       actions = {}
       actions[:audit_trail] = true
 
+      if self.invoice.items.count > 0
+        actions[:show_comments] = true
+      end
 
       if document_owner? && (self.invoice.open? || self.invoice.retracted? || self.invoice.rejected?)
         actions[:policy_editable] = get_policy_editable
