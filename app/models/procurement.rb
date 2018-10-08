@@ -221,9 +221,15 @@ class Procurement < ActiveRecord::Base
       data[:status_type] = 'invoice'
     else
       data[:invoice][:status] = 'init'
-      data[:status_message] = 'Invoice Processing'
-      data[:status_text] = 'Invoice Approval is Pending'
       data[:status_type] = 'invoice'
+      if self.invoices.present?
+        data[:status_message] = 'Invoice Processing'
+        data[:status_text] = 'Invoice Approval is Pending'
+      else
+        data[:status_message] = 'Awaiting Invoice'
+        data[:status_text] = 'Invoice Upload Pending'
+      end
+
     end
 
     if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
