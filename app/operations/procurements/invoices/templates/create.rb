@@ -3,7 +3,6 @@ class Procurements::Invoices::Templates::Create < Procurements::Invoices::Templa
 
   def pre_validate
     user_present? and params_present?
-    return if has_errors?
   end
 
   def init
@@ -17,7 +16,7 @@ class Procurements::Invoices::Templates::Create < Procurements::Invoices::Templa
 
   def validate
     unless self.invoice.present?
-      add_message :error, 'Purchase Order not found'
+      add_message :error, 'Invoice not found'
       return
     end
   end

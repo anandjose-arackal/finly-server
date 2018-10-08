@@ -161,10 +161,10 @@ class Invoice < ActiveRecord::Base
 
   scope :with_id, -> (id) {where id: id}
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
-  scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
+  scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
   scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
-  scope :with_procurement, -> { where("invoices.procurement_id IS NOT NULL")}
+  scope :with_procurement, -> {where("invoices.procurement_id IS NOT NULL")}
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
 
 
@@ -194,8 +194,8 @@ class Invoice < ActiveRecord::Base
     where('due_date >= ? && due_date <= ?', from, to)
   }
 
-  scope :created_at_desc, -> { order(created_at: :desc) }
-  scope :created_at_asc, -> { order(created_at: :asc) }
+  scope :created_at_desc, -> {order(created_at: :desc)}
+  scope :created_at_asc, -> {order(created_at: :asc)}
 
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
 
@@ -206,9 +206,19 @@ class Invoice < ActiveRecord::Base
 
   template_merge :procurement_id
   template_config do
-    include_associations [:address, :category, :cost_center, :company, :invoice_status, :receiving_account, :vendor, :location, :delivery_location, :procurement, :remaining_amount, :invoice_type, :gst_type, :tds_slab, :payment_term, :controlling_user, :controlling_for_user, :controlling_user_role, :controlling_for_user_role, :department, :sub_department, :policy, :level, :document_level_reviewer_mappings, :payments, :invoice_items, :invoice_attachments, :attachments, :custom_fields, :comments, :trails]
-    clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount,]
+    include_associations [:address, :category, :cost_center, :company, :receiving_account, :vendor, :location,
+                          :delivery_location, :remaining_amount, :invoice_type, :gst_type,
+                          :tds_slab, :payment_term, :controlling_user, :controlling_for_user,
+                          :controlling_user_role, :controlling_for_user_role, :department,
+                          :sub_department, :policy, :level, :document_level_reviewer_mappings]
+    clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
+           :original_amount, :freight_amount, :taxable_amount,
+           :invoice_items, :invoice_attachments, :attachments, :custom_fields]
     nullify :created_by_id
+    nullify :invoice_status_id
+    nullify :remaining_amount_id
+    nullify :advance_amount_id
+    nullify :balance_due_id
   end
 
   def policy
