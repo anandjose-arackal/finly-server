@@ -23,9 +23,20 @@ class Procurements::Invoices::Destroy < Procurements::Invoices::Base
   end
 
   def process
-    if self.procurement.destroy
-      add_message :success, "Successfully Deleted Procurement"
+    if procurement.procurement_type == 'invoice'
+      if self.procurement.invoices.count == 1
+        if self.procurement.destroy
+          add_message :success, "Successfully Deleted Procurement"
+        end
+      else
+        if self.invoice.destroy
+          add_message :success, 'Successfully Deleted Invoice'
+        end
+      end
+    else
+      if self.invoice.destroy
+        add_message :success, 'Successfully Deleted Invoice'
+      end
     end
   end
-
 end
