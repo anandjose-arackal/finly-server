@@ -4,7 +4,15 @@ class  Invoicing::Transactions::Index < Invoicing::Transactions::Base
   def init
     virtual_account_op = Invoicing::VirtualBankAccount::Index.(user, params)
 
-    self.virtual_bank_accounts = virtual_account_op.virtual_bank_accounts
+    if virtual_account_op.success?
+      self.virtual_bank_accounts = virtual_account_op.virtual_bank_accounts
+    else
+      add_message :error, virtual_account_op.errors.full_messages
+    end
+  end
+
+  def validate
+
   end
 
   def process
