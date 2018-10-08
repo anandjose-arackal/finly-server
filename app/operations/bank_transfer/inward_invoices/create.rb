@@ -25,7 +25,11 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
   end
 
   def process
-    self.inward_invoice = user.company.inward_invoices.build(self.inward_invoice_parameters)
+    if params[:template_id].present?
+      load_invoice_from_template
+    else
+      self.inward_invoice = user.company.inward_invoices.build(self.inward_invoice_parameters)
+    end
     # assign the attributes to the invoice and calculate the various amounts
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_parameters)
 
@@ -43,6 +47,18 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
   def success
     params[:inward_invoice] = self.inward_invoice
     BankTransfer::InwardInvoices::Show::InvoicePresenter.new(user, params, messages)
+  end
+  
+  protected
+
+  def load_invoice_from_template
+    result = Procurements::Invoices::Templates::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    self.template = result.template
+    self.purchase_order = self.template.amoeba_dup
   end
 
 

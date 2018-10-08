@@ -53,4 +53,35 @@ class Procure::InwardInvoicesController < ApplicationController
     respond
   end
 
+  # Templates
+  def template_create
+    @result = Procurements::Invoices::Templates::Create.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
+  def template_apply
+    @result = Procurements::Invoices::Templates::Apply.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
+  def template_index
+    @result = Procurements::Invoices::Templates::Index.(current_user, params)
+    respond
+  end
+
+  def template_show
+    @result = Procurements::Invoices::Templates::Show.(current_user, params)
+    respond
+  end
+
+  def template_update
+    @result = Procurements::Invoices::Templates::Update.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
+  def template_destroy
+    @result = Procurements::Invoices::Templates::Destroy.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
 end

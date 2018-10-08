@@ -208,17 +208,26 @@ class Invoice < ActiveRecord::Base
   template_config do
     include_associations [:address, :category, :cost_center, :company, :receiving_account, :vendor, :location,
                           :delivery_location, :remaining_amount, :invoice_type, :gst_type,
-                          :tds_slab, :payment_term, :controlling_user, :controlling_for_user,
-                          :controlling_user_role, :controlling_for_user_role, :department,
-                          :sub_department, :policy, :level, :document_level_reviewer_mappings]
+                          :tds_slab, :payment_term, :department, :sub_department, :policy, :level]
     clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
            :original_amount, :freight_amount, :taxable_amount,
-           :invoice_items, :invoice_attachments, :attachments, :custom_fields]
+           :invoice_items, :invoice_attachments, :attachments, :custom_fields,
+           :document_level_reviewer_mappings]
     nullify :created_by_id
     nullify :invoice_status_id
     nullify :remaining_amount_id
     nullify :advance_amount_id
     nullify :balance_due_id
+    nullify :controlling_user_id
+    nullify :controlling_for_user_id
+    nullify :controlling_user_role_id
+    nullify :controlling_for_user_role_id
+    nullify :template_name
+    nullify :is_template
+    nullify :user_id
+    nullify :invoice_number
+    nullify :invoice_date
+    set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
   end
 
   def policy
