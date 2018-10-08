@@ -99,7 +99,7 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def template_apply
     @result = Procurements::PurchaseOrders::Templates::Apply.(current_user, params)
-    respond response: @result.success? ? :success : :failure
+    respond
   end
 
   def template_index
