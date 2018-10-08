@@ -69,6 +69,8 @@
 #              2 - CGST + SGST
 
 class Invoice < ActiveRecord::Base
+  include SoftDeletable, Templatable
+
   belongs_to :address
   belongs_to :amount
   belongs_to :gross_amount, class_name: "Amount"

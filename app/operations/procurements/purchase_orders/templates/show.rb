@@ -4,7 +4,7 @@ class Procurements::PurchaseOrders::Templates::Show < Procurements::PurchaseOrde
   def pre_validate
     user_present? and params_present?
     return if has_errors?
-    if params[:id].blank? and params[:purchase_order_id].blank? and params[:template_id].blank?
+    if params[:id].blank? and params[:purchase_order_template_id].blank? and params[:template_id].blank?
       add_message :error, 'Template not found'
       return
     end

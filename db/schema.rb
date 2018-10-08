@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181005123409) do
+ActiveRecord::Schema.define(version: 20181008064652) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2858,6 +2858,7 @@ ActiveRecord::Schema.define(version: 20181005123409) do
     t.text     "shipping_address",             limit: 65535
     t.boolean  "is_template",                                                          default: false
     t.string   "template_name",                limit: 255
+    t.boolean  "is_deleted",                                                           default: false
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree

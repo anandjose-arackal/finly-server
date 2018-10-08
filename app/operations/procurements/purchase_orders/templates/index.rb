@@ -6,7 +6,7 @@ class Procurements::PurchaseOrders::Templates::Index < Procurements::PurchaseOrd
   end
 
   def init
-    self.purchase_orders = user.purchase_orders.templates
+    self.purchase_orders = user.purchase_orders_templates
   end
 
   def success
