@@ -38,8 +38,8 @@
 #  scheduled_at                   :date
 #  processed_at                   :date
 #  cost_center_id                 :integer
-#  transaction_reference_id       :string(255)
 #
+
 
 
 
@@ -441,6 +441,17 @@ class Payment < ActiveRecord::Base
 
   def company_id
     self.payment_order.company_id
+  end
+
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.id,
+        amount: self.amount.value,
+        document_owner: self.initiating_user&.name,
+        document_status: self.payment_status&.name,
+        document_type: self.class.name
+    }
   end
 
   private
