@@ -73,27 +73,49 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
         end
         next
       end
-      expense_ids = nil
       if finly_transaction.payment&.reimbursed_reports.present?
-        expense_ids = Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id)).pluck(:id)&.join(',')
+        # expense_ids = Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id)).pluck(:id)&.join(',')
+        Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id)).reimbursable.each do |expense|
+          c = finly_transaction.credit? ? expense.amount.value : nil
+          d = finly_transaction.debit? ? expense.amount.value : nil
+          contents << [
+              DateUtils.date_formatted(finly_transaction.date),
+              finly_transaction.transaction_type.name.humanize,
+              finly_transaction.payment_purpose.name.humanize,
+              expense.merchant_name,
+              c,
+              d,
+              nil,#finly_transaction.closing_balance&.value,
+              finly_transaction.status.name.humanize,
+              finly_transaction.transaction_reference_id,
+              finly_transaction.payment&.note,
+              expense.report_id,
+              finly_transaction.finly_account_type,
+              (finly_transaction.finly_account.user.name rescue nil),
+              nil,
+              expense.id
+          ]
+        end
+      else
+        contents << [
+            DateUtils.date_formatted(finly_transaction.date),
+            finly_transaction.transaction_type.name.humanize,
+            finly_transaction.payment_purpose.name.humanize,
+            merchant(finly_transaction),
+            credit_amount,
+            debit_amount,
+            finly_transaction.closing_balance&.value,
+            finly_transaction.status.name.humanize,
+            finly_transaction.transaction_reference_id,
+            finly_transaction.payment&.note,
+            finly_transaction.payment&.reimbursed_reports&.pluck(:id)&.join(','),
+            finly_transaction.finly_account_type,
+            (finly_transaction.finly_account.user.name rescue nil),
+            nil,
+            nil
+        ]
       end
-      contents << [
-          DateUtils.date_formatted(finly_transaction.date),
-          finly_transaction.transaction_type.name.humanize,
-          finly_transaction.payment_purpose.name.humanize,
-          merchant(finly_transaction),
-          credit_amount,
-          debit_amount,
-          finly_transaction.closing_balance&.value,
-          finly_transaction.status.name.humanize,
-          finly_transaction.transaction_reference_id,
-          finly_transaction.payment&.note,
-          finly_transaction.payment&.reimbursed_reports&.pluck(:id)&.join(','),
-          finly_transaction.finly_account_type,
-          (finly_transaction.finly_account.user.name rescue nil),
-          nil,
-          expense_ids
-      ]
+
     end
   end
 

@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::Templates::Apply < Procurements::PurchaseOrd
   attr_accessor :template, :purchase_order, :updated_purchase_order
 
   def init
-    po_result = Procure::PurchaseOrder::Show.(user, params)
+    po_result = Procure::PurchaseOrders::Show.(user, params)
     unless po_result.success?
       add_message :error, po_result.messages[:error]
       return

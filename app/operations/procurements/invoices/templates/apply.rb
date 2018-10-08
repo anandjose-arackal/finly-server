@@ -2,7 +2,7 @@ class Procurements::Invoices::Templates::Apply < Procurements::Invoices::Templat
   attr_accessor :template, :invoice, :updated_invoice
 
   def init
-    invoice_result = Procure::PurchaseOrder::Show.(user, params)
+    invoice_result = Procure::Invoices::Show.(user, params)
     unless invoice_result.success?
       add_message :error, invoice_result.messages[:error]
       return
