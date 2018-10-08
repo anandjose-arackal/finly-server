@@ -16,7 +16,6 @@
 #  department_id     :integer
 #  date              :date
 #  sub_department_id :integer
-#  procurement_id    :integer
 #
 
 class BudgetTrail < ActiveRecord::Base

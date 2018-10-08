@@ -80,7 +80,8 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
   def create_inward_document_params
     {
         company_id: procurement.company.id,
-        vendor_id: purchase_order&.vendor&.id
+        vendor_id: purchase_order&.vendor&.id,
+        user: user
     }
 
   end

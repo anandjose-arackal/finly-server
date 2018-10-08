@@ -17,7 +17,7 @@
 #  registered_mobile_number         :string(255)
 #  bank_type                        :string(255)
 #  default_card_expense_category_id :integer
-#  sso_enabled                      :boolean          default(FALSE)
+#  darwinbox_sso_enabled            :boolean          default(FALSE)
 #
 
 
