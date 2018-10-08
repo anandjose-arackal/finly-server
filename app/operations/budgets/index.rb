@@ -10,7 +10,7 @@ class Budgets::Index < Budgets::Base
   end
 
   def success
-    params[:budgets] = budgets
+    params[:budgets] = budgets.include_details
     Budgets::Index::IndexPresenter.new(user, params, messages)
   end
 

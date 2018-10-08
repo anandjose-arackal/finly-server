@@ -54,7 +54,9 @@ class MoneyRequest::Create < MoneyRequest::Base
     end
 
     self.money_request = for_user.money_requests.build param
-    money_request.skip_customizable_validation = true # As validation breaks the creation and loading money request, prevent it during creation
+    if self.money_request.travel_request.blank?
+      money_request.skip_customizable_validation = true # As validation breaks the creation and loading money request, prevent it during creation
+    end
     if money_request.save
       self.money_request.tracks.create action_user: for_user,
                                        action_user_role_id: UserRole.id_for(:employee),

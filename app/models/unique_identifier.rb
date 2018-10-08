@@ -21,4 +21,5 @@ class UniqueIdentifier < ActiveRecord::Base
   validates :purpose, presence: true
   validates :company_id, presence: true
   validates :sequence_start, presence: true
+
 end
