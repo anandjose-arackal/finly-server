@@ -31,6 +31,10 @@ class Procurements::PurchaseOrders::Templates::Create < Procurements::PurchaseOr
     self.template = result.template
   end
 
+  def post_process
+    add_message :success, 'Template saved'
+  end
+
   def success
     params[:template] = self.template
     Procurements::PurchaseOrders::Templates::Create::SuccessPresenter.new(user, params, messages)

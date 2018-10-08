@@ -32,7 +32,7 @@ class Procurements::PurchaseOrders::Templates::Show < Procurements::PurchaseOrde
     Procurements::PurchaseOrders::Templates::Show::SuccessPresenter.new(user, params, messages)
   end
 
-  class Procurements::PurchaseOrders::Templates::Show::SuccessPresenter < BaseOperation::BasePresenter
+  class Procurements::PurchaseOrders::Templates::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :template
 
     def init

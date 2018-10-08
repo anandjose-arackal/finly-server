@@ -28,17 +28,18 @@ class Procurements::PurchaseOrders::Templates::Apply < Procurements::PurchaseOrd
   end
 
   def process
-    result = Template::Apply.(user, template: self.template, resource: self.resource)
+    result = Template::Apply.(user, template: self.template, resource: self.purchase_order)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    self.purchase_order = result.purchase_order
+    self.purchase_order = result.resource
   end
 
   def success
     params[:purchase_order] = self.purchase_order
     params[:template] = self.template
+    Procurements::PurchaseOrders::Templates::Apply::SuccessPresenter.new(user, params, messages)
   end
 
   class Procurements::PurchaseOrders::Templates::Apply::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
