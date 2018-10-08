@@ -5,7 +5,8 @@ class Procurements::PurchaseOrders::Templates::Show < Procurements::PurchaseOrde
     user_present? and params_present?
     return if has_errors?
     if params[:id].blank? and params[:purchase_order_id].blank? and params[:template_id].blank?
-
+      add_message :error, 'Template not found'
+      return
     end
   end
 
@@ -15,7 +16,7 @@ class Procurements::PurchaseOrders::Templates::Show < Procurements::PurchaseOrde
       add_message :error, result.messages[:error]
       return
     end
-    id = params[:id] || params[:purchase_order_id] || params[:template_id]
+    id = params[:purchase_order_template_id] || params[:template_id] || params[:id]
     self.purchase_order = result.purchase_orders.find_by(id: id)
   end
 
