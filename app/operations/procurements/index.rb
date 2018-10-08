@@ -97,6 +97,10 @@ class Procurements::Index < Procurements::Base
         set_scope
         self.procurements = apply_scopes(self.procurements, params)
       end
+
+      if params[:filter_awaiting_approval].present?
+        self.procurements = self.procurements.filter_awaiting_approval(user)
+      end
     end
 
     def awaiting_action?(procurement)
@@ -110,6 +114,8 @@ class Procurements::Index < Procurements::Base
           params[:filter_invoice_number] = params[:search_query]
         when 'po_number'
           params[:filter_po_number] = params[:search_query]
+        when 'procurement_name'
+          params[:filter_procurement_name] = params[:search_query]
         else
           # do nothing
       end

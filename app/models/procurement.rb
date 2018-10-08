@@ -65,7 +65,9 @@ class Procurement < ActiveRecord::Base
       find_ordered(ordered_ids)
     end
   }
-
+  scope :filter_procurement_name, -> (name) {
+    where "procurements.name LIKE ?", "%#{name}%"
+  }
   scope :filter_po_number, -> (po_number) {
     filtered_ids = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
     where id: filtered_ids
@@ -94,6 +96,39 @@ class Procurement < ActiveRecord::Base
 
     where(id: filter_procurement_ids)
   }
+
+  scope :filter_awaiting_approval, -> (user) {
+    if user.vendor_payments_reviewer?
+      level_ids = []
+      policies = user.company.policies.with_application(:vp)
+      policies.each do |policy|
+        levels = policy.levels.with_entity_type('PurchaseOrder')
+        levels.each do |level|
+          if level.reviewers.pluck(:id).include? user.id
+            level_ids.push(level.id)
+          end
+        end
+      end
+
+      # Find all the purchase order with controlling level from above
+      purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
+      # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
+      purchase_order_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+      other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+
+      purchase_order_ids -= other_reviewer_po_ids
+
+      purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids).with_status_ids(PurchaseOrderStatus.id_for(:processing))
+
+      all_level_ids = purchase_orders.pluck(:controlling_level_id)
+
+      purchase_orders = purchase_orders.with_controlling_level_ids(level_ids & all_level_ids)
+
+      where(id: purchase_orders.pluck(:procurement_id))
+    end
+  }
+
 
   scope :include_details, -> {
     includes(
