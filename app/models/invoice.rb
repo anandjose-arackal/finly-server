@@ -116,16 +116,15 @@ class Invoice < ActiveRecord::Base
   # because multiple payments can be made against one invoice
   has_many :payments
 
-  has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
+  has_many :invoice_items, class_name: 'InvoiceLineItem', as: :parent
   has_many :invoice_attachments
 
   # Attachments created for procurement
-  has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
+  has_many :attachments, class_name: 'ProcurementAttachment', as: :procurement_document
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   # From Procurement workflow
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
-
 
   has_many :trails, as: :parent
 
@@ -204,6 +203,13 @@ class Invoice < ActiveRecord::Base
   scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
 
   after_create :set_defaults
+
+  template_merge :procurement_id
+  template_config do
+    include_associations [:address, :category, :cost_center, :company, :invoice_status, :receiving_account, :vendor, :location, :delivery_location, :procurement, :remaining_amount, :invoice_type, :gst_type, :tds_slab, :payment_term, :controlling_user, :controlling_for_user, :controlling_user_role, :controlling_for_user_role, :department, :sub_department, :policy, :level, :document_level_reviewer_mappings, :payments, :invoice_items, :invoice_attachments, :attachments, :custom_fields, :comments, :trails]
+    clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :original_amount, :advance_amount, :freight_amount, :balance_due, :taxable_amount,]
+    nullify :created_by_id
+  end
 
   def policy
     self.payment&.payment_order&.bank_payment_request&.policy
