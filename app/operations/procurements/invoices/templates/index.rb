@@ -6,7 +6,7 @@ class Procurements::Invoices::Templates::Index < Procurements::Invoices::Templat
   end
 
   def init
-    self.invoices = user.invoices.templates
+    self.invoices = user.invoice_templates
   end
 
   def success

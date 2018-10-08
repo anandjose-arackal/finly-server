@@ -2,12 +2,12 @@ class Procurements::Invoices::Templates::Apply < Procurements::Invoices::Templat
   attr_accessor :template, :invoice, :updated_invoice
 
   def init
-    invoice_result = Procure::Invoices::Show.(user, params)
-    unless invoice_result.success?
-      add_message :error, invoice_result.messages[:error]
+    po_result = Procurements::Invoices::Show.(user, params)
+    unless po_result.success?
+      add_message :error, po_result.messages[:error]
       return
     end
-    self.invoice = invoice_result.invoice
+    self.invoice = po_result.invoice
     template_result = Procurements::Invoices::Templates::Show.(user, params)
     unless template_result.success?
       add_message :error, template_result.messages[:error]
@@ -18,7 +18,7 @@ class Procurements::Invoices::Templates::Apply < Procurements::Invoices::Templat
 
   def validate
     unless self.invoice.present?
-      add_message :error, 'Purchase Order not found'
+      add_message :error, 'Invoice not found'
       return
     end
     unless self.template.present?
@@ -28,17 +28,18 @@ class Procurements::Invoices::Templates::Apply < Procurements::Invoices::Templat
   end
 
   def process
-    result = Template::Apply.(user, template: self.template, resource: self.resource)
+    result = Template::Apply.(user, template: self.template, resource: self.invoice)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    self.invoice = result.invoice
+    self.invoice = result.resource
   end
 
   def success
     params[:invoice] = self.invoice
     params[:template] = self.template
+    Procurements::Invoices::Templates::Apply::SuccessPresenter.new(user, params, messages)
   end
 
   class Procurements::Invoices::Templates::Apply::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter

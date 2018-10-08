@@ -3193,11 +3193,11 @@ Rails.application.routes.draw do
 
 
 
-    get 'invoices/templates', to: 'inward_invoices#template_index'
-    get 'invoices/templates/:id', to: 'inward_invoices#template_show'
+    get 'inward_invoices/templates', to: 'inward_invoices#template_index'
+    get 'inward_invoices/templates/:id', to: 'inward_invoices#template_show'
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
-    patch 'invoices/templates/:id', to: 'inward_invoices#template_update'
-    delete 'invoices/templates/:id', to: 'inward_invoices#template_destroy'
+    patch 'inward_invoices/templates/:id', to: 'inward_invoices#template_update'
+    delete 'inward_invoices/templates/:id', to: 'inward_invoices#template_destroy'
 
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
@@ -3205,8 +3205,8 @@ Rails.application.routes.draw do
       put 'approve', to: 'inward_invoices#approve'
       put 'reject', to: 'inward_invoices#reject'
       put 'close', to: 'inward_invoices#close'
-      post 'save_as_template', to: 'purchase_orders#template_create'
-      post 'apply_template', to: 'purchase_orders#template_apply'
+      post 'save_as_template', to: 'inward_invoices#template_create'
+      post 'apply_template', to: 'inward_invoices#template_apply'
     end
 
     resources :delivery_challans
