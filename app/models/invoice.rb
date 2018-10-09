@@ -213,7 +213,7 @@ class Invoice < ActiveRecord::Base
            :original_amount, :freight_amount, :taxable_amount,
            :invoice_items, :invoice_attachments, :attachments, :custom_fields,
            :document_level_reviewer_mappings]
-    nullify :created_by_id
+    nullify :created_by_user_id
     nullify :invoice_status_id
     nullify :remaining_amount_id
     nullify :advance_amount_id
@@ -224,9 +224,9 @@ class Invoice < ActiveRecord::Base
     nullify :controlling_for_user_role_id
     nullify :template_name
     nullify :is_template
-    nullify :user_id
     nullify :invoice_number
-    nullify :invoice_date
+    nullify :date
+    nullify :due_date
     set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
   end
 
