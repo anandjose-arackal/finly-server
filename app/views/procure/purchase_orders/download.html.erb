@@ -247,8 +247,7 @@
 <div class="approval-flow">
   <ul>
     <% approved_users = [] %>
-
-    <% @result.purchase_order.trails.natural_order.each do |trail| %>
+    <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
       <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
         <% unless approved_users.include?(trail.action_user) %>
           <% approved_users.push(trail.action_user) %>

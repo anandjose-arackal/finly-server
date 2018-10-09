@@ -102,16 +102,14 @@ views:
           url: beneficiaries
           id: beneficiaries
         cog:
-        - name: Load Company Balance
-          url: '#load-company-balance'
         <% if current_user.company.expense_management_enabled? %>
 #        - name: Expense Management
 #          url: '/'
         <% end %>
-        - name: Statements
-          url: statements
         - name: Users
           url: users
+        - name: Statements
+          url: statements
         - name: Organization Account
           url: '#organization_account'
         <% if current_user.user_panel_subscription.disburse && current_user.company.cards_enabled? %>
@@ -120,6 +118,8 @@ views:
         <% end %>
 #        - name: 'Company Statements'
 #          url: '#company_statements'
+        - name: Load Company Balance
+          url: '#load-company-balance'
   <% end %>
 
   <% if current_user.auditor? %>
@@ -162,8 +162,6 @@ views:
           url: beneficiaries
           id: beneficiaries
         cog:
-        - name: Load Company Balance
-          url: '#load-company-balance'
         <% if current_user.company.expense_management_enabled? %>
 #        - name: Expense Management
 #          url: '/'
@@ -174,6 +172,8 @@ views:
         <% end %>
 #        - name: 'Company Statements'
 #          url: '#company_statements'
+        - name: Load Company Balance
+          url: '#load-company-balance'
   <% end %>
 
   <% if current_user.vendor_payment_reviewer? %>

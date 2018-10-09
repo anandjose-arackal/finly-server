@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20181008064652) do
+=======
+ActiveRecord::Schema.define(version: 20181007183708) do
+>>>>>>> fb6e8b4da085d348be59f5f3fcf0c1b649d37388
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2901,10 +2905,12 @@ ActiveRecord::Schema.define(version: 20181008064652) do
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
     t.boolean  "is_deleted",                              default: false, null: false
+    t.integer  "user_id",                     limit: 4
   end
 
   add_index "inward_documents", ["company_id"], name: "index_inward_documents_on_company_id", using: :btree
   add_index "inward_documents", ["procurement_id"], name: "index_inward_documents_on_procurement_id", using: :btree
+  add_index "inward_documents", ["user_id"], name: "index_inward_documents_on_user_id", using: :btree
   add_index "inward_documents", ["vendor_id"], name: "index_inward_documents_on_vendor_id", using: :btree
 
   create_table "inward_invoice_statuses", force: :cascade do |t|
@@ -4012,6 +4018,7 @@ ActiveRecord::Schema.define(version: 20181008064652) do
     t.text     "note",                  limit: 65535
     t.boolean  "is_deleted",                          default: false, null: false
     t.string   "procurement_type",      limit: 255
+    t.string   "transaction_id",        limit: 255
   end
 
   add_index "procurements", ["company_id"], name: "index_procurements_on_company_id", using: :btree
@@ -5705,6 +5712,7 @@ ActiveRecord::Schema.define(version: 20181008064652) do
   add_foreign_key "inward_document_items", "purchase_order_items"
   add_foreign_key "inward_documents", "companies"
   add_foreign_key "inward_documents", "procurements"
+  add_foreign_key "inward_documents", "users"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"

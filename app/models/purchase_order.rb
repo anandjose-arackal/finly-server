@@ -109,6 +109,7 @@ class PurchaseOrder < ActiveRecord::Base
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
   scope :filter_po_number, -> (po_number) {where('purchase_orders.po_number LIKE ?', "%#{po_number}%")}
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+  scope :with_po_number, -> (po_number) {where po_number: po_number}
 
   # Used for generating document number
   scope :valid, -> {
@@ -163,8 +164,18 @@ class PurchaseOrder < ActiveRecord::Base
     shipped
   end
 
-  private
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.po_number,
+        amount: self.balance_amount&.value,
+        document_status: self.status&.name,
+        document_owner: self.user&.name,
+        document_type: self.class.name
+    }
+  end
 
+  private
 
   def calculate_line_items
     total_before_tax_amount = 0

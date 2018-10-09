@@ -304,6 +304,17 @@ class Invoice < ActiveRecord::Base
     return (self.invoice_status_id == InwardInvoiceStatus.id_for(:partially_paid))
   end
 
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.invoice_number,
+        amount: self.net_amount&.value,
+        document_status: self.invoice_status&.name,
+        document_owner: self.created_by&.name,
+        document_type: self.class.name
+    }
+  end
+
   private
 
   def set_defaults
