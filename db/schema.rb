@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20181008064652) do
-=======
-ActiveRecord::Schema.define(version: 20181007183708) do
->>>>>>> fb6e8b4da085d348be59f5f3fcf0c1b649d37388
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
