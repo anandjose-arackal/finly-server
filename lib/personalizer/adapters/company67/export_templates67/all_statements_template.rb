@@ -96,7 +96,11 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
               finly_transaction.finly_account_type,
               (finly_transaction.finly_account.user.name rescue nil),
               nil,
-              expense.id
+              expense.id,
+              expense.merchant_name,
+              expense.note,
+              expense.date,
+              expense.report&.name
           ]
         end
       else
