@@ -66,13 +66,13 @@ class InvoiceLineItem < ActiveRecord::Base
   private
 
   def budget_trail_entry
-    if self.parent.is_a?(Invoice)
+    if self.parent&.is_a?(Invoice)
       BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(self)
     end
   end
 
   def budget_trail_destroy
-    if self.parent.is_a?(Invoice)
+    if self.parent&.is_a?(Invoice)
       BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
     end
   end
