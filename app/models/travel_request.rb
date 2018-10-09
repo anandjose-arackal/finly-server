@@ -35,7 +35,7 @@ class TravelRequest < ActiveRecord::Base
           FieldCustomizer::CustomizableValidation,
           FindByOrderedIds
 
-  acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
+  acts_as_sequenced column: :transaction_id, purpose: :procurement, editable: false
 
   field_customization_key :travel_request
   customizable_validate :from_date, presence: true
