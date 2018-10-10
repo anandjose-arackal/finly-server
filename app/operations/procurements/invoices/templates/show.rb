@@ -17,7 +17,7 @@ class Procurements::Invoices::Templates::Show < Procurements::Invoices::Template
       return
     end
     id = params[:invoice_template_id] || params[:template_id] || params[:id]
-    self.invoice = result.po_templates.find_by(id: id)
+    self.invoice = result.invoice_templates.find_by(id: id)
   end
 
   def validate
