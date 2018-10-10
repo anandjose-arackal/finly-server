@@ -45,7 +45,8 @@
 #  billing_address              :text(65535)
 #  shipping_address             :text(65535)
 #  is_template                  :boolean          default(FALSE)
-#  template_name                :string(255)      default("0")
+#  template_name                :string(255)
+#  resource_template_id         :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

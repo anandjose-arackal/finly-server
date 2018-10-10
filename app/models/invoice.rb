@@ -62,7 +62,9 @@
 #  billing_address              :text(65535)
 #  shipping_address             :text(65535)
 #  is_template                  :boolean          default(FALSE)
-#  template_name                :string(255)      default("0")
+#  template_name                :string(255)
+#  is_deleted                   :boolean          default(FALSE)
+#  resource_template_id         :integer
 #
 
 #  gst_type_id: 1 - IGST
