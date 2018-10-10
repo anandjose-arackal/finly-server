@@ -28,7 +28,7 @@
 #  api_initiated             :boolean          default(FALSE)
 #
 
-class PaymentOrder < ActiveRecord::Base
+class   PaymentOrder < ActiveRecord::Base
   include PostOperationExecution
 
   CONFIG = {
@@ -110,6 +110,10 @@ class PaymentOrder < ActiveRecord::Base
 
   scope :with_initiating_or_receiving_user, -> (user_id) {
     where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
+  }
+
+  scope :with_receiving_account_type, -> (account_type) {
+    where receiving_account_type: account_type
   }
 
   scope :from_company_account, -> (enabled) {
