@@ -28,7 +28,7 @@
 #  api_initiated             :boolean          default(FALSE)
 #
 
-class   PaymentOrder < ActiveRecord::Base
+class PaymentOrder < ActiveRecord::Base
   include PostOperationExecution
 
   CONFIG = {
