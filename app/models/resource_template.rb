@@ -20,6 +20,7 @@ class ResourceTemplate < ActiveRecord::Base
   TEMPLATABLES = {}
 
   has_many :purchase_orders
+  has_many :invoices
 
   scope :with_resource_type, ->(resource_type) {where resource_type: resource_type}
   scope :filter_resource_type, ->(resource_type) {with_resource_type(resource_type)}

@@ -58,7 +58,7 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
       return
     end
     self.template = result.template
-    self.purchase_order = self.template.amoeba_dup
+    self.inward_invoice = self.template.resource.amoeba_dup
   end
 
 

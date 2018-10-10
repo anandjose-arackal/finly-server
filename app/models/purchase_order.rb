@@ -135,15 +135,23 @@ class PurchaseOrder < ActiveRecord::Base
 
 
   template_config do
-    include_associations [:policy, :level, :location, :delivery_location, :vendor,
+    include_association [:policy, :location, :delivery_location, :vendor,
                           :payment_term, :procurement_term, :department,
                           :sub_department, :cost_center]
     clone [:extra_charges, :items, :document_level_reviewer_mappings, :total_before_tax,
            :tax_amount, :total_after_tax, :discount_amount, :custom_fields]
+
+    customize(lambda { |po,new_po|
+      new_po.trails.destroy_all
+      new_po.comments.destroy_all
+      new_po.attachments.destroy_all
+    })
+
     nullify :procurement_id
     nullify :po_number
     nullify :is_template
     nullify :template_name
+    nullify :controlling_level_id
     nullify :controlling_user_id
     nullify :controlling_for_user_id
     nullify :controlling_user_role_id

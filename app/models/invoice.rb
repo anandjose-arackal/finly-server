@@ -208,18 +208,28 @@ class Invoice < ActiveRecord::Base
 
   template_merge :procurement_id
   template_config do
-    include_associations [:address, :category, :cost_center, :company, :receiving_account, :vendor, :location,
+    include_association [:address, :category, :cost_center, :company, :receiving_account, :vendor, :location,
                           :delivery_location, :remaining_amount, :invoice_type, :gst_type,
-                          :tds_slab, :payment_term, :department, :sub_department, :policy, :level]
+                          :tds_slab, :payment_term, :department, :sub_department, :policy]
+
     clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
            :original_amount, :freight_amount, :taxable_amount,
            :invoice_items, :invoice_attachments, :attachments, :custom_fields,
            :document_level_reviewer_mappings]
+
+    customize(lambda { |invoice,new_invoice|
+      new_invoice.trails.destroy_all
+      new_invoice.comments.destroy_all
+      new_invoice.attachments.destroy_all
+    })
+
+    nullify :procurement_id
     nullify :created_by_user_id
     nullify :invoice_status_id
     nullify :remaining_amount_id
     nullify :advance_amount_id
     nullify :balance_due_id
+    nullify :controlling_level_id
     nullify :controlling_user_id
     nullify :controlling_for_user_id
     nullify :controlling_user_role_id

@@ -28,6 +28,7 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
   def process
     if params[:template_id].present?
       load_po_from_template
+      self.purchase_order.procurement = self.procurement
     else
       self.purchase_order = procurement.build_purchase_order(purchase_order_params)
     end
@@ -69,6 +70,6 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
       return
     end
     self.template = result.template
-    self.purchase_order = self.template.amoeba_dup
+    self.purchase_order = self.template.resource.amoeba_dup
   end
 end

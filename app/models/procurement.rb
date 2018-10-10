@@ -175,7 +175,6 @@ class Procurement < ActiveRecord::Base
     tag_ids = self.status_tags.pluck(:id)
 
     data = {
-        purchase_order: {},
         invoice: {},
         shipment: {},
         payment: {}
@@ -232,18 +231,21 @@ class Procurement < ActiveRecord::Base
 
     end
 
-    if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
-      data[:purchase_order][:status] = 'complete'
-    elsif tag_ids.include? StatusTag.id_for(:po_processing)
-      data[:purchase_order][:status] = 'processing'
-      data[:status_message] = 'PO Processing'
-      data[:status_text] = 'PO Approval is Pending'
-      data[:status_type] = 'purchase_order'
-    else
-      data[:purchase_order][:status] = 'init'
-      data[:status_message] = 'PO Processing'
-      data[:status_text] = 'PO Approval is Pending'
-      data[:status_type] = 'purchase_order'
+    if procurement_type == 'purchase_order'
+      data[:purchase_order] = {}
+      if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
+        data[:purchase_order][:status] = 'complete'
+      elsif tag_ids.include? StatusTag.id_for(:po_processing)
+        data[:purchase_order][:status] = 'processing'
+        data[:status_message] = 'PO Processing'
+        data[:status_text] = 'PO Approval is Pending'
+        data[:status_type] = 'purchase_order'
+      else
+        data[:purchase_order][:status] = 'init'
+        data[:status_message] = 'PO Processing'
+        data[:status_text] = 'PO Approval is Pending'
+        data[:status_type] = 'purchase_order'
+      end
     end
 
     data

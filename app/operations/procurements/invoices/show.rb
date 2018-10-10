@@ -2,7 +2,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   attr_accessor :invoice
 
   def init
-    invoice_id = params[:id] || params[:invoice_id]
+    invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.find_by id: invoice_id
   end
 

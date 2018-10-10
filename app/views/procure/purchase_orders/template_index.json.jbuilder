@@ -4,6 +4,7 @@ json.array! @result.po_templates do |po_template|
   po = po_template.resource
   json.extract! po, :department, :sub_department, :cost_center
   json.vendor do
+    json.id po.vendor&.id
     json.name po.vendor&.name
     json.business_name po.vendor&.business_name
   end
