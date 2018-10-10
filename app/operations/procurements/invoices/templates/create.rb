@@ -7,13 +7,13 @@ class Procurements::Invoices::Templates::Create < Procurements::Invoices::Templa
   end
 
   def init
-    # result = Procurements::Invoices::Show.(user, params)
-    # unless result.success?
-    #   add_message :error, result.messages[:error]
-    #   return
-    # end
-    # self.invoice = result.invoice
-    self.invoice = Invoice.find(params[:inward_invoice_id])
+    result = Procurements::Invoices::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    self.invoice = result.invoice
+    # self.invoice = Invoice.find(params[:inward_invoice_id])
   end
 
   def validate

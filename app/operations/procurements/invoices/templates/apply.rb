@@ -34,6 +34,7 @@ class Procurements::Invoices::Templates::Apply < Procurements::Invoices::Templat
       return
     end
     self.invoice = result.resource
+    self.invoice.update(created_by: user)
   end
 
   def success

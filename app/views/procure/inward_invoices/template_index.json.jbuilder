@@ -4,6 +4,7 @@ json.array! @result.invoice_templates do |invoice_template|
   po = invoice_template.resource
   json.extract! po, :department, :sub_department, :cost_center
   json.vendor do
+    json.id
     json.name po.vendor&.name
     json.business_name po.vendor&.business_name
   end
