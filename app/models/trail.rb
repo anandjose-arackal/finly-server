@@ -51,7 +51,11 @@ class Trail < ActiveRecord::Base
   scope :printable_trails, -> {
     action_ids = [TrailAction.id_for(:reject), TrailAction.id_for(:retract)]
     created_at = where(action_id: action_ids).reorder(:created_at).pluck(:created_at).reverse.first
-    where('trails.created_at > ?', created_at).reorder(:created_at)
+    if created_at.present?
+      where('trails.created_at > ?', created_at).reorder(:created_at)
+    else
+      reorder(:created_at)
+    end
   }
 
   def as_json(user)
