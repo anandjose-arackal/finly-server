@@ -132,6 +132,7 @@ class PurchaseOrder < ActiveRecord::Base
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
+
   template_config do
     include_associations [:policy, :level, :location, :delivery_location, :vendor,
                           :payment_term, :procurement_term, :department,

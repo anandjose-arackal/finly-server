@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181008064652) do
+ActiveRecord::Schema.define(version: 20181009085149) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2859,6 +2859,7 @@ ActiveRecord::Schema.define(version: 20181008064652) do
     t.boolean  "is_template",                                                          default: false
     t.string   "template_name",                limit: 255
     t.boolean  "is_deleted",                                                           default: false
+    t.integer  "resource_template_id",         limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -4129,6 +4130,7 @@ ActiveRecord::Schema.define(version: 20181008064652) do
     t.text     "shipping_address",             limit: 65535
     t.boolean  "is_template",                                                         default: false
     t.string   "template_name",                limit: 255
+    t.integer  "resource_template_id",         limit: 4
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -4573,6 +4575,19 @@ ActiveRecord::Schema.define(version: 20181008064652) do
     t.text   "source",             limit: 65535
     t.text   "source_description", limit: 65535
   end
+
+  create_table "resource_templates", force: :cascade do |t|
+    t.string   "name",          limit: 255, null: false
+    t.string   "resource_type", limit: 255, null: false
+    t.integer  "user_id",       limit: 4,   null: false
+    t.datetime "last_used_at"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "resource_templates", ["name"], name: "index_resource_templates_on_name", using: :btree
+  add_index "resource_templates", ["resource_type"], name: "index_resource_templates_on_resource_type", using: :btree
+  add_index "resource_templates", ["user_id"], name: "index_resource_templates_on_user_id", using: :btree
 
   create_table "reviewal_levels", force: :cascade do |t|
     t.integer  "level_number",           limit: 4
@@ -5828,6 +5843,7 @@ ActiveRecord::Schema.define(version: 20181008064652) do
   add_foreign_key "reports", "report_processor_group_mappings"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "resource_templates", "users"
   add_foreign_key "reviewal_levels", "policies"
   add_foreign_key "tally_configurations", "companies"
   add_foreign_key "tax_rates", "companies"

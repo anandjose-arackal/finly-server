@@ -2,15 +2,23 @@ module Templatable
   extend ActiveSupport::Concern
 
   included do
-    scope :templates, -> {where(is_template: true)}
-    scope :exclude_templates, -> {where(is_template: [false, nil])}
+    scope :templates, -> {where.not(resource_template_id: nil)}
+    scope :exclude_templates, -> {where(resource_template_id: nil)}
 
-    validate :valid_template
+    belongs_to :resource_template
+
+    accepts_nested_attributes_for :resource_template
 
     class_attribute :attributes_to_merge
+
+    register_template
   end
 
   module ClassMethods
+
+    def register_template
+      ResourceTemplate.register(self)
+    end
 
     def template_merge(*list)
       self.attributes_to_merge = list
@@ -30,10 +38,8 @@ module Templatable
     true
   end
 
-  def valid_template
-    if is_template and template_name.blank?
-      errors.add :template, 'name cannot be blank'
-    end
+  def is_template?
+    resource_template_id.present?
   end
 
 end

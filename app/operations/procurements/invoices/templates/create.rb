@@ -3,6 +3,7 @@ class Procurements::Invoices::Templates::Create < Procurements::Invoices::Templa
 
   def pre_validate
     user_present? and params_present?
+    return if has_errors?
   end
 
   def init
@@ -12,7 +13,7 @@ class Procurements::Invoices::Templates::Create < Procurements::Invoices::Templa
     #   return
     # end
     # self.invoice = result.invoice
-    self.invoice = Invoice.find params[:inward_invoice_id]
+    self.invoice = Invoice.find(params[:inward_invoice_id])
   end
 
   def validate
@@ -29,6 +30,10 @@ class Procurements::Invoices::Templates::Create < Procurements::Invoices::Templa
       return
     end
     self.template = result.template
+  end
+
+  def post_process
+    add_message :success, 'Template saved'
   end
 
   def success

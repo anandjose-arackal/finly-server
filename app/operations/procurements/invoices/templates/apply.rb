@@ -18,7 +18,7 @@ class Procurements::Invoices::Templates::Apply < Procurements::Invoices::Templat
 
   def validate
     unless self.invoice.present?
-      add_message :error, 'Invoice not found'
+      add_message :error, 'Purchase Order not found'
       return
     end
     unless self.template.present?

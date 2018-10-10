@@ -16,7 +16,7 @@ class Template::Apply < Template::Base
   end
 
   def validate
-    unless self.template.respond_to?(:templatable?) and self.template.templatable?
+    unless self.template.is_a?(ResourceTemplate)#.respond_to?(:templatable?) and self.template.templatable?
       add_message :error, 'Error creating template. Cannot generate template from the resource'
       return
     end
@@ -27,7 +27,7 @@ class Template::Apply < Template::Base
     if self.resource.present?
       old_resource = self.resource
     end
-    self.resource = self.template.amoeba_dup
+    self.resource = self.template.resource.amoeba_dup
 
     if old_resource.present?
       old_resource.attributes_to_merge&.each do |attribute|

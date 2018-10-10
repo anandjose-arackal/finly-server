@@ -25,12 +25,10 @@ class Template::Create < Template::Base
   end
 
   def process
-    self.template = self.resource.amoeba_dup
-    self.template.is_template = true
-    self.template.template_name = params[:template_name]
-    self.template.user = user
+    template_resource = self.resource.amoeba_dup
+    template_resource.build_resource_template name: params[:template_name], resource_type: template_resource.class.table_name, user: user
     unless params[:skip_save]
-      unless self.template.save
+      unless template_resource.save
         add_message :error, self.template.errors.full_messages
         return
       end

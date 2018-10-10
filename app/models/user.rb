@@ -188,8 +188,9 @@ class User < ActiveRecord::Base
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
-  has_many :purchase_order_templates, -> { templates }, class_name: 'PurchaseOrder', foreign_key: :user_id
-  has_many :invoice_templates, -> { templates }, class_name: 'Invoice', foreign_key: :created_by_user_id
+  has_many :resource_templates
+  has_many :purchase_order_templates, -> { filter_resource_type(:purchase_orders) }, class_name: 'ResourceTemplate', foreign_key: :user_id
+  has_many :invoice_templates, -> { filter_resource_type(:invoices) }, class_name: 'ResourceTemplate', foreign_key: :user_id
 
   has_many :user_department_mappings
   has_many :departments, through: :user_department_mappings

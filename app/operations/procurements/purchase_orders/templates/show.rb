@@ -17,7 +17,7 @@ class Procurements::PurchaseOrders::Templates::Show < Procurements::PurchaseOrde
       return
     end
     id = params[:purchase_order_template_id] || params[:template_id] || params[:id]
-    self.purchase_order = result.purchase_orders.find_by(id: id)
+    self.purchase_order = result.po_templates.find_by(id: id)
   end
 
   def validate

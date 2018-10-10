@@ -17,7 +17,7 @@ class Procurements::Invoices::Templates::Show < Procurements::Invoices::Template
       return
     end
     id = params[:invoice_template_id] || params[:template_id] || params[:id]
-    self.invoice = result.invoices.find_by(id: id)
+    self.invoice = result.po_templates.find_by(id: id)
   end
 
   def validate
@@ -32,7 +32,7 @@ class Procurements::Invoices::Templates::Show < Procurements::Invoices::Template
     Procurements::Invoices::Templates::Show::SuccessPresenter.new(user, params, messages)
   end
 
-  class Procurements::Invoices::Templates::Show::SuccessPresenter < BaseOperation::BasePresenter
+  class Procurements::Invoices::Templates::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :template
 
     def init
