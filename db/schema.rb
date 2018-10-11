@@ -3006,6 +3006,7 @@ ActiveRecord::Schema.define(version: 20181011081517) do
     t.boolean  "exception",                                      default: false
     t.datetime "created_at",                                                     null: false
     t.datetime "updated_at",                                                     null: false
+    t.boolean  "is_deleted",                                     default: false, null: false
   end
 
   add_index "level_reviewer_mappings", ["level_id"], name: "index_level_reviewer_mappings_on_level_id", using: :btree
@@ -3856,6 +3857,7 @@ ActiveRecord::Schema.define(version: 20181011081517) do
     t.boolean  "admin",                default: false, null: false
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false
+    t.boolean  "is_deleted",           default: false, null: false
   end
 
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
@@ -4568,9 +4570,10 @@ ActiveRecord::Schema.define(version: 20181011081517) do
     t.integer  "level_number",           limit: 4
     t.integer  "policy_id",              limit: 4
     t.string   "associated_entity_type", limit: 255
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
     t.string   "name",                   limit: 255
+    t.boolean  "is_deleted",                         default: false, null: false
   end
 
   add_index "reviewal_levels", ["policy_id"], name: "index_reviewal_levels_on_policy_id", using: :btree
