@@ -134,6 +134,14 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         end
       end
 
+      if user.vendor_payment_admin?
+        actions[:document_editable] = true
+        actions[:save] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
+            method: "PUT"
+        }
+      end
+
       actions
     end
 

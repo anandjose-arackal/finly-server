@@ -221,6 +221,7 @@ class Invoice < ActiveRecord::Base
       new_invoice.trails.destroy_all
       new_invoice.comments.destroy_all
       new_invoice.attachments.destroy_all
+      new_invoice.payments.destroy_all
     })
 
     nullify :procurement_id

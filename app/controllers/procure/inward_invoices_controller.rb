@@ -61,7 +61,7 @@ class Procure::InwardInvoicesController < ApplicationController
 
   def template_apply
     @result = Procurements::Invoices::Templates::Apply.(current_user, params)
-    respond response: @result.success? ? :success : :failure
+    respond
   end
 
   def template_index
