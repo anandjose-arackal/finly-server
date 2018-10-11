@@ -3,7 +3,7 @@ class ExportController < ApplicationController
 
   before_action :set_tokens_in_header
 
-  before_action -> { finly_authorize! :web}
+  before_action -> {finly_authorize! :web}
 
   def report
     respond_to do |format|
@@ -96,6 +96,11 @@ class ExportController < ApplicationController
 
   def export_template
     @result = Personalizer::ProcessTemplate.(current_user, params)
+    respond
+  end
+
+  def processor
+    @result = ExportManager::RequestHandler.(current_user, params)
     respond
   end
 
