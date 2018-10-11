@@ -37,6 +37,10 @@ class InventoryLineItem < ActiveRecord::Base
     where category_id: category_id
   }
 
+  scope :with_id, -> (id) {
+    where id: id
+  }
+
   after_save :budget_trail_entry
 
   def as_json

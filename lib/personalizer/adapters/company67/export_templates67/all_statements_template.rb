@@ -73,19 +73,35 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
         end
         next
       end
+<<<<<<< HEAD
       if finly_transaction.payment&.reimbursed_reports.present?
         # expense_ids = Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id)).pluck(:id)&.join(',')
         Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id)).reimbursable.each do |expense|
+=======
+      expenses = nil
+      if finly_transaction.payment&.reimbursed_reports.present?
+        expenses = Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id))
+      end
+      if expenses
+        expenses.each do |expense|
+>>>>>>> 55d7dcba21a11efb47dda28bbc172ea7dad47ec7
           c = finly_transaction.credit? ? expense.amount.value : nil
           d = finly_transaction.debit? ? expense.amount.value : nil
           contents << [
               DateUtils.date_formatted(finly_transaction.date),
               finly_transaction.transaction_type.name.humanize,
               finly_transaction.payment_purpose.name.humanize,
+<<<<<<< HEAD
               expense.merchant_name,
               c,
               d,
               nil,#finly_transaction.closing_balance&.value,
+=======
+              merchant(finly_transaction),
+              c,
+              d,
+              finly_transaction.closing_balance&.value,
+>>>>>>> 55d7dcba21a11efb47dda28bbc172ea7dad47ec7
               finly_transaction.status.name.humanize,
               finly_transaction.transaction_reference_id,
               finly_transaction.payment&.note,
@@ -93,7 +109,15 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
               finly_transaction.finly_account_type,
               (finly_transaction.finly_account.user.name rescue nil),
               nil,
+<<<<<<< HEAD
               expense.id
+=======
+              expense.id,
+              expense.merchant_name,
+              expense.note,
+              expense.date,
+              expense.report&.name
+>>>>>>> 55d7dcba21a11efb47dda28bbc172ea7dad47ec7
           ]
         end
       else
@@ -108,14 +132,21 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
             finly_transaction.status.name.humanize,
             finly_transaction.transaction_reference_id,
             finly_transaction.payment&.note,
+<<<<<<< HEAD
             finly_transaction.payment&.reimbursed_reports&.pluck(:id)&.join(','),
+=======
+            nil,
+>>>>>>> 55d7dcba21a11efb47dda28bbc172ea7dad47ec7
             finly_transaction.finly_account_type,
             (finly_transaction.finly_account.user.name rescue nil),
             nil,
             nil
         ]
       end
+<<<<<<< HEAD
 
+=======
+>>>>>>> 55d7dcba21a11efb47dda28bbc172ea7dad47ec7
     end
   end
 
