@@ -77,6 +77,7 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :outward_invoice_type
   belongs_to :location, class_name: "BranchLocation"
   belongs_to :gst_type
+  belongs_to :tds_slab, class_name: "TdsRatesList"
 
   # has_one :virtual_bank_account, as: :parent
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
