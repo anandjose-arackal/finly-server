@@ -113,6 +113,7 @@ class Invoice < ActiveRecord::Base
   has_many :payments
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
+  has_many :items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
 
   # Attachments created for procurement
@@ -200,6 +201,8 @@ class Invoice < ActiveRecord::Base
   scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
 
   after_create :set_defaults
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
 
   def policy
     self.payment&.payment_order&.bank_payment_request&.policy
@@ -275,6 +278,17 @@ class Invoice < ActiveRecord::Base
     return (self.invoice_status_id == InwardInvoiceStatus.id_for(:partially_paid))
   end
 
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.invoice_number,
+        amount: self.net_amount&.value,
+        document_status: self.invoice_status&.name,
+        document_owner: self.created_by&.name,
+        document_type: self.class.name
+    }
+  end
+
   private
 
   def set_defaults
@@ -283,4 +297,19 @@ class Invoice < ActiveRecord::Base
       self.update_invoice_status
     end
   end
+
+  def budget_trail_entry
+    # as of now, no condition is being used to determine when to add the invoice to the budget trail
+    self.invoice_items.each do |invoice_item|
+      BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(invoice_item)
+    end
+  end
+
+  def budget_trail_destroy
+    self.invoice_items.each do |invoice_item|
+      BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
+    end
+  end
+
+
 end
