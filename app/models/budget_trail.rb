@@ -74,7 +74,7 @@ class BudgetTrail < ActiveRecord::Base
     end
   }
   scope :with_cost_centers, -> (cost_center_ids) {
-    unless cost_center_ids
+    unless cost_center_ids.blank?
       where(cost_center_id: cost_center_ids)
     end
   }
