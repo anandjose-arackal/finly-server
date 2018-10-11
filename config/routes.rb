@@ -1327,6 +1327,7 @@
 #                                                         PATCH  /invoicing/virtual_bank_accounts/:id(.:format)                                                                      invoicing/virtual_bank_accounts#update
 #                                                         PUT    /invoicing/virtual_bank_accounts/:id(.:format)                                                                      invoicing/virtual_bank_accounts#update
 #                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                                                      invoicing/virtual_bank_accounts#destroy
+#                                  invoicing_transactions GET    /invoicing/transactions(.:format)                                                                                   invoicing/transactions#index
 #                            invoicing_categories_invoice GET    /invoicing/categories/invoice(.:format)                                                                             invoicing/categories#invoice_categories
 #                 invoicing_categories_invoice_line_items GET    /invoicing/categories/invoice_line_items(.:format)                                                                  invoicing/categories#invoice_items_categories
 #                        invoicing_invoice_number_configs GET    /invoicing/invoice_number_configs(.:format)                                                                         invoicing/invoice_number_configs#index
