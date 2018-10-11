@@ -3115,6 +3115,8 @@ Rails.application.routes.draw do
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     get 'inventory_item_config', to: 'inventory_line_items#inventory_item_config', as: :inventory_item_config
+    put 'inventory_line_items/import', to: 'inventory_line_items#import', as: :inventory_line_items_import
+    get 'inventory_line_items/import_template', to: 'inventory_line_items#import_template', as: :inventory_line_items_import_template
     resources :inventory_line_items
     resources :payment_terms
     resources :reminders
