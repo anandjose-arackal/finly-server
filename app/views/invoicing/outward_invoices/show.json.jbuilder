@@ -165,3 +165,11 @@ json.attachment do
   end
 end
 
+json.tds_slabs do
+  json.array!(current_company.tds_slabs) do |tds_slab|
+    json.id tds_slab.id
+    json.name "#{tds_slab.tds}% - #{tds_slab.name} "
+    json.tds tds_slab.tds
+  end
+end
+
