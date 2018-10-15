@@ -1,5 +1,5 @@
 class  Invoicing::Transactions::Index < Invoicing::Transactions::Base
-  attr_accessor :transactions, :virtual_bank_accounts
+  attr_accessor :incoming_payments, :virtual_bank_accounts
 
   def init
     virtual_account_op = Invoicing::VirtualBankAccount::Index.(user, params)
@@ -16,19 +16,19 @@ class  Invoicing::Transactions::Index < Invoicing::Transactions::Base
   end
 
   def process
-    self.transactions = Payment.with_initiating_account(self.virtual_bank_accounts)
+    self.incoming_payments = Payment.with_initiating_account(self.virtual_bank_accounts)
   end
 
   def success
-    params[:transactions] = self.transactions
+    params[:incoming_payments] = self.incoming_payments
     Invoicing::Transactions::Index::IndexPresenter.new(user, params, messages)
   end
 
   class Invoicing::Transactions::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :transactions
+    attr_accessor :incoming_payments
 
     def init
-      self.transactions = params[:transactions]
+      self.incoming_payments = params[:incoming_payments]
     end
   end
 end
