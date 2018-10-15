@@ -72,6 +72,7 @@ class ExportManager::RequestHandler < BaseOperation
   def init_master
     m = ExportManager::Master::BaseMaster::MASTERS[self.params[:type]]
     if m.present?
+      return m if m.is_a?(Class)
       return Object.const_get(m)
     end
     nil
