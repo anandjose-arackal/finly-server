@@ -80,7 +80,7 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
         expenses = Expense.with_report_id(finly_transaction.payment&.reimbursed_reports.pluck(:id))
       end
       if expenses
-        expenses.each do |expense|
+        expenses.reimbursable.each do |expense|
           c = finly_transaction.credit? ? expense.amount.value : nil
           d = finly_transaction.debit? ? expense.amount.value : nil
           contents << [
