@@ -9,12 +9,12 @@ json.array!(@result.incoming_payments) do |payment|
   json.note payment.reference_resource&.note
   json.date payment.date
   json.virtual_account do
-    json.account_number virtual_trans.virtual_account&.account_number
-    json.ifsc virtual_trans.virtual_account&.ifsc
-    json.name virtual_trans.virtual_account&.name
+    json.account_number virtual_trans&.virtual_account&.account_number
+    json.ifsc virtual_trans&.virtual_account&.ifsc
+    json.name virtual_trans&.virtual_account&.name
   end
-  json.purpose virtual_trans.virtual_account.purpose&.name
-  if virtual_trans.virtual_account.purpose_id == VirtualAccountPurpose.id_for(:invoice)
-    json.invoice_id virtual_trans.invoices.first.id # todo - jugaad for now, need to be generalized to include multiple invoices
+  json.purpose virtual_trans&.virtual_account&.purpose&.name
+  if virtual_trans&.virtual_account&.purpose_id == VirtualAccountPurpose.id_for(:invoice)
+    json.invoice_id virtual_trans&.invoices&.first&.id # todo - jugaad for now, need to be generalized to include multiple invoices
   end
 end
