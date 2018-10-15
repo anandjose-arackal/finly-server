@@ -70,6 +70,8 @@ json.invoice do
     json.total_payable invoice.total_payable&.value
     json.roundoff_total_enabled invoice.roundoff_total_enabled
     json.paid_amounts @result.paid_amounts
+    json.tds invoice.tds
+    json.tds_amount invoice.tds_amount&.value
   end
 
   json.invoice_items do
