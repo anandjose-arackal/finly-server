@@ -47,15 +47,17 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
       else
         debit_amount = finly_transaction.amount.value
       end
-      if ['settlement_against_cash_on_hand', 'settlement_against_advance'].include?(finly_transaction.payment_purpose&.name) && finly_transaction.payment.reference_resource_type == "Report"
+      if ['settlement_against_cash_on_hand', 'settlement_against_advance', 'advance_against_report_unapproval'].include?(finly_transaction.payment_purpose&.name) && finly_transaction.payment.reference_resource_type == "Report"
         finly_transaction.payment.reference_resource.expenses.with_spent_from_id(user_pocket_ids).each do |expense|
+          c = finly_transaction.credit? ? expense.amount.value : nil
+          d = finly_transaction.debit? ? expense.amount.value : nil
           contents << [
               DateUtils.date_formatted(finly_transaction.date),
               finly_transaction.transaction_type.name.humanize,
               finly_transaction.payment_purpose.name.humanize,
               merchant(finly_transaction),
-              nil,
-              expense.amount.value,
+              c,
+              d,
               finly_transaction.closing_balance&.value,
               finly_transaction.status.name.humanize,
               finly_transaction.transaction_reference_id,
