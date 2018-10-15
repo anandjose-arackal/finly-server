@@ -157,7 +157,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   private
 
   def invoice_params
-    params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id,
+    params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id, :tds_slab_id,
                                     :tax_type_id, :date, :discount_type_id, :due_date, :memo, :customer_memo, :terms, :payment_term_id, :location_id,
                                     :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address, :override_invoice_number,
                                     :email, :mobile_number, :virtual_account_id, :roundoff_amount, :roundoff_total_enabled,
