@@ -13,7 +13,7 @@ json.array!(@result.incoming_payments) do |payment|
     json.ifsc virtual_trans&.virtual_account&.ifsc
     json.name virtual_trans&.virtual_account&.name
   end
-  json.purpose virtual_trans&.virtual_account&.purpose&.name
+  json.purpose virtual_trans&.virtual_account&.purpose&.name&.humanize
   if virtual_trans&.virtual_account&.purpose_id == VirtualAccountPurpose.id_for(:invoice)
     json.invoice_id virtual_trans&.invoices&.first&.id # todo - jugaad for now, need to be generalized to include multiple invoices
   end
