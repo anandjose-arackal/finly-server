@@ -44,6 +44,8 @@
 #  terms                   :text(65535)
 #  location_id             :integer
 #  tds_slab_id             :integer
+#  tds                     :decimal(10, 5)
+#  tds_amount_id           :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -71,6 +73,7 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :net_amount, class_name: "Amount"
   belongs_to :gross_amount, class_name: "Amount"
+  belongs_to :tds_amount, class_name: "Amount"
   belongs_to :total_payable, class_name: "Amount"
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
   belongs_to :payment_term
@@ -105,6 +108,7 @@ class OutwardInvoice < ActiveRecord::Base
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :paid_amount
   accepts_nested_attributes_for :total_payable
+  accepts_nested_attributes_for :tds_amount
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
 
   validates :invoice_status, presence: true

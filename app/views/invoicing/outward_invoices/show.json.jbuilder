@@ -70,6 +70,8 @@ json.invoice do
     json.total_payable invoice.total_payable&.value
     json.roundoff_total_enabled invoice.roundoff_total_enabled
     json.paid_amounts @result.paid_amounts
+    json.tds invoice.tds
+    json.tds_amount invoice.tds_amount&.value
   end
 
   json.invoice_items do
@@ -162,6 +164,14 @@ json.attachment do
     json.file_name attachment.attachment_file_name
     json.file_size (attachment.attachment_file_size / 1024).round(2).to_s + " KB"
     json.url attachment.attachment.url
+  end
+end
+
+json.tds_slabs do
+  json.array!(current_company.tds_slabs) do |tds_slab|
+    json.id tds_slab.id
+    json.name "#{tds_slab.tds}% - #{tds_slab.name} "
+    json.tds tds_slab.tds
   end
 end
 
