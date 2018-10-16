@@ -15,6 +15,13 @@ json.array!(@result.incoming_payments) do |payment|
   end
   json.purpose virtual_trans&.virtual_account&.purpose&.name&.humanize
   if virtual_trans&.virtual_account&.purpose_id == VirtualAccountPurpose.id_for(:invoice)
-    json.invoice_id virtual_trans&.invoices&.first&.id # todo - jugaad for now, need to be generalized to include multiple invoices
+    json.invoices do
+      json.array!(virtual_trans.invoices) do |invoice|
+        json.id invoice.id
+        json.invoice_number invoice.invoice_number
+        json.paid_amount invoice.paid_amount&.value
+      end
+    end
+    json.remaining_amount (payment.amount_value - virtual_trans.invoices.joins(:balance_due).sum(:value))
   end
 end
