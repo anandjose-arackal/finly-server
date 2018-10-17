@@ -49,4 +49,5 @@ class Invoicing::CompanyConfigurationsController < ApplicationController
     @result = Invoicing::Company::FundsAutoTransferConfig::Update.(current_user, params)
     respond
   end
+  
 end
