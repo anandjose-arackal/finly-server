@@ -6,6 +6,7 @@ json.array!(@result.incoming_payments) do |payment|
     json.account_number virtual_trans&.remitter_account_no
   end
   json.amount payment.amount_value
+  json.utr virtual_trans.transfer_id
   json.note payment.reference_resource&.note
   json.date payment.date
   json.virtual_account do
@@ -22,6 +23,7 @@ json.array!(@result.incoming_payments) do |payment|
         json.paid_amount invoice.paid_amount&.value
       end
     end
-    json.remaining_amount (payment.amount_value - virtual_trans.invoices.joins(:balance_due).sum(:value))
+    json.remaining_amount (virtual_trans.invoices.joins(:balance_due).sum(:value) - payment.amount_value)
+    json.expected_amount virtual_trans.invoices.joins(:balance_due).sum(:value)
   end
 end
