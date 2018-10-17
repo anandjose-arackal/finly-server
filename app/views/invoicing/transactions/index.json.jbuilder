@@ -1,4 +1,4 @@
-json.array!(@result.incoming_payments) do |payment|
+json.array!(@result.paginated_payments) do |payment|
   virtual_trans = payment.reference_resource
   json.source_account do
     json.name virtual_trans&.remitter_full_name

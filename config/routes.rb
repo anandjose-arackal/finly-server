@@ -1328,6 +1328,7 @@
 #                                                         PUT    /invoicing/virtual_bank_accounts/:id(.:format)                                                                      invoicing/virtual_bank_accounts#update
 #                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                                                      invoicing/virtual_bank_accounts#destroy
 #                                  invoicing_transactions GET    /invoicing/transactions(.:format)                                                                                   invoicing/transactions#index
+#                                         invoicing_count GET    /invoicing/transactions/count(.:format)                                                                             invoicing/transactions#count
 #                            invoicing_categories_invoice GET    /invoicing/categories/invoice(.:format)                                                                             invoicing/categories#invoice_categories
 #                 invoicing_categories_invoice_line_items GET    /invoicing/categories/invoice_line_items(.:format)                                                                  invoicing/categories#invoice_items_categories
 #                        invoicing_invoice_number_configs GET    /invoicing/invoice_number_configs(.:format)                                                                         invoicing/invoice_number_configs#index
@@ -3098,6 +3099,7 @@ Rails.application.routes.draw do
     end
 
     resources :transactions, only: [:index]
+    get 'transactions/count', to: 'transactions#count', as: :count
 
     get 'categories/invoice', to: 'categories#invoice_categories'
     get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'

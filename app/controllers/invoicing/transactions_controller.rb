@@ -9,4 +9,9 @@ class Invoicing::TransactionsController < ApplicationController
     # render json: result.as_json
   end
 
+  def count
+    @result = Invoicing::Transactions::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
 end
