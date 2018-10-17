@@ -29,7 +29,7 @@ class  Invoicing::Transactions::Index < Invoicing::Transactions::Base
 
     has_scope :virtual_account_transaction_purpose
     has_scope :filter_date, using: [:date_from, :date_to], type: :hash
-  
+
     def init
       self.incoming_payments = params[:incoming_payments]
       self.incoming_payments = apply_scopes(self.incoming_payments, params)
