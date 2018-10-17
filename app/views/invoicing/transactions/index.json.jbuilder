@@ -6,7 +6,7 @@ json.array!(@result.incoming_payments) do |payment|
     json.account_number virtual_trans&.remitter_account_no
   end
   json.amount payment.amount_value
-  json.utr virtual_trans.transfer_id
+  json.utr virtual_trans&.transfer_id
   json.note payment.reference_resource&.note
   json.date payment.date
   json.virtual_account do
