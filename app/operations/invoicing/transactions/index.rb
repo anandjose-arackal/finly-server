@@ -28,7 +28,7 @@ class  Invoicing::Transactions::Index < Invoicing::Transactions::Base
     attr_accessor :incoming_payments, :paginated_payments
 
     has_scope :virtual_account_transaction_purpose
-    has_scope :filter_date, using: [:date_from, :date_to], type: :hash
+    has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       self.incoming_payments = params[:incoming_payments]
