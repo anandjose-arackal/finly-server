@@ -121,6 +121,7 @@ class BankPaymentRequest < ActiveRecord::Base
     end
   }
 
+  scope :include_for_index, -> {includes({payment_order: [:payment_order_status,:initiating_user, :payments, {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :controlling_user)}
   scope :include_for_data_retrieval, -> {includes(payment_order: {payments: [{receiving_account: :account_owner},
                                                                              :initiating_user,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},
