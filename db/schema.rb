@@ -2304,6 +2304,30 @@ ActiveRecord::Schema.define(version: 20181011081517) do
   add_index "expenses", ["report_id"], name: "index_expenses_on_report_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
 
+  create_table "export_config_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "export_config_types", ["name"], name: "index_export_config_types_on_name", using: :btree
+
+  create_table "export_configs", force: :cascade do |t|
+    t.integer  "company_id",            limit: 4,                  null: false
+    t.integer  "export_config_type_id", limit: 4,                  null: false
+    t.integer  "field_reference_id",    limit: 4
+    t.string   "field_reference_type",  limit: 255
+    t.integer  "order",                 limit: 4
+    t.string   "field_name",            limit: 255
+    t.boolean  "spreadsheet",                       default: true
+    t.boolean  "pdf",                               default: true
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "export_configs", ["company_id"], name: "index_export_configs_on_company_id", using: :btree
+  add_index "export_configs", ["export_config_type_id"], name: "index_export_configs_on_export_config_type_id", using: :btree
+
   create_table "export_fields", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -4116,6 +4140,7 @@ ActiveRecord::Schema.define(version: 20181011081517) do
   add_index "purchase_orders", ["company_id"], name: "index_purchase_orders_on_company_id", using: :btree
   add_index "purchase_orders", ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id", using: :btree
   add_index "purchase_orders", ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id", using: :btree
+  add_index "purchase_orders", ["gst_type_id"], name: "fk_rails_a50fbe2826", using: :btree
   add_index "purchase_orders", ["location_id"], name: "index_purchase_orders_on_location_id", using: :btree
   add_index "purchase_orders", ["payment_term_id"], name: "index_purchase_orders_on_payment_term_id", using: :btree
   add_index "purchase_orders", ["policy_id"], name: "index_purchase_orders_on_policy_id", using: :btree
@@ -5668,6 +5693,8 @@ ActiveRecord::Schema.define(version: 20181011081517) do
   add_foreign_key "expenses", "expense_types"
   add_foreign_key "expenses", "reports"
   add_foreign_key "expenses", "users"
+  add_foreign_key "export_configs", "companies"
+  add_foreign_key "export_configs", "export_config_types"
   add_foreign_key "export_preferences", "companies"
   add_foreign_key "export_preferences", "export_fields"
   add_foreign_key "feedbacks", "feedback_types"
@@ -5788,6 +5815,7 @@ ActiveRecord::Schema.define(version: 20181011081517) do
   add_foreign_key "purchase_order_items", "inventory_line_items"
   add_foreign_key "purchase_order_items", "purchase_orders"
   add_foreign_key "purchase_orders", "companies"
+  add_foreign_key "purchase_orders", "gst_types"
   add_foreign_key "purchase_orders", "payment_terms"
   add_foreign_key "purchase_orders", "policies"
   add_foreign_key "purchase_orders", "procurement_terms"
