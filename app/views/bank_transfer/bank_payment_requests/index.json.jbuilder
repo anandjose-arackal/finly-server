@@ -1,6 +1,6 @@
-json.array! @result.paginated_requests.each do |payment_request|
+json.array! @result.paginated_requests.include_for_index.each do |payment_request|
   item = payment_request.payment_order
-  json.id item.bank_payment_request&.id
+  json.id payment_request&.id
   scheduled_at = item.scheduled_at
   if scheduled_at.present?
     scheduled_at = scheduled_at.strftime('%d %b %Y')
@@ -19,11 +19,11 @@ json.array! @result.paginated_requests.each do |payment_request|
     json.mobile_number item.initiating_user.mobile_number
   end
   json.note item.note
-  json.items_count item.payments.count
+  json.items_count item.payments.size
   json.payment_order_status do
     json.id item.payment_order_status.id
     json.name item.payment_order_status.name.humanize
-    json.identifier item.bank_payment_request&.status_name(current_user.id)
+    json.identifier payment_request&.status_name(current_user.id)
   end
   json.amount_processed do
     json.value precision_value item.amount_processed&.value
