@@ -297,7 +297,7 @@ class Payment < ActiveRecord::Base
 
   scope :virtual_account_transaction_purpose, -> (purpose_id) {
     virtual_account_transactions = self.where(reference_resource_type: "VirtualAccountTransaction")
-    virtual_accounts = VirtualBankAccount.where(id: virtual_account_transactions.pluck(:id)).pluck(:virtual_account_id)
+    virtual_accounts = VirtualBankAccount.where(id: virtual_account_transactions.pluck(:id)).pluck(:id)
     case purpose_id
       when 1, '1'
         virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return)).pluck(:id)
