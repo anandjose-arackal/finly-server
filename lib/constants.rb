@@ -21,7 +21,7 @@ module Constants
   end
 
   # todo - to be removed once companies are done mirating from HDFC to RBL
-  MIGRATING_COMPANIES = [51, 48, 81]
+  MIGRATING_COMPANIES = [10, 67]
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
   PRODUCT_DEMO_EMAIL_ID = ['poojitha.shetty@finly.io']
