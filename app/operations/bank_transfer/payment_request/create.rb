@@ -211,6 +211,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     }
     p[:description] = params[:description]
     p[:beneficiary_type_id] = retrieve_beneficiary_type
+    p[:name] = params[:name]
     p[:policy_id] = self.policy_id
     p[:payment_order_attributes] = {}
     p[:payment_order_attributes][:initiating_user] = user
