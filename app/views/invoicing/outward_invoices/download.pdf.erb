@@ -299,14 +299,15 @@
 </div>
 <% end %>
 
-<% if @invoice.terms.present? %>
 <div class="invoice-terms" style="margin-top: 15px;">
   <div class="address-title">
     Terms &amp; Conditions: <br>
   </div>
-  <%= simple_format @invoice.terms, {}, wrapper_tag: "p" %>
+  <p>Errors and omissions excepted (if any) leading to discrepancies in amount or tax collected shall be recoverable from the END USER at a later date through an additional invoice. </p>
+  <% if @invoice.terms.present? %>
+    <%= simple_format @invoice.terms, {}, wrapper_tag: "p" %>
+  <% end %>
 </div>
-<% end %>
 
 <!-- <div class="legal-statement" id="legalcopy">
   <p class="legal">Designed By <span style="font-weight: bold;">Finly</span>, With  <span style="color: red; font-weight: bold; font-size: 18px;"> &hearts;</span>  In <span style="font-weight: bold;">Bangalore, India.</span>
