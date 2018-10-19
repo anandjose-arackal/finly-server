@@ -257,6 +257,32 @@ class Expense::Base < BaseOperation
       }
     end
 
+    def cash_pockets
+      list = []
+      user.user_pockets.cash_and_credit_cards.include_details.each do |pocket|
+        hash = {}
+        if pocket.cash_pocket?
+          adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+          hash[:balance] = adapter&.balance(display_balance: true)
+          hash[:display_balance] = true
+        elsif pocket.credit_card_pocket?
+          hash[:balance] = 0
+          hash[:display_balance] = false
+        end
+        hash[:name] = pocket.name
+        hash[:id] = pocket.id
+
+        currency = pocket.base_currency
+        hash[:base_currency] = {
+            symbol: currency&.symbol,
+            country_code: currency&.country_code,
+            id: currency&.id
+        }
+        list << hash
+      end
+      list
+    end
+
   end
 
 end

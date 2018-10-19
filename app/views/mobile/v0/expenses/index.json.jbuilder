@@ -1,6 +1,7 @@
 json.expenses do
+  cash_pockets =  @result.cash_pockets
   json.array! @result.paginated_expenses do |expense|
-    json.partial! 'expense', expense: expense
+    json.partial! 'expense', expense: expense, cash_pockets: cash_pockets
   end
 end
 json.filter do

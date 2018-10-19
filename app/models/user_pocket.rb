@@ -63,6 +63,8 @@ class UserPocket < ActiveRecord::Base
     where user_id: user_ids
   }
 
+  scope :include_details, -> {includes :user_pocket_type, :base_currency, {balance: [:currency]}}
+
   def blocked_amount_for_pending_payments(excluded_payment_order_id = nil)
     initiating_account = self
     payment_ids = PaymentOrder.find_by(id: excluded_payment_order_id)&.payments&.pluck(:id)
