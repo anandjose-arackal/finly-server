@@ -13,9 +13,14 @@ end
 
 if expense.spent_from.present?
   json.spent_from do
-    json.pocket_name expense.spent_from&.name
-    json.pocket_id expense.spent_from&.id
-    json.can_claim_reimbursement expense.spent_from&.can_claim_reimbursement
+    json.name expense.spent_from&.name
+    json.id expense.spent_from&.id
+    currency = expense.spent_from&.base_currency
+    json.base_currency do
+      json.symbol currency&.symbol
+      json.country_code currency&.country_code
+      json.id currency&.id
+    end
   end
 end
 
