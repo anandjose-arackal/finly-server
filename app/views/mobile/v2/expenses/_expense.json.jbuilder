@@ -11,32 +11,28 @@ json.status do
   json.name expense.expense_status&.name
 end
 
-json.spent_from_name expense.spent_from&.name
-
 if expense.spent_from.present?
-  json.pocket do
-    json.pocket_name expense.spent_from&.name
-    json.pocket_id expense.spent_from&.id
-    json.can_claim_reimbursement expense.spent_from&.can_claim_reimbursement
+  json.spent_from do
+    json.name expense.spent_from&.name
+    json.id expense.spent_from&.id
+    currency = expense.spent_from&.base_currency
+    json.base_currency do
+      json.symbol currency&.symbol
+      json.country_code currency&.country_code
+      json.id currency&.id
+    end
   end
 end
-
 
 json.cash_pockets do
   json.array!(expense.user.user_pockets.cash_and_credit_cards) do |pocket|
     if pocket.cash_pocket?
       adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-      json.can_claim_reimbursement true
       json.balance adapter&.balance(display_balance: true)
       json.display_balance true
     elsif pocket.credit_card_pocket?
-      # adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
-      json.can_claim_reimbursement false
       json.balance 0
       json.display_balance false
-    else
-      adapter = nil
-      json.can_claim_reimbursement false
     end
     json.name pocket.name
     json.id pocket.id
