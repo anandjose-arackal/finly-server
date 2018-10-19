@@ -39,7 +39,7 @@ class Export::Report::WithReceipts < Export::Report::Base
       r.expenses.each do |expense|
         contents << retrieve_data(preferences, r, expense, cf_data)
         expense.receipts&.each do |receipt|
-          self.files << {name: receipt.export_image_file_name, url: receipt.image.url}
+          self.files << {name: receipt.export_image_file_name, url: receipt.image.url, dir_path: expense.report_id}
         end
       end
     end

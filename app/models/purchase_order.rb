@@ -107,12 +107,23 @@ class PurchaseOrder < ActiveRecord::Base
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
   scope :filter_po_number, -> (po_number) {where('purchase_orders.po_number LIKE ?', "%#{po_number}%")}
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+  scope :with_po_number, -> (po_number) {where po_number: po_number}
 
   # Used for generating document number
   scope :valid, -> {
-    ids = pluck(:id)
-    ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
-    where(id: ids)
+    status_ids = [
+        PurchaseOrderStatus.id_for(:processing),
+        PurchaseOrderStatus.id_for(:rejected),
+        PurchaseOrderStatus.id_for(:retracted),
+        PurchaseOrderStatus.id_for(:approved),
+        PurchaseOrderStatus.id_for(:auto_approved),
+        PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:closed)
+    ]
+    where purchase_order_status_id: PurchaseOrderStatus.id_for(status_ids)
+    # ids = pluck(:id)
+    # ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
+    # where(id: ids)
   }
 
   before_save :calculate_line_items
@@ -130,8 +141,18 @@ class PurchaseOrder < ActiveRecord::Base
     shipped
   end
 
-  private
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.po_number,
+        amount: self.balance_amount&.value,
+        document_status: self.status&.name,
+        document_owner: self.user&.name,
+        document_type: self.class.name
+    }
+  end
 
+  private
 
   def calculate_line_items
     total_before_tax_amount = 0

@@ -117,6 +117,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   def post_process
     add_message :success, "Invoice updated"
+
   end
 
 end

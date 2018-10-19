@@ -57,7 +57,11 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     end
 
     # adding the prefix and sequence to the invoice
-    prefix = user.company.invoice_number_configs.with_purpose_id(Purpose.id_for(:collect)).with_config_type_id(InvoiceNumberConfigType.id_for(self.invoice_type)).first.prefix
+    if user.company.invoice_number_configs.with_purpose_id(Purpose.id_for(:collect)).with_config_type_id(InvoiceNumberConfigType.id_for(self.invoice_type)).present?
+      prefix = user.company.invoice_number_configs.with_purpose_id(Purpose.id_for(:collect)).with_config_type_id(InvoiceNumberConfigType.id_for(self.invoice_type)).first.prefix
+    else
+      prefix = ''
+    end
     sequence = self.invoice_number&.gsub(prefix, '')
     self.invoice_parameters[:prefix] = prefix
     self.invoice_parameters[:sequence_start] = sequence
@@ -131,6 +135,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     if self.invoice.tax_invoice?
       invoice_status_id = OutwardInvoiceStatus.id_for(:unpaid)
     end
+
     if self.invoice.update(invoice_status_id: invoice_status_id, is_deleted: false)
       recalculate_totals
       self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
@@ -153,7 +158,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   private
 
   def invoice_params
-    params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id,
+    params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id, :tds_slab_id,
                                     :tax_type_id, :date, :discount_type_id, :due_date, :memo, :customer_memo, :terms, :payment_term_id, :location_id,
                                     :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address, :override_invoice_number,
                                     :email, :mobile_number, :virtual_account_id, :roundoff_amount, :roundoff_total_enabled,

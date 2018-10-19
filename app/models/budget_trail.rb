@@ -2,20 +2,23 @@
 #
 # Table name: budget_trails
 #
-#  id                :integer          not null, primary key
-#  entity_id         :integer
-#  entity_type       :string(255)
-#  category_id       :integer
-#  cost_center_id    :integer
-#  location_id       :integer
-#  vendor_id         :integer
-#  amount_id         :integer
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  user_id           :integer
-#  department_id     :integer
-#  date              :date
-#  sub_department_id :integer
+#  id                  :integer          not null, primary key
+#  entity_id           :integer
+#  entity_type         :string(255)
+#  category_id         :integer
+#  cost_center_id      :integer
+#  location_id         :integer
+#  vendor_id           :integer
+#  amount_id           :integer
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  user_id             :integer
+#  department_id       :integer
+#  date                :date
+#  sub_department_id   :integer
+#  procurement_id      :integer
+#  spent_amount_id     :integer
+#  committed_amount_id :integer
 #
 
 class BudgetTrail < ActiveRecord::Base
@@ -29,6 +32,7 @@ class BudgetTrail < ActiveRecord::Base
   belongs_to :department
   belongs_to :sub_department, class_name: "Department"
   belongs_to :user
+  belongs_to :procurement
 
   accepts_nested_attributes_for :amount
 
@@ -55,6 +59,7 @@ class BudgetTrail < ActiveRecord::Base
       where(id: ids)
     end
   }
+
   scope :with_locations, -> (location_ids) {
     unless location_ids.blank?
       where(location_id: location_ids)

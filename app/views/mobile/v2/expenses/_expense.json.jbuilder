@@ -11,7 +11,35 @@ json.status do
   json.name expense.expense_status&.name
 end
 
-json.spent_from_name expense.spent_from&.name
+if expense.spent_from.present?
+  json.spent_from do
+    json.pocket_name expense.spent_from&.name
+    json.pocket_id expense.spent_from&.id
+    json.can_claim_reimbursement expense.spent_from&.can_claim_reimbursement
+  end
+end
+
+json.cash_pockets do
+  json.array!(@result.cash_and_credit_pockets) do |pocket|
+    if pocket.cash_pocket?
+      adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+      json.balance adapter&.balance(display_balance: true)
+      json.display_balance true
+    elsif pocket.credit_card_pocket?
+      json.balance 0
+      json.display_balance false
+    end
+    json.name pocket.name
+    json.id pocket.id
+
+    currency = pocket.base_currency
+    json.base_currency do
+      json.symbol currency&.symbol
+      json.country_code currency&.country_code
+      json.id currency&.id
+    end
+  end
+end
 
 json.amount do
   json.partial! 'api/v1/shared/amount', amount: expense.amount

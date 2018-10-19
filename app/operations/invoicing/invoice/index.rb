@@ -9,7 +9,7 @@ class Invoicing::Invoice::Index < Invoicing::Invoice::Base
     has_scope :filter_amount, using: [:type, :value], type: :hash
     has_scope :filter_date, using: [:date_from, :date_to], type: :hash
     has_scope :filter_search
-    has_scope :filter_status_id
+    has_scope :filter_status_id, type: :array
     has_scope :filter_customer_id
     has_scope :filter_invoice_number
 

@@ -4,7 +4,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
     # todo scope it and in all similar places
-    self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
+    self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
 
     self.procurement = self.purchase_order&.procurement
   end
@@ -39,7 +39,6 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
-
     end
 
     self.workflow_output = op.workflow_output
@@ -51,13 +50,19 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   end
 
   def awaiting_action_from?
+    # find document level reviewer mapping
     dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
     level = purchase_order.level
 
     if dlrm.present?
-      dlrm.pluck(:reviewer_id).include? user.id
+      # dlrm.pluck(:reviewer_id).include? user.id
+      if dlrm.pluck(:reviewer_id).include?(nil)
+        level.level_reviewer_mappings.with_threshold(self.purchase_order.balance_amount.value).pluck(:reviewer_id).include? user.id
+      else
+        dlrm.pluck(:reviewer_id).include? user.id
+      end
     else
-      level.reviewers.include? user
+      level.level_reviewer_mappings.with_threshold(self.purchase_order.balance_amount.value).pluck(:reviewer_id).include? user.id
     end
   end
 end

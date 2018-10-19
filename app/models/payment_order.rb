@@ -112,6 +112,10 @@ class PaymentOrder < ActiveRecord::Base
     where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
   }
 
+  scope :with_receiving_account_type, -> (account_type) {
+    where receiving_account_type: account_type
+  }
+
   scope :from_company_account, -> (enabled) {
     if ['1', 1].include?(enabled)
       where initiating_account_type: ["ItzCashCompanyAccount", "YesBankCompanyAccount"]

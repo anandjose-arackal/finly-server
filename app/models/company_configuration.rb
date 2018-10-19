@@ -17,7 +17,7 @@
 #  registered_mobile_number         :string(255)
 #  bank_type                        :string(255)
 #  default_card_expense_category_id :integer
-#  darwinbox_sso_enabled            :boolean          default(FALSE)
+#  sso_enabled                      :boolean          default(FALSE)
 #
 
 class CompanyConfiguration < ActiveRecord::Base
