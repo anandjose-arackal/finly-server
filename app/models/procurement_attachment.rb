@@ -27,5 +27,9 @@ class ProcurementAttachment < ActiveRecord::Base
   has_attached_file :file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :file, content_type: CONTENT_TYPES
 
+  scope :orphans, -> {
+    where(procurement_document: nil)
+  }
+
   scope :with_id, -> (ids) { where id: ids }
 end

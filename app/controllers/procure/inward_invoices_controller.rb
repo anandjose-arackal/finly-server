@@ -84,4 +84,10 @@ class Procure::InwardInvoicesController < ApplicationController
     respond response: @result.success? ? :success : :failure
   end
 
+  # Template for bulk creation of NON PO invoices
+  def import_template
+    @result = Procurements::Invoices::ImportTemplate.(current_user, params)
+    respond
+  end
+
 end

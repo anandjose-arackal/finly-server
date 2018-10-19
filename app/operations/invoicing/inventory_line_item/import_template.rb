@@ -40,7 +40,8 @@ class Invoicing::InventoryLineItem::ImportTemplate < Invoicing::InventoryLineIte
     self.sheets << {
         item_headers: category_headers,
         item_contents: category_contents,
-        name: "Categories"
+        name: "Categories",
+
     }
 
     # adding Tax Rates to the Excel sheet

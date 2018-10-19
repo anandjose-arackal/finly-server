@@ -74,19 +74,20 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond_to do |format|
       format.pdf {
           render pdf: "PO-#{@result.purchase_order.po_number}",
-                 layout: "pdf.html.erb",
+                 layout: "pdf/paginated_bootstrap.html.erb",
                  print_media_type: true,
                  margin: { :bottom => 5 },
-                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
+                 # header: { left: '[page] of [topage]' },
+                 footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
                  # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
       format.html {
         render pdf: "PO-#{@result.purchase_order.po_number}",
-                 layout: "pdf.html.erb",
-                 print_media_type: true,
-                 margin: { :bottom => 5 },
-                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
-                 # header: { html: { template: 'export/header_pagination.html.erb' }}
+               layout: "pdf/paginated_bootstrap.html.erb",
+               print_media_type: true,
+               margin: { :bottom => 5 },
+               footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
+        # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
     end
   end

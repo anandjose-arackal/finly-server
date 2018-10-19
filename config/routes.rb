@@ -3192,7 +3192,7 @@ Rails.application.routes.draw do
 
     resources :payments, only: [:show]
 
-    resources :attachments, only: [:create]
+    resources :attachments
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
 
 
@@ -3202,6 +3202,8 @@ Rails.application.routes.draw do
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
     patch 'inward_invoices/templates/:id', to: 'inward_invoices#template_update'
     delete 'inward_invoices/templates/:id', to: 'inward_invoices#template_destroy'
+
+    get 'inward_invoices/import_template', to: 'inward_invoices#import_template'
 
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
