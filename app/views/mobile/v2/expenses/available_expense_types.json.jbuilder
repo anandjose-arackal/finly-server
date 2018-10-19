@@ -36,6 +36,7 @@ json.currencies do
     json.country currency.country
   end
 end
+
 json.categories do
   json.array!(@result.categories) do |category|
     json.extract! category, :id, :name
@@ -52,17 +53,12 @@ json.cash_pockets do
   json.array!(@result.cash_and_credit_pockets) do |pocket|
     if pocket.cash_pocket?
       adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-      json.can_claim_reimbursement true
       json.balance adapter&.balance(display_balance: true)
       json.display_balance true
     elsif pocket.credit_card_pocket?
       # adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
-      json.can_claim_reimbursement false
       json.balance 0
       json.display_balance false
-    else
-      adapter = nil
-      json.can_claim_reimbursement false
     end
     json.name pocket.name
     json.id pocket.id

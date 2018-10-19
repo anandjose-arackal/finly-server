@@ -18,6 +18,7 @@ expense:
     editable_merchant: <%= params[:merchant] %>
   <% elsif type == '3' or type == 3 %>
   distance_expense_attributes:
+    vehicle_rate_id: <%= params[:vehicle_rate_id] %>
     odometer_reading_start: <%= params[:odometer_reading_start] %>
     odometer_reading_end: <%= params[:odometer_reading_end] %>
     odometer_reading_receipt_start_id: <%= params[:odometer_reading_receipt_start_id] %>

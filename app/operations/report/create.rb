@@ -63,7 +63,7 @@ class Report::Create < Report::Base
       cash_pocket = expense.spent_from
       if cash_pocket.present? && cash_pocket.cash_pocket?
         cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_pocket)
-        amount = expense.calculate_amount_value(report.policy)
+        amount = expense.calculate_amount_value(policy)
         if cash_pocket_adapter.balance(display_balance: true) >= amount
           expense.update(cash_on_hand_blocked: true)
         end

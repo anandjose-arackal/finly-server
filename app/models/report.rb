@@ -35,9 +35,6 @@
 #
 
 
-
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable,
@@ -212,7 +209,7 @@ class Report < ActiveRecord::Base
 
   scope :sort_for_personal, -> {joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
 
-  scope :order_by_controlling_user, ->(user_id, manager=false) {
+  scope :order_by_controlling_user, ->(user_id, manager = false) {
     if user_id.present?
       ids = pluck(:id)
       controlling_reports = where(controlling_user_id: user_id)
@@ -225,7 +222,7 @@ class Report < ActiveRecord::Base
     end
   }
 
-  scope :order_by, ->(type, user_id=nil){
+  scope :order_by, ->(type, user_id = nil) {
     case type
     when :created_at
       reorder(created_at: :desc)
@@ -255,6 +252,7 @@ class Report < ActiveRecord::Base
   scope :includes_policy, -> {includes :policy}
   scope :not_settled, -> {where report_processor_group_mapping_id: nil}
   scope :with_processor_group_mapping, -> (id) {where report_processor_group_mapping_id: id}
+  scope :include_details, -> {includes :user, :controlling_user, :policy}
 
   scope :filter_custom_drop_down_selection, ->(drop_down_item_id) do
     drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)

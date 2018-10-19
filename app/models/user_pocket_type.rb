@@ -13,7 +13,7 @@ class UserPocketType < ActiveRecord::Base
   include Seedable
 
   def self.values
-    %w(bank_transfer card_transfer cash atm_withdrawals credit_card)
+    %w(bank_transfer card_transfer cash credit_card reimbursement paid_by_company)
   end
 
   def cash_pocket?

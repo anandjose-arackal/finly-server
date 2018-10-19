@@ -24,27 +24,7 @@ if expense.spent_from.present?
   end
 end
 
-json.cash_pockets do
-  json.array!(expense.user.user_pockets.cash_and_credit_cards) do |pocket|
-    if pocket.cash_pocket?
-      adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-      json.balance adapter&.balance(display_balance: true)
-      json.display_balance true
-    elsif pocket.credit_card_pocket?
-      json.balance 0
-      json.display_balance false
-    end
-    json.name pocket.name
-    json.id pocket.id
-
-    currency = pocket.base_currency
-    json.base_currency do
-      json.symbol currency&.symbol
-      json.country_code currency&.country_code
-      json.id currency&.id
-    end
-  end
-end
+json.cash_pockets cash_pockets
 
 json.amount do
   json.partial! 'api/v1/shared/amount', amount: expense.amount
@@ -107,6 +87,15 @@ if expense.distance_expense?
       end
     end
   end
+
+  vehicle_rates = []
+  expense.user.policies.each do |policy|
+    policy.vehicle_rates.each do |vehicle_rate|
+      vehicle_rates << vehicle_rate.as_json
+    end
+  end
+  json.vehicle_rates vehicle_rates
+  json.selected_vehicle_Rate expense.distance_expense&.vehicle_rate
 end
 json.custom_fields do
   case expense.expense_type_id
