@@ -25,7 +25,7 @@ if expense.spent_from.present?
 end
 
 json.cash_pockets do
-  json.array!(@result.cash_and_credit_pockets) do |pocket|
+  json.array!(expense.user.user_pockets.cash_and_credit_cards) do |pocket|
     if pocket.cash_pocket?
       adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
       json.balance adapter&.balance(display_balance: true)
