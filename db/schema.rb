@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181011081517) do
+ActiveRecord::Schema.define(version: 20181019100547) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2692,25 +2692,29 @@ ActiveRecord::Schema.define(version: 20181011081517) do
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
 
   create_table "inventory_line_items", force: :cascade do |t|
-    t.decimal  "tax",                       precision: 20, scale: 10
-    t.decimal  "discount",                  precision: 20, scale: 10
-    t.string   "hsn_sac",     limit: 255
-    t.integer  "company_id",  limit: 4
-    t.string   "sku",         limit: 255
-    t.decimal  "rate",                      precision: 20, scale: 10
-    t.text     "description", limit: 65535
-    t.integer  "category_id", limit: 4
-    t.datetime "created_at",                                                          null: false
-    t.datetime "updated_at",                                                          null: false
-    t.text     "note",        limit: 65535
-    t.integer  "tax_rate_id", limit: 4
-    t.boolean  "is_deleted",                                          default: false, null: false
-    t.string   "item_code",   limit: 255
-    t.string   "account",     limit: 255
+    t.decimal  "tax",                                  precision: 20, scale: 10
+    t.decimal  "discount",                             precision: 20, scale: 10
+    t.string   "hsn_sac",                limit: 255
+    t.integer  "company_id",             limit: 4
+    t.string   "sku",                    limit: 255
+    t.decimal  "rate",                                 precision: 20, scale: 10
+    t.text     "description",            limit: 65535
+    t.integer  "category_id",            limit: 4
+    t.datetime "created_at",                                                                     null: false
+    t.datetime "updated_at",                                                                     null: false
+    t.text     "note",                   limit: 65535
+    t.integer  "tax_rate_id",            limit: 4
+    t.boolean  "is_deleted",                                                     default: false, null: false
+    t.string   "item_code",              limit: 255
+    t.string   "account",                limit: 255
+    t.integer  "supply_item_type_id_id", limit: 4
+    t.integer  "supply_item_type_id",    limit: 4
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
   add_index "inventory_line_items", ["company_id"], name: "index_inventory_line_items_on_company_id", using: :btree
+  add_index "inventory_line_items", ["supply_item_type_id"], name: "index_inventory_line_items_on_supply_item_type_id", using: :btree
+  add_index "inventory_line_items", ["supply_item_type_id_id"], name: "index_inventory_line_items_on_supply_item_type_id_id", using: :btree
   add_index "inventory_line_items", ["tax_rate_id"], name: "index_inventory_line_items_on_tax_rate_id", using: :btree
 
   create_table "invoice_attachments", force: :cascade do |t|
@@ -4639,6 +4643,13 @@ ActiveRecord::Schema.define(version: 20181011081517) do
     t.datetime "updated_at",                  null: false
   end
 
+  create_table "supply_item_types", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.text     "description", limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
   create_table "system_logs", force: :cascade do |t|
     t.integer  "log_resource_id",   limit: 4,     null: false
     t.string   "log_resource_type", limit: 255,   null: false
@@ -5715,6 +5726,7 @@ ActiveRecord::Schema.define(version: 20181011081517) do
   add_foreign_key "individual_kycs", "users"
   add_foreign_key "inventory_line_items", "categories"
   add_foreign_key "inventory_line_items", "companies"
+  add_foreign_key "inventory_line_items", "supply_item_types"
   add_foreign_key "inventory_line_items", "tax_rates"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"

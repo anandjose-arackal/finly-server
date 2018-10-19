@@ -56,6 +56,21 @@ class Invoicing::InventoryLineItem::ImportTemplate < Invoicing::InventoryLineIte
         name: "Tax Rates"
     }
 
+
+    # Adding Item Types
+
+    item_types = SupplyItemType.all
+    item_type_headers = ["ID", "Item Type"]
+    item_type_contents = []
+    item_types.each do |item_type|
+      item_type_contents << [item_type.id, item_type.name]
+    end
+    self.sheets << {
+        item_headers: item_type_headers,
+        item_contents: item_type_contents,
+        name: "Item Types"
+    }
+
     # adding custom fields to the excel sheet
     # self.payment_order_custom_fields.with_field_type([FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)]).each do |custom_field_config|
     #   custom_field_headers = ["#{custom_field_config.field_name} ID", "#{custom_field_config.field_name} Name"]
@@ -88,6 +103,7 @@ class Invoicing::InventoryLineItem::ImportTemplate < Invoicing::InventoryLineIte
   def default_headers
     [
         "Item Name/Description",
+        "Item Type",
         "SKU",
         "Item Number",
         "Category ID",

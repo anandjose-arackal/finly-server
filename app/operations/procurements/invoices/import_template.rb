@@ -52,6 +52,25 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
     }
 
     ##################################################
+    # Add Non PO items list
+    op = Invoicing::InventoryLineItem::Index.(user, {filter_item_type: [SupplyItemType.id_for(:non_po_item)]})
+    items = op.inventory_line_items
+
+    item_headers = ["ID", "Description", "Category", "Tax Rate", "Discount" "Note"]
+    item_contents = []
+
+    items.each do |item|
+      item_contents << [item.id, item.description, item.category&.name, item.tax_rate&.rate, item.discount, item.note]
+    end
+
+    self.sheets << {
+        item_headers: item_headers,
+        item_contents: item_contents,
+        name: 'Non PO Items'
+    }
+
+
+    ##################################################
     # adding Tax Rates to the Excel sheet
     tax_rate_headers = ["ID", "Tax Rate Name", "Rate %", "Internal ID"]
     tax_rate_contents = []
@@ -184,7 +203,7 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
         "Departments",
         "Sub Department",
         "Cost Center",
-        "UTR"
+        "Auto Submit"
     ]
   end
 end

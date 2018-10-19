@@ -271,7 +271,7 @@ class Procurement < ActiveRecord::Base
   end
 
   def vendor
-    type_entity.vendor
+    type_entity&.vendor
   end
 
   def type_entity

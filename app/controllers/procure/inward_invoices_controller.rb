@@ -90,4 +90,10 @@ class Procure::InwardInvoicesController < ApplicationController
     respond
   end
 
+  # Bulk Import invoices through xls
+  def import
+    @respond = Procurements::Invoices::Import.(current_user, params)
+    respond
+  end
+
 end

@@ -16,7 +16,7 @@ class Invoicing::InventoryLineItem::Import < Invoicing::InventoryLineItem::Base
     self.company = user.company
     self.file = params[:file]
 
-    self.inventory_data = ImportUtil.load_spreadsheet(file, [:description, :sku, :item_code, :category_id, :hsn_sac, :rate, :discount, :tax_rate_id, :note], {skip_empty_lines: true})
+    self.inventory_data = ImportUtil.load_spreadsheet(file, [:description, :supply_item_type_id, :sku, :item_code, :category_id, :hsn_sac, :rate, :discount, :tax_rate_id, :note], {skip_empty_lines: true})
 
     self.headers = retrieve_headers
     self.contents = []
@@ -51,6 +51,7 @@ class Invoicing::InventoryLineItem::Import < Invoicing::InventoryLineItem::Base
   def retrieve_headers
     [
         "Item Name/Description",
+        "Item Type",
         "SKU",
         "Item Number",
         "Category ID",
