@@ -102,6 +102,15 @@ if expense.distance_expense?
       end
     end
   end
+
+  vehicle_rates = []
+  expense.user.policies.each do |policy|
+    policy.vehicle_rates.each do |vehicle_rate|
+      vehicle_rates << vehicle_rate.as_json
+    end
+  end
+  json.vehicle_rates vehicle_rates
+  json.selected_vehicle_Rate expense.distance_expense&.vehicle_rate
 end
 json.custom_fields do
   case expense.expense_type_id

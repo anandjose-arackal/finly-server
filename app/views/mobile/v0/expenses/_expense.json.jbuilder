@@ -32,6 +32,15 @@ if expense.distance_expense?
       end
     end
   end
+
+  vehicle_rates = []
+  expense.user.policies.each do |policy|
+    policy.vehicle_rates.each do |vehicle_rate|
+      vehicle_rates << vehicle_rate.as_json
+    end
+  end
+  json.vehicle_rates vehicle_rates
+  json.selected_vehicle_rate expense.distance_expense&.vehicle_rate
 end
 json.user do
   json.id expense.user.id
@@ -43,9 +52,9 @@ json.status do
 end
 
 if expense.spent_from.present?
-  json.pocket do
-    json.pocket_name expense.spent_from&.name
-    json.pocket_id expense.spent_from&.id
+  json.spent_from do
+    json.name expense.spent_from&.name
+    json.id expense.spent_from&.id
   end
 end
 
@@ -56,14 +65,9 @@ json.cash_pockets do
       json.balance adapter&.balance(display_balance: true)
       json.display_balance true
     elsif pocket.credit_card_pocket?
-      # adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
       json.balance 0
       json.display_balance false
-    else
-      adapter = nil
-      json.can_claim_reimbursement false
     end
-    json.can_claim_reimbursement expense.spent_from&.can_claim_reimbursement
     json.name pocket.name
     json.id pocket.id
 
