@@ -109,7 +109,7 @@ class Report::Index < Report::Base
           self.reports = self.reports.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
         end
       end
-      self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30)
+      self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30).include_details
     end
 
     def get_counts

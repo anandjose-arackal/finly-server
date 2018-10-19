@@ -99,7 +99,7 @@ class MoneyRequest::Index < MoneyRequest::Base
           self.money_requests = self.money_requests.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
         end
       end
-      self.paginated_money_requests = self.money_requests.skip_pending.paginate(page: params[:page], per_page: 30)
+      self.paginated_money_requests = self.money_requests.skip_pending.paginate(page: params[:page], per_page: 30).include_details
     end
 
     def status_name(money_request)
