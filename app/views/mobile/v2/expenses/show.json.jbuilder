@@ -1,4 +1,4 @@
-json.partial! 'expense', expense: @result.expense
+json.partial! 'expense', expense: @result.expense, cash_pockets: @result.cash_pockets
 json.currencies do
   json.array!(Currency.all) do |currency|
     json.country currency.country
