@@ -193,6 +193,7 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
         "Due Date",
         "Payment Term Name",
         "Item Id",
+        "Description",
         "Qty",
         "Amount",
         "Tax Rate ID",
