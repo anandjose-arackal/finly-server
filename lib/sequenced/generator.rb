@@ -14,6 +14,7 @@ module Sequenced
       @column = options[:column].to_sym
       @start_at = options[:start_at]
       @skip = options[:skip]
+      @prefix = options[:prefix] || ''
       @sequenced_editable = options[:editable]
       @config = UniqueIdentifier.with_company_id(record.company_id).with_purpose_id(Purpose.id_for(options[:purpose]))&.first
       @start_at ||= @config&.sequence_start
@@ -69,7 +70,7 @@ module Sequenced
     end
 
     def process_prefix
-      @prefix = @config&.prefix || ''
+      @prefix = @config&.prefix || @prefix
       @prefix = ExpressionEvaluator::Transformer.(@prefix) unless @prefix.blank?
     end
 

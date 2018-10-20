@@ -6,7 +6,8 @@ module Sequenced
     DEFAULT_OPTIONS = {
         # column: :sequential_id,
         # purpose: :travel_request,
-        start_at: 1
+        start_at: 1,
+        prefix: ''
     }.freeze
     SequencedColumnExists = Class.new(StandardError)
 
