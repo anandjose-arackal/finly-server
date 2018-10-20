@@ -13,7 +13,7 @@ class AccountManager::CreditCardPockets::CreditCardPocketsAdapter < AccountManag
     true
   end
 
-  # no such thing as credit here because the pool of money is not tracked in Finly
+  # no such thing as debit here because the pool of money is not tracked in Finly
   def debit(payment, options = {})
     true
   end
