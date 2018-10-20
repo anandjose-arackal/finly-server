@@ -189,14 +189,20 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
     [
         "Vendor ID",
         "Invoice Number",
-        "Payment Terms",
+        "Invoice Date",
+        "Due Date",
+        "Payment Term Name",
         "Item Id",
+        "Qty",
         "Amount",
         "Tax Rate ID",
         "Total",
         "Period",
         "Attachment ID",
-        "Sub Department",
+        "Policy Name",
+        "Sub Department Name",
+        "Billing Location ID",
+        "Shipping Location ID",
         "Auto Submit (Yes/No)"
     ]
   end
