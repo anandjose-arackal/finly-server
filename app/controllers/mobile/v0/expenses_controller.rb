@@ -32,7 +32,7 @@ class Mobile::V0::ExpensesController < Mobile::V1::BaseApiController
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         respond render: 'mobile/v0/reports/show'
       else
-        respond render: 'mobile/v0/expenses/show'
+        respond render: 'mobile/v0/shared/success'
       end
     else
       respond
