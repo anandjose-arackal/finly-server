@@ -18,7 +18,7 @@ module Sequenced
       @sequenced_editable = options[:editable]
       @config = UniqueIdentifier.with_company_id(record.company_id).with_purpose_id(Purpose.id_for(options[:purpose]))&.first
       @start_at ||= @config&.sequence_start
-      @min_sequence_length = @config&.sequence_start&.length || 1
+      @min_sequence_length = @config&.sequence_start&.length || 5
       process_prefix
     end
 
@@ -77,7 +77,7 @@ module Sequenced
     def find_last_record
       build_scope(*scope) do
         base_relation.
-            where("#{column.to_s} IS NOT NULL").
+            where("#{column.to_s} IS NOT NULL AND #{column.to_s} LIKE '#{@prefix}%'").
             order("created_at DESC")
       end.first
     end
