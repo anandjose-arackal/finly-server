@@ -41,21 +41,82 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
   def process
     self.invoices_params = generate_invoices_params
 
-    self.invoices_params.each do |invoice_params|
+    has_errors = false
+
+    self.invoices_params.each_with_index do |invoice_params, index|
+      has_line_item_errors = false
+      content = invoices_data[index].values
       invoice = user.company.inward_invoices.build(invoice_params)
 
-      unless invoice.valid?
-        add_message :error, "Could not process data. Please resolve errors before tying again"
-        break
+      unless invoice_params[:vendor_id].present?
+        content[0] = content[0] + "---error---"
+        has_line_item_errors = true
+        has_errors = true
       end
+
+      unless invoice_params[:invoice_number].present?
+        content[1] = content[1] + "---error---"
+        has_errors = true
+        has_line_item_errors = true
+      end
+
+      unless invoice_params[:sub_department_id].present?
+        content[14] = content[14] + "---error---"
+        has_line_item_errors = true
+        has_errors = true
+      end
+
+      unless invoice_params[:policy_id].present?
+        content[13] = content[13] + "---error---"
+        has_line_item_errors = true
+        has_errors = true
+      end
+
+      unless invoice_params[:invoice_items_attributes][0][:inventory_line_item_id].present?
+        content[5] = (content[5] || "") + "---error---"
+        has_line_item_errors = true
+        has_errors = true
+      end
+
+      unless invoice_params[:invoice_items_attributes][0][:amount].present?
+        content[8] = (content[8] || "") + "---error---"
+        has_line_item_errors = true
+        has_errors = true
+      end
+
+      unless invoice_params[:invoice_items_attributes][0][:description].present?
+        content[6] = (content[6] || "") + "---error---"
+        has_line_item_errors = true
+        has_errors = true
+      end
+
+
+      unless invoice.valid?
+        has_errors = true
+      end
+
+      if has_line_item_errors
+        content.push "ERROR"
+      end
+
+      self.contents << content
     end
 
-    add_message :success, 'All data will be processed'
+    if has_errors
+    else
+      add_message :success, 'All data will be processed'
+
+      # Call background operations
+      Procurements::Invoices::ImportProcessor.call(user, invoices_params)
+
+    end
+
   end
 
-  # def success
-  #   self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.contents}}, messages)
-  # end
+  def success
+    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.contents, template: 'export_template/template_w_validation'}}, messages)
+    self.response
+  end
 
   private
 

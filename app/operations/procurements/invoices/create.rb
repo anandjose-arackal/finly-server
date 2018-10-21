@@ -4,7 +4,7 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
   def init
     # self.invoice_params = invoice_parameters
     self.procurement = user.company.procurements.find_by id: params[:procurement_id]
-    vendor_id = params[:purchase_order][:vendor_id]
+    vendor_id = params[:purchase_order][:vendor_id] || params[:invoice][:vendor_id]
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
   end
 
