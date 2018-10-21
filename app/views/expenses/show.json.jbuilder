@@ -17,14 +17,7 @@ if @result.expense.spent_from.present?
   end
 end
 
-json.cash_pockets do
-  json.array!(@result.cash_pockets) do |pocket|
-    adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-    json.name pocket.name
-    json.balance adapter.balance(display_balance: true)
-    json.id pocket.id
-  end
-end
+json.cash_pockets @result.cash_pockets
 
 if @result.expense.report.present?
   json.report_id @result.expense.report_id

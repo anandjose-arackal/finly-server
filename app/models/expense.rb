@@ -428,7 +428,7 @@ class Expense < ActiveRecord::Base
   scope :include_details, -> {includes(
       [
           {amount: [:currency]}, :expense_status,
-          {report: [:base_currency]},
+          :report,
           {user: [{policies: [
           {vehicle_rates: [{rate: [:currency]},
                            :distance_unit]}, :distance_expense_config]}]}, :expense_type, :category,
