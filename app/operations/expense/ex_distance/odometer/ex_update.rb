@@ -65,11 +65,24 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id) || self.expense.spent_from
+    if pocket_id.blank?
+      exp_params = params[:expense] || {}
+      reimbursable = exp_params[:reimbursable]
+      from_cash_on_hand = exp_params[:from_cash_on_hand]
+      if reimbursable
+        pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
+      elsif from_cash_on_hand
+        pocket_id = user.user_pockets.cash_pockets_only&.first&.id
+      elsif exp_params.key?(:reimbursable) || exp_params.key?(:from_cash_on_hand) # Legacy support for android app -> As android only sends the key which has been updated
+        pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+      end
+    end
+    self.cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id) || expense&.spent_from
 
     if self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
     end
+    self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
   end
 
   def validate
@@ -162,7 +175,7 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     return {} if params[:expense].blank?
     params.require(:expense).permit(:note, :category_id, :date,
                                     :expense_type_id, :expense_status_id,
-                                    :report_id, :reimbursable, :spent_from_id,
+                                    :report_id, :spent_from_id,
                                     distance_expense_attributes: [:type_id, :odometer_reading_start, :odometer_reading_end,
                                                                   :odometer_reading_receipt_start_id, :odometer_reading_receipt_end_id,
                                                                   distance_attributes: [:value, :physical_unit_id]])

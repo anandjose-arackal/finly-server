@@ -37,7 +37,7 @@ class UserPocket < ActiveRecord::Base
   accepts_nested_attributes_for :balance
 
   delegate :balance_value, to: :balance
-  delegate :cash_pocket?, :credit_card_pocket?, :bank_transfer_pocket?, :card_transfer_pocket?, to: :user_pocket_type
+  delegate :cash_pocket?, :credit_card_pocket?, :bank_transfer_pocket?, :card_transfer_pocket?, :reimbursement?, :paid_by_company?, to: :user_pocket_type
 
   scope :with_id, -> (ids) { where id: ids}
   scope :cash_pockets_only, -> {
@@ -47,7 +47,14 @@ class UserPocket < ActiveRecord::Base
     where user_pocket_type_id: UserPocketType.id_for(:credit_card)
   }
   scope :cash_and_credit_cards, -> {
-    where user_pocket_type_id: [UserPocketType.id_for(:cash), UserPocketType.id_for(:credit_card), UserPocketType.id_for(:reimbursement)]
+    where user_pocket_type_id: [UserPocketType.id_for(:cash), UserPocketType.id_for(:credit_card),
+                                UserPocketType.id_for(:reimbursement), UserPocketType.id_for(:paid_by_company)]
+  }
+  scope :reimbursement_pocket_only,->{
+    where user_pocket_type_id: UserPocketType.id_for(:reimbursement)
+  }
+  scope :paid_by_company_pocket_only,->{
+    where user_pocket_type_id: UserPocketType.id_for(:paid_by_company)
   }
   scope :card_transfer_pockets_only, -> {
     where user_pocket_type_id: UserPocketType.id_for(:card_transfer)
@@ -72,7 +79,7 @@ class UserPocket < ActiveRecord::Base
   end
 
   def can_claim_reimbursement
-    cash_pocket?
+    reimbursement?
   end
 
 end
