@@ -34,6 +34,10 @@ class Trail < ActiveRecord::Base
     where(parent_type: parent_type)
   }
 
+  scope :only_approve, -> {
+    where action_id: TrailAction.id_for(:approve)
+  }
+
   scope :with_action_user_id, -> (id) {
     where(action_user_id: id)
   }
@@ -42,6 +46,16 @@ class Trail < ActiveRecord::Base
 
   scope :natural_order, -> {
       reorder :created_at
+  }
+
+  scope :printable_trails, -> {
+    action_ids = [TrailAction.id_for(:reject), TrailAction.id_for(:retract)]
+    created_at = where(action_id: action_ids).reorder(:created_at).pluck(:created_at).reverse.first
+    if created_at.present?
+      where('trails.created_at > ?', created_at).reorder(:created_at)
+    else
+      reorder(:created_at)
+    end
   }
 
   def as_json(user)

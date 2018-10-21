@@ -92,6 +92,10 @@ class BankAccount < ActiveRecord::Base
     where(id: ids)
   }
 
+  before_save do
+    self.ifsc = self.ifsc.match(Constants::VALID_IFSC).to_s
+  end
+
   after_create do
     if self.account_owner.is_a?(Company)
       self.update(company_id: self.account_owner_id)

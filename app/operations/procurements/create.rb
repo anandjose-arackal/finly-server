@@ -52,6 +52,22 @@ class Procurements::Create < Procurements::Base
     end
   end
 
+  def success
+    params[:procurement] = self.procurement
+    Procurements::Create::CreatePresenter.new(user, params, messages)
+  end
+
+  class Procurements::Create::CreatePresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :procurement, :invoices, :purchase_order
+
+    def init
+      debugger
+      self.procurement = params[:procurement]
+      self.invoices = self.procurement.invoices
+      self.purchase_order = self.procurement.purchase_order
+    end
+  end
+
   private
 
   def procurement_parameters

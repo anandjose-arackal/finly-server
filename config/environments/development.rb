@@ -76,6 +76,11 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+  end
+
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
@@ -89,6 +94,10 @@ Rails.application.configure do
   #         s3_region: ENV["aws_region_name"],
   #         access_key_id: ENV["aws_access_key_id"],
   #         secret_access_key: ENV["aws_secret_access_key"]
+  #     },
+  #     :s3_protocol => :https,
+  #     :s3_headers => {
+  #         :content_disposition => 'attachment'
   #     }
   # }
   #########################################################################################

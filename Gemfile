@@ -7,6 +7,8 @@ gem 'wkhtmltopdf-binary', '0.12.3.1'
 gem 'nokogiri', '1.6.8'
 gem 'autoprefixer-rails', '6.5.0.1'
 
+gem 'parslet'
+
 # adding gems for activeMQ
 gem 'daemons', '1.2.4'
 gem 'stomp', '1.4.3'
@@ -18,6 +20,8 @@ gem 'mocha', '1.2.1'
 # gem for crash reports
 gem 'rollbar', '2.15.5'
 gem 'oj', '~> 2.18.1'
+
+gem 'amoeba', '3.1.0'
 
 # gem for admin panel
 # gem 'activeadmin', '1.1.0', git: 'https://github.com/activeadmin/activeadmin.git'

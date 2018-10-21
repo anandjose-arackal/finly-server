@@ -33,4 +33,12 @@ class Department < ActiveRecord::Base
   scope :only_sub_departments, -> {
     where("departments.ancestry IS NOT NULL")
   }
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

@@ -7,3 +7,9 @@ json.tax_rates do
     json.merge!(tax_rate.as_json)
   end
 end
+
+json.supply_item_types do
+  json.array! @result.supply_item_types do |item|
+    json.extract! item, :id, :name
+  end
+end

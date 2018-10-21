@@ -27,6 +27,7 @@ json.amounts do
 end
 
 json.budget_trail_items do
+  index = 1
   # first will be the list of expenses
   json.expenses do
     json.array!(@result.spent_entities[0]) do |expense|
@@ -34,6 +35,8 @@ json.budget_trail_items do
       json.category_name expense.category&.name
       json.date expense.date.strftime("%Y-%B-%d")
       json.amount expense.amount&.value
+      json.index index
+      index += 1
     end
   end
 
@@ -45,6 +48,8 @@ json.budget_trail_items do
       json.cost_center_name payment.cost_center&.name
       json.amount payment.amount&.value
       json.date payment.date.strftime("%Y-%B-%d")
+      json.index index
+      index += 1
     end
   end
 
@@ -57,6 +62,22 @@ json.budget_trail_items do
       json.date purchase_order_item.purchase_order.delivery_date
       json.location purchase_order_item.purchase_order.location&.name
       json.department purchase_order_item.purchase_order.department&.name
+      json.index index
+      index += 1
+    end
+  end
+
+  # list of invoice line items
+  json.invoice_items do
+    json.array!(@result.spent_entities[3]) do |invoice_line_item|
+      json.name invoice_line_item.description
+      json.cost_center_name invoice_line_item.parent.cost_center&.name
+      json.amount invoice_line_item.net_amount&.value
+      json.date invoice_line_item.parent.date.strftime("%Y-%B-%d")
+      json.location invoice_line_item.parent.location&.name
+      json.department invoice_line_item.parent.department&.name
+      json.index index
+      index += 1
     end
   end
 end
@@ -113,7 +134,7 @@ json.sub_budgets do
       json.extract! sub_budget.budget_amount, :id, :value, :currency_id
     end
 
-    processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+    processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(sub_budget)
     json.spent_amount do
       spent_amount = processor_instance.spent_amount
       json.spent_amount spent_amount

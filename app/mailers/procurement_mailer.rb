@@ -36,7 +36,12 @@ class ProcurementMailer < ApplicationMailer
 
     @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id })
     attachments["purchase_order-#{@document.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(pdf: "purchase-order-#{@document.po_number}", template: "export/purchase_order", layout: "pdf.html.erb", print_media_type: true)
+         render_to_string(pdf: "purchase-order-#{@document.po_number}",
+                          template: "export/purchase_order",
+                          layout: "pdf/paginated_bootstrap",
+                          footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
+                          print_media_type: true
+         )
     )
     if @data.attachments.present? && @data.attachments.is_a?(Array)
       @data.attachments.each do |attachment|
@@ -63,7 +68,13 @@ class ProcurementMailer < ApplicationMailer
       @curr_user = @data.user
       ########################################################
       attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(pdf: "purchase-order-#{@data.purchase_order.po_number}", template: "export/purchase_order", layout: "pdf.html.erb", print_media_type: true)
+         render_to_string(pdf: "purchase-order-#{@data.purchase_order.po_number}",
+                          template: "export/purchase_order",
+                          layout: "pdf/paginated_bootstrap",
+                          # layout: "pdf.html.erb",
+                          footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
+                          print_media_type: true
+         )
       )
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
     end
@@ -85,6 +96,13 @@ class ProcurementMailer < ApplicationMailer
       #    render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
       # )
       mail to: presenter.to, subject: presenter.subject, template_name: 'template_invoice'
+    end
+  end
+
+  def purchase_order_bulk_approval(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_approval'
     end
   end
 end

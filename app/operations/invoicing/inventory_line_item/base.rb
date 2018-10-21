@@ -8,7 +8,7 @@ class Invoicing::InventoryLineItem::Base < BaseOperation
   end
 
   def inventory_item_params
-    params.require(:inventory_item).permit(:rate, :tax_rate_id, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note, :item_code, :account)
+    params.require(:inventory_item).permit(:rate, :tax_rate_id, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note, :item_code, :account, :supply_item_type_id)
   end
 
   class Invoicing::InventoryLineItem::Base::ItemPresenter < BaseOperation::BasePresenter::SuccessPresenter
