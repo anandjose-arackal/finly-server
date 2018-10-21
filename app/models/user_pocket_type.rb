@@ -23,4 +23,13 @@ class UserPocketType < ActiveRecord::Base
   def credit_card_pocket?
     self.id == UserPocketType.id_for(:credit_card)
   end
+
+  def reimbursement?
+    self.id == UserPocketType.id_for(:reimbursement)
+  end
+
+  def paid_by_company?
+    self.id == UserPocketType.id_for(:paid_by_company)
+  end
+
 end
