@@ -116,6 +116,8 @@ class User::Balances::Show < User::Base
             return AccountManager::CardTransferPockets::CardTransferPocketsAdapter.new(account)
           when UserPocketType.id_for(:bank_transfer)
             return AccountManager::BankTransferPockets::BankTransferPocketsAdapter.new(account)
+        when UserPocketType.id_for(:reimbursement)
+          return AccountManager::BankTransferPockets::ReimbursementPocketsAdapter.new(account)
           else
             # do nothing?
         end
