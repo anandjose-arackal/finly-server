@@ -178,7 +178,12 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     #   return
     # end
 
+    distance_expense = expense.distance_expense
+
     expense.assign_attributes(updated_expense_params)
+    if expense.distance_expense.blank?
+      expense.distance_expense = distance_expense
+    end
 
     if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
       self.expense.category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
