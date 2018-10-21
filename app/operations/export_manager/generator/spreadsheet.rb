@@ -37,7 +37,7 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
   def load_headers
     headers = []
     self.config.each do |field, conf|
-      headers << (conf[:label] || field.to_s.humanize)
+      headers << (conf[:label] || field.to_s.humanize) if conf[:spreadsheet]
     end
     headers
   end
