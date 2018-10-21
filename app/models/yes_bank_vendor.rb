@@ -25,6 +25,7 @@
 #  payment_term_id   :integer
 #  currency_id       :integer
 #  tds_rates_list_id :integer
+#  vendor_id         :string(255)
 #
 
 class YesBankVendor < ActiveRecord::Base

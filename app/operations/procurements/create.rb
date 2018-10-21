@@ -58,9 +58,10 @@ class Procurements::Create < Procurements::Base
   end
 
   class Procurements::Create::CreatePresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :procurement, :invoices, :purchase_orders
+    attr_accessor :procurement, :invoices, :purchase_order
 
     def init
+      debugger
       self.procurement = params[:procurement]
       self.invoices = self.procurement.invoices
       self.purchase_order = self.procurement.purchase_order

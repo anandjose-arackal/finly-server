@@ -3558,9 +3558,6 @@ ActiveRecord::Schema.define(version: 20181020112515) do
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
     t.integer  "location_id",             limit: 4
-    t.integer  "tds_slab_id",             limit: 4
-    t.decimal  "tds",                                   precision: 10, scale: 5
-    t.integer  "tds_amount_id",           limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
