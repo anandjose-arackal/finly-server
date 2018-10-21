@@ -10,7 +10,7 @@ class Expense::ExTime::Multiple::Base < BaseOperation
       end
     end
     receipts = params_passed[:expense][:receipts_attributes] if params_passed[:expense].present?
-    p = params_passed.require(:expense).permit(:note, :category_id, :date, :expense_type_id, :expense_status_id, :report_id, :reimbursable, :from_cash_on_hand,
+    p = params_passed.require(:expense).permit(:note, :category_id, :date, :expense_type_id, :expense_status_id, :report_id,:spent_from_id,
                                         :receipt_id, :receipt, time_expense_attributes: [:id, time_object_attributes: [:value, :id]])
     # Hack as image upload from API is failing in strong params_passed
     receipts = [receipts] unless receipts.is_a?(Array)
