@@ -61,7 +61,6 @@ class Procurements::Create < Procurements::Base
     attr_accessor :procurement, :invoices, :purchase_order
 
     def init
-      debugger
       self.procurement = params[:procurement]
       self.invoices = self.procurement.invoices
       self.purchase_order = self.procurement.purchase_order

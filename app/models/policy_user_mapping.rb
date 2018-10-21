@@ -14,12 +14,16 @@
 
 
 
+
 class PolicyUserMapping < ActiveRecord::Base
   include PolicyVersion
   include SoftDeletable
 
   belongs_to :user
   belongs_to :policy
+
+
+  default_scope { unscope(:where) }
 
   scope :admin, -> { where admin: true }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }
