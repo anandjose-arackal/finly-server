@@ -7,7 +7,7 @@ class AddPaidByCompanyWallets < ActiveRecord::Migration
         raise 'Template creation exception'
       end
     end
-    User.all.each do |user|
+    User.unscoped.all.each do |user|
       paid_by_company_template_id = user.company.company_pocket_templates.with_user_pocket_type_id(pocket_type_id)&.first.id
       unless paid_by_company_template_id
         raise 'reimbursement_template_id exception'

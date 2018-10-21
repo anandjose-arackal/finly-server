@@ -69,8 +69,8 @@ class Expense::Manual::Update < Expense::Manual::Base
     pocket_id = self.updated_expense_params[:spent_from_id]
     if pocket_id.blank?
       exp_params = params[:expense] || {}
-      reimbursable = exp_params[:reimbursable]
-      from_cash_on_hand = exp_params[:from_cash_on_hand]
+      reimbursable = StringUtils.to_bool exp_params[:reimbursable]
+      from_cash_on_hand = StringUtils.to_bool exp_params[:from_cash_on_hand]
       if reimbursable
         pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
       elsif from_cash_on_hand
@@ -85,6 +85,7 @@ class Expense::Manual::Update < Expense::Manual::Base
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
     end
     self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
+
   end
 
   def authorize

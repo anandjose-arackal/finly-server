@@ -132,10 +132,12 @@ class Expense < ActiveRecord::Base
     if self.spent_from&.reimbursement?
       self.reimbursable = true
       self.from_cash_on_hand = false
-      self
     elsif self.spent_from&.paid_by_company?
       self.reimbursable = false
       self.from_cash_on_hand = false
+    else
+      self.reimbursable = false
+      self.from_cash_on_hand = true
     end
     compute_gst_amount
     compute_tds_amount
@@ -324,7 +326,7 @@ class Expense < ActiveRecord::Base
                                                                       ExpenseType.id_for(:per_diem)])}
   scope :only_reimbursable_expenses, -> {where(reimbursable: true)}
   scope :spent_from_cash_on_hand, -> {
-    where.not(spent_from_id: nil)
+    where(from_cash_on_hand: true)
   }
   scope :blocked_against_cash_on_hand, -> {where cash_on_hand_blocked: true}
 
@@ -1036,12 +1038,12 @@ class Expense < ActiveRecord::Base
     days
   end
 
-  def from_cash_on_hand
-    if self.spent_from.present?
-      return true
-    end
-    false
-  end
+  # def from_cash_on_hand
+  #   if self.spent_from.present? and not (self.spent_from.paid_by_company? or self.spent_from.reimbursement?)
+  #     return true
+  #   end
+  #   false
+  # end
 
   def check_spent_from?
     return false if reimbursable
