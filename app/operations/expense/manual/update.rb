@@ -67,7 +67,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id) || self.expense.spent_from
 
     if self.cash_pocket.blank?
       self.cash_pocket = self.expense&.user&.user_pockets&.cash_pockets_only&.first

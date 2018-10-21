@@ -149,9 +149,9 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
 
 
       expense = value[:expense]
-      if expense.reimbursable && expense.from_cash_on_hand
-        self.errors_by_expenses[key][:error] += ["Expense cannot be both reimbursable and from cash on hand"]
-      end
+      # if expense.reimbursable && expense.from_cash_on_hand
+      #   self.errors_by_expenses[key][:error] += ["Expense cannot be both reimbursable and from cash on hand"]
+      # end
 
 
 

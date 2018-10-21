@@ -47,7 +47,7 @@ class UserPocket < ActiveRecord::Base
     where user_pocket_type_id: UserPocketType.id_for(:credit_card)
   }
   scope :cash_and_credit_cards, -> {
-    where user_pocket_type_id: [UserPocketType.id_for(:cash), UserPocketType.id_for(:credit_card)]
+    where user_pocket_type_id: [UserPocketType.id_for(:cash), UserPocketType.id_for(:credit_card), UserPocketType.id_for(:reimbursement)]
   }
   scope :card_transfer_pockets_only, -> {
     where user_pocket_type_id: UserPocketType.id_for(:card_transfer)

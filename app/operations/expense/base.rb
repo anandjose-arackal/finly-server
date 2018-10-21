@@ -114,9 +114,9 @@ class Expense::Base < BaseOperation
     # from_cash_pockets = from_cash_pockets.blank? ? (expense.spent_from&.present? or StringUtils.to_bool(params[:from_cash_on_hand])) : from_cash_pockets
     reimbursable = StringUtils.to_bool(params&.dig(:reimbursable))
     reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
-    if from_cash_pockets and reimbursable
-      add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
-    end
+    # if from_cash_pockets and reimbursable
+    #   add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
+    # end
   end
 
   # ensuring that the an expense can't be both from cash on hand AND reimbursable during creation

@@ -110,7 +110,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id) || self.expense.spent_from
 
     if self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
@@ -178,7 +178,12 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     #   return
     # end
 
+    distance_expense = expense.distance_expense
+
     expense.assign_attributes(updated_expense_params)
+    if expense.distance_expense.blank?
+      expense.distance_expense = distance_expense
+    end
 
     if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
       self.expense.category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category

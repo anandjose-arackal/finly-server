@@ -63,6 +63,13 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
 
       init_receipts
     end
+
+    pocket_id = self.updated_expense_params[:spent_from_id]
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id) || self.expense.spent_from
+
+    if self.cash_pocket.blank?
+      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    end
   end
 
   def validate
@@ -129,6 +136,23 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
       expense.update_other_currencies
     end
 
+    # check if this expense's amount allows for it to be marked against COH
+    # and if it is or is not, update the flag for this expense accordingly
+    if expense.amount.present? && expense.from_cash_on_hand
+      pocket = expense.spent_from
+      if pocket.cash_pocket?
+        pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        if pocket_adapter.balance(display_balance: true) > expense.amount_value
+          expense.update(cash_on_hand_blocked: true)
+        end
+        if pocket_adapter.balance(display_balance: true) < 0
+          expense.update(cash_on_hand_blocked: false)
+        end
+      elsif pocket.credit_card_pocket?
+        expense.update(cash_on_hand_blocked: true)
+      end
+    end
+
     add_message :success, 'Expense updated'
   end
 
@@ -138,7 +162,7 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     return {} if params[:expense].blank?
     params.require(:expense).permit(:note, :category_id, :date,
                                     :expense_type_id, :expense_status_id,
-                                    :report_id, :reimbursable,
+                                    :report_id, :reimbursable, :spent_from_id,
                                     distance_expense_attributes: [:type_id, :odometer_reading_start, :odometer_reading_end,
                                                                   :odometer_reading_receipt_start_id, :odometer_reading_receipt_end_id,
                                                                   distance_attributes: [:value, :physical_unit_id]])
