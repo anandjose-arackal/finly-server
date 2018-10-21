@@ -3204,7 +3204,7 @@ Rails.application.routes.draw do
     delete 'inward_invoices/templates/:id', to: 'inward_invoices#template_destroy'
 
     get 'inward_invoices/import_template', to: 'inward_invoices#import_template'
-
+    post '/inward_invoices/import', to: 'inward_invoices#import'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'

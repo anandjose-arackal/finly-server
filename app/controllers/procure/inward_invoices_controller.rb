@@ -92,8 +92,10 @@ class Procure::InwardInvoicesController < ApplicationController
 
   # Bulk Import invoices through xls
   def import
-    @respond = Procurements::Invoices::Import.(current_user, params)
-    respond
+    @result = Procurements::Invoices::Import.(current_user, params)
+    # respond
+
+    render json: @result.messages.as_json
   end
 
 end
