@@ -60,7 +60,7 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
+    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id) || self.expense.spent_from
 
     # todo - jugaad to support mobile app for now
     if self.cash_pocket.blank?
