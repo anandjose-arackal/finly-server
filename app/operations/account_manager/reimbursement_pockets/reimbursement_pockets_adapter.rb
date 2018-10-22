@@ -44,19 +44,10 @@ class AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter < Accoun
   end
 
   def balance(options = {})
-    balance = self.account.balance_value
     if options[:display_balance]
-      pending_reimbursement = 0
-      # extracting all expenses which were marked against this particular pocket
-      self.account.user.expenses.unverified.with_spent_from_id(self.account.id).include_spent_from_calculation.each do |expense|
-        unless expense.date == DateUtils.local_date && expense.amount&.currency_id != expense.spent_from&.base_currency&.id
-          pending_reimbursement += 0#app/operations/export_manager/request_handler.rb:76expense.amount.send(expense.spent_from&.base_currency&.country_code&.to_sym).to_f
-        end
-      end
-      # expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.blocked_against_cash_on_hand.joins_amount.sum(:value)
-      (balance + pending_reimbursement)
+      return nil
     else
-      balance
+      return 9999999999999999999999
     end
   end
 
