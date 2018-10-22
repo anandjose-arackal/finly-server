@@ -43,6 +43,9 @@
 #  outward_invoice_type_id :integer          default(1)
 #  terms                   :text(65535)
 #  location_id             :integer
+#  tds_slab_id             :integer
+#  tds                     :decimal(10, 5)
+#  tds_amount_id           :integer
 #
 
 #  gst_type_id: 1 - IGST
