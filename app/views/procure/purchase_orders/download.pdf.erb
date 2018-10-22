@@ -138,10 +138,10 @@
             <td class="font-dark-gray fw-bold"><%= item.description %></td>
             <td class="font-light-gray"><%= item.comment %></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
-            <td class="text-right">&#x20b9;<%= item.rate %></td>
-            <td class="text-right">&#x20b9;<%= item.discount_amount&.value %></td>
-            <td class="text-right">&#x20b9;<%= item.tax_amount&.value %></td>
-            <td class="text-right fc-green fw-bold">&#x20b9;<%= item.total_amount&.value %></td>
+            <td class="text-right">&#8377;<%= item.rate %></td>
+            <td class="text-right">&#8377;<%= item.discount_amount&.value %></td>
+            <td class="text-right">&#8377;<%= item.tax_amount&.value %></td>
+            <td class="text-right fc-green fw-bold">&#8377;<%= item.total_amount&.value %></td>
           </tr>
         <% end %>
         </tbody>
@@ -154,19 +154,19 @@
           <tbody>
           <tr>
             <td class="font-light-gray text-left">Total</td>
-            <td class="font-dark-gray text-right fc-green">&#x20b9;<%= @result.purchase_order.total_before_tax&.value %></td>
+            <td class="font-dark-gray text-right fc-green">&#8377;<%= @result.purchase_order.total_before_tax&.value %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Discount</td>
-            <td class="font-dark-gray text-right">&#x20b9;<%= @result.purchase_order.discount_amount&.value %></td>
+            <td class="font-dark-gray text-right">&#8377;<%= @result.purchase_order.discount_amount&.value %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Tax</td>
-            <td class="font-dark-gray text-right">&#x20b9;<%= @result.purchase_order.tax_amount&.value %></td>
+            <td class="font-dark-gray text-right">&#8377;<%= @result.purchase_order.tax_amount&.value %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
-            <td class="font-dark-gray text-right fc-dark-red">&#x20b9;<%= @result.purchase_order.balance_amount&.value %></td>
+            <td class="font-dark-gray text-right fc-dark-red">&#8377;<%= @result.purchase_order.balance_amount&.value %></td>
           </tr>
           </tbody>
         </table>
