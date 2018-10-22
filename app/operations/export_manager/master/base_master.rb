@@ -4,8 +4,8 @@ class ExportManager::Master::BaseMaster
   attr_accessor :user, :params, :input, :messages
 
   MASTERS = {
-      test: 'ExportManager::Master::Test::Provider',
-      procurement: 'ExportManager::Master::Procurements::Provider'
+      test: '::ExportManager::Master::Test::Provider',
+      procurement: '::ExportManager::Master::Procurements::Provider'
   }.with_indifferent_access
 
   DEFAULT_CONFIG = {spreadsheet: true, pdf: true}

@@ -265,6 +265,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               value: order_details[:original_amount],
               currency_id: Currency.first.id
           },
+          api_initiated: params[:api_initiated],
           note: order_details[:note],
           category_id: order_details[:category_id],
           date: DateUtils.local_date,
