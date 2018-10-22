@@ -38,8 +38,11 @@
 #  scheduled_at                   :date
 #  processed_at                   :date
 #  cost_center_id                 :integer
-#  transaction_reference_id       :string(255)
+#  company_id                     :integer
+#  external_reference_id          :integer
 #
+
+
 
 
 
@@ -321,6 +324,7 @@ class Payment < ActiveRecord::Base
 
   # validates :amount_id, presence: true
   validates :date, presence: true
+  validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
   # validates :initiating_user_id, presence: true
   # validates :receiving_user_id, presence: true
   validate :initiating_user_presence

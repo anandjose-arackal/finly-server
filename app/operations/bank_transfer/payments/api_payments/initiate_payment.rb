@@ -133,6 +133,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       },
       note: params[:note],
       date: DateUtils.local_date,
+      external_reference_id: params[:external_reference_id],
       api_initiated: true
     }
     payment_order_params = {
