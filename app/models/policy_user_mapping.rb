@@ -8,15 +8,22 @@
 #  admin      :boolean          default(FALSE), not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#  is_deleted :boolean          default(FALSE), not null
 #
+
+
 
 
 
 class PolicyUserMapping < ActiveRecord::Base
   include PolicyVersion
+  include SoftDeletable
 
   belongs_to :user
   belongs_to :policy
+
+
+  default_scope { unscope(:where) }
 
   scope :admin, -> { where admin: true }
   scope :with_policy, ->(policy_id) { where policy_id: policy_id }

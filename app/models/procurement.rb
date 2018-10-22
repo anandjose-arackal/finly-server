@@ -73,19 +73,50 @@ class Procurement < ActiveRecord::Base
     where id: filtered_ids
   }
 
+  scope :filter_sub_department, -> (sub_department_name, user_id) {
+    user = User.find user_id
+    if user.present?
+      sub_department_ids = user.company.departments.only_sub_departments.filter_name(sub_department_name).pluck(:id)
+
+      filtered_ids = PurchaseOrder.filter_sub_department_id(sub_department_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_vendor, -> (vendor_name, user_id){
+    user = User.find user_id
+    if user.present?
+      vendor_ids = user.company.yes_bank_vendors.filter_name_search(vendor_name).pluck(:id)
+
+      filtered_ids = PurchaseOrder.filter_vendor_id(vendor_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_user, -> (user_details, user_id){
+    user = User.find user_id
+
+    if user.present?
+      user_ids = user.company.users.filter_search(user_details).pluck(:id)
+
+      filtered_ids = user.company.purchase_orders.filter_user_id(user_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_invoice_number, -> (invoice_number) {
     filtered_ids = Invoice.with_procurement.filter_invoice_number(invoice_number).pluck(:procurement_id)
     where id: filtered_ids
   }
 
-  scope :filter_vendor_name, -> (name) {
-    vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
-
-    procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
-    procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
-
-    where(id: procurement_ids)
-  }
+  # scope :filter_vendor_name, -> (name) {
+  #   vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
+  #
+  #   procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
+  #   procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
+  #
+  #   where(id: procurement_ids)
+  # }
 
   scope :filter_status_tags, -> (ids) {
     all_status_tag_ids = StatusTag.all.pluck(:id)
@@ -166,7 +197,6 @@ class Procurement < ActiveRecord::Base
           break
         end
       end
-
       awaiting_action
     end
   end
@@ -175,7 +205,6 @@ class Procurement < ActiveRecord::Base
     tag_ids = self.status_tags.pluck(:id)
 
     data = {
-        purchase_order: {},
         invoice: {},
         shipment: {},
         payment: {}
@@ -232,18 +261,21 @@ class Procurement < ActiveRecord::Base
 
     end
 
-    if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
-      data[:purchase_order][:status] = 'complete'
-    elsif tag_ids.include? StatusTag.id_for(:po_processing)
-      data[:purchase_order][:status] = 'processing'
-      data[:status_message] = 'PO Processing'
-      data[:status_text] = 'PO Approval is Pending'
-      data[:status_type] = 'purchase_order'
-    else
-      data[:purchase_order][:status] = 'init'
-      data[:status_message] = 'PO Processing'
-      data[:status_text] = 'PO Approval is Pending'
-      data[:status_type] = 'purchase_order'
+    if procurement_type == 'purchase_order'
+      data[:purchase_order] = {}
+      if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
+        data[:purchase_order][:status] = 'complete'
+      elsif tag_ids.include? StatusTag.id_for(:po_processing)
+        data[:purchase_order][:status] = 'processing'
+        data[:status_message] = 'PO Processing'
+        data[:status_text] = 'PO Approval is Pending'
+        data[:status_type] = 'purchase_order'
+      else
+        data[:purchase_order][:status] = 'init'
+        data[:status_message] = 'PO Processing'
+        data[:status_text] = 'PO Approval is Pending'
+        data[:status_type] = 'purchase_order'
+      end
     end
 
     data
@@ -267,6 +299,18 @@ class Procurement < ActiveRecord::Base
     end
 
     data.sort_by!{ |doc| doc.created_at}.reverse!
+  end
+
+  def vendor
+    type_entity&.vendor
+  end
+
+  def type_entity
+    if procurement_type == 'purchase_order'
+      purchase_order
+    elsif procurement_type == 'invoice'
+      invoices&.first
+    end
   end
 
 end

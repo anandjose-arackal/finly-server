@@ -1,511 +1,296 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Procure Document</title>
-  <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
-</head>
-<body>
-<div class="containers document-header-container overflow-hidden">
-  <div class="vendor-details">
-    <div class="vendor-company-logo">
-      <img src="<%= @company.configuration.logo.url(:thumb) %>" width="150" height="auto">
+<div class="row no-margin procurement-document fs-12">
+  <div class="col col-xs-12 header-container">
+    <div class="col col-xs-8 no-padding company-details">
+      <div class="col col-xs-12 no-padding logo">
+        <img src="<%= @company.configuration.logo.url(:thumb) %>" width="120" height="auto">
+      </div>
+      <div class="col col-xs-12 no-padding address fs-12 mg-top-5">
+        <br>
+        <div class="font-light-gray mg-botm-8">Business Office :</div>
+        <div class="font-light-gray">
+          <%#= @result.purchase_order.location.address %>
+          DLF Corporate Park,<br/>
+          Ground Floor, Tower 3A, <br />
+          DLF City, Phase III,<br />
+          M.G. Road, Gurgaon, 122001<br />
+          CIN 074900HR2009PTC053732
+        </div>
+      </div>
     </div>
-    <div class="vendor-address">
-      <!--<span class="company-name font-size-14 bold"><%#= @result.purchase_order.location.name %></span>-->
-      <span class="address-line-1"></span>
-      <span class="address-line-2">
-        <%#= @result.purchase_order.location.address %>
-        Business Office:<br/>
-        DLF Corporate Park,<br/>
-        Ground Floor, Tower 3A, <br />
-        DLF City, Phase III,<br />
-        M.G. Road, Gurgaon, 122001<br />
-        CIN 074900HR2009PTC053732
-
-      </span>
+    <div class="col col-xs-4 no-padding document-details text-right">
+      <div class="col col-xs-12 no-padding document-type">
+        PURCHASE ORDER
+      </div>
+      <div class="col col-xs-12 no-padding table-document-details">
+        <table class="table table-responsive">
+          <tbody>
+          <tr>
+            <td class="font-light-gray">PO Number</td>
+            <td class="font-dark-gray"><%= @result.purchase_order.po_number %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray">Document Date</td>
+            <td class="font-dark-gray"><%= @result.purchase_order.created_at.strftime "%b-%d-%Y" %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray">Due Date</td>
+            <td class="font-dark-gray"><%= @result.purchase_order.delivery_date&.strftime "%b-%d-%Y" %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray">Payment Term</td>
+            <td class="font-dark-gray"><%= @result.purchase_order.payment_term&.name %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray">Sub Department</td>
+            <td class="font-dark-gray"><%= @result.purchase_order.sub_department&.name %></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col col-xs-12 no-padding">
+      <p class="text-center"><%= @result.purchase_order&.procurement&.note %></p>
     </div>
   </div>
-  <div class="document-details">
-    <div class="document-type">
-      <span>Purchase Order</span>
+  <div class="col col-xs-12 no-padding body-container">
+    <div class="col col-xs-4 vendor-details">
+      <h4 class="section-title">Vendor Details</h4>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.display_name %></div>
+      </div>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Mobile Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.mobile_number %></div>
+      </div>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.pan %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.gst %></div>
+      </div>
     </div>
-    <div class="document-details">
-      <span class="block">
-          <span class="title">PO Number</span>
-          <span class="value"><%= @result.purchase_order.po_number %></span>
-        </span>
-      <span class="block">
-          <span class="title">Document Date</span>
-          <span class="value"><%= @result.purchase_order.created_at.strftime "%b-%d-%Y" %></span>
-        </span>
-      <span class="block">
-          <span class="title">Due Date</span>
-          <span class="value"><%= @result.purchase_order.delivery_date&.strftime "%b-%d-%Y" %></span>
-        </span>
-      <span class="block">
-          <span class="title">Payment Term</span>
-          <span class="value"><%= @result.purchase_order.payment_term&.name %></span>
-        </span>
-    </div>
-  </div>
-</div>
-<div class="containers customer-details-container overflow-hidden">
-  <div class="customer-details wd-33">
-    <div class="main-title width-fit-content">Vendor Details</div>
-    <table class="table-customer-details" style="margin-right: 10px;">
-      <tbody>
-      <tr>
-        <td class="table-title">Name</td>
-        <td class="table-value"><%= @result.purchase_order.vendor.display_name %></td>
-      </tr>
-      <tr>
-        <td class="table-title">Mobile</td>
-        <td class="table-value"><%= @result.purchase_order.vendor.mobile_number %></td>
-      </tr>
-      <tr>
-        <td class="table-title">PAN Number</td>
-        <td class="table-value"><%= @result.purchase_order.vendor.pan %></td>
-      </tr>
-      <tr>
-        <td class="table-title">GSTIN</td>
-        <td class="table-value"><%= @result.purchase_order.vendor.gst %></td>
-      </tr>
-      </tbody>
-    </table>
-    <!-- <span class="block">
-        <span class="title">Name</span>
-        <span class="value"><%= @result.purchase_order.vendor.name %></span>
-      </span>
-    <span class="block">
-        <span class="title">Mobile</span>
-        <span class="value"><%= @result.purchase_order.vendor.mobile_number %></span>
-      </span>
-    <span class="block">
-        <span class="title">PAN Number</span>
-        <span class="value"><%= @result.purchase_order.vendor.pan %></span>
-      </span>
-    <span class="block">
-        <span class="title">GSTIN</span>
-        <span class="value"><%= @result.purchase_order.vendor.gst %></span>
-      </span> -->
-  </div>
-  <div class="billing-address wd-33">
-    <div class="main-title width-fit-content">Billing Address</div>
-    <table class="table-locations" style="margin-right: 10px;">
-      <tbody>
-      <tr>
-        <td colspan="2" class="table-title"><%= @result.purchase_order.location.name %></td>
-      </tr>
-      <tr>
-        <td colspan="2" class="table-value" style="padding-left: 0 !important;">
-          <% if @result.purchase_order.billing_address.present? %>
-            <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
-          <% else %>
-            <%= @result.purchase_order.location.address %>
-          <% end %>
-        </td>
-      </tr>
-      <tr>
-        <td class="table-title">GST Number :</td>
-        <td class="table-value"><%= @result.purchase_order.location.gstin %></td>
-      </tr>
-      <tr>
-        <td class="table-title">PAN Number :</td>
-        <td class="table-value"><%= @result.purchase_order.location.pan %></td>
-      </tr>
-      </tbody>
-    </table>
-    <!-- <div class="address">
-      <span class="address-line-1 mg-bottom-5"><%= @result.purchase_order.location.name %></span>
-      <span class="address-line-2 mg-bottom-5"><%= @result.purchase_order.location.address %></span>
-      <span class="city mg-bottom-5">GSTIN No : &nbsp; <%= @result.purchase_order.location.gstin %></span>
-      <span class="state mg-bottom-5">PAN Card : &nbsp; <%= @result.purchase_order.location.pan %></span>
-    </div> -->
-  </div>
-  <div class="shipping-address wd-33">
-    <div class="main-title width-fit-content">Shipping Address</div>
-    <table class="table-locations">
-      <tbody>
-      <tr>
-        <td colspan="2" class="table-title"><%= @result.purchase_order.delivery_location.name %></td>
-      </tr>
-      <tr>
-        <td colspan="2" class="table-value" style="padding-left: 0 !important;">
-          <% if @result.purchase_order.shipping_address.present? %>
-            <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
-          <% else %>
-            <%= @result.purchase_order.delivery_location.address %>
-          <% end %>
-        </td>
-      </tr>
-      <tr>
-        <td class="table-title">GST Number :</td>
-        <td class="table-value"><%= @result.purchase_order.delivery_location.gstin %></td>
-      </tr>
-      <tr>
-        <td class="table-title">PAN Number :</td>
-        <td class="table-value"><%= @result.purchase_order.delivery_location.pan %></td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- START -->
-<!-- SHOW THIS ONLY IF THE DOCUMENT TYPE IS 'E-WAY-BILL' -->
-<!-- <div class="containers transportation-details-container overflow-hidden">
-  <div class="main-title width-fit-content">Transportation Details</div>
-  <div class="transportation-details">
-    <span class="block">
-      <span class="title">Transportion Mode</span>
-      <span class="value"></span>
-    </span>
-    <span class="block">
-      <span class="title">Transporter ID</span>
-      <span class="value">33846011381</span>
-    </span>
-    <span class="block">
-      <span class="title">Transport Date</span>
-      <span class="value">27th April 2018</span>
-    </span>
-    <span class="block">
-      <span class="title">Document ID</span>
-      <span class="value">73217303589</span>
-    </span>
-    <span class="block">
-      <span class="title">Vehicle Number</span>
-      <span class="value">BRNJ-8281</span>
-    </span>
-  </div>
-</div> -->
-<!-- SHOW THIS ONLY IF THE DOCUMENT TYPE IS 'E-WAY-BILL' -->
-<!-- END -->
-
-<div class="containers document-line-items-container overflow-hidden">
-  <div class="main-title width-fit-content">Items</div>
-  <table class="table-document-items">
-    <thead>
-    <tr>
-      <th style="width: 25px;">#</th>
-      <th>Product Description</th>
-      <th>Comment</th>
-      <th>Quantity</th>
-      <th>Rate</th>
-      <th>Discount</th>
-      <th>Tax</th>
-      <th>Total</th>
-    </tr>
-    </thead>
-    <tbody>
-    <% @result.purchase_order.items.each_with_index do |item, index| %>
-      <tr>
-        <td><%= index + 1 %></td>
-        <td><%= item.description %></td>
-        <td><%= item.comment %></td>
-        <td><%= item.quantity %></td>
-        <td><i class="fa fa-inr"><%= item.rate %></td>
-        <td><i class="fa fa-inr"><%= item.discount_amount&.value %></td>
-        <td><i class="fa fa-inr"><%= item.tax_amount&.value %></td>
-        <td><i class="fa fa-inr"><%= item.total_amount&.value %></td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table>
-  <table class="table-document-items-summary" style="page-break-inside: avoid;">
-    <tbody>
-    <tr>
-      <td>Total</td>
-      <td><i class="fa fa-inr"><%= @result.purchase_order.total_before_tax&.value %></td>
-    </tr>
-    <tr>
-      <td>Discount</td>
-      <td><i class="fa fa-inr"><%= @result.purchase_order.discount_amount&.value %></td>
-    </tr>
-    <tr>
-      <td>Tax</td>
-      <td><i class="fa fa-inr"><%= @result.purchase_order.tax_amount&.value %></td>
-    </tr>
-    <tr>
-      <td>Balance Due</td>
-      <td><i class="fa fa-inr"><%= @result.purchase_order.balance_amount&.value %></td>
-    </tr>
-    </tbody>
-  </table>
-</div>
-<!-- <div class="footer">
-  <p>Generated by Finly Spend Management - https://www.finly.io</p>
-</div> -->
-<!--<div class="page-break"></div>-->
-
-<div class="terms">
-  <div class="main-title width-fit-content">Terms & Conditions</div>
-  <div class="term-text">
-    <%= simple_format @result.purchase_order.procurement_term_text, {}, wrapper_tag: "div" %>
-  </div>
-</div>
-
-<div class="approval-flow">
-  <ul>
-    <% approved_users = [] %>
-    <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
-      <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
-        <% unless approved_users.include?(trail.action_user) %>
-          <% approved_users.push(trail.action_user) %>
-          <li>
-            <div class="text center" style="font-size: 13px; color: #454545;"><%= trail.action_user.name %></div>
-            <div class="text-center" style="font-size: 12px; color: #888;">
-              <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
-            </div>
-          </li>
+    <div class="col col-xs-4 billing-address">
+      <h4 class="section-title">Billing Address</h4>
+      <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
+        <%= @result.purchase_order.location.name %>
+      </div>
+      <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
+        <% if @result.purchase_order.billing_address.present? %>
+          <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
+        <% else %>
+          <%= @result.purchase_order.location.address %>
         <% end %>
-      <% end %>
-    <% end %>
-  </ul>
-
-  <p style="text-align: center;font-size: 12px; color: #888;">This is a computer generated document. No signature is required.</p>
+      </div>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.gstin %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.location.pan %></div>
+      </div>
+    </div>
+    <div class="col col-xs-4 shipping-address">
+      <h4 class="section-title">Shipping Address</h4>
+      <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
+        <%= @result.purchase_order.delivery_location.name %>
+      </div>
+      <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
+        <% if @result.purchase_order.shipping_address.present? %>
+          <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
+        <% else %>
+          <%= @result.purchase_order.delivery_location.address %>
+        <% end %>
+      </div>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.gstin %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.delivery_location.pan %></div>
+      </div>
+    </div>
+  </div><br> <br>
+  <div class="col col-xs-12 line-items-container mg-top-5">
+    <h4 class="section-title">Document Line Items</h4>
+    <div class="col col-xs-12 no-padding">
+      <table class="table table-responsive table-document-items">
+        <thead>
+        <tr>
+          <th style="width: 25px;">#</th>
+          <th style="min-width: 140px;">Name/Description</th>
+          <th>Comment</th>
+          <th class="text-center">Qty</th>
+          <th class="text-right">Rate</th>
+          <th class="text-right">Discount</th>
+          <th class="text-right">Tax</th>
+          <th class="text-right">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @result.purchase_order.items.each_with_index do |item, index| %>
+          <tr>
+            <td class="font-light-gray"><%= index + 1 %></td>
+            <td class="font-dark-gray fw-bold"><%= item.description %></td>
+            <td class="font-light-gray"><%= item.comment %></td>
+            <td class="text-center font-light-gray"><%= item.quantity %></td>
+            <td class="text-right">&#8377;<%= item.rate %></td>
+            <td class="text-right">&#8377;<%= item.discount_amount&.value %></td>
+            <td class="text-right">&#8377;<%= item.tax_amount&.value %></td>
+            <td class="text-right fc-green fw-bold">&#8377;<%= item.total_amount&.value %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="col col-xs-12 no-padding">
+      <div class="col col-xs-8 no-padding"></div>
+      <div class="col col-xs-4 no-padding">
+        <table class="table table-responsive table-document-items-summary fs-12">
+          <tbody>
+          <tr>
+            <td class="font-light-gray text-left">Total</td>
+            <td class="font-dark-gray text-right fc-green">&#8377;<%= @result.purchase_order.total_before_tax&.value %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray text-left">Discount</td>
+            <td class="font-dark-gray text-right">&#8377;<%= @result.purchase_order.discount_amount&.value %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray text-left">Tax</td>
+            <td class="font-dark-gray text-right">&#8377;<%= @result.purchase_order.tax_amount&.value %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray text-left">Balance Due</td>
+            <td class="font-dark-gray text-right fc-dark-red">&#8377;<%= @result.purchase_order.balance_amount&.value %></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
+    <h4 class="section-title">Terms and Conditions</h4>
+    <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
+      <%= simple_format @result.purchase_order.procurement_term_text, {}, wrapper_tag: "div" %>
+    </div>
+    <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
+      <ul>
+        <% approved_users = [] %>
+        <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
+          <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
+            <% unless approved_users.include?(trail.action_user) %>
+              <% approved_users.push(trail.action_user) %>
+              <li>
+                <div class="text center font-light-gray"><%= trail.action_user.name %></div>
+                <div class="text-center font-dark-gray">
+                  <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
+                </div>
+              </li>
+            <% end %>
+          <% end %>
+        <% end %>
+      </ul>
+      <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
+    </div>
+  </div>
 </div>
-</body>
-</html>
 
 <style type="text/css">
-  @media print{
+  @media screen{
     body{
-      font-family: sans-serif;
-      margin:0;
-      -webkit-print-color-adjust: exact;
-      position: relative;
+      font-family: 'Open Sans', sans-serif !important;
     }
-    .no-border{
-      border: none !important;
+    .fs-12{
+      font-size: 12px !important;
     }
-    .width-fit-content{
-      width: fit-content !important;
+    .mg-botm-8{
+      margin-bottom: 8px;
     }
-    .mg-bottom-5{
-      margin-bottom: 5px;
-    }
-    .containers{
-      margin-bottom: 0;
-      padding: 10px;
-    }
-    .containers:last-child{
-      margin-bottom: 0 !important;
-    }
-    .font-size-14{
-      font-size: 14px !important;
-    }
-    .bold{
-      font-weight: bold !important;
-    }
-    .overflow-hidden{
-      overflow: hidden;
-    }
-    .block{
-      display: block;
-      overflow: hidden;
-      margin-bottom: 5px;
-    }
-    .main-title{
-      font-size: 20px;
-      font-weight: 300;
-      color: cornflowerblue;
-      margin-bottom: 10px;
-      padding-bottom: 4px;
-    }
-    .title{
-      font-size: 12px;
-      display: inline-block;
-      width: 80px;
-      margin-right: 10px;
-      font-weight: bold;
-      color: #7b7b7b;
-      float: left;
-      word-break: break-all;
-    }
-    .value{
-      font-size: 12px;
-      display: inline-block;
-      width: calc(100% - 100px);
-      margin-right: 20px;
-      margin-right: 10px;
-      font-weight: 300;
-      color: #7b7b7b;
-      float: right;
-      /*word-break: break-all;*/
-    }
-    .table-title{
-      font-size: 12px;
-      width: 85px;
-      font-weight: bold;
-      color: #7b7b7b;
-      word-break: break-all;
-      vertical-align: top;
-    }
-    .table-value{
-      font-size: 12px;
-      padding-left: 10px;
-      width: calc(100% - 85px);
-      font-weight: 300;
-      color: #7b7b7b;
-      word-break: break-all;
-      vertical-align: top;
-    }
-    .footer {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background-color: #eee;
-      text-align: right;
-      height: 25px;
-      border: 1px dashed #c4c4c4;
-      border-radius: 4px;
-    }
-    .footer p{
-      padding: 5px;
-      padding-right: 20px;
-      margin:0;
-      font-weight: 300;
-      font-size: 12px;
-      color: #7b7b7b;
-    }
-    .bank-details .title , .document-header-container .title, .tramsportation-details .title {
-      width: 120px !important;
-    }
-    .bank-details .value , .document-header-container .value , .tramsportation-details .value {
-      width: calc(100% - 140px) !important;
-    }
-    .wd-33{
-      width: 33.33%;
-      float: left;
-      overflow: hidden;
-    }
-    .document-header-container .vendor-details{
-      width: calc(100% - 320px);
-      float: left;
-      overflow: hidden;
-    }
-    .document-header-container .vendor-details .vendor-address{
-      width: 200px;
-      font-weight: 300;
-      color: #888;
-      font-size: 12px;
-    }
-    .document-header-container .vendor-details .vendor-address span{
-      display: block;
+    .mg-botm-2{
       margin-bottom: 2px;
     }
-    .address span{
-      display: block;
-      color: #888;
-    }
-    .address{
-      padding-right: 20px;
-      font-size: 12px;
-      word-break: break-all;
-    }
-    .document-header-container .document-details{
-      width: 300px;
-      float: right;
-      overflow: hidden;
-    }
-    .document-header-container .document-details .document-type{
-      padding: 10px;
-      background-color: aliceblue;
-      border-radius: 4px;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-      /*letter-spacing: 1px;*/
-      text-transform: uppercase;
-      color: #444;
-      font-weight: bold;
-      border: 1px solid #c4c4c4;
-    }
-    .document-header-container{
-
-    }
-    .customer-details-container{
-    }
-    .bank-details{
-      width: 300px;
-      border: 1px dashed #c4c4c4;
-      padding: 10px;
-      border-radius: 4px;
-      background-color: #f9f9f9;
-      padding-bottom: 5px;
-    }
-    .bank-account-container{
-      width: calc(100% - 20px);
-    }
-    .document-line-items-container{
-      padding-bottom: 40px;
-    }
-    .document-line-items-container .table-document-items{
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .document-line-items-container .table-document-items thead tr{
-      background-color: #eee;
-    }
-    .document-line-items-container .table-document-items thead th{
-      font-size: 12px;
-      color: #444;
-      font-weight: bold;
-      border: 1px solid #c4c4c4;
-      padding: 5px;
-      text-align: left;
-    }
-    .document-line-items-container .table-document-items thead th:last-child{
-      text-align: right;
-    }
-    .document-line-items-container .table-document-items tbody tr td:last-child{
-      text-align: right;
-    }
-    .document-line-items-container .table-document-items tbody td{
-      font-size: 12px;
-      color: #7b7b7b;
+    .font-light-gray{
       font-weight: 300;
-      text-align: right;
-      border: 1px solid #c4c4c4;
-      padding: 5px;
-      text-align: left;
-      word-break: break-word;
+      color: #7b7b7b !important;
+      -webkit-print-color-adjust: exact;
     }
-    .document-line-items-container .table-document-items-summary{
-      width: 220px;
-      float: right;
+    .font-dark-gray{
+      font-weight: bold;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .no-margin{
+      margin:0 !important;
+    }
+    .no-padding{
+      padding: 0 !important
+    }
+    .table-document-details{
+      border: none !important;
+    }
+    .table-document-details tbody tr td{
+      border: none;
+      background-color: #fafafa !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .table-document-details tbody tr td:first-child{
+      text-align: left;
+      width: 50%;
+    }
+    .table-document-details tbody tr td:last-child{
+      text-align: right;
+      width: 50%;
+    }
+    .fs-14{
+      font-size: 14px !important;
+    }
+    .mg-top-5{
       margin-top: 5px;
-      margin-bottom: 40px;
-      border-collapse: collapse;
     }
-    .document-line-items-container .table-document-items-summary tbody tr td{
-      border: 1px solid #c4c4c4;
-      padding: 5px;
-      color: #7b7b7b;
-      font-size: 12px;
-      word-break: break-all !important;
+    .fw-bold{
+      font-weight: bold !important;
+      -webkit-print-color-adjust: exact;
     }
-    .document-line-items-container .table-document-items-summary tbody tr td:last-child{
-      width: 100px;
+    .document-type{
+      text-align: center;
+      font-size: 16px;
+      color: #474747 !important;
+      background-color: white !important;
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
+      height: 100%;
+      overflow: hidden !important;
+      -webkit-print-color-adjust: exact;
       font-weight: bold;
-      text-align: right;
-      color: cornflowerblue;
-      font-size: 14px;
+      border: 1px solid #ddd !important;
+      border-radius: 4px;
+      margin-bottom: 10px;
     }
-    .document-line-items-container .table-document-items-summary tbody tr td:first-child{
-      font-weight: bold;
-      text-align: left;
-      color: #444;
-      width: calc(100% - 100px);
+    .header-container{
+      background-color: #fafafa !important;
+      margin-bottom: 10px;
+      -webkit-print-color-adjust: exact;
+      padding-top: 15px !important;
+      padding-bottom: 15px !important;
+      border-radius: 4px;
+      border: 1px solid #ddd;
     }
-    .terms .term-text{
-      font-weight: 300;
-      color: #7b7b7b;
-      font-size: 12px;
+    .section-title{
+      font-size: 15px;
+      color: cornflowerblue !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .mg-botm-5{
+      margin-bottom: 5px;
     }
     .approval-flow{
       padding-top: 20px;
+      /*page-break-inside: avoid;*/
     }
     .approval-flow ul{
       padding: 0;
@@ -522,245 +307,142 @@
       display: table-cell;
 
       text-align: center;
+    }
+    .table-document-items-summary{
+      border: none !important;
+    }
+    .table-document-items{
+      border: none !important;
+    }
+    .table-document-items tr th, .table-document-items tr td, .table-document-items-summary tr td, .table-document-items-summary tr th{
+      border: none !important;
+    }
+    .table-document-items tr td{
+      font-weight: normal !important;
+      /*-webkit-print-color-adjust: exact;*/
+    }
+    .table-document-items thead tr th{
+      background-color: #eee !important;
+      font-weight: normal !important;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .fc-green{
+      color: #26C965 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .terms-and-conditions-container{
+      /*page-break-inside: avoid;*/
+    }
+    .fc-dark-red{
+      color: darkred !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .td-left{
+      text-align: right !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    .pd-botm-5{
+      padding-bottom: 5px !important;
+    }
+    .bodr-botm-1{
+      border-bottom: 1px solid #ddd !important;
+    }
+    .pd-top-5{
+      padding-top: 5px !important;
     }
   }
-  @media screen{
-    .terms .term-text{
-      font-weight: 300;
-      color: #7b7b7b;
-      font-size: 12px;
-    }
+  @media print{
     body{
-      font-family: sans-serif;
-      margin:0;
-      -webkit-print-color-adjust: exact;
-      position: relative;
+      font-family: 'Open Sans', sans-serif !important;
     }
-    .no-border{
-      border: none !important;
+    .fs-12{
+      font-size: 12px !important;
     }
-    .width-fit-content{
-      width: fit-content;
+    .mg-botm-8{
+      margin-bottom: 8px;
     }
-    .mg-bottom-5{
-      margin-bottom: 5px;
-    }
-    .containers{
-      margin-bottom: 0;
-      padding: 10px;
-    }
-    .containers:last-child{
-      margin-bottom: 0 !important;
-    }
-    .font-size-14{
-      font-size: 14px !important;
-    }
-    .bold{
-      font-weight: bold !important;
-    }
-    .overflow-hidden{
-      overflow: hidden;
-    }
-    .block{
-      display: block;
-      overflow: hidden;
-      margin-bottom: 5px;
-    }
-    .main-title{
-      font-size: 20px;
-      font-weight: 300;
-      color: cornflowerblue;
-      margin-bottom: 10px;
-      padding-bottom: 4px;
-    }
-    .title{
-      font-size: 12px;
-      display: inline-block;
-      width: 80px;
-      margin-right: 10px;
-      font-weight: bold;
-      color: #7b7b7b;
-      float: left;
-    }
-    .value{
-      font-size: 12px;
-      display: inline-block;
-      width: calc(100% - 100px);
-      margin-right: 20px;
-      margin-right: 10px;
-      font-weight: 300;
-      color: #7b7b7b;
-      float: right;
-    }
-    .table-title{
-      font-size: 12px;
-      width: 85px;
-      font-weight: bold;
-      color: #7b7b7b;
-      word-break: break-all;
-      vertical-align: top;
-    }
-    .table-value{
-      font-size: 12px;
-      padding-left: 10px;
-      width: calc(100% - 85px);
-      font-weight: 300;
-      color: #7b7b7b;
-      word-break: break-all;
-      vertical-align: top;
-    }
-    .footer {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background-color: #eee;
-      text-align: right;
-      height: 25px;
-      border: 1px dashed #c4c4c4;
-      border-radius: 4px;
-    }
-    .footer p{
-      padding: 5px;
-      padding-right: 20px;
-      margin:0;
-      font-weight: 300;
-      font-size: 12px;
-      color: #7b7b7b;
-    }
-    .bank-details .title , .document-header-container .title, .tramsportation-details .title {
-      width: 120px !important;
-    }
-    .bank-details .value , .document-header-container .value , .tramsportation-details .value {
-      width: calc(100% - 140px) !important;
-    }
-    .wd-33{
-      width: 33.33%;
-      float: left;
-      overflow: hidden;
-    }
-    .document-header-container .vendor-details{
-      width: calc(100% - 250px);
-      float: left;
-      overflow: hidden;
-    }
-    .document-header-container .vendor-details .vendor-address{
-      width: 200px;
-      font-weight: 300;
-      color: #888;
-      font-size: 12px;
-    }
-    .document-header-container .vendor-details .vendor-address span{
-      display: block;
+    .mg-botm-2{
       margin-bottom: 2px;
     }
-    .address span{
-      display: block;
-      color: #888;
-    }
-    .address{
-      padding-right: 20px;
-      font-size: 14px;
-    }
-    .document-header-container .document-details{
-      width: 230px;
-      float: right;
-      overflow: hidden;
-    }
-    .document-header-container .document-details .document-type{
-      padding: 10px;
-      background-color: aliceblue;
-      border-radius: 4px;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-      /*letter-spacing: 1px;*/
-      text-transform: uppercase;
-      color: #444;
-      font-weight: bold;
-      border: 1px solid #c4c4c4;
-    }
-    .document-header-container{
-
-    }
-    .customer-details-container{
-    }
-    .bank-details{
-      width: 300px;
-      border: 1px dashed #c4c4c4;
-      padding: 10px;
-      border-radius: 4px;
-      background-color: #f9f9f9;
-      padding-bottom: 5px;
-    }
-    .bank-account-container{
-      width: calc(100% - 20px);
-    }
-    .document-line-items-container{
-      padding-bottom: 40px;
-    }
-    .document-line-items-container .table-document-items{
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .document-line-items-container .table-document-items thead tr{
-      background-color: #eee;
-    }
-    .document-line-items-container .table-document-items thead th{
-      font-size: 12px;
-      color: #444;
-      font-weight: bold;
-      border: 1px solid #c4c4c4;
-      padding: 5px;
-      text-align: left;
-    }
-    .document-line-items-container .table-document-items thead th:last-child{
-      text-align: right;
-    }
-    .document-line-items-container .table-document-items tbody tr td:last-child{
-      text-align: right;
-    }
-    .document-line-items-container .table-document-items tbody td{
-      font-size: 12px;
-      color: #7b7b7b;
+    .font-light-gray{
       font-weight: 300;
-      text-align: right;
-      border: 1px solid #c4c4c4;
-      padding: 5px;
-      text-align: left;
-      /*word-break: break-all;*/
+      color: #7b7b7b !important;
+      -webkit-print-color-adjust: exact;
     }
-    .document-line-items-container .table-document-items-summary{
-      max-width: 450px;
-      float: right;
+    .font-dark-gray{
+      font-weight: bold;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .no-margin{
+      margin:0 !important;
+    }
+    .no-padding{
+      padding: 0 !important
+    }
+    .table-document-details{
+      border: none !important;
+    }
+    .table-document-details tbody tr td{
+      border: none;
+      background-color: #fafafa !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .table-document-details tbody tr td:first-child{
+      text-align: left;
+      width: 50%;
+    }
+    .table-document-details tbody tr td:last-child{
+      text-align: right;
+      width: 50%;
+    }
+    .fs-14{
+      font-size: 14px !important;
+    }
+    .mg-top-5{
       margin-top: 5px;
-      margin-bottom: 40px;
-      border-collapse: collapse;
     }
-    .document-line-items-container .table-document-items-summary tbody tr td{
-      border: 1px solid #c4c4c4;
-      padding: 5px;
-      color: #7b7b7b;
-      font-size: 12px;
+    .fw-bold{
+      font-weight: bold !important;
+      -webkit-print-color-adjust: exact;
     }
-    .document-line-items-container .table-document-items-summary tbody tr td:last-child{
-      width: 215px;
+    .document-type{
+      text-align: center;
+      font-size: 16px;
+      color: #474747 !important;
+      background-color: white !important;
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
+      height: 100%;
+      overflow: hidden !important;
+      -webkit-print-color-adjust: exact;
       font-weight: bold;
-      text-align: right;
-      color: cornflowerblue;
-      font-size: 14px;
+      border: 1px solid #ddd !important;
+      border-radius: 4px;
+      margin-bottom: 10px;
     }
-    .document-line-items-container .table-document-items-summary tbody tr td:first-child{
-      font-weight: bold;
-      text-align: left;
-      color: #444;
-      width: 120px !important;
-      word-break: break-all;
+    .header-container{
+      background-color: #fafafa !important;
+      margin-bottom: 10px;
+      -webkit-print-color-adjust: exact;
+      padding-top: 15px !important;
+      padding-bottom: 15px !important;
+      border-radius: 4px;
+      border: 1px solid #ddd;
     }
-    .page-break { display:block; clear:both; page-break-after:always; }
-
+    .section-title{
+      font-size: 15px;
+      color: cornflowerblue !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .mg-botm-5{
+      margin-bottom: 5px;
+    }
     .approval-flow{
       padding-top: 20px;
+      /*page-break-inside: avoid;*/
     }
     .approval-flow ul{
       padding: 0;
@@ -777,6 +459,50 @@
       display: table-cell;
 
       text-align: center;
+    }
+    .table-document-items-summary{
+      border: none !important;
+    }
+    .table-document-items{
+      border: none !important;
+    }
+    .table-document-items tr th, .table-document-items tr td, .table-document-items-summary tr td, .table-document-items-summary tr th{
+      border: none !important;
+    }
+    .table-document-items tr td{
+      font-weight: normal !important;
+      /*-webkit-print-color-adjust: exact;*/
+    }
+    .table-document-items thead tr th{
+      background-color: #eee !important;
+      font-weight: normal !important;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .fc-green{
+      color: #26C965 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .terms-and-conditions-container{
+      /*page-break-inside: avoid;*/
+    }
+    .fc-dark-red{
+      color: darkred !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .td-left{
+      text-align: right !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    .pd-botm-5{
+      padding-bottom: 5px !important;
+    }
+    .bodr-botm-1{
+      border-bottom: 1px solid #ddd !important;
+    }
+    .pd-top-5{
+      padding-top: 5px !important;
     }
   }
 </style>

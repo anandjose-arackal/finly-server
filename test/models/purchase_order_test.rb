@@ -44,6 +44,9 @@
 #  sub_department_id            :integer
 #  billing_address              :text(65535)
 #  shipping_address             :text(65535)
+#  is_template                  :boolean          default(FALSE)
+#  template_name                :string(255)
+#  resource_template_id         :integer
 #
 
 require 'test_helper'

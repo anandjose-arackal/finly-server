@@ -2,6 +2,14 @@ class Invoicing::InventoryLineItem::Update < Invoicing::InventoryLineItem::Base
 
   attr_accessor :inventory_item, :inventory_item_parameters
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:invoicing, :inventory_line_item], :validate, self)
+        }
+    }
+  end
+
   def init
     id = params[:id] || params[:inventory_item_id]
     self.inventory_item = user.company.inventory_line_items.find_by(id: id)

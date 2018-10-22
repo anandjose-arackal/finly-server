@@ -34,7 +34,7 @@
 class PurchaseOrderItem < ActiveRecord::Base
   include SoftDeletable
   validates :inventory_line_item_id, presence: true
-  validates :purchase_order_id, presence: true
+  # validates :purchase_order_id, presence: true
 
   belongs_to :tax_rate
   belongs_to :purchase_order

@@ -78,7 +78,9 @@ class Policy::Show < Policy::Base
     id = (params[:policy_id] or params[:id])
     self.policy = Policy::Index.(user, params).policies.with_id(id)&.first
     self.mappings = []
-    self.policy_users = self.policy&.users || []
+
+    user_ids = self.policy.user_mapping.exclude_deleted.pluck(:user_id)
+    self.policy_users = user.company.users.with_id(user_ids)
   end
 
   def authorize
