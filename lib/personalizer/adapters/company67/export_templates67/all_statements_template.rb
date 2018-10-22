@@ -106,6 +106,10 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
           ]
         end
       else
+        expense = nil
+        if finly_transaction.associated_transaction&.class&.name == CardTransaction.name
+          expense = finly_transaction&.associated_transaction&.card_expense&.expense
+        end
         contents << [
             DateUtils.date_formatted(finly_transaction.date),
             finly_transaction.transaction_type.name.humanize,
@@ -121,7 +125,11 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
             finly_transaction.finly_account_type,
             (finly_transaction.finly_account.user.name rescue nil),
             nil,
-            nil
+            expense&.id,
+            expense&.merchant_name,
+            expense&.note,
+            expense&.date,
+            expense&.report&.name
         ]
       end
     end
