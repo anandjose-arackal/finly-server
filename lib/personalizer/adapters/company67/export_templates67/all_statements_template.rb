@@ -147,48 +147,48 @@ class Personalizer::Adapters::Company67::ExportTemplates67::AllStatementsTemplat
       prefix = 'To '
     end
     case finly_transaction.payment_purpose_id
-    when PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:personal_expense), PaymentPurpose.id_for(:card_transaction)
-      merchant = finly_transaction&.associated_transaction&.merchant_name
-    when PaymentPurpose.id_for(:vendor_payment)
-      merchant = finly_transaction.payment&.receiving_user&.name
-      if merchant.present?
-        if finly_transaction.credit?
-          merchant = "Reversal for #{merchant}'s Payment"
-        elsif finly_transaction.debit?
-          merchant = "Sent to #{merchant}"
+      when PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:personal_expense), PaymentPurpose.id_for(:card_transaction)
+        merchant = finly_transaction&.associated_transaction&.merchant_name
+      when PaymentPurpose.id_for(:vendor_payment)
+        merchant = finly_transaction.payment&.receiving_user&.name
+        if merchant.present?
+          if finly_transaction.credit?
+            merchant = "Reversal for #{merchant}'s Payment"
+          elsif finly_transaction.debit?
+            merchant = "Sent to #{merchant}"
+          end
+        else
+          merchant = 'Vendor Payment'
         end
-      else
-        merchant = 'Vendor Payment'
-      end
-    when PaymentPurpose.id_for(:corporate_balance_load)
-      merchant = 'Corporate Balance Load'
-    when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
-        PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly)
-      if finly_transaction.payment.blank?
-        if finly_transaction.associated_transaction.class.name == CompanyTransaction.name
-          merchant = finly_transaction.associated_transaction.merchant_name
+      when PaymentPurpose.id_for(:corporate_balance_load)
+        merchant = 'Corporate Balance Load'
+      when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
+          PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly)
+        if finly_transaction.payment.blank?
+          if finly_transaction.associated_transaction.class.name == CompanyTransaction.name
+            merchant = finly_transaction.associated_transaction.merchant_name
+          end
+        else
+          if finly_transaction.payment.initiating_account == finly_transaction.finly_account and finly_transaction.payment.receiving_account.present?
+            merchant = prefix
+            if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
+              merchant += "#{finly_transaction.payment.receiving_account&.user&.name}'s "
+            end
+            if [BankAccount].include? finly_transaction.payment.receiving_account.class
+              merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
+            end
+            merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
+          elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account and finly_transaction.payment.initiating_account.present?
+            merchant = prefix
+            if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
+              merchant += "#{finly_transaction.payment.initiating_account&.user&.name}'s "
+            end
+            if [BankAccount].include? finly_transaction.payment.receiving_account.class
+              merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
+            end
+            merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
+          end
         end
-      else
-        if finly_transaction.payment.initiating_account == finly_transaction.finly_account and finly_transaction.payment.receiving_account.present?
-          merchant = prefix
-          if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
-            merchant += "#{finly_transaction.payment.receiving_account&.user&.name}'s "
-          end
-          if [BankAccount].include? finly_transaction.payment.receiving_account.class
-            merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
-          end
-          merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
-        elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account and finly_transaction.payment.initiating_account.present?
-          merchant = prefix
-          if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
-            merchant += "#{finly_transaction.payment.initiating_account&.user&.name}'s "
-          end
-          if [BankAccount].include? finly_transaction.payment.receiving_account.class
-            merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
-          end
-          merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
-        end
-      end
     end
     merchant
   end

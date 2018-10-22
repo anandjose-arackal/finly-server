@@ -8,6 +8,7 @@
 #  create_beneficiaries :boolean
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  edit_terms_within_po :boolean          default(FALSE)
 #
 
 require 'test_helper'

@@ -33,4 +33,11 @@ class CostCenter < ActiveRecord::Base
     where application: "vp"
   }
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

@@ -74,20 +74,53 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond_to do |format|
       format.pdf {
           render pdf: "PO-#{@result.purchase_order.po_number}",
-                 layout: "pdf.html.erb",
+                 layout: "pdf/paginated_bootstrap.html.erb",
                  print_media_type: true,
                  margin: { :bottom => 5 },
-                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
+                 # header: { left: '[page] of [topage]' },
+                 footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
                  # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
       format.html {
         render pdf: "PO-#{@result.purchase_order.po_number}",
-                 layout: "pdf.html.erb",
-                 print_media_type: true,
-                 margin: { :bottom => 5 },
-                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
-                 # header: { html: { template: 'export/header_pagination.html.erb' }}
+               layout: "pdf/paginated_bootstrap.html.erb",
+               print_media_type: true,
+               margin: { :bottom => 5 },
+               footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
+        # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
     end
   end
+
+  # Templates
+  def template_create
+    @result = Procurements::PurchaseOrders::Templates::Create.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
+  def template_apply
+    @result = Procurements::PurchaseOrders::Templates::Apply.(current_user, params)
+    respond
+  end
+
+  def template_index
+    @result = Procurements::PurchaseOrders::Templates::Index.(current_user, params)
+    respond
+  end
+
+  def template_show
+    @result = Procurements::PurchaseOrders::Templates::Show.(current_user, params)
+    respond
+  end
+
+  def template_update
+    @result = Procurements::PurchaseOrders::Templates::Update.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
+  def template_destroy
+    @result = Procurements::PurchaseOrders::Templates::Destroy.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
 end

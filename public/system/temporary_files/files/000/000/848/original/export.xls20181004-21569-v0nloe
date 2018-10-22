@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:x="urn:schemas-microsoft-com:office:excel"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="header">
+      <ss:Font ss:Bold="1"/>
+      <ss:Interior ss:Color="#a5ccb0" ss:Pattern="Solid"/>
+    </ss:Style>
+  </ss:Styles>
+    <ss:Worksheet ss:Name="Sheet1">
+      <ss:Table>
+        <ss:Row>
+              <Cell ss:StyleID="header">
+                <Data ss:Type="String">Id</Data>
+              </Cell>
+              <Cell ss:StyleID="header">
+                <Data ss:Type="String">Merchant</Data>
+              </Cell>
+        </ss:Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257608</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">Uber</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257607</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">Uber</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257606</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">Uber</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257605</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">588.0 KM at ₹5.5 INR per KM</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257604</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">100.0 KM at ₹3.0 INR per KM</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257603</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">Uber</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257602</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">Uber</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257601</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">Uber</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257600</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">Uber</Data>
+                  </Cell>
+            </Row>
+            <Row>
+                  <Cell>
+                    <Data ss:Type="String">257599</Data>
+                  </Cell>
+                  <Cell>
+                    <Data ss:Type="String">Uber</Data>
+                  </Cell>
+            </Row>
+      </ss:Table>
+    </ss:Worksheet>
+</Workbook>
