@@ -73,19 +73,50 @@ class Procurement < ActiveRecord::Base
     where id: filtered_ids
   }
 
+  scope :filter_sub_department, -> (sub_department_name, user_id) {
+    user = User.find user_id
+    if user.present?
+      sub_department_ids = user.company.departments.only_sub_departments.filter_name(sub_department_name).pluck(:id)
+
+      filtered_ids = PurchaseOrder.filter_sub_department_id(sub_department_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_vendor, -> (vendor_name, user_id){
+    user = User.find user_id
+    if user.present?
+      vendor_ids = user.company.yes_bank_vendors.filter_name_search(vendor_name).pluck(:id)
+
+      filtered_ids = PurchaseOrder.filter_vendor_id(vendor_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_user, -> (user_details, user_id){
+    user = User.find user_id
+
+    if user.present?
+      user_ids = user.company.users.filter_search(user_details).pluck(:id)
+
+      filtered_ids = user.company.purchase_orders.filter_user_id(user_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_invoice_number, -> (invoice_number) {
     filtered_ids = Invoice.with_procurement.filter_invoice_number(invoice_number).pluck(:procurement_id)
     where id: filtered_ids
   }
 
-  scope :filter_vendor_name, -> (name) {
-    vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
-
-    procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
-    procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
-
-    where(id: procurement_ids)
-  }
+  # scope :filter_vendor_name, -> (name) {
+  #   vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
+  #
+  #   procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
+  #   procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
+  #
+  #   where(id: procurement_ids)
+  # }
 
   scope :filter_status_tags, -> (ids) {
     all_status_tag_ids = StatusTag.all.pluck(:id)

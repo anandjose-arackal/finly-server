@@ -70,15 +70,15 @@ views:
 #          url: payments
 #          id: payments
         <% if current_user.company.procurement_enabled? %>
-        - name: Templates
-          id: custom_templates
-          url: custom_templates
+#        - name: Templates
+#          id: custom_templates
+#          url: custom_templates
         - name: Procurements
           id: procurements
           url: procurements
-        - name: 'Non PO'
-          id: non_po_invoices
-          url: non_po_invoices
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
         <% end %>
         - name: Inventory
           id: inventory
@@ -121,8 +121,8 @@ views:
         <% end %>
 #        - name: 'Company Statements'
 #          url: '#company_statements'
-        - name: Attachments
-          url: '#attachments'
+#        - name: Attachments
+#          url: '#attachments'
         - name: Load Company Balance
           url: '#load-company-balance'
   <% end %>
@@ -135,15 +135,15 @@ views:
 #          url: payments
 #          id: payments
         <% if current_user.company.procurement_enabled? %>
-        - name: Templates
-          id: custom_templates
-          url: custom_templates
+#        - name: Templates
+#          id: custom_templates
+#          url: custom_templates
         - name: Procurements
           id: procurements
           url: procurements
-        - name: 'Non PO'
-          id: non_po_invoices
-          url: non_po_invoices
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
         <% end %>
         - name: Inventory
           id: inventory
@@ -192,9 +192,9 @@ views:
         - name: Procurements
           id: procurements
           url: procurements
-        - name: 'Non PO'
-          id: non_po_invoices
-          url: non_po_invoices
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
         <% end %>
         - name: Inventory
           id: inventory
@@ -233,9 +233,9 @@ views:
         - name: Procurements
           id: procurements
           url: procurements
-        - name: 'Non PO'
-          id: non_po_invoices
-          url: non_po_invoices
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
         <% end %>
         - name: Inventory
           id: inventory
@@ -271,15 +271,15 @@ views:
       menus:
         navbar:
         <% if current_user.company.procurement_enabled? %>
-        - name: Templates
-          id: custom_templates
-          url: custom_templates
+#        - name: Templates
+#          id: custom_templates
+#          url: custom_templates
         - name: Procurements
           id: procurements
           url: procurements
-        - name: 'Non PO'
-          id: non_po_invoices
-          url: non_po_invoices
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
         <% end %>
         - name: Inventory
           id: inventory

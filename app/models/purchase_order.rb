@@ -130,6 +130,18 @@ class PurchaseOrder < ActiveRecord::Base
     # where(id: ids)
   }
 
+  scope :filter_sub_department_id, -> (ids) {
+    where sub_department_id: ids
+  }
+
+  scope :filter_vendor_id, -> (ids){
+    where vendor_id: ids
+  }
+
+  scope :filter_user_id, -> (ids){
+    where user_id: ids
+  }
+
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy

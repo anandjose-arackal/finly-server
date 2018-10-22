@@ -1,4 +1,4 @@
-class ExportManager::Master::Procurement::Provider < ExportManager::Master::BaseMaster
+class ExportManager::Master::Procurements::Provider < ExportManager::Master::BaseMaster
 
   register_handle :procurement
   register_generator ExportManager::Generator::Spreadsheet
@@ -14,27 +14,29 @@ class ExportManager::Master::Procurement::Provider < ExportManager::Master::Base
                       vendor_tds_rate: {spreadsheet: false, pdf: true},
                       vendor_tds_description: {spreadsheet: false, pdf: true},
                       vendor_type: {spreadsheet: false, pdf: true},
-                      vendor_description: {spreadsheet: true, pdf: true},
+                      vendor_description: {spreadsheet: false, pdf: true},
                       vendor_address: {spreadsheet: false, pdf: true},
                       vendor_custom_fields: {spreadsheet: false, pdf: true},
                       policy: {spreadsheet: false, pdf: true},
-                      department: {spreadsheet: false, pdf: true},
-                      sub_department: {spreadsheet: false, pdf: true},
-                      cost_center: {spreadsheet: false, pdf: true},
+                      department: {spreadsheet: true, pdf: true},
+                      sub_department: {spreadsheet: true, pdf: true},
+                      cost_center: {spreadsheet: true, pdf: true},
+                      po_user: {spreadsheet: true, pdf: true},
                       po_number: {spreadsheet: true, pdf: true},
                       po_payment_term: {spreadsheet: false, pdf: true},
+                      po_date: {spreadsheet: true, pdf: true},
                       po_delivery_date: {spreadsheet: false, pdf: true},
                       po_submitted_on: {spreadsheet: false, pdf: true},
                       is_po_approved: {spreadsheet: true, pdf: true},
                       po_approved_on: {spreadsheet: false, pdf: true},
                       po_sent_on: {spreadsheet: false, pdf: true},
                       po_base_value: {spreadsheet: true, pdf: true},
-                      po_cgst: {spreadsheet: true, pdf: true},
-                      po_sgst: {spreadsheet: true, pdf: true},
-                      po_igst: {spreadsheet: true, pdf: true},
+                      po_cgst: {spreadsheet: false, pdf: true},
+                      po_sgst: {spreadsheet: false, pdf: true},
+                      po_igst: {spreadsheet: false, pdf: true},
                       po_line_items_count: {spreadsheet: false, pdf: true},
-                      po_purchase_address: {spreadsheet: false, pdf: true},
-                      po_delivery_address: {spreadsheet: false, pdf: true},
+                      po_purchase_address: {spreadsheet: true, pdf: true},
+                      po_delivery_address: {spreadsheet: true, pdf: true},
                       po_custom_fields: {spreadsheet: false, pdf: true},
                       inwards_status: {spreadsheet: false, pdf: true},
                       last_inward_received_on: {spreadsheet: false, pdf: true},
@@ -52,7 +54,7 @@ class ExportManager::Master::Procurement::Provider < ExportManager::Master::Base
                       invoice_tds_rate: {spreadsheet: true, pdf: true},
                       invoice_tds_amount: {spreadsheet: false, pdf: true},
                       invoice_total_amount: {spreadsheet: true, pdf: true},
-                      invoice_total_amount_after_tds: {spreadsheet: true, pdf: true},
+                      invoice_total_amount_after_tds: {spreadsheet: false, pdf: true},
                       invoice_payable_amount: {spreadsheet: false, pdf: true},
                       invoice_line_items_count: {spreadsheet: false, pdf: true},
                       invoice_purchase_address: {spreadsheet: false, pdf: true},
@@ -133,6 +135,10 @@ class ExportManager::Master::Procurement::Provider < ExportManager::Master::Base
     procurement.type_entity&.cost_center&.name
   end
 
+  def po_user(procurement)
+    purchase_order(procurement)&.user.name
+  end
+
   def po_number(procurement)
     purchase_order(procurement)&.po_number
   end
@@ -145,12 +151,16 @@ class ExportManager::Master::Procurement::Provider < ExportManager::Master::Base
     DateUtils.date_formatted purchase_order(procurement)&.delivery_date
   end
 
+  def po_date(procurement)
+    DateUtils.date_formatted purchase_order(procurement)&.created_at
+  end
+
   def po_submitted_on(procurement)
     # todo
   end
 
   def is_po_approved(procurement)
-    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :closed, :sent_to_vendor).include?(purchase_order(procurement)&.purchase_order_status_id)
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :closed, :sent_to_vendor).include?(purchase_order(procurement)&.purchase_order_status_id) ? 'Yes' : 'No'
   end
 
   def po_approved_on(procurement)
@@ -189,11 +199,11 @@ class ExportManager::Master::Procurement::Provider < ExportManager::Master::Base
   end
 
   def po_purchase_address(procurement)
-    # todo
+    purchase_order(procurement)&.billing_address
   end
 
   def po_delivery_address(procurement)
-    # todo
+    purchase_order(procurement)&.shipping_address
   end
 
   def po_custom_fields(procurement)
@@ -229,7 +239,7 @@ class ExportManager::Master::Procurement::Provider < ExportManager::Master::Base
   end
 
   def is_invoice_approved(procurement)
-    InwardInvoiceStatus.ids_for(:partially_paid, :paid, :approved, :rejected, :auto_approved, :closed).include?(invoice(procurement)&.invoice_status_id)
+    InwardInvoiceStatus.ids_for(:partially_paid, :paid, :approved, :rejected, :auto_approved, :closed).include?(invoice(procurement)&.invoice_status_id) ? 'Yes' : 'No'
   end
 
   def invoice_sent_on(procurement)
