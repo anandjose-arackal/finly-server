@@ -137,13 +137,13 @@ class Expense::Index < Expense::Base
 
     def cash_pockets
       list = []
-      user.user_pockets.cash_and_credit_cards.include_details.each do |pocket|
+      user.user_pockets.non_bank_card_transfer_pockets.include_details.each do |pocket|
         hash = {}
         if pocket.cash_pocket?
           adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
           hash[:balance] = adapter&.balance(display_balance: true)
           hash[:display_balance] = true
-        elsif pocket.credit_card_pocket?
+        else
           hash[:balance] = 0
           hash[:display_balance] = false
         end

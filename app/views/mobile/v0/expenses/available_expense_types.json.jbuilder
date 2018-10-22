@@ -48,13 +48,9 @@ json.cash_pockets do
       json.can_claim_reimbursement true
       json.balance adapter&.balance(display_balance: true)
       json.display_balance true
-    elsif pocket.credit_card_pocket?
-      # adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
-      json.can_claim_reimbursement false
-      json.balance 0
-      json.display_balance false
     else
       json.can_claim_reimbursement false
+      json.display_balance false
     end
     json.name pocket.name
     json.id pocket.id
