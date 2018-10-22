@@ -60,12 +60,24 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     end
 
     pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
+    if pocket_id.blank?
+      exp_params = params[:expense] || {}
+      reimbursable = exp_params[:reimbursable]
+      from_cash_on_hand = exp_params[:from_cash_on_hand]
+      if reimbursable
+        pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
+      elsif from_cash_on_hand
+        pocket_id = user.user_pockets.cash_pockets_only&.first&.id
+      elsif exp_params.key?(:reimbursable) || exp_params.key?(:from_cash_on_hand) # Legacy support for android app -> As android only sends the key which has been updated
+        pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+      end
+    end
+    self.cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id) || expense&.spent_from
 
-    # todo - jugaad to support mobile app for now
     if self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
     end
+    self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
   end
 
   def authorize

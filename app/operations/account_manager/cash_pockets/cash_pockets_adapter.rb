@@ -49,8 +49,7 @@ class AccountManager::CashPockets::CashPocketsAdapter < AccountManager::BaseAdap
     if options[:display_balance]
       expenses_against_coh_total = 0
       # extracting all expenses which were marked against this particular pocket
-      self.account.user.expenses.unverified.blocked_against_cash_on_hand.with_spent_from_id(self.account.id).each do |expense|
-
+      self.account.user.expenses.unverified.blocked_against_cash_on_hand.with_spent_from_id(self.account.id).include_spent_from_calculation.each do |expense|
         unless expense.date == DateUtils.local_date && expense.amount&.currency_id != expense.spent_from&.base_currency&.id
           expenses_against_coh_total += expense.amount.send(expense.spent_from&.base_currency&.country_code&.to_sym).to_f
         end

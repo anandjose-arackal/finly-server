@@ -56,6 +56,25 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
 
       current_expense_params[:expense_type_id] = ExpenseType.distance_expense_id
 
+      pocket_id = current_expense_params[:spent_from_id]
+      if pocket_id.blank?
+        reimbursable = params_each_expense&.dig(:expense, :reimbursable)
+        from_cash_on_hand = params_each_expense&.dig(:expense, :from_cash_on_hand)
+        if reimbursable
+          pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
+        elsif from_cash_on_hand
+          pocket_id = user.user_pockets.cash_pockets_only&.first&.id
+        else
+          pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+        end
+      end
+      cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id)
+
+      if cash_pocket.blank?
+        cash_pocket = user.user_pockets.cash_pockets_only.first
+      end
+      current_expense_params[:spent_from_id] = cash_pocket&.id
+
       # Setting order for each of the locations
       pos = 1
       current_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes)&.each do |location|

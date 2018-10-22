@@ -54,12 +54,23 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     end
 
     pocket_id = self.expense_params[:spent_from_id]
+    if pocket_id.blank?
+      reimbursable = params&.dig(:expense, :reimbursable)
+      from_cash_on_hand = params&.dig(:expense, :from_cash_on_hand)
+      if reimbursable
+        pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
+      elsif from_cash_on_hand
+        pocket_id = user.user_pockets.cash_pockets_only&.first&.id
+      else
+        pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+      end
+    end
     self.cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id)
 
-    # todo - jugaad to support mobile app for now
     if self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
     end
+    self.expense_params[:spent_from_id] = self.cash_pocket&.id
   end
 
   def validate

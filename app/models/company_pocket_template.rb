@@ -15,9 +15,8 @@ class CompanyPocketTemplate < ActiveRecord::Base
   belongs_to :user_pocket_type
 
 
-  scope :with_id, -> (ids) {
-    where id: ids
-  }
+  scope :with_id, -> (ids) { where id: ids }
+  scope :with_user_pocket_type_id, -> (user_pocket_type_id) { where user_pocket_type_id: user_pocket_type_id }
 
   validates :name, presence: true
   validates :user_pocket_type, presence: true

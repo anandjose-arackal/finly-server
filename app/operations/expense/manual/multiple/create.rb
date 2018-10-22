@@ -41,8 +41,26 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
 
       # creating strong params out of params received
       current_expense_params = manual_multiple_expense_params(params_each_expense)
-
       current_expense_params[:expense_type_id] = ExpenseType.manual_expense_id
+
+      pocket_id = current_expense_params[:spent_from_id]
+      if pocket_id.blank?
+        reimbursable = params_each_expense&.dig(:expense, :reimbursable)
+        from_cash_on_hand = params_each_expense&.dig(:expense, :from_cash_on_hand)
+        if reimbursable
+          pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
+        elsif from_cash_on_hand
+          pocket_id = user.user_pockets.cash_pockets_only&.first&.id
+        else
+          pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+        end
+      end
+      cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id)
+
+      if cash_pocket.blank?
+        cash_pocket = user.user_pockets.cash_pockets_only.first
+      end
+      current_expense_params[:spent_from_id] = cash_pocket&.id
 
       # Setting index for current expense to initialize
       multiple_expenses[key] = {}
