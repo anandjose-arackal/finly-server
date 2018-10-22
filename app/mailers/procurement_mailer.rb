@@ -36,11 +36,13 @@ class ProcurementMailer < ApplicationMailer
 
     @result = Procurements::PurchaseOrders::Show.(@data.user, {purchase_order_id: @data.document.id })
     attachments["purchase_order-#{@document.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(pdf: "purchase-order-#{@document.po_number}",
-                          template: "export/purchase_order",
-                          layout: "pdf/paginated_bootstrap.html.erb",
-                          footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-                          print_media_type: true
+         render_to_string(
+             pdf: "purchase-order-#{@document.po_number}",
+             encoding: 'UTF-8',
+             template: "export/purchase_order",
+             layout: "pdf/paginated_bootstrap.html.erb",
+             footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
+             print_media_type: true
          )
     )
     if @data.attachments.present? && @data.attachments.is_a?(Array)
@@ -68,12 +70,14 @@ class ProcurementMailer < ApplicationMailer
       @curr_user = @data.user
       ########################################################
       attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
-         render_to_string(pdf: "purchase-order-#{@data.purchase_order.po_number}",
-                          template: "export/purchase_order",
-                          layout: "pdf/paginated_bootstrap.html.erb",
-                          # layout: "pdf.html.erb",
-                          footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-                          print_media_type: true
+         render_to_string(
+             pdf: "purchase-order-#{@data.purchase_order.po_number}",
+             encoding: 'UTF-8',
+             template: "export/purchase_order",
+             layout: "pdf/paginated_bootstrap.html.erb",
+             # layout: "pdf.html.erb",
+             footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
+             print_media_type: true
          )
       )
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
