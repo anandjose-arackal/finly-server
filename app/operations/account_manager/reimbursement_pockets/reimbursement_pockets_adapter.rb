@@ -52,7 +52,7 @@ class AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter < Accoun
   end
 
   def database_balance
-    self.account.balance_value
+    9999999999999999999999
   end
 
   def eligibility(source_id)
