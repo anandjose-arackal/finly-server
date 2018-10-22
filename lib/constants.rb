@@ -24,12 +24,12 @@ module Constants
   MIGRATING_COMPANIES = [10, 67]
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
-  PRODUCT_DEMO_EMAIL_ID = ['poojitha.shetty@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io', 'venu.reddy@finly.io']
-  RESOURCE_DOWNLOAD_EMAIL_ID = ['poojitha.shetty@finly.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'admin@finlytest.io']
 
