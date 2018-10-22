@@ -83,7 +83,7 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_status_tags, type: :array
     has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number
     has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
-    has_scope :filter_vendor, using: [:sub_department_name, :user_id], type: :hash
+    has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
     has_scope :filter_user, using: [:user_details, :user_id], type: :hash
 
     def init
