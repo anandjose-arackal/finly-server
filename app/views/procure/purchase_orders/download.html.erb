@@ -138,10 +138,10 @@
             <td class="font-dark-gray fw-bold"><%= item.description %></td>
             <td class="font-light-gray"><%= item.comment %></td>
             <td class="text-center font-light-gray"><%= item.quantity %></td>
-            <td class="text-right">&#8377;<%= item.rate %></td>
-            <td class="text-right">&#8377;<%= item.discount_amount&.value %></td>
-            <td class="text-right">&#8377;<%= item.tax_amount&.value %></td>
-            <td class="text-right fc-green fw-bold">&#8377;<%= item.total_amount&.value %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= precision_value item.discount_amount&.value %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= precision_value item.tax_amount&.value %></td>
+            <td class="text-right fc-green fw-bold currency"><i class='fa fa-rupee'></i><%= precision_value item.total_amount&.value %></td>
           </tr>
         <% end %>
         </tbody>
@@ -154,19 +154,19 @@
           <tbody>
           <tr>
             <td class="font-light-gray text-left">Total</td>
-            <td class="font-dark-gray text-right fc-green">&#8377;<%= @result.purchase_order.total_before_tax&.value %></td>
+            <td class="font-dark-gray text-right fc-green currency"><i class='fa fa-rupee'></i><%= precision_value @result.purchase_order.total_before_tax&.value %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Discount</td>
-            <td class="font-dark-gray text-right">&#8377;<%= @result.purchase_order.discount_amount&.value %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= precision_value @result.purchase_order.discount_amount&.value %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Tax</td>
-            <td class="font-dark-gray text-right">&#8377;<%= @result.purchase_order.tax_amount&.value %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= precision_value @result.purchase_order.tax_amount&.value %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
-            <td class="font-dark-gray text-right fc-dark-red">&#8377;<%= @result.purchase_order.balance_amount&.value %></td>
+            <td class="font-dark-gray text-right fc-dark-red currency"><i class='fa fa-rupee'></i><%= precision_value @result.purchase_order.balance_amount&.value %></td>
           </tr>
           </tbody>
         </table>
@@ -352,6 +352,12 @@
     .pd-top-5{
       padding-top: 5px !important;
     }
+    .currency{
+      white-space: nowrap !important;
+    }
+    i{
+      font-size: 11px !important;
+    }
   }
   @media print{
     body{
@@ -503,6 +509,12 @@
     }
     .pd-top-5{
       padding-top: 5px !important;
+    }
+    .currency{
+      white-space: nowrap !important;
+    }
+    i{
+      font-size: 11px !important;
     }
   }
 </style>
