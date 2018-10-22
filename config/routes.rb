@@ -2757,6 +2757,8 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
+  get 'exports/:type', to: 'export#processor'
+
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
   post 'statements/user_summary' => 'statements#user_summary'
@@ -3120,6 +3122,8 @@ Rails.application.routes.draw do
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     get 'inventory_item_config', to: 'inventory_line_items#inventory_item_config', as: :inventory_item_config
+    put 'inventory_line_items/import', to: 'inventory_line_items#import', as: :inventory_line_items_import
+    get 'inventory_line_items/import_template', to: 'inventory_line_items#import_template', as: :inventory_line_items_import_template
     resources :inventory_line_items
     resources :payment_terms
     resources :reminders
@@ -3166,6 +3170,13 @@ Rails.application.routes.draw do
 
 
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
+
+    get 'purchase_orders/templates', to: 'purchase_orders#template_index'
+    get 'purchase_orders/templates/:id', to: 'purchase_orders#template_show'
+    # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
+    patch 'purchase_orders/templates/:id', to: 'purchase_orders#template_update'
+    delete 'purchase_orders/templates/:id', to: 'purchase_orders#template_destroy'
+
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
@@ -3175,7 +3186,10 @@ Rails.application.routes.draw do
       put 'close', to: 'purchase_orders#close'
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
+      post 'save_as_template', to: 'purchase_orders#template_create'
+      post 'apply_template', to: 'purchase_orders#template_apply'
     end
+
 
     resources :inward_documents do
 
@@ -3183,14 +3197,27 @@ Rails.application.routes.draw do
 
     resources :payments, only: [:show]
 
-    resources :attachments, only: [:create]
+    resources :attachments
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
+
+
+
+    get 'inward_invoices/templates', to: 'inward_invoices#template_index'
+    get 'inward_invoices/templates/:id', to: 'inward_invoices#template_show'
+    # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
+    patch 'inward_invoices/templates/:id', to: 'inward_invoices#template_update'
+    delete 'inward_invoices/templates/:id', to: 'inward_invoices#template_destroy'
+
+    get 'inward_invoices/import_template', to: 'inward_invoices#import_template'
+    post '/inward_invoices/import', to: 'inward_invoices#import'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
       put 'approve', to: 'inward_invoices#approve'
       put 'reject', to: 'inward_invoices#reject'
       put 'close', to: 'inward_invoices#close'
+      post 'save_as_template', to: 'inward_invoices#template_create'
+      post 'apply_template', to: 'inward_invoices#template_apply'
     end
 
     resources :delivery_challans

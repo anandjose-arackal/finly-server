@@ -94,6 +94,10 @@ Rails.application.configure do
   #         s3_region: ENV["aws_region_name"],
   #         access_key_id: ENV["aws_access_key_id"],
   #         secret_access_key: ENV["aws_secret_access_key"]
+  #     },
+  #     :s3_protocol => :https,
+  #     :s3_headers => {
+  #         :content_disposition => 'attachment'
   #     }
   # }
   #########################################################################################

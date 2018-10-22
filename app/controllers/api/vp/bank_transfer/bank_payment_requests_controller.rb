@@ -5,6 +5,7 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
   before_action -> { finly_authorize! :api }
 
   def create
+    params[:api_initiated] = true
     @result = BankTransfer::PaymentRequest::Create.(current_user, params)
     if @result.success? and @result.bank_payment_request.present?
       RequestStore.store[:current_app] = :vp # todo jugaad for fixing the reviewer for API requests

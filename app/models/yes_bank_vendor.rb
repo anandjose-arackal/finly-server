@@ -25,9 +25,14 @@
 #  payment_term_id   :integer
 #  currency_id       :integer
 #  tds_rates_list_id :integer
+#  vendor_id         :string(255)
 #
 
 class YesBankVendor < ActiveRecord::Base
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
+
   belongs_to :company
   belongs_to :state_code, class_name: "GstStateCode"
   belongs_to :created_by, class_name: "User"

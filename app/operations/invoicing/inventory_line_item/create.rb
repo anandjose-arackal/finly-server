@@ -2,6 +2,14 @@ class Invoicing::InventoryLineItem::Create < Invoicing::InventoryLineItem::Base
 
   attr_accessor :inventory_line_item, :inventory_item_parameters
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:invoicing, :inventory_line_item], :validate, self)
+        }
+    }
+  end
+
   def init
     self.inventory_item_parameters = inventory_item_params
   end

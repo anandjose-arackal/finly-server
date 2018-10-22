@@ -116,6 +116,7 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
 
     attr_accessor :request_status, :bank_reference_number, :application_id, :customer_id
 
+
     def initialize(params)
       self.request_status = params[:request_status]
       self.bank_reference_number = params[:bank_reference_number]

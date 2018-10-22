@@ -12,6 +12,9 @@
 class GstStateCode < ActiveRecord::Base
 
 
+  scope :with_state_code, -> (state_code) {
+    where(state_code)
+  }
   def full_name
     "#{self.name} - #{self.state_code}"
   end

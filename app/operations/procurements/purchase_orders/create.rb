@@ -1,5 +1,5 @@
 class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
-  attr_accessor :purchase_order, :procurement, :purchase_order_params, :vendor
+  attr_accessor :purchase_order, :procurement, :purchase_order_params, :vendor, :template
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -20,12 +20,18 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
     unless self.vendor.bank_accounts.present?
       add_message :error, "Vendor doesn't have a bank account, please add one before proceeding"
+      return
     end
 
   end
 
   def process
-    self.purchase_order = procurement.build_purchase_order(purchase_order_params)
+    if params[:template_id].present?
+      load_po_from_template
+      self.purchase_order.procurement = self.procurement
+    else
+      self.purchase_order = procurement.build_purchase_order(purchase_order_params)
+    end
     self.purchase_order.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
     self.purchase_order.user = user
     self.purchase_order.company = user.company
@@ -33,9 +39,7 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     if self.vendor.payment_term_id.present?
       self.purchase_order.payment_term_id = self.vendor.payment_term_id
     end
-
-    role_id = UserRole.id_for(:initiator)
-    self.purchase_order.controlling_user_role_id = role_id
+    self.purchase_order.controlling_user_role_id = UserRole.id_for(:initiator)
 
     if purchase_order.valid?
       purchase_order.save
@@ -56,5 +60,16 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
   def post_process
     add_message :success, 'Successfully created purchase order'
+  end
+
+  protected
+  def load_po_from_template
+    result = Procurements::PurchaseOrders::Templates::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    self.template = result.template
+    self.purchase_order = self.template.resource.amoeba_dup
   end
 end
