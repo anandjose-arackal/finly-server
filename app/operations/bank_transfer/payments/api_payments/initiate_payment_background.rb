@@ -62,7 +62,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePaymentBackground < Backgroun
           },
           note: payment[:note],
           date: DateUtils.local_date,
-          external_reference_id: payment[:external_reference_id],
+          # external_reference_id: payment[:external_reference_id],
           api_initiated: true
       }
     end
