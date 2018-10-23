@@ -70,7 +70,7 @@ class Expense::ExTime::Multiple::Create < Expense::ExTime::Multiple::Base
           pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
         end
       end
-      cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id)
+      cash_pocket = user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id)
 
       if cash_pocket.blank?
         cash_pocket = user.user_pockets.cash_pockets_only.first
