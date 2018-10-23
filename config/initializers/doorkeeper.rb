@@ -14,7 +14,7 @@ Doorkeeper.configure do
   resource_owner_from_credentials do |routes|
     u = nil
     scopes = params.dig(:scope)&.split(' ')
-    if (params[:username].blank?) || (params[:password].blank? && !(params[:darwinbox_skip_password]))
+    if (params[:username].blank?) || (params[:password].blank? && !(params[:sso_skip_password]))
       u = nil
     else
       if scopes.size == 1 and ['web', 'mobile', 'chrome', 'api'].include?(scopes.first)
@@ -34,8 +34,10 @@ Doorkeeper.configure do
             u = nil
           end
         end
-      elsif u && StringUtils.to_bool(params[:darwinbox_skip_password])
+      elsif u && (!StringUtils.to_bool(params[:sso_skip_password]))
         u = nil
+      elsif u && StringUtils.to_bool(params[:sso_skip_password])
+        # do nothing
       else
         u = nil
       end

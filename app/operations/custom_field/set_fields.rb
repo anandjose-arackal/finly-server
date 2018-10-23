@@ -103,7 +103,6 @@ class CustomField::SetFields < CustomField::Base
     #   end
     # end
 
-
     if self.reset
       # in this case we can reset the custom fields by destroying all existing custom fields and recreating them
       # from the field configurations set
@@ -160,15 +159,21 @@ class CustomField::SetFields < CustomField::Base
     all_field_values = merged_custom_field_values
     acceptable_dropdown_values = identify_acceptable_dropdown_values all_field_values
 
+
     current_ids = self.item.custom_fields.pluck(:field_configuration_id)
     configs_to_create = []
     config_ids_to_destroy = []
     required_configs = {}
+
     self.field_configurations.enabled.each do |config|
       required = false
       if config.root_field
         # Root fields have to be present
-        if current_ids.blank? or current_ids.include?(config.id)
+        if FieldParentType.expense_ids.include?(parent_type_id)
+          if current_ids.blank? or current_ids.include?(config.id)
+            required = true
+          end
+        else
           required = true
         end
       else
@@ -182,6 +187,7 @@ class CustomField::SetFields < CustomField::Base
           end
         end
       end
+
 
       required_configs[config.id] = config if required
     end
