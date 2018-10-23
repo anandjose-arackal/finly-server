@@ -172,7 +172,7 @@ class Expense < ActiveRecord::Base
     with_id(cancelled_expense_ids)
   }
 
-  scope :reimbursable, -> {where spent_from_id: true}
+  scope :reimbursable, -> {where reimbursable: true}
   scope :non_reimbursable, -> {where reimbursable: false}
 
   scope :quickbooks_non_reimbursable, -> {where reimbursable: [false, nil]}
