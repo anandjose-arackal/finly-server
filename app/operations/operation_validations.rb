@@ -9,7 +9,7 @@ module OperationValidations
   end
 
   def params_present?
-    if params&.blank?
+    if params&.nil?
       add_message :error, 'Error loading request'
       return false
     end

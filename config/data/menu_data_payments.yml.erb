@@ -69,17 +69,20 @@ views:
 #        - name: Individual Payments
 #          url: payments
 #          id: payments
-        - name: Procure
-          type: group
-          items:
-          <% if current_user.company.procurement_enabled? %>
-          - name: Procurements
-            id: procurements
-            url: procurements
-          <% end %>
-          - name: Inventory
-            id: inventory
-            url: inventory
+        <% if current_user.company.procurement_enabled? %>
+#        - name: Templates
+#          id: custom_templates
+#          url: custom_templates
+        - name: Procurements
+          id: procurements
+          url: procurements
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
+        <% end %>
+        - name: Inventory
+          id: inventory
+          url: inventory
         - name: Invoices
           url: invoices
           id: invoices
@@ -95,25 +98,21 @@ views:
 #        - name: Payment Orders
 #          url: orders
 #          id: orders
-        - name: Users
-          url: users
-          id: users
 #        - name: Vendors
 #          url: vendors
 #          id: 'vendors'
         - name: Beneficiaries
           url: beneficiaries
           id: beneficiaries
-        - name: Statements
-          url: statements
-          id: statements
         cog:
-        - name: Load Company Balance
-          url: '#load-company-balance'
         <% if current_user.company.expense_management_enabled? %>
 #        - name: Expense Management
 #          url: '/'
         <% end %>
+        - name: Users
+          url: '#users'
+        - name: Statements
+          url: '#statements'
         - name: Organization Account
           url: '#organization_account'
         <% if current_user.user_panel_subscription.disburse && current_user.company.cards_enabled? %>
@@ -122,6 +121,10 @@ views:
         <% end %>
 #        - name: 'Company Statements'
 #          url: '#company_statements'
+#        - name: Attachments
+#          url: '#attachments'
+        - name: Load Company Balance
+          url: '#load-company-balance'
   <% end %>
 
   <% if current_user.auditor? %>
@@ -131,17 +134,20 @@ views:
 #        - name: Individual Payments
 #          url: payments
 #          id: payments
-        - name: Procure
-          type: group
-          items:
-          <% if current_user.company.procurement_enabled? %>
-          - name: Procurements
-            id: procurements
-            url: procurements
-          <% end %>
-          - name: Inventory
-            id: inventory
-            url: inventory
+        <% if current_user.company.procurement_enabled? %>
+#        - name: Templates
+#          id: custom_templates
+#          url: custom_templates
+        - name: Procurements
+          id: procurements
+          url: procurements
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
+        <% end %>
+        - name: Inventory
+          id: inventory
+          url: inventory
         - name: Invoices
           url: invoices
           id: invoices
@@ -157,48 +163,44 @@ views:
 #        - name: Payment Orders
 #          url: orders
 #          id: orders
-        - name: Users
-          url: users
-          id: users
-        - name: Vendors
-          url: vendors
-          id: 'vendors'
+#        - name: Vendors
+#          url: vendors
+#          id: 'vendors'
         - name: Beneficiaries
           url: beneficiaries
           id: beneficiaries
-        - name: Statements
-          url: statements
-          id: statements
         cog:
-        - name: Load Company Balance
-          url: '#load-company-balance'
         <% if current_user.company.expense_management_enabled? %>
 #        - name: Expense Management
 #          url: '/'
         <% end %>
+        - name: Statements
+          url: '#statements'
         <% if current_user.user_panel_subscription.disburse && current_user.company.cards_enabled? %>
 #        - name: Fund Disbursement
 #          url: '/disburse'
         <% end %>
 #        - name: 'Company Statements'
 #          url: '#company_statements'
+        - name: Load Company Balance
+          url: '#load-company-balance'
   <% end %>
 
   <% if current_user.vendor_payment_reviewer? %>
     reviewer:
       menus:
         navbar:
-        - name: Procure
-          type: group
-          items:
-          <% if current_user.company.procurement_enabled? %>
-          - name: Procurements
-            id: procurements
-            url: procurements
-          <% end %>
-          - name: Inventory
-            id: inventory
-            url: inventory
+        <% if current_user.company.procurement_enabled? %>
+        - name: Procurements
+          id: procurements
+          url: procurements
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
+        <% end %>
+        - name: Inventory
+          id: inventory
+          url: inventory
 #        - name: Invoices
 #          url: invoices
 #          id: invoices
@@ -229,17 +231,17 @@ views:
 #        - name: Individual Payments
 #          url: payments
 #          id: payments
-        - name: Procure
-          type: group
-          items:
-          <% if current_user.company.procurement_enabled? %>
-          - name: Procurements
-            id: procurements
-            url: procurements
-          <% end %>
-          - name: Inventory
-            id: inventory
-            url: inventory
+        <% if current_user.company.procurement_enabled? %>
+        - name: Procurements
+          id: procurements
+          url: procurements
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
+        <% end %>
+        - name: Inventory
+          id: inventory
+          url: inventory
         - name: Invoices
           url: invoices
           id: invoices
@@ -270,17 +272,20 @@ views:
     initiator:
       menus:
         navbar:
-        - name: Procure
-          type: group
-          items:
-          <% if current_user.company.procurement_enabled? %>
-          - name: Procurements
-            id: procurements
-            url: procurements
-          <% end %>
-          - name: Inventory
-            id: inventory
-            url: inventory
+        <% if current_user.company.procurement_enabled? %>
+#        - name: Templates
+#          id: custom_templates
+#          url: custom_templates
+        - name: Procurements
+          id: procurements
+          url: procurements
+#        - name: 'Non PO'
+#          id: non_po_invoices
+#          url: non_po_invoices
+        <% end %>
+        - name: Inventory
+          id: inventory
+          url: inventory
         - name: 'Bulk Payments'
           url: 'orders/new'
 #        - name: Individual Payments

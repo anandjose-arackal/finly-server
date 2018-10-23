@@ -14,10 +14,14 @@
 #  note                  :text(65535)
 #  is_deleted            :boolean          default(FALSE), not null
 #  procurement_type      :string(255)
+#  transaction_id        :string(255)
 #
 
 class Procurement < ActiveRecord::Base
-  include SoftDeletable, FindByOrderedIds
+  include SoftDeletable, FindByOrderedIds, Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :transaction_id, purpose: :procurement, editable: false
+
   belongs_to :user
   belongs_to :company
   belongs_to :procurement_track
@@ -61,10 +65,43 @@ class Procurement < ActiveRecord::Base
       find_ordered(ordered_ids)
     end
   }
-
+  scope :filter_procurement_name, -> (name) {
+    where "procurements.name LIKE ?", "%#{name}%"
+  }
   scope :filter_po_number, -> (po_number) {
     filtered_ids = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
     where id: filtered_ids
+  }
+
+  scope :filter_sub_department, -> (sub_department_name, user_id) {
+    user = User.find user_id
+    if user.present?
+      sub_department_ids = user.company.departments.only_sub_departments.filter_name(sub_department_name).pluck(:id)
+
+      filtered_ids = PurchaseOrder.filter_sub_department_id(sub_department_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_vendor, -> (vendor_name, user_id){
+    user = User.find user_id
+    if user.present?
+      vendor_ids = user.company.yes_bank_vendors.filter_name_search(vendor_name).pluck(:id)
+
+      filtered_ids = PurchaseOrder.filter_vendor_id(vendor_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_user, -> (user_details, user_id){
+    user = User.find user_id
+
+    if user.present?
+      user_ids = user.company.users.filter_search(user_details).pluck(:id)
+
+      filtered_ids = user.company.purchase_orders.filter_user_id(user_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
   }
 
   scope :filter_invoice_number, -> (invoice_number) {
@@ -72,14 +109,14 @@ class Procurement < ActiveRecord::Base
     where id: filtered_ids
   }
 
-  scope :filter_vendor_name, -> (name) {
-    vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
-
-    procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
-    procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
-
-    where(id: procurement_ids)
-  }
+  # scope :filter_vendor_name, -> (name) {
+  #   vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
+  #
+  #   procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
+  #   procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
+  #
+  #   where(id: procurement_ids)
+  # }
 
   scope :filter_status_tags, -> (ids) {
     all_status_tag_ids = StatusTag.all.pluck(:id)
@@ -90,6 +127,39 @@ class Procurement < ActiveRecord::Base
 
     where(id: filter_procurement_ids)
   }
+
+  scope :filter_awaiting_approval, -> (user) {
+    if user.vendor_payments_reviewer?
+      level_ids = []
+      policies = user.company.policies.with_application(:vp)
+      policies.each do |policy|
+        levels = policy.levels.with_entity_type('PurchaseOrder')
+        levels.each do |level|
+          if level.reviewers.pluck(:id).include? user.id
+            level_ids.push(level.id)
+          end
+        end
+      end
+
+      # Find all the purchase order with controlling level from above
+      purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
+      # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
+      purchase_order_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+      other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+
+      purchase_order_ids -= other_reviewer_po_ids
+
+      purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids).with_status_ids(PurchaseOrderStatus.id_for(:processing))
+
+      all_level_ids = purchase_orders.pluck(:controlling_level_id)
+
+      purchase_orders = purchase_orders.with_controlling_level_ids(level_ids & all_level_ids)
+
+      where(id: purchase_orders.pluck(:procurement_id))
+    end
+  }
+
 
   scope :include_details, -> {
     includes(
@@ -127,8 +197,119 @@ class Procurement < ActiveRecord::Base
           break
         end
       end
-
       awaiting_action
+    end
+  end
+
+  def status_tag_details
+    tag_ids = self.status_tags.pluck(:id)
+
+    data = {
+        invoice: {},
+        shipment: {},
+        payment: {}
+    }
+
+    if tag_ids.include?(StatusTag.id_for(:payment_processed))
+      data[:payment][:status] = 'complete'
+      data[:status_message] = 'Transaction Complete'
+      data[:status_text] = 'Complete. No Pending Actions'
+      data[:status_type] = 'payment'
+    elsif tag_ids.include?(StatusTag.id_for(:payment_processing))
+      data[:payment][:status] = 'processing'
+      data[:status_message] = 'Payment Processing'
+      data[:status_text] = 'Payment Processing'
+      data[:status_type] = 'payment'
+    else
+      data[:payment][:status] = 'init'
+      data[:status_message] = 'Payment Processing'
+      data[:status_text] = 'Awaiting Payment'
+      data[:status_type] = 'payment'
+    end
+
+    if tag_ids.include?(StatusTag.id_for(:shipment_received))
+      data[:shipment][:status] = 'complete'
+    elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
+      data[:shipment][:status] = 'processing'
+      data[:status_message] = 'Awaiting Shipment'
+      data[:status_text] = 'Shipment Pending'
+      data[:status_type] = 'shipment'
+    else
+      data[:shipment][:status] = 'init'
+      data[:status_message] = 'Awaiting Shipment'
+      data[:status_text] = 'Shipment Pending'
+      data[:status_type] = 'shipment'
+    end
+
+    if tag_ids.include? StatusTag.id_for(:invoice_approved)
+      data[:invoice][:status] = 'complete'
+    elsif (tag_ids.include? StatusTag.id_for(:invoice_processing)) || (tag_ids.include? StatusTag.id_for(:invoice_received))
+      data[:invoice][:status] = 'processing'
+      data[:status_message] = 'Invoice Processing'
+      data[:status_text] = 'Invoice Approval is Pending'
+      data[:status_type] = 'invoice'
+    else
+      data[:invoice][:status] = 'init'
+      data[:status_type] = 'invoice'
+      if self.invoices.present?
+        data[:status_message] = 'Invoice Processing'
+        data[:status_text] = 'Invoice Approval is Pending'
+      else
+        data[:status_message] = 'Awaiting Invoice'
+        data[:status_text] = 'Invoice Upload Pending'
+      end
+
+    end
+
+    if procurement_type == 'purchase_order'
+      data[:purchase_order] = {}
+      if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
+        data[:purchase_order][:status] = 'complete'
+      elsif tag_ids.include? StatusTag.id_for(:po_processing)
+        data[:purchase_order][:status] = 'processing'
+        data[:status_message] = 'PO Processing'
+        data[:status_text] = 'PO Approval is Pending'
+        data[:status_type] = 'purchase_order'
+      else
+        data[:purchase_order][:status] = 'init'
+        data[:status_message] = 'PO Processing'
+        data[:status_text] = 'PO Approval is Pending'
+        data[:status_type] = 'purchase_order'
+      end
+    end
+
+    data
+  end
+
+  def last_updated_at
+    self.documents.map(&:updated_at).sort!.reverse!.first
+  end
+
+  def documents
+    data = []
+    data.push self.purchase_order if self.purchase_order.present?
+
+    invoices = self.invoices&.to_a
+    data += invoices
+    data += self.inward_documents&.to_a
+    # data += self.payments&.to_a
+
+    invoices.each do |invoice|
+      data += invoice.payments
+    end
+
+    data.sort_by!{ |doc| doc.created_at}.reverse!
+  end
+
+  def vendor
+    type_entity&.vendor
+  end
+
+  def type_entity
+    if procurement_type == 'purchase_order'
+      purchase_order
+    elsif procurement_type == 'invoice'
+      invoices&.first
     end
   end
 

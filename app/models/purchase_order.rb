@@ -44,22 +44,26 @@
 #  sub_department_id            :integer
 #  billing_address              :text(65535)
 #  shipping_address             :text(65535)
+#  is_template                  :boolean          default(FALSE)
+#  template_name                :string(255)
+#  resource_template_id         :integer
 #
 
 class PurchaseOrder < ActiveRecord::Base
-  include SoftDeletable
+  include SoftDeletable, Templatable
   belongs_to :company
   belongs_to :user
   belongs_to :procurement
-  belongs_to :location, class_name: "BranchLocation"
-  belongs_to :delivery_location, class_name: "BranchLocation"
-  belongs_to :vendor, class_name: "YesBankVendor"
+  belongs_to :location, class_name: 'BranchLocation'
+  belongs_to :delivery_location, class_name: 'BranchLocation'
+  belongs_to :vendor, class_name: 'YesBankVendor'
   belongs_to :payment_term
   belongs_to :procurement_term
   belongs_to :status, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
   belongs_to :department
   belongs_to :sub_department, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center
+  belongs_to :gst_type
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
@@ -107,6 +111,7 @@ class PurchaseOrder < ActiveRecord::Base
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
   scope :filter_po_number, -> (po_number) {where('purchase_orders.po_number LIKE ?', "%#{po_number}%")}
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+  scope :with_po_number, -> (po_number) {where po_number: po_number}
 
   # Used for generating document number
   scope :valid, -> {
@@ -125,9 +130,51 @@ class PurchaseOrder < ActiveRecord::Base
     # where(id: ids)
   }
 
+  scope :filter_sub_department_id, -> (ids) {
+    where sub_department_id: ids
+  }
+
+  scope :filter_vendor_id, -> (ids){
+    where vendor_id: ids
+  }
+
+  scope :filter_user_id, -> (ids){
+    where user_id: ids
+  }
+
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
+
+
+  template_config do
+    include_association [:policy, :location, :delivery_location, :vendor,
+                          :payment_term, :procurement_term, :department,
+                          :sub_department, :cost_center]
+    clone [:extra_charges, :items, :document_level_reviewer_mappings, :total_before_tax,
+           :tax_amount, :total_after_tax, :discount_amount, :custom_fields]
+
+    customize(lambda { |po,new_po|
+      new_po.trails.destroy_all
+      new_po.comments.destroy_all
+      new_po.attachments.destroy_all
+    })
+
+    nullify :procurement_id
+    nullify :po_number
+    nullify :is_template
+    nullify :template_name
+    nullify :controlling_level_id
+    nullify :controlling_user_id
+    nullify :controlling_for_user_id
+    nullify :controlling_user_role_id
+    nullify :controlling_for_user_role_id
+    nullify :balance_amount_id
+    set :purchase_order_status_id => PurchaseOrderStatus.id_for(:open)
+    nullify :user_id
+  end
+
+  template_merge :procurement_id, :user_id, :vendor_id
 
   def all_items_shipped?
     shipped = true
@@ -140,8 +187,18 @@ class PurchaseOrder < ActiveRecord::Base
     shipped
   end
 
-  private
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.po_number,
+        amount: self.balance_amount&.value,
+        document_status: self.status&.name,
+        document_owner: self.user&.name,
+        document_type: self.class.name
+    }
+  end
 
+  private
 
   def calculate_line_items
     total_before_tax_amount = 0

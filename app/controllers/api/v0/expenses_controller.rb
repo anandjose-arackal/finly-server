@@ -14,7 +14,7 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         respond render: 'api/v0/reports/show'
       else
-        respond render: 'api/v0/expenses/show'
+        respond render: 'api/v0/shared/success'
       end
     else
       respond

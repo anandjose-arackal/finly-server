@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :policies
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
-    self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
+    self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
   end
 
   def validate
@@ -88,6 +88,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         }
         actions[:policy_editable] = true
         actions[:document_editable] = true
+        actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
       end
 
       if purchase_order.approved? || purchase_order.auto_approved?
@@ -120,6 +121,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
               method: "PUT"
           }
           actions[:document_editable] = true
+          actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
         end
         if document_owner?
           actions[:retract] = {
@@ -131,7 +133,17 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
               method: "PUT"
           }
           actions[:document_editable] = false
+          actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
         end
+      end
+
+      if user.vendor_payment_admin?
+        actions[:document_editable] = true
+        actions[:save] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
+            method: "PUT"
+        }
+        actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
       end
 
       actions

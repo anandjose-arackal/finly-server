@@ -38,8 +38,12 @@
 #  scheduled_at                   :date
 #  processed_at                   :date
 #  cost_center_id                 :integer
-#  transaction_reference_id       :string(255)
+#  company_id                     :integer
+#  external_reference_id          :integer
 #
+
+
+
 
 
 
@@ -294,8 +298,33 @@ class Payment < ActiveRecord::Base
     where payment_status_id: [PaymentStatus.id_for(:pending_approval), PaymentStatus.id_for(:failed), PaymentStatus.id_for(:pending_credit)]
   }
 
+  scope :virtual_account_transaction_purpose, -> (purpose_id) {
+    virtual_account_transaction_ids = self.where(reference_resource_type: "VirtualAccountTransaction").pluck(:reference_resource_id)
+    virtual_account_transactions = VirtualAccountTransaction.where(id: virtual_account_transaction_ids)
+    virtual_accounts = VirtualBankAccount.where(id: virtual_account_transactions.pluck(:virtual_account_id))
+    case purpose_id
+      when 1, '1'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return)).pluck(:id)
+      when 2, '2'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:payment_receivable)).pluck(:id)
+      when 3, '3'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:invoice)).pluck(:id)
+      when 4, '4'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:virtual_bank_account)).pluck(:id)
+      when 5, '5'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:corporate_account_reload)).pluck(:id)
+      when 6, '6'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:finly_money_reload)).pluck(:id)
+      else
+        virtual_account_ids = []
+    end
+    virtual_account_transactions = virtual_account_transactions.where(virtual_account_id: virtual_account_ids)
+    where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
+  # validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
   # validates :initiating_user_id, presence: true
   # validates :receiving_user_id, presence: true
   validate :initiating_user_presence
@@ -441,6 +470,17 @@ class Payment < ActiveRecord::Base
 
   def company_id
     self.payment_order.company_id
+  end
+
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.id,
+        amount: self.amount.value,
+        document_owner: self.initiating_user&.name,
+        document_status: self.payment_status&.name,
+        document_type: self.class.name
+    }
   end
 
   private

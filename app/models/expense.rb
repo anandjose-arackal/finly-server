@@ -130,6 +130,16 @@ class Expense < ActiveRecord::Base
         self.expense_status_id = ExpenseStatus.unsubmitted_id
       end
     end
+    if self.spent_from&.reimbursement?
+      self.reimbursable = true
+      self.from_cash_on_hand = false
+    elsif self.spent_from&.paid_by_company?
+      self.reimbursable = false
+      self.from_cash_on_hand = false
+    else
+      self.reimbursable = false
+      self.from_cash_on_hand = true
+    end
     compute_gst_amount
     compute_tds_amount
   end
@@ -162,7 +172,7 @@ class Expense < ActiveRecord::Base
     with_id(cancelled_expense_ids)
   }
 
-  scope :reimbursable, -> {where reimbursable: true}
+  scope :reimbursable, -> {where spent_from_id: true}
   scope :non_reimbursable, -> {where reimbursable: false}
 
   scope :quickbooks_non_reimbursable, -> {where reimbursable: [false, nil]}
@@ -317,7 +327,7 @@ class Expense < ActiveRecord::Base
                                                                       ExpenseType.id_for(:per_diem)])}
   scope :only_reimbursable_expenses, -> {where(reimbursable: true)}
   scope :spent_from_cash_on_hand, -> {
-    where.not(spent_from_id: nil)
+    where(from_cash_on_hand: true)
   }
   scope :blocked_against_cash_on_hand, -> {where cash_on_hand_blocked: true}
 
@@ -423,6 +433,32 @@ class Expense < ActiveRecord::Base
     where('(expenses.expense_status_id IN (?) AND expenses.report_id IS NOT NULL) OR (expenses.expense_status_id = ? AND expenses.expense_type_id = ?)', [ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:submitted), ExpenseStatus.id_for(:verified)], ExpenseStatus.id_for(:unreported), ExpenseType.id_for(:card)).
         where('expenses.date >= ? AND expenses.date <= ?', from, to)
   }
+
+  scope :include_spent_from_calculation, ->{ includes([{amount: [:currency]}], {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]})}
+
+  scope :include_details, -> {includes(
+      [
+          {amount: [:currency]}, :expense_status,
+          :report,
+          {user: [{policies: [
+          {vehicle_rates: [{rate: [:currency]},
+                           :distance_unit]}, :distance_expense_config]}]}, :expense_type, :category,
+          {surcharge: [:currency]}, {tds_amount: [:currency]},
+          {gst_amount: [:currency]}, :expense_tax_type, :gst_type, :tds_slab,
+          {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]}, :receipts, :system_messages,
+          :duplicate_expense_mappings,
+          {manual_expense: [custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]]},
+          {card_expense: [custom_fields: [:field_configuration]]},
+          {distance_expense: [{custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]}, :distance,
+                              :maps_distance, :locations, :type, :odometer_reading_receipt_start,
+                              :odometer_reading_receipt_end,
+                              {vehicle_rate: [{rate: [:currency]}]},
+                              :distance_rate, :distance_unit]},
+          {time_expense: [custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]]},
+          {per_diem_expense: [{custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]}, :per_diem]},
+          :payment
+      ]
+  )}
 
   # scope :category_budget_expenses, -> {
   #   where('expenses.category_id = ?')
@@ -1003,12 +1039,12 @@ class Expense < ActiveRecord::Base
     days
   end
 
-  def from_cash_on_hand
-    if self.spent_from.present?
-      return true
-    end
-    false
-  end
+  # def from_cash_on_hand
+  #   if self.spent_from.present? and not (self.spent_from.paid_by_company? or self.spent_from.reimbursement?)
+  #     return true
+  #   end
+  #   false
+  # end
 
   def check_spent_from?
     return false if reimbursable

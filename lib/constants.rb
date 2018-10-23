@@ -21,15 +21,15 @@ module Constants
   end
 
   # todo - to be removed once companies are done mirating from HDFC to RBL
-  MIGRATING_COMPANIES = [51, 48, 81]
+  MIGRATING_COMPANIES = [10, 67]
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
-  PRODUCT_DEMO_EMAIL_ID = ['poojitha.shetty@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io', 'venu.reddy@finly.io']
-  RESOURCE_DOWNLOAD_EMAIL_ID = ['poojitha.shetty@finly.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'admin@finlytest.io']
 
@@ -80,7 +80,7 @@ module Constants
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io anushrut.khare@finly.io venky.d@finly.io kartik.k@finly.io abhinandan.k@finly.io)
+    TRANSCRIBER_EMAILS = %w(abhinandan.k@finly.io rakesh.g@finly.io)
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end

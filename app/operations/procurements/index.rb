@@ -63,7 +63,6 @@ class Procurements::Index < Procurements::Base
     invoice_status_ids = [InwardInvoiceStatus.id_for(:approved), InwardInvoiceStatus.id_for(:unpaid), InwardInvoiceStatus.id_for(:partially_paid), InwardInvoiceStatus.id_for(:paid)]
     procurement_ids += user.company.inward_invoices.with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)
 
-
     # If admin, select all procurements
     if user.vendor_payment_admin?
       procurement_ids += user.company.purchase_orders.pluck(:procurement_id)
@@ -83,6 +82,9 @@ class Procurements::Index < Procurements::Base
 
     has_scope :filter_status_tags, type: :array
     has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number
+    has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
+    has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
+    has_scope :filter_user, using: [:user_details, :user_id], type: :hash
 
     def init
       self.procurements = params[:procurements]
@@ -98,6 +100,10 @@ class Procurements::Index < Procurements::Base
         set_scope
         self.procurements = apply_scopes(self.procurements, params)
       end
+
+      if params[:filter_awaiting_approval].present?
+        self.procurements = self.procurements.filter_awaiting_approval(user)
+      end
     end
 
     def awaiting_action?(procurement)
@@ -105,12 +111,29 @@ class Procurements::Index < Procurements::Base
     
     def set_scope
       case params[:search_type]
-        when 'vendor_name'
-          params[:filter_vendor_name] = params[:search_query]
+        # when 'vendor_name'
+        #   params[:filter_vendor_name] = params[:search_query]
         when 'invoice_number'
           params[:filter_invoice_number] = params[:search_query]
         when 'po_number'
           params[:filter_po_number] = params[:search_query]
+        when 'procurement_name'
+          params[:filter_procurement_name] = params[:search_query]
+        when 'sub_department_name'
+          params[:filter_sub_department] = {
+              sub_department_name: params[:search_query],
+              user_id: user.id
+          }
+        when 'vendor_name'
+          params[:filter_vendor] = {
+              vendor_name: params[:search_query],
+              user_id: user.id
+          }
+        when 'user_details'
+          params[:filter_user] = {
+              user_details: params[:search_query],
+              user_id: user.id
+          }
         else
           # do nothing
       end

@@ -2,8 +2,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   attr_accessor :invoice
 
   def init
-    invoice_id = params[:id] || params[:invoice_id]
-    self.invoice = Invoice.find_by id: invoice_id
+    invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
+    self.invoice = user.company.inward_invoices.find_by id: invoice_id
   end
 
   def validate
@@ -19,7 +19,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
-                  :tax_rates, :locations
+                  :tax_rates, :locations, :budgets
 
     def init
       self.invoice = params[:invoice]
@@ -39,6 +39,12 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       self.actions = get_actions
 
+      if self.invoice.items.present?
+        op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
+        if op.success?
+          self.budgets = op.budget_data
+        end
+      end
 
       params[:reviewal_document] = invoice
 
@@ -57,6 +63,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       actions = {}
       actions[:audit_trail] = true
 
+      if self.invoice.items.count > 0
+        actions[:show_comments] = true
+      end
 
       if document_owner? && (self.invoice.open? || self.invoice.retracted? || self.invoice.rejected?)
         actions[:policy_editable] = get_policy_editable

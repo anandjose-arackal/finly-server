@@ -52,6 +52,25 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
 
       current_expense_params[:expense_type_id] = ExpenseType.per_diem_expense_id
 
+      pocket_id = current_expense_params[:spent_from_id]
+      if pocket_id.blank?
+        reimbursable = params_each_expense&.dig(:expense, :reimbursable)
+        from_cash_on_hand = params_each_expense&.dig(:expense, :from_cash_on_hand)
+        if reimbursable
+          pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
+        elsif from_cash_on_hand
+          pocket_id = user.user_pockets.cash_pockets_only&.first&.id
+        else
+          pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+        end
+      end
+      cash_pocket = user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id)
+
+      if cash_pocket.blank?
+        cash_pocket = user.user_pockets.cash_pockets_only.first
+      end
+      current_expense_params[:spent_from_id] = cash_pocket&.id
+
       multiple_expenses[key] = {}
 
       if params_each_expense[:receipt_id].present?
@@ -149,9 +168,9 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
 
 
       expense = value[:expense]
-      if expense.reimbursable && expense.from_cash_on_hand
-        self.errors_by_expenses[key][:error] += ["Expense cannot be both reimbursable and from cash on hand"]
-      end
+      # if expense.reimbursable && expense.from_cash_on_hand
+      #   self.errors_by_expenses[key][:error] += ["Expense cannot be both reimbursable and from cash on hand"]
+      # end
 
 
 

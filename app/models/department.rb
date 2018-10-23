@@ -30,7 +30,19 @@ class Department < ActiveRecord::Base
   #   where(id: Department.pluck(:ancestry).compact.map { |e| e.split('/') }.flatten.uniq)
   # }
 
+  scope :filter_name, -> (name) {
+    where("departments.name like ?", "%#{name}%")
+  }
+
   scope :only_sub_departments, -> {
     where("departments.ancestry IS NOT NULL")
   }
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

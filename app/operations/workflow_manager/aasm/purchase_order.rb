@@ -100,7 +100,6 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     # total_amount = purchase_order.total_amount
     self.current_level = ReviewalLevel.with_id(purchase_order.controlling_level_id).first
     level_number = current_level.present? ? (current_level.level_number + 1) : 1
-
     self.next_level = self.policy.levels.with_entity_type(purchase_order.class.name).with_level_number(level_number).first
   end
 end

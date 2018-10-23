@@ -1,6 +1,6 @@
 json.distance_config do
   json.enabled @result.distance_config[:enabled]
-  json.rate @result.distance_config[:rate]
+  json.vehicle_rates @result.distance_config[:vehicle_rates]
   json.default_category_id @result.distance_config[:default_category_id]
 end
 json.time_config do
@@ -48,14 +48,9 @@ json.cash_pockets do
       json.can_claim_reimbursement true
       json.balance adapter&.balance(display_balance: true)
       json.display_balance true
-    elsif pocket.credit_card_pocket?
-      # adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
-      json.can_claim_reimbursement false
-      json.balance 0
-      json.display_balance false
     else
-      adapter = nil
       json.can_claim_reimbursement false
+      json.display_balance false
     end
     json.name pocket.name
     json.id pocket.id

@@ -114,6 +114,7 @@ class Expense::Index < Expense::Base
         else
           self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)
         end
+        self.paginated_expenses = self.paginated_expenses.include_details
       end
       self.categories = user.company.active_categories
     end
@@ -132,6 +133,32 @@ class Expense::Index < Expense::Base
       else
         self.expenses = expenses&.non_personal
       end
+    end
+
+    def cash_pockets
+      list = []
+      user.user_pockets.non_bank_card_transfer_pockets.include_details.each do |pocket|
+        hash = {}
+        if pocket.cash_pocket?
+          adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+          hash[:balance] = adapter&.balance(display_balance: true)
+          hash[:display_balance] = true
+        else
+          hash[:balance] = 0
+          hash[:display_balance] = false
+        end
+        hash[:name] = pocket.name
+        hash[:id] = pocket.id
+
+        currency = pocket.base_currency
+        hash[:base_currency] = {
+            symbol: currency&.symbol,
+            country_code: currency&.country_code,
+            id: currency&.id
+        }
+        list << hash
+      end
+      list
     end
   end
 

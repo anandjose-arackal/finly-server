@@ -897,6 +897,7 @@
 #                      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)                                                                       statements#company_balance_summary
 #                 statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)                                                                  statements#company_transactions_summary
 #                     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)                                                                      statements#company_policies_summary
+#                                                         GET    /exports/:type(.:format)                                                                                            export#processor
 #                                 statements_user_summary GET    /statements/user_summary(.:format)                                                                                  statements#user_summary
 #                          statements_user_summary_export GET    /statements/user_summary/export(.:format)                                                                           statements#user_summary_export
 #                                                         POST   /statements/user_summary(.:format)                                                                                  statements#user_summary
@@ -1328,6 +1329,8 @@
 #                                                         PATCH  /invoicing/virtual_bank_accounts/:id(.:format)                                                                      invoicing/virtual_bank_accounts#update
 #                                                         PUT    /invoicing/virtual_bank_accounts/:id(.:format)                                                                      invoicing/virtual_bank_accounts#update
 #                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                                                      invoicing/virtual_bank_accounts#destroy
+#                                  invoicing_transactions GET    /invoicing/transactions(.:format)                                                                                   invoicing/transactions#index
+#                                         invoicing_count GET    /invoicing/transactions/count(.:format)                                                                             invoicing/transactions#count
 #                            invoicing_categories_invoice GET    /invoicing/categories/invoice(.:format)                                                                             invoicing/categories#invoice_categories
 #                 invoicing_categories_invoice_line_items GET    /invoicing/categories/invoice_line_items(.:format)                                                                  invoicing/categories#invoice_items_categories
 #                        invoicing_invoice_number_configs GET    /invoicing/invoice_number_configs(.:format)                                                                         invoicing/invoice_number_configs#index
@@ -1355,6 +1358,8 @@
 #                                                         DELETE /invoicing/company_configurations/:id(.:format)                                                                     invoicing/company_configurations#destroy
 #                    invoicing_inventory_line_items_count GET    /invoicing/inventory_line_items/count(.:format)                                                                     invoicing/inventory_line_items#count
 #                         invoicing_inventory_item_config GET    /invoicing/inventory_item_config(.:format)                                                                          invoicing/inventory_line_items#inventory_item_config
+#                   invoicing_inventory_line_items_import PUT    /invoicing/inventory_line_items/import(.:format)                                                                    invoicing/inventory_line_items#import
+#          invoicing_inventory_line_items_import_template GET    /invoicing/inventory_line_items/import_template(.:format)                                                           invoicing/inventory_line_items#import_template
 #                          invoicing_inventory_line_items GET    /invoicing/inventory_line_items(.:format)                                                                           invoicing/inventory_line_items#index
 #                                                         POST   /invoicing/inventory_line_items(.:format)                                                                           invoicing/inventory_line_items#create
 #                       new_invoicing_inventory_line_item GET    /invoicing/inventory_line_items/new(.:format)                                                                       invoicing/inventory_line_items#new
@@ -1418,6 +1423,10 @@
 #                                                         PUT    /procure/procurements/:id(.:format)                                                                                 procure/procurements#update
 #                                                         DELETE /procure/procurements/:id(.:format)                                                                                 procure/procurements#destroy
 #                    procure_purchase_orders_bulk_approve PUT    /procure/purchase_orders/bulk_approve(.:format)                                                                     procure/purchase_orders#bulk_approve
+#                       procure_purchase_orders_templates GET    /procure/purchase_orders/templates(.:format)                                                                        procure/purchase_orders#template_index
+#                                                 procure GET    /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_show
+#                                                         PATCH  /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_update
+#                                                         DELETE /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_destroy
 #                        procure_purchase_order_send_mail POST   /procure/purchase_orders/:purchase_order_id/send_mail(.:format)                                                     procure/purchase_orders#send_mail
 #                           procure_purchase_order_submit PUT    /procure/purchase_orders/:purchase_order_id/submit(.:format)                                                        procure/purchase_orders#submit
 #                          procure_purchase_order_retract PUT    /procure/purchase_orders/:purchase_order_id/retract(.:format)                                                       procure/purchase_orders#retract
@@ -1426,6 +1435,8 @@
 #                            procure_purchase_order_close PUT    /procure/purchase_orders/:purchase_order_id/close(.:format)                                                         procure/purchase_orders#close
 #                         procure_purchase_order_download GET    /procure/purchase_orders/:purchase_order_id/download_pdf(.:format)                                                  procure/purchase_orders#download
 #                           procure_purchase_order_remind PUT    /procure/purchase_orders/:purchase_order_id/remind(.:format)                                                        procure/purchase_orders#remind
+#                 procure_purchase_order_save_as_template POST   /procure/purchase_orders/:purchase_order_id/save_as_template(.:format)                                              procure/purchase_orders#template_create
+#                   procure_purchase_order_apply_template POST   /procure/purchase_orders/:purchase_order_id/apply_template(.:format)                                                procure/purchase_orders#template_apply
 #                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#index
 #                                                         POST   /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#create
 #                              new_procure_purchase_order GET    /procure/purchase_orders/new(.:format)                                                                              procure/purchase_orders#new
@@ -1443,13 +1454,28 @@
 #                                                         PUT    /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#update
 #                                                         DELETE /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#destroy
 #                                         procure_payment GET    /procure/payments/:id(.:format)                                                                                     procure/payments#show
-#                                     procure_attachments POST   /procure/attachments(.:format)                                                                                      procure/attachments#create
+#                                     procure_attachments GET    /procure/attachments(.:format)                                                                                      procure/attachments#index
+#                                                         POST   /procure/attachments(.:format)                                                                                      procure/attachments#create
+#                                  new_procure_attachment GET    /procure/attachments/new(.:format)                                                                                  procure/attachments#new
+#                                 edit_procure_attachment GET    /procure/attachments/:id/edit(.:format)                                                                             procure/attachments#edit
+#                                      procure_attachment GET    /procure/attachments/:id(.:format)                                                                                  procure/attachments#show
+#                                                         PATCH  /procure/attachments/:id(.:format)                                                                                  procure/attachments#update
+#                                                         PUT    /procure/attachments/:id(.:format)                                                                                  procure/attachments#update
+#                                                         DELETE /procure/attachments/:id(.:format)                                                                                  procure/attachments#destroy
 #                                  procure_create_from_po POST   /procure/inward_invoices/create_from_po(.:format)                                                                   procure/inward_invoices#create_from_po
+#                       procure_inward_invoices_templates GET    /procure/inward_invoices/templates(.:format)                                                                        procure/inward_invoices#template_index
+#                                                         GET    /procure/inward_invoices/templates/:id(.:format)                                                                    procure/inward_invoices#template_show
+#                                                         PATCH  /procure/inward_invoices/templates/:id(.:format)                                                                    procure/inward_invoices#template_update
+#                                                         DELETE /procure/inward_invoices/templates/:id(.:format)                                                                    procure/inward_invoices#template_destroy
+#                 procure_inward_invoices_import_template GET    /procure/inward_invoices/import_template(.:format)                                                                  procure/inward_invoices#import_template
+#                          procure_inward_invoices_import POST   /procure/inward_invoices/import(.:format)                                                                           procure/inward_invoices#import
 #                           procure_inward_invoice_submit PUT    /procure/inward_invoices/:inward_invoice_id/submit(.:format)                                                        procure/inward_invoices#submit
 #                          procure_inward_invoice_retract PUT    /procure/inward_invoices/:inward_invoice_id/retract(.:format)                                                       procure/inward_invoices#retract
 #                          procure_inward_invoice_approve PUT    /procure/inward_invoices/:inward_invoice_id/approve(.:format)                                                       procure/inward_invoices#approve
 #                           procure_inward_invoice_reject PUT    /procure/inward_invoices/:inward_invoice_id/reject(.:format)                                                        procure/inward_invoices#reject
 #                            procure_inward_invoice_close PUT    /procure/inward_invoices/:inward_invoice_id/close(.:format)                                                         procure/inward_invoices#close
+#                 procure_inward_invoice_save_as_template POST   /procure/inward_invoices/:inward_invoice_id/save_as_template(.:format)                                              procure/inward_invoices#template_create
+#                   procure_inward_invoice_apply_template POST   /procure/inward_invoices/:inward_invoice_id/apply_template(.:format)                                                procure/inward_invoices#template_apply
 #                                 procure_inward_invoices GET    /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#index
 #                                                         POST   /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#create
 #                              new_procure_inward_invoice GET    /procure/inward_invoices/new(.:format)                                                                              procure/inward_invoices#new
@@ -2766,6 +2792,8 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
+  get 'exports/:type', to: 'export#processor'
+
   get 'statements/user_summary' => 'statements#user_summary'
   get 'statements/user_summary/export' => 'statements#user_summary_export'
   post 'statements/user_summary' => 'statements#user_summary'
@@ -3107,6 +3135,9 @@ Rails.application.routes.draw do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
 
+    resources :transactions, only: [:index]
+    get 'transactions/count', to: 'transactions#count', as: :count
+
     get 'categories/invoice', to: 'categories#invoice_categories'
     get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'
 
@@ -3126,6 +3157,8 @@ Rails.application.routes.draw do
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     get 'inventory_item_config', to: 'inventory_line_items#inventory_item_config', as: :inventory_item_config
+    put 'inventory_line_items/import', to: 'inventory_line_items#import', as: :inventory_line_items_import
+    get 'inventory_line_items/import_template', to: 'inventory_line_items#import_template', as: :inventory_line_items_import_template
     resources :inventory_line_items
     resources :payment_terms
     resources :reminders
@@ -3172,6 +3205,13 @@ Rails.application.routes.draw do
 
 
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
+
+    get 'purchase_orders/templates', to: 'purchase_orders#template_index'
+    get 'purchase_orders/templates/:id', to: 'purchase_orders#template_show'
+    # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
+    patch 'purchase_orders/templates/:id', to: 'purchase_orders#template_update'
+    delete 'purchase_orders/templates/:id', to: 'purchase_orders#template_destroy'
+
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
@@ -3181,7 +3221,10 @@ Rails.application.routes.draw do
       put 'close', to: 'purchase_orders#close'
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
+      post 'save_as_template', to: 'purchase_orders#template_create'
+      post 'apply_template', to: 'purchase_orders#template_apply'
     end
+
 
     resources :inward_documents do
 
@@ -3189,14 +3232,27 @@ Rails.application.routes.draw do
 
     resources :payments, only: [:show]
 
-    resources :attachments, only: [:create]
+    resources :attachments
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
+
+
+
+    get 'inward_invoices/templates', to: 'inward_invoices#template_index'
+    get 'inward_invoices/templates/:id', to: 'inward_invoices#template_show'
+    # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
+    patch 'inward_invoices/templates/:id', to: 'inward_invoices#template_update'
+    delete 'inward_invoices/templates/:id', to: 'inward_invoices#template_destroy'
+
+    get 'inward_invoices/import_template', to: 'inward_invoices#import_template'
+    post '/inward_invoices/import', to: 'inward_invoices#import'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
       put 'approve', to: 'inward_invoices#approve'
       put 'reject', to: 'inward_invoices#reject'
       put 'close', to: 'inward_invoices#close'
+      post 'save_as_template', to: 'inward_invoices#template_create'
+      post 'apply_template', to: 'inward_invoices#template_apply'
     end
 
     resources :delivery_challans

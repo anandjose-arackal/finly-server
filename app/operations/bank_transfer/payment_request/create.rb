@@ -211,6 +211,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     }
     p[:description] = params[:description]
     p[:beneficiary_type_id] = retrieve_beneficiary_type
+    p[:name] = params[:name]
     p[:policy_id] = self.policy_id
     p[:payment_order_attributes] = {}
     p[:payment_order_attributes][:initiating_user] = user
@@ -264,6 +265,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               value: order_details[:original_amount],
               currency_id: Currency.first.id
           },
+          api_initiated: params[:api_initiated],
+          # external_reference_id: order_details[:external_reference_id],
           note: order_details[:note],
           category_id: order_details[:category_id],
           date: DateUtils.local_date,

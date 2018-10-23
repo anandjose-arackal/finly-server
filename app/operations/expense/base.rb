@@ -114,9 +114,9 @@ class Expense::Base < BaseOperation
     # from_cash_pockets = from_cash_pockets.blank? ? (expense.spent_from&.present? or StringUtils.to_bool(params[:from_cash_on_hand])) : from_cash_pockets
     reimbursable = StringUtils.to_bool(params&.dig(:reimbursable))
     reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
-    if from_cash_pockets and reimbursable
-      add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
-    end
+    # if from_cash_pockets and reimbursable
+    #   add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
+    # end
   end
 
   # ensuring that the an expense can't be both from cash on hand AND reimbursable during creation
@@ -169,7 +169,7 @@ class Expense::Base < BaseOperation
       self.vehicle_rates = retrieve_vehicle_rates(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
-      self.cash_pockets = expense.user.user_pockets.cash_and_credit_cards
+      self.cash_pockets = expense.user.user_pockets.non_bank_card_transfer_pockets
     end
 
     def retrieve_vehicle_rates(expense)
@@ -255,6 +255,32 @@ class Expense::Base < BaseOperation
               thumb: receipt.image.url(:thumb)
           }
       }
+    end
+
+    def cash_pockets
+      list = []
+      user.user_pockets.non_bank_card_transfer_pockets.include_details.each do |pocket|
+        hash = {}
+        if pocket.cash_pocket?
+          adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+          hash[:balance] = adapter&.balance(display_balance: true)
+          hash[:display_balance] = true
+        elsif pocket.credit_card_pocket?
+          hash[:balance] = 0
+          hash[:display_balance] = false
+        end
+        hash[:name] = pocket.name
+        hash[:id] = pocket.id
+
+        currency = pocket.base_currency
+        hash[:base_currency] = {
+            symbol: currency&.symbol,
+            country_code: currency&.country_code,
+            id: currency&.id
+        }
+        list << hash
+      end
+      list
     end
 
   end
