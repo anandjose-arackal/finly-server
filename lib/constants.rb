@@ -313,4 +313,23 @@ module Constants
 
   ###################### END OF Darwin Box ###########################
 
+
+  ################### Encryption Keys for Remunance ################
+
+  class Constants::Remunance
+    if Rails.env.production?
+      XOR_KEY = ''
+    else
+      XOR_KEY = '666666'
+    end
+
+    if Rails.env.production?
+      SHA512_KEY = ''
+    else
+      SHA512_KEY = '4150fb44a955a5ff0711f9a1c631a3ed'
+    end
+  end
+
+  ###################### END OF Remunance ###########################
+
 end
