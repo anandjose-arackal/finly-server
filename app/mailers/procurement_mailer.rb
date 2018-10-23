@@ -1,4 +1,5 @@
 class ProcurementMailer < ApplicationMailer
+  include MathUtil
   # def send_purchase_order(purchase_order, options)
   #   # @purchase_order = purchase_order
   #   # @options = options
