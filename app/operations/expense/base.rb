@@ -169,7 +169,7 @@ class Expense::Base < BaseOperation
       self.vehicle_rates = retrieve_vehicle_rates(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
-      self.cash_pockets = expense.user.user_pockets.cash_and_credit_cards
+      self.cash_pockets = expense.user.user_pockets.non_bank_card_transfer_pockets
     end
 
     def retrieve_vehicle_rates(expense)
@@ -259,7 +259,7 @@ class Expense::Base < BaseOperation
 
     def cash_pockets
       list = []
-      user.user_pockets.cash_and_credit_cards.include_details.each do |pocket|
+      user.user_pockets.non_bank_card_transfer_pockets.include_details.each do |pocket|
         hash = {}
         if pocket.cash_pocket?
           adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)

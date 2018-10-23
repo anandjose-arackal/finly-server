@@ -56,9 +56,7 @@ json.cash_pockets do
       adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
       json.balance adapter&.balance(display_balance: true)
       json.display_balance true
-    elsif pocket.credit_card_pocket?
-      # adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
-      json.balance 0
+    else
       json.display_balance false
     end
     json.name pocket.name

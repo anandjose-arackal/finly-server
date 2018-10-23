@@ -79,7 +79,7 @@ class Expense::Manual::Update < Expense::Manual::Base
         pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
       end
     end
-    self.cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id) || expense&.spent_from
+    self.cash_pocket = user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
 
     if self.cash_pocket.blank?
       self.cash_pocket = user.user_pockets.cash_pockets_only.first
