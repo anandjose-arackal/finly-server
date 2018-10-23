@@ -17,7 +17,7 @@ class DarwinboxSso::TokenController < Oauth::TokenController
       return
     end
     params[:username] = email # for the doorkeeper method that authenticates based on the key 'username'
-    params[:darwinbox_skip_password] = true # because this is used by doorkeeper to skip the password validation
+    params[:sso_skip_password] = true # because this is used by doorkeeper to skip the password validation
     # now implementing the SHA512 for the email and timestamp with the given key to check if
     # this particular user can be authenticated and logged into Finly
     finly_encrypted_hash = sha512_encrypted_email(email, timestamp)

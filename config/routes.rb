@@ -346,6 +346,7 @@
 #                                               chrome_v1 POST   /chrome/v1/emails/:id(.:format)                                                                                     chrome/v1/receipt_email#show
 #                                          api_fm_v1_auth POST   /api/fm/v1/auth(.:format)                                                                                           api/fm/v1/token#create
 #                                                         DELETE /api/fm/v1/auth(.:format)                                                                                           api/fm/v1/token#destroy
+#                                               api_fm_v1 PATCH  /api/fm/v1/users/deactivate/:id(.:format)                                                                           api/fm/v1/users#deactivate_user
 #                                         api_fm_v1_users GET    /api/fm/v1/users(.:format)                                                                                          api/fm/v1/users#index
 #                                                         POST   /api/fm/v1/users(.:format)                                                                                          api/fm/v1/users#create
 #                                          api_fm_v1_user GET    /api/fm/v1/users/:id(.:format)                                                                                      api/fm/v1/users#show
@@ -698,7 +699,7 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                                                        money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                                                        money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                                                        money_request#destroy
-#                                    darwinbox_create_sso POST   /oauth/sso_login(.:format)                                                                                          darwinbox_sso/token#create
+#                                              create_sso POST   /oauth/sso_login(.:format)                                                                                          sso/token#create
 #                                   travel_requests_count GET    /travel_requests/count(.:format)                                                                                    travel_requests#count
 #                                  travel_requests_config GET    /travel_requests/config(.:format)                                                                                   travel_requests#configuration
 #                                   travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                                                travel_requests#review
@@ -2335,6 +2336,7 @@ Rails.application.routes.draw do
       namespace :v1 do
         post 'auth', to: 'token#create'
         delete 'auth', to: 'token#destroy'
+        patch 'users/deactivate/:id', to: 'users#deactivate_user'
         resources :users, only: [:create, :show, :index, :update]
         resources :cards, only: [:index, :show]
         resources :cards do
@@ -2608,10 +2610,19 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
-  ############ Darwinbox SSO LOGIN APIs START ####################
-  post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
-  ######################################################
 
+  ######################## SSO LOGIN START #############################
+  post 'oauth/sso_login', to: 'sso/token#create', as: :create_sso
+  ######################################################################
+
+  # ############ Darwinbox SSO LOGIN APIs START #################################
+  # post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
+  # #############################################################################
+  #
+  # ############ Remunance SSO LOGIN APIs START #################################
+  # # post 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
+  # get 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
+  # ##############################################################################
 
   ######################### TRAVEL REQUESTS API START ##########################
 
