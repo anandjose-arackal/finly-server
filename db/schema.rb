@@ -1433,7 +1433,7 @@ ActiveRecord::Schema.define(version: 20181022195531) do
     t.string   "registered_mobile_number",         limit: 255
     t.string   "bank_type",                        limit: 255
     t.integer  "default_card_expense_category_id", limit: 4
-    t.boolean  "darwinbox_sso_enabled",                          default: false
+    t.boolean  "sso_enabled",                                    default: false
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -4628,6 +4628,17 @@ ActiveRecord::Schema.define(version: 20181022195531) do
     t.string   "company_name",       limit: 255
   end
 
+  create_table "sso_keys", force: :cascade do |t|
+    t.string   "xor_key",    limit: 255
+    t.string   "sha512_key", limit: 255
+    t.integer  "company_id", limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "token",      limit: 255
+  end
+
+  add_index "sso_keys", ["company_id"], name: "index_sso_keys_on_company_id", using: :btree
+
   create_table "states", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.string   "code",       limit: 255, null: false
@@ -5866,6 +5877,7 @@ ActiveRecord::Schema.define(version: 20181022195531) do
   add_foreign_key "reports", "users"
   add_foreign_key "resource_templates", "users"
   add_foreign_key "reviewal_levels", "policies"
+  add_foreign_key "sso_keys", "companies"
   add_foreign_key "tally_configurations", "companies"
   add_foreign_key "tax_rates", "companies"
   add_foreign_key "time_expenses", "expenses"

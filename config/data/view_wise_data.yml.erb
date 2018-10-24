@@ -215,9 +215,11 @@ views:
       # - name: <span class="superscript">Team</span> Money Requests
       #   url: requests
       #   id: requests
-      - name: <span class="superscript">Team</span> Trips
-        url: travel_requests
-        id: travel_requests
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+        - name: <span class="superscript">Team</span> Trips
+          url: travel_requests
+          id: travel_requests
+      <% end %>
       - name: <span class="superscript">Team</span> Money Requests
         url: requests
         id: requests
