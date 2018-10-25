@@ -26,7 +26,6 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
       add_message :error, "Empty spreadsheet uploaded"
     end
 
-
     self.headers = retrieve_headers
     self.contents = []
   end

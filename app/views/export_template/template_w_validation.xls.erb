@@ -36,12 +36,12 @@
           <% item_contents&.each do |item| %>
             <ss:Row>
               <% item.each do |value| %>
-                <% if value.index("---error---") %>
+                <% if value.present? && value.index("---error---") %>
                   <% value_content = value.split("---error---")[0] %>
                   <ss:Cell ss:StyleID="error">
                     <ss:Data ss:Type="String"><%= value_content %></ss:Data>
                   </ss:Cell>
-                <% elsif value.index("---warning---") %>
+                <% elsif value.present? && value.index("---warning---") %>
                   <% value_content = value.split("---warning---")[0] %>
                   <ss:Cell ss:StyleID="warning">
                     <ss:Data ss:Type="String"><%= value_content %></ss:Data>
@@ -93,12 +93,12 @@
         <% item_contents&.each do |item| %>
           <ss:Row>
             <% item.each do |value| %>
-              <% if value.index("---error---") %>
+              <% if value.present? && value.index("---error---") %>
                 <% value_content = value.split("---error---")[0] %>
                 <ss:Cell ss:StyleID="error">
                   <ss:Data ss:Type="String"><%= value_content %></ss:Data>
                 </ss:Cell>
-              <% elsif value.index("---warning---") %>
+              <% elsif value.present? && value.index("---warning---") %>
                 <% value_content = value.split("---warning---")[0] %>
                 <ss:Cell ss:StyleID="warning">
                   <ss:Data ss:Type="String"><%= value_content %></ss:Data>
