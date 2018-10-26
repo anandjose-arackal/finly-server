@@ -174,6 +174,8 @@ views:
 #        - name: Expense Management
 #          url: '/'
         <% end %>
+        - name: Statements
+          url: '#statements'
         <% if current_user.user_panel_subscription.disburse && current_user.company.cards_enabled? %>
 #        - name: Fund Disbursement
 #          url: '/disburse'

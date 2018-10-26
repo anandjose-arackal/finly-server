@@ -17,7 +17,7 @@
 #  registered_mobile_number         :string(255)
 #  bank_type                        :string(255)
 #  default_card_expense_category_id :integer
-#  darwinbox_sso_enabled            :boolean          default(FALSE)
+#  sso_enabled                      :boolean          default(FALSE)
 #
 
 class CompanyConfiguration < ActiveRecord::Base
@@ -29,7 +29,6 @@ class CompanyConfiguration < ActiveRecord::Base
   validates_attachment_content_type :logo, :content_type => ["image/jpg", "image/jpeg", "image/png", "image/gif"]
 
   validates :company_id, presence: true, uniqueness: true
-
 
 
 end

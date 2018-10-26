@@ -346,6 +346,7 @@
 #                                               chrome_v1 POST   /chrome/v1/emails/:id(.:format)                                                                                     chrome/v1/receipt_email#show
 #                                          api_fm_v1_auth POST   /api/fm/v1/auth(.:format)                                                                                           api/fm/v1/token#create
 #                                                         DELETE /api/fm/v1/auth(.:format)                                                                                           api/fm/v1/token#destroy
+#                                               api_fm_v1 PATCH  /api/fm/v1/users/deactivate/:id(.:format)                                                                           api/fm/v1/users#deactivate_user
 #                                         api_fm_v1_users GET    /api/fm/v1/users(.:format)                                                                                          api/fm/v1/users#index
 #                                                         POST   /api/fm/v1/users(.:format)                                                                                          api/fm/v1/users#create
 #                                          api_fm_v1_user GET    /api/fm/v1/users/:id(.:format)                                                                                      api/fm/v1/users#show
@@ -698,7 +699,7 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                                                        money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                                                        money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                                                        money_request#destroy
-#                                    darwinbox_create_sso POST   /oauth/sso_login(.:format)                                                                                          darwinbox_sso/token#create
+#                                              create_sso POST   /oauth/sso_login(.:format)                                                                                          sso/token#create
 #                                   travel_requests_count GET    /travel_requests/count(.:format)                                                                                    travel_requests#count
 #                                  travel_requests_config GET    /travel_requests/config(.:format)                                                                                   travel_requests#configuration
 #                                   travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                                                travel_requests#review
@@ -896,6 +897,7 @@
 #                      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)                                                                       statements#company_balance_summary
 #                 statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)                                                                  statements#company_transactions_summary
 #                     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)                                                                      statements#company_policies_summary
+#                                                         GET    /exports/:type(.:format)                                                                                            export#processor
 #                                 statements_user_summary GET    /statements/user_summary(.:format)                                                                                  statements#user_summary
 #                          statements_user_summary_export GET    /statements/user_summary/export(.:format)                                                                           statements#user_summary_export
 #                                                         POST   /statements/user_summary(.:format)                                                                                  statements#user_summary
@@ -1356,6 +1358,8 @@
 #                                                         DELETE /invoicing/company_configurations/:id(.:format)                                                                     invoicing/company_configurations#destroy
 #                    invoicing_inventory_line_items_count GET    /invoicing/inventory_line_items/count(.:format)                                                                     invoicing/inventory_line_items#count
 #                         invoicing_inventory_item_config GET    /invoicing/inventory_item_config(.:format)                                                                          invoicing/inventory_line_items#inventory_item_config
+#                   invoicing_inventory_line_items_import PUT    /invoicing/inventory_line_items/import(.:format)                                                                    invoicing/inventory_line_items#import
+#          invoicing_inventory_line_items_import_template GET    /invoicing/inventory_line_items/import_template(.:format)                                                           invoicing/inventory_line_items#import_template
 #                          invoicing_inventory_line_items GET    /invoicing/inventory_line_items(.:format)                                                                           invoicing/inventory_line_items#index
 #                                                         POST   /invoicing/inventory_line_items(.:format)                                                                           invoicing/inventory_line_items#create
 #                       new_invoicing_inventory_line_item GET    /invoicing/inventory_line_items/new(.:format)                                                                       invoicing/inventory_line_items#new
@@ -1419,6 +1423,10 @@
 #                                                         PUT    /procure/procurements/:id(.:format)                                                                                 procure/procurements#update
 #                                                         DELETE /procure/procurements/:id(.:format)                                                                                 procure/procurements#destroy
 #                    procure_purchase_orders_bulk_approve PUT    /procure/purchase_orders/bulk_approve(.:format)                                                                     procure/purchase_orders#bulk_approve
+#                       procure_purchase_orders_templates GET    /procure/purchase_orders/templates(.:format)                                                                        procure/purchase_orders#template_index
+#                                                 procure GET    /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_show
+#                                                         PATCH  /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_update
+#                                                         DELETE /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_destroy
 #                        procure_purchase_order_send_mail POST   /procure/purchase_orders/:purchase_order_id/send_mail(.:format)                                                     procure/purchase_orders#send_mail
 #                           procure_purchase_order_submit PUT    /procure/purchase_orders/:purchase_order_id/submit(.:format)                                                        procure/purchase_orders#submit
 #                          procure_purchase_order_retract PUT    /procure/purchase_orders/:purchase_order_id/retract(.:format)                                                       procure/purchase_orders#retract
@@ -1427,6 +1435,8 @@
 #                            procure_purchase_order_close PUT    /procure/purchase_orders/:purchase_order_id/close(.:format)                                                         procure/purchase_orders#close
 #                         procure_purchase_order_download GET    /procure/purchase_orders/:purchase_order_id/download_pdf(.:format)                                                  procure/purchase_orders#download
 #                           procure_purchase_order_remind PUT    /procure/purchase_orders/:purchase_order_id/remind(.:format)                                                        procure/purchase_orders#remind
+#                 procure_purchase_order_save_as_template POST   /procure/purchase_orders/:purchase_order_id/save_as_template(.:format)                                              procure/purchase_orders#template_create
+#                   procure_purchase_order_apply_template POST   /procure/purchase_orders/:purchase_order_id/apply_template(.:format)                                                procure/purchase_orders#template_apply
 #                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#index
 #                                                         POST   /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#create
 #                              new_procure_purchase_order GET    /procure/purchase_orders/new(.:format)                                                                              procure/purchase_orders#new
@@ -1444,13 +1454,28 @@
 #                                                         PUT    /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#update
 #                                                         DELETE /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#destroy
 #                                         procure_payment GET    /procure/payments/:id(.:format)                                                                                     procure/payments#show
-#                                     procure_attachments POST   /procure/attachments(.:format)                                                                                      procure/attachments#create
+#                                     procure_attachments GET    /procure/attachments(.:format)                                                                                      procure/attachments#index
+#                                                         POST   /procure/attachments(.:format)                                                                                      procure/attachments#create
+#                                  new_procure_attachment GET    /procure/attachments/new(.:format)                                                                                  procure/attachments#new
+#                                 edit_procure_attachment GET    /procure/attachments/:id/edit(.:format)                                                                             procure/attachments#edit
+#                                      procure_attachment GET    /procure/attachments/:id(.:format)                                                                                  procure/attachments#show
+#                                                         PATCH  /procure/attachments/:id(.:format)                                                                                  procure/attachments#update
+#                                                         PUT    /procure/attachments/:id(.:format)                                                                                  procure/attachments#update
+#                                                         DELETE /procure/attachments/:id(.:format)                                                                                  procure/attachments#destroy
 #                                  procure_create_from_po POST   /procure/inward_invoices/create_from_po(.:format)                                                                   procure/inward_invoices#create_from_po
+#                       procure_inward_invoices_templates GET    /procure/inward_invoices/templates(.:format)                                                                        procure/inward_invoices#template_index
+#                                                         GET    /procure/inward_invoices/templates/:id(.:format)                                                                    procure/inward_invoices#template_show
+#                                                         PATCH  /procure/inward_invoices/templates/:id(.:format)                                                                    procure/inward_invoices#template_update
+#                                                         DELETE /procure/inward_invoices/templates/:id(.:format)                                                                    procure/inward_invoices#template_destroy
+#                 procure_inward_invoices_import_template GET    /procure/inward_invoices/import_template(.:format)                                                                  procure/inward_invoices#import_template
+#                          procure_inward_invoices_import POST   /procure/inward_invoices/import(.:format)                                                                           procure/inward_invoices#import
 #                           procure_inward_invoice_submit PUT    /procure/inward_invoices/:inward_invoice_id/submit(.:format)                                                        procure/inward_invoices#submit
 #                          procure_inward_invoice_retract PUT    /procure/inward_invoices/:inward_invoice_id/retract(.:format)                                                       procure/inward_invoices#retract
 #                          procure_inward_invoice_approve PUT    /procure/inward_invoices/:inward_invoice_id/approve(.:format)                                                       procure/inward_invoices#approve
 #                           procure_inward_invoice_reject PUT    /procure/inward_invoices/:inward_invoice_id/reject(.:format)                                                        procure/inward_invoices#reject
 #                            procure_inward_invoice_close PUT    /procure/inward_invoices/:inward_invoice_id/close(.:format)                                                         procure/inward_invoices#close
+#                 procure_inward_invoice_save_as_template POST   /procure/inward_invoices/:inward_invoice_id/save_as_template(.:format)                                              procure/inward_invoices#template_create
+#                   procure_inward_invoice_apply_template POST   /procure/inward_invoices/:inward_invoice_id/apply_template(.:format)                                                procure/inward_invoices#template_apply
 #                                 procure_inward_invoices GET    /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#index
 #                                                         POST   /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#create
 #                              new_procure_inward_invoice GET    /procure/inward_invoices/new(.:format)                                                                              procure/inward_invoices#new
@@ -2311,6 +2336,7 @@ Rails.application.routes.draw do
       namespace :v1 do
         post 'auth', to: 'token#create'
         delete 'auth', to: 'token#destroy'
+        patch 'users/deactivate/:id', to: 'users#deactivate_user'
         resources :users, only: [:create, :show, :index, :update]
         resources :cards, only: [:index, :show]
         resources :cards do
@@ -2584,10 +2610,19 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
-  ############ Darwinbox SSO LOGIN APIs START ####################
-  post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
-  ######################################################
 
+  ######################## SSO LOGIN START #############################
+  post 'oauth/sso_login', to: 'sso/token#create', as: :create_sso
+  ######################################################################
+
+  # ############ Darwinbox SSO LOGIN APIs START #################################
+  # post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
+  # #############################################################################
+  #
+  # ############ Remunance SSO LOGIN APIs START #################################
+  # # post 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
+  # get 'remunance/oauth/sso_login', to: 'remunance_sso/token#create', as: :remunance_create_sso
+  # ##############################################################################
 
   ######################### TRAVEL REQUESTS API START ##########################
 

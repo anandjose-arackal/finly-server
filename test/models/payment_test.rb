@@ -38,6 +38,8 @@
 #  scheduled_at                   :date
 #  processed_at                   :date
 #  cost_center_id                 :integer
+#  company_id                     :integer
+#  external_reference_id          :string(255)
 #
 
 require 'test_helper'

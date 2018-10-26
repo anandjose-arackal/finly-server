@@ -20,8 +20,8 @@ module Constants
     YESBANK_EMAIL_ID = ['sreeram.nr@finly.io']
   end
 
-  # todo - to be removed once companies are done mirating from HDFC to RBL
-  MIGRATING_COMPANIES = [10, 67]
+  # todo - to be removed once companies are done migrating from HDFC to RBL
+  MIGRATING_COMPANIES = [10, 67, 112]
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
   PRODUCT_DEMO_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
@@ -312,5 +312,24 @@ module Constants
   end
 
   ###################### END OF Darwin Box ###########################
+
+
+  ################### Encryption Keys for Remunance ################
+
+  class Constants::Remunance
+    if Rails.env.production?
+      XOR_KEY = ''
+    else
+      XOR_KEY = '666666'
+    end
+
+    if Rails.env.production?
+      SHA512_KEY = ''
+    else
+      SHA512_KEY = '4150fb44a955a5ff0711f9a1c631a3ed'
+    end
+  end
+
+  ###################### END OF Remunance ###########################
 
 end
