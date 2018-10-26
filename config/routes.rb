@@ -3186,10 +3186,10 @@ Rails.application.routes.draw do
       put 'close', to: 'purchase_orders#close'
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
+      put 'void', to: 'purchase_orders#void'
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
     end
-
 
     resources :inward_documents do
 

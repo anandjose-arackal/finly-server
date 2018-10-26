@@ -69,7 +69,8 @@ class InventoryLineItem < ActiveRecord::Base
         tax: tax,
         account: account,
         item_code: item_code,
-        supply_item_type_id: supply_item_type_id
+        supply_item_type_id: supply_item_type_id,
+        item_type: supply_item_type.as_json
     }
   end
 

@@ -22,6 +22,8 @@ class Procurement < ActiveRecord::Base
 
   acts_as_sequenced column: :transaction_id, purpose: :procurement, editable: false
 
+  # procurement_type ['purchase_order', 'invoice', 'non_po_invoice'] # will be moved to model
+
   belongs_to :user
   belongs_to :company
   belongs_to :procurement_track
