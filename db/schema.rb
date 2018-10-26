@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181021163801) do
+ActiveRecord::Schema.define(version: 20181024063320) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -1433,7 +1433,7 @@ ActiveRecord::Schema.define(version: 20181021163801) do
     t.string   "registered_mobile_number",         limit: 255
     t.string   "bank_type",                        limit: 255
     t.integer  "default_card_expense_category_id", limit: 4
-    t.boolean  "darwinbox_sso_enabled",                          default: false
+    t.boolean  "sso_enabled",                                    default: false
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -2708,6 +2708,7 @@ ActiveRecord::Schema.define(version: 20181021163801) do
     t.string   "item_code",           limit: 255
     t.string   "account",             limit: 255
     t.integer  "supply_item_type_id", limit: 4
+    t.integer  "count",               limit: 4
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
@@ -2753,6 +2754,10 @@ ActiveRecord::Schema.define(version: 20181021163801) do
     t.string   "comment",                limit: 255
     t.string   "account",                limit: 255
     t.integer  "tax_rate_id",            limit: 4
+    t.decimal  "buying_price",                         precision: 10, scale: 5
+    t.decimal  "markup",                               precision: 10, scale: 5
+    t.decimal  "profit",                               precision: 10, scale: 5
+    t.integer  "customer_id",            limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -3777,6 +3782,8 @@ ActiveRecord::Schema.define(version: 20181021163801) do
     t.date     "scheduled_at"
     t.date     "processed_at"
     t.integer  "cost_center_id",                 limit: 4
+    t.integer  "company_id",                     limit: 4
+    t.string   "external_reference_id",          limit: 255
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -4625,6 +4632,17 @@ ActiveRecord::Schema.define(version: 20181021163801) do
     t.datetime "updated_at",                     null: false
     t.string   "company_name",       limit: 255
   end
+
+  create_table "sso_keys", force: :cascade do |t|
+    t.string   "xor_key",    limit: 255
+    t.string   "sha512_key", limit: 255
+    t.integer  "company_id", limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "token",      limit: 255
+  end
+
+  add_index "sso_keys", ["company_id"], name: "index_sso_keys_on_company_id", using: :btree
 
   create_table "states", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -5864,6 +5882,7 @@ ActiveRecord::Schema.define(version: 20181021163801) do
   add_foreign_key "reports", "users"
   add_foreign_key "resource_templates", "users"
   add_foreign_key "reviewal_levels", "policies"
+  add_foreign_key "sso_keys", "companies"
   add_foreign_key "tally_configurations", "companies"
   add_foreign_key "tax_rates", "companies"
   add_foreign_key "time_expenses", "expenses"
