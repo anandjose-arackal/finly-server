@@ -17,6 +17,7 @@ class Budgets::Index < Budgets::Base
   class Budgets::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :budgets
 
+
     def init
       self.budgets = params[:budgets]
     end

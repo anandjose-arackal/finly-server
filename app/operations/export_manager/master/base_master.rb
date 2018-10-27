@@ -5,7 +5,9 @@ class ExportManager::Master::BaseMaster
 
   MASTERS = {
       test: '::ExportManager::Master::Test::Provider',
-      procurement: '::ExportManager::Master::Procurements::Provider'
+      procurement: '::ExportManager::Master::Procurements::Provider',
+      budget_summary: '::ExportManager::Master::Budgets::UsageSummary',
+      budget_entities: '::ExportManager::Manager::Budgets::UsageEntities'
   }.with_indifferent_access
 
   DEFAULT_CONFIG = {spreadsheet: true, pdf: true}

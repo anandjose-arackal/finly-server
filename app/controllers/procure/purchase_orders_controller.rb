@@ -97,7 +97,7 @@ class Procure::PurchaseOrdersController < ApplicationController
     end
   end
 
-  # advance payment API
+  # advance payment API 
   def create_advance
     @result = Procurements::Payments::Create.(current_user, params)
     respond
