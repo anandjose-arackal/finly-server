@@ -2,7 +2,7 @@ class Procurements::Payments::Create < Procurements::Payments::Base
 
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
-                :payment_request_params
+                :payment_request_params, :receiving_account
 
   class Procurements::Payments::Create::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -21,11 +21,13 @@ class Procurements::Payments::Create < Procurements::Payments::Base
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
     self.payable_amount = params[:payable_amount]
+    self.receiving_account = user.company.bank_accounts.find_by(id: params[:receiving_account_id])
   end
 
   def validate
     if self.purchase_order.blank?
-      add_message :error, "Invoice not found"
+      add_message :error, "Purchase Order not found"
+      return
     end
 
     if self.payable_amount.blank?
@@ -35,6 +37,12 @@ class Procurements::Payments::Create < Procurements::Payments::Base
 
     if self.payable_amount > self.purchase_order.balance_amount.value
       add_message :error, "You cannot pay more than the purchase order total as advance"
+      return
+    end
+
+    if self.receiving_account.blank?
+      add_message :error, "Receiving bank account not found"
+      return
     end
   end
 
@@ -51,15 +59,11 @@ class Procurements::Payments::Create < Procurements::Payments::Base
   def post_process
     add_message :success, "Payment order created"
 
-    # Set status to unpaid if done via a procurement
-    if inward_invoice.procurement_id.present?
-      inward_invoice.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
-    end
   end
 
   def success
     params[:bank_payment_request] = self.bank_payment_request
-    BankTransfer::InwardInvoices::Payments::Create::BankPaymentRequestPresenter.new(user, params, messages)
+    Procurements::Payments::Create::BankPaymentRequestPresenter.new(user, params, messages)
   end
 
 
@@ -69,25 +73,23 @@ class Procurements::Payments::Create < Procurements::Payments::Base
     payment_params = [{
         payment_type_id: PaymentType.id_for(:credit),
         application: RequestStore.store[:current_app],
-        receiving_user_type: self.inward_invoice.bank_account&.account_owner&.class&.name,
-        receiving_user_id: self.inward_invoice.bank_account&.account_owner_id,
+        receiving_user_type: self.receiving_account&.account_owner&.class&.name,
+        receiving_user_id: self.receiving_account&.account_owner_id,
         initiating_user_type: "User",
         initiating_user_id: user.id,
         initiating_account_type: user.company.yes_bank_company_account&.class&.name,
         initiating_account_id: user.company.yes_bank_company_account&.id,
         receiving_account_type: "BankAccount",
-        receiving_account_id: self.inward_invoice.bank_account&.id,
+        receiving_account_id: self.receiving_account.id,
         payment_status_id: PaymentStatus.id_for(:pending_approval),
-        payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
-        payment_mode: self.payment_mode, # todo - default is NEFT for now, can be changed to something else later
+        payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
+        payment_mode: self.payment_mode,
         amount_attributes: {
             value: self.payable_amount,
             currency_id: Currency.first.id
         },
-        note: self.inward_invoice.note,
-        category_id: self.inward_invoice.category_id,
         date: DateUtils.local_date,
-        invoice_id: self.inward_invoice.id
+        purchase_order_id: self.purchase_order.id
                       }]
     payment_order_params = {
         initiating_user: user,
@@ -97,10 +99,10 @@ class Procurements::Payments::Create < Procurements::Payments::Base
             value: self.payable_amount,
             currency_id: 1
         },
-        payment_mode: "NEFT",
+        payment_mode: self.payment_mode,
         initiating_account_type: user.company.yes_bank_company_account&.class&.name,
         receiving_account_type: "BankAccount",
-        payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+        payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
         application: RequestStore.store[:current_app],
         currency_id: 1,
         scheduled_at: self.scheduled_at,
@@ -115,7 +117,7 @@ class Procurements::Payments::Create < Procurements::Payments::Base
             currency_id: 1
         },
         description: self.description,
-        beneficiary_type_id: 2, # this is because an invoice will always come from a vendor
+        beneficiary_type_id: 2, # this is because a purchase order will always come from a vendor
         policy_id: self.policy_id,
         payment_order_attributes: payment_order_params
     }

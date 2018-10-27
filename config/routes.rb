@@ -1436,6 +1436,7 @@
 #                            procure_purchase_order_close PUT    /procure/purchase_orders/:purchase_order_id/close(.:format)                                                         procure/purchase_orders#close
 #                         procure_purchase_order_download GET    /procure/purchase_orders/:purchase_order_id/download_pdf(.:format)                                                  procure/purchase_orders#download
 #                           procure_purchase_order_remind PUT    /procure/purchase_orders/:purchase_order_id/remind(.:format)                                                        procure/purchase_orders#remind
+#                             procure_purchase_order_void PUT    /procure/purchase_orders/:purchase_order_id/void(.:format)                                                          procure/purchase_orders#void
 #                 procure_purchase_order_save_as_template POST   /procure/purchase_orders/:purchase_order_id/save_as_template(.:format)                                              procure/purchase_orders#template_create
 #                   procure_purchase_order_apply_template POST   /procure/purchase_orders/:purchase_order_id/apply_template(.:format)                                                procure/purchase_orders#template_apply
 #                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#index
@@ -3227,6 +3228,7 @@ Rails.application.routes.draw do
       put 'void', to: 'purchase_orders#void'
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
+      post 'make_advance_payment', to: 'purchase_orders#create_payment'
     end
 
     resources :inward_documents do
