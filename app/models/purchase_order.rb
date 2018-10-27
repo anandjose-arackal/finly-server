@@ -142,6 +142,10 @@ class PurchaseOrder < ActiveRecord::Base
     where user_id: ids
   }
 
+  scope :filter_payment_term_id, -> (ids) {
+    where payment_term_id: ids
+  }
+
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy

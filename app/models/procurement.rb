@@ -76,7 +76,7 @@ class Procurement < ActiveRecord::Base
   }
 
   scope :filter_sub_department, -> (sub_department_name, user_id) {
-    user = User.find user_id
+    user = User.find_by id: user_id
     if user.present?
       sub_department_ids = user.company.departments.only_sub_departments.filter_name(sub_department_name).pluck(:id)
 
@@ -86,7 +86,7 @@ class Procurement < ActiveRecord::Base
   }
 
   scope :filter_vendor, -> (vendor_name, user_id){
-    user = User.find user_id
+    user = User.find_by id: user_id
     if user.present?
       vendor_ids = user.company.yes_bank_vendors.filter_name_search(vendor_name).pluck(:id)
 
@@ -96,12 +96,23 @@ class Procurement < ActiveRecord::Base
   }
 
   scope :filter_user, -> (user_details, user_id){
-    user = User.find user_id
+    user = User.find_by id: user_id
 
     if user.present?
       user_ids = user.company.users.filter_search(user_details).pluck(:id)
 
       filtered_ids = user.company.purchase_orders.filter_user_id(user_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_payment_term, -> (payment_term_name, user_id){
+    user = User.find_by id: user_id
+
+    if user.present?
+      payment_term_ids = user.company.payment_terms.filter_name(payment_term_name).pluck(:id)
+
+      filtered_ids = user.company.purchase_orders.filter_payment_term_id(payment_term_ids).pluck(:procurement_id)
       where id: filtered_ids
     end
   }

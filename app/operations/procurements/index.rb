@@ -85,6 +85,8 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
     has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
     has_scope :filter_user, using: [:user_details, :user_id], type: :hash
+    has_scope :filter_payment_term, using: [:payment_term_name, :user_id], type: :hash
+
 
     def init
       self.procurements = params[:procurements]
@@ -132,6 +134,11 @@ class Procurements::Index < Procurements::Base
         when 'user_details'
           params[:filter_user] = {
               user_details: params[:search_query],
+              user_id: user.id
+          }
+        when 'payment_term_name'
+          params[:filter_payment_term] = {
+              payment_term_name: params[:search_query],
               user_id: user.id
           }
         else
