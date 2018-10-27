@@ -1,6 +1,8 @@
-class ExportManager::Master::Procurements::UsageSummary < ExportManager::Master::BaseMaster
+class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::BaseMaster
 
-  register_handle :procurement
+  attr_accessor :spent_amount
+
+  register_handle :budget_summary
   register_generator ExportManager::Generator::Spreadsheet
   register_processor ExportManager::Processor::Synchronous
   validate :input
@@ -10,11 +12,12 @@ class ExportManager::Master::Procurements::UsageSummary < ExportManager::Master:
                   budget_start_date: {spreadsheet: true, pdf: false},
                   budget_end_date: {spreadsheet: true, pdf: false},
                   budget_amount: {spreadsheet: true, pdf: false},
-                  budget_usage: {spreadsheet: true, pdf: false}
+                  budget_usage: {spreadsheet: true, pdf: false},
+                  usage_percentage: {spreadsheet: true, pdf: true}
                   ]
 
   def input
-    op = Budgets::Index.(user, params)
+    op = ::Budgets::Index.(user, params)
     unless op.success?
       add_message :error, result.messages[:error]
       return
@@ -46,8 +49,17 @@ class ExportManager::Master::Procurements::UsageSummary < ExportManager::Master:
   end
 
   def budget_usage(budget)
-    processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
-    spent_amount = processor_instance.spent_amount
+    if self.spent_amount.present?
+      return self.spent_amount
+    else
+      processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+      self.spent_amount = processor_instance.spent_amount
+      return self.spent_amount
+    end
+  end
+
+  def usage_percentage(budget)
+    budget_usage(budget)
   end
 
 end
