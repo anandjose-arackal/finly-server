@@ -22,4 +22,8 @@ class BankTransfer::AccountOwnersController < ApplicationController
     respond
   end
 
+  def bank_accounts
+
+  end
+
 end

@@ -40,6 +40,8 @@
 #  cost_center_id                 :integer
 #  company_id                     :integer
 #  external_reference_id          :string(255)
+#  purchase_order_id              :integer
+#  procurement_id                 :integer
 #
 
 require 'test_helper'

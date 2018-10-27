@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181024063320) do
+ActiveRecord::Schema.define(version: 20181026151210) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2758,6 +2758,16 @@ ActiveRecord::Schema.define(version: 20181024063320) do
     t.decimal  "markup",                               precision: 10, scale: 5
     t.decimal  "profit",                               precision: 10, scale: 5
     t.integer  "customer_id",            limit: 4
+    t.string   "brand",                  limit: 255
+    t.string   "model_number",           limit: 255
+    t.string   "date_of_inward",         limit: 255
+    t.string   "year_of_registration",   limit: 255
+    t.decimal  "kms_driven",                           precision: 10, scale: 5
+    t.decimal  "expected_selling_price",               precision: 10, scale: 5
+    t.string   "owner_details",          limit: 255
+    t.decimal  "parking_charges",                      precision: 10, scale: 5
+    t.boolean  "billable"
+    t.string   "registration_number",    limit: 255
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -3784,12 +3794,16 @@ ActiveRecord::Schema.define(version: 20181024063320) do
     t.integer  "cost_center_id",                 limit: 4
     t.integer  "company_id",                     limit: 4
     t.string   "external_reference_id",          limit: 255
+    t.integer  "purchase_order_id",              limit: 4
+    t.integer  "procurement_id",                 limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
   add_index "payments", ["category_id"], name: "index_payments_on_category_id", using: :btree
   add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
+  add_index "payments", ["procurement_id"], name: "fk_rails_b1fc8a9b0f", using: :btree
+  add_index "payments", ["purchase_order_id"], name: "fk_rails_65acc3c87d", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
@@ -5824,6 +5838,8 @@ ActiveRecord::Schema.define(version: 20181024063320) do
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "categories"
   add_foreign_key "payments", "payment_types"
+  add_foreign_key "payments", "procurements"
+  add_foreign_key "payments", "purchase_orders"
   add_foreign_key "per_diem_expenses", "expenses"
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
