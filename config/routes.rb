@@ -3228,7 +3228,7 @@ Rails.application.routes.draw do
       put 'void', to: 'purchase_orders#void'
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
-      post 'make_advance_payment', to: 'purchase_orders#create_payment'
+      put 'make_advance_payment', to: 'purchase_orders#create_payment'
     end
 
     resources :inward_documents do

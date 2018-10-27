@@ -101,6 +101,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
           #     url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
           #     method: "PUT"
           # }
+
+          actions[:make_advance_payment] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_make_advance_payment_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+
           actions[:document_editable] = false
         end
         actions[:download] = true
