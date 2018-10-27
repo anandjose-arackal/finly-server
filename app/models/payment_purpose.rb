@@ -50,7 +50,8 @@ class PaymentPurpose < ActiveRecord::Base
         :failed_transaction_reversal,
         :opening_balance_load,
         :collect_funds_withdrawal,
-        :settlement_against_advance
+        :settlement_against_advance,
+        :advance_against_purchase_order
     ]
   end
 end

@@ -5,4 +5,10 @@ class Procure::PaymentsController < ApplicationController
     @result = Procurements::Payments::Show.(current_user, params)
     respond
   end
+
+  # this operation will create an advance payment inside a particular Procurement
+  def create
+    @result = Procurements::Payments::Create.(current_user, params)
+    respond # todo - change this in case it is just a success / failure
+  end
 end

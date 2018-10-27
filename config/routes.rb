@@ -1180,6 +1180,7 @@
 #                          bank_transfer_transfer_timings GET    /bank_transfer/transfer_timings(.:format)                                                                           bank_transfer/bank_payment_requests#within_timeframe
 #                                    bank_transfer_search GET    /bank_transfer/account_owners/search(.:format)                                                                      bank_transfer/account_owners#search
 #                      bank_transfer_account_owners_count GET    /bank_transfer/account_owners/count(.:format)                                                                       bank_transfer/account_owners#count
+#               bank_transfer_account_owner_bank_accounts GET    /bank_transfer/account_owners/:account_owner_id/bank_accounts(.:format)                                             bank_transfer/account_owners#bank_accounts
 #                            bank_transfer_account_owners GET    /bank_transfer/account_owners(.:format)                                                                             bank_transfer/account_owners#index
 #                                                         POST   /bank_transfer/account_owners(.:format)                                                                             bank_transfer/account_owners#create
 #                         new_bank_transfer_account_owner GET    /bank_transfer/account_owners/new(.:format)                                                                         bank_transfer/account_owners#new
@@ -3054,7 +3055,9 @@ Rails.application.routes.draw do
 
     get 'account_owners/search', to: 'account_owners#search', as: :search
     get 'account_owners/count', to: 'account_owners#count'
-    resources :account_owners
+    resources :account_owners do
+      get 'bank_accounts', to: 'account_owners#bank_accounts', as: :bank_accounts
+    end
 
     post 'vendors/import', to: 'vendors#import', as: :import
     get 'vendors/new_vendor_config', to: 'vendors#new_vendor_config', as: :new_vendor_config
