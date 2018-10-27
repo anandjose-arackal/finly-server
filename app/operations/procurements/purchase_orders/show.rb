@@ -109,7 +109,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       if PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id
         if user.vendor_payment_admin? || document_owner?
           actions[:void] = {
-              url: Rails.application.routes.url_helpers.procure_purchase_order_void_path(id: purchase_order.id),
+              url: Rails.application.routes.url_helpers.procure_purchase_order_void_path(purchase_order_id: purchase_order.id),
               method: 'PUT'
           }
         end
