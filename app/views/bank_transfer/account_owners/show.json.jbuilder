@@ -14,6 +14,7 @@ json.account_owner do
     json.state_code_id @result.account_owner.state_code_id
     json.state_code_name @result.account_owner.state_code&.full_name
     json.created_by @result.account_owner.created_by&.name
+    json.vendor_id @result.account_owner.vendor_id
   else
     json.editable_details false
   end

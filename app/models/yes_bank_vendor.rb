@@ -102,6 +102,7 @@ class YesBankVendor < ActiveRecord::Base
     {
         id: id,
         display_name: display_name,
+        vendor_id: vendor_id,
         name: name,
         created_at: created_at,
         email: email,

@@ -60,6 +60,7 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
         mapping_params.delete(:reviewer)
         mapping_params.delete(:level)
 
+        # todo-abi remove it and run script to delete all duplicates
         mapping_params[:policy_id] = document.policy_id
 
         mapping = document.document_level_reviewer_mappings.find_or_initialize_by(mapping_params)

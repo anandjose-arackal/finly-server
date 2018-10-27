@@ -24,9 +24,9 @@ class Procurements::Invoices::ImportProcessor < Procurements::Invoices::Base
       procurement_params = {
           procurement: {
               name: "Procurement - Invoice #{invoice_params[:invoice_number]}",
-              vendor_id: invoice_params[:vendor_id],
-              document_type: 'invoice'
+              vendor_id: invoice_params[:vendor_id]
           },
+          document_type: 'non_po_invoice',
           invoice: invoice_params
       }
 
@@ -34,14 +34,13 @@ class Procurements::Invoices::ImportProcessor < Procurements::Invoices::Base
 
       if op.success?
         # Update Invoice
-
-        invoice_parameters = get_invoices_parameters
+        # invoice_parameters = get_invoices_parameters(invoice_params)
 
         new_invoice_params = {
             id: op.invoices&.first&.id,
-            invoice: invoice_parameters
+            invoice: invoice_params
         }
-        op2 = BankTransfer::InwardInvoices::Update.(usser, new_invoice_params)
+        op2 = BankTransfer::InwardInvoices::Update.(user, new_invoice_params)
 
         unless op2.success?
           data_error[:invoice_details] = invoice_params
@@ -57,5 +56,13 @@ class Procurements::Invoices::ImportProcessor < Procurements::Invoices::Base
       end
 
     end
+  end
+
+  def get_invoice_parameters
+    {
+       invoice: {
+
+       }
+    }
   end
 end

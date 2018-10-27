@@ -23,6 +23,8 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     state :auto_approved
     state :sent_to_vendor
     state :closed
+    state :voided
+    # todo add unapprove etc
 
     event :submit do
       transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :approvers_not_present?
@@ -43,11 +45,15 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     end
 
     event :send_to_vendor do
-      transitions from: :approved, to: :sent_to_vendor
+      transitions :from => [:approved, :auto_approved], to: :sent_to_vendor
     end
 
     event :close do
-      transitions :from => [:approved, :sent_to_vendor], :to => [:closed]
+      transitions :from => [:approved, :auto_approved, :sent_to_vendor], :to => [:closed]
+    end
+
+    event :void do
+      transitions :from => [:approved, :auto_approved, :sent_to_vendor, :closed], to: :voided
     end
 
     after_all_events :change_state

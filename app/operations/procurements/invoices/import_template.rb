@@ -3,7 +3,8 @@
 class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
 
   attr_accessor :company, :invoice_custom_fields, :sample_type,
-                :headers, :content, :sheets, :attachments
+                :headers, :content, :sheets, :attachments,
+                :import_data # will be passed from import operation
 
   def init
     self.company = user.company
@@ -11,6 +12,10 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
     attachment_op = Procurements::Attachments::Index.(user, params)
     if attachment_op.success?
       self.attachments = attachment_op.attachments
+    end
+
+    if params[:import_data].present?
+      self.import_data = params[:import_data]
     end
     # self.sample_type = params[:sample_type]
   end
@@ -30,7 +35,7 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
     self.sheets = [
         {
             item_headers: self.headers,
-            item_contents: []
+            item_contents: import_data.present? ? import_data[:contents] : []
         }
     ]
 
@@ -56,11 +61,11 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
     op = Invoicing::InventoryLineItem::Index.(user, {filter_item_type: [SupplyItemType.id_for(:non_po_item)]})
     items = op.inventory_line_items
 
-    item_headers = ["ID", "Description", "Category", "Tax Rate", "Discount" "Note"]
+    item_headers = ["ID", "Description", "Category", "Rate", "Tax Rate", "Discount" "Note"]
     item_contents = []
 
     items.each do |item|
-      item_contents << [item.id, item.description, item.category&.name, item.tax_rate&.rate, item.discount, item.note]
+      item_contents << [item.id, item.description, item.category&.name, item.rate, item.tax_rate&.rate, item.discount, item.note]
     end
 
     self.sheets << {
@@ -180,31 +185,36 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets, template: 'export_template/template_w_validation'}}, messages)
   end
 
   private
 
   def default_headers
-    [
-        "Vendor ID",
-        "Invoice Number",
-        "Invoice Date",
-        "Due Date",
-        "Payment Term Name",
-        "Item Id",
-        "Description",
-        "Qty",
-        "Amount",
-        "Tax Rate ID",
-        "Total",
-        "Period",
-        "Attachment ID",
-        "Policy Name",
-        "Sub Department Name",
-        "Billing Location ID",
-        "Shipping Location ID",
-        "Auto Submit (Yes/No)"
-    ]
+    if import_data.present?
+      import_data[:headers]
+    else
+
+      [
+          "Vendor ID",
+          "Invoice Number",
+          "Invoice Date",
+          "Due Date",
+          "Payment Term Name",
+          "Item Id",
+          "Description",
+          "Qty",
+          "Amount",
+          "Tax Rate ID",
+          "Total",
+          "Period",
+          "Attachment ID",
+          "Policy Name",
+          "Sub Department Name",
+          "Billing Location ID",
+          "Shipping Location ID",
+          "Auto Submit (Yes/No)"
+      ]
+    end
   end
 end
