@@ -1440,6 +1440,7 @@
 #                 procure_purchase_order_save_as_template POST   /procure/purchase_orders/:purchase_order_id/save_as_template(.:format)                                              procure/purchase_orders#template_create
 #                   procure_purchase_order_apply_template POST   /procure/purchase_orders/:purchase_order_id/apply_template(.:format)                                                procure/purchase_orders#template_apply
 #             procure_purchase_order_make_advance_payment PUT    /procure/purchase_orders/:purchase_order_id/make_advance_payment(.:format)                                          procure/purchase_orders#create_payment
+#                 procure_purchase_order_advance_payments GET    /procure/purchase_orders/:purchase_order_id/advance_payments(.:format)                                              procure/purchase_orders#advance_payments
 #                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#index
 #                                                         POST   /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#create
 #                              new_procure_purchase_order GET    /procure/purchase_orders/new(.:format)                                                                              procure/purchase_orders#new
@@ -3230,6 +3231,7 @@ Rails.application.routes.draw do
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
+      get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
     end
 
     resources :inward_documents do
