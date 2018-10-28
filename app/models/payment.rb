@@ -92,6 +92,7 @@ class Payment < ActiveRecord::Base
   belongs_to :payment_order
   belongs_to :payment_status
   belongs_to :payment_purpose
+  belongs_to :purchase_order
 
   belongs_to :destination_pocket, class_name: "UserPocket"
 

@@ -1,10 +1,10 @@
-class Procurements::Payments::Create < Procurements::Payments::Base
+class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
 
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :receiving_account
 
-  class Procurements::Payments::Create::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::Payments::CreateAdvance::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :bank_payment_request
 
@@ -35,7 +35,7 @@ class Procurements::Payments::Create < Procurements::Payments::Base
       return
     end
 
-    if self.payable_amount > self.purchase_order.balance_amount.value
+    if self.payable_amount.to_f > self.purchase_order.balance_amount.value
       add_message :error, "You cannot pay more than the purchase order total as advance"
       return
     end
@@ -63,7 +63,7 @@ class Procurements::Payments::Create < Procurements::Payments::Base
 
   def success
     params[:bank_payment_request] = self.bank_payment_request
-    Procurements::Payments::Create::BankPaymentRequestPresenter.new(user, params, messages)
+    Procurements::Payments::CreateAdvance::BankPaymentRequestPresenter.new(user, params, messages)
   end
 
 
