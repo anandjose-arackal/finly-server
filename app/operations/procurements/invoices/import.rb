@@ -1,7 +1,8 @@
 class Procurements::Invoices::Import < Procurements::Invoices::Base
 
   attr_accessor :company, :invoices_data, :file, :headers, :data,
-                :contents, :invoices_params, :attr_mapping, :has_errors
+                :contents, :invoices_params, :attr_mapping, :has_errors,
+                :validation_data
 
   def pre_validate
     if user.blank? || params.blank?
@@ -46,64 +47,127 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
 
     self.headers = retrieve_headers
     self.contents = []
-    self.invoices_params = generate_invoices_params
     self.has_errors = false
+
+    attachments_op = Procurements::Attachments::Index.(user, params)
+
+    # Data required for validating each line item
+    self.validation_data = {
+      vendor_ids: user.company.yes_bank_vendors.pluck(:id), # todo change to vendor_id
+      payment_terms: user.company.payment_terms,
+      inventory_line_item_ids: user.company.inventory_line_items.pluck(:id),
+      tax_rates: user.company.tax_rates,
+      policies: user.company.policies.with_application(:vp),
+      sub_departments: user.company.departments.only_sub_departments,
+      locations: user.company.locations,
+      attachments: attachments_op.attachments
+    }
+
+
+    self.invoices_params = generate_invoices_params
   end
 
   def validate
     unique_invoices_data = invoices_data.uniq { |item| [item[:vendor_uid], item[:invoice_number], item[:inventory_line_item_id], item[:amount]] }
-    unless unique_invoices_data.length == invoices_data.length
-      add_message :error, 'Possible duplicate invoices found. Please resolve before uploading again'
+    # unless unique_invoices_data.length == invoices_data.length
+    #   add_message :error, 'Possible duplicate invoices found. Please resolve before uploading again'
+    # end
+
+    duplicate_invoice_data = invoices_data - unique_invoices_data
+
+    if duplicate_invoice_data.present?
+      self.invoices_params.each_with_index do |invoice_params, index|
+        content = invoices_data[index].values
+        if duplicate_invoice_data.index(invoices_data[index])
+          self.has_errors = true
+
+          error_message = ['Duplicate Invoice']
+
+          content.push "ERROR"
+          content.push error_message.join(", ")
+
+
+          self.contents << content.map{|i| add_warning(i)}
+        else
+
+          self.contents << content
+        end
+      end
+      return
     end
 
 
     self.invoices_params.each_with_index do |invoice_params, index|
-      has_line_item_errors = false
       content = invoices_data[index].values
-      invoice = user.company.inward_invoices.build(invoice_params)
+      error_message = []
 
-      unless invoice_params[:vendor_id].present?
+      invoice_build_params = get_invoice_build_params(invoice_params)
+
+      invoice = user.company.inward_invoices.build(invoice_build_params)
+
+      # Validate vendor
+      vendor_id = invoice_params[:vendor_id]&.to_i
+      if vendor_id.blank? || self.validation_data[:vendor_ids].exclude?(vendor_id)
         content[0] = add_error(content[0])
-        has_line_item_errors = true
+        error_message.push("Invalid Vendor")
       end
 
-      unless invoice_params[:invoice_number].present?
+      # Check Invoice number presence
+      invoice_number = invoice_params[:invoice_number]&.to_s
+      if invoice_number.blank?
         content[1] = add_error(content[1])
-        has_line_item_errors = true
+        error_message.push("Invoice Number Required")
       end
 
-      unless invoice_params[:sub_department_id].present?
+      # Validate sub department
+      sub_department_id = invoice_params[:sub_department_id]
+      if sub_department_id.blank?
         content[14] = add_error(content[14])
-        has_line_item_errors = true
+        error_message.push("Invalid Sub Department")
       end
 
-      unless invoice_params[:policy_id].present?
+
+      # Validate policy
+      policy_id = invoice_params[:policy_id]
+      if policy_id.blank?
         content[13] = add_error(content[13])
-        has_line_item_errors = true
+        error_message.push("Invalid Policy")
       end
 
-      unless invoice_params[:invoice_items_attributes][0][:inventory_line_item_id].present?
+      # Validate line item
+      inventory_line_item_id = invoice_params[:invoice_items_attributes][0][:inventory_line_item_id]
+      if inventory_line_item_id.blank?
         content[5] = add_error(content[5])
-        has_line_item_errors = true
+        error_message.push("Invalid Inventory Item ID")
       end
 
-      unless invoice_params[:invoice_items_attributes][0][:rate].present?
+      # Validate attachment
+      attachment_id = content[12]&.to_i
+      if attachment_id.present? && attachment_id != 0 && validation_data[:attachments].pluck(:id).exclude?(attachment_id)
+        content[12] = add_error(content[12])
+        error_message.push('Invalid Attachment ID')
+      end
+
+
+      if invoice_params[:invoice_items_attributes][0][:amount_attributes][:value].to_f == 0
         content[8] = add_error(content[8])
-        has_line_item_errors = true
+        error_message.push("Amount can't be 0")
       end
 
       unless invoice_params[:invoice_items_attributes][0][:comment].present?
         content[6] = add_error(content[6])
-        has_line_item_errors = true
+        error_message.push("Comment can't be blank")
       end
-
 
       unless invoice.valid?
         self.has_errors = true
       end
 
-      if has_line_item_errors
+      if error_message.present?
         content.push "ERROR"
+        content.push error_message.join(", ")
+      else
+        content.push "OK"
       end
 
       self.contents << content
@@ -114,8 +178,10 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
     unless has_errors
       add_message :success, 'All data will be processed'
 
+      params[:processed_invoices_params] = invoices_params
+
       # Call background operations
-      ::Procurements::Invoices::ImportProcessor.call(user, invoices_params)
+      ::Procurements::Invoices::ImportProcessor.call(user, params)
 
     end
 
@@ -139,9 +205,18 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
   def add_error(string)
     self.has_errors = true
     if string.present?
-      string.to_s + "---errror---"
+      string.to_s + "---error---"
     else
       "---error---"
+    end
+  end
+
+  def add_warning(string)
+    self.has_errors = true
+    if string.present?
+      string.to_s + "---warning---"
+    else
+      "---warning---"
     end
   end
 
@@ -171,6 +246,12 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
     ]
   end
 
+  def get_invoice_build_params(invoice_params)
+    invoice_params.delete(:auto_submit)
+    invoice_params.delete(:attachments)
+    invoice_params
+  end
+
   def generate_invoices_params
     invoices_params = []
     self.invoices_data.each do |data|
@@ -180,13 +261,25 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
       vendor = user.company.yes_bank_vendors.find_by(id: data[:vendor_uid]) # todo find by vendor uid
 
       receiving_account = vendor&.bank_accounts&.first
-      sub_department = user.company.departments.only_sub_departments.find_by name: data[:sub_department_name]
+      sub_department = self.validation_data[:sub_departments]&.find_by(name: data[:sub_department_name])
       department = sub_department&.parent
       cost_center = sub_department&.cost_center
       policy = user.company.policies.find_by name: data[:policy_name]
       tax_rate = user.company.tax_rates.find_by id: data[:tax_rate_id]
 
       payment_term = user.company.payment_terms.find_by(name: data[:pyament_term_name])
+
+      amount = data[:amount].to_f rescue 0
+      quantity = data[:quantity].to_i rescue 1
+
+      rate = amount / quantity
+      discount = data[:discount].to_f rescue 0
+
+      attachments = []
+      attachment = validation_data[:attachments]&.find_by(id: data[:attachment_id])
+      if attachment.present?
+        attachments.push(attachment.id)
+      end
 
       invoice_params = {
           vendor_id: vendor&.id,
@@ -195,6 +288,7 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
           created_by_user_id: user.id,
           invoice_type_id: ::InwardInvoiceType.id_for(:tax_invoice),
           payment_term_id: payment_term&.id,
+          date: data[:date],
           due_date: data[:due_date],
           receiving_account_id: receiving_account&.id,
           location_id: data[:location_id]&.to_i,
@@ -203,14 +297,20 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
           department_id: department&.id,
           cost_center_id: cost_center&.id,
           policy_id: policy&.id,
+          auto_submit: data[:auto_submit],
+          attachments: attachments,
           invoice_items_attributes: [{
               inventory_line_item_id: inventory_line_item&.id,
               tax_rate_id: tax_rate&.id,
               description: inventory_line_item&.description,
               comment: data[:comment],
-              rate: data[:amount].to_f / (data[:quantity].to_i || 1),
-              quantity: data[:quantity],
-              discount: data[:discount]
+              amount_attributes: {
+                  value: amount,
+                  currency_id: 1
+              },
+              rate: rate,
+              quantity: quantity,
+              discount: discount
           }]
       }
 

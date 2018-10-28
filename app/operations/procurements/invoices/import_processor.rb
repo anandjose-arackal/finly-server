@@ -2,7 +2,7 @@ class Procurements::Invoices::ImportProcessor < Procurements::Invoices::Base
   attr_accessor :invoices_params, :result
 
   def init
-    self.invoices_params = params[:invoices_params]
+    self.invoices_params = params[:processed_invoices_params]
     self.result = {
         success: [],
         error: []
@@ -46,23 +46,17 @@ class Procurements::Invoices::ImportProcessor < Procurements::Invoices::Base
           data_error[:invoice_details] = invoice_params
           data_error[:messages] = ["Couldn't add invoice"]
         else
-          invoice_id = op.invoices&.first&.id
-          op3 = Procurements::Invoices::Submit.(user, {id: invoice_id})
+          if ["YES", "yes", "Yes", "Y", "y"].include?(invoice_params[:auto_submit])
+            invoice_id = op.invoices&.first&.id
+            op3 = Procurements::Invoices::Submit.(user, {id: invoice_id})
 
-          unless op3.success?
-            data_error[:messages] = op3.messages[:error]
+            unless op3.success?
+              data_error[:messages] = op3.messages[:error]
+            end
           end
         end
       end
 
     end
-  end
-
-  def get_invoice_parameters
-    {
-       invoice: {
-
-       }
-    }
   end
 end

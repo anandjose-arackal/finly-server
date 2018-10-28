@@ -42,19 +42,19 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
 
     ##################################################
     # adding Categories to the excel sheet
-    category_headers = ["ID", "Category Name"]
-    category_contents = []
-
-    # todo only fetch categories for collect and vendor payments line items
-    user.company.categories.active.each do |category|
-      category_contents << [category.id, category.name]
-    end
-    self.sheets << {
-        item_headers: category_headers,
-        item_contents: category_contents,
-        name: "Categories",
-
-    }
+    # category_headers = ["ID", "Category Name"]
+    # category_contents = []
+    #
+    # # todo only fetch categories for collect and vendor payments line items
+    # user.company.categories.active.each do |category|
+    #   category_contents << [category.id, category.name]
+    # end
+    # self.sheets << {
+    #     item_headers: category_headers,
+    #     item_contents: category_contents,
+    #     name: "Categories",
+    #
+    # }
 
     ##################################################
     # Add Non PO items list
@@ -113,10 +113,10 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
 
     ##################################################
     # Add Payment terms
-    payment_term_headers = ["ID", "Payment Term Name"]
+    payment_term_headers = ["Payment Term Name"]
     payment_term_contents = []
     user.company.payment_terms.each do |payment_term|
-      payment_term_contents << [payment_term.id, payment_term.name]
+      payment_term_contents << [payment_term.name]
     end
 
     self.sheets << {
@@ -127,10 +127,10 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
 
     ##################################################
     # Add Sub Departments
-    sub_department_headers = ["ID", "Sub Department Name"]
+    sub_department_headers = ["Sub Department Name"]
     sub_department_contents = []
-    user.company.departments.only_sub_departments.each do |department|
-      sub_department_contents << [department.id, department.name]
+    user.departments.only_sub_departments.each do |department|
+      sub_department_contents << [department.name]
     end
     self.sheets << {
         item_headers: sub_department_headers,
@@ -140,30 +140,58 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
 
     ##################################################
     # Add Departments
-    department_headers = ["ID", "Department Name"]
-    department_contents = []
-    user.company.departments.roots.each do |department|
-      department_contents << [department.id, department.name]
+    # department_headers = ["ID", "Department Name"]
+    # department_contents = []
+    # user.company.departments.roots.each do |department|
+    #   department_contents << [department.id, department.name]
+    # end
+    #
+    # self.sheets << {
+    #     item_headers: department_headers,
+    #     item_contents: department_contents,
+    #     name: 'Departments'
+    # }
+
+    ##################################################
+    # Add Cost Centers
+    # cost_center_headers = ["ID", "Cost Center Name"]
+    # cost_center_contents = []
+    # user.company.cost_centers.each do |cc|
+    #   cost_center_contents << [cc.id, cc.name]
+    # end
+    #
+    # self.sheets << {
+    #     item_headers: cost_center_headers,
+    #     item_contents: cost_center_contents,
+    #     name: 'Cost Centers'
+    # }
+
+    ##################################################
+    # Add Locations
+    location_headers = ["ID", "Location Name", "Address"]
+    location_contents = []
+    user.company.locations.each do |location|
+      location_contents << [location.id, location.name, location.address]
     end
 
     self.sheets << {
-        item_headers: department_headers,
-        item_contents: department_contents,
-        name: 'Departments'
+        item_headers: location_headers,
+        item_contents: location_contents,
+        name: 'Locations'
     }
 
     ##################################################
-    # Add Departments
-    cost_center_headers = ["ID", "Cost Center Name"]
-    cost_center_contents = []
-    user.company.cost_centers.each do |cc|
-      cost_center_contents << [cc.id, cc.name]
+    # Add Policies
+    policies_headers = ["Policy Name"]
+    policies_contents = []
+    user.policies.with_application(:vp).each do |policy|
+      policies_contents << [policy.name]
     end
 
     self.sheets << {
-        item_headers: cost_center_headers,
-        item_contents: cost_center_contents,
-        name: 'Cost Centers'
+        item_headers: policies_headers,
+        item_contents: policies_contents,
+        name: 'Policies'
     }
 
     ##################################################

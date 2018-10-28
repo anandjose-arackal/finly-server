@@ -203,6 +203,7 @@ class User < ActiveRecord::Base
 
   has_many :procurements
   has_many :level_reviewer_mappings
+  has_many :procurement_attachments
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
