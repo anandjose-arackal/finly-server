@@ -52,6 +52,7 @@ class Budget < ActiveRecord::Base
   validates :end_date, presence: true
 
   scope :with_id, -> (ids) {where id: ids}
+  scope :filter_ids, -> (id) { where id: id}
 
   scope :applicable_to_purchase_orders, -> {
     where purchase_order: true

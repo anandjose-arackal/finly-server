@@ -77,7 +77,11 @@ class PurchaseOrderItem < ActiveRecord::Base
     # else
     #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     # end
-    BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
+    if self.purchase_order.voided?
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+    else
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
+    end
   end
 
   def budget_trail_destroy
