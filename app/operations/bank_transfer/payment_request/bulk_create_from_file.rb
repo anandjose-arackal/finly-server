@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRequest::Base
 
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
-                :result_data
+                :result_data, :order_details, :bank_payment_request_params
 
   def pre_validate
     if user.blank?
@@ -34,7 +34,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     op = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
     if op.failure?
-      self.result_data = op.result_data
+      self.contents = op.contents
+      self.header = op.header
     end
 
   end
@@ -42,6 +43,13 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   def process
     # if the validation of the data is successful, it will create a payment order and
     # asynchronously add payments to it one by one
+    self.bank_payment_request_params = parse_payment_order_data
+
+  end
+
+  # this method should create the temporary file that can be linked in the front end
+  def failure
+
   end
 
   private

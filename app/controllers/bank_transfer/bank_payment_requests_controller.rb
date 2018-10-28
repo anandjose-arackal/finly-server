@@ -19,8 +19,9 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def process_file
-    @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
-    respond
+    @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
+    # @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
+    # respond
   end
 
   def update
