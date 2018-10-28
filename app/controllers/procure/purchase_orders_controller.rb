@@ -103,6 +103,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def advance_payments
+    @result = Procurements::PurchaseOrders::AdvancePayments.(current_user, params)
+    respond
+  end
+
   # Templates
   def template_create
     @result = Procurements::PurchaseOrders::Templates::Create.(current_user, params)
