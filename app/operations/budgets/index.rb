@@ -6,7 +6,7 @@ class Budgets::Index < Budgets::Base
   end
 
   def init
-    self.budgets = user.company.budgets.roots
+    self.budgets = user.company.budgets.roots.reorder(end_date: :desc)
   end
 
   def success
@@ -18,7 +18,7 @@ class Budgets::Index < Budgets::Base
     attr_accessor :budgets
 
     has_scope :filter_date, using: [:from, :to], type: :hash
-    has_scope :filter_ids, type: :array
+    has_scope :filter_ids
 
     def init
       self.budgets = params[:budgets]

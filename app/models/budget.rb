@@ -52,7 +52,10 @@ class Budget < ActiveRecord::Base
   validates :end_date, presence: true
 
   scope :with_id, -> (ids) {where id: ids}
-  scope :filter_ids, -> (id) { where id: id}
+  scope :filter_ids, -> (id) {
+    id = id.split(",")
+    where id: id
+  }
 
   scope :applicable_to_purchase_orders, -> {
     where purchase_order: true
@@ -114,6 +117,10 @@ class Budget < ActiveRecord::Base
 
   scope :contains_date, -> (date) {
     where('start_date <= ? AND end_date >= ?', date, date)
+  }
+
+  scope :filter_date, -> (date_from, date_to) {
+    where.not('end_date < ? AND start_date > ?', Date.parse(date_from), Date.parse(date_to))
   }
 
   scope :include_details, -> {

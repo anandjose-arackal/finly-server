@@ -49,17 +49,21 @@ class ExportManager::Master::Budgets::UsageSummary < ExportManager::Master::Base
   end
 
   def budget_usage(budget)
-    if self.spent_amount.present?
-      return self.spent_amount
-    else
-      processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
-      self.spent_amount = processor_instance.spent_amount
-      return self.spent_amount
-    end
+    # if self.spent_amount.present?
+    #   return self.spent_amount
+    # else
+    #   processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+    #   self.spent_amount = processor_instance.spent_amount
+    #   return self.spent_amount
+    # end
+    processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+    spent_amount = processor_instance.spent_amount
   end
 
   def usage_percentage(budget)
-    budget_usage(budget)
+    processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
+    spent_amount = processor_instance.spent_amount
+    return ((spent_amount / budget.budget_amount&.value.to_f) * 100).round(2)
   end
 
 end

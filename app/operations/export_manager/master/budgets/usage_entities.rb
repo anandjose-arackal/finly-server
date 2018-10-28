@@ -54,50 +54,109 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
   end
 
   def po_number(item)
-
+    if item.is_a?(PurchaseOrderItem)
+      return item.purchase_order.po_number
+    end
+    ""
   end
 
   def invoice_number(item)
-
+    if item.is_a?(InvoiceLineItem)
+      return item.parent.invoice_number
+    end
+    ""
   end
 
   def payment_id(item)
-
+    if item.is_a?(Payment)
+      return item.id
+    end
+    ""
   end
 
   def expense_id(item)
-
+    if item.is_a?(Expense)
+      return item.id
+    end
+    ""
   end
 
   def department(item)
-
+    if item.is_a?(PurchaseOrderItem)
+      return item.purchase_order.department&.name
+    elsif item.is_a?(InvoiceLineItem)
+      return item.parent.department&.name
+    end
+    ""
   end
 
   def cost_center(item)
-
+    if item.is_a?(PurchaseOrderItem)
+      return item.purchase_order.cost_center&.name
+    elsif item.is_a?(InvoiceLineItem)
+      return item.parent.cost_center&.name
+    elsif item.is_a?(Payment)
+      return item.invoice.cost_center&.name
+    end
+    ""
   end
 
   def category(item)
-
+    if item.is_a?(PurchaseOrderItem)
+      return item.category&.name
+    elsif item.is_a?(InvoiceLineItem)
+      return item.category&.name
+    elsif item.is_a?(Payment)
+      return item.invoice.category&.name
+    end
+    ""
   end
 
   def amount(item)
-
+    if item.is_a?(PurchaseOrderItem)
+      return item.total_amount&.value
+    elsif item.is_a?(InvoiceLineItem)
+      return item.net_amount&.value
+    elsif item.is_a?(Payment)
+      return item.amount&.value
+    elsif item.is_a?(Expense)
+      return item.amount&.value
+    end
+    ""
   end
 
   def merchant(item)
-
+    if item.is_a?(Expense)
+      return item.merchant_name
+    end
+    ""
   end
 
   def vendor(item)
-
+    if item.is_a?(PurchaseOrderItem)
+      return item.purchase_order.vendor&.name
+    elsif item.is_a?(InvoiceLineItem)
+      return item.parent.vendor&.name
+    elsif item.is_a?(Payment)
+      return item.receiving_user&.name
+    end
+    ""
   end
 
   def created_at(item)
-
+    item.created_at
   end
 
   def created_by(item)
-
+    if item.is_a?(PurchaseOrderItem)
+      return item.purchase_order.user&.name
+    elsif item.is_a?(InvoiceLineItem)
+      return item.parent.created_by_user&.name
+    elsif item.is_a?(Payment)
+      return item.initiating_user&.name
+    elsif item.is_a?(Expense)
+      return item.user&.name
+    end
+    ""
   end
 end
