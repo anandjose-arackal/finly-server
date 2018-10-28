@@ -3,9 +3,9 @@ class ExportManager::Config::ExportConfigHandler
   DEFAULT_CONFIG = {spreadsheet: true, pdf: true}
 
   def self.config_for(user, master)
-    return {} if master.blank? or master.key.blank? or master.fields.blank? or user.blank?
-    fields_arr = master.fields
-    type = master.key
+    return {} if master.blank? or master.class.key.blank? or master.class.fields.blank? or user.blank?
+    fields_arr = master.class.fields
+    type = master.class.key
     if fields_arr.size == 1 and fields_arr.first.is_a?(Hash)
       fields = fields_arr.first
     else
