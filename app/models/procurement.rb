@@ -117,6 +117,10 @@ class Procurement < ActiveRecord::Base
     end
   }
 
+  scope :filter_procurement_type, -> (procurement_type){
+    where procurement_type: procurement_type
+  }
+
   scope :filter_invoice_number, -> (invoice_number) {
     filtered_ids = Invoice.with_procurement.filter_invoice_number(invoice_number).pluck(:procurement_id)
     where id: filtered_ids

@@ -44,7 +44,14 @@ class InventoryLineItem < ActiveRecord::Base
 
   # Filter though supply item type
   scope :filter_item_type, -> (type_id) {
-    where supply_item_type_id: type_id
+    if type_id.is_a?(Array)
+      if type_id.map(&:to_i).include?(SupplyItemType.id_for(:po_item))
+        new_type_id = type_id + [nil]
+        where supply_item_type_id: new_type_id
+      elsif type_id.map(&:to_i).include?(SupplyItemType.id_for(:non_po_item))
+        where supply_item_type_id: type_id
+      end
+    end
   }
 
   scope :with_id, -> (id) {
