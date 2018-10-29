@@ -1,0 +1,59 @@
+<% content_for :body do %>
+  <head>
+    <title>Bulk Import of Invoices</title>
+  </head>
+  <body style="background-color: #f3f3f3; height: auto;">
+  <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
+    <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;">Bulk Import of Invoice</p>
+  </div>
+  <div style="width: 100%; height: auto; margin: auto; background-color: white;">
+    <!--<p style="font-size: 20px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">Abhinash1354@gmail.com</span> has shared 'New Expense Report' with you.</p>-->
+
+    <% if @data.approval_results[:success].length > 0 %>
+      <div style="text-align: left;">Following Invoices are imported:</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Invoice Number #</th>
+          <th>Status Message</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.approval_results[:success].each_with_index do |item_details, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= item_details[:invoice_number] %></td>
+            <td><%= item_details[:messages].join(", ") %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <% if @data.approval_results[:error].length > 0 %>
+      <div style="text-align: left;">Following Invoices could not be imported</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Invoice #</th>
+          <th>Error</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.approval_results[:error].each_with_index do |item_details, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= item_details[:invoice_number] %></td>
+            <td><%= item_details[:messages].join(",") %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+  </div>
+  </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>

@@ -179,9 +179,8 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
       add_message :success, 'All data will be processed'
 
       params[:processed_invoices_params] = invoices_params
-
       # Call background operations
-      ::Procurements::Invoices::ImportProcessor.call(user, params)
+      ::Procurements::Invoices::ImportProcessor.call(user.id, params)
 
     end
 
@@ -247,9 +246,10 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
   end
 
   def get_invoice_build_params(invoice_params)
-    invoice_params.delete(:auto_submit)
-    invoice_params.delete(:attachments)
-    invoice_params
+    new_invoice_params = invoice_params.clone
+    new_invoice_params.delete(:auto_submit)
+    new_invoice_params.delete(:attachments)
+    new_invoice_params
   end
 
   def generate_invoices_params
@@ -303,7 +303,9 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
               inventory_line_item_id: inventory_line_item&.id,
               tax_rate_id: tax_rate&.id,
               description: inventory_line_item&.description,
+              category_id: inventory_line_item&.category_id,
               comment: data[:comment],
+              hsn_sac: inventory_line_item&.hsn_sac,
               amount_attributes: {
                   value: amount,
                   currency_id: 1
