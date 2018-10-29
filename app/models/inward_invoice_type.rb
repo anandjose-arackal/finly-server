@@ -13,7 +13,7 @@ class InwardInvoiceType < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:tax_invoice, :advance]
+    [:tax_invoice, :advance, :non_po_invoice]
   end
 
   def tax_invoice?
@@ -22,6 +22,10 @@ class InwardInvoiceType < ActiveRecord::Base
 
   def advance?
     self.id == InwardInvoiceType.id_for(:advance)
+  end
+
+  def non_po_invoice?
+    self.id == InwardInvoiceType.id_for(:non_po_invoice)
   end
 
 end
