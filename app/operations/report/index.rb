@@ -134,7 +134,6 @@ class Report::Index < Report::Base
       end
     end
 
-
   end
 
 end
