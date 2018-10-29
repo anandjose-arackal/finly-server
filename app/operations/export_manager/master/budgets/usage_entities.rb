@@ -101,11 +101,22 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
     ""
   end
 
+  def location(item)
+    if item.is_a?(PurchaseOrderItem)
+      return item.purchase_order.location&.name
+    elsif item.is_a?(InvoiceLineItem)
+      return item.parent.location&.name
+    elsif item.is_a?(Payment)
+      return item.invoice.location&.name
+    end
+    ""
+  end
+
   def category(item)
     if item.is_a?(PurchaseOrderItem)
-      return item.category&.name
+      return item.inventory_line_item&.category&.name
     elsif item.is_a?(InvoiceLineItem)
-      return item.category&.name
+      return item.inventory_line_item&.category&.name
     elsif item.is_a?(Payment)
       return item.invoice.category&.name
     end
