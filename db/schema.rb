@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181022195531) do
+ActiveRecord::Schema.define(version: 20181028162425) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2685,6 +2685,22 @@ ActiveRecord::Schema.define(version: 20181022195531) do
     t.string   "combined_kyc_content_type",  limit: 255
     t.integer  "combined_kyc_file_size",     limit: 4
     t.datetime "combined_kyc_updated_at"
+    t.string   "kyc_1_front_file_name",      limit: 255
+    t.string   "kyc_1_front_content_type",   limit: 255
+    t.integer  "kyc_1_front_file_size",      limit: 4
+    t.datetime "kyc_1_front_updated_at"
+    t.string   "kyc_1_back_file_name",       limit: 255
+    t.string   "kyc_1_back_content_type",    limit: 255
+    t.integer  "kyc_1_back_file_size",       limit: 4
+    t.datetime "kyc_1_back_updated_at"
+    t.string   "kyc_2_front_file_name",      limit: 255
+    t.string   "kyc_2_front_content_type",   limit: 255
+    t.integer  "kyc_2_front_file_size",      limit: 4
+    t.datetime "kyc_2_front_updated_at"
+    t.string   "kyc_2_back_file_name",       limit: 255
+    t.string   "kyc_2_back_content_type",    limit: 255
+    t.integer  "kyc_2_back_file_size",       limit: 4
+    t.datetime "kyc_2_back_updated_at"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -3778,13 +3794,17 @@ ActiveRecord::Schema.define(version: 20181022195531) do
     t.date     "processed_at"
     t.integer  "cost_center_id",                 limit: 4
     t.integer  "company_id",                     limit: 4
-    t.integer  "external_reference_id",          limit: 4
+    t.string   "external_reference_id",          limit: 255
+    t.integer  "purchase_order_id",              limit: 4
+    t.integer  "procurement_id",                 limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
   add_index "payments", ["category_id"], name: "index_payments_on_category_id", using: :btree
   add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
+  add_index "payments", ["procurement_id"], name: "fk_rails_b1fc8a9b0f", using: :btree
+  add_index "payments", ["purchase_order_id"], name: "fk_rails_65acc3c87d", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
@@ -5819,6 +5839,8 @@ ActiveRecord::Schema.define(version: 20181022195531) do
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "categories"
   add_foreign_key "payments", "payment_types"
+  add_foreign_key "payments", "procurements"
+  add_foreign_key "payments", "purchase_orders"
   add_foreign_key "per_diem_expenses", "expenses"
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
