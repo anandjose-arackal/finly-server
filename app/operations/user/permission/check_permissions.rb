@@ -26,6 +26,7 @@ class User::Permission::CheckPermissions < User::Permission::Base
     self.permission_keys.each do |key|
       self.result_hash[key] = self.permission.send(key)
     end
+
   end
 
   def success
@@ -33,4 +34,5 @@ class User::Permission::CheckPermissions < User::Permission::Base
     params[:selected_user] = self.selected_user
     User::Permission::CheckPermissions::PermissionPresenter.new(user, params, messages)
   end
+
 end
