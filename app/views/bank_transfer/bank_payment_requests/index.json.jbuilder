@@ -34,4 +34,18 @@ json.array! @result.paginated_requests.include_for_index.each do |payment_reques
     json.currency item.amount_requested&.currency
   end
   json.payment_file_downloaded payment_request.payment_file_downloaded
+
+  json.payments_count payment_request.payment_order.payments.count
+
+  payments = payment_request.payment_order.payments.limit(5)
+  json.payments do
+    json.array!(payments) do |payment|
+      json.id payment.id
+      json.beneficiary_name payment.receiving_account&.account_owner&.name
+      json.payment_mode payment.payment_mode&.upcase
+      json.date payment.date
+      json.amount payment.amount_value
+      json.utr payment.reference_resource&.bank_reference_number
+    end
+  end
 end
