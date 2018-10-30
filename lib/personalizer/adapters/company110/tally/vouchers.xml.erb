@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+   <HEADER>
+      <TALLYREQUEST>Import Data</TALLYREQUEST>
+   </HEADER>
+   <BODY>
+      <IMPORTDATA>
+         <REQUESTDESC>
+            <REPORTNAME>Vouchers</REPORTNAME>
+            <STATICVARIABLES>
+               <SVCURRENTCOMPANY>SPTPL - Maharashtra</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+         </REQUESTDESC>
+         <REQUESTDATA>
+            <TALLYMESSAGE xmlns:UDF="TallyUDF">
+            <% expense_data = {} %>
+            <% expenses.each do |expense| %>
+            <% if expense_data[expense.report_id].blank? %>
+              <% expense_data[expense.report_id] = {expenses: {}, user_name: expense.user.name, total_amount: 0} %>
+              <% expense_data[expense.report_id][:date] = expense.report.tracks.reorder(created_at: :desc).where(action_user_id: 14412, report_tracking_action_id: ReportTrackingAction.id_for(:approve))&.first&.created_at %>
+              <% if expense_data[expense.report_id][:date].blank? %>
+                <% raise "Bizongo Tally Export: Namratas approval not found for the given Report ID #{expense.report_id}" %>
+              <% end %>
+            <% end %>
+              <% expense_data[expense.report_id][:expenses][expense.category.name] = 0 if expense_data[expense.report_id][:expenses][expense.category.name].blank? %>
+              <% expense_data[expense.report_id][:expenses][expense.category.name] += expense.amount.value %>
+              <% expense_data[expense.report_id][:total_amount] += expense.amount.value %>
+            <% end %>
+            <% expense_data.each do |report_id, map| %>
+                <% date = map[:date] %>
+               <VOUCHER VCHTYPE="Re-imb" ACTION="Create">
+                  <VOUCHERTYPENAME>Re-imb</VOUCHERTYPENAME>
+                  <DATE><%= date.strftime('%Y%m%d') %></DATE>
+                  <VOUCHERNUMBER>Report ID No. <%= report_id %></VOUCHERNUMBER>
+                  <NARRATION>Being Reimbursement expense booked for the month of <%= date.strftime('%b %Y') %> against Report ID no. <%= report_id %></NARRATION>
+                  <EFFECTIVEDATE><%= date.strftime('%Y%m%d') %></EFFECTIVEDATE>
+                  <% map[:expenses].each do |gl_name, amount| %>
+                  <ALLLEDGERENTRIES.LIST>
+                     <REFERENCE>Report ID No. <%= report_id %></REFERENCE>
+                     <LEDGERNAME><%= html_escape gl_name %></LEDGERNAME>
+                     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                     <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                     <AMOUNT>-<%= amount %></AMOUNT>
+                  </ALLLEDGERENTRIES.LIST>
+                  <% end %>
+                  <ALLLEDGERENTRIES.LIST>
+                     <REFERENCE>Report ID No. <%= report_id %></REFERENCE>
+                     <LEDGERNAME><%= html_escape map[:user_name] %></LEDGERNAME>
+                     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+                     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                     <AMOUNT><%= map[:total_amount] %></AMOUNT>
+                  </ALLLEDGERENTRIES.LIST>
+               </VOUCHER>
+            <% end %>
+            </TALLYMESSAGE>
+         </REQUESTDATA>
+      </IMPORTDATA>
+   </BODY>
+</ENVELOPE>
