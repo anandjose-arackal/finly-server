@@ -123,6 +123,20 @@ class Budget < ActiveRecord::Base
     where.not('end_date < ? AND start_date > ?', Date.parse(date_from), Date.parse(date_to))
   }
 
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from start_date) = ? OR extract(year from end_date) = ?', year, year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from start_date) = ? OR extract(month from end_date) = ?', month, month)
+  }
+
   scope :include_details, -> {
     includes([
                  # :budget_criteria_mappings,

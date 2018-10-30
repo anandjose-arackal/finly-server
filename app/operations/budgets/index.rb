@@ -17,8 +17,10 @@ class Budgets::Index < Budgets::Base
   class Budgets::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :budgets
 
-    has_scope :filter_date, using: [:from, :to], type: :hash
+    # has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_ids
+    has_scope :filter_month
+    has_scope :filter_year
 
     def init
       self.budgets = params[:budgets]
