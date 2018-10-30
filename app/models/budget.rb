@@ -136,6 +136,12 @@ class Budget < ActiveRecord::Base
     end
   }
 
+  scope :filter_search, -> (term) {
+    if term.present?
+      where('name like ?', "%#{term}%")
+    end
+  }
+
   scope :include_details, -> {
     includes([
                  # :budget_criteria_mappings,

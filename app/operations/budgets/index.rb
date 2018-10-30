@@ -21,6 +21,7 @@ class Budgets::Index < Budgets::Base
     has_scope :filter_ids
     has_scope :filter_month
     has_scope :filter_year
+    has_scope :filter_search
 
     def init
       self.budgets = params[:budgets]
