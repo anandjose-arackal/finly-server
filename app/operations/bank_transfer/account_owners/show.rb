@@ -1,6 +1,6 @@
 class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
 
-  attr_accessor :account_owner, :receiving_transactions, :bank_accounts
+  attr_accessor :account_owner, :receiving_transactions, :bank_accounts, :actions
 
   def init
     super()
@@ -36,12 +36,25 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
 
   class BankTransfer::Vendors::Transfers::Show::AccountOwnersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receiving_transactions, :bank_accounts, :account_owner
+    attr_accessor :receiving_transactions, :bank_accounts, :account_owner, :actions
 
     def init
       self.receiving_transactions = params[:receiving_transactions]
       self.bank_accounts = params[:bank_accounts]
       self.account_owner = params[:account_owner]
+
+      self.actions = get_actions
+    end
+
+
+    def get_actions
+      actions = {}
+
+      if account_owner.is_a?(YesBankVendor)
+        actions[:create_beneficiaries] = user.permission.create_beneficiaries
+      end
+
+      actions
     end
 
   end
