@@ -26,6 +26,10 @@
 #  comment                :string(255)
 #  account                :string(255)
 #  tax_rate_id            :integer
+#  buying_price           :decimal(10, 5)
+#  markup                 :decimal(10, 5)
+#  profit                 :decimal(10, 5)
+#  customer_id            :integer
 #
 
 require 'test_helper'

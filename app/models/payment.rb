@@ -39,8 +39,9 @@
 #  processed_at                   :date
 #  cost_center_id                 :integer
 #  company_id                     :integer
-#  external_reference_id          :integer
+#  external_reference_id          :string(255)
 #
+
 
 
 
@@ -324,7 +325,7 @@ class Payment < ActiveRecord::Base
 
   # validates :amount_id, presence: true
   validates :date, presence: true
-  # validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
+  validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
   # validates :initiating_user_id, presence: true
   # validates :receiving_user_id, presence: true
   validate :initiating_user_presence
