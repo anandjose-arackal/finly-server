@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181024063320) do
+ActiveRecord::Schema.define(version: 20181028162425) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2685,6 +2685,22 @@ ActiveRecord::Schema.define(version: 20181024063320) do
     t.string   "combined_kyc_content_type",  limit: 255
     t.integer  "combined_kyc_file_size",     limit: 4
     t.datetime "combined_kyc_updated_at"
+    t.string   "kyc_1_front_file_name",      limit: 255
+    t.string   "kyc_1_front_content_type",   limit: 255
+    t.integer  "kyc_1_front_file_size",      limit: 4
+    t.datetime "kyc_1_front_updated_at"
+    t.string   "kyc_1_back_file_name",       limit: 255
+    t.string   "kyc_1_back_content_type",    limit: 255
+    t.integer  "kyc_1_back_file_size",       limit: 4
+    t.datetime "kyc_1_back_updated_at"
+    t.string   "kyc_2_front_file_name",      limit: 255
+    t.string   "kyc_2_front_content_type",   limit: 255
+    t.integer  "kyc_2_front_file_size",      limit: 4
+    t.datetime "kyc_2_front_updated_at"
+    t.string   "kyc_2_back_file_name",       limit: 255
+    t.string   "kyc_2_back_content_type",    limit: 255
+    t.integer  "kyc_2_back_file_size",       limit: 4
+    t.datetime "kyc_2_back_updated_at"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -2708,7 +2724,6 @@ ActiveRecord::Schema.define(version: 20181024063320) do
     t.string   "item_code",           limit: 255
     t.string   "account",             limit: 255
     t.integer  "supply_item_type_id", limit: 4
-    t.integer  "count",               limit: 4
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
@@ -2754,10 +2769,6 @@ ActiveRecord::Schema.define(version: 20181024063320) do
     t.string   "comment",                limit: 255
     t.string   "account",                limit: 255
     t.integer  "tax_rate_id",            limit: 4
-    t.decimal  "buying_price",                         precision: 10, scale: 5
-    t.decimal  "markup",                               precision: 10, scale: 5
-    t.decimal  "profit",                               precision: 10, scale: 5
-    t.integer  "customer_id",            limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -3784,12 +3795,16 @@ ActiveRecord::Schema.define(version: 20181024063320) do
     t.integer  "cost_center_id",                 limit: 4
     t.integer  "company_id",                     limit: 4
     t.string   "external_reference_id",          limit: 255
+    t.integer  "purchase_order_id",              limit: 4
+    t.integer  "procurement_id",                 limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
   add_index "payments", ["category_id"], name: "index_payments_on_category_id", using: :btree
   add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
+  add_index "payments", ["procurement_id"], name: "fk_rails_b1fc8a9b0f", using: :btree
+  add_index "payments", ["purchase_order_id"], name: "fk_rails_65acc3c87d", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
@@ -5824,6 +5839,8 @@ ActiveRecord::Schema.define(version: 20181024063320) do
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "categories"
   add_foreign_key "payments", "payment_types"
+  add_foreign_key "payments", "procurements"
+  add_foreign_key "payments", "purchase_orders"
   add_foreign_key "per_diem_expenses", "expenses"
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
