@@ -60,3 +60,5 @@ if @result.account_owner.is_a?(YesBankVendor)
     json.name @result.account_owner.vendor_type&.name
   end
 end
+
+json.actions @result.actions

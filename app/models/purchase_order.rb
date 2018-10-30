@@ -92,7 +92,7 @@ class PurchaseOrder < ActiveRecord::Base
 
   has_many :trails, as: :parent
 
-  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, to: :status
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
