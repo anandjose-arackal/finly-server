@@ -242,7 +242,7 @@ class Card < ActiveRecord::Base
   end
 
   def max_eligibility
-    upgraded? ? 50000 : 20000
+    upgraded? ? 100000 : 20000
   end
 
   def assigned?

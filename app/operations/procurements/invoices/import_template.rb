@@ -184,7 +184,10 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
     # Add Policies
     policies_headers = ["Policy Name"]
     policies_contents = []
-    user.policies.with_application(:vp).each do |policy|
+
+
+    policy_ids = user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+    user.policies.with_id(policy_ids).with_application(:vp).each do |policy|
       policies_contents << [policy.name]
     end
 

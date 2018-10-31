@@ -20,14 +20,26 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     if params[:kyc_file_2_file].present?
       params[:kyc_file_2] = extract_image(params[:kyc_file_2_file], params[:kyc_file_2_content_type], params[:kyc_file_2_file_name])
     end
-    # DEPRECATED END #
-
-    # Handling for Android START #
     if params.dig(:aadhar_front_file).present?
       params[:aadhar_front] = extract_image(params[:aadhar_front_file], params[:aadhar_front_content_type], params[:aadhar_front_file_name])
     end
     if params[:aadhar_back_file].present?
       params[:aadhar_back] = extract_image(params[:aadhar_back_file], params[:aadhar_back_content_type], params[:aadhar_back_file_name])
+    end
+    # DEPRECATED END #
+
+    # Handling for Android START #
+    if params.dig(:kyc_1_front_file).present?
+      params[:kyc_1_front] = extract_image(params[:kyc_1_front_file], params[:kyc_1_front_content_type], params[:kyc_1_front_file_name])
+    end
+    if params[:kyc_1_back_file].present?
+      params[:kyc_1_back] = extract_image(params[:kyc_1_back_file], params[:kyc_1_back_content_type], params[:kyc_1_back_file_name])
+    end
+    if params.dig(:kyc_2_front_file).present?
+      params[:kyc_2_front] = extract_image(params[:kyc_2_front_file], params[:kyc_2_front_content_type], params[:kyc_2_front_file_name])
+    end
+    if params[:kyc_2_back_file].present?
+      params[:kyc_2_back] = extract_image(params[:kyc_2_back_file], params[:kyc_2_back_content_type], params[:kyc_2_back_file_name])
     end
     if params[:photo_file].present?
       params[:photo] = extract_image(params[:photo_file], params[:photo_content_type], params[:photo_file_name])
