@@ -13,6 +13,8 @@ class BudgetsCalculator::Calculate::PaymentBudgetsProcessor < BudgetsCalculator:
         category_id: payment.category_id,
         cost_center_id: payment.cost_center_id,
         vendor_id: (payment.receiving_account_id if payment.receiving_account_type == "YesBankVendor"),
+        department_id: payment.department_id,
+        sub_department_id: payment.department_id,
         amount_attributes: {
             value: payment.amount.value,
             currency_id: payment.amount.currency_id
