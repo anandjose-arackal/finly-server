@@ -17,14 +17,14 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
     if params[:document_type].present?
       case params[:document_type]
         when 'invoice', 'proforma_invoice'
-          self.inward_invoice_type = ::InwardInvoiceStatus.id_for(:tax_invoice)
+          self.inward_invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
         when 'non_po_invoice'
-          self.inward_invoice_type = ::InwardInvoiceStatus.id_for(:non_po_invoice)
+          self.inward_invoice_type = ::InwardInvoiceType.id_for(:non_po_invoice)
         else
-          self.inward_invoice_type = ::InwardInvoiceStatus.id_for(:tax_invoice)
+          self.inward_invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
       end
     else
-      self.inward_invoice_type = ::InwardInvoiceStatus.id_for(:tax_invoice)
+      self.inward_invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
     end
   end
 

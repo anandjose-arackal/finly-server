@@ -120,6 +120,8 @@ class Trail < ActiveRecord::Base
         action = " confirmed reimbursement"
       when TrailAction.id_for(:closed)
         action = " closed"
+      when TrailAction.id_for(:void)
+        action = " voided"
       else
         action = ""
     end

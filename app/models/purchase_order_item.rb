@@ -58,6 +58,10 @@ class PurchaseOrderItem < ActiveRecord::Base
   scope :with_inventory_line_item, -> (inventory_line_item_id) {
     where inventory_line_item_id: inventory_line_item_id
   }
+
+  scope :with_category, -> (id) {
+    where category_id: id
+  }
   scope :include_details, -> {includes(:total_amount, :cost_center,purchase_order: [:department, :location])}
 
   after_save :budget_trail_entry

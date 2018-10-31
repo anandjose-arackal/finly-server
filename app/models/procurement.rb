@@ -117,6 +117,21 @@ class Procurement < ActiveRecord::Base
     end
   }
 
+  scope :filter_category, -> (category_name, user_id){
+    user = User.find_by id: user_id
+
+    if user.present?
+      category_ids = user.company.categories.inward_invoice_line_items_only.filter_search(category_name).pluck(:id)
+
+      inventory_line_item_ids = user.company.inventory_line_items.with_category_id(category_ids)
+
+      purchase_order_ids = PurchaseOrderItem.with_inventory_line_item(inventory_line_item_ids).pluck(:purchase_order_id)
+
+      filtered_ids = user.company.purchase_orders.with_id(purchase_order_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_procurement_type, -> (procurement_type){
     where procurement_type: procurement_type
   }

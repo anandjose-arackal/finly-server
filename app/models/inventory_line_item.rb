@@ -34,6 +34,10 @@ class InventoryLineItem < ActiveRecord::Base
   validates :rate, presence: true
   validates :description, presence: true
 
+  scope :with_category_id, -> (id){
+    where category_id: id
+  }
+
   scope :search, -> (term) {
     where('description like ? OR sku like ? OR note like ? OR hsn_sac like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }

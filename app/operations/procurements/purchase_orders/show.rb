@@ -153,12 +153,14 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       end
 
       if user.vendor_payment_admin?
-        actions[:document_editable] = true
-        actions[:save] = {
-            url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
-            method: "PUT"
-        }
-        actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
+        unless purchase_order.voided?
+          actions[:document_editable] = true
+          actions[:save] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
+              method: "PUT"
+          }
+          actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
+        end
       end
 
       actions

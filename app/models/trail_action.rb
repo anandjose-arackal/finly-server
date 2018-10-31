@@ -17,6 +17,7 @@ class TrailAction < ActiveRecord::Base
         :approve,
         :approve_and_forward,
         :auto_approve,
+        :void,
         :reject,
         :unapprove,
         :take_control,
