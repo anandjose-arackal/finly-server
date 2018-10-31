@@ -522,6 +522,8 @@ class User < ActiveRecord::Base
 
     # building a default cash on hand pocket, Card Transfer pocket and Bank Transfer pocket
     self.user_pockets.build(name: "Cash on Hand", user_pocket_type_id: UserPocketType.id_for(:cash), atm_withdrawal_pocket: true, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    self.user_pockets.build(name: "Reimbursement", user_pocket_type_id: UserPocketType.id_for(:reimbursement), atm_withdrawal_pocket: false, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    self.user_pockets.build(name: "Paid By Company", user_pocket_type_id: UserPocketType.id_for(:paid_by_company), atm_withdrawal_pocket: false, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     # self.user_pockets.build(name: "Finly Money - Card Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:card_transfer), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
   end
