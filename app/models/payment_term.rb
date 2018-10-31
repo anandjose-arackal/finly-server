@@ -69,4 +69,8 @@ class PaymentTerm < ActiveRecord::Base
       PaymentTerm.create(val)
     end
   end
+
+  scope :filter_name, -> (name) {
+    where("payment_terms.name LIKE ?", "%#{name}%")
+  }
 end

@@ -180,6 +180,13 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
   scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved)}
 
+  scope :filter_payment_ids, -> (payment_ids) {
+    payment_ids = payment_ids.split(",").each { |e| e.strip! }
+    all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
+    payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
+    where(payment_order_id: payment_order_ids)
+  }
+
   attr_accessor :cache_users
 
   before_save do

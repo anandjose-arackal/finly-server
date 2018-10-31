@@ -30,6 +30,17 @@
 #  markup                 :decimal(10, 5)
 #  profit                 :decimal(10, 5)
 #  customer_id            :integer
+#  brand                  :string(255)
+#  model_number           :string(255)
+#  date_of_inward         :string(255)
+#  year_of_registration   :string(255)
+#  kms_driven             :decimal(10, 5)
+#  expected_selling_price :decimal(10, 5)
+#  owner_details          :string(255)
+#  parking_charges        :decimal(10, 5)
+#  billable               :boolean
+#  registration_number    :string(255)
+#  vendor_id              :integer
 #
 
 require 'test_helper'

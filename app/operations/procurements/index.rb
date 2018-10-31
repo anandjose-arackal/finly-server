@@ -85,6 +85,11 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
     has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
     has_scope :filter_user, using: [:user_details, :user_id], type: :hash
+    has_scope :filter_payment_term, using: [:payment_term_name, :user_id], type: :hash
+    has_scope :filter_category, using: [:category_name, :user_id], type: :hash
+
+    has_scope :filter_procurement_type
+
 
     def init
       self.procurements = params[:procurements]
@@ -98,8 +103,9 @@ class Procurements::Index < Procurements::Base
     def apply_filter
       if params[:search_type].present? && params[:search_query].present?
         set_scope
-        self.procurements = apply_scopes(self.procurements, params)
       end
+
+      self.procurements = apply_scopes(self.procurements, params)
 
       if params[:filter_awaiting_approval].present?
         self.procurements = self.procurements.filter_awaiting_approval(user)
@@ -132,6 +138,16 @@ class Procurements::Index < Procurements::Base
         when 'user_details'
           params[:filter_user] = {
               user_details: params[:search_query],
+              user_id: user.id
+          }
+        when 'payment_term_name'
+          params[:filter_payment_term] = {
+              payment_term_name: params[:search_query],
+              user_id: user.id
+          }
+        when 'category_name'
+          params[:filter_category] = {
+              category_name: params[:search_query],
               user_id: user.id
           }
         else

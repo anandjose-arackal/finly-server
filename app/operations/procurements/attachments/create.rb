@@ -6,8 +6,9 @@ class Procurements::Attachments::Create < Procurements::Attachments::Base
   end
 
   def process
-    self.attachment = ProcurementAttachment.new(attachment_params)
+    self.attachment = user.procurement_attachments.new(attachment_params)
     self.attachment.company = user.company
+
     if self.attachment.save
       add_message :success, 'Upload Successful'
     else

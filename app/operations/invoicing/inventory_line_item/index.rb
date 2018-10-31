@@ -8,7 +8,7 @@ class Invoicing::InventoryLineItem::Index < Invoicing::InventoryLineItem::Base
 
     has_scope :search
     has_scope :filter_category_id
-    # has_scope :filter_item_type, type: :array #todo undo this after implementation
+    has_scope :filter_item_type, type: :array #todo undo this after implementation
 
     def init
       self.inventory_line_items = apply_scopes(params[:inventory_line_items], params)

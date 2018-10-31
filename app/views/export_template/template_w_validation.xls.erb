@@ -36,13 +36,13 @@
           <% item_contents&.each do |item| %>
             <ss:Row>
               <% item.each do |value| %>
-                <% if value.index("---error---") %>
-                  <% value_content = value.split("---error---")[0] %>
+                <% if value.present? && value.to_s.index("---error---") %>
+                  <% value_content = value.to_s.split("---error---")[0] %>
                   <ss:Cell ss:StyleID="error">
                     <ss:Data ss:Type="String"><%= value_content %></ss:Data>
                   </ss:Cell>
-                <% elsif value.index("---warning---") %>
-                  <% value_content = value.split("---warning---")[0] %>
+                <% elsif value.present? && value.to_s.index("---warning---") %>
+                  <% value_content = value.to_s.split("---warning---")[0] %>
                   <ss:Cell ss:StyleID="warning">
                     <ss:Data ss:Type="String"><%= value_content %></ss:Data>
                   </ss:Cell>
@@ -93,13 +93,13 @@
         <% item_contents&.each do |item| %>
           <ss:Row>
             <% item.each do |value| %>
-              <% if value.index("---error---") %>
-                <% value_content = value.split("---error---")[0] %>
+              <% if value.present? && value.to_s.index("---error---") %>
+                <% value_content = value.to_s.split("---error---")[0] %>
                 <ss:Cell ss:StyleID="error">
                   <ss:Data ss:Type="String"><%= value_content %></ss:Data>
                 </ss:Cell>
-              <% elsif value.index("---warning---") %>
-                <% value_content = value.split("---warning---")[0] %>
+              <% elsif value.present? && value.to_s.index("---warning---") %>
+                <% value_content = value.to_s.split("---warning---")[0] %>
                 <ss:Cell ss:StyleID="warning">
                   <ss:Data ss:Type="String"><%= value_content %></ss:Data>
                 </ss:Cell>

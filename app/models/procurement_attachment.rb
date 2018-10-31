@@ -14,6 +14,7 @@
 #  procurement_document_type :string(255)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  user_id                   :integer
 #
 
 class ProcurementAttachment < ActiveRecord::Base
@@ -21,6 +22,7 @@ class ProcurementAttachment < ActiveRecord::Base
 
   belongs_to :procurement_document, polymorphic: true
   belongs_to :company
+  belongs_to :user
 
   CONTENT_TYPES = {content_type: []}
 

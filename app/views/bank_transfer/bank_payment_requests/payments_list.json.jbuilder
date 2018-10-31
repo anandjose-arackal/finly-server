@@ -27,6 +27,10 @@ json.payments do
       json.retriable payment.retriable?
       json.change_mode payment.payment_order.failed?
     end
+    json.category_id payment.category_id
+    json.category_name payment.category&.name
+    json.department_id payment.department_id
+    json.department payment.department&.name
 
     invoice = payment.invoice
 
@@ -159,6 +163,10 @@ json.unpaid_payments do
       json.retriable payment.retriable?
       json.change_mode payment.payment_order.failed?
     end
+    json.category_id payment.category_id
+    json.category_name payment.category&.name
+    json.department_id payment.department_id
+    json.department payment.department&.name
 
     invoice = payment.invoice
 

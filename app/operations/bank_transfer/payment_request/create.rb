@@ -269,6 +269,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
           external_reference_id: order_details[:external_reference_id],
           note: order_details[:note],
           category_id: order_details[:category_id],
+          department_id: order_details[:department_id],
           date: DateUtils.local_date,
           invoice_attributes: {
               invoice_number: order_details[:invoice_number],

@@ -2,7 +2,7 @@ class Procurements::Attachments::Index < Procurements::Attachments::Base
   attr_accessor :attachments
 
   def init
-    self.attachments = user.company.procurement_attachments.orphans
+    self.attachments = user.procurement_attachments.orphans
   end
 
   def process

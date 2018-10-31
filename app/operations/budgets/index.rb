@@ -6,7 +6,7 @@ class Budgets::Index < Budgets::Base
   end
 
   def init
-    self.budgets = user.company.budgets.roots.contains_date(Date.today)
+    self.budgets = user.company.budgets.roots.reorder(end_date: :desc)
   end
 
   def success
@@ -17,8 +17,15 @@ class Budgets::Index < Budgets::Base
   class Budgets::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :budgets
 
+    # has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_ids
+    has_scope :filter_month
+    has_scope :filter_year
+    has_scope :filter_search
+
     def init
       self.budgets = params[:budgets]
+      self.budgets = apply_scopes(self.budgets, params)
     end
   end
 end
