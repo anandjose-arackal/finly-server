@@ -2,7 +2,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
-                :requested_amount, :payment_mode
+                :requested_amount, :payment_mode, :scheduled_at
 
   def pre_validate
     if user.blank?
@@ -26,6 +26,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     self.parsed_data = ImportUtil.load_spreadsheet(file, headers,
                                                    {skip_empty_lines: true})
     self.payment_mode = params[:payment_mode]
+    self.scheduled_at = params[:scheduled_at]
   end
 
   def validate
@@ -35,6 +36,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     op = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
+    debugger
 
     if op.success?
       self.requested_amount = op.requested_amount
@@ -53,6 +55,11 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
+
+  end
+
+  def success
+
   end
 
   # this method should create the temporary file that can be linked in the front end
@@ -65,7 +72,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   def parse_payment_order_data
     payment_order_attributes = {
         initiating_user_id: user.id,
-        payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
+        payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.requested_amount,
@@ -81,7 +88,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     }
     bpr_attributes = {
         owner_id: user.id,
-        status_id: BankPaymentRequestStatus.id_for(:open),
+        status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
         controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
