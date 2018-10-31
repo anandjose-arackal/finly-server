@@ -130,7 +130,10 @@ class Expense < ActiveRecord::Base
         self.expense_status_id = ExpenseStatus.unsubmitted_id
       end
     end
-    if self.spent_from&.reimbursement?
+    if card_expense?
+      self.reimbursable = false
+      self.from_cash_on_hand = false
+    elsif self.spent_from&.reimbursement?
       self.reimbursable = true
       self.from_cash_on_hand = false
     elsif self.spent_from&.paid_by_company?
