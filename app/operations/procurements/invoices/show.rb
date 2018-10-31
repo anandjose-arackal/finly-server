@@ -34,7 +34,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
-      self.policies = invoice.created_by.policies.with_application(:vp)
+      policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+
       self.reviewal_chains = []
 
       self.actions = get_actions

@@ -258,7 +258,7 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
       inventory_line_item_op = Invoicing::InventoryLineItem::Index.(user, {filter_item_type: [SupplyItemType.id_for(:non_po_item)]})
 
       inventory_line_item = inventory_line_item_op.inventory_line_items.find_by id: data[:inventory_line_item_id]
-      vendor = user.company.yes_bank_vendors.find_by(id: data[:vendor_uid]) # todo find by vendor uid
+      vendor = user.company.yes_bank_vendors.find_by(vendor_id: data[:vendor_uid])
 
       receiving_account = vendor&.bank_accounts&.first
       sub_department = self.validation_data[:sub_departments]&.find_by(name: data[:sub_department_name])

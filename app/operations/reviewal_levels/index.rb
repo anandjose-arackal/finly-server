@@ -12,6 +12,7 @@ class ReviewalLevels::Index < ReviewalLevels::Base
 
       if self.reviewal_levels.present?
         self.reviewal_levels = apply_scopes(self.reviewal_levels, params)
+        self.reviewal_levels = self.reviewal_levels.order(:level_number)
       end
 
     end
