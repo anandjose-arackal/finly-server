@@ -63,6 +63,7 @@
 #  combined_kyc_file_size     :integer
 #  combined_kyc_updated_at    :datetime
 #
+
 require 'fileutils'
 class IndividualKyc < ActiveRecord::Base
   include Attachable, Magick
@@ -108,6 +109,18 @@ class IndividualKyc < ActiveRecord::Base
 
   has_attached_file :aadhar_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :aadhar_back, content_type: CONTENT_TYPES
+
+  has_attached_file :kyc_1_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_1_front, content_type: CONTENT_TYPES
+
+  has_attached_file :kyc_1_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_1_back, content_type: CONTENT_TYPES
+
+  has_attached_file :kyc_2_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_2_front, content_type: CONTENT_TYPES
+
+  has_attached_file :kyc_2_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_2_back, content_type: CONTENT_TYPES
 
   has_attached_file :photo, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :photo, content_type: CONTENT_TYPES

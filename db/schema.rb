@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181030124113) do
+ActiveRecord::Schema.define(version: 20181028162425) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2685,6 +2685,22 @@ ActiveRecord::Schema.define(version: 20181030124113) do
     t.string   "combined_kyc_content_type",  limit: 255
     t.integer  "combined_kyc_file_size",     limit: 4
     t.datetime "combined_kyc_updated_at"
+    t.string   "kyc_1_front_file_name",      limit: 255
+    t.string   "kyc_1_front_content_type",   limit: 255
+    t.integer  "kyc_1_front_file_size",      limit: 4
+    t.datetime "kyc_1_front_updated_at"
+    t.string   "kyc_1_back_file_name",       limit: 255
+    t.string   "kyc_1_back_content_type",    limit: 255
+    t.integer  "kyc_1_back_file_size",       limit: 4
+    t.datetime "kyc_1_back_updated_at"
+    t.string   "kyc_2_front_file_name",      limit: 255
+    t.string   "kyc_2_front_content_type",   limit: 255
+    t.integer  "kyc_2_front_file_size",      limit: 4
+    t.datetime "kyc_2_front_updated_at"
+    t.string   "kyc_2_back_file_name",       limit: 255
+    t.string   "kyc_2_back_content_type",    limit: 255
+    t.integer  "kyc_2_back_file_size",       limit: 4
+    t.datetime "kyc_2_back_updated_at"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -2692,29 +2708,27 @@ ActiveRecord::Schema.define(version: 20181030124113) do
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
 
   create_table "inventory_line_items", force: :cascade do |t|
-    t.decimal  "tax",                                  precision: 20, scale: 10
-    t.decimal  "discount",                             precision: 20, scale: 10
-    t.string   "hsn_sac",                limit: 255
-    t.integer  "company_id",             limit: 4
-    t.string   "sku",                    limit: 255
-    t.decimal  "rate",                                 precision: 20, scale: 10
-    t.text     "description",            limit: 65535
-    t.integer  "category_id",            limit: 4
-    t.datetime "created_at",                                                                     null: false
-    t.datetime "updated_at",                                                                     null: false
-    t.text     "note",                   limit: 65535
-    t.integer  "tax_rate_id",            limit: 4
-    t.boolean  "is_deleted",                                                     default: false, null: false
-    t.string   "item_code",              limit: 255
-    t.string   "account",                limit: 255
-    t.integer  "supply_item_type_id_id", limit: 4
-    t.integer  "supply_item_type_id",    limit: 4
+    t.decimal  "tax",                               precision: 20, scale: 10
+    t.decimal  "discount",                          precision: 20, scale: 10
+    t.string   "hsn_sac",             limit: 255
+    t.integer  "company_id",          limit: 4
+    t.string   "sku",                 limit: 255
+    t.decimal  "rate",                              precision: 20, scale: 10
+    t.text     "description",         limit: 65535
+    t.integer  "category_id",         limit: 4
+    t.datetime "created_at",                                                                  null: false
+    t.datetime "updated_at",                                                                  null: false
+    t.text     "note",                limit: 65535
+    t.integer  "tax_rate_id",         limit: 4
+    t.boolean  "is_deleted",                                                  default: false, null: false
+    t.string   "item_code",           limit: 255
+    t.string   "account",             limit: 255
+    t.integer  "supply_item_type_id", limit: 4
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
   add_index "inventory_line_items", ["company_id"], name: "index_inventory_line_items_on_company_id", using: :btree
   add_index "inventory_line_items", ["supply_item_type_id"], name: "index_inventory_line_items_on_supply_item_type_id", using: :btree
-  add_index "inventory_line_items", ["supply_item_type_id_id"], name: "index_inventory_line_items_on_supply_item_type_id_id", using: :btree
   add_index "inventory_line_items", ["tax_rate_id"], name: "index_inventory_line_items_on_tax_rate_id", using: :btree
 
   create_table "invoice_attachments", force: :cascade do |t|
@@ -3950,10 +3964,7 @@ ActiveRecord::Schema.define(version: 20181030124113) do
     t.string   "procurement_document_type", limit: 255
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
-    t.integer  "user_id",                   limit: 4
   end
-
-  add_index "procurement_attachments", ["user_id"], name: "index_procurement_attachments_on_user_id", using: :btree
 
   create_table "procurement_charges", force: :cascade do |t|
     t.integer  "charge_type",     limit: 4
@@ -5841,7 +5852,6 @@ ActiveRecord::Schema.define(version: 20181030124113) do
   add_foreign_key "policy_user_roles", "policies"
   add_foreign_key "policy_user_roles", "user_roles"
   add_foreign_key "policy_user_roles", "users"
-  add_foreign_key "procurement_attachments", "users"
   add_foreign_key "procurement_charges", "amounts"
   add_foreign_key "procurement_comments", "users"
   add_foreign_key "procurement_status_taggables", "procurements"
