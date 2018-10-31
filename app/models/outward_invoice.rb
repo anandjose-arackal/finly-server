@@ -46,6 +46,7 @@
 #  tds_slab_id             :integer
 #  tds                     :decimal(10, 5)
 #  tds_amount_id           :integer
+#  quikr_invoice_type      :string(255)
 #
 
 #  gst_type_id: 1 - IGST

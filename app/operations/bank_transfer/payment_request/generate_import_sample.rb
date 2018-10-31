@@ -62,6 +62,19 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
         item_contents: cost_center_contents,
         name: "Cost Centers"
     }
+
+    # adding departments to the excel sheet
+    department_headers = ["ID", "Department Name"]
+    department_contents = []
+    current_company.departments.each do |department|
+      department_contents << [department.id, department.name]
+    end
+    self.sheets << {
+        item_headers: department_headers,
+        item_contents: department_contents,
+        name: "Departments"
+    }
+
     # adding custom fields to the excel sheet
     self.payment_order_custom_fields.with_field_type([FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)]).each do |custom_field_config|
       custom_field_headers = ["#{custom_field_config.field_name} ID", "#{custom_field_config.field_name} Name"]
@@ -104,6 +117,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
        "TDS Slab ID",
        "Category ID",
        "Cost Center ID",
+       "Department ID",
        "Invoice Number",
        "Invoice Date (dd-mm-yyyy)",
        "Due Date (dd-mm-yyyy)",

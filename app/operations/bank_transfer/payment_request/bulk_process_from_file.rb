@@ -85,6 +85,7 @@ class BankTransfer::PaymentRequest::BulkProcessFromFile < BankTransfer::PaymentR
       category_id = item[:category_id]
       gst_type_id = item[:gst_type_id]
       cost_center_id = item[:cost_center_id]
+      department_id = item[:department_id]
       tds_slab_id = item[:tds_slab_id]
 
 
@@ -204,7 +205,7 @@ class BankTransfer::PaymentRequest::BulkProcessFromFile < BankTransfer::PaymentR
                                tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, gst_type_id: gst_type_id, owner_name: owner_name,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id,
-                               cost_center_id: cost_center_id, tds_slab_id: tds_slab_id, total_amount: amount,
+                               cost_center_id: cost_center_id, department_id: department_id, tds_slab_id: tds_slab_id, total_amount: amount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
                                net_amount: invoice_net_amount, invoice_items: invoice_items, roundoff_amount: roundoff_amount, balance_due: balance_due,
                                item_taxes_total: item_tax_total, item_discounts_total: item_discount_total, items_net_total: items_net_total, item_amounts_total: item_amounts_total,

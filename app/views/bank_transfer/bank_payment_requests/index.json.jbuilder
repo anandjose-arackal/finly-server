@@ -46,6 +46,7 @@ json.array! @result.paginated_requests.include_for_index.each do |payment_reques
       json.date payment.date
       json.amount payment.amount_value
       json.utr payment.reference_resource&.bank_reference_number
+      json.payment_status payment.payment_status_name
     end
   end
 end
