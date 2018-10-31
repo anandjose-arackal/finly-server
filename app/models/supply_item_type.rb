@@ -23,4 +23,11 @@ class SupplyItemType < ActiveRecord::Base
   def po_item?
     self.id == SupplyItemType.id_for(:po_item)
   end
+
+  def as_json
+    {
+        id: id,
+        name: name.humanize.split(" ").map(&:capitalize).join(" ")
+    }
+  end
 end

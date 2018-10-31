@@ -34,6 +34,10 @@ class InventoryLineItem < ActiveRecord::Base
   validates :rate, presence: true
   validates :description, presence: true
 
+  scope :with_category_id, -> (id){
+    where category_id: id
+  }
+
   scope :search, -> (term) {
     where('description like ? OR sku like ? OR note like ? OR hsn_sac like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
@@ -44,7 +48,14 @@ class InventoryLineItem < ActiveRecord::Base
 
   # Filter though supply item type
   scope :filter_item_type, -> (type_id) {
-    where supply_item_type_id: type_id
+    if type_id.is_a?(Array)
+      if type_id.map(&:to_i).include?(SupplyItemType.id_for(:po_item))
+        new_type_id = type_id + [nil]
+        where supply_item_type_id: new_type_id
+      elsif type_id.map(&:to_i).include?(SupplyItemType.id_for(:non_po_item))
+        where supply_item_type_id: type_id
+      end
+    end
   }
 
   scope :with_id, -> (id) {
@@ -70,7 +81,8 @@ class InventoryLineItem < ActiveRecord::Base
         tax: tax,
         account: account,
         item_code: item_code,
-        supply_item_type_id: supply_item_type_id
+        supply_item_type_id: supply_item_type_id,
+        item_type: supply_item_type.as_json
     }
   end
 

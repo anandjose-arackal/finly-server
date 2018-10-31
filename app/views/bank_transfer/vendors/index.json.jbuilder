@@ -1,6 +1,7 @@
 json.array!(@result.vendors) do |vendor|
   json.label vendor.name
   json.value vendor.id
+  json.vendor_id vendor&.vendor_id
 
   json.extract! vendor, :id, :name, :email, :mobile_number
 

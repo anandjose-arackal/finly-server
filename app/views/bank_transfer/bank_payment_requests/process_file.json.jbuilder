@@ -27,6 +27,7 @@ json.payment do
       json.net_amount item[:net_amount]
       json.category_id item[:category_id]
       json.cost_center_id item[:cost_center_id]
+      json.department_id item[:department_id]
       json.tds_slab_id item[:tds_slab_id]
       json.roundoff_amount item[:roundoff_amount]
       json.balance_due item[:balance_due]
@@ -77,6 +78,12 @@ json.payment do
       json.id tds_slab.id
       json.name "#{tds_slab.tds}% - #{tds_slab.name} "
       json.tds tds_slab.tds
+    end
+  end
+  json.departments do
+    json.array!(current_company.departments) do |department|
+      json.id department.id
+      json.name department.name
     end
   end
   json.errors @result.errors

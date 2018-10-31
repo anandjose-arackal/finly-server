@@ -11,11 +11,12 @@ class Procurements::Create < Procurements::Base
       return
     end
 
-    document_types = %w( purchase_order invoice )
-    unless document_types.include?(params[:document_type])
+    document_types = %w( purchase_order invoice non_po_invoice )
+
+    document_type = params[:document_type]
+    unless document_types.include?(document_type)
       add_message :error, 'Invalid document type provided'
     end
-
 
   end
 
@@ -35,7 +36,7 @@ class Procurements::Create < Procurements::Base
     case params[:document_type]
       when 'purchase_order'
         op = Procurements::PurchaseOrders::Create.(user, params)
-      when 'invoice', 'proforma_invoice'
+      when 'invoice', 'proforma_invoice', 'non_po_invoice'
         # add_message :error, 'Invalid document type provided'
         op = Procurements::Invoices::Create.(user, params)
         # do nothing!

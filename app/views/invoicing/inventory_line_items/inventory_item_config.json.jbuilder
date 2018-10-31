@@ -10,6 +10,6 @@ end
 
 json.supply_item_types do
   json.array! @result.supply_item_types do |item|
-    json.extract! item, :id, :name
+    json.merge! item.as_json
   end
 end

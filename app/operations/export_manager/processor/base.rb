@@ -14,7 +14,7 @@ class ExportManager::Processor::Base
   end
 
   def init_generator
-    self.master.generators.each do |gen_config|
+    self.master_class.generators.each do |gen_config|
       generator = gen_config[:generator]
       if generator.accept?(params[:export_format], gen_config[:options])
         return generator.new(user, params, master, gen_config[:options])

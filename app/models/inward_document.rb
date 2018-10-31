@@ -41,8 +41,8 @@ class InwardDocument < ActiveRecord::Base
     total = 0
     shipped = 0
     self.items.each do |item|
-      total += (item.quantity rescue 0)
-      shipped += (item.accepted rescue 0)
+      total += item.quantity.to_f
+      shipped += item.accepted.to_f
     end
 
     "#{shipped}/#{total} delivered"

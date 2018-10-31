@@ -3,12 +3,16 @@
 class Invoicing::InventoryLineItem::ImportTemplate < Invoicing::InventoryLineItem::Base
 
   attr_accessor :company, :inventory_item_custom_fields, :sample_type,
-                :headers, :content, :sheets
+                :headers, :content, :sheets, :import_data
 
   def init
     self.company = user.company
     # self.payment_order_custom_fields = self.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
     # self.sample_type = params[:sample_type]
+
+    if params[:import_data].present?
+      self.import_data = params[:import_data]
+    end
   end
 
   def process
@@ -26,7 +30,7 @@ class Invoicing::InventoryLineItem::ImportTemplate < Invoicing::InventoryLineIte
     self.sheets = [
         {
             item_headers: self.headers,
-            item_contents: []
+            item_contents: import_data.present? ? import_data[:contents] : []
         }
     ]
     # adding Categories to the excel sheet
@@ -63,7 +67,8 @@ class Invoicing::InventoryLineItem::ImportTemplate < Invoicing::InventoryLineIte
     item_type_headers = ["ID", "Item Type"]
     item_type_contents = []
     item_types.each do |item_type|
-      item_type_contents << [item_type.id, item_type.name]
+      item_name = item_type.name.humanize.split(" ").map(&:capitalize).join(" ")
+      item_type_contents << [item_type.id, item_name]
     end
     self.sheets << {
         item_headers: item_type_headers,
@@ -95,7 +100,7 @@ class Invoicing::InventoryLineItem::ImportTemplate < Invoicing::InventoryLineIte
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets, template: 'export_template/template_w_validation'}}, messages)
   end
 
   private

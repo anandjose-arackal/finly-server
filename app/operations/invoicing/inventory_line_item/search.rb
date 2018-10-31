@@ -13,10 +13,12 @@ class Invoicing::InventoryLineItem::Search < Invoicing::InventoryLineItem::Base
 
   def init
     self.term = params[:term]
+    params[:search] = params[:term]
   end
 
   def process
-    self.search_results = user.company.inventory_line_items.search(self.term)
+    search_results_op = Invoicing::InventoryLineItem::Index.(user, params)
+    self.search_results = search_results_op.inventory_line_items
   end
 
   def success

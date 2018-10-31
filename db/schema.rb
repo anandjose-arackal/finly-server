@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181028162425) do
+ActiveRecord::Schema.define(version: 20181030124113) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2701,6 +2701,8 @@ ActiveRecord::Schema.define(version: 20181028162425) do
     t.string   "kyc_2_back_content_type",    limit: 255
     t.integer  "kyc_2_back_file_size",       limit: 4
     t.datetime "kyc_2_back_updated_at"
+    t.string   "kyc_1_number",               limit: 255
+    t.string   "kyc_2_number",               limit: 255
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -3964,7 +3966,10 @@ ActiveRecord::Schema.define(version: 20181028162425) do
     t.string   "procurement_document_type", limit: 255
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
+    t.integer  "user_id",                   limit: 4
   end
+
+  add_index "procurement_attachments", ["user_id"], name: "index_procurement_attachments_on_user_id", using: :btree
 
   create_table "procurement_charges", force: :cascade do |t|
     t.integer  "charge_type",     limit: 4
@@ -5852,6 +5857,7 @@ ActiveRecord::Schema.define(version: 20181028162425) do
   add_foreign_key "policy_user_roles", "policies"
   add_foreign_key "policy_user_roles", "user_roles"
   add_foreign_key "policy_user_roles", "users"
+  add_foreign_key "procurement_attachments", "users"
   add_foreign_key "procurement_charges", "amounts"
   add_foreign_key "procurement_comments", "users"
   add_foreign_key "procurement_status_taggables", "procurements"

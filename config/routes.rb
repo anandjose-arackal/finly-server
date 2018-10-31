@@ -1180,6 +1180,7 @@
 #                          bank_transfer_transfer_timings GET    /bank_transfer/transfer_timings(.:format)                                                                           bank_transfer/bank_payment_requests#within_timeframe
 #                                    bank_transfer_search GET    /bank_transfer/account_owners/search(.:format)                                                                      bank_transfer/account_owners#search
 #                      bank_transfer_account_owners_count GET    /bank_transfer/account_owners/count(.:format)                                                                       bank_transfer/account_owners#count
+#               bank_transfer_account_owner_bank_accounts GET    /bank_transfer/account_owners/:account_owner_id/bank_accounts(.:format)                                             bank_transfer/account_owners#bank_accounts
 #                            bank_transfer_account_owners GET    /bank_transfer/account_owners(.:format)                                                                             bank_transfer/account_owners#index
 #                                                         POST   /bank_transfer/account_owners(.:format)                                                                             bank_transfer/account_owners#create
 #                         new_bank_transfer_account_owner GET    /bank_transfer/account_owners/new(.:format)                                                                         bank_transfer/account_owners#new
@@ -1435,8 +1436,11 @@
 #                            procure_purchase_order_close PUT    /procure/purchase_orders/:purchase_order_id/close(.:format)                                                         procure/purchase_orders#close
 #                         procure_purchase_order_download GET    /procure/purchase_orders/:purchase_order_id/download_pdf(.:format)                                                  procure/purchase_orders#download
 #                           procure_purchase_order_remind PUT    /procure/purchase_orders/:purchase_order_id/remind(.:format)                                                        procure/purchase_orders#remind
+#                             procure_purchase_order_void PUT    /procure/purchase_orders/:purchase_order_id/void(.:format)                                                          procure/purchase_orders#void
 #                 procure_purchase_order_save_as_template POST   /procure/purchase_orders/:purchase_order_id/save_as_template(.:format)                                              procure/purchase_orders#template_create
 #                   procure_purchase_order_apply_template POST   /procure/purchase_orders/:purchase_order_id/apply_template(.:format)                                                procure/purchase_orders#template_apply
+#             procure_purchase_order_make_advance_payment PUT    /procure/purchase_orders/:purchase_order_id/make_advance_payment(.:format)                                          procure/purchase_orders#create_payment
+#                 procure_purchase_order_advance_payments GET    /procure/purchase_orders/:purchase_order_id/advance_payments(.:format)                                              procure/purchase_orders#advance_payments
 #                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#index
 #                                                         POST   /procure/purchase_orders(.:format)                                                                                  procure/purchase_orders#create
 #                              new_procure_purchase_order GET    /procure/purchase_orders/new(.:format)                                                                              procure/purchase_orders#new
@@ -3054,7 +3058,9 @@ Rails.application.routes.draw do
 
     get 'account_owners/search', to: 'account_owners#search', as: :search
     get 'account_owners/count', to: 'account_owners#count'
-    resources :account_owners
+    resources :account_owners do
+      get 'bank_accounts', to: 'account_owners#bank_accounts', as: :bank_accounts
+    end
 
     post 'vendors/import', to: 'vendors#import', as: :import
     get 'vendors/new_vendor_config', to: 'vendors#new_vendor_config', as: :new_vendor_config
@@ -3221,10 +3227,12 @@ Rails.application.routes.draw do
       put 'close', to: 'purchase_orders#close'
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
+      put 'void', to: 'purchase_orders#void'
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
+      put 'make_advance_payment', to: 'purchase_orders#create_payment'
+      get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
     end
-
 
     resources :inward_documents do
 

@@ -67,6 +67,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def void
+    @result = Procurements::PurchaseOrders::Void.(current_user, params)
+    respond
+  end
+
   def download
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     @purchase_order = @result.purchase_order
@@ -90,6 +95,17 @@ class Procure::PurchaseOrdersController < ApplicationController
         # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
     end
+  end
+
+  # advance payment API 
+  def create_payment
+    @result = Procurements::Payments::CreateAdvance.(current_user, params)
+    respond
+  end
+
+  def advance_payments
+    @result = Procurements::PurchaseOrders::AdvancePayments.(current_user, params)
+    respond
   end
 
   # Templates

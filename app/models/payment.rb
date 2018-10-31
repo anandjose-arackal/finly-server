@@ -40,7 +40,11 @@
 #  cost_center_id                 :integer
 #  company_id                     :integer
 #  external_reference_id          :string(255)
+#  purchase_order_id              :integer
+#  procurement_id                 :integer
+#  department_id                  :integer
 #
+
 
 
 
@@ -67,6 +71,8 @@ class Payment < ActiveRecord::Base
   belongs_to :receiving_user, polymorphic: true
   belongs_to :reference_resource, polymorphic: true
   belongs_to :original_payment_for_refund, class_name: "Payment"
+  belongs_to :category
+  belongs_to :department
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
@@ -90,6 +96,7 @@ class Payment < ActiveRecord::Base
   belongs_to :payment_order
   belongs_to :payment_status
   belongs_to :payment_purpose
+  belongs_to :purchase_order
 
   belongs_to :destination_pocket, class_name: "UserPocket"
 

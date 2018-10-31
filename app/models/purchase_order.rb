@@ -88,10 +88,11 @@ class PurchaseOrder < ActiveRecord::Base
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
   # has_many :custom_fields, as: :parent
   has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :advance_payments, class_name: "Payment"
 
   has_many :trails, as: :parent
 
-  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, to: :status
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
@@ -140,6 +141,10 @@ class PurchaseOrder < ActiveRecord::Base
 
   scope :filter_user_id, -> (ids){
     where user_id: ids
+  }
+
+  scope :filter_payment_term_id, -> (ids) {
+    where payment_term_id: ids
   }
 
   before_save :calculate_line_items
@@ -295,19 +300,15 @@ class PurchaseOrder < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    # if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.purchase_order_status_id)
-    #   self.items.each do |item|
-    #     BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
-    #   end
-    # else
-    # i.e. if the purchase order changed statuses to something other than the above, it will destroy
-    # all the line item entries in the budget trail model for this particular purchase order
-    # self.items.each do |item|
-    #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
-    # end
-    # end
-    self.items.each do |item|
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+    if self.voided?
+      # this will delete the trails of all the items within this particular purchase order
+      self.items.each do |item|
+        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+      end
+    else
+      self.items.each do |item|
+        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+      end
     end
   end
 

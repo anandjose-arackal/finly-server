@@ -43,7 +43,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
-      self.policies = purchase_order.user.policies.with_application(:vp)
+      policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+
+
 
       self.reviewal_chains = []
       params[:reviewal_document] = purchase_order
@@ -101,9 +104,24 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
           #     url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
           #     method: "PUT"
           # }
+
+          actions[:make_advance_payment] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_make_advance_payment_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+
           actions[:document_editable] = false
         end
         actions[:download] = true
+      end
+
+      if PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id
+        if user.vendor_payment_admin? || document_owner?
+          actions[:void] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_void_path(purchase_order_id: purchase_order.id),
+              method: 'PUT'
+          }
+        end
       end
 
       if purchase_order.processing?
@@ -138,12 +156,14 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       end
 
       if user.vendor_payment_admin?
-        actions[:document_editable] = true
-        actions[:save] = {
-            url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
-            method: "PUT"
-        }
-        actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
+        unless purchase_order.voided?
+          actions[:document_editable] = true
+          actions[:save] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
+              method: "PUT"
+          }
+          actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
+        end
       end
 
       actions
