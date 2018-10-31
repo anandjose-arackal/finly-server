@@ -45,7 +45,7 @@ json.budget_trail_items do
     json.array!(@result.spent_entities[1]) do |payment|
       json.vendor payment.receiving_user&.name
       json.category_name payment.category&.name
-      json.cost_center_name payment.cost_center&.name
+      json.department payment.department&.name
       json.amount payment.amount&.value
       json.date payment.date.strftime("%Y-%B-%d")
       json.index index
