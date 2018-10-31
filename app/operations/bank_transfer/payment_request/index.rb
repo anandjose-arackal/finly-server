@@ -68,6 +68,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_user_id
     has_scope :filter_scheduled_date, using: [:from, :to], type: :hash
     has_scope :filter_controlling_user
+    has_scope :filter_payment_ids
 
     def init
       self.payment_requests = params[:payment_requests]
