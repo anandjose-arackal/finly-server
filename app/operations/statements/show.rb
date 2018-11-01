@@ -92,7 +92,8 @@ class Statements::Show < Statements::Base
   end
 
   class Statements::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :finly_transactions, :account, :scoped_finly_transactions
+    attr_accessor :finly_transactions, :account, :scoped_finly_transactions,
+                  :credit_amount_value, :debit_amount_value, :credit_count_value, :debit_count_value, :summary_data
 
     has_scope :with_date_range, using: [:from, :to], type: :hash
 
@@ -100,6 +101,12 @@ class Statements::Show < Statements::Base
       self.account = params[:account]
       self.finly_transactions = params[:finly_transactions]
       self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)
+      self.credit_amount_value = credit_amount
+      self.debit_amount_value = debit_amount
+      self.credit_count_value = credits_count
+      self.debit_count_value = debits_count
+      self.summary_data = summary
+      self.scoped_finly_transactions = self.scoped_finly_transactions.include_for_export
     end
 
     def account_transactions

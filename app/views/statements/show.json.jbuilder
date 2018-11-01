@@ -9,12 +9,12 @@ end
 json.account_name @result.account_name
 json.opening_balance AmountUtils.format(@result.opening_balance, placeholder: '-', currency: currency)
 json.closing_balance AmountUtils.format(@result.closing_balance, placeholder: '-', currency: currency)
-json.credits_count AmountUtils.format(@result.credits_count, placeholder: '-', currency: currency)
-json.debits_count AmountUtils.format(@result.debits_count, placeholder: '-', currency: currency)
-json.credit_amount AmountUtils.format(@result.credit_amount, placeholder: '-', currency: currency)
-json.debit_amount AmountUtils.format(@result.debit_amount, placeholder: '-', currency: currency)
+json.credits_count AmountUtils.format(@result.credit_count_value, placeholder: '-', currency: currency)
+json.debits_count AmountUtils.format(@result.debit_count_value, placeholder: '-', currency: currency)
+json.credit_amount AmountUtils.format(@result.credit_amount_value, placeholder: '-', currency: currency)
+json.debit_amount AmountUtils.format(@result.debit_amount_value, placeholder: '-', currency: currency)
 json.summary do
-  summary = @result.summary
+  summary = @result.summary_data
   json.credits do
     json.array! summary[:credits].map{|item| "#{item[:name]}: <b>#{item[:amount]}</b>"}
   end
