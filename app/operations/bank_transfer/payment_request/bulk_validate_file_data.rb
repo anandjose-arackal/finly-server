@@ -1,6 +1,7 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :order_details, :error_messages, :valid, :contents, :header
+  attr_accessor :order_details, :error_messages, :valid, :contents, :header,
+                :requested_amount
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -32,6 +33,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     # setting the valid as true here, so that even if one line item failed in the
     # below validations it will return false
     self.valid = true
+    self.requested_amount = 0
   end
 
   def validate
@@ -51,6 +53,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       tds_slab_id = item[:tds_slab_id]
       category_id = item[:category_id]
       cost_center_id = item[:cost_center_id]
+      department_id = item[:department_id]
       invoice_number = item[:invoice_number]
       invoice_date = item[:invoice_date]
       due_date = item[:due_date]
@@ -99,11 +102,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.error_messages << "Invalid tax entered"
       end
 
-      unless validate_rate tds, 1, amount
-        self.valid = false
-        self.error_messages << "Invalid TDS entered"
-      end
-
       unless validate_rate discount, 1, amount
         self.valid = false
         self.error_messages << "Invalid discount entered"
@@ -112,6 +110,10 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       unless validate_rate advance, 1, advance
         self.valid = false
         self.error_messages << "Invalid advance entered"
+      end
+
+      if self.valid
+        self.requested_amount += amount.to_f
       end
 
       item[:errors] = self.error_messages.to_sentence
@@ -132,6 +134,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     params[:contents] = self.contents
     params[:header] = self.header
     params[:order_details] = self.order_details
+    params[:requested_amount] = self.requested_amount
     BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter.new(user, params, messages)
   end
 
@@ -192,6 +195,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         "TDS Slab ID",
         "Category ID",
         "Cost Center ID",
+        "Department ID",
         "Invoice Number",
         "Invoice Date (dd-mm-yyyy)",
         "Due Date (dd-mm-yyyy)",

@@ -42,7 +42,9 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
       if payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
         # mark the respective payment order and the associated payments as credited
         payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
-        payment_request.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:completed))
+        payment_request.payment_order.payments.each do |payment|
+          payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        end
         # create the trail for the same
         payment_request.bank_payment_request_trails.create action_user: user,
                                                           action_user_role_id: self.view_role,
