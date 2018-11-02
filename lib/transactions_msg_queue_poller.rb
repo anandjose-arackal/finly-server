@@ -110,7 +110,17 @@ class TransactionsMsgQueuePoller
           success: success
       }
 
+      # todo add billing amount, transaction amount, company and user details
       log_params = trans_params.deep_dup
+      log_params[:billing_amount] = billing_amount
+      log_params[:transaction_amount] = transaction_amount
+      card = Card.find_by_proxy(serial_id)
+      user = card&.user
+      log_params[:card_id] = card&.id
+      log_params[:user_id] = user&.id
+      log_params[:user_name] = user&.name
+      log_params[:company_id] = user&.company&.id
+      log_params[:company_name] = user&.company&.name
 
       trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
       trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
