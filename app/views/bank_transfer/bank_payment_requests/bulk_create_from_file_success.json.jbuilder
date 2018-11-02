@@ -1,0 +1,1 @@
+json.bank_payment_request_id @result.bank_payment_request_id
