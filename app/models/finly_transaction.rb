@@ -48,38 +48,43 @@ class FinlyTransaction < ActiveRecord::Base
   validates :payment_purpose_id, presence: true
   validates :date, presence: true
 
-  default_scope { order(sequence_number: :desc) }
+  default_scope {order(sequence_number: :desc)}
 
   delegate :credit?, :debit?, to: :transaction_type
 
-  scope :with_account, -> (account) { where finly_account: account }
-  scope :credits, -> { where transaction_type_id: TransactionType.id_for(:credit) }
-  scope :debits, -> { where transaction_type_id: TransactionType.id_for(:debit) }
-  scope :with_date, -> (date) { where(date: date) }
+  scope :with_account, -> (account) {where finly_account: account}
+  scope :credits, -> {where transaction_type_id: TransactionType.id_for(:credit)}
+  scope :debits, -> {where transaction_type_id: TransactionType.id_for(:debit)}
+  scope :with_date, -> (date) {where(date: date)}
   scope :with_date_range, -> (start_date, end_date) do
     start_date = start_date.beginning_of_day rescue start_date
     end_date = end_date.end_of_day rescue end_date
     where('finly_transactions.date >= ? AND finly_transactions.date <= ?', start_date, end_date)
   end
-  scope :on_or_after_date, -> (date) { where('finly_transactions.date >= ?', date) }
-  scope :on_or_before_date, -> (date) { where('finly_transactions.date <= ?', date) }
-  scope :before_date, -> (date) { where('finly_transactions.date < ?', date) }
-  scope :after_date, -> (date) { where('finly_transactions.date > ?', date) }
-  scope :sum_amounts, -> { joins(:amount).sum(:value) }
-  scope :success, -> { where status_id: TransactionStatus.id_for(:success) }
-  scope :with_reference_id, -> (ref_id) { where transaction_reference_id: ref_id }
-  scope :through_finly_dashboard, -> { where payment_purpose_id: PaymentPurpose.ids_for([:advance_outside_finly,
-                                                                               :reimbursement_outside_finly, :advance,
-                                                                               :medical_benefit,
-                                                                               :meal_benefit, :reimbursement, :payroll,
-                                                                               :vendor_payment,
-                                                                               :balance_clearance_outside_finly, :balance_clearance]) }
-  scope :joins_amounts, -> { joins :amount }
-  scope :group_by_purpose, -> { group :payment_purpose_id }
-  scope :purpose_wise_amount, -> { joins_amounts.group_by_purpose.sum('amounts.value') }
-  scope :sort_date_asc, -> { unscope(:order).order(date: :asc, id: :desc) }
-  scope :sort_date_desc, -> { unscope(:order).order(date: :desc, id: :desc) }
-  scope :limit_to_one, -> { limit 1 }
+  scope :on_or_after_date, -> (date) {where('finly_transactions.date >= ?', date)}
+  scope :on_or_before_date, -> (date) {where('finly_transactions.date <= ?', date)}
+  scope :before_date, -> (date) {where('finly_transactions.date < ?', date)}
+  scope :after_date, -> (date) {where('finly_transactions.date > ?', date)}
+  scope :sum_amounts, -> {joins(:amount).sum(:value)}
+  scope :success, -> {where status_id: TransactionStatus.id_for(:success)}
+  scope :with_reference_id, -> (ref_id) {where transaction_reference_id: ref_id}
+  scope :through_finly_dashboard, -> {where payment_purpose_id: PaymentPurpose.ids_for([:advance_outside_finly,
+                                                                                        :reimbursement_outside_finly, :advance,
+                                                                                        :medical_benefit,
+                                                                                        :meal_benefit, :reimbursement, :payroll,
+                                                                                        :vendor_payment,
+                                                                                        :balance_clearance_outside_finly, :balance_clearance])}
+  scope :include_for_export, -> {includes([:transaction_type, :payment_purpose, :amount, :closing_balance, :status,
+                                           {payment: [:receiving_user, :initiating_account,
+                                                      :receiving_account, {
+                                                          original_payment_for_refund: :receiving_user}]},
+                                           :associated_transaction])}
+  scope :joins_amounts, -> {joins :amount}
+  scope :group_by_purpose, -> {group :payment_purpose_id}
+  scope :purpose_wise_amount, -> {joins_amounts.group_by_purpose.sum('amounts.value')}
+  scope :sort_date_asc, -> {unscope(:order).order(date: :asc, id: :desc)}
+  scope :sort_date_desc, -> {unscope(:order).order(date: :desc, id: :desc)}
+  scope :limit_to_one, -> {limit 1}
 
   after_save :set_sequence_number
 
@@ -91,7 +96,7 @@ class FinlyTransaction < ActiveRecord::Base
     self.transaction_reference_id = ref_id
   end
 
-  default_scope { order(sequence_number: :desc) }
+  default_scope {order(sequence_number: :desc)}
 
   delegate :credit?, :debit?, to: :transaction_type
 
