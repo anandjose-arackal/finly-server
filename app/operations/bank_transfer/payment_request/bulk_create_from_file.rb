@@ -2,7 +2,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
-                :requested_amount, :payment_mode, :scheduled_at
+                :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request
 
   def pre_validate
     if user.blank?
@@ -25,7 +25,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
     self.parsed_data = ImportUtil.load_spreadsheet(file, headers,
                                                    {skip_empty_lines: true})
-    self.payment_mode = params[:payment_mode]
+    self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
   end
 
@@ -36,7 +36,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     op = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
-    debugger
 
     if op.success?
       self.requested_amount = op.requested_amount
@@ -55,16 +54,37 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
+    op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.parsed_data})
+    # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.parsed_data})
 
   end
 
   def success
-
+    params[:bank_payment_request_id] = self.bank_payment_request.id
+    BankTransfer::PaymentRequest::BulkCreateFromFile::SuccessPresenter.new(user, params, messages)
   end
 
   # this method should create the temporary file that can be linked in the front end
   def failure
+    # todo - generate failure file link
+  end
 
+  class BankTransfer::PaymentRequest::BulkCreateFromFile::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :bank_payment_request_id
+
+    def init
+      self.bank_payment_request_id = params[:bank_payment_request_id]
+    end
+  end
+
+  class BankTransfer::PaymentRequest::BulkCreateFromFile::FailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :result_file_path
+
+    def init
+      self.result_file_path = params[:result_file_path]
+    end
   end
 
   private

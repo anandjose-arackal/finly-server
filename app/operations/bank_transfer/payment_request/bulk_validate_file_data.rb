@@ -5,12 +5,13 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :contents, :header
+    attr_accessor :contents, :header, :order_details, :requested_amount
 
     def init
       self.contents = params[:contents]
       self.header = params[:header]
       self.order_details = params[:order_details]
+      self.requested_amount = params[:requested_amount]
     end
 
   end
@@ -105,11 +106,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       unless validate_rate discount, 1, amount
         self.valid = false
         self.error_messages << "Invalid discount entered"
-      end
-
-      unless validate_rate advance, 1, advance
-        self.valid = false
-        self.error_messages << "Invalid advance entered"
       end
 
       if self.valid
