@@ -2,7 +2,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
-                :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request
+                :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
+                :headers, :contents
 
   def pre_validate
     if user.blank?
@@ -36,12 +37,12 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     op = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
-
     if op.success?
       self.requested_amount = op.requested_amount
     else
       self.contents = op.contents
-      self.header = op.header
+      self.headers = op.headers
+      add_message :error, "Some of the payments have errors, please check the downloaded file to resolve them"
     end
 
   end
@@ -66,7 +67,14 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
   # this method should create the temporary file that can be linked in the front end
   def failure
-    # todo - generate failure file link
+    exporter = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents})
+    file = Tempfile.new("bulk_payment_import_errors.xls")
+    open(file.path, 'wb') do |f|
+      f.write exporter.generate_xls
+    end
+    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
+    params[:result_file_path] = temp_file.file.url
+    BankTransfer::PaymentRequest::BulkCreateFromFile::FailurePresenter.new(user, params, messages)
   end
 
   class BankTransfer::PaymentRequest::BulkCreateFromFile::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -78,7 +86,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
   end
 
-  class BankTransfer::PaymentRequest::BulkCreateFromFile::FailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::PaymentRequest::BulkCreateFromFile::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :result_file_path
 
