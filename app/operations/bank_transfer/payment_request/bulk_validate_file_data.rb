@@ -1,27 +1,28 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :order_details, :error_messages, :valid, :contents, :header,
+  attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
                 :requested_amount
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :contents, :header
+    attr_accessor :contents, :headers, :order_details, :requested_amount
 
     def init
       self.contents = params[:contents]
-      self.header = params[:header]
+      self.headers = params[:headers]
       self.order_details = params[:order_details]
+      self.requested_amount = params[:requested_amount]
     end
 
   end
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :contents, :header
+    attr_accessor :contents, :headers
 
     def init
       self.contents = params[:contents]
-      self.header = params[:header]
+      self.headers = params[:headers]
     end
 
   end
@@ -29,7 +30,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   def init
     self.order_details = params[:order_details]
     self.contents = []
-    self.header = retrieve_header_names
+    self.headers = retrieve_header_names
     # setting the valid as true here, so that even if one line item failed in the
     # below validations it will return false
     self.valid = true
@@ -107,11 +108,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.error_messages << "Invalid discount entered"
       end
 
-      unless validate_rate advance, 1, advance
-        self.valid = false
-        self.error_messages << "Invalid advance entered"
-      end
-
       if self.valid
         self.requested_amount += amount.to_f
       end
@@ -132,7 +128,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
   def success
     params[:contents] = self.contents
-    params[:header] = self.header
+    params[:headers] = self.headers
     params[:order_details] = self.order_details
     params[:requested_amount] = self.requested_amount
     BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter.new(user, params, messages)
@@ -140,7 +136,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
   def failure
     params[:contents] = self.contents
-    params[:header] = self.header
+    params[:headers] = self.headers
     BankTransfer::PaymentRequest::BulkValidateFileData::FailurePresenter.new(user, params, messages)
   end
 

@@ -19,9 +19,22 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def process_file
-    # @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
-    @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
-    respond
+    @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_create_from_file_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_create_from_file_failure'
+        }
+      end
+    end
+    # @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
+    # respond
   end
 
   def update
