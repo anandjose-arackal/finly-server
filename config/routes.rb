@@ -2130,6 +2130,8 @@ Rails.application.routes.draw do
 
   ######### GEMS SPECIFIC START ###########
 
+  # mount HealthMonitor::Engine, at: '/health/'
+
   mount Crono::Web, at: '/crono'
   devise_for :admin_users, controllers: {sessions: 'admin_users/sessions'}
 
@@ -3195,6 +3197,8 @@ Rails.application.routes.draw do
   end
 
   get 'ping', to: 'ping#ping'
+  get 'ping/sidekiq', to: 'ping#sidekiq'
+  get 'ping/database', to: 'ping#database'
 
   ## Budget apis start ##
   resources :budgets
