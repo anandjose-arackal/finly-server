@@ -22,6 +22,7 @@ gem 'rollbar', '2.15.5'
 gem 'oj', '~> 2.18.1'
 
 gem 'amoeba', '3.1.0'
+gem 'health-monitor-rails', '8.4.0'
 
 # gem for admin panel
 # gem 'activeadmin', '1.1.0', git: 'https://github.com/activeadmin/activeadmin.git'
