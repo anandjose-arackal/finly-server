@@ -24,7 +24,7 @@
 
 class BankAccount < ActiveRecord::Base
   include Accountable
-  # include SoftDeletable
+  include SoftDeletable
 
   belongs_to :account_owner, polymorphic: true
 
