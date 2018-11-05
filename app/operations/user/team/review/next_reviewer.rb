@@ -84,7 +84,7 @@ class User::Team::Review::NextReviewer < BaseOperation
       add_message :error, 'Error loading configuration'
       return
     end
-    if obj.user.id == user.id
+    if obj.user.id == user.id and role == UserRole.id_for(:employee)
       arg_hash[:type] = :manager
       manager = User::Team::Approver.(user, arg_hash)
       if manager.nil?
