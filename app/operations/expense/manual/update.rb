@@ -111,10 +111,10 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
-    if self.updated_expense_params[:spent_from_id].blank?
-      add_message :error, 'Please select the Spend Account'
-      return
-    end
+    # if self.updated_expense_params[:spent_from_id].blank?
+    #   add_message :error, 'Please select the Spend Account'
+    #   return
+    # end
 
     if self.updated_expense_params[:spent_from_id].present? && self.cash_pocket.blank?
       add_message :error, 'Error in Spend Account'

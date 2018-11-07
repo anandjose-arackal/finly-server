@@ -131,7 +131,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       # Jugaad End
       if pocket_id.present?
         self.cash_pocket = expense.user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
-        self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
+        self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id if self.cash_pocket.present?
       end
     end
   end
@@ -159,16 +159,15 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       end
     end
 
-    if self.updated_expense_params[:spent_from_id].blank?
-      add_message :error, 'Please select the Spend Account'
-      return
-    end
+    # if self.updated_expense_params[:spent_from_id].blank?
+    #   add_message :error, 'Please select the Spend Account'
+    #   return
+    # end
 
     if self.updated_expense_params[:spent_from_id].present? && self.cash_pocket.blank?
       add_message :error, 'Error in Spend Account'
       return
     end
-
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_availability_update(self.cash_pocket, updated_expense_params)
 
@@ -203,7 +202,6 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     # end
 
     distance_expense = expense.distance_expense
-
     expense.assign_attributes(updated_expense_params)
     if expense.distance_expense.blank?
       expense.distance_expense = distance_expense
