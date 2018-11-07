@@ -40,6 +40,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
@@ -58,7 +59,7 @@ class Expense < ActiveRecord::Base
   belongs_to :expense_tax_type
   belongs_to :gst_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
-  belongs_to :spent_from, class_name: "UserPocket"
+  belongs_to :spent_from, class_name: 'UserPocket'
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
@@ -103,6 +104,7 @@ class Expense < ActiveRecord::Base
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
   validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', 'usage', 'none', nil]}
+  validates_presence_of :spent_from_id, message: 'Please select a Spend Account to create an expense'
   validate :validate_usage_dates
   validate :no_future_date
   validate :valid_expense_type

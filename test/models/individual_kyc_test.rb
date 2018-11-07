@@ -62,6 +62,24 @@
 #  combined_kyc_content_type  :string(255)
 #  combined_kyc_file_size     :integer
 #  combined_kyc_updated_at    :datetime
+#  kyc_1_front_file_name      :string(255)
+#  kyc_1_front_content_type   :string(255)
+#  kyc_1_front_file_size      :integer
+#  kyc_1_front_updated_at     :datetime
+#  kyc_1_back_file_name       :string(255)
+#  kyc_1_back_content_type    :string(255)
+#  kyc_1_back_file_size       :integer
+#  kyc_1_back_updated_at      :datetime
+#  kyc_2_front_file_name      :string(255)
+#  kyc_2_front_content_type   :string(255)
+#  kyc_2_front_file_size      :integer
+#  kyc_2_front_updated_at     :datetime
+#  kyc_2_back_file_name       :string(255)
+#  kyc_2_back_content_type    :string(255)
+#  kyc_2_back_file_size       :integer
+#  kyc_2_back_updated_at      :datetime
+#  kyc_1_number               :string(255)
+#  kyc_2_number               :string(255)
 #
 
 require 'test_helper'
