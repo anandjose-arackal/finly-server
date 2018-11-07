@@ -15,4 +15,24 @@ class IndividualKycType < ActiveRecord::Base
     [:aadhar_card, :driving_license, :voter_id, :ngera_job_card, :passport]
   end
 
+  def aadhar_card?
+    self.id == IndividualKycType.id_for(:aadhar_card)
+  end
+
+  def driving_license?
+    self.id == IndividualKycType.id_for(:driving_license)
+  end
+
+  def voter_id?
+    self.id == IndividualKycType.id_for(:voter_id)
+  end
+
+  def ngera_job_card?
+    self.id == IndividualKycType.id_for(:ngera_job_card)
+  end
+
+  def passport?
+    self.id == IndividualKycType.id_for(:passport)
+  end
+
 end
