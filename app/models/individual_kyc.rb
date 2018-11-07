@@ -180,8 +180,7 @@ class IndividualKyc < ActiveRecord::Base
   end
 
   def generate_single_kyc
-    return false unless (self.aadhar_front.present? and self.aadhar_back.present? and
-        self.signature.present?)
+    return false unless can_submit?
     view = ActionView::Base.new(ActionController::Base.view_paths)
     view.extend ApplicationHelper
     html_string = view.render(file: 'kyc/user/kyc_template.html.erb', locals: {kyc: self})
