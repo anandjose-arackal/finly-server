@@ -3078,6 +3078,7 @@ Rails.application.routes.draw do
 
     post 'payments/bulk_upload_utr', to: 'payments#bulk_upload_utr', as: :bulk_upload_utr
     get 'payments/count', to: 'payments#count'
+    get 'payments/payout_index', to: 'payments#payout_index'
     resources :payments do
       patch 'retry', to: 'payments#retry', as: :retry
     end

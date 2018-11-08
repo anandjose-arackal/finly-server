@@ -89,6 +89,9 @@ views:
         - name: Payment Tickets
           url: orders
           id: orders
+        - name: 'Payouts'
+          url: payouts
+          id: payouts
 #        - name: Payment Orders
 #          url: orders
 #          id: orders
@@ -146,14 +149,11 @@ views:
           url: invoices
           id: invoices
         - name: Payment Tickets
-          type: group
-          items:
-          - name: Bulk Payments
-            url: orders
-            id: orders
-          - name: Individual Payments
-            url: payments
-            id: payments
+          url: orders
+          id: orders
+        - name: 'Payouts'
+          url: payouts
+          id: payouts
 #        - name: Payment Orders
 #          url: orders
 #          id: orders
@@ -241,6 +241,9 @@ views:
         - name: Payment Tickets
           url: orders
           id: orders
+        - name: 'Payouts'
+          url: payouts
+          id: payouts
 #        - name: Payment Orders
 #          url: orders
 #          id: orders
