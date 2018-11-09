@@ -5,11 +5,14 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
   class BankTransfer::PaymentRequest::Payments::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     require 'will_paginate/array'
+    has_scope :filter_status_id
     
     attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments, :unpaid_payments
 
     def init
       self.payments = params[:payments]
+      # applying scopes for the payments list
+      self.payments = apply_scopes(self.payments, params)
 
       self.payments_unverified = []
       self.payments_verified = []

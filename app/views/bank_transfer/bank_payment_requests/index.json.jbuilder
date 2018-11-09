@@ -43,7 +43,7 @@ json.array! @result.paginated_requests.include_for_index.each do |payment_reques
       json.id payment.id
       json.beneficiary_name payment.receiving_account&.account_owner&.name
       json.payment_mode payment.payment_mode&.upcase
-      json.date payment.date
+      json.date payment.date.strftime('%d %b %Y')
       json.amount payment.amount_value
       json.utr payment.reference_resource&.bank_reference_number
       json.payment_status payment.payment_status_name

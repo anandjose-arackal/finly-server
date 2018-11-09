@@ -263,6 +263,10 @@ class Payment < ActiveRecord::Base
     end
   }
 
+  scope :filter_status_id, -> (status_id) {
+    where(payment_status_id: status_id)
+  }
+
   scope :filter_user_id, -> (user_id) {
     if user_id.present?
       where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
