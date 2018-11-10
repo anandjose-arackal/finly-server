@@ -144,6 +144,7 @@ class Expense < ActiveRecord::Base
     else
       self.reimbursable = false
       self.from_cash_on_hand = true
+
     end
     compute_gst_amount
     compute_tds_amount
@@ -334,7 +335,7 @@ class Expense < ActiveRecord::Base
   scope :spent_from_cash_on_hand, -> {
     where(from_cash_on_hand: true)
   }
-  scope :blocked_against_cash_on_hand, -> {where cash_on_hand_blocked: true}
+  scope :blocked_against_cash_on_hand, -> {where from_cash_on_hand: true}
 
   scope :with_id, ->(ids) {where id: ids}
   scope :without_id, -> (id) {
