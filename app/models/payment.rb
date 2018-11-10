@@ -216,8 +216,13 @@ class Payment < ActiveRecord::Base
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
   scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
+  scope :failed, -> { where payment_status_id: PaymentStatus.id_for(:failed) }
   scope :completed, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
   scope :processed, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:processing)] }
+  scope :possible_failure, -> { where payment_status_id: PaymentStatus.id_for(:possible_failure) }
+  scope :pending, -> { where payment_status_id: PaymentStatus.id_for(:pending) }
+  scope :in_progress, -> { where payment_status_id: PaymentStatus.id_for(:in_progress) }
+  scope :pending_approval, -> { where payment_status_id: PaymentStatus.id_for(:pending_approval) }
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }
