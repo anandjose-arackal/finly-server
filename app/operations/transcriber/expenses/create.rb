@@ -66,6 +66,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
       end
     else
       self.expense = selected_user.expenses.build(expense_params)
+      set_pocket
       return unless validate_custom_fields
       if expense.save
         receipt.update(parent: expense)
@@ -135,5 +136,31 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
     CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+  end
+
+  def set_pocket
+    if expense.amount.present? and expense.amount.value > 0
+      amount = expense.amount.value || 0
+      coh_pocket = selected_user.user_pockets.cash_pockets_only&.first
+      coh_amount = 0
+      if coh_pocket.present?
+        adapter = AccountManager::CashPockets::CashPocketsAdapter.new(coh_pocket)
+        coh_amount = adapter.balance(display_balance: true)
+      end
+      reimbursement_pocket = selected_user.user_pockets.reimbursement_pocket_only&.first
+      if coh_pocket.present? and reimbursement_pocket.present?
+        if coh_amount >= amount
+          expense.spent_from = coh_pocket
+        else
+          expense.spent_from = reimbursement_pocket
+        end
+      elsif reimbursement_pocket.present? and coh_pocket.blank?
+        expense.spent_from = reimbursement_pocket
+      elsif reimbursement_pocket.blank? and coh_pocket.present?
+        expense.spent_from = coh_pocket
+      else
+          # Blank blank
+      end
+    end
   end
 end
