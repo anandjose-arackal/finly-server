@@ -52,7 +52,7 @@ class BankPaymentRequest < ActiveRecord::Base
   default_scope {order(created_at: :desc)}
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
-  delegate :requested_amount_value, to: :requested_amount
+  # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
   scope :non_owner, -> (user_id) {where.not owner_id: user_id}
@@ -304,6 +304,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def payments
     self.payment_order.payments
+  end
+
+  def requested_amount_value
+    self.payment_order.amount_requested&.value
   end
 
   private
