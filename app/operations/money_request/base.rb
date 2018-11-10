@@ -162,15 +162,43 @@ class MoneyRequest::Base < BaseOperation
 
     def forwardable_users
       if self.actions.present? and self.actions[:approve_and_forward_to].present?
-        users = User::Team::Review::PendingApprovers.(user, money_request: self.money_request).approvers rescue nil
-        return nil if users.blank?
         new_users = []
-        users.each do |item|
-          unless item[:approver].id == user.id
-            new_users << item
+        next_reviewer_presenter = User::Team::Review::NextReviewer.(self.money_request)
+        next_reviewer = next_reviewer_presenter.user
+        if next_reviewer.present?
+          new_users << {
+              approver: next_reviewer,
+              role_id: next_reviewer_presenter.role_id
+          }
+        end
+
+        # adding all the admins of the company
+        admins = user.company.users.only_admins
+        admins.each do |admin|
+          present = false
+          new_users.each do |new_user|
+            if new_user[:approver].id == admin.id
+              present = true
+            end
+          end
+          unless present
+            new_users << {
+                approver: admin,
+                role_id: UserRole.id_for(:admin)
+            }
           end
         end
         return new_users
+        #
+        # users = User::Team::Review::PendingApprovers.(user, money_request: self.money_request).approvers rescue nil
+        # return nil if users.blank?
+        # new_users = []
+        # users.each do |item|
+        #   unless item[:approver].id == user.id
+        #     new_users << item
+        #   end
+        # end
+        # return new_users
       end
       nil
     end
