@@ -14,7 +14,8 @@ class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest
 
   def init
     id = params[:id] || params[:bank_payment_request_id]
-    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
+    index_params = params.select { |k,v| [:view, :role_id].include? k }
+    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, index_params).payment_requests.find_by(id: id)
   end
 
   def validate
