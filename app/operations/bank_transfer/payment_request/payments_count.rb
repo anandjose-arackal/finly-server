@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :payments_count, :bank_payment_request
+  attr_accessor :payments_count, :bank_payment_request, :payments
 
   class BankTransfer::PaymentRequest::PaymentsCount::PaymentsCountPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -11,13 +11,14 @@ class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest
     def init
       self.payments = params[:payments]
       self.payments = apply_scopes(self.payments, params)
+      self.count = self.payments.count
     end
 
   end
 
   def init
     id = params[:id] || params[:bank_payment_request_id]
-    index_params = params.select { |k,v| [:view, :role_id].include? k }
+    index_params = params.select { |k,v| ["view", "role_id", :view, :role_id].include? k }
     self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, index_params).payment_requests.find_by(id: id)
   end
 

@@ -199,7 +199,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def payments_count
     @result = BankTransfer::PaymentRequest::PaymentsCount.(current_user, params)
-    render json: @result.as_json
+    if @result.success?
+      render json: @result.count.as_json
+    else
+      render json: 0.as_json
+    end
   end
 
   def add_invoice
