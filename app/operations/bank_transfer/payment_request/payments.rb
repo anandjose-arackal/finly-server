@@ -6,6 +6,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
 
     require 'will_paginate/array'
     has_scope :filter_status_id
+    has_scope :filter_search
     
     attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments, :unpaid_payments
 
