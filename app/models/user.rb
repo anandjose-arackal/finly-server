@@ -769,7 +769,7 @@ class User < ActiveRecord::Base
   end
 
   def distance_expense_enabled?
-    if self.company.distance_expense_enabled?
+    if self.company.distance_expense_enabled? && !self.enforce_policy_enabled?
       return true
     end
     policies = self.policies
@@ -783,7 +783,7 @@ class User < ActiveRecord::Base
   end
 
   def time_expense_enabled?
-    if self.company.time_expense_enabled?
+    if self.company.time_expense_enabled? && !self.enforce_policy_enabled?
       return true
     end
     policies = self.policies
