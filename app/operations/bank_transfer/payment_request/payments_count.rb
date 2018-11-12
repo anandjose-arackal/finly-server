@@ -4,10 +4,13 @@ class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest
 
   class BankTransfer::PaymentRequest::PaymentsCount::PaymentsCountPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :count
+    attr_accessor :count, :payments
+
+    has_scope :filter_status_id
 
     def init
-      self.count = params[:payments_count]
+      self.payments = params[:payments]
+      self.payments = apply_scopes(self.payments, params)
     end
 
   end
@@ -26,11 +29,12 @@ class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest
   end
 
   def process
-    self.payments_count = self.bank_payment_request.payment_order.payments.count
+    self.payments = self.bank_payment_request.payment_order.payments
   end
 
   def success
-    self.payments_count
+    params[:payments] = self.payments
+    BankTransfer::PaymentRequest::PaymentsCount::PaymentsCountPresenter.new(user, params, messages)
   end
 
 end
