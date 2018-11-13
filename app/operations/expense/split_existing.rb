@@ -15,9 +15,12 @@ class Expense::SplitExisting < Expense::Manual::Split
   end
 
   def init
-    if params[:expense_id].present?
-      self.existing_expense = user.expenses.find_by_id(params[:expense_id])
+    result = Expense::Show.(user, id: params[:expense_id], view: params[:view])
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
     end
+    self.existing_expense = result.expense
     return unless self.existing_expense.present?
     if self.existing_expense.card_expense?
       if params&.dig(:expense, :card_expense_attributes).present?

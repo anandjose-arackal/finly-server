@@ -99,7 +99,7 @@ class Expense::Manual::Split < Expense::Manual::Base
   def split_expense_params
     expenses_params = []
     base_params = params.require(:expense).permit(:expense_type_id, :expense_status_id,
-                                                  :report_id, :reimbursable, :date,
+                                                  :report_id, :reimbursable, :date, :spent_from_id,
                                                   manual_expense_attributes: [:merchant],
                                                   card_expense_attributes: [:editable_merchant, :card_transaction_id],
                                                   receipts_attributes: [:image],
