@@ -7,6 +7,7 @@ class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest
     attr_accessor :count, :payments
 
     has_scope :filter_status_id
+    has_scope :filter_search
 
     def init
       self.payments = params[:payments]
