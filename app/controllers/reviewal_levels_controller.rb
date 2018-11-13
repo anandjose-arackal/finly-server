@@ -13,6 +13,6 @@ class ReviewalLevelsController < ApplicationController
 
   def destroy
     @result = ReviewalLevels::Destroy.(current_user, params)
-    respond
+    respond_success_failure
   end
 end
