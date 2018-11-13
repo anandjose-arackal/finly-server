@@ -138,7 +138,7 @@ class Expense < ActiveRecord::Base
     elsif self.spent_from&.reimbursement?
       self.reimbursable = true
       self.from_cash_on_hand = false
-    elsif self.spent_from&.paid_by_company?
+    elsif self.spent_from&.paid_by_company? or self.spent_from&.credit_card_pocket?
       self.reimbursable = false
       self.from_cash_on_hand = false
     else
