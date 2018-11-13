@@ -261,7 +261,7 @@ class Expense::Base < BaseOperation
 
     def cash_pockets
       list = []
-      user.user_pockets.non_bank_card_transfer_pockets.include_details.each do |pocket|
+      expense.user.user_pockets.non_bank_card_transfer_pockets.include_details.each do |pocket|
         hash = {}
         if pocket.cash_pocket?
           adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
