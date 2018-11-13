@@ -28,6 +28,7 @@ class LevelReviewerMapping < ActiveRecord::Base
   scope :with_threshold, -> (amount) {
     where('threshold = ?', where('threshold <= ?', amount).maximum("threshold"))
   }
+  scope :non_deleted, -> { where is_deleted: [nil, false] }
 
   scope :with_reviewer_id, -> (ids){
     where reviewer_id: ids
