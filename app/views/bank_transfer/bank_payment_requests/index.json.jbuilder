@@ -37,7 +37,7 @@ json.array! @result.paginated_requests.include_for_index.each do |payment_reques
 
   json.payments_count payment_request.payment_order.payments.count
 
-  payments = payment_request.payment_order.payments.limit(5)
+  payments = payment_request.payment_order.payments[0..4]
   json.payments do
     json.array!(payments) do |payment|
       json.id payment.id

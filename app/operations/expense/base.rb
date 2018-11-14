@@ -71,7 +71,7 @@ class Expense::Base < BaseOperation
     end
 
     # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
-    if (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) or ((params&.dig(:spent_from_id).nil? or !StringUtils.to_bool(params[:from_cash_on_hand])) and expense.spent_from.present?)
+    if (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) or ((params&.dig(:spent_from_id).nil? or (params.has_key?(:from_cash_on_hand) and !StringUtils.to_bool(params[:from_cash_on_hand]))) and expense.spent_from.present?)
 
       # # first check if the expense is being created in non-INR, and if its date is today
       # if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
@@ -79,11 +79,13 @@ class Expense::Base < BaseOperation
       #   return
       # end
 
-      # todo - temporary to support mobile APIs
-      params[:spent_from_id] = pocket.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
-      params[:spent_from_id] = nil unless (StringUtils.to_bool(params[:from_cash_on_hand]) || params[:spent_from_id].present?) # this is so that if the expense is marked as NOT from COH, it will get updated accordingly from the mobile APIs
+
+      #params[:spent_from_id] = nil unless (StringUtils.to_bool(params[:from_cash_on_hand]) || params[:spent_from_id].present?) # this is so that if the expense is marked as NOT from COH, it will get updated accordingly from the mobile APIs
 
       if pocket.present?
+        # todo - temporary to support mobile APIs
+        params[:spent_from_id] = pocket&.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
+
         cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
         amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
         balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount

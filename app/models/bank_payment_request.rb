@@ -121,7 +121,12 @@ class BankPaymentRequest < ActiveRecord::Base
     end
   }
 
-  scope :include_for_index, -> {includes({payment_order: [:payment_order_status,:initiating_user, :payments, {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :controlling_user)}
+  scope :include_for_index, -> {includes({payment_order: [:payment_order_status, :initiating_user,
+                                                          {payments: [
+                                                              {receiving_account: :account_owner}, {amount: [:currency]},
+                                                              {payment_order: [bank_payment_request: [:status]]},
+                                                              :reference_resource, :payment_order]},
+                                                          {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
   scope :include_for_data_retrieval, -> {includes(payment_order: {payments: [{receiving_account: :account_owner},
                                                                              :initiating_user,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},
@@ -181,7 +186,7 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved)}
 
   scope :filter_payment_ids, -> (payment_ids) {
-    payment_ids = payment_ids.split(",").each { |e| e.strip! }
+    payment_ids = payment_ids.split(",").each {|e| e.strip!}
     all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
     payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
     where(payment_order_id: payment_order_ids)

@@ -48,12 +48,16 @@ json.cash_pockets do
     case pocket.user_pocket_type_id
       when UserPocketType.id_for(:cash)
         adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        json.display_balance true
       when UserPocketType.id_for(:credit_card)
         adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
+        json.display_balance false
       when UserPocketType.id_for(:reimbursement)
         adapter = AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter.new(pocket)
+        json.display_balance false
       when UserPocketType.id_for(:paid_by_company)
         adapter = AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(pocket)
+        json.display_balance false
       else
         adapter = nil
     end

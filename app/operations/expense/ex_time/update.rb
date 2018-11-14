@@ -59,25 +59,31 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       end
     end
 
-    pocket_id = self.updated_expense_params[:spent_from_id]
-    if pocket_id.blank?
-      exp_params = params[:expense] || {}
-      reimbursable = exp_params[:reimbursable]
-      from_cash_on_hand = exp_params[:from_cash_on_hand]
-      if reimbursable
-        pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
-      elsif from_cash_on_hand
-        pocket_id = user.user_pockets.cash_pockets_only&.first&.id
-      elsif exp_params.key?(:reimbursable) || exp_params.key?(:from_cash_on_hand) # Legacy support for android app -> As android only sends the key which has been updated
-        pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+    if expense.present?
+      pocket_id = self.params&.dig(:expense, :spent_from_id)
+      # Todo - Jugaad - Legacy support for older version of android/iOS where this is not implemented
+      if pocket_id.blank? and (params[:expense].present? and params[:expense].has_key?(:reimbursable) and params[:expense].has_key?(:from_cash_on_hand))
+        exp_params = params[:expense] || {}
+        reimbursable = StringUtils.to_bool exp_params[:reimbursable]
+        from_cash_on_hand = StringUtils.to_bool exp_params[:from_cash_on_hand]
+        if reimbursable
+          pocket_id = expense.user.user_pockets.reimbursement_pocket_only&.first&.id
+        elsif from_cash_on_hand
+          pocket_id = expense.user.user_pockets.cash_pockets_only&.first&.id
+        elsif exp_params.key?(:reimbursable) || exp_params.key?(:from_cash_on_hand) # Legacy support for android app -> As android only sends the key which has been updated
+          pocket_id = expense.user.user_pockets.paid_by_company_pocket_only&.first&.id
+        end
+        if pocket_id.blank?
+          pocket_id = expense.user.user_pockets.cash_pockets_only.first&.id
+        end
+      end
+      self.cash_pocket = expense.user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
+      # Jugaad End
+      if pocket_id.present?
+        self.cash_pocket = expense.user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
+        self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
       end
     end
-    self.cash_pocket = user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
-
-    if self.cash_pocket.blank?
-      self.cash_pocket = user.user_pockets.cash_pockets_only.first
-    end
-    self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
   end
 
   def authorize
@@ -101,6 +107,16 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       unless receipt.user_id == user.id
         add_message :error, "You do not own this receipt"
       end
+    end
+
+    # if self.updated_expense_params[:spent_from_id].blank?
+    #   add_message :error, 'Please select the Spend Account'
+    #   return
+    # end
+
+    if self.updated_expense_params[:spent_from_id].present? && self.cash_pocket.blank?
+      add_message :error, 'Error in Spend Account'
+      return
     end
 
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time

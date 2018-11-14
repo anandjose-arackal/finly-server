@@ -31,7 +31,7 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     current_user_role = User::Team::Review::UserRole.(user, self.travel_request)
     if next_reviewer.nil?
       travel_request_status = TravelRequestStatus.id_for(:approved)
-    elsif next_reviewer.travel_manager?
+    elsif next_reviewer_role_id == UserRole.id_for(:travel_manager)
       travel_request_status = TravelRequestStatus.id_for(:booking_pending)
     else
       travel_request_status = TravelRequestStatus.id_for(:processing)

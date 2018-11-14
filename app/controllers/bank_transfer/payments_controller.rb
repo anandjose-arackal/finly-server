@@ -25,4 +25,9 @@ class BankTransfer::PaymentsController < ApplicationController
     @result = BankTransfer::Payments::BulkUploadUtr.(current_user, params)
     respond
   end
+
+  def payout_index
+    @result = BankTransfer::Payments ::PayoutIndex.(current_user, params)
+    respond
+  end
 end

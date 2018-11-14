@@ -136,7 +136,7 @@ class User::AvailableExpenseTypes::Show < User::Base
     params[:time_config] = time_config
     params[:per_diem_config] = per_diem_config
     params[:custom_fields_config] = self.custom_fields_config
-    params[:categories] = self.user.company.categories.active
+    params[:categories] = self.user.company.categories.expense_management_only.active
     params[:cash_on_hand] = self.cash_on_hand
     params[:em_tax_tracking] = self.em_tax_tracking
     params[:tds_slabs] = self.tds_slabs
