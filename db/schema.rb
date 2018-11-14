@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181102093718) do
+ActiveRecord::Schema.define(version: 20181114134541) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -1434,6 +1434,7 @@ ActiveRecord::Schema.define(version: 20181102093718) do
     t.string   "bank_type",                        limit: 255
     t.integer  "default_card_expense_category_id", limit: 4
     t.boolean  "sso_enabled",                                    default: false
+    t.text     "address",                          limit: 65535
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -2726,7 +2727,6 @@ ActiveRecord::Schema.define(version: 20181102093718) do
     t.string   "item_code",           limit: 255
     t.string   "account",             limit: 255
     t.integer  "supply_item_type_id", limit: 4
-    t.integer  "count",               limit: 4
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
@@ -2772,21 +2772,6 @@ ActiveRecord::Schema.define(version: 20181102093718) do
     t.string   "comment",                limit: 255
     t.string   "account",                limit: 255
     t.integer  "tax_rate_id",            limit: 4
-    t.decimal  "buying_price",                         precision: 10, scale: 5
-    t.decimal  "markup",                               precision: 10, scale: 5
-    t.decimal  "profit",                               precision: 10, scale: 5
-    t.integer  "customer_id",            limit: 4
-    t.string   "brand",                  limit: 255
-    t.string   "model_number",           limit: 255
-    t.string   "date_of_inward",         limit: 255
-    t.string   "year_of_registration",   limit: 255
-    t.decimal  "kms_driven",                           precision: 10, scale: 5
-    t.decimal  "expected_selling_price",               precision: 10, scale: 5
-    t.string   "owner_details",          limit: 255
-    t.decimal  "parking_charges",                      precision: 10, scale: 5
-    t.boolean  "billable"
-    t.string   "registration_number",    limit: 255
-    t.integer  "vendor_id",              limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -2897,6 +2882,7 @@ ActiveRecord::Schema.define(version: 20181102093718) do
     t.string   "template_name",                limit: 255
     t.boolean  "is_deleted",                                                           default: false
     t.integer  "resource_template_id",         limit: 4
+    t.string   "invoice_id",                   limit: 255
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3596,7 +3582,6 @@ ActiveRecord::Schema.define(version: 20181102093718) do
     t.integer  "tds_slab_id",             limit: 4
     t.decimal  "tds",                                   precision: 10, scale: 5
     t.integer  "tds_amount_id",           limit: 4
-    t.string   "quikr_invoice_type",      limit: 255
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
