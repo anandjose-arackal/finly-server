@@ -13,9 +13,9 @@ class ApplicationController < ActionController::Base
   # protect_from_forgery with: :exception
   before_filter :set_paper_trail_whodunnit
 
-  before_action :initialize_query_logger
-
   before_action :load_global_variables
+
+  before_action :initialize_query_logger
 
   before_filter :store_location
 
@@ -29,18 +29,18 @@ class ApplicationController < ActionController::Base
   # handles 404 errors
   def not_found
     respond_to do |format|
-      format.html { render file: "#{Rails.root}/public/404", layout: false, status: :not_found }
-      format.xml { head :not_found }
-      format.any { head :not_found }
+      format.html {render file: "#{Rails.root}/public/404", layout: false, status: :not_found}
+      format.xml {head :not_found}
+      format.any {head :not_found}
     end
   end
 
   # handles 500 errors
   def error
     respond_to do |format|
-      format.html { render file: "#{Rails.root}/public/500", layout: false, status: :error }
-      format.xml { head :not_found }
-      format.any { head :not_found }
+      format.html {render file: "#{Rails.root}/public/500", layout: false, status: :error}
+      format.xml {head :not_found}
+      format.any {head :not_found}
     end
   end
 
@@ -61,8 +61,8 @@ class ApplicationController < ActionController::Base
   def respond_to_ajax_with_success(redirect_path = root_path, force = false)
     redirect_path = request.referrer if request.referrer && !force
     respond_to do |format|
-      format.html { redirect_to redirect_path }
-      format.js { redirect_to redirect_path, turbolinks: true }
+      format.html {redirect_to redirect_path}
+      format.js {redirect_to redirect_path, turbolinks: true}
       format.json {}
     end
   end
@@ -150,7 +150,7 @@ class ApplicationController < ActionController::Base
     @curr_user = nil
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
-      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
+      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome') or scopes.include?('api')
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?('admin')
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
@@ -169,11 +169,12 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
   def respond_success_failure
     respond response: (@result.success? ? :success : :failure)
   end
 
-  def respond(type=nil)
+  def respond(type = nil)
     if type.present?
       if type[:response] == :success
         if @result.blank?
@@ -182,7 +183,7 @@ class ApplicationController < ActionController::Base
           @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, messages)
         end
         respond_to do |format|
-          format.json { render 'shared/success' }
+          format.json {render 'shared/success'}
           format.html {}
         end
         return
@@ -193,19 +194,19 @@ class ApplicationController < ActionController::Base
           @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, messages)
         end
         respond_to do |format|
-          format.json { render 'layouts/application' }
+          format.json {render 'layouts/application'}
           format.html {}
         end
         return
       elsif type[:render].present?
         respond_to do |format|
-          format.json { render type[:render] }
+          format.json {render type[:render]}
           format.html {}
         end
         return
       elsif type[:view].present? and type[:view] == false
         respond_to do |format|
-          format.json { render 'layouts/application' }
+          format.json {render 'layouts/application'}
           format.html {}
         end
         return
@@ -225,8 +226,8 @@ class ApplicationController < ActionController::Base
         end
       else
         respond_to do |format|
-          format.js { render 'layouts/application' }
-          format.json { render 'layouts/application' }
+          format.js {render 'layouts/application'}
+          format.json {render 'layouts/application'}
           format.html {}
           format.xls {}
         end
@@ -234,7 +235,7 @@ class ApplicationController < ActionController::Base
     else
       respond_to do |format|
         format.js {}
-        format.json { render 'layouts/application' }
+        format.json {render 'layouts/application'}
         format.html {}
       end
     end
@@ -245,15 +246,14 @@ class ApplicationController < ActionController::Base
     RequestStoreUtil.set_request_params params
     RequestStoreUtil.set_current_app current_app
     RequestStoreUtil.set_current_device current_device
-    RequestStoreUtil.set_queries_count 0
   end
 
-  def respond_failure(message=nil)
+  def respond_failure(message = nil)
     messages = nil
     messages = [message] unless message.blank? or message.is_a?(Array)
     @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: messages})
     respond_to do |format|
-      format.json { render 'layouts/application' }
+      format.json {render 'layouts/application'}
     end
   end
 
@@ -304,16 +304,38 @@ class ApplicationController < ActionController::Base
   end
 
   def initialize_query_logger
-    ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:prepend, ActiveRecordExt)
-    QueryLogger.reset
+    QueryLogger.reset if ENABLE_QUERY_LOGGER
   end
 
+  FILE_LOGGER = LogStashLogger.new(type: :file, path: 'log/logstash_query_details.log', sync: true)
+
   def set_queries_counter
-    file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_query_details.log', sync: true)
-    RequestStoreUtil.set_queries_count QueryLogger.count
-    unless params[:controller] == 'notifications' && params[:action] == 'unread'
-      file_logger.info({path: request.path, post_params: request.params, total_query_time: QueryLogger.time, no_of_queries: RequestStoreUtil.queries_count, queries: QueryLogger.queries})
+    return unless ENABLE_QUERY_LOGGER
+    return if params[:controller] == 'notifications' && params[:action] == 'unread'
+    log = {
+        path: request.path,
+        post_params: request.params,
+        total_query_time: QueryLogger.time,
+        queries_count: QueryLogger.count,
+        queries_summary: QueryLogger.summary,
+        queries: QueryLogger.queries,
+        current_app: current_app,
+        current_device: current_device,
+    }
+    user = current_user rescue nil
+    if user.present?
+      log[:user_id] = user&.id
+      log[:user_name] = (user&.name rescue nil)
+      log[:user_email] = user&.email
+      log[:user_mobile_number] = user&.mobile_number
+      log[:current_app] = current_app
+      log[:current_device] = current_device
+      log[:company_name] = (current_company&.name rescue nil)
+      log[:company_id] = (current_company&.id rescue nil)
+      view = (params&.dig(:view) rescue nil)
+      log[:current_view] = view
     end
+    FILE_LOGGER.info(log)
   end
 
 end
