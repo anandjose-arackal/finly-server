@@ -56,12 +56,12 @@ class Procurement < ActiveRecord::Base
 
   scope :order_by_controlling_level, ->(user_id) {
     if user_id.present?
-      ids = pluck(:id)
+      ids = pluck(:id).uniq
 
-      level_ids = LevelReviewerMapping.with_reviewer_id(user_id).pluck(:level_id)
+      level_ids = LevelReviewerMapping.with_reviewer_id(user_id).pluck(:level_id).uniq
 
-      filtered_ids = PurchaseOrder.with_procurement_id(ids).with_controlling_level_ids(level_ids).pluck(:id)
-      filtered_ids += Invoice.with_procurement_id(ids).with_controlling_level_ids(level_ids).pluck(:id)
+      filtered_ids = PurchaseOrder.with_procurement_id(ids).with_controlling_level_ids(level_ids).pluck(:id).uniq
+      filtered_ids += Invoice.with_procurement_id(ids).with_controlling_level_ids(level_ids).pluck(:id).uniq
 
       ordered_ids = filtered_ids + (ids - filtered_ids)
       find_ordered(ordered_ids)
@@ -196,11 +196,13 @@ class Procurement < ActiveRecord::Base
   scope :include_details, -> {
     includes(
         {invoices: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}]},
+        {purchase_order: [:department, :sub_department, :cost_center, :vendor, :user, :company]},
+        {inward_documents: [:vendor, :user, :items]},
         {
             purchase_order: [:cost_center, :department, :sub_department, {vendor: :bank_accounts},
                              {balance_amount: [:currency]}, :status, {level: :reviewers}]
         },
-        :status_tags, :user
+        :status_tags, :procurement_status_taggables, :user
     )
   }
 
