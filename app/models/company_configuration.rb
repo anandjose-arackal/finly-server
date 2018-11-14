@@ -18,6 +18,7 @@
 #  bank_type                        :string(255)
 #  default_card_expense_category_id :integer
 #  sso_enabled                      :boolean          default(FALSE)
+#  address                          :text(65535)
 #
 
 class CompanyConfiguration < ActiveRecord::Base

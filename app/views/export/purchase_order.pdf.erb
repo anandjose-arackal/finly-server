@@ -8,12 +8,7 @@
         <br>
         <div class="font-light-gray mg-botm-8">Business Office :</div>
         <div class="font-light-gray">
-          <%#= @result.purchase_order.location.address %>
-          DLF Corporate Park,<br/>
-          Ground Floor, Tower 3A, <br />
-          DLF City, Phase III,<br />
-          M.G. Road, Gurgaon, 122001<br />
-          CIN 074900HR2009PTC053732
+          <%= simple_format @company.configuration.address, {}, wrapper_tag: "div" %>
         </div>
       </div>
     </div>
