@@ -314,7 +314,8 @@ class ApplicationController < ActionController::Base
     return if params[:controller] == 'notifications' && params[:action] == 'unread'
     log = {
         path: request.path,
-        post_params: request.params,
+        controller: request.params[:controller],
+        action: request.params[:action],
         total_query_time: QueryLogger.time,
         queries_count: QueryLogger.count,
         queries_summary: QueryLogger.summary,
