@@ -13,9 +13,13 @@ class ApplicationController < ActionController::Base
   # protect_from_forgery with: :exception
   before_filter :set_paper_trail_whodunnit
 
+  before_action :initialize_query_logger
+
   before_action :load_global_variables
 
   before_filter :store_location
+
+  after_filter :set_queries_counter
 
   # handling exceptions and other errors through redirects to 404s and 500s
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found
@@ -241,6 +245,7 @@ class ApplicationController < ActionController::Base
     RequestStoreUtil.set_request_params params
     RequestStoreUtil.set_current_app current_app
     RequestStoreUtil.set_current_device current_device
+    RequestStoreUtil.set_queries_count 0
   end
 
   def respond_failure(message=nil)
@@ -295,6 +300,19 @@ class ApplicationController < ActionController::Base
     access_token = request.cookies['access_token_admin']
     if access_token.present?
       request.headers['Authorization'] = "Bearer #{access_token}"
+    end
+  end
+
+  def initialize_query_logger
+    ActiveRecord::ConnectionAdapters::AbstractAdapter.send(:prepend, ActiveRecordExt)
+    QueryLogger.reset
+  end
+
+  def set_queries_counter
+    file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_query_details.log', sync: true)
+    RequestStoreUtil.set_queries_count QueryLogger.count
+    unless params[:controller] == 'notifications' && params[:action] == 'unread'
+      file_logger.info({path: request.path, post_params: request.params, total_query_time: QueryLogger.time, no_of_queries: RequestStoreUtil.queries_count, queries: QueryLogger.queries})
     end
   end
 

@@ -28,6 +28,10 @@ class RequestStoreUtil
     RequestStore.store[:current_devise] = device
   end
 
+  def self.set_queries_count(count)
+    RequestStore.store[:queries_count] = count
+  end
+
   def self.to_hash
     {
         current_app: RequestStore.store[:current_app],
@@ -82,6 +86,10 @@ class RequestStoreUtil
 
   def self.request_params
     RequestStore.store[:params]
+  end
+
+  def self.queries_count
+    RequestStore.store[:queries_count]
   end
 
 end
