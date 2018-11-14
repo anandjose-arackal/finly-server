@@ -19,8 +19,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   end
 
   def initialize
-    # self.payment_order = payment_order
-    # self.options = options
+
   end
 
   def pre_validate
@@ -103,8 +102,6 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
       puts 'SUCCESSFUL!'
     else
       puts 'FAILURE!'
-      #todo - what to do in this case?
-
     end
   end
 

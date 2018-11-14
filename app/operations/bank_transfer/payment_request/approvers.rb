@@ -106,7 +106,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
           },
           role: {
               id: bank_payment_request.controlling_user_role_id,
-              name: UserRole.id_for(bank_payment_request.controlling_user_role_id)
+              name: UserRole.name_for(bank_payment_request.controlling_user_role_id)
           }
       }
     end

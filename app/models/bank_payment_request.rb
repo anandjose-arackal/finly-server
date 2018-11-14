@@ -192,6 +192,13 @@ class BankPaymentRequest < ActiveRecord::Base
     where(payment_order_id: payment_order_ids)
   }
 
+  scope :filter_vendor_id, -> (vendor_id) {
+    payment_order_ids = self.pluck(:payment_order_id)
+    payments = Payment.where(payment_order_id: payment_order_ids)
+    payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
+    where(payment_order_id: payment_order_ids)
+  }
+
   attr_accessor :cache_users
 
   before_save do
