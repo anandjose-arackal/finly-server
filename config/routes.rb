@@ -1215,6 +1215,7 @@
 #                                                         DELETE /bank_transfer/bank_accounts/:id(.:format)                                                                          bank_transfer/bank_accounts#destroy
 #                           bank_transfer_bulk_upload_utr POST   /bank_transfer/payments/bulk_upload_utr(.:format)                                                                   bank_transfer/payments#bulk_upload_utr
 #                            bank_transfer_payments_count GET    /bank_transfer/payments/count(.:format)                                                                             bank_transfer/payments#count
+#                          bank_transfer_payments_payouts GET    /bank_transfer/payments/payouts(.:format)                                                                           bank_transfer/payments#payout_index
 #                             bank_transfer_payment_retry PATCH  /bank_transfer/payments/:payment_id/retry(.:format)                                                                 bank_transfer/payments#retry
 #                                  bank_transfer_payments GET    /bank_transfer/payments(.:format)                                                                                   bank_transfer/payments#index
 #                                                         POST   /bank_transfer/payments(.:format)                                                                                   bank_transfer/payments#create
@@ -3082,6 +3083,7 @@ Rails.application.routes.draw do
 
     post 'payments/bulk_upload_utr', to: 'payments#bulk_upload_utr', as: :bulk_upload_utr
     get 'payments/count', to: 'payments#count'
+    get 'payments/payouts', to: 'payments#payout_index'
     resources :payments do
       patch 'retry', to: 'payments#retry', as: :retry
     end

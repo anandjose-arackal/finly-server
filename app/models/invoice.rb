@@ -65,6 +65,7 @@
 #  template_name                :string(255)
 #  is_deleted                   :boolean          default(FALSE)
 #  resource_template_id         :integer
+#  invoice_id                   :string(255)
 #
 
 #  gst_type_id: 1 - IGST
@@ -72,6 +73,10 @@
 
 class Invoice < ActiveRecord::Base
   include SoftDeletable, Templatable
+
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false
 
   belongs_to :address
   belongs_to :amount
@@ -330,6 +335,10 @@ class Invoice < ActiveRecord::Base
         document_owner: self.created_by&.name,
         document_type: self.class.name
     }
+  end
+
+  def generate_sequential_id?
+    self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
   end
 
   private

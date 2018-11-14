@@ -20,10 +20,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, 'Purchase Order not found'
     end
 
-    # todo uncomment below
-    # unless self.purchase_order_params[:policy_id].present?
-    #   add_message :error, 'Policy cannot be blank'
-    # end
+    unless self.purchase_order_params[:policy_id].present?
+      add_message :error, 'Policy cannot be blank'
+    end
   end
 
   def pre_process

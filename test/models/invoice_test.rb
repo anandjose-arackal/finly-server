@@ -65,6 +65,7 @@
 #  template_name                :string(255)
 #  is_deleted                   :boolean          default(FALSE)
 #  resource_template_id         :integer
+#  invoice_id                   :string(255)
 #
 
 require 'test_helper'
