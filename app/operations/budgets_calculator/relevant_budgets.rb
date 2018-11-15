@@ -6,16 +6,32 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
 
   class BudgetsCalculator::RelevantBudgets::RelevantBudgetsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :relevant_budgets, :budget_data
+    attr_accessor :relevant_budgets, :budget_data, :object
 
     def init
       self.relevant_budgets = params[:relevant_budgets]
+      self.object = params[:object]
       # now extract the details of all budgets
       self.budget_data = []
       self.relevant_budgets.each do |budget|
         processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
         spent_amount = processor_instance.spent_amount
         expenses, payments, purchase_order_items, invoice_items = processor_instance.spent_entities
+        # now in each spent amount, we need to add this object's amount so that
+        # it shows in the front end that the budget amount has been exceeded
+        budgetable_category_ids = budget.budgetable_categories.pluck(:id)
+        budgetable_vendor_ids = budget.budgetable_vendors.pluck(:id)
+        budgetable_cost_centers = budget.budgetable_cost_centers.pluck(:id)
+        budgetable_location_ids = budget.budgetable_locations.pluck(:id)
+        budgetable_user_ids = budget.budgetable_users.pluck(:id)
+        budgetable_department_ids = budgetable_departments.pluck(:id)
+        object_amount = 0
+
+        case self.object.class.name
+          when "PurchaseOrder", "Invoice"
+            inventory_item_ids = self.object.items.pluck(:inventory_line_item_id)
+            
+        end
         self.budget_data << {
             budget: budget,
             spent_amount: spent_amount,
@@ -43,7 +59,7 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
     company_budgets = user.company.budgets
     case self.object.class.name
       when "PurchaseOrder", "Invoice"
-        delivery_date = (self.object.is_a?(PurchaseOrder)) ? self.object.delivery_date : self.object.date
+        delivery_date = (self.object.is_a?(PurchaseOrder)) ? self.object.created_at : self.object.date
         relevant_budgets = company_budgets.applicable_to_purchase_orders.contains_date(delivery_date)
         relevant_budget_ids = []
         # relevant_budget_ids += relevant_budgets.with_budgetable_locations(self.object.location_id).pluck(:id)
