@@ -36,6 +36,7 @@ json.array! @result.paginated_procurements do |p|
   invoice = p.invoices.last
   if invoice.present?
     json.invoice_number invoice.invoice_number
+    json.invoice_id invoice.invoice_id
     json.invoice_status invoice.invoice_status&.name
     json.invoice_amount invoice.net_amount
   end
