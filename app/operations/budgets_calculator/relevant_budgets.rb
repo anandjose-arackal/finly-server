@@ -15,14 +15,15 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
       self.relevant_budgets.each do |budget|
         processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
         spent_amount = processor_instance.spent_amount
-        expenses, payments, purchase_order_items = processor_instance.spent_entities
+        expenses, payments, purchase_order_items, invoice_items = processor_instance.spent_entities
         self.budget_data << {
             budget: budget,
             spent_amount: spent_amount,
             spent_entities: {
             expenses: expenses,
             payments: payments,
-            purchase_order_items: purchase_order_items
+            purchase_order_items: purchase_order_items,
+            invoice_items: invoice_items
         }}
       end
     end
