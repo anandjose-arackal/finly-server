@@ -89,6 +89,10 @@ class YesBankVendor < ActiveRecord::Base
     includes(:bank_accounts)
   }
 
+  scope :includes_for_index, -> {
+    includes(:state_code, :bank_accounts)
+  }
+
   after_create do
     if self.vendor_account.blank?
       self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save
