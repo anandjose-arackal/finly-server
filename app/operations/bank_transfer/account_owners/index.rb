@@ -24,7 +24,7 @@ class BankTransfer::AccountOwners::Index < BankTransfer::AccountOwners::Base
       when 1, '1'
         self.account_owners = company.users.with_bank_accounts
       when 2, '2'
-        self.account_owners = company.yes_bank_vendors.non_deleted.authorized
+        self.account_owners = company.yes_bank_vendors.non_deleted.authorized.includes_for_index
       else
         # do nothing?
     end

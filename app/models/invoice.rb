@@ -176,6 +176,10 @@ class Invoice < ActiveRecord::Base
   scope :with_procurement, -> {where("invoices.procurement_id IS NOT NULL")}
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
 
+  scope :with_type_non_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+  }
+
 
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id
