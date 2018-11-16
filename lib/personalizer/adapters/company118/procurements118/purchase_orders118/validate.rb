@@ -22,7 +22,7 @@ class Personalizer::Adapters::Company118::Procurements118::PurchaseOrders118::Va
 
       # now adding the above spent amount with the current POs amount to get
       # an idea of how much of the amount will be spent altogether
-      spent_amount = budget_spent_amount + self.purchase_order.balance_amount&.value
+      spent_amount = budget_spent_amount
 
       if spent_amount > budget_amount
         add_message :error, "Purchase Order Amount exceeding Budget - #{budget[:budget].name}"
