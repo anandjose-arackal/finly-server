@@ -5,6 +5,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   register_processor ExportManager::Processor::Synchronous
   validate :input
   register_fields [
+                      procurement_name: {spreadsheet: true, pdf: true},
                       vendor_name: {spreadsheet: true, pdf: true},
                       vendor_business_name: {spreadsheet: false, pdf: true},
                       vendor_mobile_number: {spreadsheet: false, pdf: true},
@@ -22,6 +23,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
                       sub_department: {spreadsheet: true, pdf: true},
                       cost_center: {spreadsheet: true, pdf: true},
                       po_user: {spreadsheet: true, pdf: true},
+                      po_status: {spreadsheet: true, pdf: true},
                       po_number: {spreadsheet: true, pdf: true},
                       po_payment_term: {spreadsheet: false, pdf: true},
                       po_date: {spreadsheet: true, pdf: true},
@@ -69,6 +71,10 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
       return
     end
     result.procurements
+  end
+
+  def procurement_name(procurement)
+    procurement.name
   end
 
   def vendor_name(procurement)
@@ -137,6 +143,10 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
 
   def po_user(procurement)
     purchase_order(procurement)&.user.name
+  end
+
+  def po_status(procurement)
+    procurement.purchase_order.status&.name&.humanize
   end
 
   def po_number(procurement)
