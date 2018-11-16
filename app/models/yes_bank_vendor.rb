@@ -79,12 +79,16 @@ class YesBankVendor < ActiveRecord::Base
 
   scope :filter_name_search, -> (term) {
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     where(id: vendor_ids)
   }
 
   scope :includes_bank_accounts, -> {
     includes(:bank_accounts)
+  }
+
+  scope :includes_for_index, -> {
+    includes(:state_code, :bank_accounts)
   }
 
   after_create do

@@ -25,7 +25,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
                   ]
 
   def input
-    op = Budgets::Show.(user, params)
+    op = ::Budgets::Show.(user, params)
     unless op.success?
       add_message :error, result.messages[:error]
       return
@@ -162,7 +162,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
     if item.is_a?(PurchaseOrderItem)
       return item.purchase_order.user&.name
     elsif item.is_a?(InvoiceLineItem)
-      return item.parent.created_by_user&.name
+      return item.parent.created_by&.name
     elsif item.is_a?(Payment)
       return item.initiating_user&.name
     elsif item.is_a?(Expense)
