@@ -20,7 +20,9 @@ class ReviewalLevels::Index < ReviewalLevels::Base
 
 
   def init
-    self.reviewal_levels = ReviewalLevel.all
+    policy_id = params[:filter_policy]
+    policy = user.company.policies.find_by(id: policy_id)
+    self.reviewal_levels = policy.levels.non_deleted
   end
 
   def success

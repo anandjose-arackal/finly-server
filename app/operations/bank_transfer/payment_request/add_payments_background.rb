@@ -19,8 +19,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   end
 
   def initialize
-    # self.payment_order = payment_order
-    # self.options = options
+
   end
 
   def pre_validate
@@ -67,6 +66,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
               cost_center_id: payment[:cost_center_id],
               inclusive_of_taxes: payment[:inclusive_of_taxes],
               gst_type_id: payment[:gst_type_id],
+              tds_slab_id: payment[:tds_slab_id],
               invoice_number: payment[:invoice_number],
               date: payment[:invoice_date],
               due_date: payment[:due_date],
@@ -91,14 +91,17 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   def process
     # now create the bank payment request object and save it so that it can be made 'Open'
     if self.bank_payment_request.save
+      # perform calculations on the payment and the TDS, Tsx etc.
+      self.bank_payment_request.payment_order.payments.each do |payment|
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+        payment.save
+      end
       # make the status of the payment order, Bank payment request and payments as of a newly created one
       self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
       self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
       puts 'SUCCESSFUL!'
     else
       puts 'FAILURE!'
-      #todo - what to do in this case?
-
     end
   end
 

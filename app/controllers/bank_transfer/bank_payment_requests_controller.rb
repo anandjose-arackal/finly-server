@@ -199,12 +199,21 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def payments_count
     @result = BankTransfer::PaymentRequest::PaymentsCount.(current_user, params)
-    render json: @result.as_json
+    if @result.success?
+      render json: @result.count.as_json
+    else
+      render json: 0.as_json
+    end
   end
 
   def add_invoice
     @result = BankTransfer::PaymentRequest::InwardInvoice::Add.(current_user, params)
     respond_success_failure
+  end
+
+  def remove_attachment
+    @result = BankTransfer::PaymentRequest::RemoveAttachment.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   private
