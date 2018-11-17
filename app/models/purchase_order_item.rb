@@ -62,6 +62,21 @@ class PurchaseOrderItem < ActiveRecord::Base
   scope :with_category, -> (id) {
     where category_id: id
   }
+
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      joins(:inventory_line_items).where("inventory_line_items.category_id IN (?)", category_ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      where(cost_center_id: cost_center_ids)
+    end
+  }
+
   scope :include_details, -> {includes(:total_amount, :cost_center,purchase_order: [:department, :location])}
 
   after_save :budget_trail_entry

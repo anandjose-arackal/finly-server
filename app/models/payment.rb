@@ -47,17 +47,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
   include PostOperationExecution
 
@@ -339,6 +328,20 @@ class Payment < ActiveRecord::Base
     end
     virtual_account_transactions = virtual_account_transactions.where(virtual_account_id: virtual_account_ids)
     where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
+  }
+
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      where(category_id: category_ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      where(cost_center_id: cost_center_ids)
+    end
   }
 
   # validates :amount_id, presence: true

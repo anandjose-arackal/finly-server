@@ -61,6 +61,35 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
     [expenses, payments, purchase_order_items, invoice_items]
   end
 
+  # this method will accept either a PO, Invoice, PaymentOrder or Report object and
+  # return the relevant items in the object that apply to this particular budget
+  def relevant_items(object)
+    category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
+    cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
+    department_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Department'}&.first&.dig('budgetable_id_list')&.split(',')
+    location_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'BranchLocation'}&.first&.dig('budgetable_id_list')&.split(',')
+    vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
+    user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
+    object = object.class.with_department_ids(department_ids).with_location_ids(location_ids).with_vendor_ids(vendor_ids).with_user_ids(user_ids).first
+    if object.blank?
+      return []
+    end
+    case object.class.name
+      when "PurchaseOrder", "Invoice"
+        items = object.items
+        items = items.with_category_ids(category_ids).with_cost_center_ids(cost_center_ids)
+      when "PaymentOrder", "BankPaymentRequest"
+        items = object.payments
+        items = items.with_category_ids(category_ids).with_cost_center_ids(cost_center_ids)
+      when "Report"
+        items = object.expenses
+        items = items.with_category_ids(category_ids).with_cost_center_ids(cost_center_ids)
+      else
+        items = []
+    end
+    items
+  end
+
   def save_trail
     if self.trail_hash[:id].present?
       budget_trail = BudgetTrail.find_by(id: self.trail_hash[:id])
