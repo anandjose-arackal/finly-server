@@ -227,7 +227,10 @@ class Invoice < ActiveRecord::Base
 
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
 
-  # scope :with_invoice_number, -> (invoice_number) {where 'invoice_number like ?', invoice_number}
+  # this scope checks for an exact match of invoice number
+  scope :with_invoice_number, -> (invoice_number) {where invoice_number: invoice_number}
+
+  # this scope checks for an approximate match - used in searches etc.
   scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
 
   after_create :set_defaults

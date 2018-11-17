@@ -783,6 +783,7 @@
 #                                                  lookup GET    /lookup(.:format)                                                                                                   users#lookup
 #                                   send_verification_otp POST   /send_verification_otp(.:format)                                                                                    users#send_verification_otp
 #                                         verify_user_otp POST   /verify_user_otp(.:format)                                                                                          users#verify_user_otp
+#                                               all_cards GET    /users/all_cards(.:format)                                                                                          users#all_cards
 #                                                   users GET    /users(.:format)                                                                                                    users#index
 #                                                         POST   /users(.:format)                                                                                                    users#create
 #                                                    user GET    /users/:id(.:format)                                                                                                users#show
@@ -2702,6 +2703,7 @@ Rails.application.routes.draw do
   post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
 
+  get 'users/all_cards', to: 'users#all_cards', as: :all_cards
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     get 'summary', to: 'users#summary', as: :user_summary
