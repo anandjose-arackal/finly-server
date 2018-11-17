@@ -197,7 +197,6 @@ class Expense < ActiveRecord::Base
     else
       # do nothing, ha
     end
-
   }
 
   scope :filter_field_configuration, ->(config_id) do

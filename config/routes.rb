@@ -783,6 +783,7 @@
 #                                                  lookup GET    /lookup(.:format)                                                                                                   users#lookup
 #                                   send_verification_otp POST   /send_verification_otp(.:format)                                                                                    users#send_verification_otp
 #                                         verify_user_otp POST   /verify_user_otp(.:format)                                                                                          users#verify_user_otp
+#                                               all_cards GET    /users/all_cards(.:format)                                                                                          users#all_cards
 #                                                   users GET    /users(.:format)                                                                                                    users#index
 #                                                         POST   /users(.:format)                                                                                                    users#create
 #                                                    user GET    /users/:id(.:format)                                                                                                users#show
@@ -1169,7 +1170,7 @@
 #       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)                              bank_transfer/bank_payment_requests#update_payment
 #         bank_transfer_bank_payment_request_payments_lst GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments(.:format)                                    bank_transfer/bank_payment_requests#payments_list
 #       bank_transfer_bank_payment_request_payments_count GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_count(.:format)                              bank_transfer/bank_payment_requests#payments_count
-#    bank_transfer_bank_payment_request_remove_attachment DELETE /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_attachment(.:format)                           bank_transfer/bank_payment_requests#remove_atachment
+#    bank_transfer_bank_payment_request_remove_attachment DELETE /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_attachment(.:format)                           bank_transfer/bank_payment_requests#remove_attachment
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                                                      bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                                                      bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                                                  bank_transfer/bank_payment_requests#new
@@ -2702,6 +2703,7 @@ Rails.application.routes.draw do
   post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
 
+  get 'users/all_cards', to: 'users#all_cards', as: :all_cards
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     get 'summary', to: 'users#summary', as: :user_summary

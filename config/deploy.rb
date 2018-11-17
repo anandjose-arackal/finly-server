@@ -69,6 +69,12 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
+set :slackistrano, {
+    channel: '#tech',
+    team: 'finlyteam',
+    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj'
+}
+
 # before 'disable_secure_storage', 'runner:restart'
 #
 # # Restart runner
