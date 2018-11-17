@@ -8,8 +8,8 @@ class ExportManager::Master::BaseMaster
       test: '::ExportManager::Master::Test::Provider',
       procurement: '::ExportManager::Master::Procurements::Provider',
       budget_summary: '::ExportManager::Master::Budgets::UsageSummary',
-      budget_entities: '::ExportManager::Manager::Budgets::UsageEntities',
-      vendor_details: '::ExportManager::Manager::Vendors::DetailsIndex'
+      budget_entities: '::ExportManager::Master::Budgets::UsageEntities',
+      vendor_details: '::ExportManager::Master::Vendors::DetailsIndex'
   }.with_indifferent_access
 
   DEFAULT_CONFIG = {spreadsheet: true, pdf: true}

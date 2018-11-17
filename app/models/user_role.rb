@@ -15,6 +15,7 @@
 
 
 
+
 class UserRole < ActiveRecord::Base
   has_many :users, through: :user_role_mappings
 

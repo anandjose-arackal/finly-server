@@ -81,6 +81,10 @@ class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::Base
     vendor.created_at
   end
 
+  def address(vendor)
+    vendor.address
+  end
+
   def default_account_number(vendor)
     account = vendor.bank_accounts.default_accounts.first
     account = vendor.bank_accounts.first if account.blank?
