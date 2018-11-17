@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181117115231) do
+ActiveRecord::Schema.define(version: 20181117155802) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -3803,6 +3803,7 @@ ActiveRecord::Schema.define(version: 20181117115231) do
     t.integer  "purchase_order_id",              limit: 4
     t.integer  "procurement_id",                 limit: 4
     t.integer  "department_id",                  limit: 4
+    t.integer  "location_id",                    limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree

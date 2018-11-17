@@ -344,6 +344,24 @@ class Payment < ActiveRecord::Base
     end
   }
 
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      where department_id: department_ids
+    end
+  }
+
+  scope :with_budgetable_location_ids, -> (location_ids) {
+    if location_ids.present?
+      where(location_id: location_ids)
+    end
+  }
+
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_ids)
+    end
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}

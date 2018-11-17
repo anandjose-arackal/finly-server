@@ -74,6 +74,12 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
         self.relevant_budgets = user.company.budgets.applicable_to_expenses
       when "Payment", "PaymentOrder", "BankPaymentRequest"
         self.relevant_budgets = user.company.budgets.applicable_to_payments
+        payments = self.object.payments
+        category_ids = payments.pluck(:category_id)
+        department_ids = payments.pluck(:department_id)
+        location_ids = payments.pluck(:location_id)
+        vendor_ids = payments.where(receiving_user_type: "YesBankVendor").pluck(:receiving_user_id)
+        self.relevant_budgets = company_budgets.with_budgetable_departments(department_ids).with_budgetable_categories(category_ids).with_budgetable_locations(location_ids).with_budgetable_vendors(vendor_ids)
       else
         self.relevant_budgets = []
     end

@@ -64,26 +64,36 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
   # this method will accept either a PO, Invoice, PaymentOrder or Report object and
   # return the relevant items in the object that apply to this particular budget
   def relevant_items(object)
+    criterial_mapping = self.budget.budget_criteria_mappings.select('budgetable_type, GROUP_CONCAT(DISTINCT budgetable_id SEPARATOR ",") AS budgetable_id_list').group(:budgetable_type).as_json
     category_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Category'}&.first&.dig('budgetable_id_list')&.split(',')
     cost_center_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'CostCenter'}&.first&.dig('budgetable_id_list')&.split(',')
     department_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'Department'}&.first&.dig('budgetable_id_list')&.split(',')
     location_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'BranchLocation'}&.first&.dig('budgetable_id_list')&.split(',')
     vendor_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'YesBankVendor'}&.first&.dig('budgetable_id_list')&.split(',')
     user_ids = criterial_mapping.select {|mapping| mapping['budgetable_type'] == 'User'}&.first&.dig('budgetable_id_list')&.split(',')
-    object = object.class.with_department_ids(department_ids).with_location_ids(location_ids).with_vendor_ids(vendor_ids).with_user_ids(user_ids).first
     if object.blank?
       return []
     end
     case object.class.name
       when "PurchaseOrder", "Invoice"
+        object = object.class.with_department_ids(department_ids).with_location_ids(location_ids).with_vendor_ids(vendor_ids).with_user_ids(user_ids).first
+        if object.blank?
+          items = []
+          return items
+        end
         items = object.items
-        items = items.with_category_ids(category_ids).with_cost_center_ids(cost_center_ids)
+        items = items.with_budgetable_category_ids(category_ids).with_budgetable_cost_center_ids(cost_center_ids)
       when "PaymentOrder", "BankPaymentRequest"
+        object = object.class.with_budgetable_user_ids(user_ids).first
+        if object.blank?
+          items = []
+          return items
+        end
         items = object.payments
-        items = items.with_category_ids(category_ids).with_cost_center_ids(cost_center_ids)
+        items = items.with_budgetable_category_ids(category_ids).with_budgetable_cost_center_ids(cost_center_ids).with_budgetable_department_ids(department_ids).with_budgetable_location_ids(location_ids).with_budgetable_vendor_ids(vendor_ids)
       when "Report"
         items = object.expenses
-        items = items.with_category_ids(category_ids).with_cost_center_ids(cost_center_ids)
+        items = items.with_budgetable_category_ids(category_ids).with_budgetable_cost_center_ids(cost_center_ids)
       else
         items = []
     end
