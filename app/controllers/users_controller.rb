@@ -164,6 +164,11 @@ class UsersController < ApplicationController
     end
   end
 
+  def all_cards
+    @result = User::Cards::AllCards.(current_user, params)
+    respond
+  end
+
 
   private
 
