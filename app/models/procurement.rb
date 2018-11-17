@@ -75,6 +75,32 @@ class Procurement < ActiveRecord::Base
     where id: filtered_ids
   }
 
+  scope :filter_po_status, -> (status_id) {
+    filtered_ids = PurchaseOrder.with_status_ids(status_id).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
+  scope :filter_invoice_status, -> (status_id) {
+    filtered_ids = Invoice.with_status_id(status_id).pluck(:procurement_id).uniq
+
+    filtered_ids.reject! {|id| id == nil}
+
+    where id: filtered_ids
+  }
+
+  scope :filter_submission_date, -> (submission_date) {
+    date = Date.parse(submission_date) rescue nil
+
+    if date
+      purchase_order_ids = Trail.with_parent_type('PurchaseOrder').with_action_id(TrailAction.id_for(:submit)).filter_date(date).pluck(:parent_id)
+      filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
+
+      where id: filtered_ids
+    end
+  }
+
+
+
   scope :filter_sub_department, -> (sub_department_name, user_id) {
     user = User.find_by id: user_id
     if user.present?

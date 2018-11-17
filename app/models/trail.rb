@@ -34,6 +34,10 @@ class Trail < ActiveRecord::Base
     where(parent_type: parent_type)
   }
 
+  scope :with_action_id, -> (id) {
+    where action_id: id
+  }
+
   scope :only_approve, -> {
     where action_id: TrailAction.id_for(:approve)
   }
@@ -56,6 +60,10 @@ class Trail < ActiveRecord::Base
     else
       reorder(:created_at)
     end
+  }
+
+  scope :filter_date, -> (date) {
+    where created_at: (date.beginning_of_day..date.end_of_day)
   }
 
   def as_json(user)

@@ -89,6 +89,8 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_user, using: [:user_details, :user_id], type: :hash
     has_scope :filter_payment_term, using: [:payment_term_name, :user_id], type: :hash
     has_scope :filter_category, using: [:category_name, :user_id], type: :hash
+    has_scope :filter_po_status
+    has_scope :filter_invoice_status
 
     has_scope :filter_procurement_type
 
