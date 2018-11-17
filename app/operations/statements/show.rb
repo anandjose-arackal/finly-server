@@ -57,7 +57,8 @@ class Statements::Show < Statements::Base
           return
         end
         users = user_presenter.team
-        self.account = Card.with_user(users.pluck(:id)).with_proxy(params[:proxy])&.first
+        card_id = params[:card_id]
+        self.account = Card.unscoped.with_user(users.pluck(:id)).with_id(card_id)&.first
     end
 
     if params[:with_date_range].nil?
