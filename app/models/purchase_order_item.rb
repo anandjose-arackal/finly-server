@@ -66,7 +66,8 @@ class PurchaseOrderItem < ActiveRecord::Base
   scope :with_budgetable_category_ids, -> (category_ids) {
     if category_ids.present?
       category_ids = [category_ids] unless category_ids.is_a?(Array)
-      joins(:inventory_line_items).where("inventory_line_items.category_id IN (?)", category_ids)
+      ids = joins(:inventory_line_item).where("inventory_line_items.category_id IN (?)", category_ids).pluck('purchase_order_items.id')
+      where(id: ids)
     end
   }
 
@@ -96,7 +97,7 @@ class PurchaseOrderItem < ActiveRecord::Base
     # else
     #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     # end
-    if self.purchase_order.voided?
+    if self.purchase_order.voided? || self.purchase_order.rejected? || self.purchase_order.retracted? || self.purchase_order.open?
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     else
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)

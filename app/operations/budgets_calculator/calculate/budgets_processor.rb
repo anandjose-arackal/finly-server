@@ -76,7 +76,7 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
     end
     case object.class.name
       when "PurchaseOrder", "Invoice"
-        object = object.class.with_department_ids(department_ids).with_location_ids(location_ids).with_vendor_ids(vendor_ids).with_user_ids(user_ids).first
+        object = object.class.with_budgetable_department_ids(department_ids).with_budgetable_location_ids(location_ids).with_budgetable_vendor_ids(vendor_ids).with_budgetable_user_ids(user_ids).with_id(object.id).first
         if object.blank?
           items = []
           return items
@@ -84,7 +84,7 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
         items = object.items
         items = items.with_budgetable_category_ids(category_ids).with_budgetable_cost_center_ids(cost_center_ids)
       when "PaymentOrder", "BankPaymentRequest"
-        object = object.class.with_budgetable_user_ids(user_ids).first
+        object = object.class.with_budgetable_user_ids(user_ids).with_id(self.object.id).first
         if object.blank?
           items = []
           return items

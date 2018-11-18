@@ -374,8 +374,14 @@ class Invoice < ActiveRecord::Base
 
   def budget_trail_entry
     # as of now, no condition is being used to determine when to add the invoice to the budget trail
-    self.invoice_items.each do |invoice_item|
-      BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(invoice_item)
+    if self.open? || self.rejected? || self.retracted?
+      self.invoice_items.each do |invoice_item|
+        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
+      end
+    else
+      self.invoice_items.each do |invoice_item|
+        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(invoice_item)
+      end
     end
   end
 

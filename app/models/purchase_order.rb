@@ -115,7 +115,9 @@ class PurchaseOrder < ActiveRecord::Base
   scope :with_po_number, -> (po_number) {where po_number: po_number}
   scope :with_budgetable_department_ids, -> (department_ids) {
     if department_ids.present?
-      where department_id: department_ids
+      ids = where(department_id: department_ids).pluck(:id)
+      ids += where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
     end
   }
   scope :with_budgetable_location_ids, -> (location_ids) {
@@ -128,7 +130,11 @@ class PurchaseOrder < ActiveRecord::Base
       where created_by_user_id: user_ids
     end
   }
-
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where vendor_id: vendor_ids
+    end
+  }
   # Used for generating document number
   scope :valid, -> {
     status_ids = [
@@ -315,7 +321,7 @@ class PurchaseOrder < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    if self.voided?
+    if self.voided? || self.rejected? || self.retracted? || self.open?
       # this will delete the trails of all the items within this particular purchase order
       self.items.each do |item|
         BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)

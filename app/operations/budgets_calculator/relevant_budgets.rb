@@ -15,22 +15,50 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
       self.budget_data = []
       self.relevant_budgets.each do |budget|
         processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget)
-        spent_amount = processor_instance.spent_amount
+        budget_spent_amount = processor_instance.spent_amount
         expenses, payments, purchase_order_items, invoice_items = processor_instance.spent_entities
         # now in each spent amount, we need to add this object's amount so that
         # it shows in the front end that the budget amount has been exceeded
-        budgetable_category_ids = budget.budgetable_categories.pluck(:id)
-        budgetable_vendor_ids = budget.budgetable_vendors.pluck(:id)
-        budgetable_cost_centers = budget.budgetable_cost_centers.pluck(:id)
-        budgetable_location_ids = budget.budgetable_locations.pluck(:id)
-        budgetable_user_ids = budget.budgetable_users.pluck(:id)
-        budgetable_department_ids = budgetable_departments.pluck(:id)
-        object_amount = 0
 
         case self.object.class.name
-          when "PurchaseOrder", "Invoice"
-            inventory_item_ids = self.object.items.pluck(:inventory_line_item_id)
-            
+          when "PurchaseOrder"
+            if self.object.open? || self.object.retracted? || self.object.rejected? || self.object.voided?
+              po_line_items = processor_instance.relevant_items(self.object)
+              if po_line_items.present?
+                current_object_amount = po_line_items.joins(:total_amount).sum(:value)
+                spent_amount = budget_spent_amount + current_object_amount
+              else
+                spent_amount = budget_spent_amount
+              end
+            else
+              spent_amount = budget_spent_amount
+            end
+          when "Invoice"
+            invoice_line_items = processor_instance.relevant_items(self.object)
+            if invoice_line_items.present?
+              current_object_amount = invoice_line_items.joins(:net_amount).sum(:value)
+              spent_amount = budget_spent_amount + current_object_amount
+            else
+              spent_amount = budget_spent_amount
+            end
+          when "PaymentOrder", "BankPaymentRequest"
+            payments = processor_instance.relevant_items(self.object)
+            if payments.present?
+              current_object_amount = payments.joins(:amount).sum(:value)
+              spent_amount = budget_spent_amount + current_object_amount
+            else
+              spent_amount = budget_spent_amount
+            end
+          when "Report"
+            expenses = processor_instance.relevant_items(self.object)
+            if expenses.present?
+              current_object_amount = expenses.joins(:amount).sum(:value)
+              spent_amount = budget_spent_amount + current_object_amount
+            else
+              spent_amount = budget_spent_amount
+            end
+          else
+            spent_amount = 0
         end
         self.budget_data << {
             budget: budget,
