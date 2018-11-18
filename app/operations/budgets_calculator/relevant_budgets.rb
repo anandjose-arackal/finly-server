@@ -47,7 +47,6 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
             end
           when "PaymentOrder", "BankPaymentRequest"
             payments = processor_instance.relevant_items(self.object)
-            debugger
             if payments.present?
               current_object_amount = payments.joins(:amount).sum(:value)
               spent_amount = budget_spent_amount + current_object_amount
