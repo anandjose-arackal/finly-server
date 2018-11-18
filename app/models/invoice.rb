@@ -177,7 +177,9 @@ class Invoice < ActiveRecord::Base
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
   scope :with_budgetable_department_ids, -> (department_ids) {
     if department_ids.present?
-      where department_id: department_ids
+      ids = where(department_id: department_ids).pluck(:id)
+      ids += where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
     end
   }
   scope :with_budgetable_location_ids, -> (location_ids) {
@@ -188,6 +190,12 @@ class Invoice < ActiveRecord::Base
   scope :with_budgetable_user_ids, -> (user_ids) {
     if user_ids.present?
       where created_by_user_id: user_ids
+    end
+  }
+
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where vendor_id: vendor_ids
     end
   }
 

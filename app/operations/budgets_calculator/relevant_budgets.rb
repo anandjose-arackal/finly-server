@@ -34,10 +34,14 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
               spent_amount = budget_spent_amount
             end
           when "Invoice"
-            invoice_line_items = processor_instance.relevant_items(self.object)
-            if invoice_line_items.present?
-              current_object_amount = invoice_line_items.joins(:net_amount).sum(:value)
-              spent_amount = budget_spent_amount + current_object_amount
+            if self.object.open? || self.object.rejected? || self.object.retracted?
+              invoice_line_items = processor_instance.relevant_items(self.object)
+              if invoice_line_items.present?
+                current_object_amount = invoice_line_items.joins(:net_amount).sum(:value)
+                spent_amount = budget_spent_amount + current_object_amount
+              else
+                spent_amount = budget_spent_amount
+              end
             else
               spent_amount = budget_spent_amount
             end

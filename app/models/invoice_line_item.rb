@@ -63,6 +63,22 @@ class InvoiceLineItem < ActiveRecord::Base
     where id: id
   }
 
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      ids = joins(:inventory_line_item).where("inventory_line_items.category_id IN (?)", category_ids).pluck('invoice_line_items.id')
+      where(id: ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    # todo - add cost center to invoice line items
+    # if cost_center_ids.present?
+    #   cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+    #   where(cost_center_id: cost_center_ids)
+    # end
+  }
+
   private
 
   def budget_trail_entry
