@@ -169,6 +169,7 @@ class Invoice < ActiveRecord::Base
   # validates :amount, presence: true
 
   scope :with_id, -> (id) {where id: id}
+  scope :without_id, -> (id) { where.not(id: id) }
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
   scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
   scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}

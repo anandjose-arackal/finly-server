@@ -20,20 +20,6 @@ class Personalizer::Adapters::Company118::Procurements118::PurchaseOrders118::Va
       budget_amount = budget[:budget].budget_amount.value
       budget_spent_amount = budget[:spent_amount]
 
-      # now adding the above spent amount with the current POs amount to get
-      # an idea of how much of the amount will be spent altogether
-      # processor_instance = BudgetsCalculator::Calculate::BudgetsProcessor.new(budget[:budget])
-      # if self.purchase_order.open? || self.purchase_order.retracted? || self.purchase_order.rejected? || self.purchase_order.voided?
-      #   po_line_items = processor_instance.relevant_items(self.purchase_order)
-      #   if po_line_items.present?
-      #     current_object_amount = po_line_items.joins(:total_amount).sum(:value)
-      #     spent_amount = budget_spent_amount + current_object_amount
-      #   else
-      #     spent_amount = budget_spent_amount
-      #   end
-      # else
-      #   spent_amount = budget_spent_amount
-      # end
       spent_amount = budget_spent_amount
 
       if spent_amount > budget_amount
