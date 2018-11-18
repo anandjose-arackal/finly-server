@@ -84,7 +84,7 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
         items = object.items
         items = items.with_budgetable_category_ids(category_ids).with_budgetable_cost_center_ids(cost_center_ids)
       when "PaymentOrder", "BankPaymentRequest"
-        object = object.class.with_budgetable_user_ids(user_ids).with_id(self.object.id).first
+        object = object.class.with_budgetable_user_ids(user_ids).with_id(object.id).first
         if object.blank?
           items = []
           return items

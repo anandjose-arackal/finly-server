@@ -47,6 +47,7 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
             end
           when "PaymentOrder", "BankPaymentRequest"
             payments = processor_instance.relevant_items(self.object)
+            debugger
             if payments.present?
               current_object_amount = payments.joins(:amount).sum(:value)
               spent_amount = budget_spent_amount + current_object_amount
@@ -107,11 +108,17 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
       when "Payment", "PaymentOrder", "BankPaymentRequest"
         self.relevant_budgets = user.company.budgets.applicable_to_payments
         payments = self.object.payments
+        relevant_budget_ids = []
+        payments.each do |payment|
+          relevant_budget_ids += self.relevant_budgets.contains_date(payment.date).pluck(:id)
+        end
+        self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
         category_ids = payments.pluck(:category_id)
         department_ids = payments.pluck(:department_id)
-        location_ids = payments.pluck(:location_id)
-        vendor_ids = payments.where(receiving_user_type: "YesBankVendor").pluck(:receiving_user_id)
-        self.relevant_budgets = company_budgets.with_budgetable_departments(department_ids).with_budgetable_categories(category_ids).with_budgetable_locations(location_ids).with_budgetable_vendors(vendor_ids)
+        # location_ids = payments.pluck(:location_id)
+        # vendor_ids = payments.where(receiving_user_type: "YesBankVendor").pluck(:receiving_user_id)
+        relevant_budget_ids = self.relevant_budgets.with_budgetable_departments(department_ids).with_budgetable_categories(category_ids).pluck(:id)
+        self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
       else
         self.relevant_budgets = []
     end
