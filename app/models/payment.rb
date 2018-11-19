@@ -43,7 +43,9 @@
 #  purchase_order_id              :integer
 #  procurement_id                 :integer
 #  department_id                  :integer
+#  location_id                    :integer
 #
+
 
 
 

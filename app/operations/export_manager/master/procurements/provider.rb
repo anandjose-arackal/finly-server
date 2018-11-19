@@ -148,7 +148,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def po_status(procurement)
-    procurement.purchase_order.status&.name&.humanize
+    procurement.purchase_order&.status&.name&.humanize
   end
 
   def po_number(procurement)

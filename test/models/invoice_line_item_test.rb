@@ -26,6 +26,7 @@
 #  comment                :string(255)
 #  account                :string(255)
 #  tax_rate_id            :integer
+#  cost_center_id         :integer
 #
 
 require 'test_helper'
