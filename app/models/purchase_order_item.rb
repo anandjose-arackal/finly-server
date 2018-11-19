@@ -62,6 +62,22 @@ class PurchaseOrderItem < ActiveRecord::Base
   scope :with_category, -> (id) {
     where category_id: id
   }
+
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      ids = joins(:inventory_line_item).where("inventory_line_items.category_id IN (?)", category_ids).pluck('purchase_order_items.id')
+      where(id: ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      where(cost_center_id: cost_center_ids)
+    end
+  }
+
   scope :include_details, -> {includes(:total_amount, :cost_center,purchase_order: [:department, :location])}
 
   after_save :budget_trail_entry
@@ -81,7 +97,7 @@ class PurchaseOrderItem < ActiveRecord::Base
     # else
     #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     # end
-    if self.purchase_order.voided?
+    if self.purchase_order.voided? || self.purchase_order.rejected? || self.purchase_order.retracted? || self.purchase_order.open?
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
     else
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)

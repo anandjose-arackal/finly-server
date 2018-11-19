@@ -47,18 +47,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
   include PostOperationExecution
 
@@ -340,6 +328,38 @@ class Payment < ActiveRecord::Base
     end
     virtual_account_transactions = virtual_account_transactions.where(virtual_account_id: virtual_account_ids)
     where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
+  }
+
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      where(category_id: category_ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      where(cost_center_id: cost_center_ids)
+    end
+  }
+
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      where department_id: department_ids
+    end
+  }
+
+  scope :with_budgetable_location_ids, -> (location_ids) {
+    if location_ids.present?
+      where(location_id: location_ids)
+    end
+  }
+
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_ids)
+    end
   }
 
   # validates :amount_id, presence: true

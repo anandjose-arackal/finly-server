@@ -59,6 +59,12 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :with_controlling_user, -> (user_id) {where controlling_user_id: user_id}
   scope :with_controlling_user_role, -> (role_id) {where controlling_user_role_id: role_id}
   scope :with_user, -> (user_id) {where owner_id: user_id}
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where(owner_id: user_ids)
+    end
+  }
+
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not id: id}

@@ -169,12 +169,36 @@ class Invoice < ActiveRecord::Base
   # validates :amount, presence: true
 
   scope :with_id, -> (id) {where id: id}
+  scope :without_id, -> (id) { where.not(id: id) }
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
   scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
   scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
   scope :with_procurement, -> {where("invoices.procurement_id IS NOT NULL")}
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      ids = where(department_id: department_ids).pluck(:id)
+      ids += where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
+    end
+  }
+  scope :with_budgetable_location_ids, -> (location_ids) {
+    if location_ids.present?
+      where location_id: location_ids
+    end
+  }
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where created_by_user_id: user_ids
+    end
+  }
+
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where vendor_id: vendor_ids
+    end
+  }
 
   scope :with_type_non_po_invoice, -> {
     where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
@@ -359,8 +383,14 @@ class Invoice < ActiveRecord::Base
 
   def budget_trail_entry
     # as of now, no condition is being used to determine when to add the invoice to the budget trail
-    self.invoice_items.each do |invoice_item|
-      BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(invoice_item)
+    if self.open? || self.rejected? || self.retracted?
+      self.invoice_items.each do |invoice_item|
+        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
+      end
+    else
+      self.invoice_items.each do |invoice_item|
+        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(invoice_item)
+      end
     end
   end
 
