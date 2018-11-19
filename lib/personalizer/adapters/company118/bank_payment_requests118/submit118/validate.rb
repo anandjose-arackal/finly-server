@@ -17,7 +17,7 @@ class Personalizer::Adapters::Company118::BankPaymentRequests118::Create118::Val
   end
 
   def process
-    budgets.each do |budget|
+    self.budgets.each do |budget|
       budget_amount = budget[:budget].budget_amount.value
       budget_spent_amount = budget[:spent_amount]
 
