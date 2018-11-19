@@ -70,9 +70,9 @@ views:
 #          url: payments
 #          id: payments
         <% if current_user.company.procurement_enabled? %>
-#        - name: Templates
-#          id: custom_templates
-#          url: custom_templates
+        - name: Templates
+          id: custom_templates
+          url: custom_templates
         - name: Procurements
           id: procurements
           url: procurements
@@ -265,9 +265,9 @@ views:
       menus:
         navbar:
         <% if current_user.company.procurement_enabled? %>
-#        - name: Templates
-#          id: custom_templates
-#          url: custom_templates
+        - name: Templates
+          id: custom_templates
+          url: custom_templates
         - name: Procurements
           id: procurements
           url: procurements
