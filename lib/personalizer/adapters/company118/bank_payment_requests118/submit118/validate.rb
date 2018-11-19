@@ -1,10 +1,10 @@
-class Personalizer::Adapters::Company118::BankPaymentRequests118::Create118::Validate < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company118::BankPaymentRequests118::Submit118::Validate < Personalizer::Adapters::Base
 
   attr_accessor :bank_payment_request, :budgets
   def init
     self.bank_payment_request = op_instance.bank_payment_request
 
-    op = BudgetsCalculator::RelevantBudgets.(user, object: self.purchase_order)
+    op = BudgetsCalculator::RelevantBudgets.(user, object: self.bank_payment_request)
     if op.success?
       self.budgets = op.budget_data
     end
