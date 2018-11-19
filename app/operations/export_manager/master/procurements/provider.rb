@@ -142,7 +142,9 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def po_user(procurement)
-    purchase_order(procurement)&.user.name
+    if procurement.purchase_order.present?
+      purchase_order(procurement)&.user&.name
+    end
   end
 
   def po_status(procurement)
@@ -321,5 +323,6 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   def purchase_order(procurement)
     procurement&.purchase_order
   end
+
 
 end
