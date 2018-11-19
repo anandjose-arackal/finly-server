@@ -362,6 +362,14 @@ class Payment < ActiveRecord::Base
     end
   }
 
+  scope :include_for_index, -> {
+        includes( :payment_status, :amount, :department, :category, :system_messages,
+                  invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
+                             :category, :cost_center, :tds_slab, :amount, :invoice_status,
+                             :invoice_attachments, :invoice_items],
+                  payment_order: [bank_payment_request: [:status]])
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
