@@ -317,10 +317,6 @@ class Invoice < ActiveRecord::Base
     self.discount
   end
 
-  def gst_type
-    self.gst_type_id
-  end
-
   def item_amounts_total
     if self.invoice_items.present?
       return self.invoice_items.joins(:amount).sum(:value)
