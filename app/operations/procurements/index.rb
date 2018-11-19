@@ -92,8 +92,9 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_po_status
     has_scope :filter_invoice_status
     has_scope :filter_submission_date
-
+    has_scope :filter_procurement_name
     has_scope :filter_procurement_type
+    has_scope :filter_invoice_id
 
 
     def init
@@ -122,8 +123,6 @@ class Procurements::Index < Procurements::Base
     
     def set_scope
       case params[:search_type]
-        # when 'vendor_name'
-        #   params[:filter_vendor_name] = params[:search_query]
         when 'invoice_number'
           params[:filter_invoice_number] = params[:search_query]
         when 'po_number'
@@ -133,6 +132,11 @@ class Procurements::Index < Procurements::Base
         when 'sub_department_name'
           params[:filter_sub_department] = {
               sub_department_name: params[:search_query],
+              user_id: user.id
+          }
+        when 'department_name'
+          params[:filter_department] = {
+              department_name: params[:search_query],
               user_id: user.id
           }
         when 'vendor_name'
@@ -155,6 +159,8 @@ class Procurements::Index < Procurements::Base
               category_name: params[:search_query],
               user_id: user.id
           }
+        when 'invoice_id'
+          params[:filter_invoice_id] = params[:search_query]
         else
           # do nothing
       end
