@@ -117,6 +117,7 @@ class Procurement < ActiveRecord::Base
       vendor_ids = user.company.yes_bank_vendors.filter_name_search(vendor_name).pluck(:id)
 
       filtered_ids = PurchaseOrder.filter_vendor_id(vendor_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.with_vendor_ids(vendor_ids).pluck(:procurement_id)
       where id: filtered_ids
     end
   }
