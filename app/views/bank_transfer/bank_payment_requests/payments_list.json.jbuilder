@@ -133,6 +133,7 @@ json.payments do
   end
 end
 
+json.payments_count @result.ordered_payments.count
 # non-paginated payments listing all payments in this payment order
 json.unpaid_payments do
   json.array!(@result.ordered_payments) do |payment|
