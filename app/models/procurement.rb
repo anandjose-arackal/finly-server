@@ -369,7 +369,7 @@ class Procurement < ActiveRecord::Base
   def type_entity
     if procurement_type == 'purchase_order'
       purchase_order
-    elsif procurement_type == 'invoice'
+    elsif procurement_type == 'non_po_invoice'
       invoices&.first
     end
   end
