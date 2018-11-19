@@ -46,12 +46,16 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
               spent_amount = budget_spent_amount
             end
           when "PaymentOrder", "BankPaymentRequest"
-            payments = processor_instance.relevant_items(self.object)
-            if payments.present?
-              current_object_amount = payments.joins(:amount).sum(:value)
-              spent_amount = budget_spent_amount + current_object_amount
-            else
+            if (self.object.is_a?(PaymentOrder) && self.object.completed?) || (self.object.is_a?(BankPaymentRequest) && self.object.credited?)
               spent_amount = budget_spent_amount
+            else
+              payments = processor_instance.relevant_items(self.object)
+              if payments.present?
+                current_object_amount = payments.joins(:amount).sum(:value)
+                spent_amount = budget_spent_amount + current_object_amount
+              else
+                spent_amount = budget_spent_amount
+              end
             end
           when "Report"
             expenses = processor_instance.relevant_items(self.object)
