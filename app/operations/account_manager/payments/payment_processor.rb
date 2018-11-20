@@ -80,12 +80,17 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
   def pre_process
     # also set the payment order's status id as either scheduled or as pending
-    if payment_order.scheduled_at.present? && payment_order.scheduled_at > DateUtils.local_date
-      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
-      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
-    else
+    if self.crediting_payments.present?
       payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
-      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
+      self.crediting_payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
+    else
+      if payment_order.scheduled_at.present? && payment_order.scheduled_at > DateUtils.local_date
+        payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+        payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
+      else
+        payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
+        payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
+      end
     end
   end
 
