@@ -156,6 +156,10 @@ class PurchaseOrder < ActiveRecord::Base
     where sub_department_id: ids
   }
 
+  scope :filter_department_id, -> (ids) {
+    where department_id: ids
+  }
+
   scope :filter_vendor_id, -> (ids){
     where vendor_id: ids
   }

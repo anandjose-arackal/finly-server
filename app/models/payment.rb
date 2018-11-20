@@ -43,7 +43,9 @@
 #  purchase_order_id              :integer
 #  procurement_id                 :integer
 #  department_id                  :integer
+#  location_id                    :integer
 #
+
 
 
 
@@ -360,6 +362,14 @@ class Payment < ActiveRecord::Base
     if vendor_ids.present?
       where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_ids)
     end
+  }
+
+  scope :include_for_index, -> {
+        includes( :payment_status, :amount, :department, :category, :system_messages,
+                  invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
+                             :category, :cost_center, :tds_slab, :amount, :invoice_status,
+                             :invoice_attachments, :invoice_items],
+                  payment_order: [bank_payment_request: [:status]])
   }
 
   # validates :amount_id, presence: true

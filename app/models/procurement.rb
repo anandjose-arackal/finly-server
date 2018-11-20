@@ -75,6 +75,11 @@ class Procurement < ActiveRecord::Base
     where id: filtered_ids
   }
 
+  scope :filter_invoice_id, -> (invoice_id) {
+    filtered_ids = Invoice.filter_invoice_id(invoice_id).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
   scope :filter_po_status, -> (status_id) {
     filtered_ids = PurchaseOrder.with_status_ids(status_id).pluck(:procurement_id)
     where id: filtered_ids
@@ -99,7 +104,16 @@ class Procurement < ActiveRecord::Base
     end
   }
 
+  scope :filter_department, -> (department_name, user_id) {
+    user = User.find_by id: user_id
+    if user.present?
+      department_ids = user.company.departments.filter_name(department_name).pluck(:id)
 
+      filtered_ids = PurchaseOrder.filter_sub_department_id(department_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.filter_sub_department_id(department_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
 
   scope :filter_sub_department, -> (sub_department_name, user_id) {
     user = User.find_by id: user_id
@@ -107,6 +121,7 @@ class Procurement < ActiveRecord::Base
       sub_department_ids = user.company.departments.only_sub_departments.filter_name(sub_department_name).pluck(:id)
 
       filtered_ids = PurchaseOrder.filter_sub_department_id(sub_department_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.filter_sub_department_id(sub_department_ids).pluck(:procurement_id)
       where id: filtered_ids
     end
   }
@@ -117,6 +132,7 @@ class Procurement < ActiveRecord::Base
       vendor_ids = user.company.yes_bank_vendors.filter_name_search(vendor_name).pluck(:id)
 
       filtered_ids = PurchaseOrder.filter_vendor_id(vendor_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.with_vendor_ids(vendor_ids).pluck(:procurement_id)
       where id: filtered_ids
     end
   }
@@ -368,7 +384,7 @@ class Procurement < ActiveRecord::Base
   def type_entity
     if procurement_type == 'purchase_order'
       purchase_order
-    elsif procurement_type == 'invoice'
+    elsif procurement_type == 'non_po_invoice'
       invoices&.first
     end
   end

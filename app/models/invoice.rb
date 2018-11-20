@@ -215,6 +215,14 @@ class Invoice < ActiveRecord::Base
     end
   }
 
+  scope :filter_department_id, -> (ids) {
+    where department_id: ids
+  }
+
+  scope :filter_sub_department_id, -> (ids) {
+    where sub_department_id: ids
+  }
+
   scope :invoice_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
@@ -241,6 +249,7 @@ class Invoice < ActiveRecord::Base
 
   # this scope checks for an approximate match - used in searches etc.
   scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
+  scope :filter_invoice_id, -> (invoice_id) { where 'invoices.invoice_id like ?', "%#{invoice_id}%" }
 
   after_create :set_defaults
   after_save :budget_trail_entry
@@ -306,10 +315,6 @@ class Invoice < ActiveRecord::Base
 
   def discount_rate
     self.discount
-  end
-
-  def gst_type
-    self.gst_type_id
   end
 
   def item_amounts_total
