@@ -18,6 +18,11 @@ class Procure::InwardInvoicesController < ApplicationController
 
   end
 
+  def index
+    @result = Procurements::Invoices::Index.(current_user, params)
+    respond
+  end
+
   def show
     @result = Procurements::Invoices::Show.(current_user, params)
     respond
@@ -82,6 +87,11 @@ class Procure::InwardInvoicesController < ApplicationController
   def template_destroy
     @result = Procurements::Invoices::Templates::Destroy.(current_user, params)
     respond response: @result.success? ? :success : :failure
+  end
+
+  def bulk_approve
+    @result = Procurements::Invoices::BulkApprove.(current_user, params)
+    respond
   end
 
   # Template for bulk creation of NON PO invoices
