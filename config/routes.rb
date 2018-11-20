@@ -3265,6 +3265,8 @@ Rails.application.routes.draw do
 
     get 'inward_invoices/import_template', to: 'inward_invoices#import_template'
     post '/inward_invoices/import', to: 'inward_invoices#import'
+
+    put 'inward_invoices/bulk_approve', to: 'inward_invoices#bulk_approve'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'

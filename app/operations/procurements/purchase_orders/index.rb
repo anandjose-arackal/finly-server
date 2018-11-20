@@ -12,15 +12,18 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     # Only used for getting pending approval
     if user.vendor_payments_reviewer?
       level_ids = []
-      policies = user.company.policies.with_application(:vp)
-      policies.each do |policy|
-        levels = policy.levels.with_entity_type('PurchaseOrder')
-        levels.each do |level|
-          if level.reviewers.pluck(:id).include? user.id
-            level_ids.push(level.id)
-          end
-        end
-      end
+
+      # Get all the policies
+      policy_ids = user.company.policies.with_application(:vp).pluck(:id)
+
+      # Get all level ids of type purchase order and with policy ids from above
+      policy_level_ids = ReviewalLevel.with_entity_type('PurchaseOrder').with_policy_ids(policy_ids).pluck(:id)
+
+      # Get all level ids from level reviewer mapping with current user id
+      reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+
+      # Get common levels
+      level_ids = policy_level_ids & reviewer_level_ids
 
       # Find all the purchase order with controlling level from above
       purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)

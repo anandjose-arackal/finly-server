@@ -250,6 +250,9 @@ class Invoice < ActiveRecord::Base
   # this scope checks for an approximate match - used in searches etc.
   scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
   scope :filter_invoice_id, -> (invoice_id) { where 'invoices.invoice_id like ?', "%#{invoice_id}%" }
+  scope :filter_inward_invoice_type, -> (invoice_type){
+    where invoice_type_id: InwardInvoiceType.id_for(invoice_type)
+  }
 
   after_create :set_defaults
   after_save :budget_trail_entry

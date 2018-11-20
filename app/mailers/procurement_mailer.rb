@@ -111,6 +111,13 @@ class ProcurementMailer < ApplicationMailer
     end
   end
 
+  def invoice_bulk_approval(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_approval_invoices'
+    end
+  end
+
   def invoices_bulk_import(presenter)
     @data = presenter
     if presenter.success?
