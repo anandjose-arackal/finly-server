@@ -222,6 +222,22 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
               url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
           }
         end
+
+        admin = user.vendor_payments_admin?
+        # checking if this particular payment order is partially completed so that it can be credited later
+        if self.bank_payment_request.payment_order.partially_completed?
+          actions[:credit] = true
+          actions[:credit_options] = {
+              credit: {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                  enabled: true,
+                  messages: "You can directly credit this payment order from your Finly Money or Company Credits",
+                  require_password: true,
+                  initiating_account: admin,
+                  method: "patch"
+              }
+          }
+        end
       end
       actions
     end
@@ -403,6 +419,22 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
               url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
           }
         end
+
+        admin = user.vendor_payments_admin?
+        # checking if this particular payment order is partially completed so that it can be credited later
+        if self.bank_payment_request.payment_order.partially_completed?
+          actions[:credit] = true
+          actions[:credit_options] = {
+              credit: {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                  enabled: true,
+                  messages: "You can directly credit this payment order from your Finly Money",
+                  require_password: true,
+                  initiating_account: admin,
+                  method: "patch"
+              }
+          }
+        end
       end
       actions
     end
@@ -523,9 +555,23 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
               url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
           }
         end
+
+        # check if the payment order is partially completed, so that they can retry the remaining payments
+        if self.bank_payment_request.payment_order.partially_completed?
+          actions[:credit] = true
+          actions[:credit_options] = {
+              credit: {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                  enabled: true,
+                  messages: "You can directly credit this payment order from your Finly Money or Company Credits",
+                  require_password: true,
+                  initiating_account: true,
+                  method: "patch"
+              }
+          }
+        end
       end
       actions
     end
-
   end
 end
