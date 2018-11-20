@@ -1,4 +1,4 @@
-class Procurements::Invoice::BulkApproveProcessor < BackgroundOperation
+class Procurements::Invoices::BulkApproveProcessor < BackgroundOperation
   attr_accessor :invoice_ids, :result
 
   def init

@@ -29,7 +29,7 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
 
       invoice_ids -= other_reviewer_invoice_ids
 
-      self.invoices = user.company.inward_invoices.with_id(invoice_ids).with_status_ids(InwardInvoiceStatus.id_for(:processing))
+      self.invoices = user.company.inward_invoices.with_id(invoice_ids).with_status_id(InwardInvoiceStatus.id_for(:processing))
 
       all_level_ids = self.invoices.pluck(:controlling_level_id)
 

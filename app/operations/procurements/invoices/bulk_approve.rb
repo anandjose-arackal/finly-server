@@ -20,7 +20,7 @@ class Procurements::Invoices::BulkApprove < Procurements::Invoices::Base
 
   def process
     Procurements::Invoices::BulkApproveProcessor.call_async(user.id, {invoice_ids: invoices.pluck(:id)})
-    # Procurements::PurchaseOrders::BulkApproveProcessor.call(user.id, {purchase_order_ids: purchase_orders.pluck(:id)})
+    # Procurements::Invoices::BulkApproveProcessor.call(user.id, {invoice_ids: invoices.pluck(:id)})
   end
 
   def post_process
