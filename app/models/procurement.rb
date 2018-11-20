@@ -76,7 +76,7 @@ class Procurement < ActiveRecord::Base
   }
 
   scope :filter_invoice_id, -> (invoice_id) {
-    filtered_ids = Invoice.filter_invoice_number(invoice_id).pluck(:procurement_id)
+    filtered_ids = Invoice.filter_invoice_id(invoice_id).pluck(:procurement_id)
     where id: filtered_ids
   }
 
