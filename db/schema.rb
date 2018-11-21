@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181120135814) do
+ActiveRecord::Schema.define(version: 20181121113122) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2171,7 +2171,7 @@ ActiveRecord::Schema.define(version: 20181120135814) do
   add_index "email_authorizations", ["token"], name: "index_email_authorizations_on_token", using: :btree
   add_index "email_authorizations", ["user_id"], name: "index_email_authorizations_on_user_id", using: :btree
 
-  create_table "enforce_budgets", force: :cascade do |t|
+  create_table "enforce_budget_configurations", force: :cascade do |t|
     t.boolean  "enforce_purchase_order_budget"
     t.boolean  "enforce_payment_budget"
     t.boolean  "enforce_expense_budget"
@@ -2181,9 +2181,17 @@ ActiveRecord::Schema.define(version: 20181120135814) do
     t.datetime "updated_at",                              null: false
   end
 
-  add_index "enforce_budgets", ["company_id"], name: "index_enforce_budgets_on_company_id", using: :btree
+  add_index "enforce_budget_configurations", ["company_id"], name: "index_enforce_budget_configurations_on_company_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
+    t.boolean  "enabled"
+    t.integer  "enforceable_id",   limit: 4
+    t.string   "enforceable_type", limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  create_table "enforce_policy_configurations", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
     t.boolean  "enabled"
@@ -2191,7 +2199,7 @@ ActiveRecord::Schema.define(version: 20181120135814) do
     t.datetime "updated_at",                   null: false
   end
 
-  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
+  add_index "enforce_policy_configurations", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
 
   create_table "expense_data_extract_sources", force: :cascade do |t|
     t.string   "name",       limit: 255

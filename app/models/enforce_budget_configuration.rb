@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: enforce_budgets
+# Table name: enforce_budget_configurations
 #
 #  id                            :integer          not null, primary key
 #  enforce_purchase_order_budget :boolean
@@ -12,7 +12,7 @@
 #  updated_at                    :datetime         not null
 #
 
-class EnforceBudget < ActiveRecord::Base
+class EnforceBudgetConfiguration < ActiveRecord::Base
 
   belongs_to :company
 end
