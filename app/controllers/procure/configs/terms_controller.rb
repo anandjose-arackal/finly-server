@@ -19,5 +19,8 @@ class Procure::Configs::TermsController < ApplicationController
     respond
   end
 
-
+  def destroy
+    @result = Procurements::Configs::Terms::Destroy.(current_user, params)
+    respond
+  end
 end
