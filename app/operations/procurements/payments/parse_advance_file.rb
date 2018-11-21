@@ -78,42 +78,35 @@ class Procurements::Payments::ParseAdvanceFile < Procurements::Payments::Base
 
   def parse_payment_order_params
     params = []
-    self.parsed_data.each do |data|
-      po_id = data[:purchase_order_id]
-      advance_amount = data[:advance_amount]
-      purchase_order = current_company.purchase_orders.find_by(id: po_id)
-      vendor = purchase_order.vendor
-      bank_account = vendor.bank_accounts.first
-      payment_order_attributes = {
-          initiating_user_id: user.id,
-          payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
-          company_id: user.company_id,
-          amount_requested_attributes: {
-              value: self.requested_amount,
-              currency_id: 1
-          },
-          payment_mode: self.payment_mode,
-          initiating_account_type: YesBankCompanyAccount.name,
-          receiving_account_type: BankAccount.name,
-          payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
-          application: "vp",
-          currency_id: Currency.first.id,
-          api_initiated: false
-      }
-      bpr_attributes = {
-          owner_id: user.id,
-          status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
-          controlling_user_id: user.id,
-          requested_amount_attributes: {
-              value: self.requested_amount,
-              currency_id: 1
-          },
-          beneficiary_type_id: 2,
-          policy_id: user.company.policies.default.first.id,
-          payment_order_attributes: payment_order_attributes,
-          api_initiated: false
-      }
-    end
+    payment_order_attributes = {
+        initiating_user_id: user.id,
+        payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
+        company_id: user.company_id,
+        amount_requested_attributes: {
+            value: self.requested_amount,
+            currency_id: 1
+        },
+        payment_mode: self.payment_mode,
+        initiating_account_type: YesBankCompanyAccount.name,
+        receiving_account_type: BankAccount.name,
+        payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+        application: "vp",
+        currency_id: Currency.first.id,
+        api_initiated: false
+    }
+    bpr_attributes = {
+        owner_id: user.id,
+        status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
+        controlling_user_id: user.id,
+        requested_amount_attributes: {
+            value: self.requested_amount,
+            currency_id: 1
+        },
+        beneficiary_type_id: 2,
+        policy_id: user.company.policies.default.first.id,
+        payment_order_attributes: payment_order_attributes,
+        api_initiated: false
+    }
   end
 
 end

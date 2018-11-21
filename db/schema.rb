@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181118063528) do
+ActiveRecord::Schema.define(version: 20181120135814) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2170,6 +2170,18 @@ ActiveRecord::Schema.define(version: 20181118063528) do
   add_index "email_authorizations", ["authorizable_type"], name: "index_email_authorizations_on_authorizable_type", using: :btree
   add_index "email_authorizations", ["token"], name: "index_email_authorizations_on_token", using: :btree
   add_index "email_authorizations", ["user_id"], name: "index_email_authorizations_on_user_id", using: :btree
+
+  create_table "enforce_budgets", force: :cascade do |t|
+    t.boolean  "enforce_purchase_order_budget"
+    t.boolean  "enforce_payment_budget"
+    t.boolean  "enforce_expense_budget"
+    t.boolean  "enforce_invoice_budget"
+    t.integer  "company_id",                    limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+  end
+
+  add_index "enforce_budgets", ["company_id"], name: "index_enforce_budgets_on_company_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false

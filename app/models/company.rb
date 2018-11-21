@@ -56,6 +56,7 @@ class Company < ActiveRecord::Base
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
+  has_one :enforce_budget
 
   has_many :payment_orders
   has_many :user_groups
