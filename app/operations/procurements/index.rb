@@ -41,7 +41,6 @@ class Procurements::Index < Procurements::Base
 
       # For PO
       # procurement_ids.push(user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:procurement_id))
-
       purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
       # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
       other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
