@@ -1462,6 +1462,7 @@
 #                                                         PATCH  /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#update
 #                                                         PUT    /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#update
 #                                                         DELETE /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#destroy
+#                             procure_bulk_create_advance POST   /procure/payments/create_bulk_advance(.:format)                                                                     procure/payments#bulk_create_advance
 #                                         procure_payment GET    /procure/payments/:id(.:format)                                                                                     procure/payments#show
 #                                     procure_attachments GET    /procure/attachments(.:format)                                                                                      procure/attachments#index
 #                                                         POST   /procure/attachments(.:format)                                                                                      procure/attachments#create
@@ -3251,6 +3252,7 @@ Rails.application.routes.draw do
 
     end
 
+    post 'payments/create_bulk_advance', to: 'payments#bulk_create_advance', as: :bulk_create_advance
     resources :payments, only: [:show]
 
     resources :attachments

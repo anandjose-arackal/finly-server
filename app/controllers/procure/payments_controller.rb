@@ -11,4 +11,8 @@ class Procure::PaymentsController < ApplicationController
     @result = Procurements::Payments::Create.(current_user, params)
     respond # todo - change this in case it is just a success / failure
   end
+
+  def bulk_create_advance
+
+  end
 end
