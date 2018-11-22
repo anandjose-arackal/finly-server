@@ -1,5 +1,5 @@
 class Procurements::Invoices::Submit < Procurements::Invoices::Base
-  attr_accessor :invoice, :procurement, :invoice_params
+  attr_accessor :invoice, :procurement, :invoice_params, :budgets
 
   def personalizer
     {
