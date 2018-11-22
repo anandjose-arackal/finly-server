@@ -111,6 +111,7 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
     Procurements::Payments::BulkCreateAdvance::SuccessPresenter.new(user, params, messages)
   end
 
+
   def failure
     exporter = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents})
     file = Tempfile.new("bulk_payment_import_errors.xls")

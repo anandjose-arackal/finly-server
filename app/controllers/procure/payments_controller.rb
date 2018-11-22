@@ -23,7 +23,7 @@ class Procure::PaymentsController < ApplicationController
     else
       respond_to do |format|
         format.json {
-          render 'bulk_create_advance_success'
+          render 'bulk_create_advance_failure'
         }
       end
     end
