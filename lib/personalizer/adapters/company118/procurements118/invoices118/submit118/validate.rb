@@ -39,14 +39,10 @@ class Personalizer::Adapters::Company118::Procurements118::Invoices118::Submit11
       if invoice_base_amount > purchase_order_base_amount
         add_message :error, 'Could not submit invoice. Invoice base amount is greater than purchase order base amount'
       end
-
-      # adding overall message to the user
-      if messages[:error].present?
-        add_message :error, 'Please contact finance to allocate more budget'
-      end
     end
 
     # adding logic for checking if budget is being exceeded
+    budget_exceeded = false
     self.budgets.each do |budget|
       budget_amount = budget[:budget].budget_amount.value
       budget_spent_amount = budget[:spent_amount]
@@ -54,8 +50,14 @@ class Personalizer::Adapters::Company118::Procurements118::Invoices118::Submit11
       spent_amount = budget_spent_amount
 
       if spent_amount > budget_amount
+        budget_exceeded = false
         add_message :error, "Invoice Amount exceeding Budget - #{budget[:budget].name}"
       end
+    end
+
+    # adding overall message to the user
+    if budget_exceeded
+      add_message :error, 'Please contact finance to allocate more budget'
     end
   end
 end
