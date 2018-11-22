@@ -21,7 +21,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     end
 
     unless self.purchase_order_params[:policy_id].present?
-      add_message :error, 'Policy cannot be blank'
+      if self.purchase_order.policy.blank?
+        add_message :error, 'Policy cannot be blank'
+      end
     end
   end
 

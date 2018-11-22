@@ -27,7 +27,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag
 
     def init
       self.purchase_order = params[:purchase_order]
@@ -46,7 +46,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
       self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
 
-
+      # Show taxes as applicable in the pdf based on this
+      self.taxes_applicable_flag = taxes_applicable_flag?
 
       self.reviewal_chains = []
       params[:reviewal_document] = purchase_order
@@ -178,6 +179,18 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
     def document_owner?
       purchase_order.user_id == user.id
+    end
+
+    def taxes_applicable_flag?
+      # Shows "Taxes as applicable" text on pdf if true
+      flag = false
+      self.purchase_order.items.each do |item|
+        if item.tax_rate.blank? || item.tax_rate&.rate == 0
+          flag = true
+          break
+        end
+      end
+      flag
     end
 
     def user_in_level? # todo put document level reviewer mapping here
