@@ -1,7 +1,8 @@
 class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
 
-  attr_accessor :header, :contents, :file, :payment_mode, :scheduled_at, :policy,
-                :bank_payment_request_params, :payable_amount, :bank_payment_request
+  attr_accessor :headers, :contents, :file, :payment_mode, :scheduled_at, :policy,
+                :bank_payment_request_params, :payable_amount, :bank_payment_request,
+                :parsed_data, :description
 
   def pre_validate
     if user.blank?
@@ -16,46 +17,75 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
 
   def init
     self.file = params[:file]
-    headers = [:purchase_order_id, :advance_amount]
-    self.parsed_data = ImportUtil.load_spreadsheet(file, headers,
+    self.headers = [:purchase_order_number, :advance_amount]
+    self.parsed_data = ImportUtil.load_spreadsheet(file, self.headers,
                                                    {skip_empty_lines: true})
-    self.payment_mode = params[:transfer_type]
+    self.payment_mode = params[:payment_mode]
     self.scheduled_at = params[:scheduled_at]
+    self.description = params[:description]
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
     self.payable_amount = 0
+    self.contents = []
   end
 
   def validate
+
+    if self.policy.blank?
+      add_message :error, "Policy cannot be blank"
+      return
+    end
+
+    if self.payment_mode.blank?
+      add_message :error, "Payment mode cannot be blank"
+      return
+    end
+
     errors_found = false
     self.parsed_data.each do |data|
-      self.contents << data.values
-      po_id = data[:purchase_order_id]
-      advance_amount = data[:advance_amount]
-      purchase_order = current_company.purchase_orders.find_by(id: po_id)
-      vendor = purchase_order.vendor
+      row_details = data.values
+      po_number = data[:purchase_order_number]
+      advance_amount = data[:advance_amount].to_f
+      purchase_order = current_company.purchase_orders.find_by(po_number: po_number)
+      vendor = purchase_order&.vendor
 
       if purchase_order.blank?
-        data[:errors] = "Purchase Order not found"
-        errors_found = true
-        next
-      end
-      if advance_amount >= purchase_order.balance_amount&.value
-        data[:errors] = "Advance cannot be greater than the balance amount in the PO"
-        errors_found = true
-        next
-      end
-      if advance_amount <= 0
-        data[:errors] = "Advance amount cannot be less than or equal to 0"
-        errors_found = true
-        next
-      end
-      if vendor.bank_accounts.empty?
-        data[:errors] = "This vendor doesn't have any bank accounts"
+        row_details << "Purchase Order not found"
+        self.contents << row_details
         errors_found = true
         next
       end
 
+      # checking to make sure the PO is approved
+      unless purchase_order.approved?
+        row_details << "Purchase Order is not approved"
+        self.contents << row_details
+        errors_found = true
+        next
+      end
+
+      if advance_amount.blank? || advance_amount <= 0
+        row_details << "Advance amount cannot be empty or less than or equal to 0"
+        self.contents << row_details
+        errors_found = true
+        next
+      end
+
+      if advance_amount >= purchase_order.balance_amount&.value
+        row_details << "Advance cannot be greater than the balance amount in the PO"
+        self.contents << row_details
+        errors_found = true
+        next
+      end
+
+      if vendor.bank_accounts.empty?
+        row_details << "This vendor doesn't have any bank accounts"
+        self.contents << row_details
+        errors_found = true
+        next
+      end
+
+      self.contents << row_details
       self.payable_amount += advance_amount.to_f
     end
 
@@ -140,7 +170,7 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because a purchase order will always come from a vendor
-        policy_id: self.policy_id,
+        policy_id: self.policy.id,
         payment_order_attributes: payment_order_params
     }
     return bank_payment_request_params
@@ -149,9 +179,9 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
   def parse_payment_params
     payment_params = []
     self.parsed_data.each do |data|
-      po_id = data[:purchase_order_id]
+      po_number = data[:purchase_order_number]
       advance_amount = data[:advance_amount]
-      purchase_order = current_company.purchase_orders.find_by(id: po_id)
+      purchase_order = current_company.purchase_orders.find_by(po_number: po_number)
       vendor = purchase_order.vendor
       bank_account = vendor.bank_accounts.first
       payment_params << {

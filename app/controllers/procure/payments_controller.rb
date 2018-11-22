@@ -13,6 +13,19 @@ class Procure::PaymentsController < ApplicationController
   end
 
   def bulk_create_advance
-
+    @result = Procurements::Payments::BulkCreateAdvance.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_create_advance_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_create_advance_success'
+        }
+      end
+    end
   end
 end
