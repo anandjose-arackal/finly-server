@@ -1,0 +1,23 @@
+# == Schema Information
+#
+# Table name: budget_modification_trails
+#
+#  id             :integer          not null, primary key
+#  budget_id      :integer
+#  action_user_id :integer
+#  action_id      :integer
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  budget_id: 
+  action_user_id: 1
+  action_id: 1
+
+two:
+  budget_id: 
+  action_user_id: 1
+  action_id: 1

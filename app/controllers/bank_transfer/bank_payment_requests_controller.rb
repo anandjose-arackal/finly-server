@@ -33,8 +33,6 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
         }
       end
     end
-    # @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
-    # respond
   end
 
   def update

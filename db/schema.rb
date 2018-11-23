@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181122021947) do
+ActiveRecord::Schema.define(version: 20181123095239) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -894,6 +894,24 @@ ActiveRecord::Schema.define(version: 20181122021947) do
   end
 
   add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
+
+  create_table "budget_modification_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "budget_modification_trails", force: :cascade do |t|
+    t.integer  "budget_id",      limit: 4
+    t.integer  "action_user_id", limit: 4
+    t.integer  "action_id",      limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "budget_modification_trails", ["action_id"], name: "index_budget_modification_trails_on_action_id", using: :btree
+  add_index "budget_modification_trails", ["action_user_id"], name: "index_budget_modification_trails_on_action_user_id", using: :btree
+  add_index "budget_modification_trails", ["budget_id"], name: "index_budget_modification_trails_on_budget_id", using: :btree
 
   create_table "budget_rule_category_mappings", force: :cascade do |t|
     t.integer  "budget_rule_id", limit: 4, null: false
@@ -5677,6 +5695,7 @@ ActiveRecord::Schema.define(version: 20181122021947) do
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
   add_foreign_key "budget_criteria_mappings", "budgets"
+  add_foreign_key "budget_modification_trails", "budgets"
   add_foreign_key "budget_rule_category_mappings", "budget_rules"
   add_foreign_key "budget_rule_category_mappings", "categories"
   add_foreign_key "budget_rule_field_mappings", "budget_rules"
