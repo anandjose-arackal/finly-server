@@ -23,7 +23,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     if @result.success?
       respond_to do |format|
         format.json {
-          render 'bulk_create_f rom_file_success'
+          render 'bulk_create_from_file_success'
         }
       end
     else
