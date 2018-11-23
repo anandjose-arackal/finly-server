@@ -101,8 +101,8 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
     self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
-    # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.parsed_data})
-    op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})
+    op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})
+    # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})
 
   end
 
@@ -189,7 +189,8 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
           name: vendor.name,
           bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
-          original_amount: advance_amount
+          original_amount: advance_amount,
+          account_id: bank_account.id
       }
     end
     payment_params
