@@ -49,10 +49,18 @@ class ExpensesController < ApplicationController
         respond response: :failure, message: "Invalid input"
         return
     end
-    respond response: :success
+
+    params[:id] = @result.expense&.id
+    messages = @result.messages
+    @result = Expense::Show.(current_user, params)
+
+    @result.messages = messages
+    # respond response: :success
+    respond render: 'show'
   end
 
   def show
+    debugger
     @result = Expense::Show.(current_user, params)
     respond
   end
