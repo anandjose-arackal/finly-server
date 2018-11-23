@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181123095239) do
+ActiveRecord::Schema.define(version: 20181123151206) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -902,11 +902,14 @@ ActiveRecord::Schema.define(version: 20181123095239) do
   end
 
   create_table "budget_modification_trails", force: :cascade do |t|
-    t.integer  "budget_id",      limit: 4
-    t.integer  "action_user_id", limit: 4
-    t.integer  "action_id",      limit: 4
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.integer  "budget_id",           limit: 4
+    t.integer  "action_user_id",      limit: 4
+    t.integer  "action_id",           limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "previous_value",      limit: 255
+    t.string   "current_value",       limit: 255
+    t.string   "changed_column_name", limit: 255
   end
 
   add_index "budget_modification_trails", ["action_id"], name: "index_budget_modification_trails_on_action_id", using: :btree

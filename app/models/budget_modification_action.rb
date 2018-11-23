@@ -9,4 +9,10 @@
 #
 
 class BudgetModificationAction < ActiveRecord::Base
+
+  include Seedable
+
+  def self.values
+    [:change_amount, :change_start_date, :change_end_date, :change_name]
+  end
 end
