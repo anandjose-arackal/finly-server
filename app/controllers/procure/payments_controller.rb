@@ -11,4 +11,21 @@ class Procure::PaymentsController < ApplicationController
     @result = Procurements::Payments::Create.(current_user, params)
     respond # todo - change this in case it is just a success / failure
   end
+
+  def bulk_create_advance
+    @result = Procurements::Payments::BulkCreateAdvance.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_create_advance_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_create_advance_failure'
+        }
+      end
+    end
+  end
 end
