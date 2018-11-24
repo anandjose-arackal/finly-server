@@ -59,6 +59,29 @@ if @result.account_owner.is_a?(YesBankVendor)
     json.id @result.account_owner.vendor_type&.id
     json.name @result.account_owner.vendor_type&.name
   end
+
+
+  json.procurement_data do
+    json.purchase_orders do
+      json.array! @result.procurement_data[:purchase_orders] do |po|
+        json.extract! po, :id, :po_number, :procurement_id
+        json.created_by po.user.name
+        json.created_at po.created_at.strftime("%d-%b-%Y")
+        json.amount po.balance_amount.value
+      end
+    end
+
+    json.non_po_invoices do
+      json.array! @result.procurement_data[:non_po_invoices] do |invoice|
+        json.extract! invoice, :id, :invoice_id, :invoice_number, :procurement_id
+        json.created_by invoice.created_by.name
+        json.created_at invoice.created_at.strftime("%d-%b-%Y")
+        json.amount invoice.net_amount.value
+      end
+    end
+
+ end
 end
 
 json.actions @result.actions
+

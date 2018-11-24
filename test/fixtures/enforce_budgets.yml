@@ -1,0 +1,27 @@
+# == Schema Information
+#
+# Table name: enforce_budgets
+#
+#  id                            :integer          not null, primary key
+#  enforce_purchase_order_budget :boolean
+#  enforce_payment_budget        :boolean
+#  enforce_expense_budget        :boolean
+#  enforce_invoice_budget        :boolean
+#  company_id                    :integer
+#  created_at                    :datetime         not null
+#  updated_at                    :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  enforce_purchase_order_budget: false
+  enforce_payment_budget: false
+  enforce_expense_budget: false
+  enforce_invoice_budget: false
+
+two:
+  enforce_purchase_order_budget: false
+  enforce_payment_budget: false
+  enforce_expense_budget: false
+  enforce_invoice_budget: false

@@ -142,6 +142,12 @@ class PaymentOrder < ActiveRecord::Base
     where('processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where initiating_user_id: user_ids
+    end
+  }
+
   scope :from_disburse, -> {where application: ["fd", "ft"]}
   scope :from_vendor_payments, -> {where application: "vp"}
 

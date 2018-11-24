@@ -36,7 +36,10 @@
 #  usage_date_type        :string(255)
 #  spent_from_id          :integer
 #  custom_conversion_rate :boolean          default(FALSE)
+#  cost_center_id         :integer
 #
+
+
 
 
 
@@ -224,7 +227,7 @@ class Expense < ActiveRecord::Base
   scope :without_usage_date_type, -> {where usage_date_type: nil}
   scope :with_usage_date_type, -> {where.not usage_date_type: nil}
   scope :usage_date_within, ->(start_date, end_date) {where.not('usage_date_start > ? OR usage_date_end < ? ', end_date, start_date)}
-  # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
+
   scope :filter_expense_type_id, ->(type_id) do
     type_id = [type_id] unless type_id.is_a?(Array)
     diff_arr = (type_id - [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'])
@@ -437,6 +440,20 @@ class Expense < ActiveRecord::Base
     # to = Date.parse(to) rescue Date.today
     where('(expenses.expense_status_id IN (?) AND expenses.report_id IS NOT NULL) OR (expenses.expense_status_id = ? AND expenses.expense_type_id = ?)', [ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:submitted), ExpenseStatus.id_for(:verified)], ExpenseStatus.id_for(:unreported), ExpenseType.id_for(:card)).
         where('expenses.date >= ? AND expenses.date <= ?', from, to)
+  }
+
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      where(category_id: category_ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      where(cost_center_id: cost_center_ids)
+    end
   }
 
   scope :include_spent_from_calculation, ->{ includes([{amount: [:currency]}], {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]})}

@@ -19,8 +19,8 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     current_company_invoices = current_company.inward_invoices
     invoice_number = self.inward_invoice_params[:invoice_number]
     vendor_id = self.inward_invoice.vendor_id || params[:vendor_id]
-    duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id)
-    if duplicate_invoices.present?
+    duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)
+    if invoice_number.present? && duplicate_invoices.present?
       add_message :error, "This invoice seems like a duplicate: Check invoice numbers: #{duplicate_invoices.pluck(:invoice_number).to_sentence}"
       return
     end

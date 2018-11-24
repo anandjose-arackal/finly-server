@@ -59,6 +59,12 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :with_controlling_user, -> (user_id) {where controlling_user_id: user_id}
   scope :with_controlling_user_role, -> (role_id) {where controlling_user_role_id: role_id}
   scope :with_user, -> (user_id) {where owner_id: user_id}
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where(owner_id: user_ids)
+    end
+  }
+
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not id: id}
@@ -123,10 +129,13 @@ class BankPaymentRequest < ActiveRecord::Base
 
   scope :include_for_index, -> {includes({payment_order: [:payment_order_status, :initiating_user,
                                                           {payments: [
-                                                              {receiving_account: :account_owner}, {amount: [:currency]},
+                                                              {amount: [:currency]},
+                                                              {invoice: [:advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount,
+                                                                         :category, :cost_center, :tds_slab, :amount,
+                                                                          :invoice_attachments]},
                                                               {payment_order: [bank_payment_request: [:status]]},
-                                                              :reference_resource, :payment_order]},
-                                                          {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
+                                                              :payment_order]},
+                                                              {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
   scope :include_for_data_retrieval, -> {includes(payment_order: {payments: [{receiving_account: :account_owner},
                                                                              :initiating_user,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},

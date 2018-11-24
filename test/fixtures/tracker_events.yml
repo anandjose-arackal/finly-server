@@ -1,0 +1,26 @@
+# == Schema Information
+#
+# Table name: tracker_events
+#
+#  id               :integer          not null, primary key
+#  http_method      :string(255)
+#  app              :string(255)
+#  path             :string(255)
+#  controller       :string(255)      not null
+#  action           :string(255)      not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  tracker_visit_id :integer
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# This model initially had no columns defined.  If you add columns to the
+# model remove the '{}' from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+one: {}
+# column: value
+#
+two: {}
+#  column: value

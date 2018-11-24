@@ -20,8 +20,6 @@ class Personalizer::Adapters::Company118::Procurements118::PurchaseOrders118::Va
       budget_amount = budget[:budget].budget_amount.value
       budget_spent_amount = budget[:spent_amount]
 
-      # now adding the above spent amount with the current POs amount to get
-      # an idea of how much of the amount will be spent altogether
       spent_amount = budget_spent_amount
 
       if spent_amount > budget_amount
