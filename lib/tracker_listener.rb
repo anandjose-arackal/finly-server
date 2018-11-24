@@ -2,7 +2,7 @@ class TrackerListener
   @queue = :usage_logger
 
   # Inactivity time before a new visit is created
-  VISIT_DURATION = 20.second
+  VISIT_DURATION = 30.minutes
 
   # FILE_LOGGER = Logger.new(Rails.root.join('log/verify_handler.log'))
   LOGGER = Logger.new(STDOUT)
