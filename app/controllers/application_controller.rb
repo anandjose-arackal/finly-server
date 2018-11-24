@@ -344,10 +344,8 @@ class ApplicationController < ActionController::Base
     user_id = current_user&.id
     # Track only if user is present
     return if user_id.blank? or request.remote_ip.blank?
-    unless TrackerListener.add_event current_user.id, current_device, current_app, request.path, params[:controller], params[:action], request.remote_ip, request.method_symbol, DateTime.now
-      # Create new visit in background
-      TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
-    end
+    # Create new visit in background
+    TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
   end
 
 end
