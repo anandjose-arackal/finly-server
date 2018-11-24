@@ -50,35 +50,23 @@ class ExpensesController < ApplicationController
         return
     end
 
-    # if current_user.company.id == 129
-    #   if @result.sucess?
-    #     params[:id] = @result.expense&.id
-    #     messages = @result.messages
-    #     @result = Expense::Show.(current_user, params)
-    #
-    #     @result.messages = messages
-    #     respond render: 'show'
-    #   else
-    #     respond response: :success
-    #   end
-    # else
-    #   respond response: :success
-    # end
+    if current_user.company.id == 129 || current_user.company.id == 1
+      if @result.success?
+        params[:id] = @result.expense&.id
+        messages = @result.messages
+        @result = Expense::Show.(current_user, params)
 
-    if @result.success?
-      params[:id] = @result.expense&.id
-      messages = @result.messages
-      @result = Expense::Show.(current_user, params)
-
-      @result.messages = messages
-      respond render: 'show'
+        @result.messages = messages
+        respond render: 'show'
+      else
+        respond response: :success
+      end
     else
       respond response: :success
     end
   end
 
   def show
-    debugger
     @result = Expense::Show.(current_user, params)
     respond
   end
