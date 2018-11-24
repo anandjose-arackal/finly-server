@@ -65,7 +65,7 @@ class ExpensesController < ApplicationController
     #   respond response: :success
     # end
 
-    if @result.sucess?
+    if @result.success?
       params[:id] = @result.expense&.id
       messages = @result.messages
       @result = Expense::Show.(current_user, params)
