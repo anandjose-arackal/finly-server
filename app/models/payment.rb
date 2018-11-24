@@ -43,17 +43,8 @@
 #  purchase_order_id              :integer
 #  procurement_id                 :integer
 #  department_id                  :integer
+#  location_id                    :integer
 #
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -341,6 +332,46 @@ class Payment < ActiveRecord::Base
     where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
   }
 
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      where(category_id: category_ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      where(cost_center_id: cost_center_ids)
+    end
+  }
+
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      where department_id: department_ids
+    end
+  }
+
+  scope :with_budgetable_location_ids, -> (location_ids) {
+    if location_ids.present?
+      where(location_id: location_ids)
+    end
+  }
+
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_ids)
+    end
+  }
+
+  scope :include_for_index, -> {
+        includes( :payment_status, :amount, :department, :category, :system_messages,
+                  invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
+                             :category, :cost_center, :tds_slab, :amount, :invoice_status,
+                             :invoice_attachments, :invoice_items],
+                  payment_order: [bank_payment_request: [:status]])
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
@@ -548,7 +579,7 @@ class Payment < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    if self.completed? || self.processing?
+    if self.completed? || self.processing? || self.possible_failure?
       BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
     else
       # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object

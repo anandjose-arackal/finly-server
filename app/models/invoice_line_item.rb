@@ -26,6 +26,7 @@
 #  comment                :string(255)
 #  account                :string(255)
 #  tax_rate_id            :integer
+#  cost_center_id         :integer
 #
 
 class InvoiceLineItem < ActiveRecord::Base
@@ -63,11 +64,31 @@ class InvoiceLineItem < ActiveRecord::Base
     where id: id
   }
 
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      ids = joins(:inventory_line_item).where("inventory_line_items.category_id IN (?)", category_ids).pluck('invoice_line_items.id')
+      where(id: ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    # todo - add cost center to invoice line items
+    # if cost_center_ids.present?
+    #   cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+    #   where(cost_center_id: cost_center_ids)
+    # end
+  }
+
   private
 
   def budget_trail_entry
     if self.parent&.is_a?(Invoice)
-      BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(self)
+      if self.parent.open? || self.parent.rejected? || self.parent.retracted?
+        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
+      else
+        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(self)
+      end
     end
   end
 

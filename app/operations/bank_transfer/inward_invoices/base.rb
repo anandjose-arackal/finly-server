@@ -4,12 +4,15 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
   class BankTransfer::InwardInvoices::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoice
+    attr_accessor :invoice, :budgets
 
     def init
       self.invoice = params[:inward_invoice]
+      # op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
+      # if op.success?
+      #   self.budgets = op.budget_data
+      # end
     end
-
   end
 
   def pre_validate

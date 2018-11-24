@@ -65,7 +65,7 @@ json.invoice do
   json.tds_amount precision_value invoice.tds_amount&.value
   json.tax precision_value invoice.tax
   json.tds precision_value invoice.tds
-  json.gst_type_id invoice.gst_type
+  json.gst_type_id invoice.gst_type_id
   json.discount_amount precision_value invoice.discount_amount&.value
   json.discount precision_value invoice.discount
   json.advance invoice.advance

@@ -1,5 +1,5 @@
 class Procurements::Invoices::Submit < Procurements::Invoices::Base
-  attr_accessor :invoice, :procurement, :invoice_params
+  attr_accessor :invoice, :procurement, :invoice_params, :budgets
 
   def personalizer
     {
@@ -18,6 +18,19 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   def validate
     unless self.invoice.present?
       add_message :error, 'Invoice not found'
+    end
+
+    # checking for configuration on whether this particular company
+    # has budgeting enforced or not
+    if self.invoice.items.present?
+      op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
+      if op.success?
+        self.budgets = op.budget_data
+      end
+    end
+    if current_company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.empty?
+      add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
+      return
     end
   end
 

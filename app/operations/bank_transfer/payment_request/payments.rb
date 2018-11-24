@@ -15,18 +15,18 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
       # applying scopes for the payments list
       self.payments = apply_scopes(self.payments, params)
 
-      self.payments_unverified = []
-      self.payments_verified = []
-      # separating the verified and unverified payments
-      self.payments.each do |payment|
-        if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
-          self.payments_verified << payment
-        else
-          self.payments_unverified << payment
-        end
-      end
-      self.ordered_payments = self.payments_verified + self.payments_unverified
-      self.paginated_payments = self.ordered_payments.paginate(page: params[:page], per_page: (params[:per_page] || 10))
+      # self.payments_unverified = []
+      # self.payments_verified = []
+      # # separating the verified and unverified payments
+      # self.payments.each do |payment|
+      #   if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+      #     self.payments_verified << payment
+      #   else
+      #     self.payments_unverified << payment
+      #   end
+      # end
+      # self.ordered_payments = self.payments_verified + self.payments_unverified
+      self.paginated_payments = self.payments.paginate(page: params[:page], per_page: (params[:per_page] || 10))
       self.unpaid_payments = self.payments.unpaid
     end
 
@@ -46,7 +46,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
   end
 
   def process
-    self.payments = self.bank_payment_request.payment_order.payments
+    self.payments = self.bank_payment_request.payment_order.payments.include_for_index
   end
 
   def success

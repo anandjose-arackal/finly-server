@@ -135,7 +135,7 @@ end
 
 # non-paginated payments listing all payments in this payment order
 json.unpaid_payments do
-  json.array!(@result.ordered_payments) do |payment|
+  json.array!(@result.unpaid_payments) do |payment|
     json.owner_name payment.receiving_account&.account_owner&.name
     json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number

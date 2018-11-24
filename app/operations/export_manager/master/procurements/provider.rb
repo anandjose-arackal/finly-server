@@ -43,18 +43,21 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
                       inwards_status: {spreadsheet: false, pdf: true},
                       last_inward_received_on: {spreadsheet: false, pdf: true},
                       invoice_number: {spreadsheet: true, pdf: true},
+                      invoice_id: {spreadsheet: true, pdf: true},
                       invoice_payment_term: {spreadsheet: false, pdf: true},
                       invoice_delivery_date: {spreadsheet: false, pdf: true},
                       invoice_submitted_on: {spreadsheet: false, pdf: true},
                       invoice_approved_on: {spreadsheet: false, pdf: true},
                       is_invoice_approved: {spreadsheet: true, pdf: true},
                       invoice_sent_on: {spreadsheet: false, pdf: true},
-                      invoice_cgst: {spreadsheet: false, pdf: true},
-                      invoice_sgst: {spreadsheet: false, pdf: true},
-                      invoice_igst: {spreadsheet: false, pdf: true},
+                      invoice_cgst: {spreadsheet: true, pdf: true},
+                      invoice_sgst: {spreadsheet: true, pdf: true},
+                      invoice_igst: {spreadsheet: true, pdf: true},
                       invoice_tds_type: {spreadsheet: true, pdf: true},
                       invoice_tds_rate: {spreadsheet: true, pdf: true},
                       invoice_tds_amount: {spreadsheet: false, pdf: true},
+                      invoice_base_amount: {spreadsheet: true, pdf: true},
+                      invoice_discount_amount: {spreadsheet: true, pdf: true},
                       invoice_total_amount: {spreadsheet: true, pdf: true},
                       invoice_total_amount_after_tds: {spreadsheet: false, pdf: true},
                       invoice_payable_amount: {spreadsheet: false, pdf: true},
@@ -142,11 +145,13 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def po_user(procurement)
-    purchase_order(procurement)&.user.name
+    if procurement.purchase_order.present?
+      purchase_order(procurement)&.user&.name
+    end
   end
 
   def po_status(procurement)
-    procurement.purchase_order.status&.name&.humanize
+    procurement.purchase_order&.status&.name&.humanize
   end
 
   def po_number(procurement)
@@ -232,6 +237,10 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
     procurement.invoices&.first&.invoice_number
   end
 
+  def invoice_id(procurement)
+    procurement.invoices.first&.invoice_id
+  end
+
   def invoice_payment_term(procurement)
     # todo
   end
@@ -257,15 +266,22 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def invoice_cgst(procurement)
-
+    if invoice(procurement)&.gst_type&.cgst?
+      value = invoice(procurement)&.tax_amount&.value
+      if value
+        return value / 2
+      end
+    end
   end
 
   def invoice_sgst(procurement)
-
+    invoice_cgst(procurement)
   end
 
   def invoice_igst(procurement)
-
+    if invoice(procurement)&.gst_type&.igst?
+      invoice(procurement)&.tax_amount&.value
+    end
   end
 
   def invoice_tds_type(procurement)
@@ -276,6 +292,13 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
     invoice(procurement)&.tds_slab&.tds
   end
 
+  def invoice_base_amount(procurement)
+    invoice(procurement)&.item_amounts_total
+  end
+
+  def invoice_discount_amount(procurement)
+    invoice(procurement)&.discount_amount&.value
+  end
 
   def invoice_tds_amount(procurement)
     invoice(procurement)&.tds_amount&.value
@@ -321,5 +344,6 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   def purchase_order(procurement)
     procurement&.purchase_order
   end
+
 
 end

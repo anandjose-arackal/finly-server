@@ -36,7 +36,7 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
 
   class BankTransfer::Vendors::Transfers::Show::AccountOwnersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receiving_transactions, :bank_accounts, :account_owner, :actions
+    attr_accessor :receiving_transactions, :bank_accounts, :account_owner, :actions, :procurement_data
 
     def init
       self.receiving_transactions = params[:receiving_transactions]
@@ -44,6 +44,10 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
       self.account_owner = params[:account_owner]
 
       self.actions = get_actions
+
+      if self.account_owner.is_a?(YesBankVendor)
+        self.procurement_data = get_procurement_data
+      end
     end
 
 
@@ -55,6 +59,16 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
       end
 
       actions
+    end
+
+    def get_procurement_data
+      data = {}
+
+      data[:purchase_orders] = PurchaseOrder.where(vendor_id: self.account_owner.id)
+      data[:non_po_invoices] = Invoice.filter_inward_invoice_type(:non_po_invoice).with_vendor_ids(self.account_owner.id)
+
+      data
+
     end
 
   end

@@ -75,12 +75,53 @@ class Procurement < ActiveRecord::Base
     where id: filtered_ids
   }
 
+  scope :filter_invoice_id, -> (invoice_id) {
+    filtered_ids = Invoice.filter_invoice_id(invoice_id).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
+  scope :filter_po_status, -> (status_id) {
+    filtered_ids = PurchaseOrder.with_status_ids(status_id).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
+  scope :filter_invoice_status, -> (status_id) {
+    filtered_ids = Invoice.with_status_id(status_id).pluck(:procurement_id).uniq
+
+    filtered_ids.reject! {|id| id == nil}
+
+    where id: filtered_ids
+  }
+
+  scope :filter_submission_date, -> (submission_date) {
+    date = Date.parse(submission_date) rescue nil
+
+    if date
+      purchase_order_ids = Trail.with_parent_type('PurchaseOrder').with_action_id(TrailAction.id_for(:submit)).filter_date(date).pluck(:parent_id)
+      filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
+
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_department, -> (department_name, user_id) {
+    user = User.find_by id: user_id
+    if user.present?
+      department_ids = user.company.departments.filter_name(department_name).pluck(:id)
+
+      filtered_ids = PurchaseOrder.filter_sub_department_id(department_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.filter_sub_department_id(department_ids).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_sub_department, -> (sub_department_name, user_id) {
     user = User.find_by id: user_id
     if user.present?
       sub_department_ids = user.company.departments.only_sub_departments.filter_name(sub_department_name).pluck(:id)
 
       filtered_ids = PurchaseOrder.filter_sub_department_id(sub_department_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.filter_sub_department_id(sub_department_ids).pluck(:procurement_id)
       where id: filtered_ids
     end
   }
@@ -91,6 +132,7 @@ class Procurement < ActiveRecord::Base
       vendor_ids = user.company.yes_bank_vendors.filter_name_search(vendor_name).pluck(:id)
 
       filtered_ids = PurchaseOrder.filter_vendor_id(vendor_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.with_vendor_ids(vendor_ids).pluck(:procurement_id)
       where id: filtered_ids
     end
   }
@@ -163,32 +205,47 @@ class Procurement < ActiveRecord::Base
   scope :filter_awaiting_approval, -> (user) {
     if user.vendor_payments_reviewer?
       level_ids = []
-      policies = user.company.policies.with_application(:vp)
-      policies.each do |policy|
-        levels = policy.levels.with_entity_type('PurchaseOrder')
-        levels.each do |level|
-          if level.reviewers.pluck(:id).include? user.id
-            level_ids.push(level.id)
-          end
-        end
-      end
+
+      policy_ids = user.company.policies.with_application(:vp).pluck(:id)
+
+      policy_level_ids = ReviewalLevel.with_entity_type(['PurchaseOrder', 'Invoice']).with_policy_ids(policy_ids).pluck(:id)
+
+      reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+
+      level_ids = policy_level_ids & reviewer_level_ids
 
       # Find all the purchase order with controlling level from above
       purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
+      # Find all the invoices with controlling level
+      invoice_ids = user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:id)
+
       # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
       purchase_order_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+
+      # Find all document level reviewer mapping with with the above list of level + reviewer and get their invoice_id
+      invoice_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('Invoice')
+
       # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
       other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
 
+      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+      other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
+
       purchase_order_ids -= other_reviewer_po_ids
+      invoice_ids -= other_reviewer_invoice_ids
 
       purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids).with_status_ids(PurchaseOrderStatus.id_for(:processing))
+      invoices = user.company.inward_invoices.with_id(invoice_ids).with_status_id(InwardInvoiceStatus.id_for(:processing))
 
-      all_level_ids = purchase_orders.pluck(:controlling_level_id)
+      all_level_po_ids = purchase_orders.pluck(:controlling_level_id)
+      all_level_invoice_ids = invoices.pluck(:controlling_level_id)
 
-      purchase_orders = purchase_orders.with_controlling_level_ids(level_ids & all_level_ids)
+      purchase_orders = purchase_orders.with_controlling_level_ids(level_ids & all_level_po_ids)
+      invoices = invoices.with_controlling_level_ids(level_ids & all_level_invoice_ids)
 
-      where(id: purchase_orders.pluck(:procurement_id))
+      procurement_ids = purchase_orders.pluck(:procurement_id) + invoices.pluck(:procurement_id)
+
+      where(id: procurement_ids.uniq)
     end
   }
 
@@ -342,7 +399,7 @@ class Procurement < ActiveRecord::Base
   def type_entity
     if procurement_type == 'purchase_order'
       purchase_order
-    elsif procurement_type == 'invoice'
+    elsif procurement_type == 'non_po_invoice'
       invoices&.first
     end
   end

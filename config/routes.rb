@@ -783,6 +783,7 @@
 #                                                  lookup GET    /lookup(.:format)                                                                                                   users#lookup
 #                                   send_verification_otp POST   /send_verification_otp(.:format)                                                                                    users#send_verification_otp
 #                                         verify_user_otp POST   /verify_user_otp(.:format)                                                                                          users#verify_user_otp
+#                                               all_cards GET    /users/all_cards(.:format)                                                                                          users#all_cards
 #                                                   users GET    /users(.:format)                                                                                                    users#index
 #                                                         POST   /users(.:format)                                                                                                    users#create
 #                                                    user GET    /users/:id(.:format)                                                                                                users#show
@@ -1169,7 +1170,7 @@
 #       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)                              bank_transfer/bank_payment_requests#update_payment
 #         bank_transfer_bank_payment_request_payments_lst GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments(.:format)                                    bank_transfer/bank_payment_requests#payments_list
 #       bank_transfer_bank_payment_request_payments_count GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_count(.:format)                              bank_transfer/bank_payment_requests#payments_count
-#    bank_transfer_bank_payment_request_remove_attachment DELETE /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_attachment(.:format)                           bank_transfer/bank_payment_requests#remove_atachment
+#    bank_transfer_bank_payment_request_remove_attachment DELETE /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_attachment(.:format)                           bank_transfer/bank_payment_requests#remove_attachment
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                                                      bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                                                      bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                                                  bank_transfer/bank_payment_requests#new
@@ -1461,6 +1462,7 @@
 #                                                         PATCH  /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#update
 #                                                         PUT    /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#update
 #                                                         DELETE /procure/inward_documents/:id(.:format)                                                                             procure/inward_documents#destroy
+#                             procure_bulk_create_advance POST   /procure/payments/create_bulk_advance(.:format)                                                                     procure/payments#bulk_create_advance
 #                                         procure_payment GET    /procure/payments/:id(.:format)                                                                                     procure/payments#show
 #                                     procure_attachments GET    /procure/attachments(.:format)                                                                                      procure/attachments#index
 #                                                         POST   /procure/attachments(.:format)                                                                                      procure/attachments#create
@@ -1477,6 +1479,7 @@
 #                                                         DELETE /procure/inward_invoices/templates/:id(.:format)                                                                    procure/inward_invoices#template_destroy
 #                 procure_inward_invoices_import_template GET    /procure/inward_invoices/import_template(.:format)                                                                  procure/inward_invoices#import_template
 #                          procure_inward_invoices_import POST   /procure/inward_invoices/import(.:format)                                                                           procure/inward_invoices#import
+#                    procure_inward_invoices_bulk_approve PUT    /procure/inward_invoices/bulk_approve(.:format)                                                                     procure/inward_invoices#bulk_approve
 #                           procure_inward_invoice_submit PUT    /procure/inward_invoices/:inward_invoice_id/submit(.:format)                                                        procure/inward_invoices#submit
 #                          procure_inward_invoice_retract PUT    /procure/inward_invoices/:inward_invoice_id/retract(.:format)                                                       procure/inward_invoices#retract
 #                          procure_inward_invoice_approve PUT    /procure/inward_invoices/:inward_invoice_id/approve(.:format)                                                       procure/inward_invoices#approve
@@ -2702,6 +2705,7 @@ Rails.application.routes.draw do
   post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
 
+  get 'users/all_cards', to: 'users#all_cards', as: :all_cards
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
     get 'summary', to: 'users#summary', as: :user_summary
@@ -3248,6 +3252,7 @@ Rails.application.routes.draw do
 
     end
 
+    post 'payments/create_bulk_advance', to: 'payments#bulk_create_advance', as: :bulk_create_advance
     resources :payments, only: [:show]
 
     resources :attachments
@@ -3263,6 +3268,8 @@ Rails.application.routes.draw do
 
     get 'inward_invoices/import_template', to: 'inward_invoices#import_template'
     post '/inward_invoices/import', to: 'inward_invoices#import'
+
+    put 'inward_invoices/bulk_approve', to: 'inward_invoices#bulk_approve'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
