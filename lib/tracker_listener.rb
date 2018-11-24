@@ -132,6 +132,8 @@ class TrackerListener
           country_code: result.country_code,
           region_code: result.region_code,
           region_name: result.region_name,
+          latitude: result.latitude,
+          longitude: result.longitude,
           city: result.city,
           zip: result.zip
       }
