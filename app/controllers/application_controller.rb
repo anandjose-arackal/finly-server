@@ -20,6 +20,7 @@ class ApplicationController < ActionController::Base
   before_filter :store_location
 
   after_filter :set_queries_counter
+  after_filter :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found
@@ -337,6 +338,14 @@ class ApplicationController < ActionController::Base
       log[:current_view] = view
     end
     FILE_LOGGER.info(log)
+  end
+
+  def track_request
+    user_id = current_user&.id
+    # Track only if user is present
+    return if user_id.blank? or request.remote_ip.blank?
+    # Create new visit in background
+    TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
   end
 
 end
