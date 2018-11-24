@@ -1,0 +1,1 @@
+Geocoder.configure(ip_lookup: :ipstack, api_key: '7430b2a577177801e07b9cd666c16fe9')
