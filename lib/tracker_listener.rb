@@ -9,7 +9,7 @@ class TrackerListener
 
   def self.add_event(user_id, device, app, path, controller, action, remote_ip, method, datetime)
     # Track only if user is present
-    return if user_id.blank? or remote_ip.blank?
+    return false if user_id.blank? or remote_ip.blank?
     visit = TrackerVisit.with_user_id(user_id).with_device(device).with_ip(remote_ip).started_after(max_last_visit_time(datetime))&.first
     return false unless visit
     # Log visit
