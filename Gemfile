@@ -173,6 +173,10 @@ gem 'aws-sdk'
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'
 
+gem 'geocoder', '1.5.0'
+gem 'device_detector'
+
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', '9.0.6'
