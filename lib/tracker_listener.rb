@@ -22,7 +22,7 @@ class TrackerListener
     # Log visit
     event = visit.events.build app: request.app, path: request.path, controller: request.controller, action: request.action, http_method: request.method
     return false unless event.valid? and event.save
-    send_to_collector request, visit&.id
+    send_to_collector request
     true
   end
 
@@ -52,7 +52,7 @@ class TrackerListener
     Resque.enqueue TrackerListener, args
   end
 
-  def self.send_to_collector(request, session_id)
+  def self.send_to_collector(request)
     return unless Rails.env.production?
     emitter = SnowplowTracker::Emitter.new('collector.finly.io', {protocol: 'https', port: 443})
     tracker = SnowplowTracker::Tracker.new(emitter)
@@ -93,6 +93,16 @@ class TrackerListener
         LOGGER.info "New request : #{args['controller']}/##{args['action']}"
         request = TrackerListener::VisitProperties.new args
 
+
+        if request.controller == 'notifications' && request.action == 'unread'
+          user = User.find_by(id: request.user_id)
+          if user
+            user.tracker_notifications.create company: user.company, app: request.app, device: request.device, view: request.view
+            send_to_collector request
+          end
+          return
+        end
+
         # As servers can handle multiple concurrent requests, to prevent multiple visits from being created, run add_event again
         if add_event request
           LOGGER.info "Part of existing visit. Event added"
@@ -113,7 +123,7 @@ class TrackerListener
         end
         event.save
 
-        send_to_collector request, visit&.id
+        send_to_collector request
 
         LOGGER.info "Created event with ID #{event.id}"
       end
