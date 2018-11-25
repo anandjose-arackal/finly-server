@@ -53,6 +53,7 @@ class TrackerListener
   end
 
   def self.send_to_collector(request, session_id)
+    return unless Rails.env.production?
     emitter = SnowplowTracker::Emitter.new('collector.finly.io', {protocol: 'https', port: 443})
     tracker = SnowplowTracker::Tracker.new(emitter)
     tracker.set_user_id(request.user_id&.to_s)
