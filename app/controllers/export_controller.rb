@@ -17,12 +17,20 @@ class ExportController < ApplicationController
         @data = @report.data
       }
       format.pdf {
-        op = Report::Exporter.(current_user, params)
-        local_variables = op.local_variables
-        local_variables[:op] = op
-        @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", template: 'pdf.html.erb', local_variables: local_variables})
-        # render pdf: "report-#{op.report.name}", layout: "pdf.html.erb", print_media_type: true
-        @result.render(self)
+        if current_company.id == 129
+          send_file(
+            "#{Rails.root}/app/assets/pdf_templates/learning_links_export.pdf",
+            filename: "report_export.pdf",
+            type: 'application/pdf'
+          )
+        else
+          op = Report::Exporter.(current_user, params)
+          local_variables = op.local_variables
+          local_variables[:op] = op
+          @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", template: 'pdf.html.erb', local_variables: local_variables})
+          # render pdf: "report-#{op.report.name}", layout: "pdf.html.erb", print_media_type: true
+          @result.render(self)
+        end
       }
       format.zip {
         @result = Export::Report::WithReceipts.(current_user, params)
