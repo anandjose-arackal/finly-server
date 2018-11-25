@@ -14,7 +14,9 @@ class TrackerListener
     return false unless visit
     # Log visit
     event = visit.events.build app: app, path: path, controller: controller, action: action, http_method: method
-    event.valid? and event.save
+    return false unless event.valid? and event.save
+    send_to_collector request, visit&.id
+    true
   end
 
   def self.enqueue(request, params, company_id, user_id, device, app)
@@ -40,6 +42,30 @@ class TrackerListener
     }
 
     Resque.enqueue TrackerListener, args
+  end
+
+  def self.send_to_collector(request, session_id)
+    emitter = SnowplowTracker::Emitter.new('collector.finly.io', {protocol: 'https', port: 443})
+    tracker = SnowplowTracker::Tracker.new(emitter)
+    tracker.set_user_id(request.user_id)
+    tracker.set_user_agent(request.user_agent)
+    tracker.set_ip_address(request.remote_ip)
+
+    tracker.track_self_describing_event(SnowplowTracker::SelfDescribingJson.new(
+        "iglu:io.finly/product_context/jsonschema/1-0-0",
+        {
+            "companyId" => request.company_id,
+            "companyName" => Company.find_by(id: request.company_id)&.name,
+            "userId" => request.user_id,
+            "userName" => User.find_by(id: request.user_id)&.name,
+            "app" => request.app,
+            "view" => request.view,
+            "device" => request.device,
+            "requestMethod" => request.method,
+            "controller" => request.controller,
+            "action" => request.action
+        }
+    ))
   end
 
   def self.max_last_visit_time(datetime)
@@ -77,6 +103,9 @@ class TrackerListener
           next
         end
         event.save
+
+        send_to_collector request, visit&.id
+
         LOGGER.info "Created event with ID #{event.id}"
       end
     rescue SystemExit, Interrupt
