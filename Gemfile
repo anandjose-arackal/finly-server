@@ -154,6 +154,8 @@ gem 'liquid'
 
 gem 'hooks', '0.4.1'
 
+gem 'snowplow-tracker', '0.6.1'
+
 gem 'bullet', '5.4.2', :group => 'development'
 
 gem 'logstasher', '1.2.2'
