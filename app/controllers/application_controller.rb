@@ -341,10 +341,16 @@ class ApplicationController < ActionController::Base
   end
 
   def track_request
-    return if params[:controller] == 'notifications' && params[:action] == 'unread'
     user_id = current_user&.id
     # Track only if user is present
     return if user_id.blank? or request.remote_ip.blank?
+    return unless current_user.class.name == User.name
+
+    if params[:controller] == 'notifications' && params[:action] == 'unread'
+      current_user.tracker_notifications.create company: current_company, app: current_app, device: current_device, view: params[:view]
+      return
+    end
+
     # Create new visit in background
     TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
   end
