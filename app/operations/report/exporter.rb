@@ -10,6 +10,17 @@ class Report::Exporter < Report::Show
 
   class Report::Exporter::SuccessPresenter < Report::Base::Presenter
 
+    attr_accessor :local_variables
+
+    def init
+      super
+      self.local_variables = {
+        report: self.report,
+        receipts: self.receipts,
+        includes_comments: true
+      }
+    end
+
     def receipts
       receipts = []
       base_path = "#{Rails.root}/public/tmp"
