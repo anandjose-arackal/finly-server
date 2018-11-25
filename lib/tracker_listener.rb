@@ -100,7 +100,7 @@ class TrackerListener
             user.tracker_notifications.create company: user.company, app: request.app, device: request.device, view: request.view
             send_to_collector request
           end
-          return
+          next
         end
 
         # As servers can handle multiple concurrent requests, to prevent multiple visits from being created, run add_event again
