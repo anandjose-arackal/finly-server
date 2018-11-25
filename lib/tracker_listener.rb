@@ -106,7 +106,7 @@ class TrackerListener
         end
         visit.save
         LOGGER.info "Created visit with ID #{visit.id}"
-        event = visit.events.build app: request.app, path: request.path, controller: request.controller, action: request.action, http_method: request.method
+        event = visit.events.build app: request.app, path: request.path, controller: request.controller, action: request.action, http_method: request.method, view: request.view
         unless event.valid?
           LOGGER.info "Failed to create event. Reason : #{event.errors.full_messages}"
           next
@@ -234,8 +234,7 @@ class TrackerListener
           screen_width: self.screen_width,
           company_id: self.company_id,
           user_id: self.user_id,
-          started_at: self.started_at,
-          view: self.view
+          started_at: self.started_at
       }
     end
 
