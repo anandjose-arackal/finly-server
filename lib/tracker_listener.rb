@@ -22,7 +22,7 @@ class TrackerListener
     # Log visit
     event = visit.events.build app: request.app, path: request.path, controller: request.controller, action: request.action, http_method: request.method
     return false unless event.valid? and event.save
-    send_to_collector request
+    send_to_collector request, visit&.id
     true
   end
 
@@ -52,7 +52,7 @@ class TrackerListener
     Resque.enqueue TrackerListener, args
   end
 
-  def self.send_to_collector(request)
+  def self.send_to_collector(request, session_id=nil)
     return unless Rails.env.production?
     emitter = SnowplowTracker::Emitter.new('collector.finly.io', {protocol: 'https', port: 443})
     tracker = SnowplowTracker::Tracker.new(emitter)
@@ -72,7 +72,8 @@ class TrackerListener
             "device" => request.device,
             "requestMethod" => request.method,
             "controller" => request.controller,
-            "action" => request.action
+            "action" => request.action,
+            "visit_id" => session_id&.to_s
         }
     ))
   end
@@ -123,7 +124,7 @@ class TrackerListener
         end
         event.save
 
-        send_to_collector request
+        send_to_collector request, visit&.id
 
         LOGGER.info "Created event with ID #{event.id}"
       end
