@@ -5,7 +5,13 @@ class TrackerListener
   VISIT_DURATION = 30.minutes
 
   # FILE_LOGGER = Logger.new(Rails.root.join('log/verify_handler.log'))
-  LOGGER = Logger.new(STDOUT)
+  if Rails.env.production?
+    LOGGER = Logger.new(Rails.root.join('log/tracker_listener.log'))
+    ERROR_LOGGER = Logger.new(Rails.root.join('log/tracker_listener_error.log'))
+  else
+    LOGGER = Logger.new(STDOUT)
+    ERROR_LOGGER = LOGGER
+  end
 
   def self.add_event(request)
     # Track only if user is present
@@ -114,6 +120,9 @@ class TrackerListener
       LOGGER.info 'Scheduling Exit'
       # LOGGER.info 'Waiting for workers to complete'
       LOGGER.info 'Bye'
+    rescue Exception => e
+      ERROR_LOGGER.error e.message
+      ERROR_LOGGER.error e.backtrace.join("\n")
     end
   end
 
