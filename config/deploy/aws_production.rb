@@ -22,6 +22,7 @@ set :sidekiq_role, :sidekiq_app
 set :crono_role, :crono_role
 set :balance_poller_role, :poller_role
 set :transaction_poller_role, :poller_role
+set :usage_tracker_role, :poller_role
 # role-based syntax
 # ==================
 

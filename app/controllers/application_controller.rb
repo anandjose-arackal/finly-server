@@ -341,6 +341,7 @@ class ApplicationController < ActionController::Base
   end
 
   def track_request
+    return if params[:controller] == 'notifications' && params[:action] == 'unread'
     user_id = current_user&.id
     # Track only if user is present
     return if user_id.blank? or request.remote_ip.blank?
