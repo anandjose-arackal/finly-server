@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181122021947) do
+ActiveRecord::Schema.define(version: 20181125104345) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -894,6 +894,27 @@ ActiveRecord::Schema.define(version: 20181122021947) do
   end
 
   add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
+
+  create_table "budget_modification_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "budget_modification_trails", force: :cascade do |t|
+    t.integer  "budget_id",           limit: 4
+    t.integer  "action_user_id",      limit: 4
+    t.integer  "action_id",           limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "previous_value",      limit: 255
+    t.string   "current_value",       limit: 255
+    t.string   "changed_column_name", limit: 255
+  end
+
+  add_index "budget_modification_trails", ["action_id"], name: "index_budget_modification_trails_on_action_id", using: :btree
+  add_index "budget_modification_trails", ["action_user_id"], name: "index_budget_modification_trails_on_action_user_id", using: :btree
+  add_index "budget_modification_trails", ["budget_id"], name: "index_budget_modification_trails_on_budget_id", using: :btree
 
   create_table "budget_rule_category_mappings", force: :cascade do |t|
     t.integer  "budget_rule_id", limit: 4, null: false
@@ -1855,6 +1876,16 @@ ActiveRecord::Schema.define(version: 20181122021947) do
   end
 
   add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
+
+  create_table "custom_export_configurations", force: :cascade do |t|
+    t.integer  "configurable_id",       limit: 4
+    t.string   "configurable_type",     limit: 255
+    t.boolean  "custom_report"
+    t.boolean  "custom_invoice"
+    t.boolean  "custom_purchase_order"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
 
   create_table "custom_fields", force: :cascade do |t|
     t.integer  "field_configuration_id", limit: 4,   null: false
@@ -4820,6 +4851,69 @@ ActiveRecord::Schema.define(version: 20181122021947) do
 
   add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
 
+  create_table "tracker_events", force: :cascade do |t|
+    t.integer  "tracker_visit_id", limit: 4,   null: false
+    t.string   "http_method",      limit: 255
+    t.string   "app",              limit: 255
+    t.string   "path",             limit: 255
+    t.string   "controller",       limit: 255, null: false
+    t.string   "action",           limit: 255, null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "tracker_events", ["action"], name: "index_tracker_events_on_action", using: :btree
+  add_index "tracker_events", ["app"], name: "index_tracker_events_on_app", using: :btree
+  add_index "tracker_events", ["controller"], name: "index_tracker_events_on_controller", using: :btree
+  add_index "tracker_events", ["path"], name: "index_tracker_events_on_path", using: :btree
+  add_index "tracker_events", ["tracker_visit_id"], name: "index_tracker_events_on_tracker_visit_id", using: :btree
+
+  create_table "tracker_visits", force: :cascade do |t|
+    t.integer  "user_id",          limit: 4
+    t.integer  "company_id",       limit: 4
+    t.string   "ip",               limit: 255,                             null: false
+    t.string   "ip_type",          limit: 255
+    t.string   "user_agent",       limit: 255
+    t.text     "referrer",         limit: 65535
+    t.string   "referring_domain", limit: 255
+    t.text     "landing_page",     limit: 65535
+    t.string   "device",           limit: 255
+    t.string   "browser",          limit: 255
+    t.string   "os",               limit: 255
+    t.string   "os_version",       limit: 255
+    t.string   "app_version",      limit: 255
+    t.string   "device_type",      limit: 255
+    t.string   "platform",         limit: 255
+    t.string   "screen_height",    limit: 255
+    t.string   "screen_width",     limit: 255
+    t.string   "continent_name",   limit: 255
+    t.string   "continent_code",   limit: 255
+    t.string   "country_name",     limit: 255
+    t.string   "country_code",     limit: 255
+    t.string   "region_code",      limit: 255
+    t.string   "region_name",      limit: 255
+    t.string   "city",             limit: 255
+    t.string   "zip",              limit: 255
+    t.decimal  "latitude",                       precision: 20, scale: 10
+    t.decimal  "longitude",                      precision: 20, scale: 10
+    t.string   "utm_source",       limit: 255
+    t.string   "utm_medium",       limit: 255
+    t.string   "utm_term",         limit: 255
+    t.string   "utm_content",      limit: 255
+    t.string   "utm_campaign",     limit: 255
+    t.datetime "started_at",                                               null: false
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+  end
+
+  add_index "tracker_visits", ["company_id"], name: "index_tracker_visits_on_company_id", using: :btree
+  add_index "tracker_visits", ["device"], name: "index_tracker_visits_on_device", using: :btree
+  add_index "tracker_visits", ["ip"], name: "index_tracker_visits_on_ip", using: :btree
+  add_index "tracker_visits", ["latitude"], name: "index_tracker_visits_on_latitude", using: :btree
+  add_index "tracker_visits", ["longitude"], name: "index_tracker_visits_on_longitude", using: :btree
+  add_index "tracker_visits", ["started_at"], name: "index_tracker_visits_on_started_at", using: :btree
+  add_index "tracker_visits", ["user_id"], name: "index_tracker_visits_on_user_id", using: :btree
+
   create_table "trail_actions", force: :cascade do |t|
     t.string "name", limit: 255
   end
@@ -5677,6 +5771,7 @@ ActiveRecord::Schema.define(version: 20181122021947) do
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
   add_foreign_key "budget_criteria_mappings", "budgets"
+  add_foreign_key "budget_modification_trails", "budgets"
   add_foreign_key "budget_rule_category_mappings", "budget_rules"
   add_foreign_key "budget_rule_category_mappings", "categories"
   add_foreign_key "budget_rule_field_mappings", "budget_rules"

@@ -1,16 +1,16 @@
 require 'RMagick'
 require 'fileutils'
 
-class Report::Exporter < Report::Show
+class Report::ExportHandler < Report::Show
 
   def success
     params[:report] = self.report
-    Report::Exporter::SuccessPresenter.new(self.user, params, messages)
+    Report::ExportHandler::SuccessPresenter.new(self.user, params, messages)
   end
 
-  class Report::Exporter::SuccessPresenter < Report::Base::Presenter
+  class Report::ExportHandler::SuccessPresenter < Report::Base::Presenter
 
-    attr_accessor :local_variables
+    attr_accessor :local_variables, :template
 
     def init
       super
@@ -19,6 +19,11 @@ class Report::Exporter < Report::Show
         receipts: self.receipts,
         includes_comments: true
       }
+      if self.user.company.custom_export_configuration.custom_report && File.exists?("#{Rails.root}/views/export/report_#{self.user.company_id}")
+        self.template = "export/report_#{self.user.company_id}"
+      else
+        self.template = "export/report"
+      end
     end
 
     def receipts

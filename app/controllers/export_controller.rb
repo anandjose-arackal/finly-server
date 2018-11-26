@@ -24,10 +24,11 @@ class ExportController < ApplicationController
             type: 'application/pdf'
           )
         else
-          op = Report::Exporter.(current_user, params)
+          op = Report::ExportHandler.(current_user, params)
           local_variables = op.local_variables
+          template = op.template
           local_variables[:op] = op
-          @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", template: 'pdf.html.erb', local_variables: local_variables})
+          @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", layout: 'pdf.html.erb', template: template, local_variables: local_variables})
           # render pdf: "report-#{op.report.name}", layout: "pdf.html.erb", print_media_type: true
           @result.render(self)
         end
