@@ -79,6 +79,8 @@ class FinlyTransaction < ActiveRecord::Base
                                                       :receiving_account, {
                                                           original_payment_for_refund: :receiving_user}]},
                                            :associated_transaction])}
+
+  scope :include_for_index, -> { includes(:system_messages) }
   scope :joins_amounts, -> {joins :amount}
   scope :group_by_purpose, -> {group :payment_purpose_id}
   scope :purpose_wise_amount, -> {joins_amounts.group_by_purpose.sum('amounts.value')}
