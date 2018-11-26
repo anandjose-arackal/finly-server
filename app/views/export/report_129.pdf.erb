@@ -447,7 +447,7 @@
     font-weight: 700;
     font-family: Garamond, serif;
     mso-font-charset: 0;
-    text-align: right;
+    text-align: center;
     border: .5pt solid windowtext;
     white-space: normal;
   }
@@ -472,7 +472,7 @@
     font-weight: 700;
     font-family: Garamond, serif;
     mso-font-charset: 0;
-    text-align: right;
+    text-align: center;
     border-top: 1.0pt solid windowtext;
     border-right: .5pt solid windowtext;
     border-bottom: .5pt solid windowtext;
@@ -596,7 +596,7 @@
     font-weight: 700;
     font-family: Garamond, serif;
     mso-font-charset: 0;
-    text-align: right;
+    text-align: center;
     border-top: 1.0pt solid windowtext;
     border-right: none;
     border-bottom: none;
@@ -2968,7 +2968,8 @@
   }
 </style>
 
-<% custom_fields = report.custom_fields %>
+<% report_custom_fields = report.custom_fields %>
+<% expenses = report.expenses %>
 
 <body>
 <table border=0 cellpadding=0 cellspacing=0 width=1317 style='border-collapse:
@@ -3162,10 +3163,14 @@
   <tr height=20 style='mso-height-source:userset;height:15.0pt'>
     <td height=20 style='height:15.0pt'></td>
     <td colspan=2 class=xl220>PROJECT NAME:</td>
-    <td colspan=3 class=xl278 width=409 style='width:307pt'></td>
+    <td colspan=3 class=xl278 width=409 style='width:307pt'>
+      <%= report_custom_fields.with_field_key("report_project_name").first&.value %>
+    </td>
     <td class=xl105></td>
     <td class=xl117>Activity Code:</td>
-    <td colspan=2 class=xl274 style='border-right:1.0pt solid black'></td>
+    <td colspan=2 class=xl274 style='border-right:1.0pt solid black'>
+      <%= report_custom_fields.with_field_key("report_activity_code").first&.value %>
+    </td>
     <td></td>
   </tr>
   <tr height=20 style='mso-height-source:userset;height:15.0pt'>
@@ -3214,7 +3219,7 @@
     <td class=xl68 style='border-top:none'>&nbsp;</td>
     <td class=xl68>&nbsp;</td>
     <td class=xl211>&nbsp;</td>
-    <td class=xl213>f0e32df5bbb80666</td>
+    <td class=xl213></td>
     <td></td>
   </tr>
   <tr height=20 style='height:15.0pt'>
@@ -3240,45 +3245,22 @@
     <td class=xl99 width=188 style='border-top:none;border-left:none;width:141pt'>Remarks</td>
     <td></td>
   </tr>
+  <% expenses.with_drop_down_custom_field_id(FieldDropDownItem.find_by(field_key: "air_rail_bus_fare")&.id).each do |expense| %>
   <tr height=21 style='height:16.0pt'>
     <td height=21 style='height:16.0pt'></td>
-    <td class=xl201 width=89 style='border-top:none;width:67pt'>&nbsp;</td>
-    <td class=xl202 width=131 style='border-top:none;border-left:none;width:98pt'>&nbsp;</td>
-    <td class=xl163 width=188 style='border-top:none;border-left:none;width:141pt'>&nbsp;</td>
-    <td class=xl201 width=101 style='border-top:none;width:76pt'>&nbsp;</td>
-    <td class=xl202 width=120 style='border-top:none;border-left:none;width:90pt'>&nbsp;</td>
-    <td class=xl163 width=120 style='border-top:none;border-left:none;width:90pt'>&nbsp;</td>
-    <td class=xl163 width=179 style='border-top:none;border-left:none;width:134pt'>&nbsp;</td>
-    <td class=xl204 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl170 width=188 style='border-top:none;border-left:none;width:141pt'>&nbsp;</td>
+    <td class=xl201 width=89 style='border-top:none;width:67pt'><%= expense.custom_fields.with_field_key("departure_date").first&.string_value %></td>
+    <td class=xl202 width=131 style='border-top:none;border-left:none;width:98pt'><%= expense.custom_fields.with_field_key("departure_time").first&.string_value %>&nbsp;</td>
+    <td class=xl163 width=188 style='border-top:none;border-left:none;width:141pt'><%= expense.custom_fields.with_field_key("departure_station").first&.string_value %>&nbsp;</td>
+    <td class=xl201 width=101 style='border-top:none;width:76pt'><%= expense.custom_fields.with_field_key("arrival_date").first&.string_value %>&nbsp;</td>
+    <td class=xl202 width=120 style='border-top:none;border-left:none;width:90pt'><%= expense.custom_fields.with_field_key("arrival_time").first&.string_value %>&nbsp;</td>
+    <td class=xl163 width=120 style='border-top:none;border-left:none;width:90pt'><%= expense.custom_fields.with_field_key("arrival_station").first&.string_value %>&nbsp;</td>
+    <td class=xl163 width=179 style='border-top:none;border-left:none;width:134pt'>&nbsp;<%= expense.custom_fields.with_field_key("mode_and_class_of_travel").first&.string_value %></td>
+    <td class=xl204 style='border-top:none;border-left:none'> <%= expense.amount_value %>&nbsp;</td>
+    <td class=xl170 width=188 style='border-top:none;border-left:none;width:141pt'><%= expense.note %>&nbsp;</td>
     <td></td>
   </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td class=xl201 width=89 style='border-top:none;width:67pt'>&nbsp;</td>
-    <td class=xl202 width=131 style='border-top:none;border-left:none;width:98pt'>&nbsp;</td>
-    <td class=xl163 width=188 style='border-top:none;border-left:none;width:141pt'>&nbsp;</td>
-    <td class=xl201 width=101 style='border-top:none;width:76pt'>&nbsp;</td>
-    <td class=xl202 width=120 style='border-top:none;border-left:none;width:90pt'>&nbsp;</td>
-    <td class=xl163 width=120 style='border-top:none;border-left:none;width:90pt'>&nbsp;</td>
-    <td class=xl163 width=179 style='border-top:none;border-left:none;width:134pt'>&nbsp;</td>
-    <td class=xl207 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl170 width=188 style='border-top:none;border-left:none;width:141pt'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td class=xl201 width=89 style='border-top:none;width:67pt'>&nbsp;</td>
-    <td class=xl202 width=131 style='border-top:none;border-left:none;width:98pt'>&nbsp;</td>
-    <td class=xl163 width=188 style='border-top:none;border-left:none;width:141pt'>&nbsp;</td>
-    <td class=xl201 width=101 style='border-top:none;width:76pt'>&nbsp;</td>
-    <td class=xl202 width=120 style='border-top:none;border-left:none;width:90pt'>&nbsp;</td>
-    <td class=xl163 width=120 style='border-top:none;border-left:none;width:90pt'>&nbsp;</td>
-    <td class=xl163 width=179 style='border-top:none;border-left:none;width:134pt'>&nbsp;</td>
-    <td class=xl203></td>
-    <td class=xl170 width=188 style='border-top:none;width:141pt'>&nbsp;</td>
-    <td></td>
-  </tr>
+  <% end %>
+
   <tr height=23 style='height:17.0pt'>
     <td height=23 style='height:17.0pt'></td>
     <td class=xl165 style='border-top:none'>&nbsp;</td>
@@ -3289,7 +3271,10 @@
     <td class=xl166 style='border-top:none;border-left:none'>&nbsp;</td>
     <td class=xl167 width=179 style='border-top:none;border-left:none;width:134pt'>Total
       :</td>
-    <td class=xl205 align=right style='border-left:none'><span style='mso-spacerun:yes'> </span>-<span style='mso-spacerun:yes'>
+    <td class=xl205 align=right style='border-left:none'><span style='mso-spacerun:yes'>
+    </span>
+      <%= expenses.with_drop_down_custom_field_id("air_rail_bus_fare").joins(:amount).sum(:value) %>
+      <span style='mso-spacerun:yes'>
                 </span></td>
     <td class=xl168 style='border-top:none;border-left:none'>&nbsp;</td>
     <td></td>
@@ -3298,7 +3283,7 @@
     <td height=21 style='height:16.0pt'></td>
     <td colspan=8 class=xl223 width=1039 style='width:779pt'>II) CONVEYANCE
       CHARGES</td>
-    <td class=xl214 width=188 style='border-top:none;width:141pt'>d98513ebfb82a11d</td>
+    <td class=xl214 width=188 style='border-top:none;width:141pt'></td>
     <td></td>
   </tr>
   <tr height=20 style='height:15.0pt'>
@@ -3311,111 +3296,36 @@
     <td class=xl101 width=188 style='border-top:none;border-left:none;width:141pt'>Remarks</td>
     <td></td>
   </tr>
+  <% expenses.with_drop_down_custom_field_id(FieldDropDownItem.find_by(field_key: "conveyance_charges")).each do |expense| %>
   <tr height=21 style='height:16.0pt'>
     <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
+    <td colspan=2 class=xl201 width=220 style='width:165pt'> <%= expense.date %>&nbsp;</td>
     <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
         border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl170 width=188 style='border-top:none;border-left:none;width:141pt'>&nbsp;</td>
+    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'><%= expense.custom_fields.with_field_key("conveyance_charges_particulars").first&.string_value %>&nbsp;</td>
+    <td class=xl169 style='border-top:none;border-left:none'><%= expense.amount_value %>&nbsp;</td>
+    <td class=xl170 width=188 style='border-top:none;border-left:none;width:141pt'> <%= expense.note %>&nbsp;</td>
     <td></td>
   </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
-    <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-        border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
-    <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-        border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
-    <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-        border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
-    <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-        border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
-    <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-        border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
-    <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-        border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
-    <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-        border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td colspan=2 class=xl201 width=220 style='width:165pt'>&nbsp;</td>
-    <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-        border-left:none;width:217pt'>&nbsp;</td>
-    <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
+  <% end %>
+
   <tr height=23 style='height:17.0pt'>
     <td height=23 style='height:17.0pt'></td>
     <td colspan=2 class=xl228 width=220 style='width:165pt'>&nbsp;</td>
     <td colspan=2 class=xl229 width=289 style='border-left:none;width:217pt'>&nbsp;</td>
     <td colspan=3 class=xl230 width=419 style='border-left:none;width:314pt'>Total
       :</td>
-    <td class=xl188 align=right style='border-top:none;border-left:none'>0</td>
+    <td class=xl188 align=right style='border-top:none;border-left:none'>
+      <%= expenses.with_drop_down_custom_field_id("air_rail_bus_fare").joins(:amount).sum(:value) %>
+    </td>
     <td class=xl168 style='border-top:none;border-left:none'>&nbsp;</td>
     <td></td>
   </tr>
   <tr height=21 style='mso-height-source:userset;height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
+    <td height=21 style='height:16.0pt'></td>z
     <td colspan=8 class=xl223 width=1039 style='width:779pt'>III)
       BOARDING/LODGING (VOUCHER ATTACHED)</td>
-    <td class=xl215 width=188 style='width:141pt'>2b75bdf875527e8f</td>
+    <td class=xl215 width=188 style='width:141pt'></td>
     <td></td>
   </tr>
   <tr height=20 style='height:15.0pt'>
@@ -3446,60 +3356,28 @@
     <td class=xl78 style='border-top:none;border-left:none'>&nbsp;</td>
     <td></td>
   </tr>
+
+  <% expenses.with_drop_down_custom_field_id(FieldDropDownItem.find_by(field_key: "boarding_lodging")).each do |expense| %>
   <tr height=21 style='height:16.0pt'>
     <td height=21 style='height:16.0pt'></td>
-    <td class=xl171 width=89 style='width:67pt'>&nbsp;</td>
-    <td class=xl172 style='border-left:none'>&nbsp;</td>
-    <td class=xl173 width=188 style='border-left:none;width:141pt'>&nbsp;</td>
-    <td colspan=2 class=xl173 width=221 style='border-left:none;width:166pt'>&nbsp;</td>
-    <td class=xl174 style='border-left:none'>&nbsp;</td>
-    <td class=xl174 style='border-left:none'>&nbsp;</td>
-    <td class=xl174 style='border-left:none'>NIL</td>
-    <td class=xl175 style='border-left:none'>&nbsp;</td>
+    <td class=xl171 width=89 style='width:67pt'><%= expense.custom_fields.with_field_key("b_l_from_date").first&.string_value %>&nbsp;</td>
+    <td class=xl172 style='border-left:none'><%= expense.custom_fields.with_field_key("b_l_to_date").first&.string_value %>&nbsp;</td>
+    <td class=xl173 width=188 style='border-left:none;width:141pt'><%= expense.custom_fields.with_field_key("b_l_no_of_days").first&.string_value %>&nbsp;</td>
+    <td colspan=2 class=xl173 width=221 style='border-left:none;width:166pt'><%= expense.custom_fields.with_field_key("place_journey").first&.string_value %> &nbsp;</td>
+    <td class=xl174 style='border-left:none'><%= expense.custom_fields.with_field_key("daily_allowance_journey").first&.string_value %>&nbsp;</td>
+    <td class=xl174 style='border-left:none'><%= expense.custom_fields.with_field_key("daily_allowance_halt").first&.string_value %> &nbsp;</td>
+    <td class=xl174 style='border-left:none'><%= expense.amount_value %> &nbsp;</td>
+    <td class=xl175 style='border-left:none'><%= expense.note%>&nbsp;</td>
     <td></td>
   </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td class=xl176 style='border-top:none'>&nbsp;</td>
-    <td class=xl172 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td colspan=2 class=xl163 width=221 style='border-left:none;width:166pt'>&nbsp;</td>
-    <td class=xl174 style='border-left:none'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td class=xl176 style='border-top:none'>&nbsp;</td>
-    <td class=xl172 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td colspan=2 class=xl163 width=221 style='border-left:none;width:166pt'>&nbsp;</td>
-    <td class=xl174 style='border-left:none'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=23 style='height:17.0pt'>
-    <td height=23 style='height:17.0pt'></td>
-    <td class=xl165 style='border-top:none'>&nbsp;</td>
-    <td class=xl166 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl166 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td colspan=2 class=xl167 width=221 style='border-left:none;width:166pt'>Total
-      :</td>
-    <td class=xl166 align=right style='border-top:none;border-left:none'>0</td>
-    <td class=xl166 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl166 align=right style='border-top:none;border-left:none'>0</td>
-    <td class=xl168 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
+  <% end %>
+
+
   <tr height=25 style='mso-height-source:userset;height:19.5pt'>
     <td height=25 style='height:19.5pt'></td>
     <td colspan=8 class=xl245 width=1039 style='width:779pt'>IV)Telephone,Fooding
       &amp; Laundry Expenses</td>
-    <td class=xl216 width=188 style='border-top:none;width:141pt'>869b04e121772818</td>
+    <td class=xl216 width=188 style='border-top:none;width:141pt'></td>
     <td></td>
   </tr>
   <tr height=36 style='mso-height-source:userset;height:27.0pt'>
@@ -3522,57 +3400,38 @@
     <td class=xl78 style='border-top:none;border-left:none'>To</td>
     <td></td>
   </tr>
+
+  <% expenses.with_drop_down_custom_field_id(FieldDropDownItem.find_by(field_key: "telephone_fooding_and_laundry_expenses")).each do |expense| %>
   <tr height=21 style='height:16.0pt'>
     <td height=21 style='height:16.0pt'></td>
-    <td class=xl171 width=89 style='width:67pt'>&nbsp;</td>
-    <td class=xl172 style='border-left:none'>&nbsp;</td>
-    <td class=xl173 width=188 style='border-left:none;width:141pt'>&nbsp;</td>
-    <td colspan=2 class=xl251 width=221 style='border-left:none;width:166pt'>&nbsp;</td>
-    <td colspan=2 class=xl252 style='border-left:none'>&nbsp;</td>
-    <td class=xl177 style='border-left:none'>&nbsp;</td>
-    <td class=xl178 style='border-left:none'>&nbsp;</td>
+    <td class=xl171 width=89 style='width:67pt'><%= expense.custom_fields.with_field_key("from_date").first&.string_value %>&nbsp;</td>
+    <td class=xl172 style='border-left:none'><%= expense.custom_fields.with_field_key("to_date").first&.string_value %>&nbsp;</td>
+    <td class=xl173 width=188 style='border-left:none;width:141pt'><%= expense.custom_fields.with_field_key("no_of_days").first&.string_value %>&nbsp;</td>
+    <td colspan=2 class=xl251 width=221 style='border-left:none;width:166pt'><%= expense.custom_fields.with_field_key("telephone_exp").first&.string_value %>&nbsp;</td>
+    <td colspan=2 class=xl252 style='border-left:none'><%= expense.custom_fields.with_field_key("fooding").first&.string_value %>&nbsp;</td>
+    <td class=xl177 style='border-left:none'><%= expense.custom_fields.with_field_key("laundry").first&.string_value %>&nbsp;</td>
+    <td class=xl178 style='border-left:none'><%= expense.note %>&nbsp;</td>
     <td></td>
   </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td class=xl180 width=89 style='border-top:none;width:67pt'>&nbsp;</td>
-    <td class=xl180 width=131 style='border-top:none;width:98pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none'>&nbsp;</td>
-    <td colspan=2 class=xl163 width=221 style='border-left:none;width:166pt'>&nbsp;</td>
-    <td colspan=2 class=xl253 style='border-right:.5pt solid black;border-left:
-        none'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=21 style='height:16.0pt'>
-    <td height=21 style='height:16.0pt'></td>
-    <td class=xl180 width=89 style='border-top:none;width:67pt'>&nbsp;</td>
-    <td class=xl180 width=131 style='border-top:none;width:98pt'>&nbsp;</td>
-    <td class=xl169 style='border-top:none'>&nbsp;</td>
-    <td colspan=2 class=xl163 width=221 style='border-left:none;width:166pt'>&nbsp;</td>
-    <td colspan=2 class=xl253 style='border-right:.5pt solid black;border-left:
-        none'>&nbsp;</td>
-    <td class=xl169 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl164 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
+  <% end %>
+
   <tr height=23 style='height:17.0pt'>
     <td height=23 style='height:17.0pt'></td>
     <td class=xl165 style='border-top:none'>&nbsp;</td>
     <td class=xl179 style='border-top:none;border-left:none'>&nbsp;</td>
     <td class=xl166 style='border-top:none;border-left:none'>Total</td>
-    <td colspan=2 class=xl229 width=221 style='border-left:none;width:166pt'>0</td>
+    <td colspan=2 class=xl229 width=221 style='border-left:none;width:166pt'></td>
     <td colspan=2 class=xl250 style='border-left:none'>&nbsp;</td>
-    <td class=xl166 align=right style='border-top:none;border-left:none'>0</td>
+    <td class=xl166 align=right style='border-top:none;border-left:none'></td>
     <td class=xl168 style='border-top:none;border-left:none'>&nbsp;</td>
     <td></td>
   </tr>
+
   <tr height=21 style='mso-height-source:userset;height:16.0pt'>
     <td height=21 style='height:16.0pt'></td>
     <td colspan=8 class=xl223 width=1039 style='width:779pt'>V) MISCELLANEOUS
       EXPENSES</td>
-    <td class=xl215 width=188 style='width:141pt'>33c8eea096c536dc</td>
+    <td class=xl215 width=188 style='width:141pt'></td>
     <td></td>
   </tr>
   <tr height=20 style='height:15.0pt'>
@@ -3584,39 +3443,24 @@
     <td class=xl101 width=188 style='border-left:none;width:141pt'>Remarks</td>
     <td></td>
   </tr>
+  <% expenses.with_drop_down_custom_field_id(FieldDropDownItem.find_by(field_key: "miscellaneous_expenses")).each_with_index do |expense, index| %>
   <tr height=20 style='height:15.0pt'>
     <td height=20 style='height:15.0pt'></td>
-    <td class=xl72 width=89 style='border-top:none;width:67pt'>1</td>
-    <td class=xl187 width=131 style='width:98pt'>&nbsp;</td>
-    <td colspan=5 class=xl73 width=708 style='border-left:none;width:531pt'>&nbsp;</td>
-    <td class=xl75 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl76 style='border-top:none;border-left:none'>&nbsp;</td>
+    <td class=xl72 width=89 style='border-top:none;width:67pt'><%= index + 1 %> </td>
+    <td class=xl187 width=131 style='width:98pt'><%= expense.date %>&nbsp;</td>
+    <td colspan=5 class=xl73 width=708 style='border-left:none;width:531pt'><%= expense.custom_fields.with_field_key("miscellaneous_particulars").first&.string_value %>&nbsp;</td>
+    <td class=xl75 style='border-top:none;border-left:none'><%= expense.amount_value %>&nbsp;</td>
+    <td class=xl76 style='border-top:none;border-left:none'><%= expense.note %>&nbsp;</td>
     <td></td>
   </tr>
-  <tr height=20 style='height:15.0pt'>
-    <td height=20 style='height:15.0pt'></td>
-    <td class=xl72 width=89 style='border-top:none;width:67pt'>&nbsp;</td>
-    <td class=xl92 width=131 style='width:98pt'>&nbsp;</td>
-    <td colspan=5 class=xl73 width=708 style='border-left:none;width:531pt'>&nbsp;</td>
-    <td class=xl75 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl76 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
-  <tr height=20 style='height:15.0pt'>
-    <td height=20 style='height:15.0pt'></td>
-    <td class=xl72 width=89 style='border-top:none;width:67pt'>&nbsp;</td>
-    <td class=xl73 width=131 style='border-top:none;border-left:none;width:98pt'>&nbsp;</td>
-    <td colspan=5 class=xl73 width=708 style='border-left:none;width:531pt'>&nbsp;</td>
-    <td class=xl75 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td class=xl76 style='border-top:none;border-left:none'>&nbsp;</td>
-    <td></td>
-  </tr>
+  <% end %>
+
   <tr height=21 style='height:16.0pt'>
     <td height=21 style='height:16.0pt'></td>
     <td class=xl79 width=89 style='border-top:none;width:67pt'>&nbsp;</td>
     <td class=xl80 width=131 style='border-top:none;border-left:none;width:98pt'>&nbsp;</td>
     <td colspan=5 class=xl249 width=708 style='border-left:none;width:531pt'>Total</td>
-    <td class=xl77 align=right style='border-top:none;border-left:none'>0</td>
+    <td class=xl77 align=right style='border-top:none;border-left:none'></td>
     <td class=xl78 style='border-top:none;border-left:none'>&nbsp;</td>
     <td></td>
   </tr>

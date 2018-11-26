@@ -61,7 +61,7 @@ class CustomField < ActiveRecord::Base
     where(field_configuration_id: drop_down_field_config_ids)
   }
 
-  scope :with_field_key, ->(key) { where field_key: key }
+  scope :with_field_key, -> (key) { where field_key: key }
 
   before_save :set_field_key
 
