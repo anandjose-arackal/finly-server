@@ -60,4 +60,12 @@ json.array! @result.paginated_procurements do |p|
       json.merge! document.procurement_index_details
     end
   end
+
+  json.attachments do
+    json.array! p.attached_documents do |attachment|
+      json.extract! attachment, :id
+      json.file_name attachment.file_file_name
+      json.url attachment.file.url
+    end
+  end
 end
