@@ -80,7 +80,7 @@ class CustomField::SetFields < CustomField::Base
   end
 
   def process
-    
+
     if self.reset
       # in this case we can reset the custom fields by destroying all existing custom fields and recreating them
       # from the field configurations set

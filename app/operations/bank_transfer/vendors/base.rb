@@ -37,9 +37,9 @@ class BankTransfer::Vendors::Base < BaseOperation
     )
   end
 
-  def validate_custom_fields
+  def validate_custom_fields(reset_fields = false)
     if self.vendor.valid?
-      set_fields = set_custom_fields false
+      set_fields = set_custom_fields false, reset_fields
       unless set_fields.success?
         add_message :error, set_fields.messages[:error]
         return
@@ -52,10 +52,10 @@ class BankTransfer::Vendors::Base < BaseOperation
     end
   end
 
-  def set_custom_fields(save)
+  def set_custom_fields(save, reset_fields = false)
     custom_fields = {custom_fields: (params[:custom_fields] or params[:expense][:custom_fields])}
     custom_fields[:user] = user
-    custom_fields[:reset_fields] = true
+    custom_fields[:reset_fields] = reset_fields
     custom_fields[:save] = save
     CustomField::SetFields.(self.vendor, FieldParentType.id_for(:vendor), custom_fields)
   end
