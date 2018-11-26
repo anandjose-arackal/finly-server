@@ -81,6 +81,8 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
       self.vendor.update(authorized: true)
     else
       self.vendor = company.yes_bank_vendors.build(vendor_parameters)
+      validate_custom_fields
+      return if has_errors?
       unless self.vendor.save
         add_message :error, vendor.errors.full_messages
       end

@@ -57,7 +57,8 @@ class CustomField::SetFields < CustomField::Base
           FieldParentType.id_for(:purchase_order)].include?(parent_type_id)
         # For reports and money requests
         self.field_configurations = item.user.company.field_configurations.exclude_deleted
-      elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item), FieldParentType.id_for(:purchase_order), FieldParentType.id_for(:vendor)].include?(parent_type_id)
+      elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item),
+             FieldParentType.id_for(:purchase_order), FieldParentType.id_for(:vendor)].include?(parent_type_id)
         self.field_configurations = current_company.field_configurations.exclude_deleted
       elsif FieldParentType.expense_ids.include?(parent_type_id)
         # For expenses
@@ -79,7 +80,7 @@ class CustomField::SetFields < CustomField::Base
   end
 
   def process
-
+    
     if self.reset
       # in this case we can reset the custom fields by destroying all existing custom fields and recreating them
       # from the field configurations set
