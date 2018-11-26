@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181126072754) do
+ActiveRecord::Schema.define(version: 20181123151206) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -1877,16 +1877,6 @@ ActiveRecord::Schema.define(version: 20181126072754) do
 
   add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
 
-  create_table "custom_export_configurations", force: :cascade do |t|
-    t.integer  "configurable_id",       limit: 4
-    t.string   "configurable_type",     limit: 255
-    t.boolean  "custom_report"
-    t.boolean  "custom_invoice"
-    t.boolean  "custom_purchase_order"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-  end
-
   create_table "custom_fields", force: :cascade do |t|
     t.integer  "field_configuration_id", limit: 4,   null: false
     t.integer  "parent_id",              limit: 4
@@ -2532,7 +2522,6 @@ ActiveRecord::Schema.define(version: 20181126072754) do
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
     t.boolean  "is_deleted",                         default: false
-    t.string   "field_key",              limit: 255
   end
 
   add_index "field_drop_down_items", ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id", using: :btree
@@ -4861,7 +4850,6 @@ ActiveRecord::Schema.define(version: 20181126072754) do
     t.string   "action",           limit: 255, null: false
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
-    t.string   "view",             limit: 255
   end
 
   add_index "tracker_events", ["action"], name: "index_tracker_events_on_action", using: :btree
@@ -4869,22 +4857,6 @@ ActiveRecord::Schema.define(version: 20181126072754) do
   add_index "tracker_events", ["controller"], name: "index_tracker_events_on_controller", using: :btree
   add_index "tracker_events", ["path"], name: "index_tracker_events_on_path", using: :btree
   add_index "tracker_events", ["tracker_visit_id"], name: "index_tracker_events_on_tracker_visit_id", using: :btree
-
-  create_table "tracker_notifications", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4,   null: false
-    t.integer  "company_id", limit: 4,   null: false
-    t.string   "app",        limit: 255
-    t.string   "device",     limit: 255
-    t.string   "view",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "tracker_notifications", ["app"], name: "index_tracker_notifications_on_app", using: :btree
-  add_index "tracker_notifications", ["company_id"], name: "index_tracker_notifications_on_company_id", using: :btree
-  add_index "tracker_notifications", ["device"], name: "index_tracker_notifications_on_device", using: :btree
-  add_index "tracker_notifications", ["user_id"], name: "index_tracker_notifications_on_user_id", using: :btree
-  add_index "tracker_notifications", ["view"], name: "index_tracker_notifications_on_view", using: :btree
 
   create_table "tracker_visits", force: :cascade do |t|
     t.integer  "user_id",          limit: 4
@@ -6051,8 +6023,6 @@ ActiveRecord::Schema.define(version: 20181126072754) do
   add_foreign_key "tax_rates", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
-  add_foreign_key "tracker_notifications", "companies"
-  add_foreign_key "tracker_notifications", "users"
   add_foreign_key "transcribed_expenses", "amounts"
   add_foreign_key "transcribed_expenses", "expenses"
   add_foreign_key "transcribed_expenses", "receipts"

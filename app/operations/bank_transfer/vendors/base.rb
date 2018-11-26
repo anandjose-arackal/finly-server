@@ -36,5 +36,29 @@ class BankTransfer::Vendors::Base < BaseOperation
                                    vendor_attachments_attributes: [:attached_file, :attachment_type, :remove_file],
     )
   end
+
+  def validate_custom_fields(reset_fields = false)
+    if self.vendor.valid?
+      set_fields = set_custom_fields false, reset_fields
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
+      valid = CustomField::Validate.(self.vendor)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return
+      end
+    end
+  end
+
+  def set_custom_fields(save, reset_fields = false)
+    custom_fields = {custom_fields: (params[:custom_fields] or params[:expense][:custom_fields])}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = reset_fields
+    custom_fields[:save] = save
+    CustomField::SetFields.(self.vendor, FieldParentType.id_for(:vendor), custom_fields)
+  end
+
 end
 
