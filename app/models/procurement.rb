@@ -392,6 +392,15 @@ class Procurement < ActiveRecord::Base
     data.sort_by!{ |doc| doc.created_at}.reverse!
   end
 
+  def attached_documents
+    attachments = []
+    if self.purchase_order.present?
+      attachments += self.purchase_order.attachments&.to_a
+    end
+    invoice_attachments = ProcurementAttachment.where(procurement_document_type: 'Invoice', procurement_document_id: self.invoices.pluck(:id))
+    attachments += invoice_attachments.to_a
+  end
+
   def vendor
     type_entity&.vendor
   end
