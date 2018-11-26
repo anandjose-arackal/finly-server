@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181125205152) do
+ActiveRecord::Schema.define(version: 20181126072754) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -894,6 +894,27 @@ ActiveRecord::Schema.define(version: 20181125205152) do
   end
 
   add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
+
+  create_table "budget_modification_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "budget_modification_trails", force: :cascade do |t|
+    t.integer  "budget_id",           limit: 4
+    t.integer  "action_user_id",      limit: 4
+    t.integer  "action_id",           limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "previous_value",      limit: 255
+    t.string   "current_value",       limit: 255
+    t.string   "changed_column_name", limit: 255
+  end
+
+  add_index "budget_modification_trails", ["action_id"], name: "index_budget_modification_trails_on_action_id", using: :btree
+  add_index "budget_modification_trails", ["action_user_id"], name: "index_budget_modification_trails_on_action_user_id", using: :btree
+  add_index "budget_modification_trails", ["budget_id"], name: "index_budget_modification_trails_on_budget_id", using: :btree
 
   create_table "budget_rule_category_mappings", force: :cascade do |t|
     t.integer  "budget_rule_id", limit: 4, null: false
@@ -1856,6 +1877,16 @@ ActiveRecord::Schema.define(version: 20181125205152) do
 
   add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
 
+  create_table "custom_export_configurations", force: :cascade do |t|
+    t.integer  "configurable_id",       limit: 4
+    t.string   "configurable_type",     limit: 255
+    t.boolean  "custom_report"
+    t.boolean  "custom_invoice"
+    t.boolean  "custom_purchase_order"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
   create_table "custom_fields", force: :cascade do |t|
     t.integer  "field_configuration_id", limit: 4,   null: false
     t.integer  "parent_id",              limit: 4
@@ -2184,6 +2215,14 @@ ActiveRecord::Schema.define(version: 20181125205152) do
   add_index "enforce_budget_configurations", ["company_id"], name: "index_enforce_budget_configurations_on_company_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
+    t.boolean  "enabled"
+    t.integer  "enforceable_id",   limit: 4
+    t.string   "enforceable_type", limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  create_table "enforce_policy_configurations", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
     t.boolean  "enabled"
@@ -2191,7 +2230,7 @@ ActiveRecord::Schema.define(version: 20181125205152) do
     t.datetime "updated_at",                   null: false
   end
 
-  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
+  add_index "enforce_policy_configurations", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
 
   create_table "expense_data_extract_sources", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -2493,6 +2532,7 @@ ActiveRecord::Schema.define(version: 20181125205152) do
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
     t.boolean  "is_deleted",                         default: false
+    t.string   "field_key",              limit: 255
   end
 
   add_index "field_drop_down_items", ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id", using: :btree
@@ -4813,6 +4853,7 @@ ActiveRecord::Schema.define(version: 20181125205152) do
   add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
 
   create_table "tracker_events", force: :cascade do |t|
+    t.integer  "tracker_visit_id", limit: 4,   null: false
     t.string   "http_method",      limit: 255
     t.string   "app",              limit: 255
     t.string   "path",             limit: 255
@@ -4820,7 +4861,6 @@ ActiveRecord::Schema.define(version: 20181125205152) do
     t.string   "action",           limit: 255, null: false
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
-    t.integer  "tracker_visit_id", limit: 4
     t.string   "view",             limit: 255
   end
 
@@ -4828,6 +4868,7 @@ ActiveRecord::Schema.define(version: 20181125205152) do
   add_index "tracker_events", ["app"], name: "index_tracker_events_on_app", using: :btree
   add_index "tracker_events", ["controller"], name: "index_tracker_events_on_controller", using: :btree
   add_index "tracker_events", ["path"], name: "index_tracker_events_on_path", using: :btree
+  add_index "tracker_events", ["tracker_visit_id"], name: "index_tracker_events_on_tracker_visit_id", using: :btree
 
   create_table "tracker_notifications", force: :cascade do |t|
     t.integer  "user_id",    limit: 4,   null: false
@@ -4850,14 +4891,19 @@ ActiveRecord::Schema.define(version: 20181125205152) do
     t.integer  "company_id",       limit: 4
     t.string   "ip",               limit: 255,                             null: false
     t.string   "ip_type",          limit: 255
-    t.text     "user_agent",       limit: 65535
+    t.string   "user_agent",       limit: 255
     t.text     "referrer",         limit: 65535
     t.string   "referring_domain", limit: 255
     t.text     "landing_page",     limit: 65535
     t.string   "device",           limit: 255
     t.string   "browser",          limit: 255
     t.string   "os",               limit: 255
+    t.string   "os_version",       limit: 255
+    t.string   "app_version",      limit: 255
     t.string   "device_type",      limit: 255
+    t.string   "platform",         limit: 255
+    t.string   "screen_height",    limit: 255
+    t.string   "screen_width",     limit: 255
     t.string   "continent_name",   limit: 255
     t.string   "continent_code",   limit: 255
     t.string   "country_name",     limit: 255
@@ -4876,11 +4922,6 @@ ActiveRecord::Schema.define(version: 20181125205152) do
     t.datetime "started_at",                                               null: false
     t.datetime "created_at",                                               null: false
     t.datetime "updated_at",                                               null: false
-    t.string   "platform",         limit: 255
-    t.string   "app_version",      limit: 255
-    t.string   "os_version",       limit: 255
-    t.string   "screen_height",    limit: 255
-    t.string   "screen_width",     limit: 255
   end
 
   add_index "tracker_visits", ["company_id"], name: "index_tracker_visits_on_company_id", using: :btree
@@ -5748,6 +5789,7 @@ ActiveRecord::Schema.define(version: 20181125205152) do
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
   add_foreign_key "budget_criteria_mappings", "budgets"
+  add_foreign_key "budget_modification_trails", "budgets"
   add_foreign_key "budget_rule_category_mappings", "budget_rules"
   add_foreign_key "budget_rule_category_mappings", "categories"
   add_foreign_key "budget_rule_field_mappings", "budget_rules"

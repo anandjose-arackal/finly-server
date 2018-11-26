@@ -51,11 +51,12 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
   # Usage
   # Example: Exporter::Pdf.new(user, {template: 'report.pdf.erb', filename: 'assign_card', local_variables: {report: self.report}}, messages)
   class Exporter::Pdf < Exporter::BaseSuccessPresenter
-    attr_accessor :template, :local_variables
+    attr_accessor :template, :local_variables, :layout
 
     def init
       super
       self.template = params[:template]
+      self.layout = params[:layout]
       self.local_variables = params[:local_variables]
     end
 
@@ -76,7 +77,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
         raise 'PDF template not found'
         return
       end
-      controller.render pdf: self.filename, layout: self.template, print_media_type: true, locals: local_variables
+      controller.render pdf: self.filename, layout: self.layout, template: self.template, print_media_type: true, locals: local_variables
     end
 
   end
