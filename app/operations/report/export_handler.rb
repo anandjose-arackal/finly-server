@@ -19,7 +19,7 @@ class Report::ExportHandler < Report::Show
         receipts: self.receipts,
         includes_comments: true
       }
-      if self.user.company.custom_export_configuration.custom_report && File.exists?("#{Rails.root}/views/export/report_#{self.user.company_id}")
+      if self.user.company.custom_export_configuration.custom_report && File.exists?("#{Rails.root}/app/views/export/report_#{self.user.company_id}.pdf.erb")
         self.template = "export/report_#{self.user.company_id}"
       else
         self.template = "export/report"
