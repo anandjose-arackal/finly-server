@@ -5,16 +5,25 @@ class TrackerListener
   VISIT_DURATION = 30.minutes
 
   # FILE_LOGGER = Logger.new(Rails.root.join('log/verify_handler.log'))
-  LOGGER = Logger.new(STDOUT)
+  if Rails.env.production?
+    LOGGER = Logger.new(Rails.root.join('log/tracker_listener.log'))
+    ERROR_LOGGER = Logger.new(Rails.root.join('log/tracker_listener_error.log'))
+  else
+    LOGGER = Logger.new(STDOUT)
+    ERROR_LOGGER = LOGGER
+  end
 
-  def self.add_event(user_id, device, app, path, controller, action, remote_ip, method, datetime)
+  def self.add_event(request)
     # Track only if user is present
-    return false if user_id.blank? or remote_ip.blank?
-    visit = TrackerVisit.with_user_id(user_id).with_device(device).with_ip(remote_ip).started_after(max_last_visit_time(datetime))&.first
+    return false if request.user_id.blank? or request.remote_ip.blank?
+    datetime = DateTime.parse(request.started_at)
+    visit = TrackerVisit.with_user_id(request.user_id).with_device(request.device).with_ip(request.remote_ip).started_after(max_last_visit_time(datetime))&.first
     return false unless visit
     # Log visit
-    event = visit.events.build app: app, path: path, controller: controller, action: action, http_method: method
-    event.valid? and event.save
+    event = visit.events.build app: request.app, path: request.path, controller: request.controller, action: request.action, http_method: request.method
+    return false unless event.valid? and event.save
+    send_to_collector request, visit&.id
+    true
   end
 
   def self.enqueue(request, params, company_id, user_id, device, app)
@@ -36,10 +45,37 @@ class TrackerListener
         os_version: params[:os_version],
         screen_height: params[:screen_height],
         screen_width: params[:screen_width],
+        view: params[:view],
         started_at: DateTime.now.to_s
     }
 
     Resque.enqueue TrackerListener, args
+  end
+
+  def self.send_to_collector(request, session_id=nil)
+    return unless Rails.env.production?
+    emitter = SnowplowTracker::Emitter.new('collector.finly.io', {protocol: 'https', port: 443})
+    tracker = SnowplowTracker::Tracker.new(emitter)
+    tracker.set_user_id(request.user_id&.to_s)
+    tracker.set_useragent(request.user_agent)
+    tracker.set_ip_address(request.remote_ip)
+
+    tracker.track_self_describing_event(SnowplowTracker::SelfDescribingJson.new(
+        "iglu:io.finly/product_context/jsonschema/1-0-0",
+        {
+            "companyId" => request.company_id,
+            "companyName" => Company.find_by(id: request.company_id)&.name,
+            "userId" => request.user_id,
+            "userName" => User.find_by(id: request.user_id)&.name,
+            "app" => request.app,
+            "view" => request.view,
+            "device" => request.device,
+            "requestMethod" => request.method,
+            "controller" => request.controller,
+            "action" => request.action,
+            "visit_id" => session_id&.to_s
+        }
+    ))
   end
 
   def self.max_last_visit_time(datetime)
@@ -58,8 +94,18 @@ class TrackerListener
         LOGGER.info "New request : #{args['controller']}/##{args['action']}"
         request = TrackerListener::VisitProperties.new args
 
+
+        if request.controller == 'notifications' && request.action == 'unread'
+          user = User.find_by(id: request.user_id)
+          if user
+            user.tracker_notifications.create company: user.company, app: request.app, device: request.device, view: request.view
+            send_to_collector request
+          end
+          next
+        end
+
         # As servers can handle multiple concurrent requests, to prevent multiple visits from being created, run add_event again
-        if add_event request.user_id, request.device, request.app, request.path, request.controller, request.action, request.remote_ip, request.method, DateTime.parse(request.started_at)
+        if add_event request
           LOGGER.info "Part of existing visit. Event added"
           next
         end
@@ -71,18 +117,24 @@ class TrackerListener
         end
         visit.save
         LOGGER.info "Created visit with ID #{visit.id}"
-        event = visit.events.build app: request.app, path: request.path, controller: request.controller, action: request.action, http_method: request.method
+        event = visit.events.build app: request.app, path: request.path, controller: request.controller, action: request.action, http_method: request.method, view: request.view
         unless event.valid?
           LOGGER.info "Failed to create event. Reason : #{event.errors.full_messages}"
           next
         end
         event.save
+
+        send_to_collector request, visit&.id
+
         LOGGER.info "Created event with ID #{event.id}"
       end
     rescue SystemExit, Interrupt
       LOGGER.info 'Scheduling Exit'
       # LOGGER.info 'Waiting for workers to complete'
       LOGGER.info 'Bye'
+    rescue Exception => e
+      ERROR_LOGGER.error e.message
+      ERROR_LOGGER.error e.backtrace.join("\n")
     end
   end
 
@@ -90,7 +142,7 @@ class TrackerListener
     attr_accessor :args, :company_id, :user_id, :device, :app, :path,
                   :method, :controller, :action, :referrer, :landing_page,
                   :remote_ip, :platform, :app_version, :os_version, :screen_height,
-                  :screen_width, :user_agent, :started_at
+                  :screen_width, :user_agent, :started_at, :view
 
     def initialize(args)
       self.args = args
@@ -112,6 +164,7 @@ class TrackerListener
       self.screen_width = args['screen_width']
       self.user_agent = args['user_agent']
       self.started_at = args['started_at']
+      self.view = args['view']
     end
 
     def visit_attrs

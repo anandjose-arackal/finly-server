@@ -344,6 +344,7 @@ class ApplicationController < ActionController::Base
     user_id = current_user&.id
     # Track only if user is present
     return if user_id.blank? or request.remote_ip.blank?
+    return unless current_user.class.name == User.name
     # Create new visit in background
     TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
   end
