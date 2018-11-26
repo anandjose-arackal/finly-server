@@ -80,29 +80,6 @@ class CustomField::SetFields < CustomField::Base
 
   def process
 
-    # if self.reset
-    #   item.custom_fields.destroy_all if item.custom_fields.present?
-    #
-    #   required_ids = self.field_configurations.pluck(:id)
-    #   existing_ids = self.item.custom_fields.pluck(:field_configuration_id)
-    #   create_ids = required_ids - existing_ids
-    #
-    #
-    #   if create_ids.present?
-    #     self.field_configurations.enabled.with_id(create_ids).each do |config|
-    #       # If value has not been set but default value is present, set the value as a deep clone of default value
-    #       default_value = nil
-    #       if config.default_value.present?
-    #         default_value =config.default_value.deep_clone
-    #       end
-    #       field = item.custom_fields.build(field_configuration: config, value: default_value)
-    #       if self.save
-    #         field.save
-    #       end
-    #     end
-    #   end
-    # end
-
     if self.reset
       # in this case we can reset the custom fields by destroying all existing custom fields and recreating them
       # from the field configurations set
