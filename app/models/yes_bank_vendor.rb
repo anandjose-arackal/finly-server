@@ -44,6 +44,7 @@ class YesBankVendor < ActiveRecord::Base
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   # Requirement first shared by olx
   # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy

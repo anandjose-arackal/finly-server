@@ -142,6 +142,10 @@ class Budget < ActiveRecord::Base
     end
   }
 
+  scope :without_id, -> (id) {
+    where.not(id: id)
+  }
+
   scope :include_details, -> {
     includes([
                  # :budget_criteria_mappings,

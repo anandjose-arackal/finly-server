@@ -36,7 +36,8 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
 
   class BankTransfer::Vendors::Transfers::Show::AccountOwnersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receiving_transactions, :bank_accounts, :account_owner, :actions, :procurement_data
+    attr_accessor :receiving_transactions, :bank_accounts, :account_owner, :actions, :procurement_data,
+                  :custom_fields
 
     def init
       self.receiving_transactions = params[:receiving_transactions]
@@ -47,6 +48,7 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
 
       if self.account_owner.is_a?(YesBankVendor)
         self.procurement_data = get_procurement_data
+        self.custom_fields = self.account_owner.custom_fields
       end
     end
 
