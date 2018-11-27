@@ -64,7 +64,7 @@
       <tr style="height:13.0pt">
         <td height="15"  style="height:13.0pt; background: silver">PROJECT NAME :</td>
         <td width="25%" style="background: silver">
-          <%= report_custom_fields.with_field_key("report_project_name").first&.value %>
+          <%= report_custom_fields.with_field_key("project_name").first&.value %>
         </td>
         <td>Employee Category / Band</td>
         <td width ="25%"></td>
@@ -73,7 +73,7 @@
       <tr style="height:13.0pt">
         <td height="17"  style="height:13.0pt;">Activity Code :</td>
         <td width="25%">
-          <%= report_custom_fields.with_field_key("report_activity_code").first&.value %>
+          <%= report_custom_fields.with_field_key("activity_code").first&.value %>
         </td>
         <td></td>
         <td width ="25%"></td>
@@ -100,11 +100,11 @@
         <% expenses.each do |expense| %>
           <tr>
             <td><%= expense.date %></td>
-            <td><%= expense.custom_fields.with_field_key("from").first&.string_value  %></td>
-            <td><%= expense.custom_fields.with_field_key("to").first&.string_value  %></td>
+            <td><%= expense.custom_fields.with_field_key("conveyance_from").first&.string_value  %></td>
+            <td><%= expense.custom_fields.with_field_key("conveyance_to").first&.string_value  %></td>
             <td><%= expense.custom_fields.with_field_key("purpose_of_travel").first&.string_value  %></td>
             <td><%= expense.custom_fields.with_field_key("mode_of_conveyance").first&.string_value  %></td>
-            <td><%= expense.custom_fields.with_field_key("distance").first&.string_value  %></td>
+            <td><%= expense.custom_fields.with_field_key("kms_travelled").first&.string_value  %></td>
             <td><%= expense.amount_value %></td>
           </tr>
         <% end %>

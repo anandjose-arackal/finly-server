@@ -84,10 +84,10 @@
           <% expenses.each do |expense| %>
             <tr>
               <td><%= row_number+=1 %></td>
-              <td><%  %></td>
+              <td><%= expense.custom_fields.with_field_key("bill_no").first&.string_value  %></td>
               <td><%= expense.date %></td>
-              <td><%= expense.custom_fields.with_field_key.("report_project_name").first&.string_value   %></td>
-              <td><%= expense.custom_fields.with_field_key.("report_activity_code").first&.string_value  %></td>
+              <td><%= expense.custom_fields.with_field_key("project_name").first&.string_value   %></td>
+              <td><%= expense.custom_fields.with_field_key("activity_code").first&.string_value  %></td>
               <td><%= expense.note %></td>
               <td><%= expense.expense_type_name %></td>
               <td><%= expense.amount_value %></td>
