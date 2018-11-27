@@ -28,7 +28,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
         self.budgets = op.budget_data
       end
     end
-    if current_company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.empty?
+    if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.empty?
       add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
       return
     end
