@@ -64,7 +64,7 @@
       <tr style="height:13.0pt">
         <td height="15"  style="height:13.0pt; background: silver">PROJECT NAME :</td>
         <td width="25%" style="background: silver">
-          <%= report_custom_fields.with_field_key("project_name").first&.value %>
+          <%= report_custom_fields.with_field_key("project_name").first&.string_value %>
         </td>
         <td>Employee Category / Band</td>
         <td width ="25%"></td>
@@ -73,7 +73,7 @@
       <tr style="height:13.0pt">
         <td height="17"  style="height:13.0pt;">Activity Code :</td>
         <td width="25%">
-          <%= report_custom_fields.with_field_key("activity_code").first&.value %>
+          <%= report_custom_fields.with_field_key("activity_code").first&.string_value %>
         </td>
         <td></td>
         <td width ="25%"></td>
