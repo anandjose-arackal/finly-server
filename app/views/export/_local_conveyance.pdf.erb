@@ -1,0 +1,141 @@
+
+<style>
+  table {
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  table#tbl-name td,
+  table#tbl-name tr{
+    height: 17.5pt;
+  }
+  table#tbl-expanses,
+  table#tbl-expanses td,
+  table#tbl-expanses th,
+  table#tbl-expanses tr{
+    border: 1.0pt solid black;
+  }
+  th{
+    font-weight: 100;
+    font-family: Sans-Serif;
+  }
+
+  td {
+    overflow-wrap: break-word;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  .image_with_text {
+    border: 1px black;
+    height: 300px;
+  }
+
+</style>
+
+<div class="container-fluid" style="font-family: Arial, sans-serif;">
+  <% report_custom_fields = report.custom_fields %>
+  <% expenses = report.expenses %>
+  <div class="row">
+    <div style="float: right">
+      <%# url = report.user.company.configuration.logo.url %>
+      <img src=<%#=url%> class="img-responsive" style="height: 50px; width:100px; display: inline;float: right">
+    </div>
+    <div style="text-align:center; font-size: 16.0pt; font-weight: 700">
+      Conveyance Voucher
+    </div>
+    <% report_custom_fields = report.custom_fields %>
+    <% expenses = report.expenses %>
+    <table id="tbl-name" style="width:900px">
+      <tr style="height:13.0pt">
+        <td height="17"  style="height:13.0pt">Employee Name :</td>
+        <td width="25%"><%= report.user.name %></td>
+        <td>Date :</td>
+        <td width ="25%"></td>
+        <td></td>
+      </tr>
+      <tr style="height:13.0pt">
+        <td height="17"  style="height:13.0pt">Dept:</td>
+        <td width="25%"> </td>
+        <td>Designation :</td>
+        <td width ="25%"></td>
+        <td></td>
+      </tr>
+      <tr style="height:13.0pt">
+        <td height="15"  style="height:13.0pt; background: silver">PROJECT NAME :</td>
+        <td width="25%" style="background: silver">
+          <%= report_custom_fields.with_field_key("report_project_name").first&.value %>
+        </td>
+        <td>Employee Category / Band</td>
+        <td width ="25%"></td>
+        <td></td>
+      </tr>
+      <tr style="height:13.0pt">
+        <td height="17"  style="height:13.0pt;">Activity Code :</td>
+        <td width="25%">
+          <%= report_custom_fields.with_field_key("report_activity_code").first&.value %>
+        </td>
+        <td></td>
+        <td width ="25%"></td>
+        <td></td>
+      </tr>
+      <tr></tr>
+    </table>
+
+    <div class="col-sm-12">
+      <table id="tbl-expanses" width="980">
+        <thead class="custom-border">
+        <tr>
+          <th> Date</th>
+          <th> From</th>
+          <th> To</th>
+          <th style="background: silver"> Purpose of Travel</th>
+          <th> Mode of Conveyance </th>
+          <th> Kms. Travelled</th>
+          <th> Amount </th>
+        </tr>
+        </thead>
+        <tbody>
+        <% row_number = 0 %>
+        <% expenses.each do |expense| %>
+          <tr>
+            <td><%= expense.date %></td>
+            <td><%= expense.custom_fields.with_field_key("from").first&.string_value  %></td>
+            <td><%= expense.custom_fields.with_field_key("to").first&.string_value  %></td>
+            <td><%= expense.custom_fields.with_field_key("purpose_of_travel").first&.string_value  %></td>
+            <td><%= expense.custom_fields.with_field_key("mode_of_conveyance").first&.string_value  %></td>
+            <td><%= expense.custom_fields.with_field_key("distance").first&.string_value  %></td>
+            <td><%= expense.amount_value %></td>
+          </tr>
+        <% end %>
+        </tbody>
+        <tfoot>
+        <tr>
+          <td colspan="2"></td>
+          <td> Amount</td>
+          <td colspan="4"> <%= report.total_amount%></td>
+        </tr>
+        </tfoot>
+      </table>
+    </div>
+    <table width="980">
+      <tr height="17" style="height:13.0pt">
+      </tr>
+      <tr height="17" style="height:13.0pt">
+        <td height="17" class="xl67" style="height:13.0pt">Prepared by :<span style="mso-spacerun:yes">&nbsp;</span></td>
+        <td></td>
+        <td >Employee ID:<span style="mso-spacerun:yes">&nbsp;</span></td>
+        <td ></td>
+        <td colspan="2" style="mso-ignore:colspan"></td>
+      </tr>
+      <tr height="17" ></tr>
+      <tr height="17" style="height:13.0pt">
+        <td height="17" style="height:13.0pt">Sactioned by :<span style="mso-spacerun:yes">&nbsp;</span></td>
+        <td></td>
+        <td >Verified by:<span style="mso-spacerun:yes">&nbsp;</span></td>
+        <td ></td>
+        <td colspan="2" style="mso-ignore:colspan"></td>
+      </tr>
+    </table>
+  </div>
+</div>
