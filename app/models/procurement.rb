@@ -413,4 +413,12 @@ class Procurement < ActiveRecord::Base
     end
   end
 
+  def non_po_procurement?
+    self.procurement_type == 'non_po_invoice'
+  end
+
+  def po_procurement?
+    self.procurement_type == 'purchase_order'
+  end
+
 end

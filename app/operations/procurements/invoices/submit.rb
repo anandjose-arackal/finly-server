@@ -22,15 +22,18 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
 
     # checking for configuration on whether this particular company
     # has budgeting enforced or not
-    if self.invoice.items.present?
-      op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
-      if op.success?
-        self.budgets = op.budget_data
+    # this will apply only if this invoice is part of a non-PO
+    if self.invoice.procurement&.non_po_procurement?
+      if self.invoice.items.present?
+        op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
+        if op.success?
+          self.budgets = op.budget_data
+        end
       end
-    end
-    if current_company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.empty?
-      add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
-      return
+      if current_company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.empty?
+        add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
+        return
+      end
     end
   end
 
