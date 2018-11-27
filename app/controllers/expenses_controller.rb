@@ -96,7 +96,20 @@ class ExpensesController < ApplicationController
       else
         # respond response: :failure, message: "Invalid input"
     end
-    respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : "Invalid Input"))
+
+    if current_user.company.id == 129 || current_user.company.id == 1
+      if @result.success?
+        messages = @result.messages
+        @result = Expense::Show.(current_user, params)
+
+        @result.messages = messages
+        respond render: 'show'
+      else
+        respond response: :success
+      end
+    else
+      respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : "Invalid Input"))
+    end
   end
 
   def split_existing
