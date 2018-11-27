@@ -70,6 +70,7 @@ class CustomField::SetFields < CustomField::Base
       end
     end
 
+
     # Retrieve configurations which are set only for items
     if self.field_configurations.present?
       self.field_configurations = self.field_configurations.exclude_deleted.with_parent_type(parent_type_id)
