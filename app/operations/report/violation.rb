@@ -341,6 +341,16 @@ class Report::Violation < Report::Base
   def check_compatible_expenses(expense)
     message = "Expenses are not enabled for the selected policy. Please change the policy of the report or remove the expense"
     case expense.expense_type_id
+    when ExpenseType.id_for(:cash)
+      unless report.policy.cash_expense_config.enabled
+        self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Cash #{message}"}
+        return
+      end
+    when ExpenseType.id_for(:card)
+      unless report.policy.card_expense_config.enabled
+        self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Card #{message}"}
+        return
+      end
     when ExpenseType.id_for(:distance)
       # unless report.policy.distance_expense_config.enabled
       #   self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
