@@ -101,7 +101,7 @@
             <td><%= expense.distance_expense&.locations&.first&.name%></td>
             <td><%= expense.distance_expense&.locations&.last&.name%></td>
             <td><%= expense.note %></td>
-            <td><%= expense.distance_expense&.vehicle_rate&.name %></td>
+            <td><%= expense.distance_expense&.vehicle_rate&.vehicle_name %></td>
             <td><%= expense.distance_expense&.distance&.value  %></td>
             <td><%= expense.amount_value %></td>
           </tr>
