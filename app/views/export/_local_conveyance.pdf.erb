@@ -34,8 +34,6 @@
 </style>
 
 <div class="container-fluid" style="font-family: Arial, sans-serif;">
-  <% report_custom_fields = report.custom_fields %>
-  <% expenses = report.expenses %>
   <div class="row">
     <div style="float: right">
       <%# url = report.user.company.configuration.logo.url %>
@@ -97,7 +95,7 @@
         </thead>
         <tbody>
         <% row_number = 0 %>
-        <% expenses.each do |expense| %>
+        <% expenses.distance_expense.each do |expense| %>
           <tr>
             <td><%= expense.date %></td>
             <td><%= expense.custom_fields.with_field_key("conveyance_from").first&.string_value  %></td>
