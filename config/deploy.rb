@@ -24,9 +24,9 @@ when :itzcash_production
   # todo - configure this for production once everything is set up
 when :aws_production, :background_production
   branch = fetch :branch
-  unless ['staging', :staging].include?(branch)
-    raise 'This branch cannot be deploy to production. Please select the correct branch'
-  end
+  # unless ['staging', :staging].include?(branch)
+  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
+  # end
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'production'
 when :itzcash
@@ -72,7 +72,8 @@ set :puma_preload_app, false
 set :slackistrano, {
     channel: '#general',
     team: 'finlyteam',
-    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj'
+    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj',
+    slack_via_slackbot: true
 }
 
 # before 'disable_secure_storage', 'runner:restart'
