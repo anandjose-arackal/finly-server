@@ -42,22 +42,24 @@ class Personalizer::Adapters::Company118::Procurements118::Invoices118::Submit11
     end
 
     # adding logic for checking if budget is being exceeded
-    budget_exceeded = false
-    self.budgets.each do |budget|
-      budget_amount = budget[:budget].budget_amount.value
-      budget_spent_amount = budget[:spent_amount]
+    if self.invoice.procurement&.non_po_procurement?
+      budget_exceeded = false
+      self.budgets.each do |budget|
+        budget_amount = budget[:budget].budget_amount.value
+        budget_spent_amount = budget[:spent_amount]
 
-      spent_amount = budget_spent_amount
+        spent_amount = budget_spent_amount
 
-      if spent_amount > budget_amount
-        budget_exceeded = false
-        add_message :error, "Invoice Amount exceeding Budget - #{budget[:budget].name}"
+        if spent_amount > budget_amount
+          budget_exceeded = false
+          add_message :error, "Invoice Amount exceeding Budget - #{budget[:budget].name}"
+        end
       end
-    end
 
-    # adding overall message to the user
-    if budget_exceeded
-      add_message :error, 'Please contact finance to allocate more budget'
+      # adding overall message to the user
+      if budget_exceeded
+        add_message :error, 'Please contact finance to allocate more budget'
+      end
     end
   end
 end
