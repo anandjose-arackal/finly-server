@@ -98,11 +98,11 @@
         <% expenses.only_distance_expenses.each do |expense| %>
           <tr>
             <td><%= expense.date %></td>
-            <td><%= expense.custom_fields.with_field_key("conveyance_from").first&.string_value  %></td>
-            <td><%= expense.custom_fields.with_field_key("conveyance_to").first&.string_value  %></td>
-            <td><%= expense.custom_fields.with_field_key("purpose_of_travel").first&.string_value  %></td>
-            <td><%= expense.custom_fields.with_field_key("mode_of_conveyance").first&.string_value  %></td>
-            <td><%= expense.custom_fields.with_field_key("kms_travelled").first&.string_value  %></td>
+            <td><%= expense.distance_expense&.locations&.first&.name%></td>
+            <td><%= expense.distance_expense&.locations&.last&.name%></td>
+            <td><%= expense.note %></td>
+            <td><%= expense.distance_expense&.vehicle_rate&.name %></td>
+            <td><%= expense.distance_expense&.distance&.value  %></td>
             <td><%= expense.amount_value %></td>
           </tr>
         <% end %>
