@@ -72,7 +72,8 @@ set :puma_preload_app, false
 set :slackistrano, {
     channel: '#general',
     team: 'finlyteam',
-    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj'
+    token: 'xoxb-69742039698-481828577170-pL7adrfoCVs74cggPFKiRNhj',
+    slack_via_slackbot: true
 }
 
 # before 'disable_secure_storage', 'runner:restart'
