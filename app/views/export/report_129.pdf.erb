@@ -9,7 +9,7 @@
 
 <% policy_name = report.policy.name.downcase %>
 <% if policy_name.include? "tsf" %>
-  <%= render  partil: "tsf", locals: {report: report} %>
+  <%= render  partial: "tsf", locals: {report: report} %>
 <% elsif policy_name.include? "petty"%>
   <%= render partial: "petty_cash", locals: {report: report}%>
 <% elsif policy_name.include? "conveyance"%>
