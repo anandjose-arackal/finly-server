@@ -120,6 +120,13 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       return
     end
 
+    vehicle_rate = VehicleRate.find_by(id: self.expense_params&.dig(:distance_expense_attributes, :vehicle_rate_id))
+
+    if vehicle_rate&.policy&.distance_expense_config&.enforce_category && !(vehicle_rate&.policy&.distance_expense_config&.default_category)
+      add_message :error, "Category enforcement for Distance expense is enabled but there is no default category"
+      return
+    end
+
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_availability_create(self.cash_pocket, expense_params)
 
@@ -150,6 +157,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     # Create custom fields only for validations. Fields will be saved later
     validate_custom_fields
     return if has_errors?
+
 
     if self.expense.save
       # Attach an existing receipt to the expense
