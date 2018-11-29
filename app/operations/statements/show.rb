@@ -37,10 +37,15 @@ class Statements::Show < Statements::Base
         end
         sel_user = user_presenter.selected_user
         case account_type
-          when :expense_card
-            self.account = sel_user.cards.expense_cards.first
-          when :reimbursement_card
-            self.account = sel_user.cards.reimbursement_cards.first
+          when :expense_card, :reimbursement_card
+            user_presenter = User::Index.(user, params)
+            unless user_presenter.success?
+              add_message :error, user_presenter.messages[:error]
+              return
+            end
+            users = user_presenter.team
+            card_id = params[:card_id]
+            self.account = Card.unscoped.with_user(users.pluck(:id)).with_id(card_id)&.first
           when :finly_money_card_transfer
             self.account = sel_user.wallet
           when :finly_money_bank_transfer
@@ -57,8 +62,6 @@ class Statements::Show < Statements::Base
           return
         end
         users = user_presenter.team
-        # card_id = params[:card_id]
-        # self.account = Card.unscoped.with_user(users.pluck(:id)).with_id(card_id)&.first
         self.account = Card.with_user(users.pluck(:id)).with_proxy(params[:proxy])&.first
     end
 

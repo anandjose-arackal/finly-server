@@ -71,6 +71,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       if document_owner? && (self.invoice.open? || self.invoice.retracted? || self.invoice.rejected?)
         actions[:policy_editable] = get_policy_editable
+        actions[:approval_chain_editable] = true
         actions[:submit] = {
             url: Rails.application.routes.url_helpers.procure_inward_invoice_submit_path(inward_invoice_id: invoice.id),
             method: "PUT"
@@ -121,6 +122,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
           }
           actions[:document_editable] = true
           actions[:policy_editable] = false
+          actions[:approval_chain_editable] = false
         end
 
         if document_owner?
@@ -152,6 +154,10 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       else
         true
       end
+    end
+
+    def get_approval_policy_editable
+
     end
 
     def user_in_level?
