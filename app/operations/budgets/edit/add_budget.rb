@@ -5,8 +5,8 @@ class Budgets::Edit::AddBudget < Budgets::Edit::Base
   end
 
   def process
-    new_amount = self.budget.amount_value + self.amount
-    unless self.budget.amount.update(value: new_amount)
+    new_amount = self.budget.budget_amount.value + self.amount
+    unless self.budget.budget_amount.update(value: new_amount)
       add_message :error, self.budget.errors.full_messages
     end
   end

@@ -11,6 +11,9 @@ class Budgets::ModificationTrails < Budgets::Base
     end
   end
 
+  def pre_validate
+
+  end
 
   def init
     id = params[:id] || params[:budget_id]
