@@ -72,7 +72,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
                                       content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         # the below will be executed only if the company is using Finly's nodal account for processing transactions
-        unless self.company.configuration.current_account_connected?
+        unless self.company.current_account_connected?
           create_refund_payment
         end
         # nulling reimbursements that might have happened through this
