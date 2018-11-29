@@ -49,7 +49,12 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        # Payment with pending transaction will rerun through CronJobs
+        if op.transfer_request.bank_error_message.include? "Error"
+          payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
+        else
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        end
         error_message = op.transfer_request.bank_error_message || op.messages[:error] || "Payment could not be processed at this time"
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
