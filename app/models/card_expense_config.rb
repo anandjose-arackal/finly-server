@@ -2,11 +2,11 @@
 #
 # Table name: card_expense_configs
 #
-#  id                  :integer          not null, primary key
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  enabled             :boolean
-#  policy_id           :integer          not null
+#  id         :integer          not null, primary key
+#  enabled    :boolean          default(TRUE)
+#  policy_id  :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
 #
 
 class CardExpenseConfig < ActiveRecord::Base
