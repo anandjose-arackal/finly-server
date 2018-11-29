@@ -1410,6 +1410,9 @@
 #                                                    ping GET    /ping(.:format)                                                                                                     ping#ping
 #                                            ping_sidekiq GET    /ping/sidekiq(.:format)                                                                                             ping#sidekiq
 #                                           ping_database GET    /ping/database(.:format)                                                                                            ping#database
+#                                       budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
+#                                    budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
+#                                           budget_trails GET    /budgets/:budget_id/modification_trails(.:format)                                                                   budgets#trails
 #                                                 budgets GET    /budgets(.:format)                                                                                                  budgets#index
 #                                                         POST   /budgets(.:format)                                                                                                  budgets#create
 #                                              new_budget GET    /budgets/new(.:format)                                                                                              budgets#new
@@ -3211,7 +3214,11 @@ Rails.application.routes.draw do
   get 'ping/database', to: 'ping#database'
 
   ## Budget apis start ##
-  resources :budgets
+  resources :budgets do
+    patch 'add_budget', to: 'budgets#add_budget', as: :add_budget
+    patch 'reduce_budget', to: 'budgets#reduce_budget', as: :reduce_budget
+    get 'modification_trails', to: 'budgets#trails', as: :trails
+  end
 
 ## Budget apis end ##
 
