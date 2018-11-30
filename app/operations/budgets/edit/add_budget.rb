@@ -10,4 +10,5 @@ class Budgets::Edit::AddBudget < Budgets::Edit::Base
       add_message :error, self.budget.errors.full_messages
     end
   end
+
 end

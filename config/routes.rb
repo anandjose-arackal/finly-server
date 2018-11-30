@@ -1421,6 +1421,7 @@
 #                                                         PATCH  /budgets/:id(.:format)                                                                                              budgets#update
 #                                                         PUT    /budgets/:id(.:format)                                                                                              budgets#update
 #                                                         DELETE /budgets/:id(.:format)                                                                                              budgets#destroy
+#                                      new_budgets_config GET    /new_budget_config(.:format)                                                                                        budgets#new_budgets_config
 #                      procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                       procure/procurements#filter_config
 #                              procure_procurements_count GET    /procure/procurements/count(.:format)                                                                               procure/procurements#count
 #                                    procure_procurements GET    /procure/procurements(.:format)                                                                                     procure/procurements#index
@@ -3219,6 +3220,7 @@ Rails.application.routes.draw do
     patch 'reduce_budget', to: 'budgets#reduce_budget', as: :reduce_budget
     get 'modification_trails', to: 'budgets#trails', as: :trails
   end
+  get 'new_budget_config', to: 'budgets#new_budgets_config', as: :new_budgets_config
 
 ## Budget apis end ##
 
