@@ -1,16 +1,16 @@
 # == Schema Information
 #
-# Table name: document_slice
+# Table name: document_slices
 #
-#  id                  :integer          not null, primary key
-#  page_number         :integer
-#  image_file_name     :string(255)
-#  image_content_type  :string(255)
-#  image_file_size     :integer(4)
-#  image_updated_at    :datetime
-#  receipt_id          :integer(4)
-#  created_at          :datetime
-#  updated_at          :datetime
+#  id                 :integer          not null, primary key
+#  page_number        :integer
+#  image_file_name    :string(255)
+#  image_content_type :string(255)
+#  image_file_size    :integer
+#  image_updated_at   :datetime
+#  receipt_id         :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
 #
 
 class DocumentSlice < ActiveRecord::Base
