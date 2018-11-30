@@ -21,6 +21,7 @@
 
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 

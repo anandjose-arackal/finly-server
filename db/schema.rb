@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181128140328) do
+ActiveRecord::Schema.define(version: 20181129044458) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2154,6 +2154,19 @@ ActiveRecord::Schema.define(version: 20181128140328) do
   add_index "document_number_configs", ["company_id"], name: "index_document_number_configs_on_company_id", using: :btree
   add_index "document_number_configs", ["document_number_config_type_id"], name: "index_document_number_configs_on_document_number_config_type_id", using: :btree
   add_index "document_number_configs", ["purpose_id"], name: "index_document_number_configs_on_purpose_id", using: :btree
+
+  create_table "document_slices", force: :cascade do |t|
+    t.integer  "page_number",        limit: 4
+    t.string   "image_file_name",    limit: 255
+    t.string   "image_content_type", limit: 255
+    t.integer  "image_file_size",    limit: 4
+    t.datetime "image_updated_at"
+    t.integer  "receipt_id",         limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "document_slices", ["receipt_id"], name: "index_document_slices_on_receipt_id", using: :btree
 
   create_table "document_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -5885,6 +5898,7 @@ ActiveRecord::Schema.define(version: 20181128140328) do
   add_foreign_key "document_number_configs", "companies"
   add_foreign_key "document_number_configs", "document_number_config_types"
   add_foreign_key "document_number_configs", "purposes"
+  add_foreign_key "document_slices", "receipts"
   add_foreign_key "e_way_bills", "amounts"
   add_foreign_key "e_way_bills", "companies"
   add_foreign_key "e_way_bills", "payment_terms"

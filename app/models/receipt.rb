@@ -30,6 +30,7 @@ class Receipt < ActiveRecord::Base
 
   has_many :expense_data_extracts, as: :extractable
   has_many :system_messages, as: :messagable, dependent: :destroy
+  has_many :document_slices, dependent: :destroy
 
   validates :user_id, presence: true
 
