@@ -133,9 +133,10 @@ class Budget < ActiveRecord::Base
   }
 
   scope :filter_month, -> (month) {
-    if month.present?
-      where('extract(month from start_date) = ? OR extract(month from end_date) = ?', month, month)
+    if month.blank?
+      month = Date.today.month
     end
+    where('extract(month from start_date) = ? OR extract(month from end_date) = ?', month, month)
   }
 
   scope :filter_search, -> (term) {
