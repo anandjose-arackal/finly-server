@@ -44,4 +44,9 @@ class BudgetsController < ApplicationController
     @result = Budgets::ModificationTrails.(current_user, params)
     respond
   end
+
+  def new_budgets_config
+    @result = Budgets::NewBudgetsConfig.(current_user, params)
+    respond
+  end
 end
