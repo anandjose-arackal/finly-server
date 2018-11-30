@@ -38,3 +38,5 @@ module Finly
     config.active_record.raise_in_transactional_callbacks = true
   end
 end
+
+# Paperclip.options[:command_path] = "/usr/local/bin/"

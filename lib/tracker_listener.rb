@@ -179,16 +179,16 @@ class TrackerListener
       result = Geocoder.search(self.remote_ip)&.first
       {
           ip_type: result&.data&.dig('type'),
-          continent_name: result.continent_name,
-          continent_code: result.continent_code,
-          country_name: result.country_name,
-          country_code: result.country_code,
-          region_code: result.region_code,
-          region_name: result.region_name,
-          latitude: result.latitude,
-          longitude: result.longitude,
-          city: result.city,
-          zip: result.zip
+          continent_name: result&.continent_name,
+          continent_code: result&.continent_code,
+          country_name: result&.country_name,
+          country_code: result&.country_code,
+          region_code: result&.region_code,
+          region_name: result&.region_name,
+          latitude: result&.latitude,
+          longitude: result&.longitude,
+          city: result&.city,
+          zip: result&.zip
       }
     end
 

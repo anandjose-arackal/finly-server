@@ -31,7 +31,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.levels = self.policy.levels.with_entity_type(document_class_name).order(:level_number)
 
     levels.each do |level|
-      mappings = level.level_reviewer_mappings
+      mappings = level.level_reviewer_mappings.non_deleted
 
       selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
       level_data = {
