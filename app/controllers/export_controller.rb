@@ -17,13 +17,12 @@ class ExportController < ApplicationController
         @data = @report.data
       }
       format.pdf {
-        @result = Report::Exporter.(current_user, params)
-        @report = @result.report
-        @skip_receipts = StringUtils.to_bool params[:skip_receipts]
-        @receipts = @result.receipts unless @skip_receipts
-        @curr_user = current_user
-        @include_comments = true
-        render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
+        op = Report::ExportHandler.(current_user, params)
+        local_variables = op.local_variables
+        template = op.template
+        local_variables[:op] = op
+        @result = Exporter::Pdf.new(current_user, {filename: "report-#{op.report.name}", layout: 'pdf.html.erb', template: template, local_variables: local_variables})
+        @result.render(self)
       }
       format.zip {
         @result = Export::Report::WithReceipts.(current_user, params)

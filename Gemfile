@@ -154,6 +154,8 @@ gem 'liquid'
 
 gem 'hooks', '0.4.1'
 
+gem 'snowplow-tracker', '0.6.1'
+
 gem 'bullet', '5.4.2', :group => 'development'
 
 gem 'logstasher', '1.2.2'
@@ -172,6 +174,10 @@ gem 'aws-sdk'
 
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'
+
+gem 'geocoder', '1.5.0'
+gem 'device_detector'
+
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

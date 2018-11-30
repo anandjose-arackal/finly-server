@@ -55,6 +55,8 @@ class BankTransfer::Vendors::Update < BankTransfer::Vendors::Base
   end
 
   def process
+    validate_custom_fields(false)
+    return if has_errors?
     unless vendor.update(vendor_parameters)
       add_message :error, vendor.errors.full_messages
     end

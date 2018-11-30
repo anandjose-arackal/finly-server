@@ -44,6 +44,8 @@ class Budget < ActiveRecord::Base
   has_many :budgetable_users, through: :budget_criteria_mappings, source: :budgetable, source_type: 'User'
   has_many :budgetable_departments, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Department'
 
+  has_many :budget_modification_trails
+
   accepts_nested_attributes_for :budget_amount
   accepts_nested_attributes_for :budget_criteria_mappings
 
@@ -140,6 +142,10 @@ class Budget < ActiveRecord::Base
     if term.present?
       where('name like ?', "%#{term}%")
     end
+  }
+
+  scope :without_id, -> (id) {
+    where.not(id: id)
   }
 
   scope :include_details, -> {

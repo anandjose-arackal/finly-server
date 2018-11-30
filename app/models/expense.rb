@@ -44,6 +44,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
@@ -454,6 +455,25 @@ class Expense < ActiveRecord::Base
       cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
       where(cost_center_id: cost_center_ids)
     end
+  }
+
+  scope :with_drop_down_custom_field_id, -> (drop_down_id) {
+    manual_ids = ManualExpense.where(expense_id: self.only_manual_expenses.pluck(:id)).pluck(:id)
+    card_ids = CardExpense.where(id: self.only_card_expenses.pluck(:id)).pluck(:id)
+    time_ids = TimeExpense.where(id: self.only_time_expenses.pluck(:id)).pluck(:id)
+    distance_ids = DistanceExpense.where(id: self.only_distance_expenses.pluck(:id)).pluck(:id)
+    per_diem_ids = PerDiemExpense.where(id: self.only_per_diem_expenses.pluck(:id)).pluck(:id)
+    custom_fields = CustomField.where('(parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?))',
+                                       "ManualExpense", manual_ids, "CardExpense", card_ids, "TimeExpense", time_ids, "DistanceExpense", distance_ids, "PerDiemExpense", per_diem_ids)
+    relevant_field_drop_down_selection_ids = FieldDropDownSelection.where(id: custom_fields.where(value_type: "FieldDropDownSelection").pluck(:value_id), value_id: drop_down_id).pluck(:id)
+    expense_data = custom_fields.where(value_type: "FieldDropDownSelection", value_id: relevant_field_drop_down_selection_ids).pluck(:parent_type, :parent_id)
+
+    relevant_expense_ids = []
+    expense_data.each do |data|
+      relevant_expense_ids << data.first.constantize.find_by(id: data.second)&.expense_id
+    end
+
+    where(id: relevant_expense_ids)
   }
 
   scope :include_spent_from_calculation, ->{ includes([{amount: [:currency]}], {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]})}

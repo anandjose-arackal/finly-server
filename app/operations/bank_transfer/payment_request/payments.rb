@@ -12,6 +12,8 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
 
     def init
       self.payments = params[:payments]
+
+      self.ordered_payments = self.payments
       # applying scopes for the payments list
       self.payments = apply_scopes(self.payments, params)
 
@@ -27,7 +29,11 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
       # end
       # self.ordered_payments = self.payments_verified + self.payments_unverified
       self.paginated_payments = self.payments.paginate(page: params[:page], per_page: (params[:per_page] || 10))
-      self.unpaid_payments = self.payments.unpaid
+      if current_company.id == 118
+        self.unpaid_payments = []
+      else
+        self.unpaid_payments = self.payments.unpaid
+      end
     end
 
   end

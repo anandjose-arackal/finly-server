@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>
+    Table
+  </title>
+</head>
+
+<% policy_name = report.policy.name.downcase %>
+<% if policy_name.include? "tsf" %>
+  <%= render  partial: "tsf", locals: {report: report} %>
+<% elsif policy_name.include? "petty"%>
+  <%= render partial: "petty_cash", locals: {report: report}%>
+<% elsif policy_name.include? "conveyance"%>
+  <%= render partial: "local_conveyance", locals: {report: report} %>
+<% end %>
+
+</body>
+
+</html>

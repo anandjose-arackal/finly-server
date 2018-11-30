@@ -85,3 +85,6 @@ end
 
 json.actions @result.actions
 
+json.custom_fields do
+  json.array! @result.custom_fields
+end

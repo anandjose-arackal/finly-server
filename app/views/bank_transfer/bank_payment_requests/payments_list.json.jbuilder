@@ -133,7 +133,9 @@ json.payments do
   end
 end
 
+json.payments_count @result.ordered_payments.count
 # non-paginated payments listing all payments in this payment order
+unless current_company.id == 118
 json.unpaid_payments do
   json.array!(@result.unpaid_payments) do |payment|
     json.owner_name payment.receiving_account&.account_owner&.name
@@ -267,4 +269,5 @@ json.unpaid_payments do
       end
     end
   end
+end
 end

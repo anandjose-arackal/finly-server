@@ -209,6 +209,9 @@ class User < ActiveRecord::Base
   has_one :itz_cash_dmt_sender
   has_one :user_permission, dependent: :destroy
 
+  has_many :tracker_visits
+  has_many :tracker_notifications
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping

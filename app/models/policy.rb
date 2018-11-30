@@ -21,6 +21,7 @@
 
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -41,6 +42,8 @@ class Policy < ActiveRecord::Base
   has_one :distance_expense_config
   has_one :time_expense_config
   has_one :per_diem_expense_config
+  has_one :cash_expense_config
+  has_one :card_expense_config
 
   has_many :per_diems, as: :configurable
   has_many :vehicle_rates
