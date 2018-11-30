@@ -33,6 +33,13 @@ class Budgets::Edit::Base < Budgets::Base
                                            current_value: self.budget.budget_amount.value).save
 
     add_message :success, "Budget successfully modified"
+
+    # updating the total of the parent based on if a child's budget was changed
+    if self.budget.ancestry.present?
+      parent_budget = self.budget.parent
+      amount = parent_budget.children.joins(:budget_amount).sum(:value)
+      parent_budget.budget_amount.update(value: amount)
+    end
   end
 
 end
