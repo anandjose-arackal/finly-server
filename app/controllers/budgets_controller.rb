@@ -29,4 +29,19 @@ class BudgetsController < ApplicationController
     @result = Budget::Configuration.(current_user, params)
     respond
   end
+
+  def add_budget
+    @result = Budgets::Edit::AddBudget.(current_user, params)
+    respond_success_failure
+  end
+
+  def reduce_budget
+    @result = Budgets::Edit::ReduceBudget.(current_user, params)
+    respond_success_failure
+  end
+
+  def trails
+    @result = Budgets::ModificationTrails.(current_user, params)
+    respond
+  end
 end
