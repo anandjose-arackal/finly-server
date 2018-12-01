@@ -66,7 +66,7 @@ class User::Wallet::Base < BaseOperation
         self.receiving_user = user
       else
         users = User::Team::Index.(user, params)
-        self.receiving_user = (users.with_id(params[:receiving_user_id]).first rescue nil) if users.present?
+        self.receiving_user = (users.with_id_or_email_or_mobile_number(params[:receiving_user_id]).first rescue nil) if users.present?
       end
     end
 
@@ -96,7 +96,7 @@ class User::Wallet::Base < BaseOperation
           self.receiving_account = receiving_user.wallet
         when :card
           if receiving_account_id.present?
-            self.receiving_account = receiving_user.cards.with_id(receiving_account_id).first rescue nil
+            self.receiving_account = receiving_user.cards.with_id_or_proxy(receiving_account_id).first rescue nil
           end
       end
     end

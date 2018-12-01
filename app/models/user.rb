@@ -236,6 +236,10 @@ class User < ActiveRecord::Base
   validates :user_panel_subscription, presence: true
 
   scope :with_id, ->(user_id) { where id: user_id }
+  scope :with_id_or_email_or_mobile_number, -> (string) {
+    ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
+    where id: ids
+  }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) do
