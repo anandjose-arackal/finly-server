@@ -118,7 +118,12 @@ class Budget < ActiveRecord::Base
   }
 
   scope :contains_date, -> (date) {
-    where('start_date <= ? AND end_date >= ?', Date.parse(date.to_s), Date.parse(date.to_s))
+    if date.present?
+      where('start_date <= ? AND end_date >= ?', Date.parse(date.to_s), Date.parse(date.to_s))
+    else
+      # i.e. return an empty array
+      where(id: [])
+    end
   }
 
   scope :filter_date, -> (date_from, date_to) {
