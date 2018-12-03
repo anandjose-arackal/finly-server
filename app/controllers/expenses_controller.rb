@@ -50,14 +50,26 @@ class ExpensesController < ApplicationController
         return
     end
 
-    if current_user.company.id == 129 || current_user.company.id == 1
+    @expenses = []
+    expense_ids = []
+    if current_user.company.id == 129 || current_user.company.id == 1 || current_user.company.id == 2
       if @result.success?
-        params[:id] = @result.expense&.id
-        messages = @result.messages
-        @result = Expense::Show.(current_user, params)
+        if params[:split]
+          expense_ids += @result.expenses.map(&:id)
+        else
+          expense_ids.push @result.expense&.id
+        end
 
-        @result.messages = messages
-        respond render: 'show'
+        expense_ids.each do |expense_id|
+          params[:id] = expense_id
+          result = Expense::Show.(current_user, params)
+          @expenses.push(result)
+        end
+
+        # params[:id] = @result.expense&.id
+        # @result = Expense::Show.(current_user, params)
+
+        respond
       else
         respond response: :success
       end
