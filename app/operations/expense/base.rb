@@ -199,7 +199,7 @@ class Expense::Base < BaseOperation
 
     def retrieve_violation
       violations = {blocking_present: false, warning_present: false, items: []}
-      if expense.report_id and expense.report.policy
+      if expense.report_id and expense.report&.policy
         violations = Report::Violation.(user, report: expense.report)
         items = violations[expense.id]
         # constructing the violation hash as required
