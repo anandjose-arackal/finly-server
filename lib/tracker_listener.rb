@@ -56,9 +56,9 @@ class TrackerListener
     return unless Rails.env.production?
     emitter = SnowplowTracker::Emitter.new('collector.finly.io', {protocol: 'https', port: 443})
     tracker = SnowplowTracker::Tracker.new(emitter)
-    tracker.set_user_id(request.user_id&.to_s)
-    tracker.set_useragent(request.user_agent)
-    tracker.set_ip_address(request.remote_ip)
+    tracker.set_user_id(request.user_id&.to_s) if request.user_id.present?
+    tracker.set_useragent(request.user_agent) if request.user_agent.present?
+    tracker.set_ip_address(request.remote_ip) if request.remote_ip.present?
 
     tracker.track_self_describing_event(SnowplowTracker::SelfDescribingJson.new(
         "iglu:io.finly/product_context/jsonschema/1-0-0",

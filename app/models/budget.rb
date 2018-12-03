@@ -118,7 +118,12 @@ class Budget < ActiveRecord::Base
   }
 
   scope :contains_date, -> (date) {
-    where('start_date <= ? AND end_date >= ?', Date.parse(date.to_s), Date.parse(date.to_s))
+    if date.present?
+      where('start_date <= ? AND end_date >= ?', Date.parse(date.to_s), Date.parse(date.to_s))
+    else
+      # i.e. return an empty array
+      where(id: [])
+    end
   }
 
   scope :filter_date, -> (date_from, date_to) {
@@ -133,9 +138,10 @@ class Budget < ActiveRecord::Base
   }
 
   scope :filter_month, -> (month) {
-    if month.present?
-      where('extract(month from start_date) = ? OR extract(month from end_date) = ?', month, month)
+    if month.blank?
+      month = Date.today.month
     end
+    where('extract(month from start_date) = ? OR extract(month from end_date) = ?', month, month)
   }
 
   scope :filter_search, -> (term) {

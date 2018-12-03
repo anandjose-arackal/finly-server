@@ -5,8 +5,21 @@ class Budgets::Index < Budgets::Base
 
   end
 
+  def pre_process
+    if params[:filter_month].blank?
+      params[:filter_month] = ""
+    end
+    if params[:filter_year].blank?
+      params[:filter_year] = ""
+    end
+  end
+
   def init
-    self.budgets = user.company.budgets.roots.reorder(end_date: :desc)
+    if params[:include_children]
+      self.budgets = user.company.budgets.reorder(end_date: :desc)
+    else
+      self.budgets = user.company.budgets.roots.reorder(end_date: :desc)
+    end
   end
 
   def success
