@@ -1,6 +1,14 @@
 class Expense::Manual::Split < Expense::Manual::Base
   attr_accessor :expenses_params, :receipt, :expenses, :receipt, :split_link
 
+  class Expense::Manual::Split::SplitPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :expenses
+
+    def init
+      self.expenses = params[:expenses]
+    end
+  end
+
   def personalizer
     {
         init: {
@@ -85,8 +93,11 @@ class Expense::Manual::Split < Expense::Manual::Base
   end
 
   def success
-    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, messages)
+    params[:expenses] = self.expenses
+    Expense::Manual::Split::SplitPresenter.new(user, params, messages)
   end
+
+
 
   protected
   def generate_split_link
