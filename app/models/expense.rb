@@ -548,7 +548,7 @@ class Expense < ActiveRecord::Base
     unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
       return self.amount
     end
-    currency = report_id.present? ? report&.base_currency : amount.currency
+    currency = (report_id.present? && self.report.present?) ? self.report.base_currency : amount.currency
     Amount.new(value: amount_value, currency: currency)
   end
 
