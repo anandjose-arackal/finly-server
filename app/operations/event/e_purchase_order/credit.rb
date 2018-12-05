@@ -50,7 +50,7 @@ class Event::EPurchaseOrder::Credit < Event::EPurchaseOrder::Base
     notify_type = NotificationActionType.id_for(:notify_credit)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:purchase_order),
                                              action_type_id: notify_type,
-                                             action_user_id: (self.crediting_user.id),
+                                             action_user_id: (self.crediting_user&.id),
                                              object_id: purchase_order.id,
                                              object_type: "Purchase Order",
                                              path_object_id: purchase_order.id,
