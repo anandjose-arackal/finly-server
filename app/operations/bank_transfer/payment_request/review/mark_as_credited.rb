@@ -73,6 +73,15 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
     self.bank_payment_requests.each do |payment_request|
       payment_request.comments.create user_id: user.id,
                                      action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
+
+      Event::EBankPaymentRequest::Credit.(user, bank_payment_request: payment_request)
+
+    end
+
+    # Sending email to procurement initiators about payments against it
+    payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id)).where.not(purchase_order_id: nil)
+    payments.each do |payment|
+      Event::EPurchaseOrder::Credit.(user, {payment: payment})
     end
   end
 end

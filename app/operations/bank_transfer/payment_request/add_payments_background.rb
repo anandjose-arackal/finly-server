@@ -49,6 +49,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
           receiving_account_id: bank_account.id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+          purchase_order_id: payment[:purchase_order_id],
           payment_mode: self.payment_mode,
           amount_attributes: {
               value: payment[:original_amount],
