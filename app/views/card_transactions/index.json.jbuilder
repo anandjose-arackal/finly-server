@@ -1,10 +1,14 @@
-json.array!(@result.transactions) do |transaction|
-  json.timestamp transaction.transaction_timestamp.strftime("%Y  %B  %d - %H:%M:%S")
-  json.amount_value transaction.billing_amount_value
-  json.currency_symbol transaction.billing_amount.currency.symbol
-  json.currency_country_code transaction.billing_amount.currency.country_code
-  json.type "Refund"
-  # todo - remove this from the details being shown
-  json.card_number transaction.serial_id
-  json.id transaction.id
+json.result do
+  json.array!(@result.paginated_transactions) do |transaction|
+    json.timestamp transaction.transaction_timestamp.strftime("%Y  %B  %d - %H:%M:%S")
+    json.amount_value transaction.billing_amount_value
+    json.currency_symbol transaction.billing_amount.currency.symbol
+    json.currency_country_code transaction.billing_amount.currency.country_code
+    json.type "Refund"
+    # todo - remove this from the details being shown
+    json.card_number transaction.serial_id
+    json.id transaction.id
+  end
 end
+
+json.count @result.count

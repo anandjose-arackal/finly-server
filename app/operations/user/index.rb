@@ -17,11 +17,12 @@ class User::Index < User::Base
   end
 
   class User::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :team, :users_type_count, :users_status_count, :pending_invites_count, :paginated_team
+    attr_accessor :team, :users_type_count, :users_status_count, :pending_invites_count, :paginated_team, :count
 
     def init
       if params[:team].present?
         self.team = params[:team]
+        self.count = self.team.count
         self.paginated_team = self.team.paginate(page: params[:page], per_page: 30)
       end
     end

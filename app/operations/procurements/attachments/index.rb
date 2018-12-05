@@ -14,10 +14,12 @@ class Procurements::Attachments::Index < Procurements::Attachments::Base
   end
 
   class Procurements::Attachments::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :attachments
+    attr_accessor :attachments, :paginated_attachments, :count
 
     def init
       self.attachments = params[:attachments]
+      self.count = self.attachments.count
+      self.paginated_attachments = self.attachments.paginate(per_page: params[:per_page], page: params[:page])
     end
   end
 
