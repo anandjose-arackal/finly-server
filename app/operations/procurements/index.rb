@@ -69,7 +69,7 @@ class Procurements::Index < Procurements::Base
       procurement_ids += user.company.inward_invoices.with_type_non_po_invoice.pluck(:procurement_id)
     end
 
-    self.procurements = user.company.procurements.with_ids(procurement_ids.uniq).include_details
+    self.procurements = user.company.procurements.with_ids(procurement_ids.uniq)
 
   end
 
@@ -79,7 +79,7 @@ class Procurements::Index < Procurements::Base
   end
 
   class Procurements::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :procurements, :paginated_procurements
+    attr_accessor :procurements, :paginated_procurements, :count
 
     has_scope :filter_status_tags, type: :array
     has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number
@@ -99,10 +99,12 @@ class Procurements::Index < Procurements::Base
     def init
       self.procurements = params[:procurements]
       apply_filter
-      self.paginated_procurements = self.procurements.order_by_controlling_level(user.id)
+
+      self.procurements = self.procurements.order_by_controlling_level(user.id)
       page = params[:page] || 1
       per_page = params[:per_page] || 30
-      self.paginated_procurements = self.paginated_procurements.paginate(page: page, per_page: per_page)
+      self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).include_details
+      self.count = self.procurements.count
     end
 
     def apply_filter
@@ -115,6 +117,7 @@ class Procurements::Index < Procurements::Base
       if params[:filter_awaiting_approval].present?
         self.procurements = self.procurements.filter_awaiting_approval(user)
       end
+
     end
 
     def awaiting_action?(procurement)
