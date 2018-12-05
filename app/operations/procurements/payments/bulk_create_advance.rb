@@ -46,7 +46,7 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
       row_details = data.values
       po_number = data[:purchase_order_number]
       advance_amount = data[:advance_amount].to_f
-      purchase_order = current_company.purchase_orders.find_by(po_number: po_number)
+      purchase_order = user.company.purchase_orders.find_by(po_number: po_number)
       vendor = purchase_order&.vendor
 
       if purchase_order.blank?
@@ -190,7 +190,8 @@ class Procurements::Payments::BulkCreateAdvance < Procurements::Payments::Base
           bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
           original_amount: advance_amount,
-          account_id: bank_account.id
+          account_id: bank_account.id,
+          purchase_order_id: purchase_order&.id
       }
     end
     payment_params
