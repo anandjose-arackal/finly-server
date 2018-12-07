@@ -45,6 +45,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
