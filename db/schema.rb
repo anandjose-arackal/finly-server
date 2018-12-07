@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181204091305) do
+ActiveRecord::Schema.define(version: 20181207093053) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -1474,6 +1474,7 @@ ActiveRecord::Schema.define(version: 20181204091305) do
     t.integer  "default_card_expense_category_id", limit: 4
     t.boolean  "sso_enabled",                                    default: false
     t.text     "address",                          limit: 65535
+    t.boolean  "cash_money_requests_enabled",                    default: true
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree

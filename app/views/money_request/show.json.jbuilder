@@ -11,6 +11,8 @@ manager_name = @result.manager.name rescue ''
 json.manager_name manager_name
 json.controlling_user @result.money_request.controlling_user&.name
 finance_manager_name = @result.finance_manager.name rescue ''
+
+json.cash_money_requests_allowed !!current_company&.configuration&.cash_money_requests_enabled
 json.finance_manager_name finance_manager_name
 json.export_csv ''
 json.export_xls ''
