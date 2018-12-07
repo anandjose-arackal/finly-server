@@ -139,7 +139,7 @@ json.account_details do
   json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
   if card.present?
     json.card_balance card_adapter.balance
-    json.card_type "#{@result.money_request.user.cards.first&.card_program&.name&.humanize} Card"
+    json.card_type "#{card.card_program&.name&.humanize} Card"
   end
   json.finly_money_balance finly_money_adapter.balance
 end
