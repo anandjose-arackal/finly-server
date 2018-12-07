@@ -110,10 +110,10 @@ class Expense::Index < Expense::Base
         ############################################################################
 
         if (params[:view] == 'personal' or params[:view].nil?) and params[:filter_split_link].blank?
-          self.paginated_expenses = self.expenses&.unreported_and_rejected.paginate(page: params[:page], per_page: 30)
+          self.paginated_expenses = self.expenses&.unreported_and_rejected.paginate(page: params[:page], per_page: params[:per_page])
           self.count = self.expenses&.unreported_and_rejected&.count
         else
-          self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)
+          self.paginated_expenses = expenses.paginate(page: params[:page], per_page: params[:per_page])
           self.count = self.expenses.count
         end
         self.paginated_expenses = self.paginated_expenses.include_details

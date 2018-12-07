@@ -23,7 +23,8 @@ class User::Index < User::Base
       if params[:team].present?
         self.team = params[:team]
         self.count = self.team.count
-        self.paginated_team = self.team.paginate(page: params[:page], per_page: 30)
+        per_page = params[:per_page] || 30
+        self.paginated_team = self.team.paginate(page: params[:page], per_page: per_page)
       end
     end
   end
