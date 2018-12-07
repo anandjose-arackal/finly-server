@@ -31,7 +31,7 @@ class BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor < BudgetsCalcul
         user_id: invoice_item.parent.created_by_user_id,
         location_id: invoice_item.parent.location_id,
         department_id: invoice_item.parent.sub_department_id,
-        date: invoice_item.parent.date,
+        date: invoice_item.parent.created_at,
         amount_attributes: {
             value: invoice_item.net_amount&.value,
             currency_id: invoice_item.net_amount&.currency_id
