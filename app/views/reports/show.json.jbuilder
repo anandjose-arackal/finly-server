@@ -205,13 +205,16 @@ end
 
 # this will contain a summary of the user's account details
 json.account_details do
+  card = @result.report.user.cards.first
   cash_on_hand_pocket = @result.report.user.user_pockets.cash_pockets_only.first
   cash_on_hand_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_on_hand_pocket)
   finly_money_adapter = AccountManager::Wallet::WalletAdapter.new(@result.report.user.wallet)
-  card_adapter = AccountManager::Cards::CardAdapter.new(@result.report.user.cards.first)
+  card_adapter = AccountManager::Cards::CardAdapter.new(@result.report.user.cards.first) if card.present?
 
   json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
-  json.card_balance card_adapter.balance
-  json.card_type "#{@result.report.user.cards.first&.card_program&.name&.humanize} Card"
+  if card.present?
+    json.card_balance card_adapter.balance
+    json.card_type "#{@result.report.user.cards.first&.card_program&.name&.humanize} Card"
+  end
   json.finly_money_balance finly_money_adapter.balance
 end
