@@ -143,7 +143,7 @@ production:
     base: "https://sky.yesbank.in:444"
     path: "app/live/fundsTransferByCustomerService2"
   finly_collect:
-    base: 'https://collect.finly.io'
+    base: 'http://172.33.74.252'
     path: 'receivables'
 
 
