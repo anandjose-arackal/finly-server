@@ -116,7 +116,7 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
 
   def on_completion(options)
     payment = options[:payment]
-    if PaymentPurpose.ids_for(:medical_benefit, :meal_benefit)
+    if PaymentPurpose.ids_for(:medical_benefit, :meal_benefit).include?(payment&.payment_purpose_id)
       if payment.credit?
         Event::EWallet::Credit.(payment.initiating_user, payment: payment)
       elsif payment.debit?
