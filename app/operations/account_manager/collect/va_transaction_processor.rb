@@ -1,5 +1,5 @@
 class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
-  sidekiq_options queue: 'payments_queue'
+  sidekiq_options queue: :payments_queue
 
   attr_accessor :virtual_account_transaction, :virtual_account, :payment, :adapter
 

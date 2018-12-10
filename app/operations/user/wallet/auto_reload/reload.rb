@@ -1,5 +1,5 @@
 class User::Wallet::AutoReload::Reload < BackgroundOperation
-  sidekiq_options queue: 'payments_queue'
+  sidekiq_options queue: :payments_queue
 
   attr_accessor :selected_user, :source_account, :auto_reload_config, :expense_card, :card_balance_value, :load_amount_value,
                 :payment, :source_account_adapter
