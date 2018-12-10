@@ -11,7 +11,7 @@ class PingController < ApplicationController
     processes = ::Sidekiq::ProcessSet.new
     # processes.size = total number of alive processes
     # processes.as_json.size = total processes
-    if processes.size == processes.as_json.size
+    if processes.size != processes.as_json.size
       raise 'Sidekiq is down!'
     end
 
