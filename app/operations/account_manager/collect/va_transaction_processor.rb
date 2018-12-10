@@ -1,4 +1,6 @@
 class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
+  queue_as :payments_queue
+
   attr_accessor :virtual_account_transaction, :virtual_account, :payment, :adapter
 
   def pre_validate
