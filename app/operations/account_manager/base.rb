@@ -1,4 +1,5 @@
 class AccountManager::Base < BackgroundOperation
+  sidekiq_options queue: 'payments_queue'
 
   def user_model
     [User, AdminUser]
