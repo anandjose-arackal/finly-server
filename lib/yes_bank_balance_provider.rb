@@ -1,6 +1,6 @@
-class YesBankBalanceProvider < ActiveJob::Base
+class YesBankBalanceProvider
   include Sidekiq::Worker
-  queue_as :payments_queue
+  sidekiq_options queue: 'payments_queue'
 
   # LOGGER = Logger.new(STDOUT)
 

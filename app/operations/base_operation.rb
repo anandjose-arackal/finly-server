@@ -1,5 +1,5 @@
 require 'hooks'
-class BaseOperation < ActiveJob::Base
+class BaseOperation
   include CallbackHandler, MathUtil, HasScope, OperationValidations
   # todo rename user to resource as User is a model and there can be other models such as AdminUser etc
   attr_accessor :user, :company, :params, :messages, :process_complete, :response

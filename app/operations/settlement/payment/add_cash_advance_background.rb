@@ -1,4 +1,5 @@
 class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
+  sidekiq_options queue: 'payments_queue'
 
   attr_accessor :options, :user_id
   attr_accessor :payment_param, :role, :payment, :payment_purpose, :initiating_account, :receiving_account,

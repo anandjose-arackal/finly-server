@@ -1,4 +1,5 @@
 class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
+  sidekiq_options queue: 'payments_queue'
 
   attr_accessor :virtual_account_transaction, :virtual_account
 
