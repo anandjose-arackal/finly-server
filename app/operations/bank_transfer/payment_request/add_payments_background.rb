@@ -1,4 +1,5 @@
 class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
+  sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
                 :company_id, :execute
