@@ -179,11 +179,4 @@ class Budget < ActiveRecord::Base
              ])
   }
 
-
-  # todo - change this to reflect the new structure
-  # scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
-  # scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}
-  # scope :with_budgetable_yes_bank_vendor_id, -> (ids) {where budgetable_id: ids, budgetable_type: "YesBankVendor"}
-  # scope :with_budgetable_field_drop_down_item, -> (ids)  { where budgetable_type: "FieldDropDownItem", budgetable_id: ids }
-  # scope :with_budgetable_cost_center_id, -> (ids)  { where budgetable_type: "CostCenter", budgetable_id: ids }
 end
