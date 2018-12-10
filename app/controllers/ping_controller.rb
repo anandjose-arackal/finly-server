@@ -7,6 +7,14 @@ class PingController < ApplicationController
   def sidekiq
     sidekiq = HealthMonitor::Providers::Sidekiq.new
     sidekiq.check!
+
+    processes = ::Sidekiq::ProcessSet.new
+    # processes.size = total number of alive processes
+    # processes.as_json.size = total processes
+    if processes.size == processes.as_json.size
+      raise 'Sidekiq is down!'
+    end
+
     render json: {success: true}
   end
 
