@@ -2,7 +2,7 @@ class DocumentSlice::Create < BackgroundOperation
   attr_accessor :receipt, :tempfile, :base_path
 
   def init
-    self.receipt = Receipt.find_by(params[:receipt_id])
+    self.receipt = Receipt.find_by(id: params[:receipt_id])
     self.base_path = "#{Rails.root}/public/tmp"
     FileUtils::mkdir_p base_path
     self.tempfile = Tempfile.new('temp_export')
