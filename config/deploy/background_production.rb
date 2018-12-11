@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
+server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role web app db}
 set :stage, 'production'
 # set :stage, 'staging'
 set :use_sudo, false
