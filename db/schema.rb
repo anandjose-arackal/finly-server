@@ -4497,6 +4497,7 @@ ActiveRecord::Schema.define(version: 20181207093053) do
     t.boolean  "hard_copy_received",               default: true
     t.integer  "sourcable_id",       limit: 4
     t.integer  "sourcable_type",     limit: 4
+    t.boolean  "is_deleted",                       default: false
   end
 
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
