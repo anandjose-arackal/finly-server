@@ -101,9 +101,9 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
       # make the status of the payment order, Bank payment request and payments as of a newly created one
       self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
       self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
-      puts 'SUCCESSFUL!'
+      # puts 'SUCCESSFUL!'
     else
-      puts 'FAILURE!'
+      # puts 'FAILURE!'
     end
   end
 
