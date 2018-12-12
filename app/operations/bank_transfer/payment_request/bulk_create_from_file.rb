@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents
+                :headers, :contents, :validate_operation
 
   def pre_validate
     if user.blank?
@@ -36,12 +36,12 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
       return
     end
 
-    op = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
-    if op.success?
-      self.requested_amount = op.requested_amount
+    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
+    if validate_operation.success?
+      self.requested_amount = validate_operation.requested_amount
     else
-      self.contents = op.contents
-      self.headers = op.headers
+      self.contents = validate_operation.contents
+      self.headers = validate_operation.headers
       add_message :error, "Some of the payments have errors, please check the downloaded file to resolve them"
     end
 
@@ -55,8 +55,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
-    op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.parsed_data})
-    # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.parsed_data})
+    op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
   end
 

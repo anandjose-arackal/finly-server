@@ -2,7 +2,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute
+                :company_id, :execute, :payment_params
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -34,10 +34,10 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode
     # here assign attributes to the existing bank payment request object which can be saved later
-    payment_params = []
+    self.payment_params = []
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
-      payment_params << {
+      self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
           application: "vp",
           receiving_user_type: bank_account.account_owner.class.name,
@@ -80,10 +80,10 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
                   value: payment[:original_amount],
                   currency_id: 1
               }
-          }
+          },
+          custom_fields: payment[:custom_fields]
       }
     end
-    self.bank_payment_request.payment_order.payments.build(payment_params)
   end
 
   def validate
@@ -91,21 +91,23 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   end
 
   def process
-    # now create the bank payment request object and save it so that it can be made 'Open'
-    if self.bank_payment_request.save
-      # perform calculations on the payment and the TDS, Tsx etc.
-      self.bank_payment_request.payment_order.payments.each do |payment|
+    self.payment_params.each do |params|
+      custom_fields = params[:custom_fields]
+      params.delete(:custom_fields)
+      payment = self.bank_payment_request.payment_order.payments.build(params)
+      if payment.save
+        # perform the required calculations
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
         payment.save
+        # now save the custom fields to the invoice
+        set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
       end
-
-      # make the status of the payment order, Bank payment request and payments as of a newly created one
-      self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
-      self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
-      puts 'SUCCESSFUL!'
-    else
-      puts 'FAILURE!'
     end
+
+    # now once the payment request has been created and the payments saved, we can mark it as open
+    self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
+    self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+    puts 'SUCCESSFUL!'
   end
 
   private

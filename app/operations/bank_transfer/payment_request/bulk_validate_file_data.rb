@@ -61,16 +61,21 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       note = item[:note]
 
       # generating custom field data
-      custom_fields = []
+      custom_fields = {}
       field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
       field_configurations.each do |field|
         field_name = field.field_name.gsub(" ", "_").underscore
         if item[field_name.to_sym].present?
-          custom_fields << {field.id => item[field_name.to_sym]}
+          if field.field_type_id == FieldType.id_for(:multiselect)
+            custom_fields[field.id] = [item[field_name.to_sym]]
+          elsif field.field_type_id == FieldType.id_for(:drop_down)
+            custom_fields[field.id] = item[field_name.to_sym]
+          end
         end
       end
 
-      
+      item[:custom_fields] = custom_fields
+
 
       self.error_messages = []
       # Check if bank account number is present
@@ -123,7 +128,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.requested_amount += amount.to_f
       end
 
-      item[:errors] = self.error_messages.to_sentence
+      item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
       self.contents << item.values
     end
