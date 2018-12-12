@@ -25,7 +25,7 @@ class  Invoicing::Transactions::Index < Invoicing::Transactions::Base
   end
 
   class Invoicing::Transactions::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :incoming_payments, :paginated_payments
+    attr_accessor :incoming_payments, :paginated_payments, :count
 
     has_scope :virtual_account_transaction_purpose
     has_scope :filter_date, using: [:from, :to], type: :hash
@@ -34,6 +34,7 @@ class  Invoicing::Transactions::Index < Invoicing::Transactions::Base
       self.incoming_payments = params[:incoming_payments]
       self.incoming_payments = apply_scopes(self.incoming_payments, params)
       self.paginated_payments = self.incoming_payments.paginate(page: params[:page], per_page: params[:per_page])
+      self.count = self.incoming_payments.count
     end
   end
 end

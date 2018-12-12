@@ -15,10 +15,12 @@ class Procurements::PurchaseOrders::Templates::Index < Procurements::PurchaseOrd
   end
 
   class Procurements::PurchaseOrders::Templates::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :po_templates
+    attr_accessor :po_templates, :count, :paginated_po_templates
 
     def init
       self.po_templates = params[:po_templates]
+      self.paginated_po_templates = self.po_templates.paginate(per_page: params[:per_page], page: params[:page])
+      self.count = self.po_templates.count
     end
 
   end
