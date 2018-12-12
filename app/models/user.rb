@@ -105,8 +105,8 @@ class User < ActiveRecord::Base
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
-  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
-  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
