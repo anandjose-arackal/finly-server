@@ -60,6 +60,17 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       due_date = item[:due_date]
       note = item[:note]
 
+      # generating custom field data
+      custom_fields = []
+      field_configurations = self.user.company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+      field_configurations.each do |field|
+        field_name = field.field_name.gsub(" ", "_").underscore
+        if item[field_name.to_sym].present?
+          custom_fields << {field.id => item[field_name.to_sym]}
+        end
+      end
+
+      
 
       self.error_messages = []
       # Check if bank account number is present

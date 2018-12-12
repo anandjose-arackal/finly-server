@@ -179,7 +179,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
           add_message :error, set_fields.messages[:error]
           return
         end
-        valid = CustomField::Validate.(self.bank_payment_request)
+        valid = CustomField::Validate.(payment.invoice)
         unless valid.success?
           add_message :error, valid.messages[:error]
           return

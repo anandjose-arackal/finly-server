@@ -98,6 +98,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
         payment.save
       end
+
       # make the status of the payment order, Bank payment request and payments as of a newly created one
       self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
       self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
@@ -108,6 +109,14 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   end
 
   private
+
+  def set_custom_fields_invoice(payment, data, save)
+    custom_fields = {custom_fields: data[:custom_fields]}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+  end
 
   def retrieve_bank_account(order_details)
     if order_details[:account_id].present?
