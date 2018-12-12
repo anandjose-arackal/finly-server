@@ -45,6 +45,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
@@ -548,7 +549,7 @@ class Expense < ActiveRecord::Base
     unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
       return self.amount
     end
-    currency = report_id.present? ? report.base_currency : amount.currency
+    currency = (report_id.present? && self.report.present?) ? self.report.base_currency : amount.currency
     Amount.new(value: amount_value, currency: currency)
   end
 
@@ -566,7 +567,7 @@ class Expense < ActiveRecord::Base
 
   def converted?
     return false unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
-    if report.base_currency_id != amount.currency_id
+    if report&.base_currency_id != amount.currency_id
       return true
     end
     false
@@ -670,7 +671,7 @@ class Expense < ActiveRecord::Base
 
   def report_name
     if report_id
-      self.report.name
+      self.report&.name
     end
   end
 

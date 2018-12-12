@@ -61,7 +61,6 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     
     payment_request = PaymentRequest.(initiating_user, initiating_account, Card.name, :credit, payment_purpose, {scheduled_at: self.scheduled_at, background: true})
     self.processed_order_data.processed_order.each do |item|
-
       receiving_user = item[:user][:user_details]
       receiving_account = item[:card]
       amount = item[:amount]

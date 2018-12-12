@@ -38,7 +38,7 @@ when :staging, :development, :combined_development, :insights, :development_2, :
 end
 
 set :pty, false
-set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}
+set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/sidekiq.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 
