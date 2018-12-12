@@ -34,7 +34,6 @@
 
 class UserManagerMapping < ActiveRecord::Base
   include PolicyVersion
-  include SoftDeletable
 
   belongs_to :user
   belongs_to :manager, class_name: 'User'
