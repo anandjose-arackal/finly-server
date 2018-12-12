@@ -91,6 +91,7 @@ class Card::Transaction::Index < BaseOperation
       self.transactions = params[:transactions]
       page = params[:page] || 1
       per_page = params[:per_page] || 30
+      self.transactions = apply_scopes(transactions, params)
       self.count = self.transactions.count
       self.paginated_transactions = apply_scopes(transactions, params).paginate(page: page, per_page: per_page)
     end
