@@ -1,4 +1,5 @@
-json.array! @result.po_templates do |po_template|
+json.result do
+json.array! @result.paginated_po_templates do |po_template|
   json.extract! po_template, :id, :name
   json.template_name po_template.name
   po = po_template.resource
@@ -10,3 +11,7 @@ json.array! @result.po_templates do |po_template|
   end
   json.created_on DateUtils.date_formatted(po.created_at)
 end
+
+end
+
+json.count @result.count
