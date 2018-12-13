@@ -94,6 +94,7 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_procurement_name
     has_scope :filter_procurement_type
     has_scope :filter_invoice_id
+    has_scope :filter_purchase_order_id, type: :array
 
 
     def init
@@ -111,7 +112,6 @@ class Procurements::Index < Procurements::Base
       if params[:search_type].present? && params[:search_query].present?
         set_scope
       end
-
       self.procurements = apply_scopes(self.procurements, params)
 
       if params[:filter_awaiting_approval].present?

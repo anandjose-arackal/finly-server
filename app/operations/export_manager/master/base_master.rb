@@ -9,7 +9,8 @@ class ExportManager::Master::BaseMaster
       procurement: '::ExportManager::Master::Procurements::Provider',
       budget_summary: '::ExportManager::Master::Budgets::UsageSummary',
       budget_entities: '::ExportManager::Master::Budgets::UsageEntities',
-      vendor_details: '::ExportManager::Master::Vendors::DetailsIndex'
+      vendor_details: '::ExportManager::Master::Vendors::DetailsIndex',
+      purchase_order_items: '::ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index'
   }.with_indifferent_access
 
   DEFAULT_CONFIG = {spreadsheet: true, pdf: true}
