@@ -1,5 +1,5 @@
 class ExportManager::Master::BaseMaster
-
+  include MathUtil
   cattr_accessor :data_map
 
   attr_accessor :user, :params, :input, :messages
@@ -10,7 +10,8 @@ class ExportManager::Master::BaseMaster
       budget_summary: '::ExportManager::Master::Budgets::UsageSummary',
       budget_entities: '::ExportManager::Master::Budgets::UsageEntities',
       vendor_details: '::ExportManager::Master::Vendors::DetailsIndex',
-      purchase_order_items: '::ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index'
+      purchase_order_items: '::ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index',
+      non_po_items: '::ExportManager::Master::Invoices::InvoiceLineItems::Index'
   }.with_indifferent_access
 
   DEFAULT_CONFIG = {spreadsheet: true, pdf: true}

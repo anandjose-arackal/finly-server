@@ -93,8 +93,9 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_submission_date
     has_scope :filter_procurement_name
     has_scope :filter_procurement_type
-    has_scope :filter_invoice_id
+    has_scope :filter_invoice_serial
     has_scope :filter_purchase_order_id, type: :array
+    has_scope :filter_invoice_id, type: :array
 
 
     def init
