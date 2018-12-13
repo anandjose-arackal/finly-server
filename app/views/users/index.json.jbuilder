@@ -32,51 +32,50 @@ json.result do
         end
       end
     end
-  end
 
-  # user roles
-  json.roles do
-    json.array!(user.user_roles) do |role|
-      json.id role.id
-      json.name UserRole.name_for(role.id)
-    end
-  end
-
-  # user status
-  json.status user.status
-
-  # user accounts
-  json.accounts do
-    json.array!(user.user_pockets) do |pocket|
-      json.name pocket.name
-      json.id pocket.id
-      case pocket.user_pocket_type_id
-        when UserPocketType.id_for(:cash)
-          adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-          json.creditable true
-          json.display_balance true
-        when UserPocketType.id_for(:credit_card)
-          adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
-          json.creditable false
-        when UserPocketType.id_for(:reimbursement)
-          adapter = AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter.new(pocket)
-          json.creditable false
-        when UserPocketType.id_for(:paid_by_company)
-          adapter = AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(pocket)
-          json.creditable false
-        else
-          adapter = nil
-      end
-      json.balance adapter.balance(display_balance: true)
-      currency = pocket.base_currency
-      json.base_currency do
-        json.symbol currency&.symbol
-        json.country_code currency&.country_code
-        json.id currency&.id
+    # user roles
+    json.roles do
+      json.array!(user.user_roles) do |role|
+        json.id role.id
+        json.name UserRole.name_for(role.id)
       end
     end
-  end
 
+    # user status
+    json.status user.status
+
+    # user accounts
+    json.accounts do
+      json.array!(user.user_pockets) do |pocket|
+        json.name pocket.name
+        json.id pocket.id
+        case pocket.user_pocket_type_id
+          when UserPocketType.id_for(:cash)
+            adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+            json.creditable true
+            json.display_balance true
+          when UserPocketType.id_for(:credit_card)
+            adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
+            json.creditable false
+          when UserPocketType.id_for(:reimbursement)
+            adapter = AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter.new(pocket)
+            json.creditable false
+          when UserPocketType.id_for(:paid_by_company)
+            adapter = AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(pocket)
+            json.creditable false
+          else
+            adapter = nil
+        end
+        json.balance adapter.balance(display_balance: true)
+        currency = pocket.base_currency
+        json.base_currency do
+          json.symbol currency&.symbol
+          json.country_code currency&.country_code
+          json.id currency&.id
+        end
+      end
+    end
+  end
 end
 
 json.count @result.count
