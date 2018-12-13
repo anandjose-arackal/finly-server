@@ -71,7 +71,7 @@ class MoneyRequest::Index < MoneyRequest::Base
   end
 
   class MoneyRequest::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :money_requests, :counts, :paginated_money_requests
+    attr_accessor :money_requests, :counts, :paginated_money_requests, :count
 
     has_scope :filter_search
     has_scope :filter_id
@@ -99,6 +99,7 @@ class MoneyRequest::Index < MoneyRequest::Base
           self.money_requests = self.money_requests.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
         end
       end
+      self.count = self.money_requests.count
       self.paginated_money_requests = self.money_requests.skip_pending.paginate(page: params[:page], per_page: 30).include_details
     end
 

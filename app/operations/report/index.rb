@@ -78,7 +78,7 @@ class Report::Index < Report::Base
   end
 
   class Report::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :reports, :counts, :paginated_reports
+    attr_accessor :reports, :counts, :paginated_reports, :count
 
     has_scope :filter_search
     has_scope :filter_id
@@ -109,6 +109,7 @@ class Report::Index < Report::Base
           self.reports = self.reports.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
         end
       end
+      self.count = self.reports.count
       self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30).include_details
     end
 
