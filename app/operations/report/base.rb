@@ -56,7 +56,7 @@ class Report::Base < BaseOperation
       self.report = params[:report]
       report.reload
       self.categories = report.user.company.categories
-      self.expenses = report.expenses.includes(:amount)
+      self.expenses = report.expenses.includes(:amount,:receipts,:card_expense,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type)
       self.status = report.relative_status_name user
       self.total = report.total_amount
       self.dates = report.date_as_string
