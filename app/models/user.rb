@@ -893,6 +893,17 @@ class User < ActiveRecord::Base
 
   end
 
+  def status
+    "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+    if self.active and self.invitation_token.blank? and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+      return "Active"
+    elsif self.first_name.blank? || self.invitation_token.present? || self.mobile_only_invite
+      return "Pending"
+    elsif !self.active and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+      return "Inactive"
+    end
+  end
+
   private
 
 end
