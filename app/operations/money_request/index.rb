@@ -100,7 +100,9 @@ class MoneyRequest::Index < MoneyRequest::Base
         end
       end
       self.count = self.money_requests.count
-      self.paginated_money_requests = self.money_requests.skip_pending.paginate(page: params[:page], per_page: 30).include_details
+      page = params[:page] || 1
+      per_page = params[:per_page] || 30
+      self.paginated_money_requests = self.money_requests.skip_pending.paginate(page: page, per_page: per_page).include_details
     end
 
     def status_name(money_request)

@@ -69,6 +69,17 @@ class ProcurementMailer < ApplicationMailer
     if @result.success?
       @invoice = @data.invoice
       @curr_user = @data.user
+      attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+         render_to_string(
+             pdf: "invoice-#{@data.invoice.invoice_number}",
+             encoding: 'UTF-8',
+             template: "export/inward_invoice",
+             layout: "pdf/paginated_bootstrap.html.erb",
+             # layout: "pdf.html.erb",
+             footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
+             print_media_type: true
+         )
+      )
       ########################################################
       # attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
       #    render_to_string(pdf: "invoice-#{@data.invoice.invoice_number}", template: "export/inward_invoice", layout: "pdf.html.erb", print_media_type: true)
