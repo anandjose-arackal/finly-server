@@ -197,9 +197,20 @@ class Procurement < ActiveRecord::Base
     status_tag_ids = all_status_tag_ids & ids.map(&:to_i)
 
     procurement_status_taggables = ProcurementStatusTaggable.with_status_tag_ids(status_tag_ids).with_procurement_ids(pluck(:id))
-    filter_procurement_ids = procurement_status_taggables.pluck(:procurement_id)
+    filtered_procurement_ids = procurement_status_taggables.pluck(:procurement_id)
 
-    where(id: filter_procurement_ids)
+    where(id: filtered_procurement_ids)
+  }
+
+  scope :filter_purchase_order_id, -> (ids) {
+    filtered_procurement_ids = PurchaseOrder.with_id(ids).pluck(:procurement_id)
+    where(id: filtered_procurement_ids)
+  }
+
+  scope :filter_invoice_id, -> (ids) {
+    filtered_procurement_ids = Invoice.with_id(ids).pluck(:procurement_id)
+    filtered_procurement_ids = filtered_procurement_ids.reject(&:blank?)
+    where(id: filtered_procurement_ids)
   }
 
   scope :filter_awaiting_approval, -> (user) {
