@@ -1,11 +1,11 @@
 class BaseHandler
   attr_accessor :params, :messages, :connection, :process_complete, :response, :user, :timeout, :parsed_response
 
-  def self.call(user, params={})
+  def self.call(user, params = {})
     self.new(user, params).run
   end
 
-  def initialize(user, params={})
+  def initialize(user, params = {})
     self.timeout = false
     self.user = user
     self.params = (ActionController::Parameters.new(params) or {})
@@ -112,75 +112,79 @@ class BaseHandler
     header_param = self.header_params
     return if p.nil? or has_errors?
     begin
-      puts "Posting Path : #{p}"
-      puts "Post Params: #{body_param}"
+      unless Rails.env.production?
+        puts "Posting Path : #{p}"
+        puts "Post Params: #{body_param}"
+      end
 
       request_type = http_request_type
 
       case request_type
-        when :get
-          # self.response = self.connection.post p, body_param
-          self.response = self.connection.get do |req|
-            req.url p
-            if header_param.present? and header_param.is_a?(Hash)
-              header_param.each do |k, v|
-                req[k] = v
-              end
-            end
-            req.params = query_param if query_param.present?
-          end
-        when :post
-          # self.response = self.connection.post p, body_param
-          self.response = self.connection.post do |req|
-            req.url p
-            req.params = query_param if query_param.present?
-            if header_param.present? and header_param.is_a?(Hash)
-              header_param.each do |k, v|
-                req[k] = v
-              end
-            end
-            req.body = body_param if body_param.present?
-          end
-        when :patch
-          # self.response = self.connection.post p, body_param
-          self.response = self.connection.patch do |req|
-            req.url p
-            req.params = query_param if query_param.present?
-            req.body = body_param if body_param.present?
-            if header_param.present? and header_param.is_a?(Hash)
-              header_param.each do |k, v|
-                req[k] = v
-              end
+      when :get
+        # self.response = self.connection.post p, body_param
+        self.response = self.connection.get do |req|
+          req.url p
+          if header_param.present? and header_param.is_a?(Hash)
+            header_param.each do |k, v|
+              req[k] = v
             end
           end
-        when :put
-          # self.response = self.connection.post p, body_param
-          self.response = self.connection.put do |req|
-            req.url p
-            req.params = query_param if query_param.present?
-            req.body = body_param if body_param.present?
-            if header_param.present? and header_param.is_a?(Hash)
-              header_param.each do |k, v|
-                req[k] = v
-              end
+          req.params = query_param if query_param.present?
+        end
+      when :post
+        # self.response = self.connection.post p, body_param
+        self.response = self.connection.post do |req|
+          req.url p
+          req.params = query_param if query_param.present?
+          if header_param.present? and header_param.is_a?(Hash)
+            header_param.each do |k, v|
+              req[k] = v
             end
           end
-        when :delete
-          # self.response = self.connection.post p, body_param
-          self.response = self.connection.delete do |req|
-            req.url p
-            req.params = query_param if query_param.present?
-            if header_param.present? and header_param.is_a?(Hash)
-              header_param.each do |k, v|
-                req[k] = v
-              end
+          req.body = body_param if body_param.present?
+        end
+      when :patch
+        # self.response = self.connection.post p, body_param
+        self.response = self.connection.patch do |req|
+          req.url p
+          req.params = query_param if query_param.present?
+          req.body = body_param if body_param.present?
+          if header_param.present? and header_param.is_a?(Hash)
+            header_param.each do |k, v|
+              req[k] = v
             end
           end
-        else
-          add_message :error, 'Invalid Request Type'
-          return
+        end
+      when :put
+        # self.response = self.connection.post p, body_param
+        self.response = self.connection.put do |req|
+          req.url p
+          req.params = query_param if query_param.present?
+          req.body = body_param if body_param.present?
+          if header_param.present? and header_param.is_a?(Hash)
+            header_param.each do |k, v|
+              req[k] = v
+            end
+          end
+        end
+      when :delete
+        # self.response = self.connection.post p, body_param
+        self.response = self.connection.delete do |req|
+          req.url p
+          req.params = query_param if query_param.present?
+          if header_param.present? and header_param.is_a?(Hash)
+            header_param.each do |k, v|
+              req[k] = v
+            end
+          end
+        end
+      else
+        add_message :error, 'Invalid Request Type'
+        return
       end
-      puts "response : #{self.response.body}"
+      unless Rails.env.production?
+        puts "response : #{self.response.body}"
+      end
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
       messages[:error] << 'Request timed out. Please try again'
@@ -227,7 +231,7 @@ class BaseHandler
     include MathUtil, HasScope
     attr_accessor :user, :params, :messages, :config, :timeout
 
-    def initialize(user, params={}, messages={})
+    def initialize(user, params = {}, messages = {})
       self.config = {}
       self.user = user
       self.params = params
@@ -295,6 +299,7 @@ class BaseHandler
   end
 
   protected
+
   def success
     BaseHandler::BasePresenter::SuccessPresenter.new(self.user, self.params, self.messages)
   end
@@ -333,7 +338,7 @@ class BaseHandler
     if user.present?
       user_types.each do |user_type|
         if (user_type == :employee and user.employee?) or (user_type == :manager and user.manager?) or
-            (user_type == :finance_manager and user.finance_manager?) or(user_type == :policy_admin and user.policy_admin?) or
+            (user_type == :finance_manager and user.finance_manager?) or (user_type == :policy_admin and user.policy_admin?) or
             (user_type == :company_admin and user.company_admin?) or (user_type == :admin and user.admin?)
           return
         end
