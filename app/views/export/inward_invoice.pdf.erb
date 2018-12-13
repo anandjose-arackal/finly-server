@@ -14,7 +14,7 @@
     </div>
     <div class="col col-xs-4 no-padding document-details text-right">
       <div class="col col-xs-12 no-padding document-type">
-        INVOICE
+        INWARD INVOICE
       </div>
       <div class="col col-xs-12 no-padding table-document-details">
         <table class="table table-responsive">
@@ -29,7 +29,7 @@
           </tr>
           <tr>
             <td class="font-light-gray">Due Date</td>
-            <td class="font-dark-gray"><%= @result.invoice.invoice_date&.strftime "%b-%d-%Y" %></td>
+            <td class="font-dark-gray"><%= @result.invoice.due_date&.strftime "%b-%d-%Y" %></td>
           </tr>
           <tr>
             <td class="font-light-gray">Payment Term</td>
@@ -49,7 +49,7 @@
   </div>
   <div class="col col-xs-12 no-padding body-container">
     <div class="col col-xs-4 vendor-details">
-      <h4 class="section-title">Vendor</h4>
+      <h4 class="section-title">Billed From (Vendor)</h4>
       <div class="col col-xs-12 no-padding mg-botm-8">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
         <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.display_name %></div>
@@ -136,31 +136,31 @@
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
             <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
-            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= item.total_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= item.net_amount&.value&.to_d.round(2) rescue 0 %></td>
           </tr>
         <% end %>
         </tbody>
       </table>
     </div>
     <div class="col col-xs-12 no-padding">
-      <div class="col col-xs-4 no-padding">
+      <div class="col col-xs-4 col-xs-offset-8 no-padding">
         <table class="table table-responsive table-document-items-summary fs-12">
           <tbody>
           <tr>
             <td class="font-light-gray text-left">Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.total_before_tax&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.item_amounts_total.to_d.round(2) rescue 0 %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Discount</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.discount&.to_d.round(2) rescue 0 %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Tax</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.tax&.to_d.round(2) rescue 0 %></td>
           </tr>
           <tr>
             <td class="font-light-gray text-left">Net Total</td>
-            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.balance_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.balance_due&.value&.to_d.round(2) rescue 0 %></td>
           </tr>
           </tbody>
         </table>
