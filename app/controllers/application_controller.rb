@@ -352,6 +352,7 @@ class ApplicationController < ActionController::Base
   end
 
   def init_elastic_apm
+    return unless Rails.env.production?
     return unless current_user
     return unless current_user.is_a?(User)
     ElasticAPM.set_user(current_user)
