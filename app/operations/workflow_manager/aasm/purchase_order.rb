@@ -36,6 +36,19 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
       transitions :from => :processing, :to => :processing
     end
 
+    event :unapprove do
+      transitions :from => :processing, :to => :processing
+      transitions :from => :approved, :to => :processing
+    end
+
+    event :take_control do
+      transitions :from => :processing, :to => :processing
+    end
+
+    event :return_control do
+      transitions :from => :processing, :to => :processing
+    end
+
     event :reject do
       transitions :from => :processing, :to => :rejected
     end
