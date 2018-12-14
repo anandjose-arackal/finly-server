@@ -17,6 +17,8 @@ class ApplicationController < ActionController::Base
 
   before_action :initialize_query_logger
 
+  before_action :init_elastic_apm
+
   before_filter :store_location
 
   after_filter :set_queries_counter
@@ -347,6 +349,19 @@ class ApplicationController < ActionController::Base
     return unless current_user.class.name == User.name
     # Create new visit in background
     TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
+  end
+
+  def init_elastic_apm
+    return unless current_user
+    return unless current_user.is_a?(User)
+    ElasticAPM.set_user(current_user)
+    ElasticAPM.set_tag(:company_id, current_user.company_id)
+    ElasticAPM.set_tag(:company_name, current_user.company_name)
+    ElasticAPM.set_tag(:user_id, current_user.id)
+    ElasticAPM.set_tag(:user_name, current_user.name)
+    ElasticAPM.set_tag(:app, current_app)
+    ElasticAPM.set_tag(:device, current_device)
+    ElasticAPM.set_tag(:view, params&.dig(:view))
   end
 
 end
