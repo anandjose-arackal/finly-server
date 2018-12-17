@@ -42,6 +42,10 @@ class Trail < ActiveRecord::Base
     where action_id: TrailAction.id_for(:approve)
   }
 
+  scope :only_retract, -> {
+    where action_id: TrailAction.id_for(:retract)
+  }
+
   scope :with_action_user_id, -> (id) {
     where(action_user_id: id)
   }

@@ -3246,6 +3246,7 @@ Rails.application.routes.draw do
       put 'submit', to: 'purchase_orders#submit'
       put 'retract', to: 'purchase_orders#retract'
       put 'approve', to: 'purchase_orders#approve'
+      put 'unapprove', to: 'purchase_orders#unapprove'
       put 'reject', to: 'purchase_orders#reject'
       put 'close', to: 'purchase_orders#close'
       get 'download_pdf', to: 'purchase_orders#download', as: :download

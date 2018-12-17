@@ -90,6 +90,10 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
       self.current_level = nil
     end
 
+    if [:unapprove].include?(aasm.current_event)
+      self.next_level = previous_level
+    end
+
     # Change state of purchase order
     purchase_order_status_id = ::PurchaseOrderStatus.id_for(self.aasm.current_state)
     update_params = {
@@ -120,5 +124,16 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     self.current_level = ReviewalLevel.with_id(purchase_order.controlling_level_id).first
     level_number = current_level.present? ? (current_level.level_number + 1) : 1
     self.next_level = self.policy.levels.with_entity_type(purchase_order.class.name).with_level_number(level_number).first
+  end
+
+  def previous_level
+    self.current_level = ReviewalLevel.with_id(purchase_order.controlling_level_id).first
+    if current_level.present? && current_level.level_number > 1
+      level_number = current_level.level_number - 1
+      level = self.policy.levels.with_entity_type(purchase_order.class.name).with_level_number(level_number).first
+    else
+      level = nil
+    end
+    level
   end
 end

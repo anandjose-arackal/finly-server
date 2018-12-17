@@ -228,6 +228,21 @@ class PurchaseOrder < ActiveRecord::Base
     }
   end
 
+  def can_unapprove?(user=nil)
+    return false if user.blank?
+
+    last_approve_trail = self.trails.natural_order.only_approve.last
+    last_retract_trail = self.trails.natural_order.only_retract.last
+    if last_approve_trail.action_user.id == user.id
+      if last_retract_trail.present? && last_retract_trail.created_at > last_approve_trail.created_at
+        return false
+      end
+      return true
+    else
+      return false
+    end
+  end
+
   private
 
   def calculate_line_items
