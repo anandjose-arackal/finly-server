@@ -29,6 +29,14 @@ class MoneyRequest::Create < MoneyRequest::Base
     if [1, '1'].include?(mr_create_params[:payment_mode_id]) and mr_create_params[:destination_pocket_id].blank?
       mr_create_params[:destination_pocket_id] = self.for_user.user_pockets.cash_pockets_only.first.id
     end
+
+    if [1, '1'].include?(mr_create_params[:payment_mode_id])
+      pocket = for_user.user_pockets.with_id(mr_create_params[:destination_pocket_id])&.first
+
+      mr_create_params&.dig(:items_attributes).each do |item_attr|
+        item_attr[:amount_attributes][:currency_id] = pocket.base_currency_id rescue nil
+      end
+    end
   end
 
   def process
