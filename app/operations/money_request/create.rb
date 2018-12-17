@@ -44,12 +44,14 @@ class MoneyRequest::Create < MoneyRequest::Base
     param[:status_id] = MoneyRequestStatus.id_for(:open)
     param[:controlling_user] = self.for_user
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
-    param[:payment_mode_id] = PaymentMode.id_for(:cash)
     param[:policy_id] = self.policy_id
 
-    # Money request can only be request through expense cards
-    if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
-      param[:payment_mode_id] = PaymentMode.id_for(:card)
+    if mr_create_params[:payment_mode_id].blank?
+      param[:payment_mode_id] = PaymentMode.id_for(:cash)
+      # Money request can only be request through expense cards
+      if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
+        param[:payment_mode_id] = PaymentMode.id_for(:card)
+      end
     end
 
     if param[:items_attributes].present?
