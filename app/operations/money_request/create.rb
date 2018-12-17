@@ -26,7 +26,7 @@ class MoneyRequest::Create < MoneyRequest::Base
   end
 
   def pre_process
-    if [1, '1'].include?(mr_create_params[:payment_mode_id])
+    if [1, '1'].include?(mr_create_params[:payment_mode_id]) and mr_create_params[:destination_pocket_id].blank?
       mr_create_params[:destination_pocket_id] = self.for_user.user_pockets.cash_pockets_only.first.id
     end
   end
