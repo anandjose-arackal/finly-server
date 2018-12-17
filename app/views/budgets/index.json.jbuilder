@@ -1,5 +1,5 @@
 json.result do
-  json.array! @result.budgets do |budget|
+  json.array! @result.paginated_budgets do |budget|
     json.extract! budget, :id, :name
     # json.period do
     #   json.extract! budget.period, :id, :name

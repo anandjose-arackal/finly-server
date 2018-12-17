@@ -39,7 +39,9 @@ class Budgets::Index < Budgets::Base
     def init
       self.budgets = params[:budgets]
       self.budgets = apply_scopes(self.budgets, params)
-      self.paginated_budgets = self.budgets.paginate(per_page: params[:per_page], page: params[:page])
+      per_page = params[:per_page] || 30
+      page = params[:page] || 1
+      self.paginated_budgets = self.budgets.paginate(per_page: per_page, page: page)
       self.count = self.budgets.count
     end
   end
