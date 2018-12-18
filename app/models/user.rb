@@ -561,6 +561,16 @@ class User < ActiveRecord::Base
     self.user_roles
   end
 
+  def expense_management_roles
+    role_ids = self.role_mapping.expense_management.pluck(:user_role_id)
+    UserRole.where(id: role_ids)
+  end
+
+  def vendor_payment_roles
+    role_ids = self.role_mapping.vendor_payments.pluck(:user_role_id)
+    UserRole.where(id: role_ids)
+  end
+
   def company_admin?
     role_mapping.expense_management.admin.present?
   end

@@ -35,7 +35,7 @@ json.result do
 
     # user roles
     json.roles do
-      json.array!(user.user_roles) do |role|
+      json.array!(user.expense_management_roles) do |role|
         json.id role.id
         json.name UserRole.name_for(role.id)
       end
