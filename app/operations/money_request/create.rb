@@ -26,8 +26,16 @@ class MoneyRequest::Create < MoneyRequest::Base
   end
 
   def pre_process
-    if [1, '1'].include?(mr_create_params[:payment_mode_id])
+    if [1, '1'].include?(mr_create_params[:payment_mode_id]) and mr_create_params[:destination_pocket_id].blank?
       mr_create_params[:destination_pocket_id] = self.for_user.user_pockets.cash_pockets_only.first.id
+    end
+
+    if [1, '1'].include?(mr_create_params[:payment_mode_id])
+      pocket = for_user.user_pockets.with_id(mr_create_params[:destination_pocket_id])&.first
+
+      mr_create_params&.dig(:items_attributes).each do |item_attr|
+        item_attr[:amount_attributes][:currency_id] = pocket.base_currency_id rescue nil
+      end
     end
   end
 
@@ -36,12 +44,14 @@ class MoneyRequest::Create < MoneyRequest::Base
     param[:status_id] = MoneyRequestStatus.id_for(:open)
     param[:controlling_user] = self.for_user
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
-    param[:payment_mode_id] = PaymentMode.id_for(:cash)
     param[:policy_id] = self.policy_id
 
-    # Money request can only be request through expense cards
-    if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
-      param[:payment_mode_id] = PaymentMode.id_for(:card)
+    if mr_create_params[:payment_mode_id].blank?
+      param[:payment_mode_id] = PaymentMode.id_for(:cash)
+      # Money request can only be request through expense cards
+      if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
+        param[:payment_mode_id] = PaymentMode.id_for(:card)
+      end
     end
 
     if param[:items_attributes].present?

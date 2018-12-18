@@ -64,6 +64,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     def get_actions
       actions = {}
       actions[:audit_trail] = true
+      actions[:export_items] = true
 
       if self.invoice.items.count > 0
         actions[:show_comments] = true

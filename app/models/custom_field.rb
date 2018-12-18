@@ -152,7 +152,7 @@ class CustomField < ActiveRecord::Base
       when FieldType.id_for(:multiselect)
         names = []
         self.value&.field_multiselect_selection_items&.each do |item|
-          names << item.value.name
+          names << item.value&.name
         end
         return names.to_sentence
       else

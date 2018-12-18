@@ -63,6 +63,13 @@ class InvoiceLineItem < ActiveRecord::Base
   scope :with_id, -> (id) {
     where id: id
   }
+  scope :with_parent_type, -> (type) {
+    where parent_type: type
+  }
+
+  scope :with_parent_id, -> (ids) {
+    where parent_id: ids
+  }
 
   scope :with_budgetable_category_ids, -> (category_ids) {
     if category_ids.present?
