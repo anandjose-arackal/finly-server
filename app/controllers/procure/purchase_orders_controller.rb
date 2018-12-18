@@ -72,6 +72,12 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def export_items
+    @result = Procurements::PurchaseOrders::ExportItems.(current_user, params)
+    respond
+  end
+
+
   def download
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     @purchase_order = @result.purchase_order

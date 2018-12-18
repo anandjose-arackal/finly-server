@@ -59,6 +59,10 @@ class PurchaseOrderItem < ActiveRecord::Base
     where inventory_line_item_id: inventory_line_item_id
   }
 
+  scope :with_purchase_order_id, -> (purchase_order_ids){
+    where purchase_order_id: purchase_order_ids
+  }
+
   scope :with_category, -> (id) {
     where category_id: id
   }

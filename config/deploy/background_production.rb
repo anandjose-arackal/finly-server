@@ -8,6 +8,7 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role web app db}
+server '172.33.215.128', user: 'centos', roles: %w{sidekiq_app}
 set :stage, 'production'
 # set :stage, 'staging'
 set :use_sudo, false

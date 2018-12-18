@@ -78,8 +78,16 @@ class MoneyRequest::Update < MoneyRequest::Base
     end
 
     # to support mobile app
-    if [1, '1'].include?(update_param[:payment_mode_id])
+    if [1, '1'].include?(update_param[:payment_mode_id]) and update_param[:destination_pocket_id].blank?
       update_param[:destination_pocket_id] = self.money_request.user&.user_pockets&.cash_pockets_only&.first&.id
+    end
+
+    if [1, '1'].include?(update_param[:payment_mode_id])
+      pocket = self.money_request&.user&.user_pockets.with_id(update_param[:destination_pocket_id])&.first
+
+      update_param&.dig(:items_attributes).each do |item_attr|
+        item_attr[:amount_attributes][:currency_id] = pocket.base_currency_id rescue nil
+      end
     end
   end
 
