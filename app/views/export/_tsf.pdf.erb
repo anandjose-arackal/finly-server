@@ -3290,8 +3290,8 @@
       <td height=21 style='height:16.0pt'></td>
       <td colspan=2 class=xl201 width=220 style='width:165pt'> <%= expense.date %>&nbsp;</td>
       <td colspan=2 class=xl217 width=289 style='border-right:.5pt solid black;
-          border-left:none;width:217pt'>&nbsp;</td>
-      <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'><%= expense.custom_fields.with_field_key("conveyance_charges_particulars").first&.string_value %>&nbsp;</td>
+          border-left:none;width:217pt'><%= expense.custom_fields.with_field_key("conveyance_place").first&.string_value %></td>
+      <td colspan=3 class=xl163 width=419 style='border-left:none;width:314pt'><%= expense.custom_fields.with_field_key("particulars").first&.string_value %>&nbsp;</td>
       <td class=xl169 style='border-top:none;border-left:none'><%= expense.amount_value %>&nbsp;</td>
       <td class=xl170 width=188 style='border-top:none;border-left:none;width:141pt'> <%= expense.note %>&nbsp;</td>
       <td></td>
