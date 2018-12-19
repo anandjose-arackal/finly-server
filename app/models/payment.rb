@@ -520,7 +520,7 @@ class Payment < ActiveRecord::Base
   end
 
   def company_id
-    self.payment_order.company_id
+    self.payment_order&.company_id
   end
 
   def procurement_index_details
