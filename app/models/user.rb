@@ -561,6 +561,16 @@ class User < ActiveRecord::Base
     self.user_roles
   end
 
+  def expense_management_roles
+    role_ids = self.role_mapping.expense_management.pluck(:user_role_id)
+    UserRole.where(id: role_ids)
+  end
+
+  def vendor_payment_roles
+    role_ids = self.role_mapping.vendor_payments.pluck(:user_role_id)
+    UserRole.where(id: role_ids)
+  end
+
   def company_admin?
     role_mapping.expense_management.admin.present?
   end
@@ -891,6 +901,17 @@ class User < ActiveRecord::Base
 
   def reimbursements_awaiting_confirmation?
 
+  end
+
+  def status
+    "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+    if self.active and self.invitation_token.blank? and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+      return "Active"
+    elsif self.first_name.blank? || self.invitation_token.present? || self.mobile_only_invite
+      return "Pending"
+    elsif !self.active and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+      return "Inactive"
+    end
   end
 
   private
