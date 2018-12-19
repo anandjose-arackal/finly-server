@@ -22,6 +22,7 @@
 
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -134,6 +135,8 @@ class Policy < ActiveRecord::Base
     self.build_distance_expense_config(enabled: false).save
     self.build_time_expense_config(enabled: false).save
     self.build_per_diem_expense_config(enabled: false).save
+    self.build_cash_expense_config(enabled: true).save
+    self.build_card_expense_config(enabled: true).save
   end
 
 end

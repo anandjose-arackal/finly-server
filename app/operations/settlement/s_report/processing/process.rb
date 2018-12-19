@@ -1,4 +1,5 @@
 class Settlement::SReport::Processing::Process < BackgroundOperation
+  sidekiq_options queue: :payments_queue
   attr_accessor :report_processor_group
 
   def authorized_user_types

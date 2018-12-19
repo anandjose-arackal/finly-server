@@ -152,7 +152,7 @@ class CustomField < ActiveRecord::Base
       when FieldType.id_for(:multiselect)
         names = []
         self.value&.field_multiselect_selection_items&.each do |item|
-          names << item.value.name
+          names << item.value&.name
         end
         return names.to_sentence
       else
@@ -165,7 +165,7 @@ class CustomField < ActiveRecord::Base
     dependent_field_configuration_ids = []
     has_dependent_cf = false
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
-      options = field_configuration.drop_down_items
+      options = field_configuration.drop_down_items.exclude_deleted
       options.each do |option|
         if option.dependent_field_configurations.present?
           dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)

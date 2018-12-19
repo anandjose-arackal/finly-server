@@ -52,27 +52,24 @@ class ExpensesController < ApplicationController
 
     @expenses = []
     expense_ids = []
-    if current_user.company.id == 129 || current_user.company.id == 1 || current_user.company.id == 2
-      if @result.success?
-        if params[:split]
-          expense_ids += @result.expenses.map(&:id)
-        else
-          expense_ids.push @result.expense&.id
-        end
-
-        expense_ids.each do |expense_id|
-          params[:id] = expense_id
-          result = Expense::Show.(current_user, params)
-          @expenses.push(result)
-        end
-
-        # params[:id] = @result.expense&.id
-        # @result = Expense::Show.(current_user, params)
-
-        respond
+    # if current_user.company.id == 129 || current_user.company.id == 1 || current_user.company.id == 2
+    if @result.success?
+      if params[:split]
+        expense_ids += @result.expenses.map(&:id)
       else
-        respond response: :success
+        expense_ids.push @result.expense&.id
       end
+
+      expense_ids.each do |expense_id|
+        params[:id] = expense_id
+        result = Expense::Show.(current_user, params)
+        @expenses.push(result)
+      end
+
+      # params[:id] = @result.expense&.id
+      # @result = Expense::Show.(current_user, params)
+
+      respond
     else
       respond response: :success
     end
@@ -109,19 +106,19 @@ class ExpensesController < ApplicationController
         # respond response: :failure, message: "Invalid input"
     end
 
-    if current_user.company.id == 129 || current_user.company.id == 1
-      if @result.success?
-        messages = @result.messages
-        @result = Expense::Show.(current_user, params)
+    # if current_user.company.id == 129 || current_user.company.id == 1
+    if @result.success?
+      messages = @result.messages
+      @result = Expense::Show.(current_user, params)
 
-        @result.messages = messages
-        respond render: 'show'
-      else
-        respond response: :success
-      end
+      @result.messages = messages
+      respond render: 'show'
     else
-      respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : "Invalid Input"))
+      respond response: :success
     end
+    # else
+    #   respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : "Invalid Input"))
+    # end
   end
 
   def split_existing

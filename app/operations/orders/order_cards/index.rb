@@ -42,7 +42,7 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
   end
 
   class Orders::OrderCards::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment_orders, :paginated_payment_orders
+    attr_accessor :payment_orders, :paginated_payment_orders, :count
 
     include HasScope
 
@@ -51,6 +51,7 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
     def init
       self.payment_orders = params[:payment_orders]
       self.payment_orders = apply_scopes(payment_orders, params)
+      self.count = self.payment_orders.count
       self.paginated_payment_orders = self.payment_orders&.paginate(page: params[:page], per_page: 30)
     end
   end

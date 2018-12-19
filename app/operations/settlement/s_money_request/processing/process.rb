@@ -1,4 +1,5 @@
 class Settlement::SMoneyRequest::Processing::Process < BackgroundOperation
+  sidekiq_options queue: :payments_queue
   attr_accessor :money_request_processor
 
   def authorized_user_types

@@ -1,5 +1,6 @@
 class YesBankBalanceProvider
   include Sidekiq::Worker
+  sidekiq_options queue: :payments_critical_queue
 
   # LOGGER = Logger.new(STDOUT)
 

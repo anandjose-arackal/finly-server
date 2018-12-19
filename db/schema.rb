@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181204091305) do
+ActiveRecord::Schema.define(version: 20181207093053) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -1474,6 +1474,7 @@ ActiveRecord::Schema.define(version: 20181204091305) do
     t.integer  "default_card_expense_category_id", limit: 4
     t.boolean  "sso_enabled",                                    default: false
     t.text     "address",                          limit: 65535
+    t.boolean  "cash_money_requests_enabled",                    default: true
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -2246,6 +2247,14 @@ ActiveRecord::Schema.define(version: 20181204091305) do
   add_index "enforce_budget_configurations", ["company_id"], name: "index_enforce_budget_configurations_on_company_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
+    t.boolean  "enabled"
+    t.integer  "enforceable_id",   limit: 4
+    t.string   "enforceable_type", limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  create_table "enforce_policy_configurations", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
     t.boolean  "enabled"
@@ -2253,7 +2262,7 @@ ActiveRecord::Schema.define(version: 20181204091305) do
     t.datetime "updated_at",                   null: false
   end
 
-  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
+  add_index "enforce_policy_configurations", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
 
   create_table "expense_data_extract_sources", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -5282,8 +5291,8 @@ ActiveRecord::Schema.define(version: 20181204091305) do
     t.datetime "created_at",                                           null: false
     t.datetime "updated_at",                                           null: false
     t.boolean  "edit_terms_within_po",                 default: false
-    t.boolean  "crud_inventory_item_po"
-    t.boolean  "crud_inventory_item_non_po"
+    t.boolean  "crud_inventory_item_po",               default: true
+    t.boolean  "crud_inventory_item_non_po",           default: true
   end
 
   add_index "user_permissions", ["company_id"], name: "index_user_permissions_on_company_id", using: :btree
