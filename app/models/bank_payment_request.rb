@@ -130,9 +130,8 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :include_for_index, -> {includes({payment_order: [:payment_order_status, :initiating_user,
                                                           {payments: [
                                                               {amount: [:currency]},
-                                                              {invoice: [:advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount,
-                                                                         :category, :cost_center, :tds_slab, :amount,
-                                                                          :invoice_attachments]},
+                                                              {receiving_account: :account_owner}, :payment_status, :reference_resource,
+                                                              :invoice,
                                                               {payment_order: [bank_payment_request: [:status]]},
                                                               :payment_order]},
                                                               {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
