@@ -43,6 +43,8 @@ json.total @result.report.total_amount
 json.base_currency_id @result.report.base_currency_id
 json.date @result.report.created_at.strftime('%d %b %Y')
 
+json.approvers @result.approvers
+
 json.comments @result.comments do |comment|
   json.content comment.generate @result.user
   json.created_at comment.created_at.strftime('%d %b %Y')
@@ -212,6 +214,7 @@ json.account_details do
   card_adapter = AccountManager::Cards::CardAdapter.new(@result.report.user.cards.first) if card.present?
 
   json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
+  json.cash_on_hand_base_currency cash_on_hand_pocket.base_currency&.country_code
   if card.present?
     json.card_balance card_adapter.balance
     json.card_type "#{card.card_program&.name&.humanize} Card"
