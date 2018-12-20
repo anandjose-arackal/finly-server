@@ -7,8 +7,8 @@
 # "payment_purpose",          string 255
 # "merchant",                 string 255
 # "note",                     string 65535
-# "transaction_type_id",      integer 4
-# "status_id",                integer 4,     null: false
+# "transaction_type",         string 255
+# "status",                   string 255
 # "amount_id",                integer 4
 # "finly_transaction_id",     integer 4
 # "opening_balance_id",       integer 4
@@ -25,8 +25,5 @@ class TransactionDetail < ActiveRecord::Base
   belongs_to :finly_transaction
   belongs_to :opening_balance, class_name: 'Amount'
   belongs_to :closing_balance, class_name: 'Amount'
-  belongs_to :status
-  belongs_to :transaction_type
-  belongs_to :finly_account, polymorphic: true
 
 end

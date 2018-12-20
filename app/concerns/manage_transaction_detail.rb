@@ -7,8 +7,8 @@
        params = {
            finly_transaction_id: transaction.id,
            transaction_reference_id: transaction.transaction_reference_id,
-           transaction_type_id: transaction.transaction_type.id,
-           status_id: transaction.status_id,
+           transaction_type: transaction.transaction_type.name,
+           status: transaction.status.name,
            amount_id: transaction.amount_id,
            opening_balance_id: transaction.opening_balance_id,
            closing_balance_id: transaction.closing_balance_id,

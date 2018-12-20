@@ -5,8 +5,8 @@ class CreateTransactionDetails < ActiveRecord::Migration
       t.string :payment_purpose
       t.string :merchant
       t.text :note
-      t.integer :transaction_type_id, references: "TransactionType", foreign_key: true, index: true
-      t.integer :status_id, null: false, index: true, foreign_key: true, class: 'TransactionStatus'
+      t.string :transaction_type
+      t.string :status
       t.references :amount, foreign_key: true
       t.references :finly_transaction, foreign_key: true
       t.integer :opening_balance_id, foreign_key: true, references: 'Amount'
@@ -24,8 +24,6 @@ class CreateTransactionDetails < ActiveRecord::Migration
   end
 
   def down
-    remove_index :transaction_details, :transaction_type_id
-    remove_index :transaction_details, :status_id
     remove_index :transaction_details, :company_id
     drop_table :transaction_details
   end
