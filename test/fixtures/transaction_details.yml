@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  finly_transaction_id: 
+  opening_balance_id: 
+  closing_balance_id: 
+
+two:
+  finly_transaction_id: 
+  opening_balance_id: 
+  closing_balance_id: 
