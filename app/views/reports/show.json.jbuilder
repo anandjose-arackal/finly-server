@@ -43,6 +43,8 @@ json.total @result.report.total_amount
 json.base_currency_id @result.report.base_currency_id
 json.date @result.report.created_at.strftime('%d %b %Y')
 
+json.approvers @result.approvers
+
 json.comments @result.comments do |comment|
   json.content comment.generate @result.user
   json.created_at comment.created_at.strftime('%d %b %Y')
