@@ -98,6 +98,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   private
 
   def parse_payment_order_data
+    policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
     payment_order_attributes = {
         initiating_user_id: user.id,
         payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
@@ -123,7 +124,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             currency_id: 1
         },
         beneficiary_type_id: 2,
-        policy_id: user.company.policies.default.first.id,
+        policy_id: policy&.id,
         payment_order_attributes: payment_order_attributes,
         api_initiated: false
     }
