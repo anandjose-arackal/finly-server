@@ -15,6 +15,7 @@
 
 
 
+
 class PolicyUserMapping < ActiveRecord::Base
   include PolicyVersion
   include SoftDeletable
