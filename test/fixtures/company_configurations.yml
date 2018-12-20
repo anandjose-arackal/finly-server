@@ -20,6 +20,7 @@
 #  sso_enabled                      :boolean          default(FALSE)
 #  address                          :text(65535)
 #  cash_money_requests_enabled      :boolean          default(TRUE)
+#  budget_date_configuration_id     :integer
 #
 
 

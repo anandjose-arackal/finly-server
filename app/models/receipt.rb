@@ -18,8 +18,9 @@
 #  hard_copy_received :boolean          default(TRUE)
 #  sourcable_id       :integer
 #  sourcable_type     :integer
-# is_deleted          :boolean
+#  is_deleted         :boolean          default(FALSE)
 #
+
 
 
 
@@ -32,7 +33,7 @@ class Receipt < ActiveRecord::Base
 
   has_many :expense_data_extracts, as: :extractable
   has_many :system_messages, as: :messagable, dependent: :destroy
-  has_many :document_slices, dependent: :destroy
+  has_many :document_slices
 
   validates :user_id, presence: true
 
