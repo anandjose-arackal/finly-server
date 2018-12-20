@@ -1,26 +1,30 @@
-json.array!(@result.paginated_reports) do |report|
-  json.extract! report, :id, :name, :travel_request
-  json.user do
-    json.extract! report.user, :name
-  end
-  if report.memo
-    if report.memo[21]
-      json.memo report.memo[0, 20] + "..."
-    else
-      json.memo report.memo
+json.result do
+  json.array!(@result.paginated_reports) do |report|
+    json.extract! report, :id, :name, :travel_request
+    json.user do
+      json.extract! report.user, :name
     end
+    if report.memo
+      if report.memo[21]
+        json.memo report.memo[0, 20] + "..."
+      else
+        json.memo report.memo
+      end
+    end
+    if report.policy
+      json.policy report.policy.name
+    end
+    json.controlling_user report.controlling_user
+    json.status @result.status_name(report)
+    json.total(('%.2f' % report.total_amount))
+    json.currency_id report.base_currency_id
+    json.date report.created_at.strftime("%d %b")
+    json.currency_symbol report.base_currency_symbol
+    json.sync_status_id report.sync_status_id
+    json.sync_status report.sync_status
+    json.sync_type_id report.sync_type_id
+    json.sync_type report.sync_type
   end
-  if report.policy
-    json.policy report.policy.name
-  end
-  json.controlling_user report.controlling_user
-  json.status @result.status_name(report)
-  json.total(('%.2f' % report.total_amount))
-  json.currency_id report.base_currency_id
-  json.date report.created_at.strftime("%d %b")
-  json.currency_symbol report.base_currency_symbol
-  json.sync_status_id report.sync_status_id
-  json.sync_status report.sync_status
-  json.sync_type_id report.sync_type_id
-  json.sync_type report.sync_type
 end
+
+json.count @result.count

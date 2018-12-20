@@ -3211,7 +3211,7 @@ Rails.application.routes.draw do
   end
 
   get 'ping', to: 'ping#ping'
-  get 'ping/sidekiq', to: 'ping#sidekiq'
+  get 'ping/sidekiq/:type', to: 'ping#sidekiq'
   get 'ping/database', to: 'ping#database'
 
   ## Budget apis start ##

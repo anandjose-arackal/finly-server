@@ -157,6 +157,6 @@ json.comments do
   end
 end
 
-json.custom_fields do
-  json.array! @result.travel_request.custom_fields
-end
+# json.custom_fields do
+#   json.array! @result.travel_request.custom_fields
+# end

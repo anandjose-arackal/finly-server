@@ -23,10 +23,10 @@ when :itzcash_production
   # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
 when :aws_production, :background_production
-  branch = fetch :branch
-  unless ['staging', :staging].include?(branch)
-    raise 'This branch cannot be deploy to production. Please select the correct branch'
-  end
+  # branch = fetch :branch
+  # unless ['staging', :staging].include?(branch)
+  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
+  # end
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'production'
 when :itzcash
@@ -38,7 +38,12 @@ when :staging, :development, :combined_development, :insights, :development_2, :
 end
 
 set :pty, false
-set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/sidekiq.yml}
+linked_dirs = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}
+case fetch(:stage)
+  when :itzcash_production, :aws_production, :background_production
+    linked_dirs << "config/sidekiq.yml"
+end
+set :linked_files, linked_dirs
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 

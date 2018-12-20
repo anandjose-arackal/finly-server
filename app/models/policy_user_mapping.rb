@@ -22,7 +22,6 @@ class PolicyUserMapping < ActiveRecord::Base
   belongs_to :user
   belongs_to :policy
 
-
   default_scope { unscope(:where) }
 
   scope :admin, -> { where admin: true }
