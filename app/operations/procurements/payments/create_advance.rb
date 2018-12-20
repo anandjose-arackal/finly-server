@@ -35,7 +35,7 @@ class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
       return
     end
 
-    if self.payable_amount.to_f > self.purchase_order.balance_amount.value
+    if self.payable_amount.to_f >= self.purchase_order.balance_amount.value
       add_message :error, "You cannot pay more than the purchase order total as advance"
       return
     end
