@@ -29,4 +29,6 @@ class TransactionDetail < ActiveRecord::Base
   belongs_to :transaction_type
   belongs_to :finly_account, polymorphic: true
 
+  validates :finly_transaction_id, uniqueness: true
+
 end
