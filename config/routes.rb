@@ -1408,7 +1408,7 @@
 #                          summary_configurations_manager POST   /summary/configurations/manager(.:format)                                                                           summary/configuration#manager_create
 #                                                         DELETE /summary/configurations/manager/:id(.:format)                                                                       summary/configuration#manager_destroy
 #                                                    ping GET    /ping(.:format)                                                                                                     ping#ping
-#                                            ping_sidekiq GET    /ping/sidekiq(.:format)                                                                                             ping#sidekiq
+#                                                         GET    /ping/sidekiq/:type(.:format)                                                                                       ping#sidekiq
 #                                           ping_database GET    /ping/database(.:format)                                                                                            ping#database
 #                                       budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                    budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget

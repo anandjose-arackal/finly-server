@@ -81,9 +81,9 @@ class Report::Approvers < Report::Base
           action_id: track.report_tracking_action_id,
           controlling_user: false,
           action_user: {
-              name: track.action_user.name,
-              email: track.action_user.email,
-              mobile_number: track.action_user.mobile_number,
+              name: track.action_user&.name,
+              email: track.action_user&.email,
+              mobile_number: track.action_user&.mobile_number,
           },
           role: {
               id: track.action_user_role_id,
