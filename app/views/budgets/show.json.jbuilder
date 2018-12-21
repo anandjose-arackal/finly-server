@@ -63,7 +63,7 @@ json.budget_trail_items do
       json.location purchase_order_item.purchase_order.location&.name
       json.department purchase_order_item.purchase_order.department&.name
       json.sub_department purchase_order_item.purchase_order.sub_department&.name
-      json.po_number purchase_order_item.purchasse_order.po_number
+      json.po_number purchase_order_item.purchase_order.po_number
       json.index index
       index += 1
     end
