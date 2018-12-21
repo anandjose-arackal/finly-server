@@ -23,7 +23,9 @@
 #
 
 class FinlyTransaction < ActiveRecord::Base
+
   include ManageTransactionDetail
+
   belongs_to :finly_account, polymorphic: true
   belongs_to :transaction_type
   belongs_to :amount

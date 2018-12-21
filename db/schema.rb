@@ -5000,6 +5000,27 @@ ActiveRecord::Schema.define(version: 20181220143629) do
   add_index "trails", ["modified_level_id"], name: "index_trails_on_modified_level_id", using: :btree
   add_index "trails", ["parent_type", "parent_id"], name: "index_trails_on_parent_type_and_parent_id", using: :btree
 
+  create_table "transaction_details", force: :cascade do |t|
+    t.string   "transaction_reference_id", limit: 255
+    t.string   "payment_purpose",          limit: 255
+    t.string   "merchant",                 limit: 255
+    t.text     "note",                     limit: 65535
+    t.string   "transaction_type",         limit: 255
+    t.string   "status",                   limit: 255
+    t.integer  "amount_id",                limit: 4
+    t.integer  "finly_transaction_id",     limit: 4
+    t.integer  "opening_balance_id",       limit: 4
+    t.integer  "closing_balance_id",       limit: 4
+    t.integer  "company_id",               limit: 4
+    t.datetime "transaction_date"
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+  end
+
+  add_index "transaction_details", ["amount_id"], name: "fk_rails_12e08cc879", using: :btree
+  add_index "transaction_details", ["company_id"], name: "index_transaction_details_on_company_id", using: :btree
+  add_index "transaction_details", ["finly_transaction_id"], name: "fk_rails_db0f67a401", using: :btree
+
   create_table "transaction_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -6100,6 +6121,8 @@ ActiveRecord::Schema.define(version: 20181220143629) do
   add_foreign_key "time_objects", "physical_units"
   add_foreign_key "tracker_notifications", "companies"
   add_foreign_key "tracker_notifications", "users"
+  add_foreign_key "transaction_details", "amounts"
+  add_foreign_key "transaction_details", "finly_transactions"
   add_foreign_key "transcribed_expenses", "amounts"
   add_foreign_key "transcribed_expenses", "expenses"
   add_foreign_key "transcribed_expenses", "receipts"

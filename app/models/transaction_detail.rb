@@ -1,22 +1,22 @@
-
 # == Schema Information
 #
-# Table name: transaction_detail
+# Table name: transaction_details
 #
-# "transaction_reference_id", string255
-# "payment_purpose",          string 255
-# "merchant",                 string 255
-# "note",                     string 65535
-# "transaction_type",         string 255
-# "status",                   string 255
-# "amount_id",                integer 4
-# "finly_transaction_id",     integer 4
-# "opening_balance_id",       integer 4
-# "closing_balance_id",       integer 4
-# "company_id",               integer 4
-# "transaction_date"          datetime
-# "created_at",              null: false
-# "updated_at",              null: false
+#  id                       :integer          not null, primary key
+#  transaction_reference_id :string(255)
+#  payment_purpose          :string(255)
+#  merchant                 :string(255)
+#  note                     :text(65535)
+#  transaction_type         :string(255)
+#  status                   :string(255)
+#  amount_id                :integer
+#  finly_transaction_id     :integer
+#  opening_balance_id       :integer
+#  closing_balance_id       :integer
+#  company_id               :integer
+#  transaction_date         :datetime
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
 #
 
 class TransactionDetail < ActiveRecord::Base
