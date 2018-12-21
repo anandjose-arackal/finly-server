@@ -15,13 +15,13 @@
 
 
 
+
 class PolicyUserMapping < ActiveRecord::Base
   include PolicyVersion
   include SoftDeletable
 
   belongs_to :user
   belongs_to :policy
-
 
   default_scope { unscope(:where) }
 

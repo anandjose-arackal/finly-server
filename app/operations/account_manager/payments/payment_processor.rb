@@ -33,7 +33,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.company = Company.find_by(id: company_id)
       self.options = {}
       self.options[:bank_transfer_type] = params[:bank_transfer_type]
-      self.background = params[:background]
+      self.background = params[:background] || self.payment_request.background
     end
 
     # setting the company id based on whether it's a user or an AdminUser

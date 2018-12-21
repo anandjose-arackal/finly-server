@@ -74,4 +74,4 @@ json.results do
 
 end
 
-json.count @result.procurements.length
+json.count @result.count

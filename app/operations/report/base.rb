@@ -50,13 +50,13 @@ class Report::Base < BaseOperation
   class Report::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
-                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets
+                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets, :approvers
 
     def init
       self.report = params[:report]
       report.reload
       self.categories = report.user.company.categories
-      self.expenses = report.expenses.includes(:amount)
+      self.expenses = report.expenses.includes(:amount,:receipts,:card_expense,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type)
       self.status = report.relative_status_name user
       self.total = report.total_amount
       self.dates = report.date_as_string
@@ -71,6 +71,12 @@ class Report::Base < BaseOperation
       self.reimbursable_expenses_total = reimbursable_expenses
       self.non_reimbursable_expenses_total = non_reimbursable_expenses
       self.card_expenses_total = report.total_amount(:only_card_expenses)
+      op = Report::Approvers.(report: self.report)
+      if op.success?
+        self.approvers = op.approvers
+      else
+        self.approvers = []
+      end
       # budgets_op = BudgetsProcessor::Report.(user, report: self.report)
       # self.budgets = budgets_op.budgets
       self.budgets = []

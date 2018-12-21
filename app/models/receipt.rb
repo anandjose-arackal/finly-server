@@ -18,11 +18,14 @@
 #  hard_copy_received :boolean          default(TRUE)
 #  sourcable_id       :integer
 #  sourcable_type     :integer
+#  is_deleted         :boolean          default(FALSE)
 #
 
 
 
+
 class Receipt < ActiveRecord::Base
+  include SoftDeletable
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
   belongs_to :receipt_email
@@ -30,6 +33,7 @@ class Receipt < ActiveRecord::Base
 
   has_many :expense_data_extracts, as: :extractable
   has_many :system_messages, as: :messagable, dependent: :destroy
+  has_many :document_slices
 
   validates :user_id, presence: true
 

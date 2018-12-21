@@ -78,7 +78,7 @@ class Card::Transaction::Index < BaseOperation
   end
 
   class Card::Transaction::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
+    attr_accessor :transactions, :count, :paginated_transactions
     include HasScope
 
     has_scope :filter_refunds
@@ -86,11 +86,14 @@ class Card::Transaction::Index < BaseOperation
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_user_id
 
-    attr_accessor :transactions
 
     def init
       self.transactions = params[:transactions]
-      self.transactions = apply_scopes(transactions, params).paginate(page: params[:page], per_page: 30)
+      page = params[:page] || 1
+      per_page = params[:per_page] || 30
+      self.transactions = apply_scopes(transactions, params)
+      self.count = self.transactions.count
+      self.paginated_transactions = apply_scopes(transactions, params).paginate(page: page, per_page: per_page)
     end
 
   end

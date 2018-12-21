@@ -199,7 +199,7 @@ class Expense::Base < BaseOperation
 
     def retrieve_violation
       violations = {blocking_present: false, warning_present: false, items: []}
-      if expense.report_id and expense.report.policy
+      if expense.report_id and expense.report&.policy
         violations = Report::Violation.(user, report: expense.report)
         items = violations[expense.id]
         # constructing the violation hash as required
@@ -223,11 +223,11 @@ class Expense::Base < BaseOperation
 
     def retrieve_editable
       if personal_view?
-        if expense.report_id.blank? or expense.report.editable?
+        if expense.report.blank? or expense.report&.editable?
           return true
         end
       end
-      if expense.report_id.present? and expense.report.processing? and expense.report.controlling_user.id == user.id
+      if expense.report_id.present? and expense.report.present? and expense.report&.processing? and expense.report&.controlling_user.id == user.id
         return true
       end
       false

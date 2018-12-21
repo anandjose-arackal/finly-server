@@ -1408,8 +1408,11 @@
 #                          summary_configurations_manager POST   /summary/configurations/manager(.:format)                                                                           summary/configuration#manager_create
 #                                                         DELETE /summary/configurations/manager/:id(.:format)                                                                       summary/configuration#manager_destroy
 #                                                    ping GET    /ping(.:format)                                                                                                     ping#ping
-#                                            ping_sidekiq GET    /ping/sidekiq(.:format)                                                                                             ping#sidekiq
+#                                                         GET    /ping/sidekiq/:type(.:format)                                                                                       ping#sidekiq
 #                                           ping_database GET    /ping/database(.:format)                                                                                            ping#database
+#                                       budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
+#                                    budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
+#                                           budget_trails GET    /budgets/:budget_id/modification_trails(.:format)                                                                   budgets#trails
 #                                                 budgets GET    /budgets(.:format)                                                                                                  budgets#index
 #                                                         POST   /budgets(.:format)                                                                                                  budgets#create
 #                                              new_budget GET    /budgets/new(.:format)                                                                                              budgets#new
@@ -1418,6 +1421,7 @@
 #                                                         PATCH  /budgets/:id(.:format)                                                                                              budgets#update
 #                                                         PUT    /budgets/:id(.:format)                                                                                              budgets#update
 #                                                         DELETE /budgets/:id(.:format)                                                                                              budgets#destroy
+#                                      new_budgets_config GET    /new_budget_config(.:format)                                                                                        budgets#new_budgets_config
 #                      procure_procurements_filter_config GET    /procure/procurements/filter_config(.:format)                                                                       procure/procurements#filter_config
 #                              procure_procurements_count GET    /procure/procurements/count(.:format)                                                                               procure/procurements#count
 #                                    procure_procurements GET    /procure/procurements(.:format)                                                                                     procure/procurements#index
@@ -3207,11 +3211,16 @@ Rails.application.routes.draw do
   end
 
   get 'ping', to: 'ping#ping'
-  get 'ping/sidekiq', to: 'ping#sidekiq'
+  get 'ping/sidekiq/:type', to: 'ping#sidekiq'
   get 'ping/database', to: 'ping#database'
 
   ## Budget apis start ##
-  resources :budgets
+  resources :budgets do
+    patch 'add_budget', to: 'budgets#add_budget', as: :add_budget
+    patch 'reduce_budget', to: 'budgets#reduce_budget', as: :reduce_budget
+    get 'modification_trails', to: 'budgets#trails', as: :trails
+  end
+  get 'new_budget_config', to: 'budgets#new_budgets_config', as: :new_budgets_config
 
 ## Budget apis end ##
 

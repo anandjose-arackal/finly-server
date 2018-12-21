@@ -105,8 +105,8 @@ class User < ActiveRecord::Base
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
-  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
-  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
@@ -236,6 +236,10 @@ class User < ActiveRecord::Base
   validates :user_panel_subscription, presence: true
 
   scope :with_id, ->(user_id) { where id: user_id }
+  scope :with_id_or_email_or_mobile_number, -> (string) {
+    ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
+    where id: ids
+  }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) do
@@ -555,6 +559,16 @@ class User < ActiveRecord::Base
 
   def roles
     self.user_roles
+  end
+
+  def expense_management_roles
+    role_ids = self.role_mapping.expense_management.pluck(:user_role_id)
+    UserRole.where(id: role_ids)
+  end
+
+  def vendor_payment_roles
+    role_ids = self.role_mapping.vendor_payments.pluck(:user_role_id)
+    UserRole.where(id: role_ids)
   end
 
   def company_admin?
@@ -887,6 +901,17 @@ class User < ActiveRecord::Base
 
   def reimbursements_awaiting_confirmation?
 
+  end
+
+  def status
+    "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+    if self.active and self.invitation_token.blank? and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+      return "Active"
+    elsif self.first_name.blank? || self.invitation_token.present? || self.mobile_only_invite
+      return "Pending"
+    elsif !self.active and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+      return "Inactive"
+    end
   end
 
   private

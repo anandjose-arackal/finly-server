@@ -7,7 +7,9 @@ gem 'wkhtmltopdf-binary', '0.12.3.1'
 gem 'nokogiri', '1.6.8'
 gem 'autoprefixer-rails', '6.5.0.1'
 
-gem 'parslet'
+gem 'parslet', '1.8.2'
+
+gem 'elastic-apm', '2.1.2'
 
 # adding gems for activeMQ
 gem 'daemons', '1.2.4'
@@ -155,6 +157,8 @@ gem 'liquid'
 gem 'hooks', '0.4.1'
 
 gem 'snowplow-tracker', '0.6.1'
+
+gem 'maxminddb', '0.1.22'
 
 gem 'bullet', '5.4.2', :group => 'development'
 

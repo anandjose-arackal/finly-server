@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181128140328) do
+ActiveRecord::Schema.define(version: 20181220143629) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -895,6 +895,12 @@ ActiveRecord::Schema.define(version: 20181128140328) do
 
   add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
 
+  create_table "budget_date_configurations", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "budget_modification_actions", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -974,6 +980,8 @@ ActiveRecord::Schema.define(version: 20181128140328) do
     t.date     "date"
     t.integer  "sub_department_id", limit: 4
     t.integer  "procurement_id",    limit: 4
+    t.date     "created_at_date"
+    t.date     "submitted_at_date"
   end
 
   create_table "budgets", force: :cascade do |t|
@@ -1474,6 +1482,8 @@ ActiveRecord::Schema.define(version: 20181128140328) do
     t.integer  "default_card_expense_category_id", limit: 4
     t.boolean  "sso_enabled",                                    default: false
     t.text     "address",                          limit: 65535
+    t.boolean  "cash_money_requests_enabled",                    default: true
+    t.integer  "budget_date_configuration_id",     limit: 4
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -2154,6 +2164,19 @@ ActiveRecord::Schema.define(version: 20181128140328) do
   add_index "document_number_configs", ["company_id"], name: "index_document_number_configs_on_company_id", using: :btree
   add_index "document_number_configs", ["document_number_config_type_id"], name: "index_document_number_configs_on_document_number_config_type_id", using: :btree
   add_index "document_number_configs", ["purpose_id"], name: "index_document_number_configs_on_purpose_id", using: :btree
+
+  create_table "document_slices", force: :cascade do |t|
+    t.integer  "page_number",        limit: 4
+    t.string   "image_file_name",    limit: 255
+    t.string   "image_content_type", limit: 255
+    t.integer  "image_file_size",    limit: 4
+    t.datetime "image_updated_at"
+    t.integer  "receipt_id",         limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "document_slices", ["receipt_id"], name: "index_document_slices_on_receipt_id", using: :btree
 
   create_table "document_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -2955,6 +2978,7 @@ ActiveRecord::Schema.define(version: 20181128140328) do
     t.boolean  "is_deleted",                                                           default: false
     t.integer  "resource_template_id",         limit: 4
     t.string   "invoice_id",                   limit: 255
+    t.datetime "submitted_at"
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -4242,6 +4266,7 @@ ActiveRecord::Schema.define(version: 20181128140328) do
     t.boolean  "is_template",                                                         default: false
     t.string   "template_name",                limit: 255
     t.integer  "resource_template_id",         limit: 4
+    t.datetime "submitted_at"
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -4483,6 +4508,7 @@ ActiveRecord::Schema.define(version: 20181128140328) do
     t.boolean  "hard_copy_received",               default: true
     t.integer  "sourcable_id",       limit: 4
     t.integer  "sourcable_type",     limit: 4
+    t.boolean  "is_deleted",                       default: false
   end
 
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
@@ -5885,6 +5911,7 @@ ActiveRecord::Schema.define(version: 20181128140328) do
   add_foreign_key "document_number_configs", "companies"
   add_foreign_key "document_number_configs", "document_number_config_types"
   add_foreign_key "document_number_configs", "purposes"
+  add_foreign_key "document_slices", "receipts"
   add_foreign_key "e_way_bills", "amounts"
   add_foreign_key "e_way_bills", "companies"
   add_foreign_key "e_way_bills", "payment_terms"

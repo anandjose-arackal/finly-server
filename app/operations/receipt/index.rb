@@ -23,12 +23,14 @@ class Receipt::Index < Receipt::Base
 
   class Receipt::Index::ReceiptsPresenter < BaseOperation::BasePresenter::SuccessPresenter
     include HasScope
-    attr_accessor :receipts, :categories
+    attr_accessor :receipts, :categories, :count, :paginated_receipts
 
     has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
-      self.receipts = apply_scopes(params[:receipts]).paginate(page: params[:page], per_page: 32) rescue nil
+      self.receipts = apply_scopes(params[:receipts])
+      self.count = self.receipts.count
+      self.paginated_receipts = self.receipts.paginate(page: params[:page], per_page: 32) rescue nil
       self.categories = user.company.categories.active
     end
   end

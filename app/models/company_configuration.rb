@@ -19,6 +19,8 @@
 #  default_card_expense_category_id :integer
 #  sso_enabled                      :boolean          default(FALSE)
 #  address                          :text(65535)
+#  cash_money_requests_enabled      :boolean          default(TRUE)
+#  budget_date_configuration_id     :integer
 #
 
 class CompanyConfiguration < ActiveRecord::Base
@@ -30,6 +32,5 @@ class CompanyConfiguration < ActiveRecord::Base
   validates_attachment_content_type :logo, :content_type => ["image/jpg", "image/jpeg", "image/png", "image/gif"]
 
   validates :company_id, presence: true, uniqueness: true
-
 
 end

@@ -44,6 +44,8 @@ class Budget < ActiveRecord::Base
   has_many :budgetable_users, through: :budget_criteria_mappings, source: :budgetable, source_type: 'User'
   has_many :budgetable_departments, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Department'
 
+  has_many :budget_modification_trails
+
   accepts_nested_attributes_for :budget_amount
   accepts_nested_attributes_for :budget_criteria_mappings
 
@@ -116,7 +118,12 @@ class Budget < ActiveRecord::Base
   }
 
   scope :contains_date, -> (date) {
-    where('start_date <= ? AND end_date >= ?', date, date)
+    if date.present?
+      where('start_date <= ? AND end_date >= ?', Date.parse(date.to_s), Date.parse(date.to_s))
+    else
+      # i.e. return an empty array
+      where(id: [])
+    end
   }
 
   scope :filter_date, -> (date_from, date_to) {
@@ -131,9 +138,10 @@ class Budget < ActiveRecord::Base
   }
 
   scope :filter_month, -> (month) {
-    if month.present?
-      where('extract(month from start_date) = ? OR extract(month from end_date) = ?', month, month)
+    if month.blank?
+      month = Date.today.month
     end
+    where('extract(month from start_date) = ? OR extract(month from end_date) = ?', month, month)
   }
 
   scope :filter_search, -> (term) {
@@ -171,11 +179,4 @@ class Budget < ActiveRecord::Base
              ])
   }
 
-
-  # todo - change this to reflect the new structure
-  # scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
-  # scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}
-  # scope :with_budgetable_yes_bank_vendor_id, -> (ids) {where budgetable_id: ids, budgetable_type: "YesBankVendor"}
-  # scope :with_budgetable_field_drop_down_item, -> (ids)  { where budgetable_type: "FieldDropDownItem", budgetable_id: ids }
-  # scope :with_budgetable_cost_center_id, -> (ids)  { where budgetable_type: "CostCenter", budgetable_id: ids }
 end

@@ -87,9 +87,9 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
     user_ids.each do |user_id|
       destination_pocket_ids = self.money_requests.pluck(:destination_pocket_id).uniq
       destination_pocket_ids.each do |pocket_id|
-        request_ids = self.money_requests.with_user(user_id).with_destination_pocket_id(pocket_id).pluck(:id)
-        amount = MoneyRequestItem.with_money_request(request_ids).sum_amount
         pocket = UserPocket.find_by(id: pocket_id)
+        request_ids = self.money_requests.with_user(user_id).with_destination_pocket_id(pocket_id).pluck(:id)
+        amount = MoneyRequestItem.with_money_request(request_ids).sum_amount(pocket&.base_currency&.country_code)
         self.user_count += 1
         self.request_total[pocket.base_currency&.country_code] = Amount.new(value: 0, currency_id: pocket.base_currency_id) if self.request_total[pocket.base_currency&.country_code].blank?
         self.request_total[pocket.base_currency&.country_code].value += amount

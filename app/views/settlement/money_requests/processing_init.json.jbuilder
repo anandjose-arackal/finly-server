@@ -15,7 +15,10 @@ json.details do
         final_approver = money_request.final_approver
         json.auto_approved final_approver.blank?
         json.final_approver final_approver
-        json.request_total money_request.total_amount
+        json.request_total do
+          json.value money_request.total_amount
+          json.currency money_request.base_currency
+        end
       end
     end
     json.bank_accounts detail[:bank_accounts]

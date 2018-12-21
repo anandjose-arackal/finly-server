@@ -73,6 +73,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       actions = {}
 
       actions[:audit_trail] = true
+      actions[:export_items] = true
       if purchase_order.items.count > 0
         actions[:show_comments] = true
       end

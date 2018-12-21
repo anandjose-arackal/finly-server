@@ -43,6 +43,8 @@ json.total @result.report.total_amount
 json.base_currency_id @result.report.base_currency_id
 json.date @result.report.created_at.strftime('%d %b %Y')
 
+json.approvers @result.approvers
+
 json.comments @result.comments do |comment|
   json.content comment.generate @result.user
   json.created_at comment.created_at.strftime('%d %b %Y')
@@ -201,4 +203,21 @@ json.show_trips travel_desk_enabled
 if travel_desk_enabled
   json.user_travel_requests @result.report.user.travel_requests.reportable, :id, :name, :trip_id
   json.associated_trip @result.report.travel_request
+end
+
+# this will contain a summary of the user's account details
+json.account_details do
+  card = @result.report.user.cards.first
+  cash_on_hand_pocket = @result.report.user.user_pockets.cash_pockets_only.first
+  cash_on_hand_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_on_hand_pocket)
+  finly_money_adapter = AccountManager::Wallet::WalletAdapter.new(@result.report.user.wallet)
+  card_adapter = AccountManager::Cards::CardAdapter.new(@result.report.user.cards.first) if card.present?
+
+  json.cash_on_hand_balance cash_on_hand_adapter.balance(display_balance: true)
+  json.cash_on_hand_base_currency cash_on_hand_pocket.base_currency&.country_code
+  if card.present?
+    json.card_balance card_adapter.balance
+    json.card_type "#{card.card_program&.name&.humanize} Card"
+  end
+  json.finly_money_balance finly_money_adapter.balance
 end

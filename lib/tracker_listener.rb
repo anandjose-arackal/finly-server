@@ -56,9 +56,9 @@ class TrackerListener
     return unless Rails.env.production?
     emitter = SnowplowTracker::Emitter.new('collector.finly.io', {protocol: 'https', port: 443})
     tracker = SnowplowTracker::Tracker.new(emitter)
-    tracker.set_user_id(request.user_id&.to_s)
-    tracker.set_useragent(request.user_agent)
-    tracker.set_ip_address(request.remote_ip)
+    tracker.set_user_id(request.user_id&.to_s) if request.user_id.present?
+    tracker.set_useragent(request.user_agent) if request.user_agent.present?
+    tracker.set_ip_address(request.remote_ip) if request.remote_ip.present?
 
     tracker.track_self_describing_event(SnowplowTracker::SelfDescribingJson.new(
         "iglu:io.finly/product_context/jsonschema/1-0-0",
@@ -179,16 +179,16 @@ class TrackerListener
       result = Geocoder.search(self.remote_ip)&.first
       {
           ip_type: result&.data&.dig('type'),
-          continent_name: result.continent_name,
-          continent_code: result.continent_code,
-          country_name: result.country_name,
-          country_code: result.country_code,
-          region_code: result.region_code,
-          region_name: result.region_name,
-          latitude: result.latitude,
-          longitude: result.longitude,
-          city: result.city,
-          zip: result.zip
+          continent_name: result&.continent_name,
+          continent_code: result&.continent_code,
+          country_name: result&.country_name,
+          country_code: result&.country_code,
+          region_code: result&.region_code,
+          region_name: result&.region_name,
+          latitude: result&.latitude,
+          longitude: result&.longitude,
+          city: result&.city,
+          zip: result&.zip
       }
     end
 
