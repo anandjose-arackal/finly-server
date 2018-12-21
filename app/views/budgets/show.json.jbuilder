@@ -57,11 +57,13 @@ json.budget_trail_items do
   json.purchase_order_items do
     json.array!(@result.spent_entities[2]) do |purchase_order_item|
       json.name purchase_order_item.description
-      json.cost_center_name purchase_order_item.cost_center&.name
+      json.cost_center_name purchase_order_item.purchase_order.cost_center&.name
       json.amount purchase_order_item.total_amount&.value
       json.date purchase_order_item.purchase_order.delivery_date
       json.location purchase_order_item.purchase_order.location&.name
       json.department purchase_order_item.purchase_order.department&.name
+      json.sub_department purchase_order_item.purchase_order.sub_department&.name
+      json.po_number purchase_order_item.purchasse_order.po_number
       json.index index
       index += 1
     end
@@ -76,6 +78,8 @@ json.budget_trail_items do
       json.date invoice_line_item.parent.date&.strftime("%Y-%B-%d")
       json.location invoice_line_item.parent.location&.name
       json.department invoice_line_item.parent.department&.name
+      json.sub_department invoice_line_item.parent&.sub_department&.name
+      json.invoice_number invoice_line_item.parent.invoice_number
       json.index index
       index += 1
     end
