@@ -42,7 +42,10 @@ class TravelRequests::Create < TravelRequests::Base
   end
 
   def process
-    unless travel_request.save
+    if travel_request.save
+      # add the custom fields associated with this travel request
+      CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), reset_fields: true, save: true)
+    else
       add_message :error, travel_request.errors.full_messages
     end
   end

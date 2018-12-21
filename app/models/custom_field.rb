@@ -152,7 +152,7 @@ class CustomField < ActiveRecord::Base
       when FieldType.id_for(:multiselect)
         names = []
         self.value&.field_multiselect_selection_items&.each do |item|
-          names << item.value.name
+          names << item.value&.name
         end
         return names.to_sentence
       else
@@ -191,7 +191,7 @@ class CustomField < ActiveRecord::Base
         names = []
         self.value&.field_multiselect_selection_items&.each do |item|
           ids << item.value_id
-          names << item.value.name
+          names << item.value&.name
         end
         json["#{field_configuration.field_type.name.to_sym}_field_value"] = {
             ids: ids,

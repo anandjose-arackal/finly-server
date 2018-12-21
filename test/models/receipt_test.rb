@@ -18,6 +18,7 @@
 #  hard_copy_received :boolean          default(TRUE)
 #  sourcable_id       :integer
 #  sourcable_type     :integer
+#  is_deleted         :boolean          default(FALSE)
 #
 
 

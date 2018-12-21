@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181207093053) do
+ActiveRecord::Schema.define(version: 20181211082350) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2247,14 +2247,6 @@ ActiveRecord::Schema.define(version: 20181207093053) do
   add_index "enforce_budget_configurations", ["company_id"], name: "index_enforce_budget_configurations_on_company_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
-    t.boolean  "enabled"
-    t.integer  "enforceable_id",   limit: 4
-    t.string   "enforceable_type", limit: 255
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-  end
-
-  create_table "enforce_policy_configurations", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
     t.boolean  "enabled"
@@ -2262,7 +2254,7 @@ ActiveRecord::Schema.define(version: 20181207093053) do
     t.datetime "updated_at",                   null: false
   end
 
-  add_index "enforce_policy_configurations", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
+  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
 
   create_table "expense_data_extract_sources", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -4497,6 +4489,7 @@ ActiveRecord::Schema.define(version: 20181207093053) do
     t.boolean  "hard_copy_received",               default: true
     t.integer  "sourcable_id",       limit: 4
     t.integer  "sourcable_type",     limit: 4
+    t.boolean  "is_deleted",                       default: false
   end
 
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
@@ -5291,8 +5284,8 @@ ActiveRecord::Schema.define(version: 20181207093053) do
     t.datetime "created_at",                                           null: false
     t.datetime "updated_at",                                           null: false
     t.boolean  "edit_terms_within_po",                 default: false
-    t.boolean  "crud_inventory_item_po",               default: true
-    t.boolean  "crud_inventory_item_non_po",           default: true
+    t.boolean  "crud_inventory_item_po"
+    t.boolean  "crud_inventory_item_non_po"
   end
 
   add_index "user_permissions", ["company_id"], name: "index_user_permissions_on_company_id", using: :btree

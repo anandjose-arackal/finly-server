@@ -66,6 +66,7 @@
 #  is_deleted                   :boolean          default(FALSE)
 #  resource_template_id         :integer
 #  invoice_id                   :string(255)
+#  submitted_at                 :datetime
 #
 
 #  gst_type_id: 1 - IGST
@@ -176,6 +177,7 @@ class Invoice < ActiveRecord::Base
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
   scope :with_procurement, -> {where("invoices.procurement_id IS NOT NULL")}
   scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+  scope :with_created_by_user_id, -> (user_ids) {where created_by_user_id: user_ids}
   scope :with_budgetable_department_ids, -> (department_ids) {
     if department_ids.present?
       ids = where(department_id: department_ids).pluck(:id)

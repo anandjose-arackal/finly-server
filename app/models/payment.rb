@@ -50,6 +50,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
   include PostOperationExecution
 
@@ -366,10 +367,10 @@ class Payment < ActiveRecord::Base
   }
 
   scope :include_for_index, -> {
-        includes( :payment_status, :amount, :department, :category, :system_messages,
+        includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
+                  receiving_account: [:account_owner],
                   invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
-                             :category, :cost_center, :tds_slab, :amount, :invoice_status,
-                             :invoice_attachments, :invoice_items],
+                            :category, :cost_center, :tds_slab, :amount, :invoice_status, :invoice_attachments, :invoice_items],
                   payment_order: [bank_payment_request: [:status]])
   }
 
@@ -520,7 +521,7 @@ class Payment < ActiveRecord::Base
   end
 
   def company_id
-    self.payment_order.company_id
+    self.payment_order&.company_id
   end
 
   def procurement_index_details
