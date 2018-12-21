@@ -24,6 +24,7 @@
 
 
 
+
 class Receipt < ActiveRecord::Base
   include SoftDeletable
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report

@@ -264,12 +264,9 @@ class Procurement < ActiveRecord::Base
   scope :include_details, -> {
     includes(
         {invoices: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}]},
-        {purchase_order: [:department, :sub_department, :cost_center, :vendor, :user, :company]},
+        # {purchase_order: [:department, :sub_department, :cost_center, :vendor, :user, :company]},
+        {purchase_order: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}, :user, {balance_amount: [:currency]}, :status, {level: :reviewers}]},
         {inward_documents: [:vendor, :user, :items]},
-        {
-            purchase_order: [:cost_center, :department, :sub_department, {vendor: :bank_accounts},
-                             {balance_amount: [:currency]}, :status, {level: :reviewers}]
-        },
         :status_tags, :procurement_status_taggables, :user
     )
   }
