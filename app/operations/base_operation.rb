@@ -230,6 +230,10 @@ class BaseOperation
     RequestStore.store[:current_user]
   end
 
+  def actual_current_user
+    RequestStore.store[:actual_current_user]
+  end
+
   def authorized_scopes
     RequestStore.store[:authorized_scopes]
   end

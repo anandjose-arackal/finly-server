@@ -163,6 +163,10 @@ class ApplicationController < ActionController::Base
     if @curr_user.class.name == 'User'
       RequestStoreUtil.set_current_company @curr_user&.company
     end
+
+    # looking for if the particular user is a delegate for someone else
+    retrieve_delegate_user
+
     @curr_user
   end
 
@@ -172,6 +176,17 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
+  def retrieve_delegate_user
+    # header is going to send a 'delegate_for_user_id' attribute
+    delegate_for_user_id = request.headers["delegate_for_user_id"]
+    delegated_for_user = @curr_user.delegated_for_users.find_by(id: delegate_for_user_id)
+    RequestStore.store[:actual_current_user] = @curr_user # setting the actual current user as this guy
+    if delegated_for_user.present?
+      @curr_user = delegated_for_user
+      RequestStore.store[:current_user] = delegated_for_user
+    end
+  end
 
   def respond_success_failure
     respond response: (@result.success? ? :success : :failure)

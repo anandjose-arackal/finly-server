@@ -37,6 +37,7 @@
 #  spent_from_id          :integer
 #  custom_conversion_rate :boolean          default(FALSE)
 #  cost_center_id         :integer
+#  created_by_id          :integer
 #
 
 
@@ -65,6 +66,7 @@ class Expense < ActiveRecord::Base
   belongs_to :gst_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
   belongs_to :spent_from, class_name: 'UserPocket'
+  belongs_to :created_by, class_name: "User"
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
