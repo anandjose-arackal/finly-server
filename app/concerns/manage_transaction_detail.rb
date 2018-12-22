@@ -19,7 +19,7 @@
            transaction_date: transaction.date
        }
 
-       self.create_transaction_detail(params)
+       self.build_transaction_detail(params).save
     end
 
     def merchant(finly_transaction)
