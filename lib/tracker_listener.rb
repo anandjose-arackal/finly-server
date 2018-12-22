@@ -177,6 +177,7 @@ class TrackerListener
 
     def location_properties
       result = Geocoder.search(self.remote_ip)&.first
+      begin
       {
           ip_type: result&.data&.dig('type'),
           continent_name: result&.continent_name,
@@ -190,6 +191,9 @@ class TrackerListener
           city: result&.city,
           zip: result&.zip
       }
+      rescue Exception => e
+        {}
+      end
     end
 
     def utm_properties
