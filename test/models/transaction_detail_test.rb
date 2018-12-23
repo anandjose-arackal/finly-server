@@ -6,7 +6,7 @@
 #  transaction_reference_id :string(255)
 #  payment_purpose          :string(255)
 #  merchant                 :string(255)
-#  note                     :text(65535)
+#  note                     :text(16777215)
 #  transaction_type         :string(255)
 #  status                   :string(255)
 #  amount_id                :integer
