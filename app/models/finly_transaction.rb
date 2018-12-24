@@ -23,6 +23,9 @@
 #
 
 class FinlyTransaction < ActiveRecord::Base
+
+  include ManageTransactionDetail
+
   belongs_to :finly_account, polymorphic: true
   belongs_to :transaction_type
   belongs_to :amount
@@ -34,6 +37,7 @@ class FinlyTransaction < ActiveRecord::Base
   belongs_to :payment
   belongs_to :company
   has_many :system_messages, as: :messagable, dependent: :destroy
+  has_one :transaction_detail
 
   accepts_nested_attributes_for :amount, :opening_balance, :closing_balance
 
@@ -89,6 +93,7 @@ class FinlyTransaction < ActiveRecord::Base
   scope :limit_to_one, -> {limit 1}
 
   after_save :set_sequence_number
+  after_create :save_transaction_detail
 
   before_create do
     ref_id = payment&.reference_id

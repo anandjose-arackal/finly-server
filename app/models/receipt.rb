@@ -19,7 +19,9 @@
 #  sourcable_id       :integer
 #  sourcable_type     :integer
 #  is_deleted         :boolean          default(FALSE)
+#  created_by_id      :integer
 #
+
 
 
 
