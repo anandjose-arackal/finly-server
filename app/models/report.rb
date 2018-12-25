@@ -277,6 +277,21 @@ class Report < ActiveRecord::Base
     ids = Report.where(id: original_report_ids, user_id: user_ids).pluck(:id)
     where(id: ids)
   }
+
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where user_id: user_ids
+    end
+  }
+
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      ids = where(department_id: department_ids).pluck(:id)
+      ids = where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
+    end
+  }
+
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount

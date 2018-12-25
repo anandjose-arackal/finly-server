@@ -108,6 +108,9 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
         self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
       when "Expense", "Report"
         self.relevant_budgets = user.company.budgets.applicable_to_expenses
+        expenses = self.object.expenses
+        department_ids = [self.object.department_id]
+
       when "Payment", "PaymentOrder", "BankPaymentRequest"
         self.relevant_budgets = user.company.budgets.applicable_to_payments
         payments = self.object.payments
