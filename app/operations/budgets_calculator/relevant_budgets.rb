@@ -107,10 +107,16 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
         relevant_budget_ids = relevant_budgets.with_id(relevant_budget_ids).with_budgetable_categories(category_ids).pluck(:id)
         self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
       when "Expense", "Report"
-        self.relevant_budgets = user.company.budgets.applicable_to_expenses
         expenses = self.object.expenses
-        department_ids = [self.object.department_id]
-
+        department_ids = []
+        department_ids = [self.object.department_id] if self.object.department.present?
+        department_ids = [self.object.sub_department_id] if self.object.sub_department.present?
+        date = DateUtils.local_date
+        self.relevant_budgets = user.company.budgets.applicable_to_expenses.contains_date(date)
+        category_ids = expenses.pluck(:category_id)
+        user_ids = expenses.pluck(:user_id)
+        relevant_budget_ids = self.relevant_budgets.with_budgetable_departments(department_ids).with_budgetable_users(user_ids).with_budgetable_categories(category_ids)
+        self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
       when "Payment", "PaymentOrder", "BankPaymentRequest"
         self.relevant_budgets = user.company.budgets.applicable_to_payments
         payments = self.object.payments
