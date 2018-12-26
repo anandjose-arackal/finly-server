@@ -1,18 +1,4 @@
 class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
-  # If policy not present auto approve
-  #
-
-  # include AASM
-  # attr_accessor :document_state, :document, :user, :violations_present, :policy, :current_level, :next_level
-  #
-  # def initialize(document, violations_present, user)
-  #   self.document = document
-  #   self.violations_present = violations_present
-  #   self.aasm.current_state = self.document.status.name.to_sym ## Have to take care where status is stored in a different attribute
-  #   self.user = user
-  #   self.policy = self.document.policy ## Have to take care where status is stored in a different attribute
-  #   set_levels
-  # end
 
   aasm :whiny_transitions => false do
     state :open, initial: true, :before_enter => :set_state
@@ -26,7 +12,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
     state :closed
 
     event :submit do
-      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :approvers_not_present?
+      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
       transitions from: [:open, :retracted, :rejected], to: :processing
     end
 
@@ -74,9 +60,10 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
 
   private
 
-  def set_state
-    aasm.current_state = self.document_state
-  end
+  # def set_state
+  #   debugger
+  #   aasm.current_state = self.document_state
+  # end
 
   def change_state
     # reset levels
@@ -93,11 +80,11 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
     end
 
     # Change state of purchase order
-    purchase_order_status_id = ::PurchaseOrderStatus.id_for(self.aasm.current_state)
+    report_status_id = ::ReportStatus.id_for(self.aasm.current_state)
     update_params = {
-        purchase_order_status_id: purchase_order_status_id,
+        report_status_id: report_status_id,
         controlling_level_id: self.next_level&.id
     }
-    self.purchase_order.update(update_params)
+    self.document.update(update_params)
   end
 end

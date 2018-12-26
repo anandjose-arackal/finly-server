@@ -12,7 +12,6 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
     end
 
     if mappings_params[:document_reviewer_mappings].present?
-
       mappings_params[:document_reviewer_mappings].each do |mapping_params|
         # check if level present in company
         level = ::ReviewalLevel.find_by id: mapping_params[:level_id]
@@ -23,18 +22,18 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
 
         mapping_params[:level] = level
 
-        # check if reviewer present in company
+        # # check if reviewer present in company
         reviewer = user.company.users.find_by id: mapping_params[:reviewer_id]
-
+        #
         if reviewer.present?
           mapping_params[:reviewer] = reviewer
         end
       end
-
     end
   end
 
   def process
+    # find
     if mappings_params[:document_reviewer_mappings].present?
       mappings_params[:document_reviewer_mappings].each do |mapping_params|
         reviewer_id = mapping_params[:reviewer_id].to_i
@@ -75,6 +74,9 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
         end
       end
     end
+
+    # find all without current policy and delete
+    document.document_level_reviewer_mappings.where.not(policy_id: document.policy_id).destroy_all
   end
 
   private
