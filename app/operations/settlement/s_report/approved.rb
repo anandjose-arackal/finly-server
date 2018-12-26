@@ -4,7 +4,7 @@
 # report: report being marked as approved
 #
 
-class Settlement::SReport::Approved < Report::Base
+class Settlement::SReport::Approved < Reports::Base
   attr_accessor :report
 
   def authorized_user_types

@@ -101,7 +101,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
   def post_process
     # add report comment
-    Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+    Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     # if the new category is personal, mark the expense as personal
     if expense.category_name == 'Personal'

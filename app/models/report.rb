@@ -42,12 +42,14 @@ class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
-          FindByOrderedIds
+          FindByOrderedIds, Transitionable
+
+
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :user, inverse_of: :reports
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
-  belongs_to :policy
+  # belongs_to :policy # Added by Transitionable
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'

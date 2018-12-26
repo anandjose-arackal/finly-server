@@ -72,7 +72,7 @@ class Settlement::Summary < Settlement::Base
   protected
 
   def load_reports_summary
-    reports_presenter = Report::Index.(user, params)
+    reports_presenter = Reports::Index.(user, params)
     unless reports_presenter.success?
       add_message :error, reports_presenter.messages[:error]
       return

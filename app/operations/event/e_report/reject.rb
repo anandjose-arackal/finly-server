@@ -22,7 +22,7 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def affected_users
-    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
   end
 
   def send_push_notification(user)
@@ -32,7 +32,7 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def set_notification(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
     notification = user.notifications.build(user: user,
                                             notification_type_id: NotificationType.id_for(:report),
                                             action_type_id: NotificationActionType.id_for(:notify_reject),
@@ -66,7 +66,7 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def report_view_role(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
     return roles.first
   end
 

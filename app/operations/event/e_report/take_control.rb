@@ -62,7 +62,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def report_view_role(user)
-    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
     roles.first
   end
 

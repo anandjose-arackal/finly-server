@@ -185,7 +185,7 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def post_process
     # add comment in report if expense is added within report
-    Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+    Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     if expense.date == DateUtils.local_date
       if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id

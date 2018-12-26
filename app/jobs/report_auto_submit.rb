@@ -20,7 +20,7 @@ class ReportAutoSubmit < ActiveJob::Base
 
     auto_submit_configs.each do |config|
       user = config.submitable
-      Report::AutoSubmit.(nil, user: user)
+      Reports::AutoSubmit.(nil, user: user)
     end
   end
 
