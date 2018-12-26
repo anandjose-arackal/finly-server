@@ -37,5 +37,6 @@ class ReviewalLevel < ActiveRecord::Base
   # Since you can alias scopes as they are class methods, you have use the below method
   singleton_class.send :alias_method, :filter_associated_entity_type, :with_entity_type
   singleton_class.send :alias_method, :filter_policy, :with_policy_ids
+  singleton_class.send :alias_method, :filter_policy_id, :with_policy_ids
   singleton_class.send :alias_method, :with_ids, :with_id
 end
