@@ -33,7 +33,10 @@
 #  report_processor_group_mapping_id  :integer
 #  travel_request_id                  :integer
 #  created_by_id                      :integer
+#  department_id                      :integer
+#  sub_department_id                  :integer
 #
+
 
 
 
@@ -69,7 +72,8 @@ class Report < ActiveRecord::Base
   belongs_to :sync_status, class_name: 'ReportSyncStatus'
   belongs_to :sync_type, class_name: 'ReportSyncType'
   belongs_to :travel_request
-  # belongs_to :money_request
+  belongs_to :department
+  belongs_to :sub_department, class_name: "Department"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

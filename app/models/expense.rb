@@ -47,6 +47,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
@@ -1184,10 +1185,12 @@ class Expense < ActiveRecord::Base
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report&.report_status_id)
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
-    else
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
+    if self.report.present?
+      if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report&.report_status_id)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+      else
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
+      end
     end
   end
 

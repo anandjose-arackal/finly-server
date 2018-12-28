@@ -58,10 +58,14 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
               end
             end
           when "Report"
-            expenses = processor_instance.relevant_items(self.object)
-            if expenses.present?
-              current_object_amount = expenses.joins(:amount).sum(:value)
-              spent_amount = budget_spent_amount + current_object_amount
+            if self.object.open? || self.object.retracted? || self.object.rejected?
+              expenses = processor_instance.relevant_items(self.object)
+              if expenses.present?
+                current_object_amount = expenses.joins(:amount).sum(:value)
+                spent_amount = budget_spent_amount + current_object_amount
+              else
+                spent_amount = budget_spent_amount
+              end
             else
               spent_amount = budget_spent_amount
             end
