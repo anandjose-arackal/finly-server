@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181225121207) do
+ActiveRecord::Schema.define(version: 20181228112956) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -5021,6 +5021,7 @@ ActiveRecord::Schema.define(version: 20181225121207) do
     t.datetime "transaction_date"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.integer  "sequence_number",          limit: 4
   end
 
   add_index "transaction_details", ["amount_id"], name: "fk_rails_12e08cc879", using: :btree
