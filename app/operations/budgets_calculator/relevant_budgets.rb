@@ -101,20 +101,20 @@ class BudgetsCalculator::RelevantBudgets < BudgetsCalculator::Base
       when "PurchaseOrder", "Invoice"
         delivery_date = (self.object.is_a?(PurchaseOrder)) ? self.object.created_at : self.object.date
         relevant_budgets = company_budgets.applicable_to_purchase_orders.contains_date(delivery_date)
-        relevant_budget_ids = []
         # relevant_budget_ids += relevant_budgets.with_budgetable_locations(self.object.location_id).pluck(:id)
-        department_ids = [self.object.department_id, self.object.sub_department_id]
-        relevant_budget_ids = relevant_budgets.with_budgetable_departments(department_ids).pluck(:id)
+        department_ids = []
+        department_ids += [self.object.department_id] if self.object.department.present?
+        department_ids += [self.object.sub_department_id] if self.object.sub_department.present?
         # relevant_budget_ids = relevant_budgets.with_budgetable_vendors(self.object.vendor_id).pluck(:id)
         inventory_item_ids = self.object.items.pluck(:inventory_line_item_id)
         category_ids = InventoryLineItem.with_id(inventory_item_ids).pluck(:category_id)
-        relevant_budget_ids = relevant_budgets.with_id(relevant_budget_ids).with_budgetable_categories(category_ids).pluck(:id)
+        relevant_budget_ids = relevant_budgets.with_budgetable_departments(department_ids).with_budgetable_categories(category_ids).pluck(:id)
         self.relevant_budgets = company_budgets.with_id(relevant_budget_ids)
       when "Expense", "Report"
         expenses = self.object.expenses
         department_ids = []
-        department_ids = [self.object.department_id] if self.object.department.present?
-        department_ids = [self.object.sub_department_id] if self.object.sub_department.present?
+        department_ids += [self.object.department_id] if self.object.department.present?
+        department_ids += [self.object.sub_department_id] if self.object.sub_department.present?
         date = DateUtils.local_date
         self.relevant_budgets = user.company.budgets.applicable_to_expenses.contains_date(date)
         category_ids = expenses.pluck(:category_id)
