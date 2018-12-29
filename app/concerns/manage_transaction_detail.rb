@@ -16,8 +16,8 @@
            merchant: merchant(transaction),
            note: transaction.payment&.note,
            payment_purpose: transaction.payment_purpose&.name,
-           transaction_date: transaction.date
-           # sequence_number: transaction.sequence_number
+           transaction_date: transaction.date,
+           sequence_number: transaction.sequence_number
        }
 
        if self.transaction_detail.present?
