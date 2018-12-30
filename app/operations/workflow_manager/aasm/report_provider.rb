@@ -131,7 +131,6 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
     end
 
     # Change state of purchase order
-    debugger
     report_status_id = ::ReportStatus.id_for(self.aasm.current_state)
     update_params = {
         report_status_id: report_status_id,
