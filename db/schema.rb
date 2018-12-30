@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181226081509) do
+ActiveRecord::Schema.define(version: 20181228105820) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2132,6 +2132,10 @@ ActiveRecord::Schema.define(version: 20181226081509) do
     t.integer  "level_number",                    limit: 4
     t.boolean  "taken_control",                               default: false
     t.integer  "taken_control_by_id",             limit: 4
+    t.boolean  "viewable",                                    default: false
+    t.datetime "became_viewable_at"
+    t.integer  "action_taken_by_id",              limit: 4
+    t.integer  "action_id",                       limit: 4
   end
 
   add_index "document_level_reviewer_mappings", ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id", using: :btree

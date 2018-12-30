@@ -100,6 +100,16 @@ class Reports::Create < Reports::Base
 
       CustomField::SetFields.(report, FieldParentType.id_for(:report), reset_fields: true, save: true)
 
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.report.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Create.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
     else
       add_message :error, report.errors.full_messages
     end

@@ -17,7 +17,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
     end
 
     event :approve do
-      transitions :from => :processing, :to => :approved, guard: :approvers_not_present?
+      transitions :from => :processing, :to => :approved, guard: :reviewers_not_present?
       transitions :from => :processing, :to => :processing
     end
 
@@ -66,6 +66,57 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
   # end
 
   def change_state
+    # Update Document Level Reviewer Mapping
+    # find current document_level_reviewer_mappings
+    if [:approve, :reject].include?(aasm.current_event)
+      dlrm = document.document_level_reviewer_mappings
+                 .where(level_id: level.id, policy_id: document.policy.id)
+                 .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
+
+      if dlrm.present?
+        dlrm.update({
+                        action_id: TrailAction.id_for(aasm.current_event),
+                        viewable: true,
+                        action_taken_by_id: user.id
+
+                    })
+      end
+    end
+
+    if [:take_control].include?(aasm.current_event)
+      dlrm = document.document_level_reviewer_mappings
+          .where(level_id: level.id, policy_id: document.policy.id)
+
+      if dlrm.present?
+        dlrm.update_all(taken_control_by_id: user.id, taken_control: true)
+      end
+    end
+
+    if [:retract].include?(aasm.current_event)
+      dlrm = document.document_level_reviwer_mappings
+      dlrm.update_all(
+          taken_control: false,
+          taken_control_by_id: nil,
+          action_taken_by_id: nil,
+          action_id: nil
+      )
+    end
+
+    if [:reject].include?(aasm.current_event)
+      dlrm = document.document_level_reviewer_mappings
+      dlrm.update_all(
+              taken_control: false,
+              taken_control_by_id: nil,
+              action_taken_by_id: nil,
+              action_id: nil
+      )
+    end
+
+
+
+
+
+
     # reset levels
     if [:retract, :reject].include?(aasm.current_event)
       self.next_level = nil
@@ -80,6 +131,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
     end
 
     # Change state of purchase order
+    debugger
     report_status_id = ::ReportStatus.id_for(self.aasm.current_state)
     update_params = {
         report_status_id: report_status_id,

@@ -29,6 +29,15 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
           mapping_params[:reviewer] = reviewer
         end
       end
+    else
+      mappings_params[:document_reviewer_mappings] = []
+      document.policy.levels.each do |level|
+        mapping_data = {
+            level_id: level.id,
+            level: level
+        }
+        mappings_params[:document_reviewer_mappings].push(mapping_data)
+      end
     end
   end
 
@@ -45,33 +54,66 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
         reviewer = mapping_params[:reviewer]
         level = mapping_params[:level]
 
-        if level.present? && reviewer.present?
-          amount = get_document_amount
-          reviewer_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
+        amount = get_document_amount
+        valid_reviewers = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
 
-          unless reviewer_ids.include?(reviewer.id)
-            add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount is greater than threshold value. Please select a different reviewer."
-            break
+        if level.present?
+          if reviewer.present?
+            if valid_reviewers.include?(reviewer.id)
+              new_level = document.document_level_reviewer_mappings.new({
+                                                                           level_id: level.id,
+                                                                           policy_id: document.policy.id,
+                                                                           reviewer_id: reviewer.id,
+                                                                           level_number: level.level_number
+                                                                       })
+              document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
+              new_level.save
+            else
+              add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount is greater than threshold value"
+            end
+          else
+            document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
+            level.reviewers.each do |level_reviewer|
+              if valid_reviewers.include?(level_reviewer.id)
+
+              document.document_level_reviewer_mappings.create({
+                                                                   level_id: level.id,
+                                                                   policy_id: document.policy_id,
+                                                                   reviewer_id: level_reviewer.id,
+                                                                   level_number: level.level_number
+                                                               })
+              end
+            end
           end
         end
 
-        mapping_params.delete(:reviewer_id)
-        mapping_params.delete(:reviewer)
-        mapping_params.delete(:level)
+        # if level.present? && reviewer.present?
+        #   amount = get_document_amount
+        #   reviewer_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
+        #
+        #   unless reviewer_ids.include?(reviewer.id)
+        #     add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount is greater than threshold value. Please select a different reviewer."
+        #     break
+        #   end
+        # end
 
-        # todo-abi remove it and run script to delete all duplicates
-        mapping_params[:policy_id] = document.policy_id
+        # mapping_params.delete(:reviewer_id)
+        # mapping_params.delete(:reviewer)
+        # mapping_params.delete(:level)
+        #
+        # # todo-abi remove it and run script to delete all duplicates
+        # mapping_params[:policy_id] = document.policy_id
 
-        mapping = document.document_level_reviewer_mappings.find_or_initialize_by(mapping_params)
+        # mapping = document.document_level_reviewer_mappings.find_or_initialize_by(mapping_params)
 
-        if reviewer.present?
-          mapping.reviewer_id = reviewer.id
-          unless mapping.save
-            add_message :error, "Couldn't create mapping reviewer level mapping for level_id: #{mapping_params[:level_id]}, reviewer_id: #{reviewer_id}"
-          end
-        else
-          mapping.destroy if mapping.persisted?
-        end
+        # if reviewer.present?
+        #   mapping.reviewer_id = reviewer.id
+        #   unless mapping.save
+        #     add_message :error, "Couldn't create mapping reviewer level mapping for level_id: #{mapping_params[:level_id]}, reviewer_id: #{reviewer_id}"
+        #   end
+        # else
+        #   mapping.destroy if mapping.persisted?
+        # end
       end
     end
 

@@ -1,4 +1,4 @@
-class WorkflowManager::Aasm::Invoice < WorkflowManager::Aasm::Base
+class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::Base
   # If policy not present auto approve
   #
 

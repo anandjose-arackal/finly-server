@@ -1,6 +1,6 @@
 class WorkflowManager::Aasm::Base
   include AASM
-  attr_accessor :document_state, :document, :user, :violations_present, :policy, :current_level, :next_level
+  attr_accessor :document_state, :document, :user, :violations_present, :policy, :current_level, :next_level, :reviewers
 
   def initialize(document, violations_present, user)
     self.document = document
@@ -8,7 +8,13 @@ class WorkflowManager::Aasm::Base
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
     self.user = user
     self.policy = self.document.policy ## Have to take care where status is stored in a different attribute
-    set_levels
+
+
+    # get reviewers
+    self.current_level = document.level
+    self.next_level = document.get_level(:next)
+    self.previous_level = document.get_level(:prev)
+    self.reviewers = document.get_reviewers
   end
 
   private
@@ -27,39 +33,10 @@ class WorkflowManager::Aasm::Base
     amount
   end
 
+  def approvers_not_present?
+  end
+
   def reviewers_not_present?
-    if self.policy.present?
-      if self.next_level.present?
-        if self.next_level.level_reviewer_mappings.with_threshold(document_amount).present?
-          return false
-        else
-          return true
-        end
-      else
-        return true
-      end
-    else
-      true
-    end
+    self.reviewers.blank?
   end
-
-  def set_levels
-    # total_amount = purchase_order.total_amount
-    self.current_level = ReviewalLevel.with_id(document.controlling_level_id).first
-    level_number = current_level.present? ? (current_level.level_number + 1) : 1
-    self.next_level = self.policy.levels.with_entity_type(document.class.name).with_level_number(level_number).first
-  end
-
-  def previous_level
-    self.current_level = ReviewalLevel.with_id(document.controlling_level_id).first
-    if current_level.present? && current_level.level_number > 1
-      level_number = current_level.level_number - 1
-      level = self.policy.levels.with_entity_type(document.class.name).with_level_number(level_number).first
-    else
-      level = nil
-    end
-    level
-  end
-
-
 end

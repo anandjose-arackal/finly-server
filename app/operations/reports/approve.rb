@@ -48,9 +48,10 @@ class Reports::Approve < Reports::Base
   end
 
   def validate
-    unless report.processing? or auto_approve
-      add_message :error, 'Cannot approve this report as it is not in processing state'
-    end
+    # Will be moved to workflow manager
+    # unless report.processing? or auto_approve
+    #   add_message :error, 'Cannot approve this report as it is not in processing state'
+    # end
 
     violations = Reports::Violation.(user, report: report)
     violations_present = false
@@ -65,57 +66,73 @@ class Reports::Approve < Reports::Base
   end
 
   def process
-    presenter = User::Team::Review::NextReviewer.(report, has_violations: self.has_violations)
-    manager = presenter.user
-    to_user_role_id = presenter.role_id
-    status = ReportStatus.processing_id
-    if auto_approve or manager.blank?
-      status = ReportStatus.approved_id
+    ############
+    # approved_at,
+    #############
+    # presenter = User::Team::Review::NextReviewer.(report, has_violations: self.has_violations)
+    # manager = presenter.user
+    # to_user_role_id = presenter.role_id
+    # status = ReportStatus.processing_id
+    # if auto_approve or manager.blank?
+    #   status = ReportStatus.approved_id
       # if the report has no reimbursable expenses, mark it as closed because there are no reimbursements
-      if report.expenses.only_reimbursable_expenses.count == 0
-        status = ReportStatus.closed_id
-      end
-    end
-    if status == ReportStatus.approved_id || status == ReportStatus.closed_id
-      approved_at = DateUtils.local_date_time
-    else
-      approved_at = nil
-    end
-    curr_user_role = User::Team::Review::UserRole.(user, self.report)
-    update_attributes = {report_status_id: status,
-                         controlling_user: manager,
-                         controlling_for_user_id: nil,
-                         controlling_user_role_id: to_user_role_id,
-                         controlling_for_user_role_id: nil,
-                         auto_approve: auto_approve,
-                         approved_at: approved_at}
-    update_attributes[:submitted_at] = DateTime.now if auto_approve
-    if report.update_attributes update_attributes
-      if auto_approve
-        track = report.tracks.build action_user: nil,
-                                    modified_user: nil,
-                                    report_tracking_action_id: ReportTrackingAction.id_for(:auto_approve),
-                                    report_status_id: status
-      else
-        track = report.tracks.build action_user: user,
-                                    modified_user_id: report.controlling_user_id,
-                                    modified_user_role_id: to_user_role_id,
-                                    report_tracking_action_id: ReportTrackingAction.id_for(:approve),
-                                    report_status_id: status,
-                                    action_user_role_id: curr_user_role
-      end
-      track.save
+      # if report.expenses.only_reimbursable_expenses.count == 0
+      #   status = ReportStatus.closed_id
+      # end
+    # end
+    # if status == ReportStatus.approved_id || status == ReportStatus.closed_id
+    #   approved_at = DateUtils.local_date_time
+    # else
+    #   approved_at = nil
+    # end
+    # curr_user_role = User::Team::Review::UserRole.(user, self.report)
+    # update_attributes = {report_status_id: status,
+    #                      controlling_user: manager,
+    #                      controlling_for_user_id: nil,
+    #                      controlling_user_role_id: to_user_role_id,
+    #                      controlling_for_user_role_id: nil,
+    #                      auto_approve: auto_approve,
+    #                      approved_at: approved_at}
+    # update_attributes[:submitted_at] = DateTime.now if auto_approve
+    # if report.update_attributes update_attributes
+    #   if auto_approve
+    #     track = report.tracks.build action_user: nil,
+    #                                 modified_user: nil,
+    #                                 report_tracking_action_id: ReportTrackingAction.id_for(:auto_approve),
+    #                                 report_status_id: status
+    #   else
+    #     track = report.tracks.build action_user: user,
+    #                                 modified_user_id: report.controlling_user_id,
+    #                                 modified_user_role_id: to_user_role_id,
+    #                                 report_tracking_action_id: ReportTrackingAction.id_for(:approve),
+    #                                 report_status_id: status,
+    #                                 action_user_role_id: curr_user_role
+    #   end
+    #   track.save
+    #
+    #   if report.closed?
+    #     track = report.tracks.build action_user: nil,
+    #                                 modified_user: nil,
+    #                                 report_tracking_action_id: ReportTrackingAction.id_for(:closed),
+    #                                 report_status_id: ReportStatus.closed_id
+    #     track.save
+    #   end
+    #   return true
+    # end
+    # add_message :error, report.errors.full_messages
 
-      if report.closed?
-        track = report.tracks.build action_user: nil,
-                                    modified_user: nil,
-                                    report_tracking_action_id: ReportTrackingAction.id_for(:closed),
-                                    report_status_id: ReportStatus.closed_id
-        track.save
-      end
-      return true
+    #  Workflow Manager
+    params[:document] = self.report
+    params[:aasm_event] = 'approve'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
     end
-    add_message :error, report.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

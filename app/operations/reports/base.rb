@@ -3,7 +3,7 @@
 
 require "#{Rails.root}/lib/formatter.rb"
 class Reports::Base < BaseOperation
-  attr_accessor :report, :report_id
+  attr_accessor :report, :report_id, :workflow_output
 
   def pre_validate
     if user.blank?
