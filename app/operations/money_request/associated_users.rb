@@ -1,5 +1,5 @@
 # params = {money_request: request_obj, user_before: user_object}
-# Note: the request object caches users roles. So if you call Report::ActionUserRole by passing the same object, it responds without running any queries.
+# Note: the request object caches users roles. So if you call Reports::ActionUserRole by passing the same object, it responds without running any queries.
 
 class MoneyRequest::AssociatedUsers < MoneyRequest::Base
   attr_accessor :associated_users, :tracks, :user_before

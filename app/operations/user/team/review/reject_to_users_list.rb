@@ -6,7 +6,7 @@ class User::Team::Review::RejectToUsersList < BaseOperation
     if obj.is_a?(MoneyRequest)
       MoneyRequest::AssociatedUsers.(self.user, money_request: self.obj, user_before: user)
     elsif obj.is_a?(Report)
-      Report::AssociatedUsers.(self.user, report: self.obj, user_before: user)
+      Reports::AssociatedUsers.(self.user, report: self.obj, user_before: user)
     end
   end
 

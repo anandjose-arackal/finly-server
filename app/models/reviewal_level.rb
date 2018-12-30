@@ -37,5 +37,23 @@ class ReviewalLevel < ActiveRecord::Base
   # Since you can alias scopes as they are class methods, you have use the below method
   singleton_class.send :alias_method, :filter_associated_entity_type, :with_entity_type
   singleton_class.send :alias_method, :filter_policy, :with_policy_ids
+  singleton_class.send :alias_method, :filter_policy_id, :with_policy_ids
   singleton_class.send :alias_method, :with_ids, :with_id
+
+  def get_level(type)
+    # Provide :next / :prev to get the respective levels
+    if type == 'next' || type == :next
+      level_number = self.level_number + 1
+    elsif ['previous', :previous, 'prev', :prev].include?(type)
+      level_number = self.level_number - 1
+    else
+      return nil
+    end
+
+    ReviewalLevel.exclude_deleted.where({
+                                            level_number: level_number,
+                                            policy_id: self.policy_id,
+                                            associated_entity_type: self.associated_entity_type
+                        }).first
+  end
 end

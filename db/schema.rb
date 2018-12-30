@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181223093330) do
+ActiveRecord::Schema.define(version: 20181228105820) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -556,6 +556,7 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.boolean  "payment_file_downloaded",                    default: false
     t.boolean  "auto_approved"
     t.boolean  "api_initiated",                              default: false
+    t.integer  "controlling_level_id",         limit: 4
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -895,12 +896,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
 
   add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
 
-  create_table "budget_date_configurations", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "budget_modification_actions", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -980,8 +975,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.date     "date"
     t.integer  "sub_department_id", limit: 4
     t.integer  "procurement_id",    limit: 4
-    t.date     "created_at_date"
-    t.date     "submitted_at_date"
   end
 
   create_table "budgets", force: :cascade do |t|
@@ -1483,7 +1476,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.boolean  "sso_enabled",                                    default: false
     t.text     "address",                          limit: 65535
     t.boolean  "cash_money_requests_enabled",                    default: true
-    t.integer  "budget_date_configuration_id",     limit: 4
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -2133,10 +2125,17 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.integer  "policy_id",                       limit: 4
     t.integer  "level_id",                        limit: 4
     t.integer  "reviewer_id",                     limit: 4
-    t.integer  "document_reviewer_mappable_id",   limit: 4,   null: false
-    t.string   "document_reviewer_mappable_type", limit: 255, null: false
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.integer  "document_reviewer_mappable_id",   limit: 4,                   null: false
+    t.string   "document_reviewer_mappable_type", limit: 255,                 null: false
+    t.datetime "created_at",                                                  null: false
+    t.datetime "updated_at",                                                  null: false
+    t.integer  "level_number",                    limit: 4
+    t.boolean  "taken_control",                               default: false
+    t.integer  "taken_control_by_id",             limit: 4
+    t.boolean  "viewable",                                    default: false
+    t.datetime "became_viewable_at"
+    t.integer  "action_taken_by_id",              limit: 4
+    t.integer  "action_id",                       limit: 4
   end
 
   add_index "document_level_reviewer_mappings", ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id", using: :btree
@@ -2256,14 +2255,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
   add_index "enforce_budget_configurations", ["company_id"], name: "index_enforce_budget_configurations_on_company_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
-    t.boolean  "enabled"
-    t.integer  "enforceable_id",   limit: 4
-    t.string   "enforceable_type", limit: 255
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-  end
-
-  create_table "enforce_policy_configurations", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
     t.boolean  "enabled"
@@ -2271,7 +2262,7 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.datetime "updated_at",                   null: false
   end
 
-  add_index "enforce_policy_configurations", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
+  add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
 
   create_table "expense_data_extract_sources", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -2388,7 +2379,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.integer  "spent_from_id",          limit: 4
     t.boolean  "custom_conversion_rate",                              default: false
     t.integer  "cost_center_id",         limit: 4
-    t.integer  "created_by_id",          limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -2979,7 +2969,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.boolean  "is_deleted",                                                           default: false
     t.integer  "resource_template_id",         limit: 4
     t.string   "invoice_id",                   limit: 255
-    t.datetime "submitted_at"
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3413,7 +3402,7 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.datetime "approved_at"
     t.integer  "travel_request_id",                  limit: 4
     t.integer  "destination_pocket_id",              limit: 4
-    t.integer  "created_by_id",                      limit: 4
+    t.integer  "controlling_level_id",               limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -4268,7 +4257,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.boolean  "is_template",                                                         default: false
     t.string   "template_name",                limit: 255
     t.integer  "resource_template_id",         limit: 4
-    t.datetime "submitted_at"
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -4511,7 +4499,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.integer  "sourcable_id",       limit: 4
     t.integer  "sourcable_type",     limit: 4
     t.boolean  "is_deleted",                       default: false
-    t.integer  "created_by_id",      limit: 4
   end
 
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
@@ -4695,7 +4682,7 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.integer  "sync_type_id",                       limit: 4
     t.integer  "report_processor_group_mapping_id",  limit: 4
     t.integer  "travel_request_id",                  limit: 4
-    t.integer  "created_by_id",                      limit: 4
+    t.integer  "controlling_level_id",               limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -5167,6 +5154,7 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.datetime "approved_at"
     t.datetime "selection_requested_at"
     t.datetime "booking_confirmed_at"
+    t.integer  "controlling_level_id",         limit: 4
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree
@@ -5221,33 +5209,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
   add_index "user_balance_histories", ["finly_money_load_id"], name: "index_user_balance_histories_on_finly_money_load_id", using: :btree
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
-
-  create_table "user_delegate_mappings", force: :cascade do |t|
-    t.integer  "user_id",                limit: 4
-    t.integer  "delegate_for_user_id",   limit: 4
-    t.boolean  "expense_create"
-    t.boolean  "expense_update"
-    t.boolean  "receipt_create"
-    t.boolean  "receipt_add_to_expense"
-    t.boolean  "receipt_update"
-    t.boolean  "report_create"
-    t.boolean  "report_submit"
-    t.boolean  "report_retract"
-    t.boolean  "report_update"
-    t.boolean  "money_request_create"
-    t.boolean  "money_request_update"
-    t.boolean  "money_request_submit"
-    t.boolean  "money_request_retract"
-    t.boolean  "trip_create"
-    t.boolean  "trip_update"
-    t.boolean  "trip_submit"
-    t.boolean  "trip_retract"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "user_delegate_mappings", ["delegate_for_user_id"], name: "index_user_delegate_mappings_on_delegate_for_user_id", using: :btree
-  add_index "user_delegate_mappings", ["user_id"], name: "index_user_delegate_mappings_on_user_id", using: :btree
 
   create_table "user_department_mappings", force: :cascade do |t|
     t.integer  "user_id",       limit: 4
@@ -6170,7 +6131,6 @@ ActiveRecord::Schema.define(version: 20181223093330) do
   add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
-  add_foreign_key "user_delegate_mappings", "users"
   add_foreign_key "user_department_mappings", "departments"
   add_foreign_key "user_department_mappings", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"

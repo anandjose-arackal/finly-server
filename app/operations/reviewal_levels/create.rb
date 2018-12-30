@@ -23,7 +23,7 @@ class ReviewalLevels::Create < ReviewalLevels::Base
       add_message :error, 'Policy not found'
     end
 
-    entity_types = %w( PurchaseOrder Invoice )
+    entity_types = %w( PurchaseOrder Invoice Report MoneyRequest TravelRequest BankPaymentRequest )
 
     unless entity_types.include?(reviewal_level_params[:associated_entity_type])
       add_message :error, 'Invalid Entity Type'

@@ -17,13 +17,6 @@
 #
 
 
-
-
-
-
-
-
-
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -69,6 +62,8 @@ class Policy < ActiveRecord::Base
   has_many :policy_field_mappings
   has_many :field_configurations, through: :policy_field_mappings
   has_many :levels, class_name: 'ReviewalLevel', dependent: :destroy
+
+  has_many :finance_managers
 
   validates :company_id, presence: true
   validate :one_default_per_company

@@ -47,11 +47,10 @@
 #  is_template                  :boolean          default(FALSE)
 #  template_name                :string(255)
 #  resource_template_id         :integer
-#  submitted_at                 :datetime
 #
 
 class PurchaseOrder < ActiveRecord::Base
-  include SoftDeletable, Templatable
+  include SoftDeletable, Templatable, Transitionable
   belongs_to :company
   belongs_to :user
   belongs_to :procurement

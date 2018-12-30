@@ -9,21 +9,21 @@ class ExternalUrlController < ApplicationController
     # todo use report controlling user to figure out user role for report
     if report.blank? && current_user.manager?
         params[:view] = 'manager'
-        result = Report::Show.(current_user, params) rescue nil
+        result = Reports::Show.(current_user, params) rescue nil
         if result&.success?
           report = result.report
         end
     end
     if report.blank? and current_user.finance_manager?
       params[:view] = 'finance_manager'
-      result = Report::Show.(current_user, params) rescue nil
+      result = Reports::Show.(current_user, params) rescue nil
       if result&.success?
         report = result.report
       end
     end
     if report.blank? and current_user.admin?
       params[:view] = 'admin'
-      result = Report::Show.(current_user, params)
+      result = Reports::Show.(current_user, params)
       if result.success?
         report = result.report
       end

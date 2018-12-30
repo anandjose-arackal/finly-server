@@ -6,7 +6,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
   def init
     self.document = params[:reviewal_document]
     self.chain = []
-    self.document_types = ['PurchaseOrder', 'Invoice']
+    self.document_types = ['PurchaseOrder', 'Invoice', 'Report', 'MoneyRequest', 'BankPaymentRequest']
     policy_id = params[:policy_id]
 
     self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil

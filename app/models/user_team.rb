@@ -11,7 +11,6 @@
 #
 
 class UserTeam < ActiveRecord::Base
-
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id, :case_sensitive => false}
 
@@ -22,5 +21,4 @@ class UserTeam < ActiveRecord::Base
   accepts_nested_attributes_for :user_team_group_item_mappings
 
   scope :with_application, -> (application) { where application: application }
-
 end

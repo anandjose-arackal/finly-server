@@ -449,7 +449,7 @@ if Report.count == 0
 
     # creating open reports
     5.times.each do
-      report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
+      report = Reports::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
@@ -461,12 +461,12 @@ if Report.count == 0
         expenses << e
         expenses_ids << e.id
       end
-      Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
+      Reports::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
     end
 
     # creating submitted reports
     5.times.each do
-      report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
+      report = Reports::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
@@ -478,13 +478,13 @@ if Report.count == 0
         expenses << e
         expenses_ids << e.id
       end
-      Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
-      Report::Submit.(user, {report_id: report.id})
+      Reports::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
+      Reports::Submit.(user, {report_id: report.id})
     end
 
     # creating approved reports
     5.times.each do
-      report = Report::Create.(user, {name: Faker::Commerce.product_name}).report
+      report = Reports::Create.(user, {name: Faker::Commerce.product_name}).report
 
       expenses = []
       expenses_ids = []
@@ -496,11 +496,11 @@ if Report.count == 0
         expenses << e
         expenses_ids << e.id
       end
-      Report::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
-      Report::Submit.(user, {report_id: report.id})
+      Reports::Expenses::Add.(user, {expense_ids: expenses_ids, report_id: report.id})
+      Reports::Submit.(user, {report_id: report.id})
       report.reload
       while report.controlling_user.present?
-        Report::Approve.(report.controlling_user, {report_id: report.id})
+        Reports::Approve.(report.controlling_user, {report_id: report.id})
         report.reload
       end
     end

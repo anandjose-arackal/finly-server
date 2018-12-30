@@ -10,6 +10,13 @@
 #  document_reviewer_mappable_type :string(255)      not null
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
+#  level_number                    :integer
+#  taken_control                   :boolean          default(FALSE)
+#  taken_control_by_id             :integer
+#  viewable                        :boolean          default(FALSE)
+#  became_viewable_at              :datetime
+#  action_taken_by_id              :integer
+#  action_id                       :integer
 #
 
 class DocumentLevelReviewerMapping < ActiveRecord::Base
@@ -21,12 +28,18 @@ class DocumentLevelReviewerMapping < ActiveRecord::Base
   belongs_to :level, class_name: 'ReviewalLevel'
   belongs_to :reviewer, class_name: 'User'
   belongs_to :document_reviewer_mappable, polymorphic: true
+  belongs_to :taken_control_by, class_name: 'User'
+  belongs_to :action_taken_by, class_name: 'User'
+  belongs_to :action, class_name: 'TrailAction'
+
 
   scope :with_level_ids, -> (ids) {where level_id: ids}
+  scope :with_level_id, -> (ids) {where level_id: ids}
   scope :with_reviewer_ids, -> (ids) {where reviewer_id: ids}
   scope :not_with_reviewer_ids, ->(id) { where.not reviewer_id: id }
   scope :with_policy_ids, -> (ids) {where policy_id: ids}
   scope :with_document_type, -> (document_type) {where document_reviewer_mappable_type: document_type}
+  scope :with_taken_control, -> { where taken_control: true }
 
   scope :with_document_id, -> (document_ids) {where document_reviewer_mappable_id: document_ids}
 

@@ -6,6 +6,7 @@ class ReviewalLevels::Index < ReviewalLevels::Base
 
     has_scope :filter_policy
     has_scope :filter_associated_entity_type
+    # has_scope :reviewal_level_id
 
     def init
       self.reviewal_levels = params[:reviewal_levels]
@@ -20,9 +21,13 @@ class ReviewalLevels::Index < ReviewalLevels::Base
 
 
   def init
-    policy_id = params[:filter_policy]
-    policy = user.company.policies.find_by(id: policy_id)
-    self.reviewal_levels = policy.levels.non_deleted
+    # policy_id = params[:filter_policy]
+    # policy = user.company.policies.find_by(id: policy_id)
+    # self.reviewal_levels = policy.levels.non_deleted
+
+    policy_ids = user.company.policies.pluck(:id)
+    self.reviewal_levels = ReviewalLevel.with_policy_ids(policy_ids).non_deleted
+
   end
 
   def success

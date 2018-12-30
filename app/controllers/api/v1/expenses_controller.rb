@@ -25,7 +25,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     @result.config[:mobile_api] = true
     if @result.success?
       if @result.expense.report_id.present?
-        @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
+        @result = Reports::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         respond render: 'api/v1/reports/show'
       else
         respond render: 'api/v0/shared/success'
@@ -67,7 +67,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
     @result.config[:mobile_api] = true
     if @result.success?
       if @result.expense.reload.report_id.present?
-        @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
+        @result = Reports::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
         respond render: 'api/v1/reports/show'
       else
         respond render: 'api/v1/expenses/show'

@@ -12,7 +12,7 @@ class BankPaymentRequestStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:open, :processing, :submitted, :retracted, :rejected, :approved, :unapprove, :credited, :pending, :creation_in_progress]
+    [:open, :processing, :submitted, :retracted, :rejected, :approved, :unapprove, :credited, :pending, :creation_in_progress, :auto_approved]
   end
 
   def open?

@@ -41,8 +41,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
 
+      purchase_order.save
+      purchase_order.save
+
       # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.purchase_order
+      params[:reviewal_document] = self.purchase_order.reload
       params[:document_reviewer_mappings] = document_reviewer_mappings_params
 
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Create.(user, params)
@@ -50,9 +53,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         add_message :error, document_reviewer_mappings_op.messages[:error]
         return
       end
-
-      purchase_order.save
-      purchase_order.save
 
       # Save Custom Fields
       if params[:custom_fields].present?

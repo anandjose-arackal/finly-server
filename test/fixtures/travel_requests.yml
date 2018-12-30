@@ -27,6 +27,7 @@
 #  approved_at                  :datetime
 #  selection_requested_at       :datetime
 #  booking_confirmed_at         :datetime
+#  controlling_level_id         :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
