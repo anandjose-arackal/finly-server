@@ -1,6 +1,8 @@
 class WorkflowManager::Aasm::Base
   include AASM
-  attr_accessor :document_state, :document, :user, :violations_present, :policy, :current_level, :next_level, :reviewers
+  attr_accessor :document_state, :document, :user, :violations_present, :policy,
+                :current_level, :next_level, :previous_level,
+                :current_level_reviewers, :reviewers
 
   def initialize(document, violations_present, user)
     self.document = document
@@ -14,7 +16,8 @@ class WorkflowManager::Aasm::Base
     self.current_level = document.level
     self.next_level = document.get_level(:next)
     self.previous_level = document.get_level(:prev)
-    self.reviewers = document.get_reviewers
+    self.current_level_reviewers = document.get_reviewers
+    self.reviewers = document.get_next_level_reviewers
   end
 
   private

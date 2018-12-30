@@ -53,9 +53,21 @@ module Transitionable
       User.where(id: user_ids)
     end
 
+    # Get reviewers from current level
+    def get_next_level_reviewers
+      user_ids = []
+      next_level = get_level(:next)
+      if next_level.present?
+        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:taken_control_by_ids)
+        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:reviewer_id)
+      end
+
+      User.where(id: user_ids)
+    end
+
     def get_level(type)
       # Provide :next / :prev to get the respective levels
-      current_level_number = document.level.present? ? document.level.level_number : 0
+      current_level_number = self.level.present? ? self.level.level_number : 0
       if type == 'next' || type == :next
         level_number = current_level_number + 1
       elsif ['previous', :previous, 'prev', :prev].include?(type)
@@ -66,7 +78,7 @@ module Transitionable
 
       ReviewalLevel.exclude_deleted.where({
                                               level_number: level_number,
-                                              policy_id: document.policy.id,
+                                              policy_id: self.policy.id,
                                               associated_entity_type: self.name
                                           }).first
     end
