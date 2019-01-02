@@ -79,10 +79,8 @@ class FinlyTransaction < ActiveRecord::Base
                                                                                         :vendor_payment,
                                                                                         :balance_clearance_outside_finly, :balance_clearance])}
   scope :include_for_export, -> {includes([:transaction_type, :payment_purpose, :amount, :closing_balance, :status,
-                                           {payment: [:receiving_user, :initiating_account,
-                                                      :receiving_account, {
-                                                          original_payment_for_refund: :receiving_user}]},
-                                           :associated_transaction])}
+                                           {transaction_detail: [:amount, :closing_balance, :opening_balance]},
+                                           :associated_transaction, :system_messages])}
 
   scope :include_for_index, -> { includes(:system_messages) }
   scope :joins_amounts, -> {joins :amount}
