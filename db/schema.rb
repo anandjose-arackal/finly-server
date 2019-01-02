@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181223093330) do
+ActiveRecord::Schema.define(version: 20181228112956) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -4696,6 +4696,8 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.integer  "report_processor_group_mapping_id",  limit: 4
     t.integer  "travel_request_id",                  limit: 4
     t.integer  "created_by_id",                      limit: 4
+    t.integer  "department_id",                      limit: 4
+    t.integer  "sub_department_id",                  limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -5019,6 +5021,7 @@ ActiveRecord::Schema.define(version: 20181223093330) do
     t.datetime "transaction_date"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.integer  "sequence_number",          limit: 4
   end
 
   add_index "transaction_details", ["amount_id"], name: "fk_rails_12e08cc879", using: :btree
