@@ -53,7 +53,6 @@ class WorkflowManager::Base < BaseOperation
     end
 
     trail.save
-
     # Return Data to referrer
   end
 

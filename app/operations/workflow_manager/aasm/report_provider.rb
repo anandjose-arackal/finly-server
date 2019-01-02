@@ -61,7 +61,6 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
   private
 
   # def set_state
-  #   debugger
   #   aasm.current_state = self.document_state
   # end
 
@@ -112,11 +111,6 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
       )
     end
 
-
-
-
-
-
     # reset levels
     if [:retract, :reject].include?(aasm.current_event)
       self.next_level = nil
@@ -136,6 +130,8 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
         report_status_id: report_status_id,
         controlling_level_id: self.next_level&.id
     }
-    self.document.update(update_params)
+    if self.document.update(update_params)
+      p "Success ! !!!!!"
+    end
   end
 end

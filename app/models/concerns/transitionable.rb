@@ -34,10 +34,12 @@ module Transitionable
     # Skips users who have already approved the document
     def retract_affected_users
       user_ids = []
-      if self.level_id.present?
+      if self.level.present?
+        taken_control_by_ids = []
         # If the current level has been taken control by someone return their ids else the current reviewers in the level
-        taken_control_by_ids =  self.document_level_reviewer_mappings.with_level_id(self.level_id).pluck(:taken_control_by_ids)
-        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level_id).pluck(:reviewer_id)
+        taken_control_by_ids =  self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:taken_control_by_id)
+        taken_control_by_ids.reject! {|user_id| user_id.nil?}
+        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:reviewer_id)
       end
       user_ids
     end
@@ -46,7 +48,9 @@ module Transitionable
     def get_reviewers
       user_ids = []
       if self.level.present?
-        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:taken_control_by_ids)
+        taken_control_by_ids = []
+        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:taken_control_by_id)
+        taken_control_by_ids.reject! {|user_id| user_id.nil?}
         user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:reviewer_id)
       end
 
@@ -57,8 +61,11 @@ module Transitionable
     def get_next_level_reviewers
       user_ids = []
       next_level = get_level(:next)
+
       if next_level.present?
-        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:taken_control_by_ids)
+        taken_control_by_ids = []
+        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:taken_control_by_id)
+        taken_control_by_ids.reject! {|user_id| user_id.nil?}
         user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:reviewer_id)
       end
 
@@ -79,7 +86,7 @@ module Transitionable
       ReviewalLevel.exclude_deleted.where({
                                               level_number: level_number,
                                               policy_id: self.policy.id,
-                                              associated_entity_type: self.name
+                                              associated_entity_type: self.class.name
                                           }).first
     end
 
