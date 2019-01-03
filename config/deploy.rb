@@ -38,12 +38,12 @@ when :staging, :development, :combined_development, :insights, :development_2, :
 end
 
 set :pty, false
-linked_dirs = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}
+linked_files = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml, config/elastic_apm.yml}
 case fetch(:stage)
   when :itzcash_production, :aws_production, :background_production
-    linked_dirs << "config/sidekiq.yml"
+    linked_files << "config/sidekiq.yml"
 end
-set :linked_files, linked_dirs
+set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 

@@ -65,7 +65,7 @@ json.invoice_line_items_custom_fields @result.invoice_line_items_custom_fields
 json.attachments do
   json.array!(@result.payment_order.payment_order_attachments) do |attachment|
     json.id attachment.id
-    json.url attachment.attached_file.url
+    json.url attachment.attached_file.url(:default, timestamp: false)
     json.thumb attachment.attached_file.url(:thumb)
     json.description attachment.description
     json.file_type attachment.file_format(attachment.attached_file)

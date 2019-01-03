@@ -57,6 +57,7 @@ Thumbs.db
 dump.rdb
 .idea/
 config/secure_storage_config.yml
+config/elastic_apm.yml
 config/deploy/config/*
 
 public/tmp
