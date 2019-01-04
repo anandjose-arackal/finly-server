@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181228112956) do
+ActiveRecord::Schema.define(version: 20190104122839) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -556,6 +556,7 @@ ActiveRecord::Schema.define(version: 20181228112956) do
     t.boolean  "payment_file_downloaded",                    default: false
     t.boolean  "auto_approved"
     t.boolean  "api_initiated",                              default: false
+    t.integer  "controlling_level_id",         limit: 4
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -2124,10 +2125,17 @@ ActiveRecord::Schema.define(version: 20181228112956) do
     t.integer  "policy_id",                       limit: 4
     t.integer  "level_id",                        limit: 4
     t.integer  "reviewer_id",                     limit: 4
-    t.integer  "document_reviewer_mappable_id",   limit: 4,   null: false
-    t.string   "document_reviewer_mappable_type", limit: 255, null: false
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.integer  "document_reviewer_mappable_id",   limit: 4,                   null: false
+    t.string   "document_reviewer_mappable_type", limit: 255,                 null: false
+    t.datetime "created_at",                                                  null: false
+    t.datetime "updated_at",                                                  null: false
+    t.integer  "level_number",                    limit: 4
+    t.boolean  "taken_control",                               default: false
+    t.integer  "taken_control_by_id",             limit: 4
+    t.boolean  "viewable",                                    default: false
+    t.datetime "became_viewable_at"
+    t.integer  "action_taken_by_id",              limit: 4
+    t.integer  "action_id",                       limit: 4
   end
 
   add_index "document_level_reviewer_mappings", ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id", using: :btree
@@ -2846,7 +2854,7 @@ ActiveRecord::Schema.define(version: 20181228112956) do
     t.string   "parent_id",              limit: 255
     t.integer  "inventory_line_item_id", limit: 4
     t.text     "item_info",              limit: 65535
-    t.string   "comment",                limit: 255
+    t.text     "comment",                limit: 65535
     t.string   "account",                limit: 255
     t.integer  "tax_rate_id",            limit: 4
     t.integer  "cost_center_id",         limit: 4
@@ -3394,6 +3402,7 @@ ActiveRecord::Schema.define(version: 20181228112956) do
     t.datetime "approved_at"
     t.integer  "travel_request_id",                  limit: 4
     t.integer  "destination_pocket_id",              limit: 4
+    t.integer  "controlling_level_id",               limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -4673,6 +4682,7 @@ ActiveRecord::Schema.define(version: 20181228112956) do
     t.integer  "sync_type_id",                       limit: 4
     t.integer  "report_processor_group_mapping_id",  limit: 4
     t.integer  "travel_request_id",                  limit: 4
+    t.integer  "controlling_level_id",               limit: 4
     t.integer  "department_id",                      limit: 4
     t.integer  "sub_department_id",                  limit: 4
   end
@@ -5147,6 +5157,7 @@ ActiveRecord::Schema.define(version: 20181228112956) do
     t.datetime "approved_at"
     t.datetime "selection_requested_at"
     t.datetime "booking_confirmed_at"
+    t.integer  "controlling_level_id",         limit: 4
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree
