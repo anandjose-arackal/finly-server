@@ -22,6 +22,11 @@ class Receipt::Update < Receipt::Base
     end
   end
 
+  def pre_process
+    update_params[:modified_by_id] = actual_current_user.id if actual_current_user.present?
+  end
+
+
   def process
     unless receipt.update_attributes(update_params)
       messages[:error] = receipt.errors.full_messages
@@ -34,6 +39,6 @@ class Receipt::Update < Receipt::Base
 
   private
   def update_params
-    params.require(:receipt).permit(:image, :note, :to_be_transcribed)
+    params.require(:receipt).permit(:image, :note, :to_be_transcribed, :modified_by_id)
   end
 end

@@ -13,15 +13,21 @@
 
 class MoneyRequestCommentAction < ActiveRecord::Base
 
-  ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4,
-             approve_and_forward: 5, auto_approve: 6, reject: 7,
-             unapprove: 8, take_control: 9, comment: 10, update: 11,
-             credited: 12, credited_from_virtual_account_to_wallet: 13,
-             credited_from_virtual_account_to_card: 14,
-             credited_from_wallet_to_wallet: 15,
-             credited_from_wallet_to_card: 16,
-             credited_from_card_to_card: 17,
-             credited_from_card_to_wallet: 18}
+  ACTIONS = {
+              create: 1, retract: 2, submit: 3, approve: 4,
+              approve_and_forward: 5, auto_approve: 6, reject: 7,
+              unapprove: 8, take_control: 9, comment: 10, update: 11,
+              credited: 12, credited_from_virtual_account_to_wallet: 13,
+              credited_from_virtual_account_to_card: 14,
+              credited_from_wallet_to_wallet: 15,
+              credited_from_wallet_to_card: 16,
+              credited_from_card_to_card: 17,
+              credited_from_card_to_wallet: 18,
+              created_by_delegate: 19,
+              updated_by_delegate: 20,
+              submitted_by_delegate: 21,
+              retracted_by_delegate: 22
+            }
 
   self.class.instance_eval do
     ACTIONS.each do |key, value|

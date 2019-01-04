@@ -89,27 +89,32 @@ class MoneyRequest::Submit < MoneyRequest::Base
     end
     submitted_at = DateTime.now
     manager_id = manager.id rescue nil
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil 
     if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
                                        controlling_user_id: manager_id,
                                        controlling_for_user_id: nil,
                                        controlling_user_role_id: manager_role_id,
                                        controlling_for_user_role_id: nil,
                                        submitted_at: submitted_at,
-                                       submitted_amount_attributes: submitted_amount_attributes
+                                       submitted_amount_attributes: submitted_amount_attributes,
+                                       created_by_id: delegated_action_user_id
       money_request.tracks.create action_user: user,
                                   action_user_role_id: UserRole.id_for(:employee),
                                   modified_user_id: money_request.controlling_user_id,
                                   modified_user_role_id: manager_role_id,
                                   money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:submit),
-                                  status_id: MoneyRequestStatus.id_for(:processing)
+                                  status_id: MoneyRequestStatus.id_for(:processing),
+                                  delegated_action_user_id: delegated_action_user_id
       return true
     end
     messages[:error] = money_request.errors.full_messages
   end
 
   def post_process
+    mr_comment_action = actual_current_user.present? ? :submitted_by_delegate : :submit
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     # adding comment regarding the change in status of this money request
-    money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:submit)
+    money_request.comments.create(user: user, comment_action_id: MoneyRequestCommentAction.id_for(mr_comment_action), delegated_action_user_id: delegated_action_user_id)
 
     add_message :success, 'Money Request Submitted'
     

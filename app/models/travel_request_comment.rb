@@ -26,6 +26,7 @@ class TravelRequestComment < ActiveRecord::Base
   belongs_to :action, class_name: "TravelRequestCommentAction"
   belongs_to :booking
   belongs_to :booking_request
+  belongs_to :delegated_action_user, class_name: 'User'
 
   default_scope { order created_at: :desc }
 
@@ -36,6 +37,10 @@ class TravelRequestComment < ActiveRecord::Base
       comment_content += "You have"
     else
       comment_content += "#{self.user&.name} has"
+    end
+    if self.delegated_action_user_id.present?
+      current_user_name = self.user.name
+      comment_content = "#{self.delegated_action_user&.name} has"
     end
 
     case self.action_id
@@ -67,6 +72,14 @@ class TravelRequestComment < ActiveRecord::Base
       comment_content += " requested selection  of booking options"
     when TravelRequestCommentAction.id_for(:selection_confirmed)
       comment_content += " confirmed selection"
+    when TravelRequestCommentAction.id_for(:created_by_delegate)
+      comment_content += " created trip on behalf of #{current_user_name}"
+    when TravelRequestCommentAction.id_for(:updated_by_delegate)
+      comment_content += " updated trip on behalf of #{current_user_name}"
+    when TravelRequestCommentAction.id_for(:submitted_by_delegate)
+      comment_content += " submitted trip on behalf of #{current_user_name}"
+    when TravelRequestCommentAction.id_for(:retracted_by_delegate)
+      comment_content += " retracted trip on behalf of #{current_user_name}"
     else
       return nil
     end

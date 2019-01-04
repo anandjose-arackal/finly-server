@@ -21,6 +21,9 @@ class Receipt::Create < Receipt::Base
     end
   end
 
+  def pre_process
+    receipt_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
+  end
 
   def process
     self.receipt = user.receipts.build(receipt_params)
@@ -65,7 +68,7 @@ class Receipt::Create < Receipt::Base
 
   private
   def create_params
-    p = params.require(:receipt).permit(:image, :note, :to_be_transcribed)
+    p = params.require(:receipt).permit(:image, :note, :to_be_transcribed, :created_by_id)
     p[:image] = params[:receipt][:image] rescue nil
     p.permit!
   end

@@ -57,12 +57,14 @@ class Report::Retract < Report::Base
                                 controlling_user_role_id: role_id,
                                 controlling_for_user_role_id: nil,
                                 submitted_at: nil, auto_submit: false
+      delegated_action_user = actual_current_user.present? ? actual_current_user : nil
       track = report.tracks.build action_user: user,
                                   action_user_role_id: role_id,
                                   modified_user: prev_controlling_user,
                                   modified_user_role_id: prev_controlling_user_role,
                                   report_tracking_action_id: ReportTrackingAction.id_for(:retract),
-                                  report_status_id: ReportStatus.retracted_id
+                                  report_status_id: ReportStatus.retracted_id,
+                                  delegated_action_user: delegated_action_user
       track.save
       report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:unsubmitted))
       return
@@ -71,7 +73,11 @@ class Report::Retract < Report::Base
   end
 
   def post_process
-    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
+    if actual_current_user.present?
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retracted_by_delegate), delegated_action_user: actual_current_user 
+    else
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
+    end
     # destroying the submitted amount field
     report.submitted_amount&.destroy
 

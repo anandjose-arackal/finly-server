@@ -138,6 +138,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if StringUtils.to_bool(updated_expense_params[:reimbursable])
       updated_expense_params[:spent_from_id] = nil
     end
+    updated_expense_params[:modified_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process

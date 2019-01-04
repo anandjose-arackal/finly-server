@@ -165,7 +165,7 @@ class ApplicationController < ActionController::Base
     end
 
     # looking for if the particular user is a delegate for someone else
-    retrieve_delegate_user
+    retrieve_delegate_user if user_signed_in?
 
     @curr_user
   end
@@ -179,9 +179,14 @@ class ApplicationController < ActionController::Base
 
   def retrieve_delegate_user
     # header is going to send a 'delegate_for_user_id' attribute
-    delegate_for_user_id = request.headers["delegate_for_user_id"]
-    delegated_for_user = @curr_user.delegated_for_users.find_by(id: delegate_for_user_id)
-    RequestStore.store[:actual_current_user] = @curr_user # setting the actual current user as this guy
+    delegate_for_user_id = request.headers['Delegate-For-User-Id']
+    puts "*"*20
+    puts "#{delegate_for_user_id}"
+    puts "*"*20
+    delegated_for_user = @curr_user.delegated_for_users.find_by(id: delegate_for_user_id) if delegate_for_user_id.present?
+    if delegated_for_user.present?
+      RequestStore.store[:actual_current_user] = @curr_user # setting the actual current user as this guy
+    end
     if delegated_for_user.present?
       @curr_user = delegated_for_user
       RequestStore.store[:current_user] = delegated_for_user

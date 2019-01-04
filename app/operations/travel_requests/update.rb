@@ -70,7 +70,11 @@ class TravelRequests::Update < TravelRequests::Base
   end
 
   def post_process
-    add_message :success, 'Successfully updated travel request'
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    debugger
+    travel_request.comments.create(user_id: user.id,
+                                   action_id: TravelRequestCommentAction.id_for(:updated_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
+    add_message :success, 'Successfully updated trip'
   end
 
   protected

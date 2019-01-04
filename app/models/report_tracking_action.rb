@@ -28,7 +28,7 @@ class ReportTrackingAction < ActiveRecord::Base
         :take_control,
         :settled,
         :settlement_confirmed,
-        :closed,
+        :closed
     ]
   end
 

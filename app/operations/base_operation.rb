@@ -7,7 +7,11 @@ class BaseOperation
   # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
     clear_messages
-    self.user = user
+    if actual_current_user.present?
+      self.user = current_user
+    else
+      self.user = user
+    end
     self.params = (ActionController::Parameters.new(params) or {})
   end
 

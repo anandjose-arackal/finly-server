@@ -918,6 +918,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def actual_current_user
+    RequestStore.store[:actual_current_user]
+  end
+
+  def current_user
+    RequestStore.store[:current_user]
+  end
+
   private
 
 end

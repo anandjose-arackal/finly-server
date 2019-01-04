@@ -2725,6 +2725,8 @@ Rails.application.routes.draw do
     patch 'set_delegate', to: 'users#set_delegate', as: :set_delegate
   end
   get 'company_users', to: 'users#company_users', as: :company_users
+  get 'user_delegates', to: 'users#user_delegates', as: :user_delegates
+  patch 'users/:id/set_delegates', to: 'users#set_delegates', as: :set_delegates
   get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
 
   # routes for testing import

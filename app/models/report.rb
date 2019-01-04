@@ -70,6 +70,7 @@ class Report < ActiveRecord::Base
   belongs_to :sync_type, class_name: 'ReportSyncType'
   belongs_to :travel_request
   belongs_to :created_by, class_name: "User"
+  belongs_to :modified_by, class_name: 'User'
   # belongs_to :money_request
 
   has_many :custom_fields, as: :parent, dependent: :destroy

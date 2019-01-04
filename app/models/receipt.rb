@@ -33,6 +33,7 @@ class Receipt < ActiveRecord::Base
   belongs_to :receipt_email
   belongs_to :sourcable, polymorphic: true
   belongs_to :created_by, class_name: "User"
+  belongs_to :modified_by, class_name: 'User'
 
   has_many :expense_data_extracts, as: :extractable
   has_many :system_messages, as: :messagable, dependent: :destroy

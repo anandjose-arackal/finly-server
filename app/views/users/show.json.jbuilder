@@ -62,6 +62,17 @@ json.user_delegate do
   json.user_delegate_email @result.selected_user.user_delegate&.mobile_number
 end
 
+json.user_delegates do
+  json.array! @result.selected_user.user_delegate_mappings do |user_delegate_mapping|
+    json.id @result.selected_user.id
+    json.name user_delegate_mapping.delegate_for_user.name
+    json.email user_delegate_mapping.delegate_for_user.email
+    json.mobile_number user_delegate_mapping.delegate_for_user.mobile_number
+  end
+end
+
+json.user_delegation_enabled @result.selected_user.delegation_enabled
+
 json.subscriptions do
   json.show_config @result.selected_user.company.more_than_one_subscription?
   json.expense_management @result.user_panel_subscription.expense_management

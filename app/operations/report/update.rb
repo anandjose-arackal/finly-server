@@ -1,6 +1,6 @@
 # action that updates the report - name or policy update.
 class Report::Update < Report::Base
-  attr_accessor :changes, :update_param
+  attr_accessor :changes, :update_param, :for_user
 
   def pre_validate
     super
@@ -20,7 +20,7 @@ class Report::Update < Report::Base
       self.report = user.controlling_reports.with_id(id).first rescue nil
     end
     self.update_param = {}
-    self.update_param = self.params.permit(:name, :policy_id, :memo, :travel_request_id)
+    self.update_param = self.params.permit(:name, :policy_id, :memo, :travel_request_id, :modified_by_id)
     if self.update_param[:policy_id].present? and ([0, '0', 'nil'].include?(self.update_param[:policy_id]))
       self.update_param[:policy_id] = nil
     end
@@ -51,6 +51,11 @@ class Report::Update < Report::Base
     before_save self.report, &method(:generate_comments)
   end
 
+  def pre_process
+    self.for_user = (params[:for_user] or user)
+    update_param[:modified_by_id] = actual_current_user.id if actual_current_user.present?
+  end
+
   def process
     original_policy_id = report.policy_id
     if report.update_attributes(update_param)
@@ -67,6 +72,8 @@ class Report::Update < Report::Base
   def post_process
     save_comments
     calculate_amounts # this method recalculates the amoutns for the various Distance/Time/Per Diem expenses
+    # track_change
+    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_updated_by_delegate), delegated_action_user: actual_current_user if actual_current_user.present?
     messages[:success] << 'Report updated'
   end
 
@@ -80,16 +87,19 @@ class Report::Update < Report::Base
     query = []
     changes.each do |key, value|
       next unless value.present? and key.present?
+      delegated_action_user = actual_current_user.present? ?  actual_current_user : nil
       case key
         when :name
-          query << {user: user, report_comment_action_id: ReportCommentAction.id_for(:report_update),
-                    updated_field: 'name', updated_from: value[0], updated_to: value[1]}
+          report_comment_action = actual_current_user.present? ? :report_updated_by_delegate : :report_update
+          query << {user: user, report_comment_action_id: ReportCommentAction.id_for(report_comment_action),
+                    updated_field: 'name', updated_from: value[0], updated_to: value[1], delegated_action_user: delegated_action_user}
         when :policy_id
           from = to = nil
           from = Policy.with_id(value[0]).first.name rescue nil if value[0].present?
           to = Policy.with_id(value[1]).first.name rescue nil if value[1].present?
-          query << {user: user, report_comment_action_id: ReportCommentAction.id_for(:report_update_id),
-                    updated_field: 'policy', updated_from: from, updated_to: to}
+          report_comment_action = actual_current_user.present? ? :report_updated_by_delegate : :report_update_id
+          query << {user: user, report_comment_action_id: ReportCommentAction.id_for(report_comment_action),
+                    updated_field: 'policy', updated_from: from, updated_to: to, delegated_action_user: delegated_action_user}
         else
       end
     end
@@ -102,6 +112,19 @@ class Report::Update < Report::Base
         expense.amount.update(value: expense.calculate_amount_value(report.policy), currency_id: expense.report.policy.base_currency_id)
       end
     end
+  end
+
+  def track_change
+    # If user is delegated to perform actions on behalf of other user
+    delegated_action_user = actual_current_user.present? ? actual_current_user : nil
+    report.tracks.create action_user: for_user,
+                         action_user_role_id: role_id = UserRole.id_for(:employee),
+                         modified_user: for_user,
+                         modified_user_role_id: role_id,
+                         report_tracking_action_id: ReportTrackingAction.id_for(:update),
+                         report_status_id: ReportStatus.open_id,
+                         delegated_action_user: delegated_action_user
+    report.save
   end
 
 end

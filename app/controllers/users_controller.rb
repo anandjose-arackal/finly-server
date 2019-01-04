@@ -155,6 +155,11 @@ class UsersController < ApplicationController
     respond
   end
 
+  def user_delegates
+    @result = User::DelegateMappings::Index.(current_user, params)
+    respond
+  end
+
   def set_delegate
     @result = User::Delegate::Update.(current_user, params)
     if @result.success?
@@ -164,11 +169,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def set_delegates
+      @result = User::DelegateMappings::Update.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end    
+  end
+
   def all_cards
     @result = User::Cards::AllCards.(current_user, params)
     respond
   end
-
 
   private
 
