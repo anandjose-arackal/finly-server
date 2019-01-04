@@ -107,6 +107,11 @@ module Transitionable
         # Get controlling level id from all documents
         if self.column_names.include? 'company_id'
           controlling_level_ids = self.where(company_id: user.company.id).pluck(:controlling_level_id).reject { |document_id| document_id.nil? }
+          # controlling_level_ids += DocumentLevelReviewerMapping.where(
+          #                                                          document_reviewer_mappable_type: self.name,
+          #                                                          taken_control: true,
+          #                                                          taken_control_by_id: user.id
+          # ).pluck(:level_id)
         else
           # Models like Report doesn't has company_id attribute
           user_ids = user.company.users.pluck(:id)
@@ -126,6 +131,12 @@ module Transitionable
             document_reviewer_mappable_type: self.name,
             viewable: true,
         ).pluck(:document_reviewer_mappable_id)
+
+        document_ids += DocumentLevelReviewerMapping.where(
+                                                        taken_control: true,
+                                                        document_reviewer_mappable_type: self.name,
+                                                        taken_control_by_id: user.id
+        )
 
         self.where(id: document_ids)
       end

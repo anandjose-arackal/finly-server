@@ -267,6 +267,9 @@ RSpec.describe "Report Workflow" do
 
     describe "show up in admin's index" do
       let(:reviewer) {@em_admin_user1}
+      it "test" do
+        debugger
+      end
       it_should_behave_like "reviewer has access to document"
     end
   end

@@ -112,23 +112,28 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
     end
 
     # reset levels
-    if [:retract, :reject].include?(aasm.current_event)
-      self.next_level = nil
+    # if [:retract, :reject].include?(aasm.current_event)
+    #   self.new_level = nil
+    # end
+    if [:submit, :approve].include?(aasm.current_event)
+      self.new_level = self.next_level
     end
 
-    if [:retract].include?(aasm.current_event)
-      self.current_level = nil
+    if [:take_control].include?(aasm.current_event)
+      self.new_level = self.current_level
     end
 
     if [:unapprove].include?(aasm.current_event)
-      self.next_level = previous_level
+      self.new_level = self.previous_level
     end
+
+
 
     # Change state of purchase order
     report_status_id = ::ReportStatus.id_for(self.aasm.current_state)
     update_params = {
         report_status_id: report_status_id,
-        controlling_level_id: self.next_level&.id
+        controlling_level_id: self.new_level&.id
     }
     if self.document.update(update_params)
       p document.controlling_level_id
