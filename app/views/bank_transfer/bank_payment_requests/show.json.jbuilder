@@ -12,6 +12,7 @@ json.summary do
   json.payment_type @result.payment_order.payment_type&.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
   json.processed_at @result.payment_order.processed_at&.strftime "%d %b %Y"
+  json.submitted_at @result.bank_payment_request.submitted_at&.strftime("%d %b %Y")
   json.amount_requested precision_value @result.payment_order.amount_requested&.value
   json.amount_processed precision_value @result.payment_order.amount_processed&.value
   json.description @result.bank_payment_request.description
