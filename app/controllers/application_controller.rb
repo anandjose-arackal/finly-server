@@ -165,7 +165,7 @@ class ApplicationController < ActionController::Base
     end
 
     # looking for if the particular user is a delegate for someone else
-    retrieve_delegate_user if user_signed_in?
+    retrieve_delegate_user
 
     @curr_user
   end
