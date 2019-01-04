@@ -132,11 +132,12 @@ module Transitionable
             viewable: true,
         ).pluck(:document_reviewer_mappable_id)
 
+        # Get all the taken control items for admin user
         document_ids += DocumentLevelReviewerMapping.where(
                                                         taken_control: true,
                                                         document_reviewer_mappable_type: self.name,
                                                         taken_control_by_id: user.id
-        )
+        ).pluck(:document_reviewer_mappable_id)
 
         self.where(id: document_ids)
       end

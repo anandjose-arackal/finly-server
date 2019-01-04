@@ -180,7 +180,7 @@ RSpec.describe "Report Workflow" do
     end
   end
 
-  xdescribe "Report Rejection at 2nd level" do
+  describe "Report Rejection at 2nd level" do
     before(:all) do
       skip if @document.status.id != ReportStatus.id_for(:processing)
       @op4 = Reports::Reject.(@em_reviewer_user2, {id: @document.id, reject_note: "Test note"})
@@ -232,7 +232,7 @@ RSpec.describe "Report Workflow" do
     end
   end
 
-  describe "Report Take Control by Admin" do
+  xdescribe "Report Take Control by Admin" do
     before(:all) do
       op = Reports::TakeControl.(@em_admin_user1, {id: @document.id})
       if op.failure?
