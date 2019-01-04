@@ -42,5 +42,10 @@ class BankTransfer::BankAccountsController < ApplicationController
     end
   end
 
+  def disable
+    @result = BankTransfer::BankAccounts::Disable.(current_user, params)
+    respond
+  end
+
 
 end

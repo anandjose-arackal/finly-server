@@ -58,6 +58,18 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
     create_bank_payment_request
   end
 
+  def validate
+    if self.bank_account.disabled?
+      add_message :error, "You cannot make transfers to this bank account as it has been blacklisted"
+      return
+    end
+    account_owner = self.bank_account.account_owner
+    if account_owner.is_a?(YesBankVendor) && account_owner.disabled?
+      add_message :error, "You cannot make transfers to this vendor because they have been blacklisted"
+      return
+    end
+  end
+
   def process
     # now that we have the payment request and the payment order with us,
     # we can initiate the payment using the payment processor

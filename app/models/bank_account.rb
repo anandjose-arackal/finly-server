@@ -20,6 +20,7 @@
 #  reimbursable       :boolean
 #  default_account    :boolean          default(FALSE)
 #  is_deleted         :boolean          default(FALSE)
+#  disabled           :boolean          default(FALSE)
 #
 
 class BankAccount < ActiveRecord::Base
@@ -110,8 +111,6 @@ class BankAccount < ActiveRecord::Base
         account_number: account_number,
         ifsc: ifsc,
         name: name,
-        # account_owner_type: account_owner_type,
-        # account_owner: account_owner,
         default_account: default_account
     }
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181228112956) do
+ActiveRecord::Schema.define(version: 20190104105613) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -473,6 +473,7 @@ ActiveRecord::Schema.define(version: 20181228112956) do
     t.boolean  "reimbursable"
     t.boolean  "default_account",                default: false
     t.boolean  "is_deleted",                     default: false
+    t.boolean  "disabled",                       default: false
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
@@ -5792,6 +5793,7 @@ ActiveRecord::Schema.define(version: 20181228112956) do
     t.integer  "currency_id",       limit: 4
     t.integer  "tds_rates_list_id", limit: 4
     t.string   "vendor_id",         limit: 255
+    t.boolean  "disabled",                        default: false
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
