@@ -40,7 +40,7 @@ json.invoice do
   json.advance_rate precision_value invoice.advance_rate
   #############################
   json.invoice_attachment do
-    json.url invoice.invoice_attachments.first&.attached_file&.url
+    json.url invoice.invoice_attachments.first&.attached_file&.url(:original, timestamp: false)
     json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
     json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
     json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
