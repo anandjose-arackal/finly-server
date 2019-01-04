@@ -473,6 +473,7 @@ ActiveRecord::Schema.define(version: 20190104122839) do
     t.boolean  "reimbursable"
     t.boolean  "default_account",                default: false
     t.boolean  "is_deleted",                     default: false
+    t.boolean  "disabled",                       default: false
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
@@ -556,7 +557,6 @@ ActiveRecord::Schema.define(version: 20190104122839) do
     t.boolean  "payment_file_downloaded",                    default: false
     t.boolean  "auto_approved"
     t.boolean  "api_initiated",                              default: false
-    t.integer  "controlling_level_id",         limit: 4
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -2125,17 +2125,10 @@ ActiveRecord::Schema.define(version: 20190104122839) do
     t.integer  "policy_id",                       limit: 4
     t.integer  "level_id",                        limit: 4
     t.integer  "reviewer_id",                     limit: 4
-    t.integer  "document_reviewer_mappable_id",   limit: 4,                   null: false
-    t.string   "document_reviewer_mappable_type", limit: 255,                 null: false
-    t.datetime "created_at",                                                  null: false
-    t.datetime "updated_at",                                                  null: false
-    t.integer  "level_number",                    limit: 4
-    t.boolean  "taken_control",                               default: false
-    t.integer  "taken_control_by_id",             limit: 4
-    t.boolean  "viewable",                                    default: false
-    t.datetime "became_viewable_at"
-    t.integer  "action_taken_by_id",              limit: 4
-    t.integer  "action_id",                       limit: 4
+    t.integer  "document_reviewer_mappable_id",   limit: 4,   null: false
+    t.string   "document_reviewer_mappable_type", limit: 255, null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
   end
 
   add_index "document_level_reviewer_mappings", ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id", using: :btree
@@ -3402,7 +3395,6 @@ ActiveRecord::Schema.define(version: 20190104122839) do
     t.datetime "approved_at"
     t.integer  "travel_request_id",                  limit: 4
     t.integer  "destination_pocket_id",              limit: 4
-    t.integer  "controlling_level_id",               limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -4682,7 +4674,6 @@ ActiveRecord::Schema.define(version: 20190104122839) do
     t.integer  "sync_type_id",                       limit: 4
     t.integer  "report_processor_group_mapping_id",  limit: 4
     t.integer  "travel_request_id",                  limit: 4
-    t.integer  "controlling_level_id",               limit: 4
     t.integer  "department_id",                      limit: 4
     t.integer  "sub_department_id",                  limit: 4
   end
@@ -5157,7 +5148,6 @@ ActiveRecord::Schema.define(version: 20190104122839) do
     t.datetime "approved_at"
     t.datetime "selection_requested_at"
     t.datetime "booking_confirmed_at"
-    t.integer  "controlling_level_id",         limit: 4
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree
@@ -5803,6 +5793,7 @@ ActiveRecord::Schema.define(version: 20190104122839) do
     t.integer  "currency_id",       limit: 4
     t.integer  "tds_rates_list_id", limit: 4
     t.string   "vendor_id",         limit: 255
+    t.boolean  "disabled",                        default: false
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree

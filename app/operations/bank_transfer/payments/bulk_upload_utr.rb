@@ -59,7 +59,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
         payment.update(reference_resource: bank_transaction)
       end
       # add a success message to the result array
-      self.result_array
+      self.result_array[index] << "Success!"
     end
   end
 
