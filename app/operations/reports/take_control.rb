@@ -9,8 +9,14 @@ class Reports::TakeControl < Reports::Base
     [:admin]
   end
 
+  def init
+    report_id = params[:id] || params[:report_id]
+    self.report = Report.admin_associated_items(user).find_by report_id
+  end
+
   def authorize
     super
+    debugger
     if not user.company_admin? and user.policy_admin?
       if report.policy and not user.policy_admin?(report.policy) # that is the report has a policy and the user is not policy admin
         raise_unauthorized_exception
@@ -19,26 +25,40 @@ class Reports::TakeControl < Reports::Base
   end
 
   def validate
+    debugger
     unless report.can_take_control?
       messages[:error] << 'Report cannot be taken control of at this stage'
     end
   end
 
   def process
-    if report.update_attributes controlling_user: user,
-                                controlling_for_user: report.controlling_user,
-                                controlling_user_role_id: UserRole.id_for(:admin),
-                                controlling_for_user_role_id: report.controlling_user_role_id
-      track = report.tracks.build action_user: user,
-                                  action_user_role_id: UserRole.id_for(:admin),
-                                  modified_user_id: report.controlling_for_user_id,
-                                  modified_user_role_id: report.controlling_for_user_role_id,
-                                  report_tracking_action_id: ReportTrackingAction.id_for(:take_control),
-                                  report_status_id: report.status_id
-      track.save
+    # if report.update_attributes controlling_user: user,
+    #                             controlling_for_user: report.controlling_user,
+    #                             controlling_user_role_id: UserRole.id_for(:admin),
+    #                             controlling_for_user_role_id: report.controlling_user_role_id
+    #   track = report.tracks.build action_user: user,
+    #                               action_user_role_id: UserRole.id_for(:admin),
+    #                               modified_user_id: report.controlling_for_user_id,
+    #                               modified_user_role_id: report.controlling_for_user_role_id,
+    #                               report_tracking_action_id: ReportTrackingAction.id_for(:take_control),
+    #                               report_status_id: report.status_id
+    #   track.save
+    #   return
+    # end
+    # self.messages = report.errors.full_messages
+
+    #  Workflow Manager
+    params[:document] = self.report
+    params[:aasm_event] = 'take_control'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
       return
     end
-    self.messages = report.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

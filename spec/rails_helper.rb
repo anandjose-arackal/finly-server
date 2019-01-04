@@ -1,6 +1,9 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'support/database_cleaner'
 require 'support/factory_bot'
+require 'support/shared_examples'
+
+# Dir[Rails.root.join("spec/support/*.rb")].each { |f| require f }
 
 # Dir[File.expand_path('./support/*.rb')].each { |f| require f }
 require 'spec_helper'

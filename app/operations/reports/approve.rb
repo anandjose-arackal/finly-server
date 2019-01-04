@@ -32,7 +32,9 @@ class Reports::Approve < Reports::Base
     self.report = params[:report]
     if self.report.blank?
       id = (params[:id] or params[:report_id])
-      self.report = user.controlling_reports.with_id(id).first rescue nil
+
+      # self.report = user.controlling_reports.with_id(id).first rescue nil
+      self.report = Report.reviewer_associated_items(user).with_id(id).first rescue nil
     end
     self.auto_approve = (params[:auto_approve] or false)
     self.auto_submit = params[:auto_submit]
@@ -42,9 +44,9 @@ class Reports::Approve < Reports::Base
     unless report
       raise_unauthorized_exception
     end
-    unless auto_approve or report.controlling_user_id == user.id
-      raise_unauthorized_exception
-    end
+    # unless auto_approve or report.controlling_user_id == user.id
+    #   raise_unauthorized_exception
+    # end
   end
 
   def validate

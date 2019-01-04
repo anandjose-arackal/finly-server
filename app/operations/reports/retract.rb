@@ -48,32 +48,45 @@ class Reports::Retract < Reports::Base
 
   def process
     self.prev_status = report.status
-    prev_controlling_user = (report.controlling_for_user or report.controlling_user)
-    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
-    role_id = UserRole.id_for(:employee)
-    if report.update_attributes report_status_id: ReportStatus.retracted_id,
-                                controlling_user_id: user.id,
-                                controlling_for_user_id: nil,
-                                controlling_user_role_id: role_id,
-                                controlling_for_user_role_id: nil,
-                                submitted_at: nil, auto_submit: false
-      track = report.tracks.build action_user: user,
-                                  action_user_role_id: role_id,
-                                  modified_user: prev_controlling_user,
-                                  modified_user_role_id: prev_controlling_user_role,
-                                  report_tracking_action_id: ReportTrackingAction.id_for(:retract),
-                                  report_status_id: ReportStatus.retracted_id
-      track.save
-      report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:unsubmitted))
+    # prev_controlling_user = (report.controlling_for_user or report.controlling_user)
+    # prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
+    # role_id = UserRole.id_for(:employee)
+    # if report.update_attributes report_status_id: ReportStatus.retracted_id,
+    #                             controlling_user_id: user.id,
+    #                             controlling_for_user_id: nil,
+    #                             controlling_user_role_id: role_id,
+    #                             controlling_for_user_role_id: nil,
+    #                             submitted_at: nil, auto_submit: false
+    #   track = report.tracks.build action_user: user,
+    #                               action_user_role_id: role_id,
+    #                               modified_user: prev_controlling_user,
+    #                               modified_user_role_id: prev_controlling_user_role,
+    #                               report_tracking_action_id: ReportTrackingAction.id_for(:retract),
+    #                               report_status_id: ReportStatus.retracted_id
+    #   track.save
+    #   report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:unsubmitted))
+    #   return
+    # end
+
+    #  Workflow Manager
+    params[:document] = self.report
+    params[:aasm_event] = 'retract'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
       return
     end
-    add_message :error, report.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
     # destroying the submitted amount field
     report.submitted_amount&.destroy
+
 
     if prev_status.approved? || report.auto_approve
       op = Settlement::SReport::Unapproved.(user, report: report)

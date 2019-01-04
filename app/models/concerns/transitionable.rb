@@ -99,13 +99,48 @@ module Transitionable
 
   module ClassMethods
     # Returns list of items for role 'Manager/Reviewer'
-    def associated_items(user)
+
+    # Known Bug -> If user retracts > Changes policy(results in deletion of all dlrm and user who had interacted with document before lose access to it)
+    def reviewer_associated_items(user)
       if user.instance_of?(User)
+        # todo - While writing for invoice , owner of the document is stored at owner_id
+        # Get controlling level id from all documents
+        if self.column_names.include? 'company_id'
+          controlling_level_ids = self.where(company_id: user.company.id).pluck(:controlling_level_id).reject { |document_id| document_id.nil? }
+        else
+          # Models like Report doesn't has company_id attribute
+          user_ids = user.company.users.pluck(:id)
+          controlling_level_ids = self.where(user_id: user_ids).pluck(:controlling_level_id).reject {|document_id| document_id.nil?}
+        end
+
+        # Get all the documents without viewable
         document_ids = DocumentLevelReviewerMapping.where(
-            reviewer_id: user.id,
-            document_reviewer_mappable_type: self.name,
+                                                       reviewer_id: user.id,
+                                                       document_reviewer_mappable_type: self.name,
+                                                       level_id: controlling_level_ids
         ).pluck(:document_reviewer_mappable_id)
 
+        # Get all the documents where the user had previously interacted with
+        document_ids += DocumentLevelReviewerMapping.where(
+            reviewer_id: user.id,
+            document_reviewer_mappable_type: self.name,
+            viewable: true,
+        ).pluck(:document_reviewer_mappable_id)
+
+        self.where(id: document_ids)
+      end
+    end
+
+    #todo below
+    # Displays all document. Need to remove draft state
+    def admin_associated_items(user)
+      if user.instance_of?(User)
+        if self.column_names.include? 'company_id'
+          document_ids = self.where(company_id: user.company.id).pluck(:id)
+        else
+          user_ids = user.company.users.pluck(:id)
+          document_ids = self.where(user_id: user_ids).pluck(:id)
+        end
         self.where(id: document_ids)
       end
     end

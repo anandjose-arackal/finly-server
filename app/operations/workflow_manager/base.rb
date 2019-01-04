@@ -42,6 +42,7 @@ class WorkflowManager::Base < BaseOperation
       return
     end
 
+
     # Create Trail
     trail = document.trails.new action_user: user,
                            action_id: TrailAction.id_for(aasm_event),

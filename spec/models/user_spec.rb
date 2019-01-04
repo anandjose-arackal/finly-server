@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
   before(:all) do
-    debugger
     @user = create(:em_employee_user)
   end
   it "is subscribed to expense management" do

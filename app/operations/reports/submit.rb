@@ -24,6 +24,8 @@ class Reports::Submit < Reports::Base
   def init
     id = (params[:report_id] or params[:id])
     self.report = user.reports.find_by(id: id)
+    # add_message :error, 'User not found'
+
   end
 
   def validate

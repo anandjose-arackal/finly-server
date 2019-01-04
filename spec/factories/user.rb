@@ -11,7 +11,7 @@ FactoryBot.define do
 
 
   factory :user do
-    company
+    company_id {nil}
     first_name {"Joe"}
     last_name {"Doe"}
     email {generate(:user_email)}

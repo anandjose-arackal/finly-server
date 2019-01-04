@@ -69,7 +69,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
     # find current document_level_reviewer_mappings
     if [:approve, :reject].include?(aasm.current_event)
       dlrm = document.document_level_reviewer_mappings
-                 .where(level_id: level.id, policy_id: document.policy.id)
+                 .where(level_id: current_level.id, policy_id: document.policy.id)
                  .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
 
       if dlrm.present?
@@ -84,7 +84,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
 
     if [:take_control].include?(aasm.current_event)
       dlrm = document.document_level_reviewer_mappings
-          .where(level_id: level.id, policy_id: document.policy.id)
+          .where(level_id: current_level.id, policy_id: document.policy.id)
 
       if dlrm.present?
         dlrm.update_all(taken_control_by_id: user.id, taken_control: true)
@@ -92,7 +92,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
     end
 
     if [:retract].include?(aasm.current_event)
-      dlrm = document.document_level_reviwer_mappings
+      dlrm = document.document_level_reviewer_mappings
       dlrm.update_all(
           taken_control: false,
           taken_control_by_id: nil,
@@ -131,7 +131,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::Base
         controlling_level_id: self.next_level&.id
     }
     if self.document.update(update_params)
-      p "Success ! !!!!!"
+      p document.controlling_level_id
     end
   end
 end
