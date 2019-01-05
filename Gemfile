@@ -87,6 +87,8 @@ gem 'jbuilder', '~> 2.8.0'
 
 gem 'rake', '~> 12.3.2'
 
+gem 'bootsnap', '1.3.2', require: false
+
 # gem 'handlebars_assets'
 
 #For pushing notifications
@@ -207,7 +209,10 @@ group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 3.7.0'
   gem 'foreman', '~> 0.85.0'
-  gem 'bullet'
+  gem 'bullet', '~> 5.9.0'
+  gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'spring', '~> 2.0.0'
+  gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
 # gem 'backup'
