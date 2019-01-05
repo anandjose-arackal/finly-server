@@ -521,8 +521,16 @@ class Report < ActiveRecord::Base
     self.sync_status_id == ReportSyncStatus.id_for(:synced)
   end
 
-
   private
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push ReportStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
 
   def controller_has_role
     if controlling_user_id.present?

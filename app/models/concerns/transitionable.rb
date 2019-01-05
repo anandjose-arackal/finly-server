@@ -75,13 +75,34 @@ module Transitionable
     def get_level(type)
       # Provide :next / :prev to get the respective levels
       current_level_number = self.level.present? ? self.level.level_number : 0
-      if type == 'next' || type == :next
-        level_number = current_level_number + 1
-      elsif ['previous', :previous, 'prev', :prev].include?(type)
-        level_number = current_level_number - 1
+
+      if self.level.present?
+        current_level_number = self.level.level_number
+        if type == 'next' || type == :next
+          level_number = current_level_number + 1
+        elsif ['previous', :previous, 'prev', :prev].include?(type)
+          level_number = current_level_number - 1
+        else
+          return nil
+        end
       else
-        return nil
+        # If a document has already approved and you try to get next level, it will give you 1 putting it into loop
+        # Or if you try to get previous level of a approved document, it will never be able to find it
+        if self.class.status_ids(:retracted, :rejected, :open, :draft).include? self.status.id
+          if type == 'next' || type == :next
+            level_number = 1
+          elsif ['previous', :previous, 'prev', :prev].include?(type)
+            level_number = nil
+          end
+        else
+          if type == 'next' || type == :next
+            level_number = nil
+          elsif ['previous', :previous, 'prev', :prev].include?(type)
+            level_number = self.document_level_reviewer_mappings.pluck(:level_number).max
+          end
+        end
       end
+
 
       ReviewalLevel.exclude_deleted.where({
                                               level_number: level_number,
@@ -92,6 +113,17 @@ module Transitionable
 
     # In case reviewer wants to reject it to a particular user who had previously approved
     def reject_to_users
+    end
+
+    def can_return_control?
+      return nil if level.blank?
+
+      dlrms = self.document_level_reviewer_mappings.with_level_id(level.id)
+      dlrms.each do |dlrm|
+        return false if dlrm.taken_control == false
+      end
+
+      return true
     end
 
 

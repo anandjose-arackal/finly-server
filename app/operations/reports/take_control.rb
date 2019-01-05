@@ -16,7 +16,6 @@ class Reports::TakeControl < Reports::Base
 
   def authorize
     super
-    debugger
     if not user.company_admin? and user.policy_admin?
       if report.policy and not user.policy_admin?(report.policy) # that is the report has a policy and the user is not policy admin
         raise_unauthorized_exception
@@ -25,7 +24,6 @@ class Reports::TakeControl < Reports::Base
   end
 
   def validate
-    debugger
     unless report.can_take_control?
       messages[:error] << 'Report cannot be taken control of at this stage'
     end

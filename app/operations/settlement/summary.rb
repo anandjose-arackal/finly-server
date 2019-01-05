@@ -87,7 +87,7 @@ class Settlement::Summary < Settlement::Base
   end
 
   def load_money_requests_summary
-    money_requests_presenter = Object.const_get('MoneyRequest::Index').(user, params)
+    money_requests_presenter = Object.const_get('MoneyRequests::Index').(user, params)
     unless money_requests_presenter.success?
       add_message :error, money_requests_presenter.messages[:error]
       return

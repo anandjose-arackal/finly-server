@@ -17,7 +17,8 @@ class Reports::Update < Reports::Base
     super
     if self.report.blank?
       id = (params[:id] or params[:report_id])
-      self.report = user.controlling_reports.with_id(id).first rescue nil
+      # self.report = user.controlling_reports.with_id(id).first rescue nil
+      self.report = user.reports.with_id(id).first rescue nil
     end
     self.update_param = {}
     self.update_param = self.params.permit(:name, :policy_id, :memo, :travel_request_id)
@@ -35,10 +36,10 @@ class Reports::Update < Reports::Base
     #   messages[:error] << 'Only report owners can update report'
     #   raise_unauthorized_exception
     # end
-    unless user == report.controlling_user
-      messages[:error] << 'You cannot edit the report at this stage'
-      raise_unauthorized_exception
-    end
+    # unless user == report.controlling_user
+    #   messages[:error] << 'You cannot edit the report at this stage'
+    #   raise_unauthorized_exception
+    # end
   end
 
   def validate
@@ -57,6 +58,16 @@ class Reports::Update < Reports::Base
       updated_policy_id = report.policy_id
       if params[:custom_fields].present? or original_policy_id != updated_policy_id
         CustomField::SetFields.(report, FieldParentType.id_for(:report), custom_fields: params[:custom_fields], save: true, reset_fields: true)
+      end
+
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.report.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Create.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
       end
     else
       messages[:error] = report.errors.full_messages

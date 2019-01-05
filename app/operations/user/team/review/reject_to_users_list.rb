@@ -4,7 +4,7 @@ class User::Team::Review::RejectToUsersList < BaseOperation
     return nil unless obj.is_a?(MoneyRequest) or obj.is_a?(Report)
     return nil unless obj.processing?
     if obj.is_a?(MoneyRequest)
-      MoneyRequest::AssociatedUsers.(self.user, money_request: self.obj, user_before: user)
+      MoneyRequests::AssociatedUsers.(self.user, money_request: self.obj, user_before: user)
     elsif obj.is_a?(Report)
       Reports::AssociatedUsers.(self.user, report: self.obj, user_before: user)
     end

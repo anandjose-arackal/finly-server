@@ -49,7 +49,8 @@ class MoneyRequest < ActiveRecord::Base
           MathUtil,
           SoftDeletable,
           FieldCustomizer::CustomizableValidation,
-          FindByOrderedIds
+          FindByOrderedIds,
+          Transitionable
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :status, class_name: 'MoneyRequestStatus'
@@ -370,6 +371,17 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   private
+
+  # doesn't make it private
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push MoneyRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
   def handle_name
     if self.name.blank?
       self.name = MoneyRequest.get_default_name(self.user)

@@ -45,7 +45,7 @@ class TravelRequests::Index < TravelRequests::Base
       self.travel_requests = TravelRequest.with_id((controlling_travel_request_query + interacted_travel_requests_query))
     when UserRole.id_for(:finance_manager)
       # Pick up trips from money requests
-      result = MoneyRequest::Index.(user, params)
+      result = MoneyRequests::Index.(user, params)
       if result.success?
         travel_requests = result.money_requests.pluck(:travel_request_id)
         self.travel_requests = TravelRequest.with_id(travel_requests)

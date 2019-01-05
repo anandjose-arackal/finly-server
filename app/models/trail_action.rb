@@ -21,12 +21,15 @@ class TrailAction < ActiveRecord::Base
         :reject,
         :unapprove,
         :take_control,
+        :return_control,
         :credited,
         :settled,
         :settlement_confirmed,
         :reimbursed,
         :reimbursement_confirmed,
-        :closed
+        :closed,
+        :hold,
+        :release
     ]
   end
 end

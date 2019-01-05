@@ -40,6 +40,7 @@ class DocumentLevelReviewerMapping < ActiveRecord::Base
   scope :with_policy_ids, -> (ids) {where policy_id: ids}
   scope :with_document_type, -> (document_type) {where document_reviewer_mappable_type: document_type}
   scope :with_taken_control, -> { where taken_control: true }
+  scope :with_level_number, -> (number) {where level_number: number}
 
   scope :with_document_id, -> (document_ids) {where document_reviewer_mappable_id: document_ids}
 

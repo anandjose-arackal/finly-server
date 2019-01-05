@@ -123,6 +123,9 @@ class Reports::Approve < Reports::Base
     # end
     # add_message :error, report.errors.full_messages
 
+
+    ###################
+    # NEW CODE
     #  Workflow Manager
     params[:document] = self.report
     params[:aasm_event] = 'approve'
@@ -135,6 +138,8 @@ class Reports::Approve < Reports::Base
     end
 
     self.workflow_output = op.workflow_output
+    # NEW CODE ENDS
+    ####################
   end
 
   def post_process

@@ -4,67 +4,67 @@ class Settlement::MoneyRequestsController < ApplicationController
   before_action -> { finly_authorize! :web }
 
   def pending_index
-    @result = Settlement::SMoneyRequest::Pending::Index.(current_user, params)
+    @result = Settlement::SMoneyRequests::Pending::Index.(current_user, params)
     respond
   end
 
   def pending_count
-    @result = Settlement::SMoneyRequest::Pending::Index.(current_user, params)
+    @result = Settlement::SMoneyRequests::Pending::Index.(current_user, params)
     respond
   end
 
   def processing_init
-    @result = Settlement::SMoneyRequest::Processing::Init.(current_user, params)
+    @result = Settlement::SMoneyRequests::Processing::Init.(current_user, params)
     respond
   end
 
   def processing_create
-    @result = Settlement::SMoneyRequest::Processing::Create.(current_user, params)
+    @result = Settlement::SMoneyRequests::Processing::Create.(current_user, params)
     respond response: (@result&.success? ? :success : :failure)
   end
 
   def processing_cancel
-    @result = Settlement::SMoneyRequest::Processing::Cancel.(current_user, params)
+    @result = Settlement::SMoneyRequests::Processing::Cancel.(current_user, params)
     respond response: (@result&.success? ? :success : :failure)
   end
 
   def processing_mark_paid
-    @result = Settlement::SMoneyRequest::Processing::MarkAsPaid.(current_user, params)
+    @result = Settlement::SMoneyRequests::Processing::MarkAsPaid.(current_user, params)
     respond response: (@result&.success? ? :success : :failure)
   end
 
   def processing_index
-    @result = Settlement::SMoneyRequest::Processing::Index.(current_user, params)
+    @result = Settlement::SMoneyRequests::Processing::Index.(current_user, params)
     respond
   end
 
   def processing_count
-    @result = Settlement::SMoneyRequest::Processing::Index.(current_user, params)
+    @result = Settlement::SMoneyRequests::Processing::Index.(current_user, params)
     respond
   end
 
   def processing_payment_file
-    @result = Settlement::SMoneyRequest::Processing::GeneratePaymentFile.(current_user, params)
+    @result = Settlement::SMoneyRequests::Processing::GeneratePaymentFile.(current_user, params)
     respond
   end
 
   def completed_index
-    @result = Settlement::SMoneyRequest::Completed::Index.(current_user, params)
+    @result = Settlement::SMoneyRequests::Completed::Index.(current_user, params)
     respond
   end
 
   def completed_count
-    @result = Settlement::SMoneyRequest::Completed::Index.(current_user, params)
+    @result = Settlement::SMoneyRequests::Completed::Index.(current_user, params)
     respond
   end
 
   def completed_batch_index
-    @result = Settlement::SMoneyRequest::Completed::BatchIndex.(current_user, params)
+    @result = Settlement::SMoneyRequests::Completed::BatchIndex.(current_user, params)
     respond
   end
 
   def completed_batch_count
-    @result = Settlement::SMoneyRequest::Completed::BatchIndex.(current_user, params)
+    @result = Settlement::SMoneyRequests::Completed::BatchIndex.(current_user, params)
     respond
   end
   

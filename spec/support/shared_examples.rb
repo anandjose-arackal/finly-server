@@ -46,3 +46,17 @@ RSpec.shared_examples "reviewer does NOT have access to document" do
   end
 end
 
+RSpec.shared_examples "document has moved to level" do
+  debugger
+  it "has controlling level as given level" do
+    expect(@document.controlling_level_id).to eq(level.id)
+  end
+end
+
+RSpec.shared_examples "trailed with right data" do
+  it "trailed with action user & action" do
+    last_trail = @document.trails.natural_order.reload.last
+    expect(last_trail&.action_id).to eq(TrailAction.id_for(action))
+    expect(last_trail&.action_user_id).to eq(user.id)
+  end
+end
