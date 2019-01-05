@@ -47,19 +47,30 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
         payment[:errors] << "Account number cannot be blank"
         errors_found = true
       end
+
+      # check if this bank account exists and if it has been blacklisted
+      ba = user.company.bank_accounts.find_by(account_number: payment[:account_number])
+      if ba&.disabled?
+        payment[:errors] << "This account has been blacklisted, you cannot make transfers to this account"
+        errors_found = true
+      end
+
       if payment[:ifsc].blank?
         payment[:errors] << "IFSC cannot be blank"
         errors_found = true
       end
+
       # todo - come back to this regex check
       # unless payment[:ifsc] =~ Constants::VALID_IFSC
       #   payment[:errors] << "IFSC cannot be blank"
       #   errors_found = true
       # end
+
       if payment[:amount].blank?
         payment[:errors] << "Amount cannot be blank"
         errors_found = true
       end
+
       if payment[:name].blank?
         payment[:errors] << "Name cannot be blank"
         errors_found = true
@@ -71,7 +82,6 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
       end
 
       self.total_amount_requested += payment[:amount].to_f
-
     end
     if errors_found
       self.errors_result = self.payments_attributes

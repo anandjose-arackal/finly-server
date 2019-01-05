@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190104122839) do
+ActiveRecord::Schema.define(version: 20190104105613) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -2847,7 +2847,7 @@ ActiveRecord::Schema.define(version: 20190104122839) do
     t.string   "parent_id",              limit: 255
     t.integer  "inventory_line_item_id", limit: 4
     t.text     "item_info",              limit: 65535
-    t.text     "comment",                limit: 65535
+    t.string   "comment",                limit: 255
     t.string   "account",                limit: 255
     t.integer  "tax_rate_id",            limit: 4
     t.integer  "cost_center_id",         limit: 4
