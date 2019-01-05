@@ -4,10 +4,11 @@ class BankTransfer::BankAccounts::Base < BaseOperation
 
   class BankTransfer::BankAccounts::Base::BankAccountPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :bank_account
+    attr_accessor :bank_account, :bank_accounts
 
     def init
       self.bank_account = params[:bank_account]
+      self.bank_accounts = params[:bank_accounts]
     end
   end
 
