@@ -199,6 +199,7 @@ group :development, :test do
   # gem 'flamegraph'
   gem 'stackprof', '~> 0.2.12' # ruby 2.1+ only
   gem 'memory_profiler', '~> 0.9.12'
+  gem 'brakeman'
   # gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
   # gem 'binding_of_caller'
