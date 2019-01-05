@@ -55,6 +55,10 @@ class BankAccount < ActiveRecord::Base
     where company_id: company_id
   }
 
+  scope :with_account_number, -> (account_number) {
+    where account_number: account_number
+  }
+
   scope :with_owner_ids, -> (type, ids) {
     case type
       when 1, '1'
@@ -111,8 +115,6 @@ class BankAccount < ActiveRecord::Base
         account_number: account_number,
         ifsc: ifsc,
         name: name,
-        # account_owner_type: account_owner_type,
-        # account_owner: account_owner,
         default_account: default_account
     }
   end
