@@ -24,9 +24,8 @@ class TransactionDetail < ActiveRecord::Base
 
   belongs_to :company
   belongs_to :finly_transaction
+  belongs_to :amount
   belongs_to :opening_balance, class_name: 'Amount'
   belongs_to :closing_balance, class_name: 'Amount'
-
-  validates :finly_transaction_id, uniqueness: true
 
 end

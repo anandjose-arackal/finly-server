@@ -9,8 +9,6 @@ gem 'autoprefixer-rails', '6.5.0.1'
 
 gem 'parslet', '1.8.2'
 
-gem 'elastic-apm', '2.1.2'
-
 # adding gems for activeMQ
 gem 'daemons', '1.2.4'
 gem 'stomp', '1.4.3'
@@ -230,4 +228,8 @@ group :test do
   gem 'rails-perftest', '0.0.6'
   gem 'ruby-prof', '0.16.2'
   gem 'test-unit', '3.2.3'
+end
+
+group :production do
+  gem 'elastic-apm', '2.1.2'
 end

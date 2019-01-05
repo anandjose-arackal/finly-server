@@ -37,8 +37,9 @@
 #  spent_from_id          :integer
 #  custom_conversion_rate :boolean          default(FALSE)
 #  cost_center_id         :integer
-#  created_by_id          :integer
 #
+
+
 
 
 
@@ -1184,10 +1185,12 @@ class Expense < ActiveRecord::Base
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed]).include?(self.report&.report_status_id)
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
-    else
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+    if self.report.present?
+      if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report&.report_status_id)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+      else
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
+      end
     end
   end
 

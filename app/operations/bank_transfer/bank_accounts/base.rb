@@ -2,6 +2,16 @@ class BankTransfer::BankAccounts::Base < BaseOperation
 
   attr_accessor :bank_account
 
+  class BankTransfer::BankAccounts::Base::BankAccountPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :bank_account, :bank_accounts
+
+    def init
+      self.bank_account = params[:bank_account]
+      self.bank_accounts = params[:bank_accounts]
+    end
+  end
+
   # def authorized_user_types
   #   [:company_admin, :finance_manager, :manager, :personal]
   # end

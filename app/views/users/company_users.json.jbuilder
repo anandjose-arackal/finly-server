@@ -5,4 +5,5 @@ json.array!(@result.users) do |user|
   json.value user.id
   json.email user.email
   json.mobile_number user.mobile_number
+  json.active user.active
 end
