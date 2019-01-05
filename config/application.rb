@@ -1,4 +1,4 @@
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
 require 'csv'
 require 'rails/all'
@@ -9,21 +9,12 @@ Bundler.require(*Rails.groups)
 
 module Finly
   class Application < Rails::Application
-    # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration should go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded.
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 5.0
 
-    # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
-    # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     config.time_zone = 'Kolkata'
     config.active_record.default_timezone = :local
-    # config.middleware.use Rack::Deflater
 
-    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-    # config.i18n.default_locale = :de
-
-    # adding aws key details to environment variables
     config.before_configuration do
       env_file = File.join(Rails.root, 'config', 'aws_details.yml')
       YAML.load(File.open(env_file)).each do |key, value|
@@ -31,16 +22,11 @@ module Finly
       end if File.exists?(env_file)
     end
 
-    # config.after_initialize do
-    #   Proselytism.config.log_level  ||= Rails.logger.level
-    #   Proselytism.config.log_path   ||= File.join(Rails.root, 'log', "proselytism.log")
-    #   Proselytism.config.logger     ||= Proselytism::Logger.new Proselytism.config.log_path, Proselytism.config.log_level
-    # end
-
-    # autoload paths that are in the lib folder
     config.autoload_paths += %W(#{config.root}/lib)
 
+    # Settings in config/environments/* take precedence over those specified here.
+    # Application configuration can go into files in config/initializers
+    # -- all .rb files in that directory are automatically loaded after loading
+    # the framework and any gems in your application.
   end
 end
-
-# Paperclip.options[:command_path] = "/usr/local/bin/"

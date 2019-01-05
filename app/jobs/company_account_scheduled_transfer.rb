@@ -1,4 +1,4 @@
-class CompanyAccountScheduledTransfer < ActiveJob::Base
+class CompanyAccountScheduledTransfer < ApplicationJob
 
   def perform
     configs = CompanyFundsAutoTransferConfig.enabled
