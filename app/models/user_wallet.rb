@@ -9,10 +9,10 @@
 #  updated_at :datetime         not null
 #
 
-class UserWallet < ActiveRecord::Base
+class UserWallet < ApplicationRecord
   include Accountable
-  belongs_to :user
-  belongs_to :balance, class_name: 'Amount'
+  belongs_to :user, optional: true
+  belongs_to :balance, optional: true, class_name: 'Amount'
 
   has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
   has_many :receiving_payments, as: :receiving_account, class_name: "Payment"

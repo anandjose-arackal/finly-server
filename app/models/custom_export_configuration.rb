@@ -12,8 +12,8 @@
 #  updated_at            :datetime         not null
 #
 
-class CustomExportConfiguration < ActiveRecord::Base
+class CustomExportConfiguration < ApplicationRecord
 
-  belongs_to :configurable, polymorphic: true
+  belongs_to :configurable, optional: true, polymorphic: true
 
 end

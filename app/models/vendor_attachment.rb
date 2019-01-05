@@ -14,11 +14,11 @@
 #  attachment_type            :string(255)
 #
 
-class VendorAttachment < ActiveRecord::Base
+class VendorAttachment < ApplicationRecord
 
   # Attachment Types: [:pan, gstin, cancelled_cheque]
 
-  belongs_to :yes_bank_vendor
+  belongs_to :yes_bank_vendor, optional: true
 
   include Attachable
 

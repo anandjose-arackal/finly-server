@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class BudgetModificationAction < ActiveRecord::Base
+class BudgetModificationAction < ApplicationRecord
 
   include Seedable
 

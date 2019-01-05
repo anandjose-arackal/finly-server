@@ -1,4 +1,4 @@
-class SeedTdsRatesList < ActiveRecord::Migration
+class SeedTdsRatesList < ActiveRecord::Migration[4.2]
   def change
     add_column :tds_rates_lists, :company_id, :integer, references: "Company", foreign_key: true, index: true
 

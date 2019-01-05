@@ -178,8 +178,8 @@ class PaymentRequest < NonPersistentModel
              :initiating_account, :initiating_account_id, :initiating_account_type, :scheduled_at,
              :payment_type_id, :currency_id, :payment_purpose_id, to: :payment_request, allow_nil: true
 
-    belongs_to :receiving_resource, polymorphic: true
-    belongs_to :receiving_account, polymorphic: true
+    belongs_to :receiving_resource, optional: true, polymorphic: true
+    belongs_to :receiving_account, optional: true, polymorphic: true
 
     validates :amount, presence: true
     validates :payment_request, presence: true

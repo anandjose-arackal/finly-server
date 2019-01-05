@@ -1,4 +1,4 @@
-class SeedTravelRequestCommentAction < ActiveRecord::Migration
+class SeedTravelRequestCommentAction < ActiveRecord::Migration[4.2]
   def change
     TravelRequestCommentAction.seed_data
   end

@@ -14,11 +14,11 @@
 #  company_id                 :integer
 #
 
-class InvoiceAttachment < ActiveRecord::Base
+class InvoiceAttachment < ApplicationRecord
   include Attachable
 
-  belongs_to :invoice
-  belongs_to :company
+  belongs_to :invoice, optional: true
+  belongs_to :company, optional: true
 
   # CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
 

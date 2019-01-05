@@ -179,11 +179,11 @@
 #  MYR         :decimal(20, 5)
 #
 
-class Amount < ActiveRecord::Base
+class Amount < ApplicationRecord
   include MathUtil
   include SoftDeletable
 
-  belongs_to :currency
+  belongs_to :currency, optional: true
 
   accepts_nested_attributes_for :currency
 

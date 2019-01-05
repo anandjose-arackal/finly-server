@@ -29,7 +29,7 @@
 #  booking_confirmed_at         :datetime
 #
 
-class TravelRequest < ActiveRecord::Base
+class TravelRequest < ApplicationRecord
   include SoftDeletable,
           Sequenced::ActsAsSequenced,
           FieldCustomizer::CustomizableValidation,
@@ -42,18 +42,18 @@ class TravelRequest < ActiveRecord::Base
   customizable_validate :to_date, presence: true
   customizable_validate :purpose_of_travel, presence: false
 
-  belongs_to :user
-  belongs_to :policy
-  belongs_to :status, class_name: 'TravelRequestStatus'
+  belongs_to :user, optional: true
+  belongs_to :policy, optional: true
+  belongs_to :status, optional: true, class_name: 'TravelRequestStatus'
   has_many :reports
   has_many :money_requests
   has_many :bookings
 
-  belongs_to :controlling_user, class_name: 'User'
-  belongs_to :controlling_user_role, class_name: 'UserRole'
-  belongs_to :controlling_for_user, class_name: 'User'
-  belongs_to :controlling_for_user_role, class_name: 'UserRole'
-  belongs_to :company
+  belongs_to :controlling_user, optional: true, class_name: 'User'
+  belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :controlling_for_user, optional: true, class_name: 'User'
+  belongs_to :controlling_for_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :company, optional: true
 
   has_many :destinations, class_name: 'TravelRequestDestination'
   has_many :travel_request_trails, dependent: :destroy

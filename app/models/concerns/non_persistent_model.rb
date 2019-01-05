@@ -1,6 +1,5 @@
-class NonPersistentModel
-  include ActiveModel::Model
-  include ActiveModel::Associations
+class NonPersistentModel < ApplicationRecord
+  self.abstract_class = true
 
   def initialize(attributes= {})
     pre_initialize(attributes)

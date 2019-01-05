@@ -1,4 +1,4 @@
-class SeedNotificationType3 < ActiveRecord::Migration
+class SeedNotificationType3 < ActiveRecord::Migration[4.2]
   def change
     NotifierType.seed_data
   end

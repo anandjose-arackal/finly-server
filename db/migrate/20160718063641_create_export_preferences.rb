@@ -1,4 +1,4 @@
-class CreateExportPreferences < ActiveRecord::Migration
+class CreateExportPreferences < ActiveRecord::Migration[4.2]
   def change
     create_table :export_preferences do |t|
       t.references :company, index: true, foreign_key: true, null: false

@@ -1,4 +1,4 @@
-class CreateCardBalanceHistories < ActiveRecord::Migration
+class CreateCardBalanceHistories < ActiveRecord::Migration[4.2]
   def change
     create_table :card_balance_histories do |t|
       t.references :card, index: true, foreign_key: true

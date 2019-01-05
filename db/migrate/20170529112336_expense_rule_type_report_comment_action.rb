@@ -1,4 +1,4 @@
-class ExpenseRuleTypeReportCommentAction < ActiveRecord::Migration
+class ExpenseRuleTypeReportCommentAction < ActiveRecord::Migration[4.2]
   def up
     if Company.count > 0
       ExpenseRuleType.seed_data

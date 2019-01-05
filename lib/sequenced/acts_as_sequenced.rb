@@ -34,8 +34,8 @@ module Sequenced
       #
       # Examples
       #
-      #   class Answer < ActiveRecord::Base
-      #     belongs_to :question
+      #   class Answer < ApplicationRecord
+      #     belongs_to :question, optional: true
       #     acts_as_sequenced :scope => :question_id
       #   end
       #

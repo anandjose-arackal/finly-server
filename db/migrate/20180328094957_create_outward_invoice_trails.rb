@@ -1,4 +1,4 @@
-class CreateOutwardInvoiceTrails < ActiveRecord::Migration
+class CreateOutwardInvoiceTrails < ActiveRecord::Migration[4.2]
   def change
     create_table :outward_invoice_trails do |t|
       t.integer :action_id, references: "OutwardInvoiceTrailAction", index: true, foreign_key: true

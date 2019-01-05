@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class TravelRequestCommentAction < ActiveRecord::Base
+class TravelRequestCommentAction < ApplicationRecord
 
   include Seedable
 

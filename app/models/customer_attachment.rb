@@ -13,10 +13,10 @@
 #  updated_at                 :datetime         not null
 #
 
-class CustomerAttachment < ActiveRecord::Base
+class CustomerAttachment < ApplicationRecord
   include Attachable
 
-  belongs_to :customer
+  belongs_to :customer, optional: true
 
   CONTENT_TYPES = {content_type: []}
 

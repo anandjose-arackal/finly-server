@@ -15,7 +15,7 @@
 
 
 
-class State < ActiveRecord::Base
+class State < ApplicationRecord
   include Seedable
 
   STATES = [{:code => 'S00', :name => 'Outside India'}, {:code => 'S01', :name => 'Maharashtra'}, {:code => 'S02', :name => 'Gujarat'}, {:code => 'S03', :name => 'Andhra Pradesh'},

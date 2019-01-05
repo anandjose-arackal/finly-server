@@ -10,7 +10,7 @@
 #  updated_at       :datetime         not null
 #
 
-class Feedback < ActiveRecord::Base
-  belongs_to :feedback_type
-  belongs_to :user
+class Feedback < ApplicationRecord
+  belongs_to :feedback_type, optional: true
+  belongs_to :user, optional: true
 end

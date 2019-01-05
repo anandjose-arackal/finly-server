@@ -1,4 +1,4 @@
-class CreateCurrencyConversionRates < ActiveRecord::Migration
+class CreateCurrencyConversionRates < ActiveRecord::Migration[4.2]
   def change
     create_table :currency_conversion_rates do |t|
       t.date :date, null: false, index: true

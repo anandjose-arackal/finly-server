@@ -1,4 +1,4 @@
-class AddNonDependentAsFlagForFieldConfigurations < ActiveRecord::Migration
+class AddNonDependentAsFlagForFieldConfigurations < ActiveRecord::Migration[4.2]
   def change
     add_column :field_configurations, :root_field, :boolean, default: true
 

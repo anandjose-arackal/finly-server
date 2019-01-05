@@ -1,4 +1,4 @@
-class AddUserPermissionForAllUsers < ActiveRecord::Migration
+class AddUserPermissionForAllUsers < ActiveRecord::Migration[4.2]
   def change
     User.all.each do |user|
       if user.vendor_payments_admin?

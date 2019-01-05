@@ -1,4 +1,4 @@
-class RemovePersonalCategory < ActiveRecord::Migration
+class RemovePersonalCategory < ActiveRecord::Migration[4.2]
   def change
     # changing the category of all expenses that were originally 'Personal'
     Expense.unscoped.all.each do |expense|

@@ -17,10 +17,10 @@
 
 
 
-class PolicyConfiguration < ActiveRecord::Base
+class PolicyConfiguration < ApplicationRecord
   include PolicyVersion
-  belongs_to :policy
-  belongs_to :report_currency, class_name: 'Currency'
+  belongs_to :policy, optional: true
+  belongs_to :report_currency, optional: true, class_name: 'Currency'
 
   has_paper_trail
 

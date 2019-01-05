@@ -22,20 +22,20 @@
 #  sequence_number             :integer
 #
 
-class FinlyTransaction < ActiveRecord::Base
+class FinlyTransaction < ApplicationRecord
 
   include ManageTransactionDetail
 
-  belongs_to :finly_account, polymorphic: true
-  belongs_to :transaction_type
-  belongs_to :amount
-  belongs_to :status, class_name: 'TransactionStatus'
-  belongs_to :payment_purpose
-  belongs_to :opening_balance, class_name: 'Amount'
-  belongs_to :closing_balance, class_name: 'Amount'
-  belongs_to :associated_transaction, polymorphic: true
-  belongs_to :payment
-  belongs_to :company
+  belongs_to :finly_account, optional: true, polymorphic: true
+  belongs_to :transaction_type, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :status, optional: true, class_name: 'TransactionStatus'
+  belongs_to :payment_purpose, optional: true
+  belongs_to :opening_balance, optional: true, class_name: 'Amount'
+  belongs_to :closing_balance, optional: true, class_name: 'Amount'
+  belongs_to :associated_transaction, optional: true, polymorphic: true
+  belongs_to :payment, optional: true
+  belongs_to :company, optional: true
   has_many :system_messages, as: :messagable, dependent: :destroy
   has_one :transaction_detail
 

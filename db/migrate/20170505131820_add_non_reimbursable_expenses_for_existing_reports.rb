@@ -1,4 +1,4 @@
-class AddNonReimbursableExpensesForExistingReports < ActiveRecord::Migration
+class AddNonReimbursableExpensesForExistingReports < ActiveRecord::Migration[4.2]
   def change
     unless Report.count == 0
       Report.approved.all.each do |report|

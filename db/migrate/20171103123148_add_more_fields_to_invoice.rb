@@ -1,4 +1,4 @@
-class AddMoreFieldsToInvoice < ActiveRecord::Migration
+class AddMoreFieldsToInvoice < ActiveRecord::Migration[4.2]
   def change
     add_column :invoices, :gross_amount_id, :integer, references: "Amount", foreign_key: true, index: true
     add_column :invoices, :net_amount_id, :integer, references: "Amount", foreign_key: true, index: true

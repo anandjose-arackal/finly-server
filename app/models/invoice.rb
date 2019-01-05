@@ -72,52 +72,52 @@
 #  gst_type_id: 1 - IGST
 #              2 - CGST + SGST
 
-class Invoice < ActiveRecord::Base
+class Invoice < ApplicationRecord
   include SoftDeletable, Templatable
 
   include Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false
 
-  belongs_to :address
-  belongs_to :amount
-  belongs_to :gross_amount, class_name: "Amount"
-  belongs_to :net_amount, class_name: "Amount"
-  belongs_to :tds_amount, class_name: "Amount"
-  belongs_to :tax_amount, class_name: "Amount"
-  belongs_to :discount_amount, class_name: "Amount"
-  belongs_to :original_amount, class_name: "Amount"
-  belongs_to :advance_amount, class_name: "Amount"
-  belongs_to :freight_amount, class_name: "Amount"
-  belongs_to :balance_due, class_name: "Amount"
-  belongs_to :taxable_amount, class_name: "Amount"
-  belongs_to :category
-  belongs_to :cost_center
-  belongs_to :created_by, class_name: "User", foreign_key: :created_by_user_id
-  belongs_to :company
-  belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
-  belongs_to :receiving_account, polymorphic: true
-  belongs_to :vendor, class_name: "YesBankVendor"
-  belongs_to :location, class_name: 'BranchLocation'
-  belongs_to :delivery_location, class_name: 'BranchLocation'
+  belongs_to :address, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :gross_amount, optional: true, class_name: "Amount"
+  belongs_to :net_amount, optional: true, class_name: "Amount"
+  belongs_to :tds_amount, optional: true, class_name: "Amount"
+  belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :discount_amount, optional: true, class_name: "Amount"
+  belongs_to :original_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :freight_amount, optional: true, class_name: "Amount"
+  belongs_to :balance_due, optional: true, class_name: "Amount"
+  belongs_to :taxable_amount, optional: true, class_name: "Amount"
+  belongs_to :category, optional: true
+  belongs_to :cost_center, optional: true
+  belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
+  belongs_to :company, optional: true
+  belongs_to :invoice_status, optional: true, class_name: "InwardInvoiceStatus"
+  belongs_to :receiving_account, optional: true, polymorphic: true
+  belongs_to :vendor, optional: true, class_name: "YesBankVendor"
+  belongs_to :location, optional: true, class_name: 'BranchLocation'
+  belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
 
-  belongs_to :procurement, class_name: "Procurement"
-  belongs_to :remaining_amount, class_name: "Amount"
-  belongs_to :invoice_type, class_name: "InwardInvoiceType"
-  belongs_to :gst_type
-  belongs_to :tds_slab, class_name: 'TdsRatesList'
-  belongs_to :payment_term
+  belongs_to :procurement, optional: true, class_name: "Procurement"
+  belongs_to :remaining_amount, optional: true, class_name: "Amount"
+  belongs_to :invoice_type, optional: true, class_name: "InwardInvoiceType"
+  belongs_to :gst_type, optional: true
+  belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
+  belongs_to :payment_term, optional: true
 
-  belongs_to :controlling_user, class_name: 'User'
-  belongs_to :controlling_for_user, class_name: 'User'
-  belongs_to :controlling_user_role, class_name: 'UserRole'
-  belongs_to :controlling_for_user_role, class_name: 'UserRole'
+  belongs_to :controlling_user, optional: true, class_name: 'User'
+  belongs_to :controlling_for_user, optional: true, class_name: 'User'
+  belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :controlling_for_user_role, optional: true, class_name: 'UserRole'
 
-  belongs_to :department
-  belongs_to :sub_department, class_name: 'Department', foreign_key: :sub_department_id
+  belongs_to :department, optional: true
+  belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
 
-  belongs_to :policy
-  belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+  belongs_to :policy, optional: true
+  belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 

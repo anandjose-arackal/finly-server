@@ -1,4 +1,4 @@
-class CreateWebHookTracks < ActiveRecord::Migration
+class CreateWebHookTracks < ActiveRecord::Migration[4.2]
   def change
     create_table :web_hook_tracks do |t|
       t.references :web_hook, index: true, foreign_key: true

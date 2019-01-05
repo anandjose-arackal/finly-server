@@ -62,7 +62,7 @@
 
 
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include OperationCallbacks
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -77,9 +77,9 @@ class User < ActiveRecord::Base
 
   serialize :gl_config
 
-  belongs_to :company
-  belongs_to :otp_request_type
-  belongs_to :user_delegate, class_name: "User"
+  belongs_to :company, optional: true
+  belongs_to :otp_request_type, optional: true
+  belongs_to :user_delegate, optional: true, class_name: "User"
 
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy

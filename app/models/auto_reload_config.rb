@@ -16,13 +16,13 @@
 #  application          :string(255)
 #
 
-class AutoReloadConfig < ActiveRecord::Base
+class AutoReloadConfig < ApplicationRecord
 
-  belongs_to :reloadable, polymorphic: true
-  belongs_to :minimum_balance, class_name: 'Amount'
-  belongs_to :threshold_balance, class_name: "Amount"
-  belongs_to :target_balance, class_name: "Amount"
-  belongs_to :source_account, polymorphic: true
+  belongs_to :reloadable, optional: true, polymorphic: true
+  belongs_to :minimum_balance, optional: true, class_name: 'Amount'
+  belongs_to :threshold_balance, optional: true, class_name: "Amount"
+  belongs_to :target_balance, optional: true, class_name: "Amount"
+  belongs_to :source_account, optional: true, polymorphic: true
 
   accepts_nested_attributes_for :minimum_balance
   accepts_nested_attributes_for :threshold_balance

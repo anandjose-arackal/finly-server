@@ -1,4 +1,4 @@
-class RemoveReimbursementAmountAndAddOtherColumns < ActiveRecord::Migration
+class RemoveReimbursementAmountAndAddOtherColumns < ActiveRecord::Migration[4.2]
   def change
     remove_column :reports, :reimbursement_amount_id
     add_column :reports, :cash_expenses_total_id, :integer, foreign_key: true, index: true

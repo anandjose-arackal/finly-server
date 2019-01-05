@@ -1,4 +1,4 @@
-class CreateTransactionStatuses < ActiveRecord::Migration
+class CreateTransactionStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :transaction_statuses do |t|
       t.string :name, null: false

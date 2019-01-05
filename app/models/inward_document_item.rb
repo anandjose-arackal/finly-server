@@ -19,7 +19,7 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #
 
-class InwardDocumentItem < ActiveRecord::Base
+class InwardDocumentItem < ApplicationRecord
   include SoftDeletable
-  belongs_to :inward_document
+  belongs_to :inward_document, optional: true
 end

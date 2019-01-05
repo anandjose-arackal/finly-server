@@ -1,4 +1,4 @@
-class AddReferenceIdToPayment < ActiveRecord::Migration
+class AddReferenceIdToPayment < ActiveRecord::Migration[4.2]
   def change
     add_column :payments, :reference_id, :string, index: true, unique: true
     add_column :finly_transactions, :date, :datetime, index: true

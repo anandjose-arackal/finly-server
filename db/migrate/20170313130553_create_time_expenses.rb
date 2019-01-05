@@ -1,4 +1,4 @@
-class CreateTimeExpenses < ActiveRecord::Migration
+class CreateTimeExpenses < ActiveRecord::Migration[4.2]
   def change
     create_table :time_expenses do |t|
       t.decimal :duration, null: false

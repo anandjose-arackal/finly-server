@@ -1,4 +1,4 @@
-class AddAddressToProcurementDocuments < ActiveRecord::Migration
+class AddAddressToProcurementDocuments < ActiveRecord::Migration[4.2]
   def change
     add_column :purchase_orders, :billing_address, :text
     add_column :purchase_orders, :shipping_address, :text

@@ -8,7 +8,11 @@ class BaseOperation
   def initialize(user, params={})
     clear_messages
     self.user = user
-    self.params = (ActionController::Parameters.new(params) or {})
+    if params.class.name == ActionController::Parameters.name
+      self.params = params
+    else
+      self.params = (ActionController::Parameters.new(params) or {})
+    end
   end
 
   def self.call(user, params={})
@@ -255,6 +259,9 @@ class BaseOperation
       self.config = {}
       self.user = user
       self.params = params
+      if self.params.class.name == ActionController::Parameters.name
+        self.params = self.params.permit!.to_h
+      end
       self.messages = messages
       init
     end

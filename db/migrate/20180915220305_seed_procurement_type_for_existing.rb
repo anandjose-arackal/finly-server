@@ -1,4 +1,4 @@
-class SeedProcurementTypeForExisting < ActiveRecord::Migration
+class SeedProcurementTypeForExisting < ActiveRecord::Migration[4.2]
   def change
     procurements = Procurement.all
 

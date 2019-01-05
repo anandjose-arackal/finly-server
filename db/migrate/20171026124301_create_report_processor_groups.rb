@@ -1,4 +1,4 @@
-class CreateReportProcessorGroups < ActiveRecord::Migration
+class CreateReportProcessorGroups < ActiveRecord::Migration[4.2]
   def change
     create_table :report_processor_group_statuses do |t|
       t.string :name, null: false, index: true

@@ -1,4 +1,4 @@
-class CreateCollectTransactionPurposes < ActiveRecord::Migration
+class CreateCollectTransactionPurposes < ActiveRecord::Migration[4.2]
   def change
     create_table :collect_transaction_purposes do |t|
       t.string :name

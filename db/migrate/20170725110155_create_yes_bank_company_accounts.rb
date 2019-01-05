@@ -1,4 +1,4 @@
-class CreateYesBankCompanyAccounts < ActiveRecord::Migration
+class CreateYesBankCompanyAccounts < ActiveRecord::Migration[4.2]
   def change
     create_table :yes_bank_company_accounts do |t|
       t.references :company, index: true, foreign_key: true

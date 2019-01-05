@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
 
   # protect_from_forgery with: :exception
-  before_filter :set_paper_trail_whodunnit
+  before_action :set_paper_trail_whodunnit
 
   before_action :load_global_variables
 
@@ -19,10 +19,10 @@ class ApplicationController < ActionController::Base
 
   before_action :init_elastic_apm
 
-  before_filter :store_location
+  before_action :store_location
 
-  after_filter :set_queries_counter
-  after_filter :track_request
+  after_action :set_queries_counter
+  after_action :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found

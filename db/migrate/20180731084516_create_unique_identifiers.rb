@@ -1,4 +1,4 @@
-class CreateUniqueIdentifiers < ActiveRecord::Migration
+class CreateUniqueIdentifiers < ActiveRecord::Migration[4.2]
   def change
     create_table :unique_identifiers do |t|
       t.string :prefix, null: false

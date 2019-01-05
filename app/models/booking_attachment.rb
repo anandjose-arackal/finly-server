@@ -15,12 +15,12 @@
 #  updated_at              :datetime         not null
 #
 
-class BookingAttachment < ActiveRecord::Base
+class BookingAttachment < ApplicationRecord
   include Attachable
 
-  belongs_to :booking
-  belongs_to :user
-  belongs_to :company
+  belongs_to :booking, optional: true
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
 
   CONTENT_TYPES = {content_type: []}
 

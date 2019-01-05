@@ -11,7 +11,7 @@
 #  source_description :text(65535)
 #
 
-class ResourceRequest < ActiveRecord::Base
+class ResourceRequest < ApplicationRecord
 
   validates :email, presence: true, format: { allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
   validates :mobile_number, presence: true

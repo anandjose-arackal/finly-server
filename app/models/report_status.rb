@@ -12,7 +12,7 @@
 
 
 
-class ReportStatus < ActiveRecord::Base
+class ReportStatus < ApplicationRecord
   include Seedable
 
   scope :open, -> { find_by(id: ReportStatus.open_id) }

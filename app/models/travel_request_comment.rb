@@ -18,14 +18,14 @@
 #  is_deleted         :boolean          default(FALSE)
 #
 
-class TravelRequestComment < ActiveRecord::Base
+class TravelRequestComment < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :travel_request
-  belongs_to :user
-  belongs_to :action, class_name: "TravelRequestCommentAction"
-  belongs_to :booking
-  belongs_to :booking_request
+  belongs_to :travel_request, optional: true
+  belongs_to :user, optional: true
+  belongs_to :action, optional: true, class_name: "TravelRequestCommentAction"
+  belongs_to :booking, optional: true
+  belongs_to :booking_request, optional: true
 
   default_scope { order created_at: :desc }
 

@@ -1,4 +1,4 @@
-class CreateReportProcessorGroupMappings < ActiveRecord::Migration
+class CreateReportProcessorGroupMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :report_processor_group_mappings do |t|
       t.integer :processor_group_id, references: 'ReportProcessorGroup', index: true, foreign_key: true, null: false

@@ -1,4 +1,4 @@
-class CreatePaymentOrderAttachments < ActiveRecord::Migration
+class CreatePaymentOrderAttachments < ActiveRecord::Migration[4.2]
   def change
     # creating payment order attachments
     create_table :payment_order_attachments do |t|

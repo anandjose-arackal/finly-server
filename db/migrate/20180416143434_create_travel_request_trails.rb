@@ -1,4 +1,4 @@
-class CreateTravelRequestTrails < ActiveRecord::Migration
+class CreateTravelRequestTrails < ActiveRecord::Migration[4.2]
   def change
     create_table :travel_request_trails do |t|
       t.references :travel_request, index: true, foreign_key: true

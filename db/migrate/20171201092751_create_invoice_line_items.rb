@@ -1,4 +1,4 @@
-class CreateInvoiceLineItems < ActiveRecord::Migration
+class CreateInvoiceLineItems < ActiveRecord::Migration[4.2]
   def change
     create_table :invoice_line_items do |t|
       t.references :invoice, index: true, foreign_key: true

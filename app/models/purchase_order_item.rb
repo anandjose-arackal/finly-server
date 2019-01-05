@@ -31,19 +31,19 @@
 #  tax_rate_id            :integer
 #
 
-class PurchaseOrderItem < ActiveRecord::Base
+class PurchaseOrderItem < ApplicationRecord
   include SoftDeletable
   validates :inventory_line_item_id, presence: true
   # validates :purchase_order_id, presence: true
 
-  belongs_to :tax_rate
-  belongs_to :purchase_order
-  belongs_to :inventory_line_item
-  belongs_to :tax_amount, class_name: "Amount"
-  belongs_to :discount_amount, class_name: "Amount"
-  belongs_to :total_amount, class_name: "Amount"
-  belongs_to :category
-  belongs_to :cost_center
+  belongs_to :tax_rate, optional: true
+  belongs_to :purchase_order, optional: true
+  belongs_to :inventory_line_item, optional: true
+  belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :discount_amount, optional: true, class_name: "Amount"
+  belongs_to :total_amount, optional: true, class_name: "Amount"
+  belongs_to :category, optional: true
+  belongs_to :cost_center, optional: true
 
   # link to budget trails table
   has_many :budget_trails, as: :entity

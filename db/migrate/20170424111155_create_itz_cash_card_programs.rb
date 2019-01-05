@@ -1,4 +1,4 @@
-class CreateItzCashCardPrograms < ActiveRecord::Migration
+class CreateItzCashCardPrograms < ActiveRecord::Migration[4.2]
   def change
     create_table :itz_cash_card_programs do |t|
       t.string :product_code

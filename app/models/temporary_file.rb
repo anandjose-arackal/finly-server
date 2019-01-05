@@ -12,7 +12,7 @@
 #  updated_at        :datetime         not null
 #
 
-class TemporaryFile < ActiveRecord::Base
+class TemporaryFile < ApplicationRecord
   has_attached_file :file
   do_not_validate_attachment_file_type :file
 end

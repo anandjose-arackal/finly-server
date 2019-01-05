@@ -14,11 +14,11 @@
 
 
 
-class BalanceSheet < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :cash_in_hand, class_name: 'Amount'
-  belongs_to :approved_reports_total, class_name: 'Amount'
-  belongs_to :pending_advance, class_name: 'Amount'
+class BalanceSheet < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :cash_in_hand, optional: true, class_name: 'Amount'
+  belongs_to :approved_reports_total, optional: true, class_name: 'Amount'
+  belongs_to :pending_advance, optional: true, class_name: 'Amount'
 
   delegate :approved_reports_total_value, to: :approved_reports_total
 

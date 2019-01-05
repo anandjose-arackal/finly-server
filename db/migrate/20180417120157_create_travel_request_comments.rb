@@ -1,4 +1,4 @@
-class CreateTravelRequestComments < ActiveRecord::Migration
+class CreateTravelRequestComments < ActiveRecord::Migration[4.2]
   def change
     create_table :travel_request_comments do |t|
       t.references :travel_request, index: true, foreign_key: true

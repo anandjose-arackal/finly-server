@@ -25,11 +25,11 @@
 #  beneficiary_account_no     :string(255)
 #
 
-class VirtualAccountTransaction < ActiveRecord::Base
+class VirtualAccountTransaction < ApplicationRecord
   include SystemLoggable
 
   has_one :payment, as: :reference_resource
-  belongs_to :virtual_account, class_name: "VirtualBankAccount"
+  belongs_to :virtual_account, optional: true, class_name: "VirtualBankAccount"
   has_many :invoice_transaction_mappings, foreign_key: :va_transaction_id
   has_many :invoices, through: :invoice_transaction_mappings
 

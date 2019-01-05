@@ -11,7 +11,7 @@
 #
 
 
-class Currency < ActiveRecord::Base
+class Currency < ApplicationRecord
   has_many :amounts
 
   # since default currency is INR

@@ -1,4 +1,4 @@
-class CreateEnforceBudgets < ActiveRecord::Migration
+class CreateEnforceBudgets < ActiveRecord::Migration[4.2]
   def change
     create_table :enforce_budgets do |t|
       t.boolean :enforce_purchase_order_budget

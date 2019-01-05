@@ -1,4 +1,4 @@
-class CreateVendorAccountTransactions < ActiveRecord::Migration
+class CreateVendorAccountTransactions < ActiveRecord::Migration[4.2]
   def change
     create_table :vendor_account_transactions do |t|
       t.references :vendor_account, index: true, foreign_key: true

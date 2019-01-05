@@ -11,12 +11,12 @@
 #  user_group_id      :integer
 #
 
-class UserGroupItemMapping < ActiveRecord::Base
+class UserGroupItemMapping < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :user
+  belongs_to :user, optional: true
 
-  belongs_to :user_group_item
+  belongs_to :user_group_item, optional: true
 
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :with_group, ->(group_id) { where user_group_id: group_id }

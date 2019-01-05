@@ -20,13 +20,13 @@
 
 
 
-class ReportComment < ActiveRecord::Base
-  belongs_to :report
-  belongs_to :user
-  belongs_to :report_comment_action
-  belongs_to :expense
-  belongs_to :rejected_to, class_name: 'User'
-  belongs_to :payment
+class ReportComment < ApplicationRecord
+  belongs_to :report, optional: true
+  belongs_to :user, optional: true
+  belongs_to :report_comment_action, optional: true
+  belongs_to :expense, optional: true
+  belongs_to :rejected_to, optional: true, class_name: 'User'
+  belongs_to :payment, optional: true
 
   validates :report_id, presence: true
   validates :report_comment_action_id, presence: true

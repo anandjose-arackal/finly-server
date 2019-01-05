@@ -1,4 +1,4 @@
-class SetBeneficiaryTypesAsFlags < ActiveRecord::Migration
+class SetBeneficiaryTypesAsFlags < ActiveRecord::Migration[4.2]
   def change
     # drop_table :itz_cash_dmt_beneficiary_types
     add_column :itz_cash_dmt_beneficiaries, :reimbursement, :boolean, index: true, default: false

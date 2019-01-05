@@ -19,16 +19,16 @@
 
 
 
-class ReportTrack < ActiveRecord::Base
-  belongs_to :report
-  belongs_to :report_status
-  belongs_to :tracking_action, class_name: 'ReportTrackingAction'
-  belongs_to :action_user, class_name: 'User'
-  belongs_to :action_user_role, class_name: 'UserRole'
-  belongs_to :modified_user, class_name: 'User'
-  belongs_to :modified_user_role, class_name: 'UserRole'
-  belongs_to :payment
-  belongs_to :cash_in_hand_deduction, class_name: 'Payment'
+class ReportTrack < ApplicationRecord
+  belongs_to :report, optional: true
+  belongs_to :report_status, optional: true
+  belongs_to :tracking_action, optional: true, class_name: 'ReportTrackingAction'
+  belongs_to :action_user, optional: true, class_name: 'User'
+  belongs_to :action_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :modified_user, optional: true, class_name: 'User'
+  belongs_to :modified_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :payment, optional: true
+  belongs_to :cash_in_hand_deduction, optional: true, class_name: 'Payment'
 
   default_scope { order('report_tracks.created_at ASC') }
 

@@ -37,12 +37,12 @@
 
 
 require 'fileutils'
-class ReceiptEmail < ActiveRecord::Base
+class ReceiptEmail < ApplicationRecord
   has_many :receipts, as: :sourcable
   has_many :receipt_email_attachments, dependent: :destroy
   has_many :expense_data_extracts, as: :extractable
-  belongs_to :user
-  belongs_to :expense
+  belongs_to :user, optional: true
+  belongs_to :expense, optional: true
 
   accepts_nested_attributes_for :receipt_email_attachments
 

@@ -1,4 +1,4 @@
-class AddAadharFrontBackPhotoSignatureToKyc < ActiveRecord::Migration
+class AddAadharFrontBackPhotoSignatureToKyc < ActiveRecord::Migration[4.2]
   def change
     add_attachment :individual_kycs, :aadhar_front
     add_attachment :individual_kycs, :aadhar_back

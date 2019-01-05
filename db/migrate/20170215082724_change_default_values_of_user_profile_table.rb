@@ -1,4 +1,4 @@
-class ChangeDefaultValuesOfUserProfileTable < ActiveRecord::Migration
+class ChangeDefaultValuesOfUserProfileTable < ActiveRecord::Migration[4.2]
   def change
     # changing the ability to have null of the users and user profile columns
     change_column_null :users, :first_name, true

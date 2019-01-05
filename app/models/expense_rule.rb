@@ -21,15 +21,15 @@
 
 
 
-class ExpenseRule < ActiveRecord::Base
+class ExpenseRule < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :greater_than_amount, class_name: "Amount", dependent: :destroy
-  belongs_to :category
+  belongs_to :greater_than_amount, optional: true, class_name: "Amount", dependent: :destroy
+  belongs_to :category, optional: true
 
-  belongs_to :rule_type
-  belongs_to :expense_rule_type
-  belongs_to :policy
+  belongs_to :rule_type, optional: true
+  belongs_to :expense_rule_type, optional: true
+  belongs_to :policy, optional: true
 
   accepts_nested_attributes_for :greater_than_amount
 

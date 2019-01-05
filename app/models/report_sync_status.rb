@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class ReportSyncStatus < ActiveRecord::Base
+class ReportSyncStatus < ApplicationRecord
   include Seedable
 
   def self.values

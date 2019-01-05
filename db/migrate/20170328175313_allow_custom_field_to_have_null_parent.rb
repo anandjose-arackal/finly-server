@@ -1,4 +1,4 @@
-class AllowCustomFieldToHaveNullParent < ActiveRecord::Migration
+class AllowCustomFieldToHaveNullParent < ActiveRecord::Migration[4.2]
   def change
     change_column :custom_fields, :parent_id, :integer, foreign_key: true, index: true, null: true
     change_column :custom_fields, :parent_type, :string, foreign_key: true, index: true, null: true

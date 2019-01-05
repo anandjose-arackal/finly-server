@@ -1,4 +1,4 @@
-class CreateCompanyPocketTemplates < ActiveRecord::Migration
+class CreateCompanyPocketTemplates < ActiveRecord::Migration[4.2]
   def change
     create_table :company_pocket_templates do |t|
       t.string :name

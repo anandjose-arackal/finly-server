@@ -5,7 +5,7 @@ module Templatable
     scope :templates, -> {where.not(resource_template_id: nil)}
     scope :exclude_templates, -> {where(resource_template_id: nil)}
 
-    belongs_to :resource_template
+    belongs_to :resource_template, optional: true
 
     accepts_nested_attributes_for :resource_template
 

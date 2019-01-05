@@ -1,4 +1,4 @@
-class AddCompanyIdToInvoices < ActiveRecord::Migration
+class AddCompanyIdToInvoices < ActiveRecord::Migration[4.2]
   def change
     add_column :outward_invoices, :company_id, :integer, references: "Company", foreign_key: true, index: true
   end

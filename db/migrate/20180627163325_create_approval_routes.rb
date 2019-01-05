@@ -1,4 +1,4 @@
-class CreateApprovalRoutes < ActiveRecord::Migration
+class CreateApprovalRoutes < ActiveRecord::Migration[4.2]
   def change
     create_table :approval_routes do |t|
       t.references :purpose, index: true, foreign_key: true, null: false

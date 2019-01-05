@@ -13,13 +13,13 @@
 #
 
 
-class UserRoleMapping < ActiveRecord::Base
+class UserRoleMapping < ApplicationRecord
 
-  belongs_to :user
-  belongs_to :user_role
-  belongs_to :company_department
-  belongs_to :branch_location
-  belongs_to :purpose, class_name: "Purpose"
+  belongs_to :user, optional: true
+  belongs_to :user_role, optional: true
+  belongs_to :company_department, optional: true
+  belongs_to :branch_location, optional: true
+  belongs_to :purpose, optional: true, class_name: "Purpose"
 
   scope :role, ->(role_id) { where user_role_id: role_id }
   scope :admin, -> { where(user_role_id: UserRole.id_for(:admin)) }

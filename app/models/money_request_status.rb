@@ -15,7 +15,7 @@
 
 
 
-class MoneyRequestStatus < ActiveRecord::Base
+class MoneyRequestStatus < ApplicationRecord
   include Seedable
 
   VALUES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, credited: 6, pending: 7}

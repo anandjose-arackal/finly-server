@@ -1,4 +1,4 @@
-class CreateBudgetEntityMappings < ActiveRecord::Migration
+class CreateBudgetEntityMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :budget_entity_mappings do |t|
       t.references :budget, index: true, foreign_key: true

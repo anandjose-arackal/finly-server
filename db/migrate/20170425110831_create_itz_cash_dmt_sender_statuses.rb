@@ -1,4 +1,4 @@
-class CreateItzCashDmtSenderStatuses < ActiveRecord::Migration
+class CreateItzCashDmtSenderStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :itz_cash_dmt_sender_statuses do |t|
       t.string :name, null: false

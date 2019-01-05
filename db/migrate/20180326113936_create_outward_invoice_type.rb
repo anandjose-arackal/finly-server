@@ -1,4 +1,4 @@
-class CreateOutwardInvoiceType < ActiveRecord::Migration
+class CreateOutwardInvoiceType < ActiveRecord::Migration[4.2]
   def change
     create_table :outward_invoice_types do |t|
       t.string :name

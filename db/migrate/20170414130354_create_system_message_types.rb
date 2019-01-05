@@ -1,4 +1,4 @@
-class CreateSystemMessageTypes < ActiveRecord::Migration
+class CreateSystemMessageTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :system_message_types do |t|
       t.string :name, null: false

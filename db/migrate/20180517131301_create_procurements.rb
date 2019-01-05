@@ -1,4 +1,4 @@
-class CreateProcurements < ActiveRecord::Migration
+class CreateProcurements < ActiveRecord::Migration[4.2]
   def change
     create_table :procurements do |t|
       t.string :name

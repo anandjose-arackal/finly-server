@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class PurchaseOrderStatus < ActiveRecord::Base
+class PurchaseOrderStatus < ApplicationRecord
   include Seedable
   def self.values
     %w( open retracted processing approved rejected auto_approved sent_to_vendor closed voided )

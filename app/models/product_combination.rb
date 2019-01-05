@@ -9,7 +9,7 @@
 #
 
 
-class ProductCombination < ActiveRecord::Base
+class ProductCombination < ApplicationRecord
 
   VALUES = {transportation: 1,
             ground_transportation: 2,

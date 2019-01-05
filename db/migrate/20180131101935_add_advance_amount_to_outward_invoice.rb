@@ -1,4 +1,4 @@
-class AddAdvanceAmountToOutwardInvoice < ActiveRecord::Migration
+class AddAdvanceAmountToOutwardInvoice < ActiveRecord::Migration[4.2]
   def change
     add_column :outward_invoices, :advance_amount_id, :integer, references: "Amount", foreign_key: true, index: true
   end

@@ -12,7 +12,7 @@
 
 
 
-class ExpenseType < ActiveRecord::Base
+class ExpenseType < ApplicationRecord
 
   validates :name, presence: true
 

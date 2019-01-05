@@ -12,12 +12,12 @@
 #  updated_at       :datetime         not null
 #
 
-class VehicleRate < ActiveRecord::Base
+class VehicleRate < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :policy
-  belongs_to :rate, class_name: 'Amount'
-  belongs_to :distance_unit, class_name: 'PhysicalUnit'
+  belongs_to :policy, optional: true
+  belongs_to :rate, optional: true, class_name: 'Amount'
+  belongs_to :distance_unit, optional: true, class_name: 'PhysicalUnit'
 
   validates :policy_id, presence: true
   validates :rate, presence: true

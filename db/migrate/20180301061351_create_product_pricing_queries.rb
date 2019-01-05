@@ -1,4 +1,4 @@
-class CreateProductPricingQueries < ActiveRecord::Migration
+class CreateProductPricingQueries < ActiveRecord::Migration[4.2]
   def change
     create_table :product_pricing_queries do |t|
       t.string :name

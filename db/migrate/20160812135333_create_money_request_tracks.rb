@@ -1,4 +1,4 @@
-class CreateMoneyRequestTracks < ActiveRecord::Migration
+class CreateMoneyRequestTracks < ActiveRecord::Migration[4.2]
   def change
     create_table :money_request_tracking_actions do |t|
       t.string :name

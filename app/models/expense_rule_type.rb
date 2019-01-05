@@ -9,7 +9,7 @@
 #
 
 
-class ExpenseRuleType < ActiveRecord::Base
+class ExpenseRuleType < ApplicationRecord
 
   ACTIONS = {
     'Require Receipt': 1,

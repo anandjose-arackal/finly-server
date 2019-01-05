@@ -1,4 +1,4 @@
-class RenameBudgetEntityTrailsToBudgetCriteriaTrails < ActiveRecord::Migration
+class RenameBudgetEntityTrailsToBudgetCriteriaTrails < ActiveRecord::Migration[4.2]
   def change
     rename_table :budget_entity_mappings, :budget_criteria_mappings
 

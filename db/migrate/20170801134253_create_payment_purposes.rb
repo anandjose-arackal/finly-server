@@ -1,4 +1,4 @@
-class CreatePaymentPurposes < ActiveRecord::Migration
+class CreatePaymentPurposes < ActiveRecord::Migration[4.2]
   def change
     create_table :payment_purposes do |t|
       t.string :name

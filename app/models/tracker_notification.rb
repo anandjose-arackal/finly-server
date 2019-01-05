@@ -12,7 +12,7 @@
 #  updated_at :datetime         not null
 #
 
-class TrackerNotification < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :company
+class TrackerNotification < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
 end

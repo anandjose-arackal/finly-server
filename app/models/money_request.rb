@@ -44,7 +44,7 @@
 
 
 
-class MoneyRequest < ActiveRecord::Base
+class MoneyRequest < ApplicationRecord
   include OperationCallbacks,
           MathUtil,
           SoftDeletable,
@@ -52,20 +52,20 @@ class MoneyRequest < ActiveRecord::Base
           FindByOrderedIds
 
   has_many :email_authorizations, as: :authorizable
-  belongs_to :status, class_name: 'MoneyRequestStatus'
-  belongs_to :user, inverse_of: :money_requests
-  belongs_to :card
-  belongs_to :loaded_by, class_name: 'User'
-  belongs_to :controlling_user, class_name: 'User'
-  belongs_to :controlling_user_role, class_name: 'UserRole'
-  belongs_to :controlling_for_user, class_name: 'User'
-  belongs_to :controlling_for_user_role, class_name: 'UserRole'
-  belongs_to :payment_mode
-  belongs_to :status, class_name: 'MoneyRequestStatus'
-  belongs_to :policy
-  belongs_to :payment
-  belongs_to :money_request_processor_mapping
-  belongs_to :destination_pocket, class_name: "UserPocket"
+  belongs_to :status, optional: true, class_name: 'MoneyRequestStatus'
+  belongs_to :user, optional: true, inverse_of: :money_requests
+  belongs_to :card, optional: true
+  belongs_to :loaded_by, optional: true, class_name: 'User'
+  belongs_to :controlling_user, optional: true, class_name: 'User'
+  belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :controlling_for_user, optional: true, class_name: 'User'
+  belongs_to :controlling_for_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :payment_mode, optional: true
+  belongs_to :status, optional: true, class_name: 'MoneyRequestStatus'
+  belongs_to :policy, optional: true
+  belongs_to :payment, optional: true
+  belongs_to :money_request_processor_mapping, optional: true
+  belongs_to :destination_pocket, optional: true, class_name: "UserPocket"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -73,11 +73,11 @@ class MoneyRequest < ActiveRecord::Base
   has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy
   has_many :items, class_name: 'MoneyRequestItem', foreign_key: :money_request_id, dependent: :destroy
 
-  belongs_to :travel_request
+  belongs_to :travel_request, optional: true
 
   # submission amount for determining the approving manager and finance manager
-  belongs_to :submitted_amount, class_name: "Amount"
-  belongs_to :processed_amount, class_name: "Amount"
+  belongs_to :submitted_amount, optional: true, class_name: "Amount"
+  belongs_to :processed_amount, optional: true, class_name: "Amount"
 
   accepts_nested_attributes_for :submitted_amount
   accepts_nested_attributes_for :processed_amount

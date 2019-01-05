@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class InwardInvoiceType < ActiveRecord::Base
+class InwardInvoiceType < ApplicationRecord
 
   include Seedable
 

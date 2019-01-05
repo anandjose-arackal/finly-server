@@ -17,14 +17,14 @@
 
 
 
-class ReceiptEmailAttachment < ActiveRecord::Base
+class ReceiptEmailAttachment < ApplicationRecord
   PDF_CONTENT_TYPES = ['application/pdf'].freeze
   IMAGE_CONTENT_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze
   MSWORD_CONTENT_TYPES = ['application/rtf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].freeze
 
   has_many :system_messages, as: :messagable, dependent: :destroy
 
-  belongs_to :receipt_email
+  belongs_to :receipt_email, optional: true
   has_attached_file :original_attachment
 
   validate :original_or_url_presence

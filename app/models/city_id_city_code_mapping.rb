@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class CityIdCityCodeMapping < ActiveRecord::Base
+class CityIdCityCodeMapping < ApplicationRecord
 
   scope :with_city_id, -> (city_id) {where city_id: city_id}
   scope :with_city_code, -> (city_code) {where city_code: city_code}

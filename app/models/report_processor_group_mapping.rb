@@ -18,14 +18,14 @@
 #  marked_as_closed           :boolean
 #
 
-class ReportProcessorGroupMapping < ActiveRecord::Base
+class ReportProcessorGroupMapping < ApplicationRecord
 
-  belongs_to :user
-  belongs_to :amount, dependent: :destroy
-  belongs_to :processor_group, class_name: 'ReportProcessorGroup'
-  belongs_to :processor_accountable, polymorphic: true
-  belongs_to :status, class_name: 'ReportProcessorGroupStatus'
-  belongs_to :payment
+  belongs_to :user, optional: true
+  belongs_to :amount, optional: true, dependent: :destroy
+  belongs_to :processor_group, optional: true, class_name: 'ReportProcessorGroup'
+  belongs_to :processor_accountable, optional: true, polymorphic: true
+  belongs_to :status, optional: true, class_name: 'ReportProcessorGroupStatus'
+  belongs_to :payment, optional: true
 
   has_many :reports
   has_many :system_messages, as: :messagable, dependent: :destroy

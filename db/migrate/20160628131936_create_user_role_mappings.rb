@@ -1,4 +1,4 @@
-class CreateUserRoleMappings < ActiveRecord::Migration
+class CreateUserRoleMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :user_role_mappings do |t|
       t.references :user, index: true, foreign_key: true, null: false

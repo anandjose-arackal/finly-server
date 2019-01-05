@@ -12,10 +12,10 @@
 #  updated_at             :datetime         not null
 #
 
-class CardAssignRequestTrack < ActiveRecord::Base
-  belongs_to :card_assign_request
-  belongs_to :action_resource, polymorphic: true
-  belongs_to :action, class_name: 'CardAssignRequestTrackAction'
+class CardAssignRequestTrack < ApplicationRecord
+  belongs_to :card_assign_request, optional: true
+  belongs_to :action_resource, optional: true, polymorphic: true
+  belongs_to :action, optional: true, class_name: 'CardAssignRequestTrackAction'
 
   validates :card_assign_request_id, presence: true
   validates :action_id, presence: true

@@ -20,12 +20,12 @@
 #  updated_at               :datetime         not null
 #
 
-class TransactionDetail < ActiveRecord::Base
+class TransactionDetail < ApplicationRecord
 
-  belongs_to :company
-  belongs_to :finly_transaction
-  belongs_to :opening_balance, class_name: 'Amount'
-  belongs_to :closing_balance, class_name: 'Amount'
+  belongs_to :company, optional: true
+  belongs_to :finly_transaction, optional: true
+  belongs_to :opening_balance, optional: true, class_name: 'Amount'
+  belongs_to :closing_balance, optional: true, class_name: 'Amount'
 
   validates :finly_transaction_id, uniqueness: true
 

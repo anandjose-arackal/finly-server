@@ -1,4 +1,4 @@
-class CreateCardExpenses < ActiveRecord::Migration
+class CreateCardExpenses < ActiveRecord::Migration[4.2]
   def change
     create_table :card_expenses do |t|
       t.text :editable_merchant

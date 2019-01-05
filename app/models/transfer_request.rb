@@ -9,7 +9,7 @@ class TransferRequest < NonPersistentModel
                 :bank_error_message, :transaction_result,
                 :error_code
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
   validates :company_id, presence: true
   validates :beneficiary_account_number, presence: true

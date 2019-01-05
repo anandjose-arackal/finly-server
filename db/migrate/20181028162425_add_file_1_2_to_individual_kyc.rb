@@ -1,4 +1,4 @@
-class AddFile12ToIndividualKyc < ActiveRecord::Migration
+class AddFile12ToIndividualKyc < ActiveRecord::Migration[4.2]
   def change
     add_attachment :individual_kycs, :kyc_1_front
     add_attachment :individual_kycs, :kyc_1_back

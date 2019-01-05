@@ -29,18 +29,18 @@
 #  cost_center_id         :integer
 #
 
-class InvoiceLineItem < ActiveRecord::Base
-  belongs_to :invoice
-  belongs_to :category
-  belongs_to :amount
-  belongs_to :discount_amount, class_name: "Amount"
-  belongs_to :tax_amount, class_name: "Amount"
-  belongs_to :net_amount, class_name: "Amount"
-  belongs_to :parent, polymorphic: true
-  belongs_to :taxable_amount, class_name: "Amount"
-  belongs_to :inventory_line_item
-  belongs_to :gst_type
-  belongs_to :tax_rate
+class InvoiceLineItem < ApplicationRecord
+  belongs_to :invoice, optional: true
+  belongs_to :category, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :discount_amount, optional: true, class_name: "Amount"
+  belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :net_amount, optional: true, class_name: "Amount"
+  belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :taxable_amount, optional: true, class_name: "Amount"
+  belongs_to :inventory_line_item, optional: true
+  belongs_to :gst_type, optional: true
+  belongs_to :tax_rate, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

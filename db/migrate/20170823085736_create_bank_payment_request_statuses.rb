@@ -1,4 +1,4 @@
-class CreateBankPaymentRequestStatuses < ActiveRecord::Migration
+class CreateBankPaymentRequestStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :bank_payment_request_statuses do |t|
       t.string :name

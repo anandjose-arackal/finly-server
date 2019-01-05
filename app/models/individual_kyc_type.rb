@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class IndividualKycType < ActiveRecord::Base
+class IndividualKycType < ApplicationRecord
   include Seedable
 
   def self.values

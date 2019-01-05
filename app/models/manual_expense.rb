@@ -16,10 +16,10 @@
 
 
 
-class ManualExpense < ActiveRecord::Base
+class ManualExpense < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :expense # foreign key expense_id
+  belongs_to :expense, optional: true # foreign key expense_id
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields
 

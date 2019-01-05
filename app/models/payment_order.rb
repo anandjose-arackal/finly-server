@@ -28,7 +28,7 @@
 #  api_initiated             :boolean          default(FALSE)
 #
 
-class PaymentOrder < ActiveRecord::Base
+class PaymentOrder < ApplicationRecord
   include PostOperationExecution
 
   CONFIG = {
@@ -55,13 +55,13 @@ class PaymentOrder < ActiveRecord::Base
       }
   }
 
-  belongs_to :payment_purpose
-  belongs_to :payment_order_status
-  belongs_to :company
-  belongs_to :amount_requested, class_name: 'Amount'
-  belongs_to :amount_processed, class_name: 'Amount'
-  belongs_to :initiating_user, class_name: 'User'
-  belongs_to :currency
+  belongs_to :payment_purpose, optional: true
+  belongs_to :payment_order_status, optional: true
+  belongs_to :company, optional: true
+  belongs_to :amount_requested, optional: true, class_name: 'Amount'
+  belongs_to :amount_processed, optional: true, class_name: 'Amount'
+  belongs_to :initiating_user, optional: true, class_name: 'User'
+  belongs_to :currency, optional: true
 
   serialize :post_operation_payload, Hash
 

@@ -10,9 +10,9 @@
 #  updated_at       :datetime         not null
 #
 
-class EnforcePolicy < ActiveRecord::Base
+class EnforcePolicy < ApplicationRecord
 
-  belongs_to :enforceable, polymorphic: true
+  belongs_to :enforceable, optional: true, polymorphic: true
 
   validate :at_least_one_default_policy
 

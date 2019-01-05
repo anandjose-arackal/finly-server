@@ -1,4 +1,4 @@
-class AddDetailsToVendor < ActiveRecord::Migration
+class AddDetailsToVendor < ActiveRecord::Migration[4.2]
   def change
     add_column :yes_bank_vendors, :address, :string
     add_column :yes_bank_vendors, :business_name, :string

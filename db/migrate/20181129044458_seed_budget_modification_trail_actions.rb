@@ -1,4 +1,4 @@
-class SeedBudgetModificationTrailActions < ActiveRecord::Migration
+class SeedBudgetModificationTrailActions < ActiveRecord::Migration[4.2]
   def change
     BudgetModificationAction.seed_data
   end

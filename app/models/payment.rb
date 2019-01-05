@@ -51,7 +51,7 @@
 
 
 
-class Payment < ActiveRecord::Base
+class Payment < ApplicationRecord
   include PostOperationExecution
 
   class Payment::AccountType
@@ -60,14 +60,14 @@ class Payment < ActiveRecord::Base
     CARD = 'Card'
   end
 
-  belongs_to :amount
-  belongs_to :payment_type
-  belongs_to :initiating_user, polymorphic: true
-  belongs_to :receiving_user, polymorphic: true
-  belongs_to :reference_resource, polymorphic: true
-  belongs_to :original_payment_for_refund, class_name: "Payment"
-  belongs_to :category
-  belongs_to :department
+  belongs_to :amount, optional: true
+  belongs_to :payment_type, optional: true
+  belongs_to :initiating_user, optional: true, polymorphic: true
+  belongs_to :receiving_user, optional: true, polymorphic: true
+  belongs_to :reference_resource, optional: true, polymorphic: true
+  belongs_to :original_payment_for_refund, optional: true, class_name: "Payment"
+  belongs_to :category, optional: true
+  belongs_to :department, optional: true
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
@@ -84,19 +84,19 @@ class Payment < ActiveRecord::Base
   has_one :payment, as: :reference_resource
 
   # because there needs to be a reference against which an invoice payment was made
-  belongs_to :invoice
+  belongs_to :invoice, optional: true
 
-  belongs_to :parent, polymorphic: true
+  belongs_to :parent, optional: true, polymorphic: true
 
-  belongs_to :payment_order
-  belongs_to :payment_status
-  belongs_to :payment_purpose
-  belongs_to :purchase_order
+  belongs_to :payment_order, optional: true
+  belongs_to :payment_status, optional: true
+  belongs_to :payment_purpose, optional: true
+  belongs_to :purchase_order, optional: true
 
-  belongs_to :destination_pocket, class_name: "UserPocket"
+  belongs_to :destination_pocket, optional: true, class_name: "UserPocket"
 
-  belongs_to :initiating_account, polymorphic: true
-  belongs_to :receiving_account, polymorphic: true
+  belongs_to :initiating_account, optional: true, polymorphic: true
+  belongs_to :receiving_account, optional: true, polymorphic: true
 
   has_many :system_messages, as: :messagable, dependent: :destroy
 

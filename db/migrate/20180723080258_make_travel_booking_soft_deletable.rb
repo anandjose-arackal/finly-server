@@ -1,4 +1,4 @@
-class MakeTravelBookingSoftDeletable < ActiveRecord::Migration
+class MakeTravelBookingSoftDeletable < ActiveRecord::Migration[4.2]
   def change
     add_column :booking_requests, :is_deleted, :boolean, index: true, default: false
     add_column :booking_flights, :is_deleted, :boolean, index: true, default: false

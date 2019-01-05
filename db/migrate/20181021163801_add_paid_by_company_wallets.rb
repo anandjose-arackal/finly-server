@@ -1,4 +1,4 @@
-class AddPaidByCompanyWallets < ActiveRecord::Migration
+class AddPaidByCompanyWallets < ActiveRecord::Migration[4.2]
   def change
     pocket_type_id = UserPocketType.where(name: 'paid_by_company')&.first&.id
     Company.all.each do |company|

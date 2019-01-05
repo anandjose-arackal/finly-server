@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class FieldDecimal < ActiveRecord::Base
+class FieldDecimal < ApplicationRecord
   has_one :custom_field, as: :value
   has_one :field_configuration, as: :default_value
 

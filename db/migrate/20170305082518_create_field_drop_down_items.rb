@@ -1,4 +1,4 @@
-class CreateFieldDropDownItems < ActiveRecord::Migration
+class CreateFieldDropDownItems < ActiveRecord::Migration[4.2]
   def change
     create_table :field_drop_down_items do |t|
       t.string :name, null: false

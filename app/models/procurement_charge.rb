@@ -16,10 +16,10 @@
 #  updated_at      :datetime         not null
 #
 
-class ProcurementCharge < ActiveRecord::Base
-  belongs_to :amount
-  belongs_to :tax_amount, class_name: "Amount"
-  belongs_to :total_amount, class_name: "Amount"
-  belongs_to :chargable, polymorphic: true
+class ProcurementCharge < ApplicationRecord
+  belongs_to :amount, optional: true
+  belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :total_amount, optional: true, class_name: "Amount"
+  belongs_to :chargable, optional: true, polymorphic: true
 
 end

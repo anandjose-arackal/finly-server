@@ -1,4 +1,4 @@
-class CreateCompanyStatuses < ActiveRecord::Migration
+class CreateCompanyStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :company_statuses do |t|
       t.string :name, null: false, index: true

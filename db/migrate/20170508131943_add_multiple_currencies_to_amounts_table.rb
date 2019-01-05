@@ -1,4 +1,4 @@
-class AddMultipleCurrenciesToAmountsTable < ActiveRecord::Migration
+class AddMultipleCurrenciesToAmountsTable < ActiveRecord::Migration[4.2]
   def change
     add_column :amounts, :INR, :decimal, precision: 10, scale: 5
     add_column :amounts, :USD, :decimal, precision: 10, scale: 5

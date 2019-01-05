@@ -9,7 +9,7 @@
 #  updated_at            :datetime         not null
 #
 
-class CompanyLocationDepartment < ActiveRecord::Base
-  belongs_to :branch_location
-  belongs_to :company_department
+class CompanyLocationDepartment < ApplicationRecord
+  belongs_to :branch_location, optional: true
+  belongs_to :company_department, optional: true
 end

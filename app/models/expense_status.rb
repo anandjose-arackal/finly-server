@@ -12,7 +12,7 @@
 
 
 
-class ExpenseStatus < ActiveRecord::Base
+class ExpenseStatus < ApplicationRecord
   include Seedable
 
   validates :name, presence: true

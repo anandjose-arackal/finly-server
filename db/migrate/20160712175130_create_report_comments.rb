@@ -1,4 +1,4 @@
-class CreateReportComments < ActiveRecord::Migration
+class CreateReportComments < ActiveRecord::Migration[4.2]
   def change
     create_table :report_comments do |t|
       t.references :report, index: true, foreign_key: true, null: false

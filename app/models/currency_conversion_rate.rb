@@ -177,7 +177,7 @@
 #  ZWL        :decimal(20, 5)
 #
 
-class CurrencyConversionRate < ActiveRecord::Base
+class CurrencyConversionRate < ApplicationRecord
 
   validates :date, presence: true, uniqueness: true
 

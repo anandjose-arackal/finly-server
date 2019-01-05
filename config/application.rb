@@ -31,11 +31,15 @@ module Finly
       end if File.exists?(env_file)
     end
 
+    # config.after_initialize do
+    #   Proselytism.config.log_level  ||= Rails.logger.level
+    #   Proselytism.config.log_path   ||= File.join(Rails.root, 'log', "proselytism.log")
+    #   Proselytism.config.logger     ||= Proselytism::Logger.new Proselytism.config.log_path, Proselytism.config.log_level
+    # end
+
     # autoload paths that are in the lib folder
     config.autoload_paths += %W(#{config.root}/lib)
 
-    # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
   end
 end
 
