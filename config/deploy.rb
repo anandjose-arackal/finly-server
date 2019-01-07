@@ -1,5 +1,5 @@
 # config valid only for current version of Capistrano
-lock '3.10.2'
+lock '3.11.0'
 
 if ['aws_production', 'background_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
