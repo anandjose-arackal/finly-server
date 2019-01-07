@@ -214,6 +214,10 @@ GEM
     haml (5.0.4)
       temple (>= 0.8.0)
       tilt
+    handlebars_assets (0.23.2)
+      execjs (~> 2.0)
+      sprockets (>= 2.0.0)
+      tilt (>= 1.2)
     has_scope (0.7.2)
       actionpack (>= 4.1)
       activesupport (>= 4.1)
@@ -520,6 +524,7 @@ DEPENDENCIES
   griddler (~> 1.5.2)
   griddler-sendgrid (~> 1.1.0)
   haml (~> 5.0.4)
+  handlebars_assets
   has_scope (~> 0.7.2)
   health-monitor-rails (~> 8.4.0)
   hirb (~> 0.7.3)
