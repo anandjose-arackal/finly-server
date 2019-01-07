@@ -11,6 +11,7 @@ class TravelRequests::Create < TravelRequests::Base
 
   def pre_validate
     user_present? and params_present?
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init

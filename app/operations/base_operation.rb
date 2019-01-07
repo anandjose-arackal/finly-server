@@ -254,6 +254,20 @@ class BaseOperation
     RequestStore.store[:params]
   end
 
+  # Disallow unauthorized UserDelegateMapping operation
+  def validate_delegator_action
+    delegator_action = "#{request_params["controller"].singularize}_#{request_params["action"]}" rescue nil
+    if delegator_action.present?
+      user_delegate_mapping = actual_current_user.user_delegate_mappings.find_by_delegate_for_user_id(current_user.id)
+      # Allow actions not defined in UserDelegateMapping
+      delegate_authorized = user_delegate_mapping.send(delegator_action) rescue true
+    end
+    unless defined?(delegate_authorized) && delegate_authorized
+      messages[:error] << "You are not authorized to delegate for this action"
+      return
+    end
+  end
+
   # Used to present the data to the UI
   class BaseOperation::BasePresenter
     include MathUtil, HasScope

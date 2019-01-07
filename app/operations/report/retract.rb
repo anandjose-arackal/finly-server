@@ -23,6 +23,7 @@ class Report::Retract < Report::Base
     if id.blank?
       add_message :error, 'Error loading report'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -73,11 +74,9 @@ class Report::Retract < Report::Base
   end
 
   def post_process
-    if actual_current_user.present?
-      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retracted_by_delegate), delegated_action_user: actual_current_user 
-    else
-      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
-    end
+    delegated_action_user = actual_current_user.present? ? actual_current_user : nil
+    report_comment_action = actual_current_user.present? ? :report_retracted_by_delegate : :report_retract 
+    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(report_comment_action), delegated_action_user: delegated_action_user
     # destroying the submitted amount field
     report.submitted_amount&.destroy
 

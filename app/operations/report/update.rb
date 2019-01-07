@@ -4,6 +4,7 @@ class Report::Update < Report::Base
 
   def pre_validate
     super
+    validate_delegator_action if actual_current_user.present?
   end
 
   def pre_authorize
@@ -72,7 +73,6 @@ class Report::Update < Report::Base
   def post_process
     save_comments
     calculate_amounts # this method recalculates the amoutns for the various Distance/Time/Per Diem expenses
-    # track_change
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_updated_by_delegate), delegated_action_user: actual_current_user if actual_current_user.present?
     messages[:success] << 'Report updated'
   end
@@ -114,17 +114,5 @@ class Report::Update < Report::Base
     end
   end
 
-  def track_change
-    # If user is delegated to perform actions on behalf of other user
-    delegated_action_user = actual_current_user.present? ? actual_current_user : nil
-    report.tracks.create action_user: for_user,
-                         action_user_role_id: role_id = UserRole.id_for(:employee),
-                         modified_user: for_user,
-                         modified_user_role_id: role_id,
-                         report_tracking_action_id: ReportTrackingAction.id_for(:update),
-                         report_status_id: ReportStatus.open_id,
-                         delegated_action_user: delegated_action_user
-    report.save
-  end
 
 end

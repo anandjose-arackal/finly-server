@@ -64,7 +64,7 @@ end
 
 json.user_delegates do
   json.array! @result.selected_user.user_delegate_mappings do |user_delegate_mapping|
-    json.id @result.selected_user.id
+    json.id user_delegate_mapping.delegate_for_user.id
     json.name user_delegate_mapping.delegate_for_user.name
     json.email user_delegate_mapping.delegate_for_user.email
     json.mobile_number user_delegate_mapping.delegate_for_user.mobile_number

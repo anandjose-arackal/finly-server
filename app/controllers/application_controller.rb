@@ -180,9 +180,6 @@ class ApplicationController < ActionController::Base
   def retrieve_delegate_user
     # header is going to send a 'delegate_for_user_id' attribute
     delegate_for_user_id = request.headers['Delegate-For-User-Id']
-    puts "*"*20
-    puts "#{delegate_for_user_id}"
-    puts "*"*20
     delegated_for_user = @curr_user.delegated_for_users.find_by(id: delegate_for_user_id) if delegate_for_user_id.present?
     if delegated_for_user.present?
       RequestStore.store[:actual_current_user] = @curr_user # setting the actual current user as this guy

@@ -44,7 +44,8 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
                                                   action_user_role_id: UserRole.id_for(:employee),
                                                   action_id: TravelRequestTrailAction.id_for(:submit),
                                                   modified_user_id: manager&.id,
-                                                  modified_user_role_id: manager_role_id
+                                                  modified_user_role_id: manager_role_id,
+                                                  delegated_action_user_id: delegated_action_user_id
       approve_op = TravelRequests::Review::Approve.(user, id: travel_request.id, auto_approve: true)
       unless approve_op.success?
         add_message :error, approve_op.messages[:error]

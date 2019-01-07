@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190104005143) do
+ActiveRecord::Schema.define(version: 20190107014315) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -5233,10 +5233,10 @@ ActiveRecord::Schema.define(version: 20190104005143) do
     t.boolean  "money_request_update"
     t.boolean  "money_request_submit"
     t.boolean  "money_request_retract"
-    t.boolean  "trip_create"
-    t.boolean  "trip_update"
-    t.boolean  "trip_submit"
-    t.boolean  "trip_retract"
+    t.boolean  "travel_request_create"
+    t.boolean  "travel_request_update"
+    t.boolean  "travel_request_submit"
+    t.boolean  "travel_request_retract"
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
   end

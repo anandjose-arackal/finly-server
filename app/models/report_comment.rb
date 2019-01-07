@@ -191,7 +191,7 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:report_retracted_by_delegate)
         comment = "#{delegation_user_name} retracted report on behalf of #{current_user_name}"
       when ReportCommentAction.id_for(:report_updated_by_delegate)
-        comment = "#{delegation_user_name} updated report #{updated_field} from #{updated_from} to #{updated_to} on behalf of #{current_user_name}"
+        comment = "#{delegation_user_name} updated report on behalf of #{current_user_name}"
       else
         # do nothing
     end

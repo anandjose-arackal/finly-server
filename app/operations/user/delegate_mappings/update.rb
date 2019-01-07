@@ -10,8 +10,22 @@ class User::DelegateMappings::Update < User::Base
 
   def validate
     if self.delegation_enabled && delegate_for_user_ids.blank?
-        add_message :error, "Please add users for delegation"
+        # Disable delegation if no user is present
+        self.selected_user.update(delegation_enabled: self.delegation_enabled)
+        add_message :error, "Please add atleast one user for delegation"
         return
+    # User cannot be delegated to itself
+    elsif self.delegation_enabled && !delegate_for_user_ids.blank? && delegate_for_user_ids.include?(selected_user.id)
+      add_message :error, "Please remove yourself from list"
+      return
+    elsif self.delegation_enabled && !delegate_for_user_ids.blank? && !UserDelegateMapping.where(delegate_for_user_id: delegate_for_user_ids).blank?
+      # Users having delegation already
+      # One person will have only one delegator
+      names =  User.where(id: delegate_for_user_ids).map(&:name).join(',') rescue nil
+      if !names.blank?
+        add_message :error, "#{names} already has a delegation"
+        return
+      end
     end
   end
 
@@ -26,13 +40,12 @@ class User::DelegateMappings::Update < User::Base
       new_delegate_for_user_ids = delegate_for_user_ids - user.user_delegate_mappings.pluck(:delegate_for_user_id)
       destroy_delegate_for_user_ids = current_delegate_for_user_ids - present_delegate_user_ids
       unless new_delegate_for_user_ids.blank?
-        new_delegate_for_user_ids.each do |delegated_user_id|
-          user.user_delegate_mappings.create(user_id: user.id, delegate_for_user_id: delegated_user_id)
+        new_delegate_for_user_ids.uniq.each do |delegated_user_id|
+          user.user_delegate_mappings.create(user_id: user.id, delegate_for_user_id: delegated_user_id, expense_create: true, expense_update: true, receipt_create: true, receipt_add_to_expense: true, receipt_update: true, report_create: true, report_submit: true, report_retract: true, report_update: true, money_request_create: true, money_request_update: true, money_request_submit: true, money_request_retract: true, travel_request_create: true, travel_request_update: true, travel_request_submit: true, travel_request_retract: true)
         end
       end
       unless destroy_delegate_for_user_ids.blank?
-        destroy_delegate_for_user_ids.each do |delegated_user_id|
-          debugger
+        destroy_delegate_for_user_ids.uniq.each do |delegated_user_id|
           user.user_delegate_mappings.find_by_delegate_for_user_id(delegated_user_id).destroy
         end
       end

@@ -32,6 +32,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if amount_value.present? and amount_value <= 0
       messages[:error] << 'Amount cannot be less than or equal to 0'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init

@@ -96,8 +96,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
                                        controlling_user_role_id: manager_role_id,
                                        controlling_for_user_role_id: nil,
                                        submitted_at: submitted_at,
-                                       submitted_amount_attributes: submitted_amount_attributes,
-                                       created_by_id: delegated_action_user_id
+                                       submitted_amount_attributes: submitted_amount_attributes
       money_request.tracks.create action_user: user,
                                   action_user_role_id: UserRole.id_for(:employee),
                                   modified_user_id: money_request.controlling_user_id,

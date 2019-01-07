@@ -26,8 +26,8 @@ class ReportCommentAction < ActiveRecord::Base
               hard_copy_receipt_not_submitted: 25,
               report_created_by_delegate: 26,
               report_submitted_by_delegate: 27,
-              report_retracted_by_delegate: 28,
-              report_updated_by_delegate: 29,
+              report_retracted_by_delegate: 28,
+              report_updated_by_delegate: 29
             }
 
   scope :with_name, -> (name) {where name: name}

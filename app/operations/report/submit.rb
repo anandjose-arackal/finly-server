@@ -19,6 +19,7 @@ class Report::Submit < Report::Base
     if user.blank? and not params[:auto_approve] and not params[:auto_submit]
       add_message :error, 'User not found'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init

@@ -34,7 +34,7 @@ class MoneyRequestTrack < ActiveRecord::Base
   belongs_to :action_user_role, class_name: 'UserRole'
   belongs_to :modified_user_role, class_name: 'UserRole'
   belongs_to :payment
-  belongs_to :delegated_action_user_id, class_name: 'User'
+  belongs_to :delegated_action_user, class_name: 'User'
 
   default_scope { order('money_request_tracks.created_at ASC') }
 

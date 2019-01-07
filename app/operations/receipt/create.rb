@@ -5,6 +5,7 @@ class Receipt::Create < Receipt::Base
     if params.blank? or params&.dig(:receipt).blank? or user.blank?
       add_message :error, 'Image cannot be blank'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init

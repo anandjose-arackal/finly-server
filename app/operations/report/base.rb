@@ -16,18 +16,6 @@ class Report::Base < BaseOperation
     if params[:filter_search].present?
       params[:filter_search].strip! if params[:filter_search].is_a?(String)
     end
-
-    # Perform authorized operation present in respective UserDelegateMapping
-    # if actual_current_user.present?
-    #   delegator_action = "#{request_params["controller"].singularize}_#{request_params["action"]}" rescue nil
-    #   if delegator_action.present?
-    #     user_delegate_mapping = actual_current_user.user_delegate_mappings.find_by_delegate_for_user_id(current_user.id)
-    #     delegate_authorized = user_delegate_mapping.send(delegator_action) rescue return
-    #   end
-    #   unless delegate_authorized.present? && delegate_authorized
-    #     messages[:error] << "You are not allowed to delegate for this action"
-    #   end
-    # end
   end
 
   def init

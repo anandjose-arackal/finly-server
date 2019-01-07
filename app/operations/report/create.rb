@@ -14,6 +14,7 @@ class Report::Create < Report::Base
     if user.blank?
       add_message :error, 'User not found'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
