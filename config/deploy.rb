@@ -40,13 +40,14 @@ end
 set :pty, false
 linked_files = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}
 case fetch(:stage)
-  when :itzcash_production, :aws_production, :background_production
-    linked_files << "config/sidekiq.yml"
-    linked_files << "config/elastic_apm.yml"
+when :itzcash_production, :aws_production, :background_production
+  linked_files << "config/sidekiq.yml"
+  linked_files << "config/elastic_apm.yml"
 end
 set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
+
 
 # set :rails_env, "staging"
 # set :rails_env, 'production'
