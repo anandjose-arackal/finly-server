@@ -12,6 +12,14 @@ GIT
       tilt (~> 2.0)
 
 GIT
+  remote: git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git
+  revision: 278af4329cbd4f7687177831725e51756ddbc101
+  specs:
+    finly-secure_storage-sdk (0.1.31)
+      aws-sdk-ec2 (>= 1.24.0)
+      rails (>= 4.2)
+
+GIT
   remote: https://github.com/ruckus/quickbooks-ruby.git
   revision: 22c8df58bbed441207f3d0d8ac5a786cdb4821a5
   ref: 22c8df58bbed441207f3d0d8ac5a786cdb4821a5
@@ -22,14 +30,6 @@ GIT
       nokogiri
       oauth (= 0.5.1)
       roxml (= 3.3.1)
-
-GIT
-  remote: ssh://git@altssh.bitbucket.org:443/vivek_a17/finly-secure_storage-sdk.git
-  revision: 278af4329cbd4f7687177831725e51756ddbc101
-  specs:
-    finly-secure_storage-sdk (0.1.31)
-      aws-sdk-ec2 (>= 1.24.0)
-      rails (>= 4.2)
 
 GEM
   remote: https://rubygems.org/
