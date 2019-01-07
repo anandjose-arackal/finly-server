@@ -13,9 +13,9 @@ GIT
 
 GIT
   remote: git@bitbucket.org:finlycore/proselytism.git
-  revision: d46b14dd3575715627c7bf7ae7890c795aee4e48
+  revision: c99a3876e54cd4bdad7a02db0a65c8b967df3892
   specs:
-    proselytism (0.0.3)
+    proselytism (0.0.5.2)
       activesupport (>= 4.2.6)
 
 GIT
@@ -242,7 +242,7 @@ GEM
     httparty (0.16.3)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.4.0)
+    i18n (1.5.1)
       concurrent-ruby (~> 1.0)
     imgkit (1.6.1)
     jbuilder (2.8.0)
