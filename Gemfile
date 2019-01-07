@@ -119,7 +119,7 @@ gem 'paper_trail', '~> 10.1.0'
 gem 'paper_trail-association_tracking', '~> 1.1.0'
 # gem 'turboboost'
 
-# gem 'remotipart'
+gem 'remotipart', '~> 1.4'
 
 # gem 'bootbox-rails'
 
