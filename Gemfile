@@ -121,6 +121,8 @@ gem 'paper_trail-association_tracking', '~> 1.1.0'
 
 gem 'remotipart', '~> 1.4'
 
+gem 'bootbox-rails', '0.5.0'
+
 # gem 'bootbox-rails'
 
 gem 'sidekiq', '~> 5.2.3'
