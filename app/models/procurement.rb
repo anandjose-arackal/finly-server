@@ -144,6 +144,7 @@ class Procurement < ApplicationRecord
       user_ids = user.company.users.filter_search(user_details).pluck(:id)
 
       filtered_ids = user.company.purchase_orders.filter_user_id(user_ids).pluck(:procurement_id)
+      filtered_ids += user.company.inward_invoices.with_created_by_user_id(user_ids).with_procurement.pluck(:procurement_id)
       where id: filtered_ids
     end
   }

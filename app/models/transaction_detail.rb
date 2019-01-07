@@ -24,9 +24,8 @@ class TransactionDetail < ApplicationRecord
 
   belongs_to :company, optional: true
   belongs_to :finly_transaction, optional: true
+  belongs_to :amount, optional: true
   belongs_to :opening_balance, optional: true, class_name: 'Amount'
   belongs_to :closing_balance, optional: true, class_name: 'Amount'
-
-  validates :finly_transaction_id, uniqueness: true
 
 end

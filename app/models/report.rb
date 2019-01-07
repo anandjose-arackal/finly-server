@@ -32,8 +32,10 @@
 #  sync_type_id                       :integer
 #  report_processor_group_mapping_id  :integer
 #  travel_request_id                  :integer
-#  created_by_id                      :integer
+#  department_id                      :integer
+#  sub_department_id                  :integer
 #
+
 
 
 
@@ -69,7 +71,8 @@ class Report < ApplicationRecord
   belongs_to :sync_status, optional: true, class_name: 'ReportSyncStatus'
   belongs_to :sync_type, optional: true, class_name: 'ReportSyncType'
   belongs_to :travel_request, optional: true
-  # belongs_to :money_request, optional: true
+  belongs_to :department, optional: true
+  belongs_to :sub_department, optional: true, class_name: "Department"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -277,6 +280,21 @@ class Report < ApplicationRecord
     ids = Report.where(id: original_report_ids, user_id: user_ids).pluck(:id)
     where(id: ids)
   }
+
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where user_id: user_ids
+    end
+  }
+
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      ids = where(department_id: department_ids).pluck(:id)
+      ids = where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
+    end
+  }
+
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount
@@ -565,13 +583,13 @@ class Report < ApplicationRecord
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if [ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed])].include?(self.report_status_id)
+    if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report_status_id)
       self.expenses.each do |expense|
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(expense)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
       end
     else
       self.expenses.each do |expense|
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(expense)
       end
     end
   end

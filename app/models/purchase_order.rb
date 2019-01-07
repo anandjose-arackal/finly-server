@@ -47,7 +47,6 @@
 #  is_template                  :boolean          default(FALSE)
 #  template_name                :string(255)
 #  resource_template_id         :integer
-#  submitted_at                 :datetime
 #
 
 class PurchaseOrder < ApplicationRecord

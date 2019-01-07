@@ -26,6 +26,7 @@
 #  currency_id       :integer
 #  tds_rates_list_id :integer
 #  vendor_id         :string(255)
+#  disabled          :boolean          default(FALSE)
 #
 
 class YesBankVendor < ApplicationRecord

@@ -20,6 +20,7 @@
 #  reimbursable       :boolean
 #  default_account    :boolean          default(FALSE)
 #  is_deleted         :boolean          default(FALSE)
+#  disabled           :boolean          default(FALSE)
 #
 
 class BankAccount < ApplicationRecord
@@ -52,6 +53,10 @@ class BankAccount < ApplicationRecord
   }
   scope :with_company, -> (company_id) {
     where company_id: company_id
+  }
+
+  scope :with_account_number, -> (account_number) {
+    where account_number: account_number
   }
 
   scope :with_owner_ids, -> (type, ids) {
@@ -110,8 +115,6 @@ class BankAccount < ApplicationRecord
         account_number: account_number,
         ifsc: ifsc,
         name: name,
-        # account_owner_type: account_owner_type,
-        # account_owner: account_owner,
         default_account: default_account
     }
   end
