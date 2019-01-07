@@ -12,13 +12,6 @@ GIT
       tilt (~> 2.0)
 
 GIT
-  remote: git@bitbucket.org:finlycore/proselytism.git
-  revision: c99a3876e54cd4bdad7a02db0a65c8b967df3892
-  specs:
-    proselytism (0.0.5.2)
-      activesupport (>= 4.2.6)
-
-GIT
   remote: https://github.com/ruckus/quickbooks-ruby.git
   revision: 22c8df58bbed441207f3d0d8ac5a786cdb4821a5
   ref: 22c8df58bbed441207f3d0d8ac5a786cdb4821a5
@@ -543,7 +536,6 @@ DEPENDENCIES
   paper_trail (~> 10.1.0)
   paper_trail-association_tracking (~> 1.1.0)
   paperclip (~> 6.1.0)
-  proselytism!
   pry (~> 0.12.2)
   puma (~> 3.12.0)
   quickbooks-ruby!

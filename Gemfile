@@ -139,7 +139,7 @@ gem 'griddler-sendgrid', '~> 1.1.0'
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
 # gem 'wkhtmltoimage-binary'
-gem 'proselytism', git: 'git@bitbucket.org:finlycore/proselytism.git'
+# gem 'proselytism', git: 'git@bitbucket.org:finlycore/proselytism.git'
 
 gem 'require_all', '~> 2.0.0'
 gem 'haml', '~> 5.0.4'
