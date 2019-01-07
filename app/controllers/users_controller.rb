@@ -140,7 +140,11 @@ class UsersController < ApplicationController
   def menu_data
     # Helps the front end app to get user specific yaml data from view_wise_data.yml
     # render partial: 'menu_data'
-    @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/view_wise_data.yml.erb", {current_company: current_company, current_user: current_user})
+    if current_user.actual_current_user.present?
+      @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/delegator_view_wise_data.yml.erb", {current_company: current_company, current_user: current_user})
+    else
+      @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/view_wise_data.yml.erb", {current_company: current_company, current_user: current_user})
+    end
     render json: @views.as_json
   end
 

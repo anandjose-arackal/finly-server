@@ -5,9 +5,15 @@ class User::DelegateMappings::Base < BaseOperation
     unless user.present?
       add_message :error, 'User not found'
     end
-    unless user.delegated_for_users.present?
-      add_message :error, 'You are not delegated for any user'
-      return
+    if actual_current_user.present?
+      unless actual_current_user.delegated_for_users.present?
+        add_message :error, 'You are not delegated for any user'
+        return
+        unless actual_current_user.delegation_enabled
+          add_message :error, 'Delegation is not enabled for you'
+          return
+        end
+      end
     end
   end
 end
