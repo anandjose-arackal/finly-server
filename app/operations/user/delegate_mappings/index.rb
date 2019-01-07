@@ -2,7 +2,11 @@ class User::DelegateMappings::Index < User::DelegateMappings::Base
   attr_accessor :user_delegates
 
   def process
-    user_ids = self.user.user_delegate_mappings.pluck(:delegate_for_user_id).compact
+    unless actual_current_user.present?
+      user_ids = current_user.user_delegate_mappings.pluck(:delegate_for_user_id).compact
+    else
+      user_ids = actual_current_user.user_delegate_mappings.pluck(:delegate_for_user_id).compact
+    end
     self.user_delegates = User.with_id(user_ids).with_company_id(self.user.company_id)
   end
 

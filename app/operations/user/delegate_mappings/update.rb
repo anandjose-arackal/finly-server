@@ -16,12 +16,13 @@ class User::DelegateMappings::Update < User::Base
         return
     # User cannot be delegated to itself
     elsif self.delegation_enabled && !delegate_for_user_ids.blank? && delegate_for_user_ids.include?(selected_user.id)
-      add_message :error, "Please remove yourself from list"
+      add_message :error, "Please remove delegator from list"
       return
-    elsif self.delegation_enabled && !delegate_for_user_ids.blank? && !UserDelegateMapping.where(delegate_for_user_id: delegate_for_user_ids).blank?
+    elsif user_has_delegator
       # Users having delegation already
       # One person will have only one delegator
-      names =  User.where(id: delegate_for_user_ids).map(&:name).join(',') rescue nil
+      delegate_ids = UserDelegateMapping.where(delegate_for_user_id: repeated_delegated_for_users).pluck(:delegate_for_user_id).uniq rescue nil
+      names =  User.where(id: delegate_ids).map(&:name).join(',') rescue nil
       if !names.blank?
         add_message :error, "#{names} already has a delegation"
         return
@@ -49,10 +50,27 @@ class User::DelegateMappings::Update < User::Base
           user.user_delegate_mappings.find_by_delegate_for_user_id(delegated_user_id).destroy
         end
       end
+    elsif delegate_for_user_ids.blank? && !self.delegation_enabled
+      user.user_delegate_mappings.destroy_all       
     end
   end 
 
   def post_process
     add_message :success, "Delegation Updated Successfully"
+  end
+
+  def user_has_delegator
+    repeated_delegated_for_users
+    return self.delegation_enabled && !delegate_for_user_ids.blank? && !repeated_delegated_for_users.blank?
+  end
+
+  def repeated_delegated_for_users
+    delegate_ids = UserDelegateMapping.where.not(user_id: self.selected_user.id).where(delegate_for_user_id: delegate_for_user_ids).pluck(:delegate_for_user_id) rescue nil
+    # Hash with delegate id and number of times it has occurred
+    # If delegate is already present, count > 1
+    # delegate_with_count = Hash[delegate_ids.group_by(&:itself).map {|k,v| [k, v.size] }] rescue nil
+    # Ids of repeated delegated_for_users
+    # repeated_delegated_for_users = delegate_with_count.select{|k,v| v > 1}.keys rescue nil
+    return delegate_ids
   end
 end
