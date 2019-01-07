@@ -9,7 +9,7 @@ gem 'wkhtmltopdf-binary', '~> 0.12.4'
 gem 'nokogiri', '~> 1.10.0'
 gem 'autoprefixer-rails', '~> 9.4.4'
 
-# gem 'parslet'
+gem 'parslet', '~> 1.8.2'
 
 gem 'elastic-apm', '~> 2.1.2'
 
