@@ -422,7 +422,7 @@ class Report < ApplicationRecord
   def versioned_policy
     if self.submitted_at.present?
       if self.policy
-        return self.policy.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
+        return self.policy.paper_trail.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
       end
     end
     self.policy
