@@ -11,8 +11,6 @@ gem 'autoprefixer-rails', '~> 9.4.4'
 
 gem 'parslet', '~> 1.8.2'
 
-gem 'elastic-apm', '~> 2.1.2'
-
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
 gem 'stomp', '~> 1.4.8'
@@ -166,7 +164,7 @@ gem 'geocoder', '~> 1.5.0'
 gem 'device_detector', '~> 1.0.1'
 
 gem 'logstasher', '~> 1.3.0'
-gem 'lograge', '~> 0.10.0'
+# gem 'lograge', '~> 0.10.0'
 gem 'sidekiq-logstash', '~> 1.0.1'
 gem 'logstash-logger', '~> 0.26.1'
 
@@ -234,4 +232,8 @@ group :test do
   gem 'rails-perftest', '~> 0.0.7'
   gem 'ruby-prof', '~> 0.17.0'
   gem 'test-unit', '~> 3.2.9'
+end
+
+group :production do
+  gem 'elastic-apm', '~> 2.1.2'
 end

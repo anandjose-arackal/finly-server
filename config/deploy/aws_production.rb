@@ -20,7 +20,6 @@ set :rbenv_type, :user
 set :rbenv_ruby, '2.6.0' # Edit this if you are using MRI Ruby
 
 set :sidekiq_role, :sidekiq_app
-set :puma_role, :app
 set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 set :crono_role, :crono_role
 set :balance_poller_role, :poller_role
