@@ -1,5 +1,4 @@
 require 'require_all'
-
 # Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base

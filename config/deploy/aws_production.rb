@@ -8,10 +8,10 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 server '172.32.152.12', user: 'centos', roles: %w{web app db}
-# server '172.32.62.170', user: 'centos', roles: %w{web app}
-# server '172.32.33.187', user: 'centos', roles: %w{web app}
-# server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
-# server '172.33.215.128', user: 'centos', roles: %w{sidekiq_app}
+server '172.32.62.170', user: 'centos', roles: %w{web app}
+server '172.32.33.187', user: 'centos', roles: %w{web app}
+server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
+server '172.33.215.128', user: 'centos', roles: %w{sidekiq_app}
 
 set :stage, 'production'
 # set :stage, 'staging'
@@ -20,6 +20,7 @@ set :rbenv_type, :user
 set :rbenv_ruby, '2.6.0' # Edit this if you are using MRI Ruby
 
 set :sidekiq_role, :sidekiq_app
+set :puma_role, :app
 set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq.yml')
 set :crono_role, :crono_role
 set :balance_poller_role, :poller_role
