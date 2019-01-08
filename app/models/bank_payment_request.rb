@@ -29,7 +29,8 @@
 class BankPaymentRequest < ActiveRecord::Base
 
   include SoftDeletable,
-          FindByOrderedIds
+          FindByOrderedIds,
+          Transitionable
 
   belongs_to :status, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, dependent: :destroy
@@ -240,9 +241,9 @@ class BankPaymentRequest < ActiveRecord::Base
     processing?
   end
 
-  def can_return_control?
-    processing?
-  end
+  # def can_return_control?
+  #   processing?
+  # end
 
   def credit_pending?
     approved? && !credited?
@@ -327,6 +328,15 @@ class BankPaymentRequest < ActiveRecord::Base
   end
 
   private
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push BankPaymentRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
 
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"

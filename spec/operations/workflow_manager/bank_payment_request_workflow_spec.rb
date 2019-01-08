@@ -16,8 +16,8 @@ require 'rails_helper'
 
 # Create
 
-RSpec.describe "Money Request Workflow -- " do
-  before(:all) do
+RSpec.describe "Bank Payment Request Workflow -- " do
+  before(:all) do |example|
     @company = create(:company)
     # Create Users
     @em_employee_user1 = create(:em_employee_user, company_id: @company.id)
@@ -34,34 +34,37 @@ RSpec.describe "Money Request Workflow -- " do
     create(:policy_user_mapping, {user_id: @em_employee_user1.id, policy_id: @policy.id})
 
     # Create Levels
-    @level1 = create(:reviewal_level, policy_id: @policy.id)
-    @level2 = create(:reviewal_level, policy_id: @policy.id)
-    @level3 = create(:reviewal_level, policy_id: @policy.id)
+    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
+    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
+    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
 
     # Create level reviewer mappings
     @level1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})
     @level2.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
     @level3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user3.id, threshold: 0, exception: false})
 
-    money_request_params = {
-        money_request: {
-            name: "Test Money request", memo: "Test memo", travel_request_id: nil,
-            required_by_date: "01-01-2019", policy_id: @policy.id,  payment_mode_id: 1,
-            items_attributes: [{
-                                   category_id: @company.categories.first.id, amount_attributes: {value: 1, currency_id: 1}
-                               }]
-        }
-    }
+    vendor_params = {vendor: {name: "test vendor 1", email: "vendor1@grr.la", mobile_number: "9876543210", authorized: true, description: "Some Description", pan: "AVWPC2314I", gst: "23AVWPC2314I8I1", state_code_id: 23, gst_registered: true, business_name: "Test Business 1", address: "Address 1", bank_accounts_attributes:[{account_number: "33846011376", ifsc: "SBIN0003578", name: "Primary Account", default_account: true, address_1: "Addr 1", address_2: "Addr 2", address_3: "Addr 3", pin_code: 560068, country: "India"}]}}
 
-    document_op = MoneyRequests::Create.(@em_employee_user1, params)
+    vendor_op = BankTransfer::Vendors::Create.(@em_admin_user1, vendor_params)
+    unless vendor_op.success?
+      fail
+    end
 
+
+    bpr_params = {"transfer_type"=>"neft", "policy_id"=>@policy.id, "initating_account_type"=>"2", "account_owner_type"=>"2", "scheduled_at"=>"08 Jan 2019", "description"=>"TEST", "payment_order"=>{
+        "0"=>{
+            "account_id"=>1, "owner_name"=>"Primary Account", "name"=>"test vendor 1", "bank_account_number"=>"33846011376", "ifsc"=>"SBIN0003578", "invoice_number"=>"", "invoice_date"=>"", "due_date"=>"", "category_id"=>"", "note"=>"", "cost_center_id"=>"", "department_id"=>"", "original_amount"=>"500", "currency_id"=>"1", "discount"=>"0", "discount_amount"=>"0", "tax"=>"0", "tax_amount"=>"0", "tds_slab_id"=>"", "tds_amount"=>"0", "advance_amount"=>"0", "freight"=>"0.00", "roundoff_amount"=>"0.00"}}, "view"=>"initiator"}
+
+    document_op = BankTransfer::PaymentRequest::Create.(@em_employee_user1, bpr_params)
     if document_op.success?
-      @document = MoneyRequest.first # Change this, make operation return document instead
+      @document = BankPaymentRequest.first # Change this, make operation return document instead
+    else
+      p "Bank Payment Request Workflow", document_op.messages[:error]
     end
   end
 
   describe "CREATE -- " do
-    skip unless @document.persisted?
+    # skip unless @document.persisted?
     before(:all) do |example|
       @document.reload
     end
@@ -71,48 +74,63 @@ RSpec.describe "Money Request Workflow -- " do
   end
 
   describe "SUBMIT -- " do
-    before(:all) do
-      @op2 = MoneyRequests::Submit.(@em_employee_user1, {id: @document.id})
+    before(:all) do |example|
+      op = MoneyRequests::Submit.(@em_employee_user1, {id: @document.id})
       @document.reload
-      skip if @op2.failure?
+      if op.failure?
+        p example.description, op.messages[:example]
+        skip
+      end
     end
 
-    it "has created last trail with action :submit and action user id" do
-      last_trail = @document.trails.natural_order.last
-      expect(last_trail&.action_id).to eq(TrailAction.id_for(:submit))
-      expect(last_trail&.action_user_id).to eq(@em_employee_user1.id)
+    describe "trail, level -- " do
+
+      let(:user) {@em_employee_user1}
+      let(:level) {@level1}
+      let(:action) {:submit}
+      let(:reviewer) {@em_reviewer_user1}
+      it_should_behave_like "trailed with right data"
+      it_should_behave_like "document has moved to level"
+      it_should_behave_like "reviewer has access to document"
     end
 
-    it "is submitted successfully" do
-      expect(@op2.success?).to eq true
-    end
-
-    it "has moved to first level" do
-      expect(@document.controlling_level_id).to eq(@level1.id)
-    end
-
-    it "'s reviewer is set to level 1's reviewer" do
-      expect(@document.get_reviewers.pluck(:id)).to include(*@level1.reviewers.pluck(:id))
+    describe "2nd level reviewer doesn't have access to document" do
+      let(:reviewer) {@em_reviewer_user2}
+      it_should_behave_like "reviewer does NOT have access to document"
     end
 
 
-    it "shows up 1st level reviewers's index" do
-      associated_documents_id = Report.reviewer_associated_items(@em_reviewer_user1).pluck(:id)
-      expect(associated_documents_id).to include(@document.id)
-    end
-
-    it "doensn't shows up 2nd level reviewers's index yet" do
-      associated_documents_id = Report.reviewer_associated_items(@em_reviewer_user2).pluck(:id)
-      expect(associated_documents_id).not_to include(@document.id)
-    end
+    # it "'s reviewer is set to level 1's reviewer" do
+    #   expect(@document.get_reviewers.pluck(:id)).to include(*@level1.reviewers.pluck(:id))
+    # end
+    #
+    #
+    # it "doensn't shows up 2nd level reviewers's index yet" do
+    #   associated_documents_id = Report.reviewer_associated_items(@em_reviewer_user2).pluck(:id)
+    #   expect(associated_documents_id).not_to include(@document.id)
+    # end
   end
 
   describe "APPROVE 1ST LEVEL -- " do
-    before(:all) do
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      @op3 = Reports::Approve.(@em_reviewer_user1, {id: @document.id})
+    before(:all) do |example|
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::Approve.(@em_reviewer_user1, {id: @document.id})
+
+      if op.failure?
+        p example.description, op.messages[:error]
+        skip
+      end
       @document.reload
-      skip if @op3.failure?
+    end
+
+    describe "trail, level" do
+      let(:user) {@em_reviewer_user1}
+      let(:action) {:approve}
+      let(:level) {@level2}
+
+      it_should_behave_like "trailed with right data"
+      it_should_behave_like "document has moved to level"
+
     end
 
     it "Has created trail with action approve & right action user id" do
@@ -163,8 +181,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   xdescribe "RETRACT -- " do
     before(:all) do
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      @op4 = Reports::Retract.(@em_employee_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      @op4 = MoneyRequests::Retract.(@em_employee_user1, {id: @document.id})
       skip if @op4.failure?
       @document.reload
     end
@@ -192,8 +210,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   xdescribe "REJECT -- " do
     before(:all) do
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      @op4 = Reports::Reject.(@em_reviewer_user2, {id: @document.id, reject_note: "Test note"})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      @op4 = MoneyRequests::Reject.(@em_reviewer_user2, {id: @document.id, reject_note: "Test note"})
       if @op4.failure?
         p @op4.messages[:error]
         skip
@@ -212,7 +230,7 @@ RSpec.describe "Money Request Workflow -- " do
     end
 
     it "status has changed" do
-      expect(@document.status.id).to eq(ReportStatus.id_for(:rejected))
+      expect(@document.status.id).to eq(MoneyRequestStatus.id_for(:rejected))
     end
 
     it "document's next level is first level" do
@@ -244,9 +262,9 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "TAKE CONTROL ON 2ND LEVEL -- " do
     before(:all) do |example|
-      op = Reports::TakeControl.(@em_admin_user1, {id: @document.id})
+      op = MoneyRequests::TakeControl.(@em_admin_user1, {id: @document.id})
       if op.failure?
-        p example.description, op.messages[:error]
+        p "TAKE CONTROL ON 2ND LEVEL", op.messages[:error]
         skip
       end
       @document.reload
@@ -281,10 +299,10 @@ RSpec.describe "Money Request Workflow -- " do
     end
   end
 
-  xdescribe "RETURN CONTROL TO 2ND LEVEL -- " do
+  describe "RETURN CONTROL TO 2ND LEVEL -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::ReturnControl.(@em_admin_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::ReturnControl.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
         p example.description, op.messages[:error]
@@ -318,8 +336,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "APPROVE AS ADMIN -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::Approve.(@em_admin_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::Approve.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
         p example.description, op.messages[:error]
@@ -360,9 +378,9 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "TAKE CONTROL ON 3RD LEVEL -- " do
     before(:all) do |example|
-      op = Reports::TakeControl.(@em_admin_user1, {id: @document.id})
+      op = MoneyRequests::TakeControl.(@em_admin_user1, {id: @document.id})
       if op.failure?
-        p example.description, op.messages[:error]
+        p "TAKE CONTROL ON 3RD LEVEL", op.messages[:error]
         skip
       end
       @document.reload
@@ -399,8 +417,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "RETURN CONTROL TO 3RD LEVEL -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::ReturnControl.(@em_admin_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::ReturnControl.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
         p example.description, op.messages[:error]
@@ -434,8 +452,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   xdescribe "APPROVE AS ADMIN -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::Approve.(@em_admin_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::Approve.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
         p example.description, op.messages[:error]
@@ -481,8 +499,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "APPROVE 3RD LEVEL -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::Approve.(@em_reviewer_user3, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::Approve.(@em_reviewer_user3, {id: @document.id})
       if op.failure?
         p example.description, op.messages[:error]
         skip if op.failure?
@@ -531,7 +549,7 @@ RSpec.describe "Money Request Workflow -- " do
     end
 
     it "has set the report as approved" do
-      expect(@document.status.id).to eq(ReportStatus.id_for(:approved))
+      expect(@document.status.id).to eq(MoneyRequestStatus.id_for(:approved))
     end
   end
 

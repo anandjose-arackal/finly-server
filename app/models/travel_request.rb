@@ -34,7 +34,9 @@ class TravelRequest < ActiveRecord::Base
   include SoftDeletable,
           Sequenced::ActsAsSequenced,
           FieldCustomizer::CustomizableValidation,
-          FindByOrderedIds
+          FindByOrderedIds,
+          Transitionable
+
 
   acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false, prefix: 'TR-'
 
@@ -288,6 +290,15 @@ class TravelRequest < ActiveRecord::Base
         destinations_list: destinations_list,
         summary: summary
     }
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push TravelRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
   end
 
   protected

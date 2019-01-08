@@ -34,9 +34,9 @@ RSpec.describe "Money Request Workflow -- " do
     create(:policy_user_mapping, {user_id: @em_employee_user1.id, policy_id: @policy.id})
 
     # Create Levels
-    @level1 = create(:reviewal_level, policy_id: @policy.id)
-    @level2 = create(:reviewal_level, policy_id: @policy.id)
-    @level3 = create(:reviewal_level, policy_id: @policy.id)
+    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
+    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
+    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
 
     # Create level reviewer mappings
     @level1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})
@@ -75,7 +75,6 @@ RSpec.describe "Money Request Workflow -- " do
     before(:all) do |example|
       op = MoneyRequests::Submit.(@em_employee_user1, {id: @document.id})
       @document.reload
-      debugger
       if op.failure?
         p example.description, op.messages[:example]
         skip
@@ -83,6 +82,7 @@ RSpec.describe "Money Request Workflow -- " do
     end
 
     describe "trail, level -- " do
+
       let(:user) {@em_employee_user1}
       let(:level) {@level1}
       let(:action) {:submit}
@@ -90,7 +90,9 @@ RSpec.describe "Money Request Workflow -- " do
       it_should_behave_like "trailed with right data"
       it_should_behave_like "document has moved to level"
       it_should_behave_like "reviewer has access to document"
+    end
 
+    describe "2nd level reviewer doesn't have access to document" do
       let(:reviewer) {@em_reviewer_user2}
       it_should_behave_like "reviewer does NOT have access to document"
     end
@@ -177,8 +179,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   xdescribe "RETRACT -- " do
     before(:all) do
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      @op4 = Reports::Retract.(@em_employee_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      @op4 = MoneyRequests::Retract.(@em_employee_user1, {id: @document.id})
       skip if @op4.failure?
       @document.reload
     end
@@ -206,8 +208,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   xdescribe "REJECT -- " do
     before(:all) do
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      @op4 = Reports::Reject.(@em_reviewer_user2, {id: @document.id, reject_note: "Test note"})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      @op4 = MoneyRequests::Reject.(@em_reviewer_user2, {id: @document.id, reject_note: "Test note"})
       if @op4.failure?
         p @op4.messages[:error]
         skip
@@ -226,7 +228,7 @@ RSpec.describe "Money Request Workflow -- " do
     end
 
     it "status has changed" do
-      expect(@document.status.id).to eq(ReportStatus.id_for(:rejected))
+      expect(@document.status.id).to eq(MoneyRequestStatus.id_for(:rejected))
     end
 
     it "document's next level is first level" do
@@ -258,9 +260,9 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "TAKE CONTROL ON 2ND LEVEL -- " do
     before(:all) do |example|
-      op = Reports::TakeControl.(@em_admin_user1, {id: @document.id})
+      op = MoneyRequests::TakeControl.(@em_admin_user1, {id: @document.id})
       if op.failure?
-        p example.description, op.messages[:error]
+        p "TAKE CONTROL ON 2ND LEVEL", op.messages[:error]
         skip
       end
       @document.reload
@@ -297,8 +299,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   xdescribe "RETURN CONTROL TO 2ND LEVEL -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::ReturnControl.(@em_admin_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::ReturnControl.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
         p example.description, op.messages[:error]
@@ -332,11 +334,11 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "APPROVE AS ADMIN -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::Approve.(@em_admin_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::Approve.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
-        p example.description, op.messages[:error]
+        p "APPROVE AS ADMIN", op.messages[:error]
         skip
       end
       @document.reload
@@ -374,9 +376,9 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "TAKE CONTROL ON 3RD LEVEL -- " do
     before(:all) do |example|
-      op = Reports::TakeControl.(@em_admin_user1, {id: @document.id})
+      op = MoneyRequests::TakeControl.(@em_admin_user1, {id: @document.id})
       if op.failure?
-        p example.description, op.messages[:error]
+        p "TAKE CONTROL ON 3RD LEVEL", op.messages[:error]
         skip
       end
       @document.reload
@@ -413,8 +415,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "RETURN CONTROL TO 3RD LEVEL -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::ReturnControl.(@em_admin_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::ReturnControl.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
         p example.description, op.messages[:error]
@@ -448,8 +450,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   xdescribe "APPROVE AS ADMIN -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::Approve.(@em_admin_user1, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::Approve.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
         p example.description, op.messages[:error]
@@ -495,8 +497,8 @@ RSpec.describe "Money Request Workflow -- " do
 
   describe "APPROVE 3RD LEVEL -- " do
     before(:all) do |example|
-      skip if @document.status.id != ReportStatus.id_for(:processing)
-      op = Reports::Approve.(@em_reviewer_user3, {id: @document.id})
+      skip if @document.status.id != MoneyRequestStatus.id_for(:processing)
+      op = MoneyRequests::Approve.(@em_reviewer_user3, {id: @document.id})
       if op.failure?
         p example.description, op.messages[:error]
         skip if op.failure?
@@ -545,7 +547,7 @@ RSpec.describe "Money Request Workflow -- " do
     end
 
     it "has set the report as approved" do
-      expect(@document.status.id).to eq(ReportStatus.id_for(:approved))
+      expect(@document.status.id).to eq(MoneyRequestStatus.id_for(:approved))
     end
   end
 

@@ -74,7 +74,7 @@ module Transitionable
 
     def get_level(type)
       # Provide :next / :prev to get the respective levels
-      current_level_number = self.level.present? ? self.level.level_number : 0
+      # current_level_number = self.level.present? ? self.level.level_number : 0
 
       if self.level.present?
         current_level_number = self.level.level_number
@@ -109,6 +109,10 @@ module Transitionable
                                               policy_id: self.policy.id,
                                               associated_entity_type: self.class.name
                                           }).first
+
+      # Previously it was picked from policy's levels
+      # todo - fix it
+      # Bug: Let's say last level is deleted, it gonna approve without going to the last dlrm
     end
 
     # In case reviewer wants to reject it to a particular user who had previously approved

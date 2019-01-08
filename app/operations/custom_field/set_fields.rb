@@ -59,7 +59,7 @@ class CustomField::SetFields < CustomField::Base
         self.field_configurations = item.user.company.field_configurations.exclude_deleted
       elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item),
              FieldParentType.id_for(:purchase_order), FieldParentType.id_for(:vendor)].include?(parent_type_id)
-        self.field_configurations = current_company.field_configurations.exclude_deleted
+        self.field_configurations = user.company.field_configurations.exclude_deleted
       elsif FieldParentType.expense_ids.include?(parent_type_id)
         # For expenses
         user = item.expense.user rescue nil

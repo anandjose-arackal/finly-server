@@ -3,6 +3,11 @@ class MoneyRequests::TakeControl < MoneyRequests::Base
   def authorized_user_types
     [:admin]
   end
+
+  def init
+    money_request_id = params[:id] || params[:money_request_id]
+    self.money_request = MoneyRequest.admin_associated_items(user).find_by money_request_id
+  end
   
   def authorize
     super
@@ -21,23 +26,36 @@ class MoneyRequests::TakeControl < MoneyRequests::Base
   end
   
   def process
-    memo = (params[:note] or params[:memo] or money_request.memo)
-    if money_request.update_attributes controlling_user: user, 
-                                       controlling_for_user: money_request.controlling_user,
-                                       controlling_user_role_id: UserRole.id_for(:admin),
-                                       controlling_for_user_role_id: money_request.controlling_user_role_id
-      money_request.tracks.create action_user: user,
-                                  action_user_role_id: UserRole.id_for(:admin),
-                                  modified_user_id: money_request.controlling_for_user_id,
-                                  modified_user_role_id: money_request.controlling_for_user_role_id,
-                                  money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:take_control),
-                                  status_id: money_request.status_id
-      money_request.comments.create user: user, 
-                                    comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
-                                    content: params[:take_control_note]
+    # memo = (params[:note] or params[:memo] or money_request.memo)
+    # if money_request.update_attributes controlling_user: user,
+    #                                    controlling_for_user: money_request.controlling_user,
+    #                                    controlling_user_role_id: UserRole.id_for(:admin),
+    #                                    controlling_for_user_role_id: money_request.controlling_user_role_id
+    #   money_request.tracks.create action_user: user,
+    #                               action_user_role_id: UserRole.id_for(:admin),
+    #                               modified_user_id: money_request.controlling_for_user_id,
+    #                               modified_user_role_id: money_request.controlling_for_user_role_id,
+    #                               money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:take_control),
+    #                               status_id: money_request.status_id
+    #   money_request.comments.create user: user,
+    #                                 comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
+    #                                 content: params[:take_control_note]
+    #   return
+    # end
+    # self.messages = money_request.errors.full_messages
+
+    #  Workflow Manager
+    params[:document] = self.money_request
+    params[:aasm_event] = 'take_control'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
       return
     end
-    self.messages = money_request.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

@@ -47,7 +47,6 @@ RSpec.shared_examples "reviewer does NOT have access to document" do
 end
 
 RSpec.shared_examples "document has moved to level" do
-  debugger
   it "has controlling level as given level" do
     expect(@document.controlling_level_id).to eq(level.id)
   end
