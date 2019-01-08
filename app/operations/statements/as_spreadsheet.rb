@@ -21,24 +21,25 @@ class Statements::AsSpreadsheet < Statements::Base
     ]
     self.contents = []
     result.scoped_finly_transactions.success.sort_date_asc.all.each do |finly_transaction|
+      transaction_detail = finly_transaction.transaction_detail
       credit_amount = nil
       debit_amount = nil
       if finly_transaction.credit?
-        credit_amount = finly_transaction.amount.value
+        credit_amount = transaction_detail.amount.value
       else
-        debit_amount = finly_transaction.amount.value
+        debit_amount = transaction_detail.amount.value
       end
       self.contents << [
-          DateUtils.date_formatted(finly_transaction.date),
-          finly_transaction.transaction_type.name.humanize,
-          finly_transaction.payment_purpose.name.humanize,
-          result.merchant(finly_transaction),
+          DateUtils.date_formatted(transaction_detail.transaction_date),
+          transaction_detail.transaction_type.humanize,
+          transaction_detail.payment_purpose.humanize,
+          transaction_detail.merchant,
           credit_amount,
           debit_amount,
-          finly_transaction.closing_balance&.value,
-          finly_transaction.status.name.humanize,
-          finly_transaction.transaction_reference_id,
-          finly_transaction.payment&.note
+          transaction_detail.closing_balance&.value,
+          transaction_detail.status.humanize,
+          transaction_detail.transaction_reference_id,
+          transaction_detail.note
       ]
     end
   end

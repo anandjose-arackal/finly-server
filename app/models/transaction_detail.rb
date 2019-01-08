@@ -15,6 +15,7 @@
 #  closing_balance_id       :integer
 #  company_id               :integer
 #  transaction_date         :datetime
+#  sequence_number          :integer
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #
@@ -23,9 +24,8 @@ class TransactionDetail < ActiveRecord::Base
 
   belongs_to :company
   belongs_to :finly_transaction
+  belongs_to :amount
   belongs_to :opening_balance, class_name: 'Amount'
   belongs_to :closing_balance, class_name: 'Amount'
-
-  validates :finly_transaction_id, uniqueness: true
 
 end

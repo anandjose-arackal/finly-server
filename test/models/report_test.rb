@@ -32,7 +32,8 @@
 #  sync_type_id                       :integer
 #  report_processor_group_mapping_id  :integer
 #  travel_request_id                  :integer
-#  created_by_id                      :integer
+#  department_id                      :integer
+#  sub_department_id                  :integer
 #
 
 

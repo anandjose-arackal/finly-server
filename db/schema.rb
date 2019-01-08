@@ -473,6 +473,7 @@ ActiveRecord::Schema.define(version: 20190107014315) do
     t.boolean  "reimbursable"
     t.boolean  "default_account",                default: false
     t.boolean  "is_deleted",                     default: false
+    t.boolean  "disabled",                       default: false
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
@@ -4686,6 +4687,8 @@ ActiveRecord::Schema.define(version: 20190107014315) do
     t.integer  "travel_request_id",                  limit: 4
     t.integer  "created_by_id",                      limit: 4
     t.integer  "modified_by_id",                     limit: 4
+    t.integer  "department_id",                      limit: 4
+    t.integer  "sub_department_id",                  limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -5008,6 +5011,7 @@ ActiveRecord::Schema.define(version: 20190107014315) do
     t.datetime "transaction_date"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.integer  "sequence_number",          limit: 4
   end
 
   add_index "transaction_details", ["amount_id"], name: "fk_rails_12e08cc879", using: :btree
@@ -5834,6 +5838,7 @@ ActiveRecord::Schema.define(version: 20190107014315) do
     t.integer  "currency_id",       limit: 4
     t.integer  "tds_rates_list_id", limit: 4
     t.string   "vendor_id",         limit: 255
+    t.boolean  "disabled",                        default: false
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
@@ -6165,7 +6170,6 @@ ActiveRecord::Schema.define(version: 20190107014315) do
   add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
-  add_foreign_key "user_delegate_mappings", "users"
   add_foreign_key "user_department_mappings", "departments"
   add_foreign_key "user_department_mappings", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"

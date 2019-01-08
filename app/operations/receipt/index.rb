@@ -28,7 +28,7 @@ class Receipt::Index < Receipt::Base
     has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
-      self.receipts = apply_scopes(params[:receipts])
+      self.receipts = apply_scopes(params[:receipts]).includes(:system_messages)
       self.count = self.receipts.count
       self.paginated_receipts = self.receipts.paginate(page: params[:page], per_page: 32) rescue nil
       self.categories = user.company.categories.active

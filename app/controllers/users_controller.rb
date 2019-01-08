@@ -187,6 +187,11 @@ class UsersController < ApplicationController
     respond
   end
 
+  def all_users
+    @result = User::AllUsers.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type = nil)
