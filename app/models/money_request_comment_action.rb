@@ -29,6 +29,8 @@ class MoneyRequestCommentAction < ActiveRecord::Base
               retracted_by_delegate: 22
             }
 
+  scope :with_name, -> (name) {where name: name}
+
   self.class.instance_eval do
     ACTIONS.each do |key, value|
       define_method "#{key}_id" do
@@ -39,6 +41,15 @@ class MoneyRequestCommentAction < ActiveRecord::Base
 
   def self.id_for(action)
     ACTIONS[action]
+  end
+
+  def self.seed_data
+    count = MoneyRequestCommentAction.count
+    ACTIONS.each do |key, value|
+      if count == 0 or MoneyRequestCommentAction.with_name(key).blank?
+        MoneyRequestCommentAction.create id: value, name: key
+      end
+    end
   end
 
 end
