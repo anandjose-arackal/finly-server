@@ -15,5 +15,11 @@ class User::DelegateMappings::Base < BaseOperation
         end
       end
     end
+    if actual_current_user.blank?
+      unless user.delegation_enabled
+        add_message :error, 'Delegation is not enabled for you'
+        return
+      end
+    end
   end
 end
