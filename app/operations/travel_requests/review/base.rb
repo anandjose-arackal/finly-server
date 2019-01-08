@@ -6,6 +6,7 @@ class TravelRequests::Review::Base < TravelRequests::Base
       add_message :error, "Invalid parameters, try again"
       return
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init

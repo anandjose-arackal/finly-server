@@ -71,6 +71,9 @@ class Report < ActiveRecord::Base
   belongs_to :sync_status, class_name: 'ReportSyncStatus'
   belongs_to :sync_type, class_name: 'ReportSyncType'
   belongs_to :travel_request
+  belongs_to :created_by, class_name: "User"
+  belongs_to :modified_by, class_name: 'User'
+  # belongs_to :money_request
   belongs_to :department
   belongs_to :sub_department, class_name: "Department"
 

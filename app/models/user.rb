@@ -193,7 +193,11 @@ class User < ActiveRecord::Base
   has_many :user_department_mappings
   has_many :departments, through: :user_department_mappings
 
-  #Budgets
+  # adding a many to many association for user and his/her delegates
+  has_many :user_delegate_mappings
+  has_many :delegated_for_users, class_name: "User", through: :user_delegate_mappings, source: :delegate_for_user
+
+  # Budgets
 
   # many-to-many mapping between user and budget
   has_many :budget_criteria_mappings, as: :budgetable
@@ -912,6 +916,14 @@ class User < ActiveRecord::Base
     elsif !self.active and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
       return "Inactive"
     end
+  end
+
+  def actual_current_user
+    RequestStore.store[:actual_current_user]
+  end
+
+  def current_user
+    RequestStore.store[:current_user]
   end
 
   private

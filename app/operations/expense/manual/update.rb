@@ -32,6 +32,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if amount_value.present? and amount_value <= 0
       messages[:error] << 'Amount cannot be less than or equal to 0'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -138,6 +139,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if StringUtils.to_bool(updated_expense_params[:reimbursable])
       updated_expense_params[:spent_from_id] = nil
     end
+    updated_expense_params[:modified_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process
