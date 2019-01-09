@@ -1,5 +1,9 @@
 module ActiveRecordExt
   def log(query, *)
-    QueryLogger.log(query) { super }
+    if self.class <= NonPersistentModel
+      super
+    else
+      QueryLogger.log(query) {super}
+    end
   end
 end

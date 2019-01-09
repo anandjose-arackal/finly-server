@@ -4,6 +4,7 @@
 # payment items will most likely be a hash of details that are relevant to that particular payment object
 
 class PaymentRequest < NonPersistentModel
+  self.abstract_class = true
 
   AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name, BankAccount.name, VendorPaymentWallet.name, VirtualBankAccount.name, UserPocket.name]
 
