@@ -26,17 +26,29 @@ class BankTransfer::PaymentRequest::Review::Retract < BankTransfer::PaymentReque
 
   def process
 
-    if bank_payment_request.update status_id: BankPaymentRequestStatus.id_for(:retracted),
-                                   controlling_user_id: user.id,
-                                   controlling_user_role_id: UserRole.id_for(:employee),
-                                   controlling_for_user_id: nil,
-                                   controlling_for_user_role_id: nil
-      bank_payment_request.bank_payment_request_trails.create action_user: user,
-                                                              action_user_role_id: UserRole.id_for(:employee),
-                                                              action_id: BankPaymentRequestTrailAction.id_for(:retract)
-      return true
+    # if bank_payment_request.update status_id: BankPaymentRequestStatus.id_for(:retracted),
+    #                                controlling_user_id: user.id,
+    #                                controlling_user_role_id: UserRole.id_for(:employee),
+    #                                controlling_for_user_id: nil,
+    #                                controlling_for_user_role_id: nil
+    #   bank_payment_request.bank_payment_request_trails.create action_user: user,
+    #                                                           action_user_role_id: UserRole.id_for(:employee),
+    #                                                           action_id: BankPaymentRequestTrailAction.id_for(:retract)
+    #   return true
+    # end
+    # add_message :error, bank_payment_request.errors.full_messages
+
+    params[:document] = self.bank_payment_request
+    params[:aasm_event] = 'retract'
+    params[:violation_present] = false
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
     end
-    add_message :error, bank_payment_request.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

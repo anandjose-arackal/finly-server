@@ -8,9 +8,13 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
     case document.class.name
       when 'PurchaseOrder'
         amount = document&.balance_amount&.value rescue 0
+      when 'MoneyRequest'
+        amount = document&.total_amount
       when 'Invoice'
         amount = document&.net_amount&.value rescue 0
       when 'Report'
+        amount = document&.total_amount rescue 0
+      when 'BankPaymentRequest'
         amount = document&.total_amount rescue 0
       else
         amount = 0

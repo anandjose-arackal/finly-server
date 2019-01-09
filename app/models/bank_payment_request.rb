@@ -338,6 +338,10 @@ class BankPaymentRequest < ActiveRecord::Base
     status_ids.reject { |status_id| status_id.nil? }
   end
 
+  def self.document_owner_attribute
+    'owner_id'
+  end
+
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end

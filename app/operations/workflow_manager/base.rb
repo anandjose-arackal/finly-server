@@ -19,6 +19,8 @@ class WorkflowManager::Base < BaseOperation
         self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user
       when 'TravelRequest'
         self.aasm_document = ::WorkflowManager::Aasm::TravelRequestProvider.new self.document, violations_present, user
+      when 'BankPaymentRequest'
+        self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
       else
         add_message :error, 'Unknown document type'
     end

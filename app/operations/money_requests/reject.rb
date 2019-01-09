@@ -15,7 +15,7 @@ class MoneyRequests::Reject < MoneyRequests::Base
 
   def init
     id = (params[:id] or params[:money_request_id])
-    self.money_request = MoneyRequest.reviewer_associated_items(user).find_by id
+    self.money_request = MoneyRequest.reviewer_associated_items(user).find_by id: id
     # if params[:reject_to_user_id].present?
     #   rejectable_users = User::Team::Review::RejectToUsersList.(self.money_request, self.user)
     #   self.reject_to_user = rejectable_users.with_id(params[:reject_to_user_id]).first if rejectable_users.present?

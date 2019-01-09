@@ -12,7 +12,7 @@ class Reports::Reject < Reports::Base
 
   def init
     report_id = params[:id] || params[:report_id]
-    self.report = Report.reviewer_associated_items(user).find_by report_id
+    self.report = Report.reviewer_associated_items(user).find_by id: report_id
     # todo allow rejecting to users
     # if params[:reject_to_user_id].present?
     #   rejectable_users = User::Team::Review::RejectToUsersList.(self.report, self.user)

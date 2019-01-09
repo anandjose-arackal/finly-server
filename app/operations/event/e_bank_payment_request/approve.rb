@@ -4,7 +4,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
 
   def init
     super
-    self.approving_user = self.bank_payment_request.bank_payment_request_trails.last.action_user
+    self.approving_user = self.bank_payment_request.trails.natural_order.reload.last.action_user
     self.approved = (self.bank_payment_request.approved? || self.bank_payment_request.credited?) ? true : false
     self.auto_approve = params[:approve]
   end

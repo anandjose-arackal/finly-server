@@ -6,7 +6,7 @@ class MoneyRequests::ReturnControl < MoneyRequests::Base
 
   def init
     money_request_id = params[:id] || params[:money_request_id]
-    self.money_request = MoneyRequest.admin_associated_items(user).find_by money_request_id
+    self.money_request = MoneyRequest.admin_associated_items(user).find_by id: money_request_id
   end
 
   def authorize

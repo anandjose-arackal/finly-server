@@ -11,7 +11,7 @@ class Reports::ReturnControl < Reports::Base
 
   def init
     report_id = params[:id] || params[:report_id]
-    self.report = Report.admin_associated_items(user).find_by report_id
+    self.report = Report.admin_associated_items(user).find_by id: report_id
   end
 
   def authorize

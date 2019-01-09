@@ -63,6 +63,34 @@ FactoryBot.define do
         ]}
       end
     end
+    factory :vp_user do
+      user_panel_subscription_attributes {{yes_bank_account_transfer: true}}
+
+      factory :vp_initiator_user do
+        role_mapping_attributes { [{user_role_id: 4, purpose_id: 2}] }
+      end
+
+      factory :vp_reviewer_user do
+        role_mapping_attributes {[
+            {user_role_id: 4, purpose_id: 2},
+            {user_role_id: 3, purpose_id: 2}
+        ]}
+      end
+
+      factory :vp_creditor_user do
+        role_mapping_attributes {[
+            {user_role_id: 4, purpose_id: 2},
+            {user_role_id: 2, purpose_id: 2}
+        ]}
+      end
+
+      factory :vp_admin_user do
+        role_mapping_attributes {[
+            {user_role_id: 4, purpose_id: 2},
+            {user_role_id: 1, purpose_id: 2}
+        ]}
+      end
+    end
   end
 
   # factory :user_panel_subscription do
