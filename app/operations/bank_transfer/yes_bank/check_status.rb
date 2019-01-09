@@ -54,14 +54,14 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
-        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:processing))
         # destroying previous messages first, before adding the processing message
         self.payment.system_messages.destroy_all
         self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
                                       content: "Payment processed. Awaiting credit confirmation").save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # elsif true
-        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         # destroying previous messages first, before adding the failure message
