@@ -18,7 +18,9 @@ class Personalizer::Adapters::Company118::Procurements118::PurchaseOrders118::Va
   def process
     budgets.each do |budget|
       budget_amount = budget[:budget].budget_amount.value
-      spent_amount = budget[:spent_amount]
+      budget_spent_amount = budget[:spent_amount]
+
+      spent_amount = budget_spent_amount
 
       if spent_amount > budget_amount
         add_message :error, "Purchase Order Amount exceeding Budget - #{budget[:budget].name}"

@@ -47,12 +47,26 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       expense_params.delete(:receipts_attributes)
     end
 
-    pocket_id = self.expense_params[:spent_from_id]
-    self.cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id)
-
-    # todo - jugaad to support mobile app for now
-    if self.cash_pocket.blank?
-      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    pocket_id = self.params&.dig(:expense, :spent_from_id)
+    # Todo - Jugaad - Legacy support for older version of android/iOS where this is not implemented
+    if pocket_id.blank? and (params[:expense].present? and params[:expense].has_key?(:reimbursable) and params[:expense].has_key?(:from_cash_on_hand))
+      reimbursable = params&.dig(:expense, :reimbursable)
+      from_cash_on_hand = params&.dig(:expense, :from_cash_on_hand)
+      if reimbursable
+        pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
+      elsif from_cash_on_hand
+        pocket_id = user.user_pockets.cash_pockets_only&.first&.id
+      else
+        pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+      end
+      if pocket_id.blank?
+        pocket_id = user.user_pockets.cash_pockets_only.first&.id
+      end
+    end
+    # Jugaad End
+    if pocket_id.present?
+      self.cash_pocket = user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id)
+      self.expense_params[:spent_from_id] = self.cash_pocket&.id
     end
   end
 
@@ -76,8 +90,13 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       end
     end
 
+    if self.expense_params[:spent_from_id].blank?
+      add_message :error, 'Please select the Spend Account'
+      return
+    end
+
     if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
-      add_message :error, "Could not find pocket from which this expense was spent"
+      add_message :error, 'Error in Spend Account'
       return
     end
 
@@ -99,6 +118,7 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     if StringUtils.to_bool(expense_params[:reimbursable])
       expense_params[:spent_from_id] = nil
     end
+    expense_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process
@@ -124,10 +144,10 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     # calculate amount of the expense
     amount = expense.amount
     if amount.blank?
-      amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency_id: expense.report.policy.base_currency_id)
+      amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency_id: per_diem.configurable.base_currency_id)
       expense.update(amount: amount)
     else
-      amount.update(value: expense.calculate_amount_value(per_diem.configurable), currency_id: expense.report.policy.base_currency_id)
+      amount.update(value: expense.calculate_amount_value(per_diem.configurable), currency_id: per_diem.configurable.base_currency_id)
 
       # calculate the equivalent amount in all currencies in the amounts table
       if expense.date == DateUtils.local_date

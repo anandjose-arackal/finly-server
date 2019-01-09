@@ -4,6 +4,19 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
                 :initiating_account, :creditable_payment_requests, :creditable_payment_orders,
                 :view_role
 
+  def pre_validate
+    super
+    return if has_errors?
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate the transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
+  end
+
   def init
     ids = params[:payment_request_ids] || params[:bank_payment_request_ids] || params[:ids]
     unless ids.is_a?(Array)

@@ -2,8 +2,34 @@ class Invoicing::InventoryLineItem::Create < Invoicing::InventoryLineItem::Base
 
   attr_accessor :inventory_line_item, :inventory_item_parameters
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:invoicing, :inventory_line_item], :validate, self)
+        }
+    }
+  end
+
   def init
     self.inventory_item_parameters = inventory_item_params
+  end
+
+  def validate
+    supply_item_type_id = inventory_item_params[:supply_item_type_id]
+
+    if supply_item_type_id.present?
+      supply_item_type = SupplyItemType.name_for(supply_item_type_id.to_i)
+
+      if supply_item_type == 'po_item'
+        unless user.permission.crud_inventory_item_po
+          add_message :error, "You don't have permission for this action"
+        end
+      elsif supply_item_type == 'non_po_item'
+        unless user.permission.crud_inventory_item_non_po
+          add_message :error, "You don't have permission for this action"
+        end
+      end
+    end
   end
 
   def process

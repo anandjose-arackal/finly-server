@@ -272,6 +272,11 @@ class TravelRequests::Show < TravelRequests::Base
       {highlighted: highlighted, message: message}
     end
 
+    def custom_fields_for(policy, type)
+      return nil unless policy.present?
+      policy.field_configurations.exclude_deleted.root_fields.order_created_at_desc.with_parent_type(FieldParentType.id_for(type))
+    end
+
   end
 
 end

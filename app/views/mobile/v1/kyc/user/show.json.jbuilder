@@ -3,6 +3,8 @@ json.require_photo kyc.require_photo?
 json.editable kyc.editable?
 json.retractable kyc.retractable?
 json.kyc_number kyc&.kyc_number
+json.kyc_1_number kyc&.kyc_1_number
+json.kyc_2_number kyc&.kyc_2_number
 json.admin_note kyc&.admin_note
 json.status do
   json.id kyc.kyc_status.id
@@ -35,6 +37,30 @@ json.aadhar_back do
   json.file_type kyc.file_format(kyc.aadhar_back)
   json.original kyc&.aadhar_back&.url
   json.thumb kyc&.aadhar_back&.url(:thumb)
+end
+json.kyc_1_front do
+  json.file_format kyc&.file_format(kyc&.kyc_1_front)
+  json.file_type kyc.file_format(kyc.kyc_1_front)
+  json.original kyc&.kyc_1_front&.url
+  json.thumb kyc&.kyc_1_front&.url(:thumb)
+end
+json.kyc_1_back do
+  json.file_format kyc&.file_format(kyc&.kyc_1_back)
+  json.file_type kyc.file_format(kyc.kyc_1_back)
+  json.original kyc&.kyc_1_back&.url
+  json.thumb kyc&.kyc_1_back&.url(:thumb)
+end
+json.kyc_2_front do
+  json.file_format kyc&.file_format(kyc&.kyc_2_front)
+  json.file_type kyc.file_format(kyc.kyc_2_front)
+  json.original kyc&.kyc_2_front&.url
+  json.thumb kyc&.kyc_2_front&.url(:thumb)
+end
+json.kyc_2_back do
+  json.file_format kyc&.file_format(kyc&.kyc_2_back)
+  json.file_type kyc.file_format(kyc.kyc_2_back)
+  json.original kyc&.kyc_2_back&.url
+  json.thumb kyc&.kyc_2_back&.url(:thumb)
 end
 json.photo do
   json.file_format kyc&.file_format(kyc&.photo)

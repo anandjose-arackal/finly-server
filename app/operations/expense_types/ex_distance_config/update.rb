@@ -65,7 +65,7 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
   private
 
   def distance_expense_config_params
-    params.require(:distance_expense_config).permit(:default_category_id, :enabled, rate_attributes: [:value, :currency_id])
+    params.require(:distance_expense_config).permit(:default_category_id, :enforce_category, :enabled, rate_attributes: [:value, :currency_id])
   end
 
 end

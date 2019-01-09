@@ -11,22 +11,62 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
       add_message :error, 'Document not found'
     end
 
+    if mappings_params[:document_reviewer_mappings].present?
 
+      mappings_params[:document_reviewer_mappings].each do |mapping_params|
+        # check if level present in company
+        level = ::ReviewalLevel.find_by id: mapping_params[:level_id]
+        unless level&.policy&.company_id == user.company_id
+          add_message :error, 'Invalid Level Details'
+          break
+        end
 
-    # check if reviewer present in company
-    # check if level present in company
+        mapping_params[:level] = level
+
+        # check if reviewer present in company
+        reviewer = user.company.users.find_by id: mapping_params[:reviewer_id]
+
+        if reviewer.present?
+          mapping_params[:reviewer] = reviewer
+        end
+      end
+
+    end
   end
 
   def process
     if mappings_params[:document_reviewer_mappings].present?
       mappings_params[:document_reviewer_mappings].each do |mapping_params|
-        reviewer_id = mapping_params[:reviewer_id]
+        reviewer_id = mapping_params[:reviewer_id].to_i
+
+        # reviewer = user.company.users.find_by id: reviewer_id
+
+        # level = ::ReviewalLevel.find_by id: mapping_params[:level_id]
+
+        reviewer = mapping_params[:reviewer]
+        level = mapping_params[:level]
+
+        if level.present? && reviewer.present?
+          amount = get_document_amount
+          reviewer_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
+
+          unless reviewer_ids.include?(reviewer.id)
+            add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount is greater than threshold value. Please select a different reviewer."
+            break
+          end
+        end
+
         mapping_params.delete(:reviewer_id)
+        mapping_params.delete(:reviewer)
+        mapping_params.delete(:level)
+
+        # todo-abi remove it and run script to delete all duplicates
         mapping_params[:policy_id] = document.policy_id
+
         mapping = document.document_level_reviewer_mappings.find_or_initialize_by(mapping_params)
 
-        if reviewer_id.present?
-          mapping.reviewer_id = reviewer_id
+        if reviewer.present?
+          mapping.reviewer_id = reviewer.id
           unless mapping.save
             add_message :error, "Couldn't create mapping reviewer level mapping for level_id: #{mapping_params[:level_id]}, reviewer_id: #{reviewer_id}"
           end

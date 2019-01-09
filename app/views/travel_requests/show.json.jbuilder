@@ -28,13 +28,21 @@ json.destinations do
 end
 
 json.actions @result.actions
-json.policies @result.policies
+json.policies @result.policies.each do |policy|
+  json.id policy.id
+  json.name policy.name
+  json.custom_fields @result.custom_fields_for(policy, :travel_request)
+end
+json.booking_requests_config do
+  json.custom_fields @result.custom_fields_for(@result.travel_request.policy, :booking_request)
+end
 json.editable @result.editable
 json.destroyable @result.destroyable
 json.can_select_options @result.can_select_options?
 json.can_add_request @result.can_add_request?
 json.can_add_options @result.can_add_options?
 json.can_add_booking @result.can_add_booking?
+json.can_mark_as_unavailable @result.can_add_options?
 json.can_cancel_booking @result.can_cancel_booking?
 json.can_create_money_requests @result.can_create_money_requests?
 json.show_money_requests @result.show_money_requests?
@@ -148,3 +156,7 @@ json.comments do
     json.initials comment.user&.initials
   end
 end
+
+# json.custom_fields do
+#   json.array! @result.travel_request.custom_fields
+# end

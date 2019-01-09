@@ -41,7 +41,8 @@ class ExpenseTypesConfigurationController < ApplicationController
   end
 
   def menu_data_payments
-    @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_payments.yml.erb", {current_company: current_company, current_user: current_user})
+    default_url = get_default_url('vp', current_company, current_user)
+    @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_payments.yml.erb", {current_company: current_company, current_user: current_user, default_url: default_url})
     render json: @views.as_json
   end
 
@@ -92,6 +93,22 @@ class ExpenseTypesConfigurationController < ApplicationController
       @field_configurations = field_configuration_result.field_configurations
     end
     respond
+  end
+
+  def get_default_url(product, company, user)
+    path = ""
+
+    case product
+      when 'vp'
+        path = 'orders'
+        if company.feature_subscription.procurement
+          path = 'procurements'
+        end
+      else
+        path = ""
+    end
+
+    path
   end
 
 end

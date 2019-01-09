@@ -112,6 +112,10 @@ class PaymentOrder < ActiveRecord::Base
     where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
   }
 
+  scope :with_receiving_account_type, -> (account_type) {
+    where receiving_account_type: account_type
+  }
+
   scope :from_company_account, -> (enabled) {
     if ['1', 1].include?(enabled)
       where initiating_account_type: ["ItzCashCompanyAccount", "YesBankCompanyAccount"]
@@ -136,6 +140,12 @@ class PaymentOrder < ActiveRecord::Base
     date_from = date_from.to_time if date_from.present?
     date_to = date_to.to_time if date_to.present?
     where('processed_at >= ? AND processed_at <= ?', date_from, date_to)
+  }
+
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where initiating_user_id: user_ids
+    end
   }
 
   scope :from_disburse, -> {where application: ["fd", "ft"]}

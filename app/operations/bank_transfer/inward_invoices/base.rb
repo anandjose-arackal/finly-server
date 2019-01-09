@@ -4,12 +4,15 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
   class BankTransfer::InwardInvoices::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoice
+    attr_accessor :invoice, :budgets
 
     def init
       self.invoice = params[:inward_invoice]
+      # op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
+      # if op.success?
+      #   self.budgets = op.budget_data
+      # end
     end
-
   end
 
   def pre_validate
@@ -20,7 +23,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
   def invoice_attributes
     params.require(:invoice).permit(:note, :tax, :gst_type_id, :tds, :tds_type_id, :category_id, :cost_center_id, :tds_slab_id, :payment_term_id,
-                                    :department_id, :sub_department_id, :policy_id,
+                                    :department_id, :sub_department_id, :policy_id, :billing_address, :shipping_address,
                                      :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount, :location_id, :delivery_location_id,
                                      :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id, :vendor_id,
                                      original_amount_attributes: [:value, :currency_id],

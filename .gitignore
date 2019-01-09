@@ -13,6 +13,7 @@
 config/finly_collect.yml
 config/deploy/config/*
 lib/tasks/aws.rake
+config/data_store.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -38,6 +39,7 @@ public/system/vendor_attachments/*
 /Sample transactions
 /sample_bank_transfer.xls
 config/data/bypass_authorized_users.yml
+public/system/temporary_files/
 
 /yes_bank_api_call_logs
 .vagrant/
@@ -55,6 +57,7 @@ Thumbs.db
 dump.rdb
 .idea/
 config/secure_storage_config.yml
+config/elastic_apm.yml
 config/deploy/config/*
 
 public/tmp

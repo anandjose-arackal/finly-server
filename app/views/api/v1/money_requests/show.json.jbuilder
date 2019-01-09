@@ -1,6 +1,7 @@
 json.partial! 'money_request', money_request: @result.money_request
 json.manager_name @result.manager.present? ? @result.manager.name : ''
 json.finance_manager_name @result.finance_manager.present? ? @result.finance_manager.name : ''
+json.cash_money_requests_allowed !!current_company&.configuration&.cash_money_requests_enabled
 json.actions @result.actions
 json.categories @result.items.each do |item|
   json.category do
@@ -49,4 +50,11 @@ json.payment_modes do
 end
 json.custom_fields do
   json.array! @result.money_request.custom_fields
+end
+
+travel_desk_enabled = @result.money_request.user.travel_desk_enabled?
+json.show_trips travel_desk_enabled
+if travel_desk_enabled
+  json.pending_travel_requests @result.money_request.user.travel_requests, :id, :name
+  json.associated_trip @result.money_request.travel_request
 end

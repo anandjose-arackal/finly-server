@@ -17,11 +17,12 @@ json.actions do
     json.set! key, (value[:url].present? or value[:value].present?)
   end
 end
+cash_pockets = @result.cash_pockets
 json.sections @result.expenses_category_sorted do |item|
   json.name item[:section_name]
   json.total item[:section_total]
   json.expenses item[:expenses] do |expense_item|
-    json.partial! '/mobile/v2/expenses/expense', expense: expense_item
+    json.partial! '/mobile/v2/expenses/expense', expense: expense_item, cash_pockets: cash_pockets
   end
 end
 json.comments @result.comments do |comment|
@@ -41,4 +42,11 @@ json.currencies do
     json.country_code currency.country_code
     json.id currency.id
   end
+end
+
+travel_desk_enabled = @result.report.user.travel_desk_enabled?
+json.show_trips travel_desk_enabled
+if travel_desk_enabled
+  json.user_travel_requests @result.report.user.travel_requests.reportable, :id, :name, :trip_id
+  json.associated_trip @result.report.travel_request
 end

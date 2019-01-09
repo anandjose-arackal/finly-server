@@ -62,7 +62,26 @@
 #  combined_kyc_content_type  :string(255)
 #  combined_kyc_file_size     :integer
 #  combined_kyc_updated_at    :datetime
+#  kyc_1_front_file_name      :string(255)
+#  kyc_1_front_content_type   :string(255)
+#  kyc_1_front_file_size      :integer
+#  kyc_1_front_updated_at     :datetime
+#  kyc_1_back_file_name       :string(255)
+#  kyc_1_back_content_type    :string(255)
+#  kyc_1_back_file_size       :integer
+#  kyc_1_back_updated_at      :datetime
+#  kyc_2_front_file_name      :string(255)
+#  kyc_2_front_content_type   :string(255)
+#  kyc_2_front_file_size      :integer
+#  kyc_2_front_updated_at     :datetime
+#  kyc_2_back_file_name       :string(255)
+#  kyc_2_back_content_type    :string(255)
+#  kyc_2_back_file_size       :integer
+#  kyc_2_back_updated_at      :datetime
+#  kyc_1_number               :string(255)
+#  kyc_2_number               :string(255)
 #
+
 require 'fileutils'
 class IndividualKyc < ActiveRecord::Base
   include Attachable, Magick
@@ -75,6 +94,8 @@ class IndividualKyc < ActiveRecord::Base
   belongs_to :upgraded_by_resource, class_name: 'AdminUser'
   has_many :tracks, class_name: 'IndividualKycTrack'
   has_many :system_messages, as: :messagable, dependent: :destroy
+
+  delegate :aadhar_card?, :driving_license?, :voter_id?, :ngera_job_card?, :passport?, to: :type, allow_nil: true
 
   scope :with_admin_review_workflow, -> (workflow_id) { where admin_review_workflow_id: workflow_id }
   scope :with_review_position, ->(review_pos) { where review_position: review_pos }
@@ -108,6 +129,18 @@ class IndividualKyc < ActiveRecord::Base
 
   has_attached_file :aadhar_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :aadhar_back, content_type: CONTENT_TYPES
+
+  has_attached_file :kyc_1_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_1_front, content_type: CONTENT_TYPES
+
+  has_attached_file :kyc_1_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_1_back, content_type: CONTENT_TYPES
+
+  has_attached_file :kyc_2_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_2_front, content_type: CONTENT_TYPES
+
+  has_attached_file :kyc_2_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_2_back, content_type: CONTENT_TYPES
 
   has_attached_file :photo, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :photo, content_type: CONTENT_TYPES
@@ -147,8 +180,7 @@ class IndividualKyc < ActiveRecord::Base
   end
 
   def generate_single_kyc
-    return false unless (self.aadhar_front.present? and self.aadhar_back.present? and
-        self.signature.present?)
+    return false unless can_submit?
     view = ActionView::Base.new(ActionController::Base.view_paths)
     view.extend ApplicationHelper
     html_string = view.render(file: 'kyc/user/kyc_template.html.erb', locals: {kyc: self})
@@ -161,14 +193,10 @@ class IndividualKyc < ActiveRecord::Base
   end
 
   def can_submit?
-    if require_photo?
-      photo_check = self.photo.present?
-    else
-      photo_check = true
-    end
-    (self.kyc_file_1.present? or (self.aadhar_front.present? and self.aadhar_back.present? and
-        photo_check and self.signature.present?)) and
-        self.kyc_number.present?
+    return false if require_photo? and not self.photo.present?
+    return false unless self.kyc_1_front.present? and self.kyc_1_back.present? and kyc_1_number.present?
+    return false if self.type&.aadhar_card? and (self.kyc_1_front.blank? or self.kyc_1_back.blank? or self.kyc_2_number.blank?)
+    true
   end
 
   def require_photo?

@@ -1,0 +1,519 @@
+<div class="row no-margin procurement-document fs-12">
+  <div class="col col-xs-12 header-container">
+    <div class="col col-xs-8 no-padding company-details">
+      <div class="col col-xs-12 no-padding logo">
+        <img src="<%= @company.configuration.logo.url(:thumb) %>" width="120" height="auto">
+      </div>
+      <div class="col col-xs-12 no-padding address fs-12 mg-top-5">
+        <br>
+        <div class="font-light-gray mg-botm-8">Business Office :</div>
+        <div class="font-light-gray">
+          <%= simple_format @company.configuration.address, {}, wrapper_tag: "div" %>
+        </div>
+      </div>
+    </div>
+    <div class="col col-xs-4 no-padding document-details text-right">
+      <div class="col col-xs-12 no-padding document-type">
+        INWARD INVOICE
+      </div>
+      <div class="col col-xs-12 no-padding table-document-details">
+        <table class="table table-responsive">
+          <tbody>
+          <tr>
+            <td class="font-light-gray">Invoice Number</td>
+            <td class="font-dark-gray"><%= @result.invoice.invoice_number %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray">Document Date</td>
+            <td class="font-dark-gray"><%= @result.invoice.date&.strftime "%b-%d-%Y" %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray">Due Date</td>
+            <td class="font-dark-gray"><%= @result.invoice.due_date&.strftime "%b-%d-%Y" %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray">Payment Term</td>
+            <td class="font-dark-gray"><%= @result.invoice.payment_term&.name %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray">Sub Department</td>
+            <td class="font-dark-gray"><%= @result.invoice.sub_department&.name %></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col col-xs-12 no-padding">
+      <p class="text-center"><%= @result.invoice&.procurement&.note %></p>
+    </div>
+  </div>
+  <div class="col col-xs-12 no-padding body-container">
+    <div class="col col-xs-4 vendor-details">
+      <h4 class="section-title">Billed From (Vendor)</h4>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Name</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.display_name %></div>
+      </div>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Mobile Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.mobile_number %></div>
+      </div>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.pan %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.vendor.gst %></div>
+      </div>
+    </div>
+    <div class="col col-xs-4 billing-address">
+      <h4 class="section-title">Billing Address</h4>
+      <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
+        <%= @result.invoice.location.name %>
+      </div>
+      <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
+        <% if @result.invoice.billing_address.present? %>
+          <%= simple_format @result.invoice.billing_address, {}, wrapper_tag: "div" %>
+        <% else %>
+          <%= @result.invoice.location.address %>
+        <% end %>
+      </div>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.location.gstin %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.location.pan %></div>
+      </div>
+    </div>
+    <div class="col col-xs-4 shipping-address">
+      <h4 class="section-title">Shipping Address</h4>
+      <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
+        <%= @result.invoice.delivery_location.name %>
+      </div>
+      <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
+        <% if @result.invoice.shipping_address.present? %>
+          <%= simple_format @result.invoice.shipping_address, {}, wrapper_tag: "div" %>
+        <% else %>
+          <%= @result.invoice.delivery_location.address %>
+        <% end %>
+      </div>
+      <div class="col col-xs-12 no-padding mg-botm-8">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.delivery_location.gstin %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.delivery_location.pan %></div>
+      </div>
+    </div>
+  </div><br> <br>
+  <div class="col col-xs-12 line-items-container mg-top-5">
+    <h4 class="section-title">Items</h4>
+    <div class="col col-xs-12 no-padding">
+      <table class="table table-responsive table-document-items">
+        <thead>
+        <tr>
+          <th style="width: 25px;">#</th>
+          <th style="min-width: 140px;">Name/Description</th>
+          <th>Comment</th>
+          <th class="text-center">Qty</th>
+          <th class="text-right">Rate</th>
+          <th class="text-right">Discount</th>
+          <th class="text-right">Tax</th>
+          <th class="text-right">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @result.invoice.invoice_items.each_with_index do |item, index| %>
+          <tr>
+            <td class="font-light-gray"><%= index + 1 %></td>
+            <td class="font-dark-gray fw-bold"><%= item.description %></td>
+            <td class="font-light-gray"><%= item.comment %></td>
+            <td class="text-center font-light-gray"><%= item.quantity %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= item.net_amount&.value&.to_d.round(2) rescue 0 %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="col col-xs-12 no-padding">
+      <div class="col col-xs-4 col-xs-offset-8 no-padding">
+        <table class="table table-responsive table-document-items-summary fs-12">
+          <tbody>
+          <tr>
+            <td class="font-light-gray text-left">Total</td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.item_amounts_total.to_d.round(2) rescue 0 %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray text-left">Discount</td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.discount&.to_d.round(2) rescue 0 %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray text-left">Tax</td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.tax&.to_d.round(2) rescue 0 %></td>
+          </tr>
+          <tr>
+            <td class="font-light-gray text-left">Net Total</td>
+            <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.invoice.balance_due&.value&.to_d.round(2) rescue 0 %></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
+    <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
+      <ul>
+        <% approved_users = [] %>
+        <% @result.invoice.trails.printable_trails.only_approve.each do |trail| %>
+          <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
+            <% unless approved_users.include?(trail.action_user) %>
+              <% approved_users.push(trail.action_user) %>
+              <li>
+                <div class="text center font-light-gray"><%= trail.action_user.name %></div>
+                <div class="text-center font-dark-gray">
+                  <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
+                </div>
+              </li>
+            <% end %>
+          <% end %>
+        <% end %>
+      </ul>
+      <ul>
+
+        <li>
+          <div class="text center font-light-gray"><%= @result.invoice.created_by.name %></div>
+          <div class="text-center font-dark-gray">
+            <%= "Received By" %>
+          </div>
+        </li>
+      </ul>
+      <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
+    </div>
+  </div>
+</div>
+
+<style type="text/css">
+  @media screen{
+    body{
+      font-family: 'Open Sans', sans-serif !important;
+    }
+    .fs-12{
+      font-size: 12px !important;
+    }
+    .mg-botm-8{
+      margin-bottom: 8px;
+    }
+    .mg-botm-2{
+      margin-bottom: 2px;
+    }
+    .font-light-gray{
+      font-weight: 300;
+      color: #7b7b7b !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .font-dark-gray{
+      font-weight: bold;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .no-margin{
+      margin:0 !important;
+    }
+    .no-padding{
+      padding: 0 !important
+    }
+    .table-document-details{
+      border: none !important;
+    }
+    .table-document-details tbody tr td{
+      border: none;
+      background-color: #fafafa !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .table-document-details tbody tr td:first-child{
+      text-align: left;
+      width: 50%;
+    }
+    .table-document-details tbody tr td:last-child{
+      text-align: right;
+      width: 50%;
+    }
+    .fs-14{
+      font-size: 14px !important;
+    }
+    .mg-top-5{
+      margin-top: 5px;
+    }
+    .fw-bold{
+      font-weight: bold !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .document-type{
+      text-align: center;
+      font-size: 16px;
+      color: #474747 !important;
+      background-color: white !important;
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
+      height: 100%;
+      overflow: hidden !important;
+      -webkit-print-color-adjust: exact;
+      font-weight: bold;
+      border: 1px solid #ddd !important;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .header-container{
+      background-color: #fafafa !important;
+      margin-bottom: 10px;
+      -webkit-print-color-adjust: exact;
+      padding-top: 15px !important;
+      padding-bottom: 15px !important;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    .section-title{
+      font-size: 15px;
+      color: cornflowerblue !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .mg-botm-5{
+      margin-bottom: 5px;
+    }
+    .approval-flow{
+      padding-top: 20px;
+      /*page-break-inside: avoid;*/
+    }
+    .approval-flow ul{
+      padding: 0;
+      margin: 0;
+      display: table;
+      table-layout: fixed;
+
+      width:100%;
+      height:100px;
+
+    }
+    .approval-flow ul li{
+      list-style: none;
+      display: table-cell;
+
+      text-align: center;
+    }
+    .table-document-items-summary{
+      border: none !important;
+    }
+    .table-document-items{
+      border: none !important;
+    }
+    .table-document-items tr th, .table-document-items tr td, .table-document-items-summary tr td, .table-document-items-summary tr th{
+      border: none !important;
+    }
+    .table-document-items tr td{
+      font-weight: normal !important;
+      /*-webkit-print-color-adjust: exact;*/
+    }
+    .table-document-items thead tr th{
+      background-color: #eee !important;
+      font-weight: normal !important;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .fc-green{
+      color: #26C965 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .terms-and-conditions-container{
+      /*page-break-inside: avoid;*/
+    }
+    .fc-dark-red{
+      color: darkred !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .td-left{
+      text-align: right !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    .pd-botm-5{
+      padding-bottom: 5px !important;
+    }
+    .bodr-botm-1{
+      border-bottom: 1px solid #ddd !important;
+    }
+    .pd-top-5{
+      padding-top: 5px !important;
+    }
+    .currency{
+      white-space: nowrap !important;
+    }
+    i{
+      font-size: 11px !important;
+    }
+  }
+  @media print{
+    body{
+      font-family: 'Open Sans', sans-serif !important;
+    }
+    .fs-12{
+      font-size: 12px !important;
+    }
+    .mg-botm-8{
+      margin-bottom: 8px;
+    }
+    .mg-botm-2{
+      margin-bottom: 2px;
+    }
+    .font-light-gray{
+      font-weight: 300;
+      color: #7b7b7b !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .font-dark-gray{
+      font-weight: bold;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .no-margin{
+      margin:0 !important;
+    }
+    .no-padding{
+      padding: 0 !important
+    }
+    .table-document-details{
+      border: none !important;
+    }
+    .table-document-details tbody tr td{
+      border: none;
+      background-color: #fafafa !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .table-document-details tbody tr td:first-child{
+      text-align: left;
+      width: 50%;
+    }
+    .table-document-details tbody tr td:last-child{
+      text-align: right;
+      width: 50%;
+    }
+    .fs-14{
+      font-size: 14px !important;
+    }
+    .mg-top-5{
+      margin-top: 5px;
+    }
+    .fw-bold{
+      font-weight: bold !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .document-type{
+      text-align: center;
+      font-size: 16px;
+      color: #474747 !important;
+      background-color: white !important;
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
+      height: 100%;
+      overflow: hidden !important;
+      -webkit-print-color-adjust: exact;
+      font-weight: bold;
+      border: 1px solid #ddd !important;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .header-container{
+      background-color: #fafafa !important;
+      margin-bottom: 10px;
+      -webkit-print-color-adjust: exact;
+      padding-top: 15px !important;
+      padding-bottom: 15px !important;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    .section-title{
+      font-size: 15px;
+      color: cornflowerblue !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .mg-botm-5{
+      margin-bottom: 5px;
+    }
+    .approval-flow{
+      padding-top: 20px;
+      /*page-break-inside: avoid;*/
+    }
+    .approval-flow ul{
+      padding: 0;
+      margin: 0;
+      display: table;
+      table-layout: fixed;
+
+      width:100%;
+      height:100px;
+
+    }
+    .approval-flow ul li{
+      list-style: none;
+      display: table-cell;
+
+      text-align: center;
+    }
+    .table-document-items-summary{
+      border: none !important;
+    }
+    .table-document-items{
+      border: none !important;
+    }
+    .table-document-items tr th, .table-document-items tr td, .table-document-items-summary tr td, .table-document-items-summary tr th{
+      border: none !important;
+    }
+    .table-document-items tr td{
+      font-weight: normal !important;
+      /*-webkit-print-color-adjust: exact;*/
+    }
+    .table-document-items thead tr th{
+      background-color: #eee !important;
+      font-weight: normal !important;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .fc-green{
+      color: #26C965 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .terms-and-conditions-container{
+      /*page-break-inside: avoid;*/
+    }
+    .fc-dark-red{
+      color: darkred !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .td-left{
+      text-align: right !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    .pd-botm-5{
+      padding-bottom: 5px !important;
+    }
+    .bodr-botm-1{
+      border-bottom: 1px solid #ddd !important;
+    }
+    .pd-top-5{
+      padding-top: 5px !important;
+    }
+    .currency{
+      white-space: nowrap !important;
+    }
+    i{
+      font-size: 11px !important;
+    }
+  }
+</style>

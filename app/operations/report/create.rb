@@ -14,6 +14,7 @@ class Report::Create < Report::Base
     if user.blank?
       add_message :error, 'User not found'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -63,7 +64,7 @@ class Report::Create < Report::Base
       cash_pocket = expense.spent_from
       if cash_pocket.present? && cash_pocket.cash_pocket?
         cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(cash_pocket)
-        amount = expense.calculate_amount_value(report.policy)
+        amount = expense.calculate_amount_value(policy)
         if cash_pocket_adapter.balance(display_balance: true) >= amount
           expense.update(cash_on_hand_blocked: true)
         end
@@ -73,19 +74,24 @@ class Report::Create < Report::Base
 
   def process
     role_id = UserRole.id_for(:employee)
+    # If user is delegated to perform actions on behalf of other user
+    delegated_action_user = actual_current_user.present? ? actual_current_user : nil
     self.report = for_user.reports.build report_status_id: ReportStatus.open_id,
                                          controlling_user: for_user,
                                          controlling_user_role_id: role_id,
                                          policy_id: policy_id,
                                          travel_request_id: params[:travel_request_id],
-                                         name: params[:name]
+                                         name: params[:name],
+                                         created_by: delegated_action_user
+    report.skip_customizable_validation = true # As validation breaks the creation and loading of report, prevent it during creation
     if report.save
       report.tracks.create action_user: for_user,
                            action_user_role_id: role_id,
                            modified_user: for_user,
                            modified_user_role_id: role_id,
                            report_tracking_action_id: ReportTrackingAction.id_for(:create),
-                           report_status_id: ReportStatus.open_id
+                           report_status_id: ReportStatus.open_id,
+                           delegated_action_user: delegated_action_user
       expenses = params[:expenses]
       expense_ids = nil
 
@@ -105,6 +111,9 @@ class Report::Create < Report::Base
   end
 
   def post_process
+    if actual_current_user.present?
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_created_by_delegate), delegated_action_user: actual_current_user
+    end
     add_message :success, 'Report created'
   end
 

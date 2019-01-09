@@ -38,6 +38,12 @@
 #  scheduled_at                   :date
 #  processed_at                   :date
 #  cost_center_id                 :integer
+#  company_id                     :integer
+#  external_reference_id          :string(255)
+#  purchase_order_id              :integer
+#  procurement_id                 :integer
+#  department_id                  :integer
+#  location_id                    :integer
 #  transaction_reference_id       :string(255)
 #
 

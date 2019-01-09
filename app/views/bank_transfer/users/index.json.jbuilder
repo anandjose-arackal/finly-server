@@ -1,4 +1,5 @@
-json.array!(@result.paginated_team) do |user|
+json.results do
+  json.array!(@result.paginated_team) do |user|
   json.extract! user, :id, :email, :mobile_number, :name, :active
 
   wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
@@ -12,4 +13,7 @@ json.array!(@result.paginated_team) do |user|
   end
 
   # ain't nothing called cards here anyway, so ¯\_(ツ)_/¯
+  end
 end
+
+json.count @result.users.count

@@ -10,7 +10,7 @@
 
 class PaymentOrderStatus < ActiveRecord::Base
 
-  VALUES = {cancelled: 1, pending: 2, in_progress: 3, completed: 4, partially_completed: 5, failed: 6, scheduled: 7, pending_approval: 8, partialy_processed: 9}
+  VALUES = {cancelled: 1, pending: 2, in_progress: 3, completed: 4, partially_completed: 5, failed: 6, scheduled: 7, pending_approval: 8, partialy_processed: 9, creation_in_progress: 10}
   # Cancelled, In Progress, Completed, Partial Complete, Failed, Scheduled
 
   validates :name, presence: true

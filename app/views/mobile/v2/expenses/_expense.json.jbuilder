@@ -11,7 +11,20 @@ json.status do
   json.name expense.expense_status&.name
 end
 
-json.spent_from_name expense.spent_from&.name
+if expense.spent_from.present?
+  json.spent_from do
+    json.name expense.spent_from&.name
+    json.id expense.spent_from&.id
+    currency = expense.spent_from&.base_currency
+    json.base_currency do
+      json.symbol currency&.symbol
+      json.country_code currency&.country_code
+      json.id currency&.id
+    end
+  end
+end
+
+json.cash_pockets cash_pockets
 
 json.amount do
   json.partial! 'api/v1/shared/amount', amount: expense.amount
@@ -74,6 +87,15 @@ if expense.distance_expense?
       end
     end
   end
+
+  vehicle_rates = []
+  expense.user.policies.each do |policy|
+    policy.vehicle_rates.each do |vehicle_rate|
+      vehicle_rates << vehicle_rate.as_json
+    end
+  end
+  json.vehicle_rates vehicle_rates
+  json.selected_vehicle_Rate expense.distance_expense&.vehicle_rate
 end
 json.custom_fields do
   case expense.expense_type_id

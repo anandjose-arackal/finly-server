@@ -12,9 +12,9 @@ class Expense::ExDistance::Base < Expense::Base
     end
     receipts = params[:expense][:receipts_attributes] if params[:expense].present?
     p = params.require(:expense).permit(
-        :note, :category_id, :date, :expense_type_id, :spent_from_id,
-        :expense_status_id, :report_id, :reimbursable, :from_cash_on_hand,
-        :receipt_id, :receipt,
+        :note, :category_id, :date, :expense_type_id,
+        :expense_status_id, :report_id,
+        :receipt_id, :receipt, :created_by_id, :modified_by_id,
         distance_expense_attributes: [
             :id, :vehicle_rate_id,
             distance_attributes: [:value, :id],

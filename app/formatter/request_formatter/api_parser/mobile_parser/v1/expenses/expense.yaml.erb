@@ -2,6 +2,7 @@ view: <%= params[:view] %>
 id: <%= params[:id] %>
 receipt_id: <%= params[:receipt_id] %>
 expense:
+  spent_from_id: <%= params[:spent_from_id] %>
   report_id: <%= params[:report_id] %>
   date: <%= params[:date] %>
   note: <%= params[:note] %>
@@ -17,6 +18,7 @@ expense:
     editable_merchant: <%= params[:merchant] %>
   <% elsif type == '3' or type == 3 %>
   distance_expense_attributes:
+    vehicle_rate_id: <%= params[:vehicle_rate_id] %>
     odometer_reading_start: <%= params[:odometer_reading_start] %>
     odometer_reading_end: <%= params[:odometer_reading_end] %>
     odometer_reading_receipt_start_id: <%= params[:odometer_reading_receipt_start_id] %>

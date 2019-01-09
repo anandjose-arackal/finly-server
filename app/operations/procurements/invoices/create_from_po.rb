@@ -105,6 +105,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       gst_type_id: self.purchase_order.gst_type_id,
       location_id: self.purchase_order.location_id,
       delivery_location_id: self.purchase_order.delivery_location_id,
+      billing_address: self.purchase_order.billing_address,
+      shipping_address: self.purchase_order.shipping_address,
       department_id: self.purchase_order.department_id,
       sub_department_id: self.purchase_order.sub_department_id,
       cost_center_id: self.purchase_order.cost_center_id,

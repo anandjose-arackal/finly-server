@@ -26,9 +26,18 @@ class MoneyRequest::Create < MoneyRequest::Base
   end
 
   def pre_process
-    if [1, '1'].include?(mr_create_params[:payment_mode_id])
+    if [1, '1'].include?(mr_create_params[:payment_mode_id]) and mr_create_params[:destination_pocket_id].blank?
       mr_create_params[:destination_pocket_id] = self.for_user.user_pockets.cash_pockets_only.first.id
     end
+
+    if [1, '1'].include?(mr_create_params[:payment_mode_id])
+      pocket = for_user.user_pockets.with_id(mr_create_params[:destination_pocket_id])&.first
+
+      mr_create_params&.dig(:items_attributes).each do |item_attr|
+        item_attr[:amount_attributes][:currency_id] = pocket.base_currency_id rescue nil
+      end
+    end
+    mr_create_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process
@@ -36,12 +45,14 @@ class MoneyRequest::Create < MoneyRequest::Base
     param[:status_id] = MoneyRequestStatus.id_for(:open)
     param[:controlling_user] = self.for_user
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
-    param[:payment_mode_id] = PaymentMode.id_for(:cash)
     param[:policy_id] = self.policy_id
 
-    # Money request can only be request through expense cards
-    if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
-      param[:payment_mode_id] = PaymentMode.id_for(:card)
+    if mr_create_params[:payment_mode_id].blank?
+      param[:payment_mode_id] = PaymentMode.id_for(:cash)
+      # Money request can only be request through expense cards
+      if for_user.cards.with_card_program(CardProgram.id_for(:expense)).present?
+        param[:payment_mode_id] = PaymentMode.id_for(:card)
+      end
     end
 
     if param[:items_attributes].present?
@@ -54,13 +65,18 @@ class MoneyRequest::Create < MoneyRequest::Base
     end
 
     self.money_request = for_user.money_requests.build param
+    if self.money_request.travel_request.blank?
+      money_request.skip_customizable_validation = true # As validation breaks the creation and loading money request, prevent it during creation
+    end
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     if money_request.save
       self.money_request.tracks.create action_user: for_user,
                                        action_user_role_id: UserRole.id_for(:employee),
                                        modified_user: for_user,
                                        modified_user_role_id: param[:controlling_user_role_id],
                                        money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
-                                       status_id: MoneyRequestStatus.id_for(:open)
+                                       status_id: MoneyRequestStatus.id_for(:open),
+                                       delegated_action_user_id: delegated_action_user_id
       CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request),
           custom_fields: params[:custom_fields], reset_fields: true, save: true)
     else
@@ -72,13 +88,15 @@ class MoneyRequest::Create < MoneyRequest::Base
     if self.money_request.travel_request.present? and TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.money_request.travel_request.status_id)
       self.money_request.update(status_id: MoneyRequestStatus.id_for(:pending))
     end
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    money_request.comments.create(user: user, comment_action_id: MoneyRequestCommentAction.id_for(:created_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
   end
 
   private
 
   def create_params
     return {} unless params[:money_request].present?
-    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :destination_pocket_id,
+    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :created_by_id, :destination_pocket_id,
                                           items_attributes: [:category_id, :money_request_item_category_id, amount_attributes: [:value, :currency_id]])
   end
 

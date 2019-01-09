@@ -9,18 +9,34 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
   def init
     super
     self.approving_user = self.purchase_order.trails.natural_order.last.action_user
-    self.approved = (purchase_order.approved? or purchase_order.closed?) if purchase_order.present?
-    #todo add it to params
+    self.approved = (purchase_order.approved? || purchase_order.closed? || purchase_order.auto_approved?) if purchase_order.present?
     self.auto_approve = params[:auto_approve]
 
+    self.controlling_users = []
+
     # Get controlling users
-    controlling_level = self.purchase_order.level
-    if controlling_level.present?
+    level = self.purchase_order.level
+
+
+    if level.present?
       amount = purchase_order.balance_amount&.value || 0
-      controlling_user_ids = controlling_level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
-      self.controlling_users = User.with_id(controlling_user_ids).with_company_id(self.user.company_id)
+
+      # Find list of possible controlling user ids
+      controlling_users_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
+
+      user_selected_reviewer = purchase_order.document_level_reviewer_mappings.with_level_ids(level.id).last&.reviewer
+      if user_selected_reviewer.present? && controlling_users_ids.include?(user_selected_reviewer.id)
+      # Check if user selected reviewer is satisfies level reviewer mapping threshold criteria
+        self.controlling_users.push user_selected_reviewer
+      else
+        # User selected reviewer is not present in list of users satisfying current level's threshold criteria
+        # select all the threshold satifying reviewers
+        user.company.users.with_id(controlling_users_ids).each do |user|
+          self.controlling_users.push(user)
+        end
+      end
     else
-      self.controlling_users = []
+      controlling_users = []
     end
   end
 
@@ -84,8 +100,7 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
   end
 
   def mailer_subject(user)
-    approver_id = self.purchase_order.trails.last.action_user.id rescue nil
-    if approver_id.present? and user.id == approver_id
+    if self.approving_user.present? and user.id == self.approving_user.id
       "Purchase Order approved : #{self.purchase_order.po_number}"
     else
       if approved and user.id == self.purchase_order.user.id
@@ -101,8 +116,7 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
   end
 
   def mailer_body(user)
-    approver_id = self.purchase_order.trails.last.action_user.id rescue nil
-    if approver_id.present? and user.id == approver_id
+    if self.approving_user.present? and user.id == self.approving_user.id
       message = "You have successfully approved the purchase order : #{self.purchase_order.po_number}"
     else
       if approved and user.id == purchase_order.user.id
@@ -117,5 +131,4 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
     end
     message
   end
-
 end

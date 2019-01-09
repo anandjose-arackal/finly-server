@@ -32,14 +32,34 @@ class User::AssociatedUsers::Index < User::AssociatedUsers::Base
     # # # todo Because if user_before was used, then the cached data is going to be only for those users. If UserRole is called, then it returns from this cached data
     # cache_user_roles tracking, :interacted_roles
 
+
     action_user_ids = tracking.map(&:action_user_id)
     modified_level_ids = tracking.map(&:modified_level_id)
     modified_levels = ::ReviewalLevel.with_ids(modified_level_ids)
     modified_level_user_ids = []
+    # modified_levels.each do |level|
+    #   reviewer_ids = level.level_reviewer_mappings.with_threshold(self.amount).pluck(:reviewer_id)
+    #   modified_level_user_ids += reviewer_ids
+    # end
+
+
+    # Test
     modified_levels.each do |level|
-      reviewer_ids = level.level_reviewer_mappings.with_threshold(self.amount).pluck(:reviewer_id)
-      modified_level_user_ids += reviewer_ids
+      controlling_user_ids = level.level_reviewer_mappings.with_threshold(self.amount).pluck(:reviewer_id)
+
+      user_selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).last&.reviewer
+
+      if user_selected_reviewer.present? && controlling_user_ids.include?(user_selected_reviewer.id)
+        # Check if user selected reviewer is satisfies level reviewer mapping threshold criteria
+        modified_level_user_ids.push(user_selected_reviewer.id)
+      else
+        # User selected reviewer is not present in list of users satisfying current level's threshold criteria
+        # select all the threshold satifying reviewers
+        modified_level_user_ids += controlling_user_ids
+      end
     end
+
+    # Test ends
 
     user_ids = action_user_ids + modified_level_user_ids
 

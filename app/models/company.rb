@@ -52,9 +52,12 @@ class Company < ActiveRecord::Base
   has_many :web_hooks
   has_many :web_hook_tracks
   has_many :invoice_attachments
+  has_many :export_configs
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
+  has_one :enforce_budget_configuration
+  has_one :custom_export_configuration, as: :configurable
 
   has_many :payment_orders
   has_many :user_groups
@@ -416,6 +419,14 @@ class Company < ActiveRecord::Base
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+
+    # creating budget configurations
+    self.build_enforce_budget_configuration(enforce_purchase_order_budget: false, enforce_payment_budget: false,
+                                               enforce_expense_budget: false, enforce_invoice_budget: false).save
+
+    # creating custom export configurations for a company
+    self.build_custom_export_configuration(custom_report: false, custom_invoice: false, custom_purchase_order: false).save
+
 
     # Create Invoicing System Auto transfer config (enabled: false)
     self.build_collect_auto_transfer_config.save

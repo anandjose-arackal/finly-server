@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :policies
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
-    self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
+    self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
   end
 
   def validate
@@ -26,12 +26,14 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers, :sub_departments, :tax_rates
+    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag
 
     def init
       self.purchase_order = params[:purchase_order]
       self.actions = get_actions
       self.departments = user.company.departments.roots
+      self.locations = user.company.locations
 
       if purchase_order.user.departments.present?
         self.sub_departments = purchase_order.user.departments.only_sub_departments
@@ -41,7 +43,11 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
-      self.policies = purchase_order.user.policies.with_application(:vp)
+      policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+
+      # Show taxes as applicable in the pdf based on this
+      self.taxes_applicable_flag = taxes_applicable_flag?
 
       self.reviewal_chains = []
       params[:reviewal_document] = purchase_order
@@ -67,6 +73,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       actions = {}
 
       actions[:audit_trail] = true
+      actions[:export_items] = true
       if purchase_order.items.count > 0
         actions[:show_comments] = true
       end
@@ -86,6 +93,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         }
         actions[:policy_editable] = true
         actions[:document_editable] = true
+        actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
       end
 
       if purchase_order.approved? || purchase_order.auto_approved?
@@ -98,9 +106,26 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
           #     url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
           #     method: "PUT"
           # }
+
           actions[:document_editable] = false
         end
+
+        if user.vendor_payment_admin? || user.vendor_payment_finance?
+          actions[:make_advance_payment] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_make_advance_payment_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+        end
         actions[:download] = true
+      end
+
+      if PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id
+        if user.vendor_payment_admin?
+          actions[:void] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_void_path(purchase_order_id: purchase_order.id),
+              method: 'PUT'
+          }
+        end
       end
 
       if purchase_order.processing?
@@ -118,13 +143,30 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
               method: "PUT"
           }
           actions[:document_editable] = true
+          actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
         end
         if document_owner?
           actions[:retract] = {
               url: Rails.application.routes.url_helpers.procure_purchase_order_retract_path(purchase_order_id: purchase_order.id),
               method: "PUT"
           }
+          actions[:remind] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_remind_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
           actions[:document_editable] = false
+          actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
+        end
+      end
+
+      if user.vendor_payment_admin?
+        unless purchase_order.voided?
+          actions[:document_editable] = true
+          actions[:save] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
+              method: "PUT"
+          }
+          actions[:procurement_terms_editable] = user.permission.edit_terms_within_po
         end
       end
 
@@ -140,7 +182,19 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       purchase_order.user_id == user.id
     end
 
-    def user_in_level?
+    def taxes_applicable_flag?
+      # Shows "Taxes as applicable" text on pdf if true
+      flag = false
+      self.purchase_order.items.each do |item|
+        if item.tax_rate.blank? || item.tax_rate&.rate == 0
+          flag = true
+          break
+        end
+      end
+      flag
+    end
+
+    def user_in_level? # todo put document level reviewer mapping here
       current_level = purchase_order.level
       amount = purchase_order&.balance_amount&.value || 0
 

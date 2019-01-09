@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= @report.name %></title>
+  <title><%= report.name %></title>
   <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css", media: "all", "data-turbolinks-track" => true %>
   <%= stylesheet_link_tag "http://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css", media: "all", "data-turbolinks-track" => true %>
   <%= stylesheet_link_tag 'retailers_pdf', media: 'print' %>
@@ -44,60 +44,60 @@
 
   <div class="row">
 
-    <h1 style="text-align: center; font-size: 16px;"><label><%= @report.name %></label></h1>
+    <h1 style="text-align: center; font-size: 16px;"><label><%= report.name %></label></h1>
     <div class="col-sm-12">
       <table class="table table-bordered table-condensed">
         <tr>
           <td width="25%"><label>Report ID</label></td>
-          <td width="25%"><%= @report.id %></td>
+          <td width="25%"><%= report.id %></td>
 
           <td width="25%"><label>From</label></td>
-          <td width="25%"><%= @report.user.name %></td>
+          <td width="25%"><%= report.user.name %></td>
         </tr>
 
         <tr>
           <td width="25%"><label>Policy</label></td>
-          <td width="25%"><%= @report.policy.name rescue "None" %></td>
+          <td width="25%"><%= report.policy.name rescue "None" %></td>
 
           <td width="25%"><label>Memo</label></td>
-          <td width="25%"><%= @report.memo %></td>
+          <td width="25%"><%= report.memo %></td>
         </tr>
 
         <tr>
           <td width="25%"><label>To manager</label></td>
-          <td width="25%"><%= @result.manager.name rescue "None" %></td>
+          <td width="25%"><%= op.manager.name rescue "None" %></td>
 
           <td width="25%"><label>To Finance Manager</label></td>
-          <td width="25%"><%= @result.finance_manager.name rescue "None" %></td>
+          <td width="25%"><%= op.finance_manager.name rescue "None" %></td>
         </tr>
 
         <tr>
           <td width="25%"><label>Status</label></td>
-          <td width="25%"><%= @report.status_name %></td>
+          <td width="25%"><%= report.status_name %></td>
 
           <td width="25%"><label>Date</label></td>
-          <td width="25%"><%= @report.date_as_string %></td>
+          <td width="25%"><%= report.date_as_string %></td>
         </tr>
 
         <tr>
           <td width="25%"><label>Total Amount:</label></td>
-          <td width="25%"><i class="fa fa-inr">&nbsp;</i><%= @report.total_amount %></td>
+          <td width="25%"><i class="fa fa-inr">&nbsp;</i><%= report.total_amount %></td>
 
           <td width="25%"><label>Reimbursable Amount:</label></td>
-          <td width="25%"><i class="fa fa-inr">&nbsp;</i><%= @report.reimbursable_expenses %></td>
+          <td width="25%"><i class="fa fa-inr">&nbsp;</i><%= report.reimbursable_expenses %></td>
         </tr>
       </table>
     </div>
 
-    <% if @result.success? && @result.violations_present %>
+    <% if op.success? && op.violations_present %>
       <div class="col-sm-12">
         <h1 style="font-size: 15px; text-align: left;"><label>Report Violations.</label></h1>
         <div class="col-sm-12">
 
-          <% unless @result.warning_array.empty? %>
+          <% unless op.warning_array.empty? %>
             <h5 style="text-align: left; margin: 0px;"><label>Warning Violations</label></h5>
             <ul>
-              <% @result.warning_array.each do |violation| %>
+              <% op.warning_array.each do |violation| %>
                 <li>
                   <p style="overflow-wrap: break-word;"><%= violation[:message] %></p>
                 </li>
@@ -107,10 +107,10 @@
 
           <div style="margin: 10px;"></div>
 
-          <% unless @result.blocking_array.empty? %>
+          <% unless op.blocking_array.empty? %>
             <h5 style="text-align: left; margin: 0px;"><label>Blocking Violations</label></h5>
             <ul>
-              <% @result.blocking_array.each do |violation| %>
+              <% op.blocking_array.each do |violation| %>
                 <li>
                   <p style="overflow-wrap: break-word;"><%= violation[:message] %></p>
                 </li>
@@ -128,7 +128,7 @@
     </div>
 
     <% @index = 1 %>
-    <% @result.expenses_category_sorted.each do |section| %>
+    <% op.expenses_category_sorted.each do |section| %>
 
       <div class="col-sm-12">
         <table class="table">
@@ -187,19 +187,19 @@
         <tr>
           <td width="80%" style="text-align: right; font-size: 16px"><label>Report&nbsp;Total&nbsp;:&nbsp;</label></td>
           <td width="20%" style="font-size: 16px;">
-            <label><i class="fa fa-rupee"></i>&nbsp<%= @report.total_amount.to_f %></label></td>
+            <label><i class="fa fa-rupee"></i>&nbsp<%= report.total_amount.to_f %></label></td>
         </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <% if @include_comments %>
+  <% if includes_comments %>
 
-    <% unless @report.comments.empty? %>
+    <% unless report.comments.empty? %>
       <h1 class="page-break" style="text-align: left; font-size: 16px; margin-left: 12px"><label>Timeline</label></h1>
       <div class="col-sm-12">
-        <% @report.comments.each do |comment| %>
+        <% report.comments.each do |comment| %>
           <div class="row" style="width: 100%">
             <div class="col-sm-2">
               <label><%= comment.user.name if comment.user %></label> |&nbsp;
@@ -207,7 +207,7 @@
             </div>
 
             <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
-              <%= comment.generate(@curr_user) %>
+              <%= comment.generate(current_user) %>
             </div>
           </div>
 
@@ -218,13 +218,15 @@
 
   <% end %>
 
-  <% unless @receipts.blank? %>
+  <% unless receipts.blank? %>
   <div class="row page-break" style="width: 100%;">
       <div class="col-sm-12">
         <h1 style="text-align: left; font-size: 16px; margin-left: 12px"><label>Receipts</label></h1>
-        <% @receipts.each do |receipt| %>
+        <% receipts.each do |receipt| %>
+          <% next if receipt[:path].nil? %>
           <div class="img-responsive" style="text-align: center;">
-            <img src="file:///<%= receipt[:path]  %>"/>
+            <!--<img src="file:///<%= receipt[:path]  %>"/>-->
+            <%= wicked_pdf_image_tag(receipt[:path], :style=>"max-width:100%; height:auto;")%>
             <p class="text-center">Merchant: <%= receipt[:merchant] %> | Amount: <%= receipt[:amount] %></p>
           </div>
         <% end %>

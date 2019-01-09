@@ -7,6 +7,8 @@ gem 'wkhtmltopdf-binary', '0.12.3.1'
 gem 'nokogiri', '1.6.8'
 gem 'autoprefixer-rails', '6.5.0.1'
 
+gem 'parslet', '1.8.2'
+
 # adding gems for activeMQ
 gem 'daemons', '1.2.4'
 gem 'stomp', '1.4.3'
@@ -19,12 +21,17 @@ gem 'mocha', '1.2.1'
 gem 'rollbar', '2.15.5'
 gem 'oj', '~> 2.18.1'
 
+gem 'amoeba', '3.1.0'
+gem 'health-monitor-rails', '8.4.0'
+
 # gem for admin panel
 # gem 'activeadmin', '1.1.0', git: 'https://github.com/activeadmin/activeadmin.git'
 
 # puma web server
 gem 'figaro', '1.1.1'
 gem 'puma', '3.11.2'
+
+gem 'resque', '1.27.4'
 
 gem 'crono', '1.0.3'
 gem 'haml'
@@ -147,6 +154,10 @@ gem 'liquid'
 
 gem 'hooks', '0.4.1'
 
+gem 'snowplow-tracker', '0.6.1'
+
+gem 'maxminddb', '0.1.22'
+
 gem 'bullet', '5.4.2', :group => 'development'
 
 gem 'logstasher', '1.2.2'
@@ -158,11 +169,17 @@ gem 'ancestry', '3.0.2'
 
 gem 'aasm', '4.12.3'
 
+gem 'slackistrano', '3.8.3'
+
 # adding aws-sdk gem for using their API enabled services
 gem 'aws-sdk'
 
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'
+
+gem 'geocoder', '1.5.0'
+gem 'device_detector'
+
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -211,4 +228,8 @@ group :test do
   gem 'rails-perftest', '0.0.6'
   gem 'ruby-prof', '0.16.2'
   gem 'test-unit', '3.2.3'
+end
+
+group :production do
+  gem 'elastic-apm', '2.1.2'
 end

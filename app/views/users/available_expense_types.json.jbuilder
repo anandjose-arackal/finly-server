@@ -1,7 +1,7 @@
 json.distance_config do
   json.enabled @result.distance_config[:enabled]
   json.vehicle_rates @result.distance_config[:vehicle_rates]
-  json.default_category_id @result.distance_config[:default_category_id]
+  # json.default_category_id @result.distance_config[:default_category_id]
 end
 json.time_config do
   json.enabled @result.time_config[:enabled]
@@ -45,12 +45,21 @@ end
 
 json.cash_pockets do
   json.array!(@result.cash_and_credit_pockets) do |pocket|
-    if pocket.cash_pocket?
-      adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-    elsif pocket.credit_card_pocket?
-      adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
-    else
-      adapter = nil
+    case pocket.user_pocket_type_id
+      when UserPocketType.id_for(:cash)
+        adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        json.display_balance true
+      when UserPocketType.id_for(:credit_card)
+        adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
+        json.display_balance false
+      when UserPocketType.id_for(:reimbursement)
+        adapter = AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter.new(pocket)
+        json.display_balance false
+      when UserPocketType.id_for(:paid_by_company)
+        adapter = AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(pocket)
+        json.display_balance false
+      else
+        adapter = nil
     end
     json.name pocket.name
     json.balance adapter&.balance(display_balance: true)

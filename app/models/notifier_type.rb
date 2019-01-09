@@ -125,6 +125,8 @@ class NotifierType < ActiveRecord::Base
               configurable_push_notification: true, configurable_mailer: true},
              {key: :purchase_order_comment, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_order_credit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
 
              # Inward Invoice
              {key: :invoice_submit, has_push_notification: true, has_mailer: true,

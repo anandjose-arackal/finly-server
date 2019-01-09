@@ -5,6 +5,7 @@ class Receipt::Create < Receipt::Base
     if params.blank? or params&.dig(:receipt).blank? or user.blank?
       add_message :error, 'Image cannot be blank'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -21,6 +22,9 @@ class Receipt::Create < Receipt::Base
     end
   end
 
+  def pre_process
+    receipt_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
+  end
 
   def process
     self.receipt = user.receipts.build(receipt_params)
@@ -44,6 +48,11 @@ class Receipt::Create < Receipt::Base
       end
       #############################################
     end
+
+    # if attachment is a pdf format then convert each page to an image file and store in +DocumentSlice+
+    if receipt.is_pdf?
+      DocumentSlice::Create.call_async(user.id, {receipt_id: receipt.id})
+    end
   end
 
   def success
@@ -60,7 +69,7 @@ class Receipt::Create < Receipt::Base
 
   private
   def create_params
-    p = params.require(:receipt).permit(:image, :note, :to_be_transcribed)
+    p = params.require(:receipt).permit(:image, :note, :to_be_transcribed, :created_by_id)
     p[:image] = params[:receipt][:image] rescue nil
     p.permit!
   end

@@ -5,6 +5,7 @@ class Budgets::Show < Budgets::Base
 
   def init
     id = (params[:id] or params[:budget_id])
+    params[:include_children] = true # this is so that children are included in the show API
     self.budget = Budgets::Index.(user, params).budgets.with_id(id).first rescue nil
   end
 

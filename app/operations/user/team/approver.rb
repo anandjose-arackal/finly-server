@@ -29,7 +29,7 @@ class User::Team::Approver < User::Team::Base
 
   def process
     mapping = self.mappings.send(params[:type]).policy(self.policy_id).with_purpose(self.purpose_id).amount(self.currency_id, self.amount_value).first rescue nil
-
+    
     # Handling condition where approver is required only if violations exists
     unless params[:has_violations] or params[:report].blank?
       case params[:type]
@@ -37,6 +37,10 @@ class User::Team::Approver < User::Team::Base
         mapping = nil if mapping&.manager_violation_only
       when :finance_manager
         mapping = nil if mapping&.finance_violation_only
+      when :approves_to
+        mapping = nil if mapping&.approves_to_violation_only
+      when :approves_finance_to
+        mapping = nil if mapping&.approves_finance_to_violation_only
       else
         # Nothing
       end

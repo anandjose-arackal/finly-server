@@ -11,11 +11,16 @@ class Procurements::Create < Procurements::Base
       return
     end
 
-    document_types = %w( purchase_order invoice )
-    unless document_types.include?(params[:document_type])
-      add_message :error, 'Invalid document type provided'
+    unless user.vendor_payment_initiator?
+      add_message :error, "You do not have permission for this action"
     end
 
+    document_types = %w( purchase_order invoice non_po_invoice )
+
+    document_type = params[:document_type]
+    unless document_types.include?(document_type)
+      add_message :error, 'Invalid document type provided'
+    end
 
   end
 
@@ -35,7 +40,7 @@ class Procurements::Create < Procurements::Base
     case params[:document_type]
       when 'purchase_order'
         op = Procurements::PurchaseOrders::Create.(user, params)
-      when 'invoice', 'proforma_invoice'
+      when 'invoice', 'proforma_invoice', 'non_po_invoice'
         # add_message :error, 'Invalid document type provided'
         op = Procurements::Invoices::Create.(user, params)
         # do nothing!
@@ -49,6 +54,21 @@ class Procurements::Create < Procurements::Base
       add_message :success, 'Successfully created new procurement'
     else
       add_message :error, op.messages[:error]
+    end
+  end
+
+  def success
+    params[:procurement] = self.procurement
+    Procurements::Create::CreatePresenter.new(user, params, messages)
+  end
+
+  class Procurements::Create::CreatePresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :procurement, :invoices, :purchase_order
+
+    def init
+      self.procurement = params[:procurement]
+      self.invoices = self.procurement.invoices
+      self.purchase_order = self.procurement.purchase_order
     end
   end
 

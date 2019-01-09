@@ -7,7 +7,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
   def init
     if params[:spreadsheet].present?
-      self.spreadsheet_exporter= Exporter::Spreadsheet.new user, params[:spreadsheet], messages
+      self.spreadsheet_exporter = Exporter::Spreadsheet.new user, params[:spreadsheet], messages
     end
     if params[:pdf].present?
       self.pdf_exporter = Exporter::Pdf.new user, params[:pdf], messages
@@ -23,17 +23,17 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
   def render(controller)
     controller.respond_to do |format|
       if self.spreadsheet_exporter.present?
-        format.csv { self.spreadsheet_exporter.render_csv controller }
-        format.xls { self.spreadsheet_exporter.render_xls controller }
+        format.csv {self.spreadsheet_exporter.render_csv controller}
+        format.xls {self.spreadsheet_exporter.render_xls controller}
       end
       if self.pdf_exporter.present?
-        format.pdf { self.pdf_exporter.render_pdf controller }
+        format.pdf {self.pdf_exporter.render_pdf controller}
       end
       if self.zip_exporter.present?
-        format.zip { self.zip_exporter.render_zip controller }
+        format.zip {self.zip_exporter.render_zip controller}
       end
       if self.xml_exporter.present?
-        format.xml { self.xml_exporter.render_xml controller }
+        format.xml {self.xml_exporter.render_xml controller}
       end
     end
   end
@@ -51,17 +51,18 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
   # Usage
   # Example: Exporter::Pdf.new(user, {template: 'report.pdf.erb', filename: 'assign_card', local_variables: {report: self.report}}, messages)
   class Exporter::Pdf < Exporter::BaseSuccessPresenter
-    attr_accessor :template, :local_variables
+    attr_accessor :template, :local_variables, :layout
 
     def init
       super
       self.template = params[:template]
+      self.layout = params[:layout]
       self.local_variables = params[:local_variables]
     end
 
     def render(controller)
       controller.respond_to do |format|
-        format.pdf { render_pdf controller }
+        format.pdf {render_pdf controller}
       end
     end
 
@@ -76,7 +77,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
         raise 'PDF template not found'
         return
       end
-      controller.render pdf: self.filename, layout: self.template, print_media_type: true, locals: local_variables
+      controller.render pdf: self.filename, layout: self.layout, template: self.template, print_media_type: true, locals: local_variables
     end
 
   end
@@ -114,8 +115,8 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     def render(controller)
       controller.respond_to do |format|
-        format.csv { render_csv controller }
-        format.xls { render_xls controller }
+        format.csv {render_csv controller}
+        format.xls {render_xls controller}
       end
     end
 
@@ -176,7 +177,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     def render(controller)
       controller.respond_to do |format|
-        format.zip { render_zip controller }
+        format.zip {render_zip controller}
       end
     end
 
@@ -191,9 +192,10 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       self.files = [] if self.files.blank?
       zip_buffer = Zip::OutputStream.write_buffer do |stream|
         self.files.each do |file_details|
+          dir_path = file_details[:dir_path].present? ? "#{file_details[:dir_path]}/#{file_details[:name]}" : file_details[:name]
           raise 'Invalid data format' if not file_details.is_a?(Hash) or file_details[:name].blank? or
               (file_details[:path].blank? and file_details[:file_contents].blank? and file_details[:url].blank?)
-          stream.put_next_entry(file_details[:name])
+          stream.put_next_entry(dir_path)
           if file_details[:path].present?
             stream.write IO.read(file_details[:path])
           elsif file_details[:file_contents].present?
@@ -223,7 +225,7 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     def render(controller)
       controller.respond_to do |format|
-        format.xml { render_xml controller }
+        format.xml {render_xml controller}
       end
     end
 

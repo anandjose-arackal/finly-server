@@ -19,8 +19,20 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def process_file
-    @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
-    respond
+    @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_create_from_file_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_create_from_file_failure'
+        }
+      end
+    end
   end
 
   def update
@@ -185,12 +197,21 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def payments_count
     @result = BankTransfer::PaymentRequest::PaymentsCount.(current_user, params)
-    render json: @result.as_json
+    if @result.success?
+      render json: @result.count.as_json
+    else
+      render json: 0.as_json
+    end
   end
 
   def add_invoice
     @result = BankTransfer::PaymentRequest::InwardInvoice::Add.(current_user, params)
     respond_success_failure
+  end
+
+  def remove_attachment
+    @result = BankTransfer::PaymentRequest::RemoveAttachment.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   private

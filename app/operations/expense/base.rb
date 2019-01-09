@@ -9,6 +9,7 @@ class Expense::Base < BaseOperation
     if user.blank?
       messages[:error] << 'User not found'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -71,7 +72,7 @@ class Expense::Base < BaseOperation
     end
 
     # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
-    if (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) or ((params&.dig(:spent_from_id).nil? or !StringUtils.to_bool(params[:from_cash_on_hand])) and expense.spent_from.present?)
+    if (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) or ((params&.dig(:spent_from_id).nil? or (params.has_key?(:from_cash_on_hand) and !StringUtils.to_bool(params[:from_cash_on_hand]))) and expense.spent_from.present?)
 
       # # first check if the expense is being created in non-INR, and if its date is today
       # if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
@@ -79,16 +80,18 @@ class Expense::Base < BaseOperation
       #   return
       # end
 
-      # todo - temporary to support mobile APIs
-      params[:spent_from_id] = pocket.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
-      params[:spent_from_id] = nil unless (StringUtils.to_bool(params[:from_cash_on_hand]) || params[:spent_from_id].present?) # this is so that if the expense is marked as NOT from COH, it will get updated accordingly from the mobile APIs
+
+      #params[:spent_from_id] = nil unless (StringUtils.to_bool(params[:from_cash_on_hand]) || params[:spent_from_id].present?) # this is so that if the expense is marked as NOT from COH, it will get updated accordingly from the mobile APIs
 
       if pocket.present?
+        # todo - temporary to support mobile APIs
+        params[:spent_from_id] = pocket&.id if (StringUtils.to_bool(params[:from_cash_on_hand]) && params[:spent_from_id].blank?)
+
         cash_pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
         amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
         balance = cash_pocket_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
         # if the expense is continuing to be from COH, and only the amount is changing
-        if expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand]))
+        if expense.spent_from.present? && (params&.dig(:spent_from_id).present? or StringUtils.to_bool(params[:from_cash_on_hand])) && params&.dig(:amount_attributes, :value).present?
           difference = params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
           unless difference <= balance
             add_message :error, "You do not have enough balance in your #{pocket.name} account to mark this expense against it"
@@ -114,9 +117,9 @@ class Expense::Base < BaseOperation
     # from_cash_pockets = from_cash_pockets.blank? ? (expense.spent_from&.present? or StringUtils.to_bool(params[:from_cash_on_hand])) : from_cash_pockets
     reimbursable = StringUtils.to_bool(params&.dig(:reimbursable))
     reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
-    if from_cash_pockets and reimbursable
-      add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
-    end
+    # if from_cash_pockets and reimbursable
+    #   add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
+    # end
   end
 
   # ensuring that the an expense can't be both from cash on hand AND reimbursable during creation
@@ -169,7 +172,7 @@ class Expense::Base < BaseOperation
       self.vehicle_rates = retrieve_vehicle_rates(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
-      self.cash_pockets = expense.user.user_pockets.cash_and_credit_cards
+      self.cash_pockets = expense.user.user_pockets.non_bank_card_transfer_pockets
     end
 
     def retrieve_vehicle_rates(expense)
@@ -197,7 +200,7 @@ class Expense::Base < BaseOperation
 
     def retrieve_violation
       violations = {blocking_present: false, warning_present: false, items: []}
-      if expense.report_id and expense.report.policy
+      if expense.report_id and expense.report&.policy
         violations = Report::Violation.(user, report: expense.report)
         items = violations[expense.id]
         # constructing the violation hash as required
@@ -221,11 +224,11 @@ class Expense::Base < BaseOperation
 
     def retrieve_editable
       if personal_view?
-        if expense.report_id.blank? or expense.report.editable?
+        if expense.report.blank? or expense.report&.editable?
           return true
         end
       end
-      if expense.report_id.present? and expense.report.processing? and expense.report.controlling_user.id == user.id
+      if expense.report_id.present? and expense.report.present? and expense.report&.processing? and expense.report&.controlling_user.id == user.id
         return true
       end
       false
@@ -255,6 +258,32 @@ class Expense::Base < BaseOperation
               thumb: receipt.image.url(:thumb)
           }
       }
+    end
+
+    def cash_pockets
+      list = []
+      expense.user.user_pockets.non_bank_card_transfer_pockets.include_details.each do |pocket|
+        hash = {}
+        if pocket.cash_pocket?
+          adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+          hash[:balance] = adapter&.balance(display_balance: true)
+          hash[:display_balance] = true
+        elsif pocket.credit_card_pocket?
+          hash[:balance] = 0
+          hash[:display_balance] = false
+        end
+        hash[:name] = pocket.name
+        hash[:id] = pocket.id
+
+        currency = pocket.base_currency
+        hash[:base_currency] = {
+            symbol: currency&.symbol,
+            country_code: currency&.country_code,
+            id: currency&.id
+        }
+        list << hash
+      end
+      list
     end
 
   end

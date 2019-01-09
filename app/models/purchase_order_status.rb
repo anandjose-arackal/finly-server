@@ -11,7 +11,7 @@
 class PurchaseOrderStatus < ActiveRecord::Base
   include Seedable
   def self.values
-    %w( open retracted processing approved rejected auto_approved sent_to_vendor closed )
+    %w( open retracted processing approved rejected auto_approved sent_to_vendor closed voided )
   end
 
   def open?
@@ -44,5 +44,18 @@ class PurchaseOrderStatus < ActiveRecord::Base
 
   def closed?
     self.id == PurchaseOrderStatus.id_for(:closed)
+  end
+
+  def voided?
+    self.id == PurchaseOrderStatus.id_for(:voided)
+  end
+
+  def self.status_ids_for_voidable
+    [
+        PurchaseOrderStatus.id_for(:approved),
+        PurchaseOrderStatus.id_for(:auto_approved),
+        PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:closed)
+    ]
   end
 end

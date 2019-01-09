@@ -3,10 +3,11 @@ class Procurements::Invoices::Destroy < Procurements::Invoices::Base
   attr_accessor :procurement, :invoice, :invoice_params, :invoice
 
   def init
-    id = params[:id] || params[:invoice_id]
-    self.procurement = user.company.procurements.find_by(id: id)
-    self.invoice = self.procurement.invoice
-    self.invoice_params = set_invoice_parameters
+    invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
+    # self.procurement = user.company.procurements.find_by(id: invoice_id)
+    self.invoice = user.company.inward_invoices.find_by id: invoice_id
+    self.procurement = invoice.procurement
+    # self.invoice_params = set_invoice_parameters
   end
 
   def validate
@@ -16,13 +17,26 @@ class Procurements::Invoices::Destroy < Procurements::Invoices::Base
     end
 
     if self.invoice.blank?
-      add_message :error, "Invoice not present"
+      add_message :error, "Invoice not found"
       return
-    end
-
-    if self.invoice_params.blank?
-      add_message :error, "Procurement or invoice not present"
     end
   end
 
+  def process
+    if procurement.procurement_type == 'invoice'
+      if self.procurement.invoices.count == 1
+        if self.procurement.destroy
+          add_message :success, "Successfully Deleted Procurement"
+        end
+      else
+        if self.invoice.destroy
+          add_message :success, 'Successfully Deleted Invoice'
+        end
+      end
+    else
+      if self.invoice.destroy
+        add_message :success, 'Successfully Deleted Invoice'
+      end
+    end
+  end
 end

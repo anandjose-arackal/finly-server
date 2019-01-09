@@ -22,13 +22,15 @@
 #  departure_time   :time
 #  arrival_date     :date
 #  arrival_time     :time
+#  booking_id       :integer
 #
 
 class BookingFlight < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation
 
-  belongs_to :parent, polymorphic: true
+  # belongs_to :parent, polymorphic: true
+  belongs_to :booking, inverse_of: :booking_flight
   belongs_to :booking_class, class_name: 'BookingFlightClass'
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
   belongs_to :from, class_name: 'Location', dependent: :destroy
@@ -38,19 +40,28 @@ class BookingFlight < ActiveRecord::Base
   accepts_nested_attributes_for :to
   accepts_nested_attributes_for :cost
 
-  scope :with_parent_booking_id, ->(id) { where parent_type: 'Booking', parent_id: id }
+  scope :with_parent_booking_id, ->(id) { where booking_id: id }
   scope :sum_cost, -> { joins(:cost).sum(:value) }
 
-  # As front end calls this comment and not description, have to give an alias for validation purpose
-  alias_attribute :comment, :description
+  delegate :request?, to: :booking
 
   validates :from, presence: true
   validates :to, presence: true
   validates :departure_date, presence: true
 
+  # As front end calls this comment and not description, have to give an alias for validation purpose
+  alias_attribute :comment, :description
+
   field_customization_key :booking_flight
-  # customizable_validate :comment, presence: false
-  validates :comment, presence: true
+  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company], if: :request?
+  # validates :comment, presence: true
+
+
+  def comment_presence
+    if comment.blank? and parent.booking_request?
+      errors.add :comment, 'cannot be blank'
+    end
+  end
 
   def as_json(options={})
     {

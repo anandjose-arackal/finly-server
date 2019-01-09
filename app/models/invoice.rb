@@ -59,12 +59,25 @@
 #  controlling_user_role_id     :integer
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
+#  billing_address              :text(65535)
+#  shipping_address             :text(65535)
+#  is_template                  :boolean          default(FALSE)
+#  template_name                :string(255)
+#  is_deleted                   :boolean          default(FALSE)
+#  resource_template_id         :integer
+#  invoice_id                   :string(255)
 #
 
 #  gst_type_id: 1 - IGST
 #              2 - CGST + SGST
 
 class Invoice < ActiveRecord::Base
+  include SoftDeletable, Templatable
+
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false
+
   belongs_to :address
   belongs_to :amount
   belongs_to :gross_amount, class_name: "Amount"
@@ -111,10 +124,11 @@ class Invoice < ActiveRecord::Base
   has_many :payments
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
+  has_many :items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
 
   # Attachments created for procurement
-  has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
+  has_many :attachments, class_name: 'ProcurementAttachment', as: :procurement_document
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   # From Procurement workflow
@@ -155,11 +169,42 @@ class Invoice < ActiveRecord::Base
   # validates :amount, presence: true
 
   scope :with_id, -> (id) {where id: id}
+  scope :without_id, -> (id) { where.not(id: id) }
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
-  scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
+  scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
   scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
-  scope :with_procurement, -> { where("invoices.procurement_id IS NOT NULL")}
+  scope :with_procurement, -> {where("invoices.procurement_id IS NOT NULL")}
+  scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+  scope :with_created_by_user_id, -> (user_ids) {where created_by_user_id: user_ids}
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      ids = where(department_id: department_ids).pluck(:id)
+      ids += where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
+    end
+  }
+  scope :with_budgetable_location_ids, -> (location_ids) {
+    if location_ids.present?
+      where location_id: location_ids
+    end
+  }
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where created_by_user_id: user_ids
+    end
+  }
+
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where vendor_id: vendor_ids
+    end
+  }
+
+  scope :with_type_non_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+  }
+
 
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id
@@ -169,6 +214,14 @@ class Invoice < ActiveRecord::Base
     if StringUtils.to_bool(enabled)
       where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid]))
     end
+  }
+
+  scope :filter_department_id, -> (ids) {
+    where department_id: ids
+  }
+
+  scope :filter_sub_department_id, -> (ids) {
+    where sub_department_id: ids
   }
 
   scope :invoice_date, -> (from, to) {
@@ -187,12 +240,61 @@ class Invoice < ActiveRecord::Base
     where('due_date >= ? && due_date <= ?', from, to)
   }
 
-  scope :created_at_desc, -> { order(created_at: :desc) }
-  scope :created_at_asc, -> { order(created_at: :asc) }
+  scope :created_at_desc, -> {order(created_at: :desc)}
+  scope :created_at_asc, -> {order(created_at: :asc)}
 
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
 
+  # this scope checks for an exact match of invoice number
+  scope :with_invoice_number, -> (invoice_number) {where invoice_number: invoice_number}
+
+  # this scope checks for an approximate match - used in searches etc.
+  scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
+  scope :filter_invoice_id, -> (invoice_id) { where 'invoices.invoice_id like ?', "%#{invoice_id}%" }
+  scope :filter_inward_invoice_type, -> (invoice_type){
+    where invoice_type_id: InwardInvoiceType.id_for(invoice_type)
+  }
+
   after_create :set_defaults
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
+
+  template_merge :procurement_id
+  template_config do
+    include_association [:address, :category, :cost_center, :company, :receiving_account, :vendor, :location,
+                          :delivery_location, :remaining_amount, :invoice_type, :gst_type,
+                          :tds_slab, :payment_term, :department, :sub_department, :policy]
+
+    clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
+           :original_amount, :freight_amount, :taxable_amount,
+           :invoice_items, :invoice_attachments, :attachments, :custom_fields,
+           :document_level_reviewer_mappings]
+
+    customize(lambda { |invoice,new_invoice|
+      new_invoice.trails.destroy_all
+      new_invoice.comments.destroy_all
+      new_invoice.attachments.destroy_all
+      new_invoice.payments.destroy_all
+    })
+
+    nullify :procurement_id
+    nullify :created_by_user_id
+    nullify :invoice_status_id
+    nullify :remaining_amount_id
+    nullify :advance_amount_id
+    nullify :balance_due_id
+    nullify :controlling_level_id
+    nullify :controlling_user_id
+    nullify :controlling_for_user_id
+    nullify :controlling_user_role_id
+    nullify :controlling_for_user_role_id
+    nullify :template_name
+    nullify :is_template
+    nullify :invoice_number
+    nullify :date
+    nullify :due_date
+    set :invoice_status_id => InwardInvoiceStatus.id_for(:open)
+  end
 
   def policy
     self.payment&.payment_order&.bank_payment_request&.policy
@@ -217,10 +319,6 @@ class Invoice < ActiveRecord::Base
 
   def discount_rate
     self.discount
-  end
-
-  def gst_type
-    self.gst_type_id
   end
 
   def item_amounts_total
@@ -268,6 +366,21 @@ class Invoice < ActiveRecord::Base
     return (self.invoice_status_id == InwardInvoiceStatus.id_for(:partially_paid))
   end
 
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.invoice_number,
+        amount: self.net_amount&.value,
+        document_status: self.invoice_status&.name,
+        document_owner: self.created_by&.name,
+        document_type: self.class.name
+    }
+  end
+
+  def generate_sequential_id?
+    self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+  end
+
   private
 
   def set_defaults
@@ -276,4 +389,25 @@ class Invoice < ActiveRecord::Base
       self.update_invoice_status
     end
   end
+
+  def budget_trail_entry
+    # as of now, no condition is being used to determine when to add the invoice to the budget trail
+    if self.open? || self.rejected? || self.retracted?
+      self.invoice_items.each do |invoice_item|
+        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
+      end
+    else
+      self.invoice_items.each do |invoice_item|
+        BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.save_trail(invoice_item)
+      end
+    end
+  end
+
+  def budget_trail_destroy
+    self.invoice_items.each do |invoice_item|
+      BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(invoice_item)
+    end
+  end
+
+
 end

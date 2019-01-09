@@ -4,12 +4,12 @@ class Invoicing::Invoice::Index < Invoicing::Invoice::Base
 
   class Invoicing::Invoice::Index::InvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoices, :paginated_invoices
+    attr_accessor :invoices, :paginated_invoices, :count
 
     has_scope :filter_amount, using: [:type, :value], type: :hash
     has_scope :filter_date, using: [:date_from, :date_to], type: :hash
     has_scope :filter_search
-    has_scope :filter_status_id
+    has_scope :filter_status_id, type: :array
     has_scope :filter_customer_id
     has_scope :filter_invoice_number
 
@@ -17,6 +17,7 @@ class Invoicing::Invoice::Index < Invoicing::Invoice::Base
       self.invoices = params[:invoices]
       self.invoices = apply_scopes(self.invoices, params)
       self.paginated_invoices = invoices.paginate(page: params[:page], per_page: params[:per_page])
+      self.count = self.invoices.count
     end
 
   end

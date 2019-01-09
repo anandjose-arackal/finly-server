@@ -6,10 +6,16 @@ json.data do
     json.array!(@result.user_pockets) do |pocket|
       json.name pocket.name
       json.id pocket.id
-      if pocket.cash_pocket?
+      case pocket.user_pocket_type_id
+      when UserPocketType.id_for(:cash)
         adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-      elsif pocket.credit_card_pocket?
+        json.display_balance true
+      when UserPocketType.id_for(:credit_card)
         adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
+      when UserPocketType.id_for(:reimbursement)
+        adapter = AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter.new(pocket)
+      when UserPocketType.id_for(:paid_by_company)
+        adapter = AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(pocket)
       else
         adapter = nil
       end

@@ -30,13 +30,11 @@ class InvoiceCalculationUtils
       self.balance_due_amount = precision_value self.net_amount, 0
     end
 
-    # assign TDS and advance amount - only applicable for inward invoices
-    if self.invoice.is_a?(Invoice)
-      if self.invoice&.tds_amount.present?
-        self.invoice.tds_amount.value = self.tds_amount
-      else
-        self.invoice.tds_amount = Amount.new(value: self.tds_amount, currency_id: 1)
-      end
+    # assign TDS and advance amount
+    if self.invoice&.tds_amount.present?
+      self.invoice.tds_amount.value = self.tds_amount
+    else
+      self.invoice.tds_amount = Amount.new(value: self.tds_amount, currency_id: 1)
     end
 
     if self.invoice&.advance_amount.present?
@@ -232,18 +230,14 @@ class InvoiceCalculationUtils
   end
 
   def calculate_tds
-    if self.invoice.is_a?(Invoice)
-      if invoice.tds_slab_id.present?
-        tds = invoice.tds_slab.tds
-        invoice.tds = tds # setting the TDS for this invoice as well
-      else
-        tds = invoice.tds
-      end
-      new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, tds)
-      self.tds_amount = self.gross_amount - new_gross_amount
+    if invoice.tds_slab_id.present?
+      tds = invoice.tds_slab&.tds
+      invoice.tds = tds # setting the TDS for this invoice as well
     else
-      self.tds_amount = 0
+      tds = invoice.tds
     end
+    new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, tds)
+    self.tds_amount = self.gross_amount - new_gross_amount
   end
 
   def calculate_advance_paid

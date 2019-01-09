@@ -96,7 +96,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
         end
       end
       if not self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).nil? and not
-          self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).present?
+      self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).present?
         self.updated_expense_params[:distance_expense_attributes].delete(:maps_distance_attributes)
       end
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
@@ -105,15 +105,34 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       if params[:receipt_id].present?
         # If a new receipt is attached from existing receipts, remove the old receipt
         self.old_receipt = expense.receipts.first if expense.receipts.present?
-        self.receipt = user.receipts.find_by(id: params[:receipt_id])
+        self.receipt = expense.user.receipts.find_by(id: params[:receipt_id])
       end
     end
 
-    pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
-
-    if self.cash_pocket.blank?
-      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    if expense.present?
+      pocket_id = self.params&.dig(:expense, :spent_from_id)
+      # Todo - Jugaad - Legacy support for older version of android/iOS where this is not implemented
+      if pocket_id.blank? and (params[:expense].present? and params[:expense].has_key?(:reimbursable) and params[:expense].has_key?(:from_cash_on_hand))
+        exp_params = params[:expense] || {}
+        reimbursable = StringUtils.to_bool exp_params[:reimbursable]
+        from_cash_on_hand = StringUtils.to_bool exp_params[:from_cash_on_hand]
+        if reimbursable
+          pocket_id = expense.user.user_pockets.reimbursement_pocket_only&.first&.id
+        elsif from_cash_on_hand
+          pocket_id = expense.user.user_pockets.cash_pockets_only&.first&.id
+        elsif exp_params.key?(:reimbursable) || exp_params.key?(:from_cash_on_hand) # Legacy support for android app -> As android only sends the key which has been updated
+          pocket_id = expense.user.user_pockets.paid_by_company_pocket_only&.first&.id
+        end
+        if pocket_id.blank?
+          pocket_id = expense.user.user_pockets.cash_pockets_only.first&.id
+        end
+      end
+      self.cash_pocket = expense.user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
+      # Jugaad End
+      if pocket_id.present?
+        self.cash_pocket = expense.user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
+        self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id if self.cash_pocket.present?
+      end
     end
   end
 
@@ -140,11 +159,15 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       end
     end
 
+    # if self.updated_expense_params[:spent_from_id].blank?
+    #   add_message :error, 'Please select the Spend Account'
+    #   return
+    # end
+
     if self.updated_expense_params[:spent_from_id].present? && self.cash_pocket.blank?
-      add_message :error, "Could not find pocket from which this expense was spent"
+      add_message :error, 'Error in Spend Account'
       return
     end
-
     # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
     check_coh_availability_update(self.cash_pocket, updated_expense_params)
 
@@ -161,6 +184,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     if StringUtils.to_bool(updated_expense_params[:reimbursable])
       updated_expense_params[:spent_from_id] = nil
     end
+    updated_expense_params[:modified_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process
@@ -178,7 +202,17 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     #   return
     # end
 
-    if expense.update(updated_expense_params)
+    distance_expense = expense.distance_expense
+    expense.assign_attributes(updated_expense_params)
+    if expense.distance_expense.blank?
+      expense.distance_expense = distance_expense
+    end
+
+    if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
+      self.expense.category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
+    end
+
+    if expense.save
       expense.distance_expense.locations.with_id(locations_marked_for_destruction).destroy_all if self.locations_marked_for_destruction.present?
       if self.destroy_receipts
         expense.receipts.each do |receipt|

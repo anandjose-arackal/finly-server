@@ -24,7 +24,11 @@ class DocumentLevelReviewerMapping < ActiveRecord::Base
 
   scope :with_level_ids, -> (ids) {where level_id: ids}
   scope :with_reviewer_ids, -> (ids) {where reviewer_id: ids}
+  scope :not_with_reviewer_ids, ->(id) { where.not reviewer_id: id }
   scope :with_policy_ids, -> (ids) {where policy_id: ids}
+  scope :with_document_type, -> (document_type) {where document_reviewer_mappable_type: document_type}
+
+  scope :with_document_id, -> (document_ids) {where document_reviewer_mappable_id: document_ids}
 
   validates :policy_id, presence: true
   validates :level_id, presence: true

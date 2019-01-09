@@ -67,11 +67,26 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       pos += 1
     end
 
-    pocket_id = self.expense_params[:spent_from_id]
-    self.cash_pocket = user.user_pockets.cash_and_credit_cards.find_by(id: pocket_id)
-
-    if self.cash_pocket.blank?
-      self.cash_pocket = user.user_pockets.cash_pockets_only.first
+    pocket_id = self.params&.dig(:expense, :spent_from_id)
+    # Todo - Jugaad - Legacy support for older version of android/iOS where this is not implemented
+    if pocket_id.blank? and (params[:expense].present? and params[:expense].has_key?(:reimbursable) and params[:expense].has_key?(:from_cash_on_hand))
+      reimbursable = params&.dig(:expense, :reimbursable)
+      from_cash_on_hand = params&.dig(:expense, :from_cash_on_hand)
+      if reimbursable
+        pocket_id = user.user_pockets.reimbursement_pocket_only&.first&.id
+      elsif from_cash_on_hand
+        pocket_id = user.user_pockets.cash_pockets_only&.first&.id
+      else
+        pocket_id = user.user_pockets.paid_by_company_pocket_only&.first&.id
+      end
+      if pocket_id.blank?
+        pocket_id = user.user_pockets.cash_pockets_only.first&.id
+      end
+    end
+    # Jugaad End
+    if pocket_id.present?
+      self.cash_pocket = user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id)
+      self.expense_params[:spent_from_id] = self.cash_pocket&.id
     end
   end
 
@@ -95,8 +110,20 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       end
     end
 
+    if self.expense_params[:spent_from_id].blank?
+      add_message :error, 'Please select the Spend Account'
+      return
+    end
+
     if self.expense_params[:spent_from_id].present? && self.cash_pocket.blank?
-      add_message :error, "Could not find pocket from which this expense was spent"
+      add_message :error, 'Error in Spend Account'
+      return
+    end
+
+    vehicle_rate = VehicleRate.find_by(id: self.expense_params&.dig(:distance_expense_attributes, :vehicle_rate_id))
+
+    if vehicle_rate&.policy&.distance_expense_config&.enforce_category && !(vehicle_rate&.policy&.distance_expense_config&.default_category)
+      add_message :error, "Category enforcement for Distance expense is enabled but there is no default category"
       return
     end
 
@@ -118,14 +145,20 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     if StringUtils.to_bool(expense_params[:reimbursable])
       expense_params[:spent_from_id] = nil
     end
+    expenses_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process
     self.expense = user.expenses.build(expense_params)
 
+    if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
+      self.expense.category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
+    end
+
     # Create custom fields only for validations. Fields will be saved later
     validate_custom_fields
     return if has_errors?
+
 
     if self.expense.save
       # Attach an existing receipt to the expense

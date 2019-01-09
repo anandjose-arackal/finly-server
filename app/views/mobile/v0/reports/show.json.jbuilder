@@ -24,10 +24,11 @@ json.actions do
   json.editable @result.actions[:editable].present?
   json.submit @result.actions[:submit].present?
 end
+cash_pockets = @result.cash_pockets
 json.expenses_group @result.expenses_category_sorted do |item|
   json.extract! item, :section_name, :section_total
   json.expenses item[:expenses] do |expense_item|
-    json.partial! '/mobile/v0/expenses/expense', expense: expense_item
+    json.partial! '/mobile/v0/expenses/expense', expense: expense_item, cash_pockets: cash_pockets
   end
 end
 json.comments @result.comments do |comment|

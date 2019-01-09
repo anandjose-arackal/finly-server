@@ -52,13 +52,19 @@ class BankPaymentRequest < ActiveRecord::Base
   default_scope {order(created_at: :desc)}
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
-  delegate :requested_amount_value, to: :requested_amount
+  # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
   scope :non_owner, -> (user_id) {where.not owner_id: user_id}
   scope :with_controlling_user, -> (user_id) {where controlling_user_id: user_id}
   scope :with_controlling_user_role, -> (role_id) {where controlling_user_role_id: role_id}
   scope :with_user, -> (user_id) {where owner_id: user_id}
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where(owner_id: user_ids)
+    end
+  }
+
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not id: id}
@@ -121,6 +127,14 @@ class BankPaymentRequest < ActiveRecord::Base
     end
   }
 
+  scope :include_for_index, -> {includes({payment_order: [:payment_order_status, :initiating_user,
+                                                          {payments: [
+                                                              {amount: [:currency]},
+                                                              {receiving_account: :account_owner}, :payment_status, :reference_resource,
+                                                              :invoice,
+                                                              {payment_order: [bank_payment_request: [:status]]},
+                                                              :payment_order]},
+                                                              {amount_processed: [:currency]}, {amount_requested: [:currency]}]}, :status, :controlling_user)}
   scope :include_for_data_retrieval, -> {includes(payment_order: {payments: [{receiving_account: :account_owner},
                                                                              :initiating_user,
                                                                              {payment_order: [bank_payment_request: [:status, :controlling_user]]},
@@ -178,6 +192,20 @@ class BankPaymentRequest < ActiveRecord::Base
 
   scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
   scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved)}
+
+  scope :filter_payment_ids, -> (payment_ids) {
+    payment_ids = payment_ids.split(",").each {|e| e.strip!}
+    all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
+    payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
+    where(payment_order_id: payment_order_ids)
+  }
+
+  scope :filter_vendor_id, -> (vendor_id) {
+    payment_order_ids = self.pluck(:payment_order_id)
+    payments = Payment.where(payment_order_id: payment_order_ids)
+    payment_order_ids = payments.where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_id).pluck(:payment_order_id)
+    where(payment_order_id: payment_order_ids)
+  }
 
   attr_accessor :cache_users
 
@@ -291,6 +319,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def payments
     self.payment_order.payments
+  end
+
+  def requested_amount_value
+    self.payment_order.amount_requested&.value
   end
 
   private

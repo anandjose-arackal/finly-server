@@ -13,7 +13,7 @@ class AccountManager::CreditCardPockets::CreditCardPocketsAdapter < AccountManag
     true
   end
 
-  # no such thing as credit here because the pool of money is not tracked in Finly
+  # no such thing as debit here because the pool of money is not tracked in Finly
   def debit(payment, options = {})
     true
   end
@@ -21,7 +21,7 @@ class AccountManager::CreditCardPockets::CreditCardPocketsAdapter < AccountManag
   # returning an insanely large number as balance because credit amount is not known and this validation should always pass
   def balance(options = {})
     if options[:display_balance]
-      return "∞"
+      return nil
     else
       return 9999999999999999999999
     end

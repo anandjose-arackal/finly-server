@@ -27,6 +27,10 @@ json.payments do
       json.retriable payment.retriable?
       json.change_mode payment.payment_order.failed?
     end
+    json.category_id payment.category_id
+    json.category_name payment.category&.name
+    json.department_id payment.department_id
+    json.department_name payment.department&.name
 
     invoice = payment.invoice
 
@@ -129,9 +133,11 @@ json.payments do
   end
 end
 
+json.payments_count @result.ordered_payments.count
 # non-paginated payments listing all payments in this payment order
+unless current_company.id == 118
 json.unpaid_payments do
-  json.array!(@result.ordered_payments) do |payment|
+  json.array!(@result.unpaid_payments) do |payment|
     json.owner_name payment.receiving_account&.account_owner&.name
     json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
@@ -159,6 +165,10 @@ json.unpaid_payments do
       json.retriable payment.retriable?
       json.change_mode payment.payment_order.failed?
     end
+    json.category_id payment.category_id
+    json.category_name payment.category&.name
+    json.department_id payment.department_id
+    json.department_name payment.department&.name
 
     invoice = payment.invoice
 
@@ -259,4 +269,5 @@ json.unpaid_payments do
       end
     end
   end
+end
 end

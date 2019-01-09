@@ -16,6 +16,7 @@
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  is_deleted                  :boolean          default(FALSE), not null
+#  user_id                     :integer
 #
 
 class InwardDocument < ActiveRecord::Base
@@ -35,4 +36,25 @@ class InwardDocument < ActiveRecord::Base
 
 
   scope :document_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
+
+  def items_shipped
+    total = 0
+    shipped = 0
+    self.items.each do |item|
+      total += item.quantity.to_f
+      shipped += item.accepted.to_f
+    end
+
+    "#{shipped}/#{total} delivered"
+  end
+
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.doc_number,
+        amount: self.items_shipped,
+        document_owner: self.user&.name,
+        document_type: self.class.name
+    }
+  end
 end

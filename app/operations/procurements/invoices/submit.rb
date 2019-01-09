@@ -1,5 +1,5 @@
 class Procurements::Invoices::Submit < Procurements::Invoices::Base
-  attr_accessor :invoice, :procurement, :invoice_params
+  attr_accessor :invoice, :procurement, :invoice_params, :budgets
 
   def personalizer
     {
@@ -19,13 +19,29 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
     unless self.invoice.present?
       add_message :error, 'Invoice not found'
     end
+
+    # checking for configuration on whether this particular company
+    # has budgeting enforced or not
+    # this will apply only if this invoice is part of a non-PO
+    if self.invoice.procurement&.non_po_procurement?
+      if self.invoice.items.present?
+        op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
+        if op.success?
+          self.budgets = op.budget_data
+        end
+      end
+      if user.company.enforce_budget_configuration.enforce_invoice_budget? && self.budgets.empty?
+        add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
+        return
+      end
+    end
   end
 
   def process
     params[:document] = self.invoice
     params[:aasm_event] = 'submit'
     params[:violation_present] = false
-    op = WorkflowManager::Base.(current_user, params)
+    op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
       return

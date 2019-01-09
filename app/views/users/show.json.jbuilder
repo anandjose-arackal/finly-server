@@ -30,10 +30,19 @@ json.user_pockets do
     case pocket.user_pocket_type_id
       when UserPocketType.id_for(:cash)
         adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        json.creditable true
+        json.display_balance true
       when UserPocketType.id_for(:credit_card)
         adapter = AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(pocket)
+        json.creditable false
+      when UserPocketType.id_for(:reimbursement)
+        adapter = AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter.new(pocket)
+        json.creditable false
+      when UserPocketType.id_for(:paid_by_company)
+        adapter = AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(pocket)
+        json.creditable false
       else
-        adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+        adapter = nil
     end
     json.balance adapter.balance(display_balance: true)
     currency = pocket.base_currency
@@ -52,6 +61,17 @@ json.user_delegate do
   json.user_delegate_email @result.selected_user.user_delegate&.email
   json.user_delegate_email @result.selected_user.user_delegate&.mobile_number
 end
+
+json.user_delegates do
+  json.array! @result.selected_user.user_delegate_mappings do |user_delegate_mapping|
+    json.id user_delegate_mapping.delegate_for_user.id
+    json.name user_delegate_mapping.delegate_for_user.name
+    json.email user_delegate_mapping.delegate_for_user.email
+    json.mobile_number user_delegate_mapping.delegate_for_user.mobile_number
+  end
+end
+
+json.user_delegation_enabled @result.selected_user.delegation_enabled
 
 json.subscriptions do
   json.show_config @result.selected_user.company.more_than_one_subscription?

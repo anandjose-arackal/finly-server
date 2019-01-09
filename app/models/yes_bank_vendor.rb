@@ -25,9 +25,15 @@
 #  payment_term_id   :integer
 #  currency_id       :integer
 #  tds_rates_list_id :integer
+#  vendor_id         :string(255)
+#  disabled          :boolean          default(FALSE)
 #
 
 class YesBankVendor < ActiveRecord::Base
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
+
   belongs_to :company
   belongs_to :state_code, class_name: "GstStateCode"
   belongs_to :created_by, class_name: "User"
@@ -39,6 +45,7 @@ class YesBankVendor < ActiveRecord::Base
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   # Requirement first shared by olx
   # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy
@@ -66,20 +73,26 @@ class YesBankVendor < ActiveRecord::Base
 
   scope :filter_search, -> (term) do
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("name like ? OR email like ? OR mobile_number like ? OR description like ? OR business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%").pluck(:id)
-    bank_account_ids = BankAccount.where("account_number like ? OR ifsc like ? OR name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%").pluck(:id)
+    bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
   end
 
   scope :filter_name_search, -> (term) {
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR
+                                      yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ?",
+                                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     where(id: vendor_ids)
   }
 
   scope :includes_bank_accounts, -> {
     includes(:bank_accounts)
+  }
+
+  scope :includes_for_index, -> {
+    includes(:state_code, :bank_accounts)
   }
 
   after_create do
@@ -89,7 +102,7 @@ class YesBankVendor < ActiveRecord::Base
   end
 
   def display_name
-    self.business_name || self.name
+    self.business_name.blank? ? self.name : self.business_name
   end
 
   def as_json(options={})
@@ -97,6 +110,7 @@ class YesBankVendor < ActiveRecord::Base
     {
         id: id,
         display_name: display_name,
+        vendor_id: vendor_id,
         name: name,
         created_at: created_at,
         email: email,

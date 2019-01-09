@@ -36,6 +36,8 @@
 #  usage_date_type        :string(255)
 #  spent_from_id          :integer
 #  custom_conversion_rate :boolean          default(FALSE)
+#  cost_center_id         :integer
+#  created_by_id          :integer
 #
 
 
@@ -43,14 +45,14 @@
 
 
 
-
 class Expense < ActiveRecord::Base
-  include SoftDeletable
-  include MathUtil
+  include SoftDeletable,
+          FieldCustomizer::CustomizableValidation,
+          MathUtil
 
   belongs_to :amount
   belongs_to :expense_status
-  belongs_to :user
+  belongs_to :user, inverse_of: :expenses
   belongs_to :expense_type
   belongs_to :category
   belongs_to :report
@@ -61,7 +63,9 @@ class Expense < ActiveRecord::Base
   belongs_to :expense_tax_type
   belongs_to :gst_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
-  belongs_to :spent_from, class_name: "UserPocket"
+  belongs_to :spent_from, class_name: 'UserPocket'
+  belongs_to :created_by, class_name: "User"
+  belongs_to :modified_by, class_name: "User"
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
@@ -106,11 +110,18 @@ class Expense < ActiveRecord::Base
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
   validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', 'usage', 'none', nil]}
+  validates_presence_of :spent_from_id, message: 'Please select a Spend Account to create an expense', if: Proc.new { |exp| !exp.card_expense?}
   validate :validate_usage_dates
   validate :no_future_date
   validate :valid_expense_type
   validate :valid_amount_value
   validate :at_least_one_type
+
+  alias_attribute :purpose, :note
+
+  field_customization_key :expense
+  customizable_validate :purpose, presence: false, scope: [:user, :company]
+  customizable_validate :spent_from, presence: false, scope: [:user, :company], if: :check_spent_from?
 
   # i.e. an expense associated with a report can't be destroyed
   before_destroy do
@@ -126,6 +137,20 @@ class Expense < ActiveRecord::Base
       else
         self.expense_status_id = ExpenseStatus.unsubmitted_id
       end
+    end
+    if card_expense?
+      self.reimbursable = false
+      self.from_cash_on_hand = false
+    elsif self.spent_from&.reimbursement?
+      self.reimbursable = true
+      self.from_cash_on_hand = false
+    elsif self.spent_from&.paid_by_company? or self.spent_from&.credit_card_pocket?
+      self.reimbursable = false
+      self.from_cash_on_hand = false
+    else
+      self.reimbursable = false
+      self.from_cash_on_hand = true
+
     end
     compute_gst_amount
     compute_tds_amount
@@ -178,7 +203,6 @@ class Expense < ActiveRecord::Base
     else
       # do nothing, ha
     end
-
   }
 
   scope :filter_field_configuration, ->(config_id) do
@@ -206,7 +230,7 @@ class Expense < ActiveRecord::Base
   scope :without_usage_date_type, -> {where usage_date_type: nil}
   scope :with_usage_date_type, -> {where.not usage_date_type: nil}
   scope :usage_date_within, ->(start_date, end_date) {where.not('usage_date_start > ? OR usage_date_end < ? ', end_date, start_date)}
-  # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
+
   scope :filter_expense_type_id, ->(type_id) do
     type_id = [type_id] unless type_id.is_a?(Array)
     diff_arr = (type_id - [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'])
@@ -314,9 +338,9 @@ class Expense < ActiveRecord::Base
                                                                       ExpenseType.id_for(:per_diem)])}
   scope :only_reimbursable_expenses, -> {where(reimbursable: true)}
   scope :spent_from_cash_on_hand, -> {
-    where.not(spent_from_id: nil)
+    where(from_cash_on_hand: true)
   }
-  scope :blocked_against_cash_on_hand, -> {where cash_on_hand_blocked: true}
+  scope :blocked_against_cash_on_hand, -> {where from_cash_on_hand: true}
 
   scope :with_id, ->(ids) {where id: ids}
   scope :without_id, -> (id) {
@@ -421,6 +445,65 @@ class Expense < ActiveRecord::Base
         where('expenses.date >= ? AND expenses.date <= ?', from, to)
   }
 
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      where(category_id: category_ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      where(cost_center_id: cost_center_ids)
+    end
+  }
+
+  scope :with_drop_down_custom_field_id, -> (drop_down_id) {
+    manual_ids = ManualExpense.where(expense_id: self.only_manual_expenses.pluck(:id)).pluck(:id)
+    card_ids = CardExpense.where(id: self.only_card_expenses.pluck(:id)).pluck(:id)
+    time_ids = TimeExpense.where(id: self.only_time_expenses.pluck(:id)).pluck(:id)
+    distance_ids = DistanceExpense.where(id: self.only_distance_expenses.pluck(:id)).pluck(:id)
+    per_diem_ids = PerDiemExpense.where(id: self.only_per_diem_expenses.pluck(:id)).pluck(:id)
+    custom_fields = CustomField.where('(parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?))',
+                                       "ManualExpense", manual_ids, "CardExpense", card_ids, "TimeExpense", time_ids, "DistanceExpense", distance_ids, "PerDiemExpense", per_diem_ids)
+    relevant_field_drop_down_selection_ids = FieldDropDownSelection.where(id: custom_fields.where(value_type: "FieldDropDownSelection").pluck(:value_id), value_id: drop_down_id).pluck(:id)
+    expense_data = custom_fields.where(value_type: "FieldDropDownSelection", value_id: relevant_field_drop_down_selection_ids).pluck(:parent_type, :parent_id)
+
+    relevant_expense_ids = []
+    expense_data.each do |data|
+      relevant_expense_ids << data.first.constantize.find_by(id: data.second)&.expense_id
+    end
+
+    where(id: relevant_expense_ids)
+  }
+
+  scope :include_spent_from_calculation, ->{ includes([{amount: [:currency]}], {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]})}
+
+  scope :include_details, -> {includes(
+      [
+          {amount: [:currency]}, :expense_status,
+          :report,
+          {user: [{policies: [
+          {vehicle_rates: [{rate: [:currency]},
+                           :distance_unit]}, :distance_expense_config]}]}, :expense_type, :category,
+          {surcharge: [:currency]}, {tds_amount: [:currency]},
+          {gst_amount: [:currency]}, :expense_tax_type, :gst_type, :tds_slab,
+          {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]}, :receipts, :system_messages,
+          :duplicate_expense_mappings,
+          {manual_expense: [custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]]},
+          {card_expense: [custom_fields: [:field_configuration]]},
+          {distance_expense: [{custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]}, :distance,
+                              :maps_distance, :locations, :type, :odometer_reading_receipt_start,
+                              :odometer_reading_receipt_end,
+                              {vehicle_rate: [{rate: [:currency]}]},
+                              :distance_rate, :distance_unit]},
+          {time_expense: [custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]]},
+          {per_diem_expense: [{custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]}, :per_diem]},
+          :payment
+      ]
+  )}
+
   # scope :category_budget_expenses, -> {
   #   where('expenses.category_id = ?')
   # }
@@ -467,7 +550,7 @@ class Expense < ActiveRecord::Base
     unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
       return self.amount
     end
-    currency = report_id.present? ? report.base_currency : amount.currency
+    currency = (report_id.present? && self.report.present?) ? self.report.base_currency : amount.currency
     Amount.new(value: amount_value, currency: currency)
   end
 
@@ -485,14 +568,14 @@ class Expense < ActiveRecord::Base
 
   def converted?
     return false unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
-    if report.base_currency_id != amount.currency_id
+    if report&.base_currency_id != amount.currency_id
       return true
     end
     false
   end
 
   # this method is to calculate the amount values for the various time/distance/per diem expenses
-  def calculate_amount_value(policy=nil)
+  def calculate_amount_value(policy = nil)
     case self.expense_type_id
     when ExpenseType.id_for(:manual)
       return self.amount.value
@@ -589,7 +672,7 @@ class Expense < ActiveRecord::Base
 
   def report_name
     if report_id
-      self.report.name
+      self.report&.name
     end
   end
 
@@ -1000,11 +1083,17 @@ class Expense < ActiveRecord::Base
     days
   end
 
-  def from_cash_on_hand
-    if self.spent_from.present?
-      return true
-    end
-    false
+  # def from_cash_on_hand
+  #   if self.spent_from.present? and not (self.spent_from.paid_by_company? or self.spent_from.reimbursement?)
+  #     return true
+  #   end
+  #   false
+  # end
+
+  def check_spent_from?
+    return false if reimbursable
+    return false if card?
+    true
   end
 
   private
@@ -1095,10 +1184,12 @@ class Expense < ActiveRecord::Base
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed]).include?(self.report&.report_status_id)
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
-    else
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+    if self.report.present?
+      if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report&.report_status_id)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+      else
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
+      end
     end
   end
 

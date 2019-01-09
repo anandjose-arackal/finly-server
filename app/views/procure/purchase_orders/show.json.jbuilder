@@ -1,9 +1,15 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
-              :payment_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id
+              :payment_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
+              :billing_address, :shipping_address
 json.vendor @result.purchase_order.vendor.as_json
 
 json.actions @result.actions
+
+if @result.purchase_order.advance_payments.present?
+  json.show_advance_payments true
+  json.advance_payments_count @result.purchase_order.advance_payments.count
+end
 
 json.status do
   json.extract! @result.purchase_order&.status, :id, :name
@@ -60,7 +66,7 @@ json.attachments do
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
-    json.url attachment.file.url
+    json.url attachment.file.url(:original, timestamp: false)
   end
 end
 
@@ -137,6 +143,13 @@ end
 json.tax_rates do
   json.array! @result.tax_rates do |tax_rate|
     json.merge! tax_rate.as_json
+  end
+end
+
+json.locations do
+  json.array! @result.locations do |location|
+    json.extract! location, :id, :name, :gstin, :pan
+    json.address location.address
   end
 end
 

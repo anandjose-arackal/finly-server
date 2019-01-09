@@ -9,6 +9,14 @@ else
   json.category_name expense.category.name
 end
 
+if expense.spent_from.present?
+  json.pocket do
+    json.pocket_name expense.spent_from&.name
+    json.pocket_id expense.spent_from&.id
+    json.pocket_balance expense.spent_from&.name
+  end
+end
+
 json.usage_date_start DateUtils.date_formatted expense.usage_date_start
 json.usage_date_end DateUtils.date_formatted expense.usage_date_end
 

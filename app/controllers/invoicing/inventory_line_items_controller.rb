@@ -42,4 +42,14 @@ class Invoicing::InventoryLineItemsController < ApplicationController
     @result = Invoicing::InventoryLineItem::InventoryItemConfig.(current_user, params)
     respond
   end
+
+  def import
+    @result = Invoicing::InventoryLineItem::Import.(current_user, params)
+    respond
+  end
+
+  def import_template
+    @result = Invoicing::InventoryLineItem::ImportTemplate.(current_user, params)
+    respond
+  end
 end

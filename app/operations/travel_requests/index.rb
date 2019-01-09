@@ -73,7 +73,7 @@ class TravelRequests::Index < TravelRequests::Base
   end
 
   class TravelRequests::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :travel_requests, :counts, :paginated_travel_requests
+    attr_accessor :travel_requests, :counts, :paginated_travel_requests, :count
 
     # has_scope :filter_search
     # has_scope :filter_status
@@ -87,7 +87,10 @@ class TravelRequests::Index < TravelRequests::Base
 
     def init
       self.travel_requests = params[:travel_requests]
-      return unless self.travel_requests.present?
+      unless self.travel_requests.present?
+        self.paginated_travel_requests = self.travel_requests
+        return
+      end
       self.travel_requests = apply_scopes(self.travel_requests, params)
       if travel_requests.present?
         if personal_view?
@@ -96,6 +99,7 @@ class TravelRequests::Index < TravelRequests::Base
           self.travel_requests = self.travel_requests.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
         end
       end
+      self.count = self.travel_requests.count
       self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
     end
   end

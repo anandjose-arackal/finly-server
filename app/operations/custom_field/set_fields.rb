@@ -45,14 +45,20 @@ class CustomField::SetFields < CustomField::Base
     # if self.reset
 
     # If policy has been set, fetch all the custom fields from the policy, else retrieve it from organisation account
-    if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id) and item.policy.present?
+    if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request),
+        FieldParentType.id_for(:travel_request)].include?(parent_type_id) and item.policy.present?
       policy = item.policy
       self.field_configurations = policy.field_configurations.exclude_deleted
+    elsif [FieldParentType.id_for(:booking_request)].include?(parent_type_id)
+      policy = item.travel_request.policy
+      self.field_configurations = policy.field_configurations.exclude_deleted
     else
-      if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request), FieldParentType.id_for(:purchase_order)].include?(parent_type_id)
+      if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request),
+          FieldParentType.id_for(:purchase_order)].include?(parent_type_id)
         # For reports and money requests
         self.field_configurations = item.user.company.field_configurations.exclude_deleted
-      elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item), FieldParentType.id_for(:purchase_order)].include?(parent_type_id)
+      elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item),
+             FieldParentType.id_for(:purchase_order), FieldParentType.id_for(:vendor)].include?(parent_type_id)
         self.field_configurations = current_company.field_configurations.exclude_deleted
       elsif FieldParentType.expense_ids.include?(parent_type_id)
         # For expenses
@@ -62,8 +68,8 @@ class CustomField::SetFields < CustomField::Base
         end
         self.field_configurations = user.company.field_configurations.exclude_deleted
       end
-
     end
+
 
     # Retrieve configurations which are set only for items
     if self.field_configurations.present?
@@ -75,30 +81,6 @@ class CustomField::SetFields < CustomField::Base
   end
 
   def process
-
-    # if self.reset
-    #   item.custom_fields.destroy_all if item.custom_fields.present?
-    #
-    #   required_ids = self.field_configurations.pluck(:id)
-    #   existing_ids = self.item.custom_fields.pluck(:field_configuration_id)
-    #   create_ids = required_ids - existing_ids
-    #
-    #
-    #   if create_ids.present?
-    #     self.field_configurations.enabled.with_id(create_ids).each do |config|
-    #       # If value has not been set but default value is present, set the value as a deep clone of default value
-    #       default_value = nil
-    #       if config.default_value.present?
-    #         default_value =config.default_value.deep_clone
-    #       end
-    #       field = item.custom_fields.build(field_configuration: config, value: default_value)
-    #       if self.save
-    #         field.save
-    #       end
-    #     end
-    #   end
-    # end
-
 
     if self.reset
       # in this case we can reset the custom fields by destroying all existing custom fields and recreating them
@@ -160,11 +142,17 @@ class CustomField::SetFields < CustomField::Base
     current_ids = self.item.custom_fields.pluck(:field_configuration_id)
     configs_to_create = []
     config_ids_to_destroy = []
+    required_configs = {}
+
     self.field_configurations.enabled.each do |config|
       required = false
       if config.root_field
         # Root fields have to be present
-        if current_ids.blank? or current_ids.include?(config.id)
+        if FieldParentType.expense_ids.include?(parent_type_id)
+          if current_ids.blank? or current_ids.include?(config.id)
+            required = true
+          end
+        else
           required = true
         end
       else
@@ -172,28 +160,25 @@ class CustomField::SetFields < CustomField::Base
           # If the custom field configuration is a dropdown and
           # the value matches the dependent field configuration criteria, add it to required custom fields
           if config.parent_drop_down_items.pluck(:id).include?(value.to_i)
-            if current_ids.blank? or current_ids.include?(config.id)
-              required = true
-            end
+            # if current_ids.blank? or not current_ids.include?(config.id)
+            required = true
+            # end
           end
         end
       end
 
 
-      if required
-        if current_ids.include?(config.id)
-          # do nothing?
-        else
-          # Create
-          configs_to_create << config
-        end
-      else
-        if current_ids.include?(config.id)
-          # Destroy
-          config_ids_to_destroy << config.id
-        end
+      required_configs[config.id] = config if required
+    end
+
+    config_ids_to_destroy = current_ids - required_configs.keys
+
+    required_configs.each do |id, config|
+      unless current_ids.include?(id)
+        configs_to_create << config
       end
     end
+
     [configs_to_create, config_ids_to_destroy]
   end
 
@@ -230,7 +215,7 @@ class CustomField::SetFields < CustomField::Base
           acceptable_value = true
         else
           if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.pluck(:id).include?(drop_down_value)}
-          # if acceptable_dropdown_values.include?(config.parent_id.to_s)
+            # if acceptable_dropdown_values.include?(config.parent_id.to_s)
             acceptable_value = true
           end
         end

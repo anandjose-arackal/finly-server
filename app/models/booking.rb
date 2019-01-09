@@ -13,6 +13,7 @@
 #  travel_request_id  :integer          not null
 #  destination_id     :integer          not null
 #  parent_booking_id  :integer
+#  reject_reason      :text(65535)
 #
 
 class Booking < ActiveRecord::Base
@@ -28,17 +29,19 @@ class Booking < ActiveRecord::Base
   has_many :bookings, foreign_key: :parent_booking_id, dependent: :destroy
   belongs_to :parent_booking, class_name: 'Booking'
 
+  has_many :custom_fields, as: :parent, dependent: :destroy
+
   has_many :travel_members, dependent: :destroy
 
   has_many :attachments, class_name: 'BookingAttachment', dependent: :destroy
 
-  has_one :booking_car_rental, as: :parent, dependent: :destroy
-  has_one :booking_bus, as: :parent, dependent: :destroy
-  has_one :booking_flight, as: :parent, dependent: :destroy
-  has_one :booking_hotel, as: :parent, dependent: :destroy
-  has_one :booking_restaurant, as: :parent, dependent: :destroy
-  has_one :booking_train, as: :parent, dependent: :destroy
-  has_one :booking_other, as: :parent, dependent: :destroy
+  has_one :booking_car_rental, dependent: :destroy, inverse_of: :booking
+  has_one :booking_bus, dependent: :destroy, inverse_of: :booking
+  has_one :booking_flight, dependent: :destroy, inverse_of: :booking
+  has_one :booking_hotel, dependent: :destroy, inverse_of: :booking
+  has_one :booking_restaurant, dependent: :destroy, inverse_of: :booking
+  has_one :booking_train, dependent: :destroy, inverse_of: :booking
+  has_one :booking_other, dependent: :destroy, inverse_of: :booking
 
   accepts_nested_attributes_for :booking_car_rental, allow_destroy: true
   accepts_nested_attributes_for :booking_bus, allow_destroy: true
@@ -48,9 +51,10 @@ class Booking < ActiveRecord::Base
   accepts_nested_attributes_for :booking_train, allow_destroy: true
   accepts_nested_attributes_for :booking_other, allow_destroy: true
   accepts_nested_attributes_for :travel_members, allow_destroy: true
+  accepts_nested_attributes_for :custom_fields, allow_destroy: true
 
   delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type
-  delegate :request?, :option?, :confirmed?, :processing?, :cancelled?, :rejected?, to: :booking_status
+  delegate :request?, :option?, :confirmed?, :processing?, :selected_for_booking?, :cancelled?, :rejected?, to: :booking_status
 
   accepts_nested_attributes_for :travel_members, allow_destroy: true
 
@@ -104,11 +108,15 @@ class Booking < ActiveRecord::Base
         travel_members: travel_members,
     }
     data[booking_type&.name] = booking_type_object
-    if self.request? or self.confirmed?
+    if self.request? or self.confirmed? or self.rejected?
       data[:options] = self.bookings.options
       data[:selected_for_booking] = self.bookings.selected_for_booking
       data[:confirmed] = self.bookings.confirmed&.first
       data[:cancelled] = self.bookings.cancelled
+      data[:custom_fields] = self.custom_fields
+    end
+    if self.rejected?
+      data[:reject_reason] = self.reject_reason
     end
     if self.confirmed?
       data[:attachments] = self.attachments

@@ -25,7 +25,9 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
     end
     self.booking_parameters = []
     self.request_params.each do |param|
-      self.booking_parameters << booking_params(param)
+      booking_param = booking_params(param)
+      booking_param[:custom_fields] = param[:custom_fields]
+      self.booking_parameters << booking_param
     end
 
     if params&.dig(:parent_booking_id).present?
@@ -65,11 +67,14 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
 
     self.booking_parameters.each do |booking_param|
       # Extracting booking attachments from params
-      booking = self.destination.bookings.build(booking_param.except(:booking_attachments))
+      booking = self.destination.bookings.build(booking_param.except(:booking_attachments, :custom_fields))
       booking.parent_booking = self.parent_booking
       booking.travel_request = self.travel_request
       booking.created_by_user = user
-
+      if booking.request?
+        validate_custom_fields(booking, booking_param[:custom_fields])
+        return if has_errors?
+      end
       if booking.valid?
       else
         add_message :error, booking.errors.full_messages
@@ -82,11 +87,13 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
       booking_param = booking_params param
       # Extracting booking attachments from params
       booking_attachments = user.company.booking_attachments.with_id(param[:booking_attachments])
-      booking = self.destination.bookings.build(booking_param)
+      booking = self.destination.bookings.build(booking_param.except(:custom_fields))
       booking.parent_booking = self.parent_booking
       booking.travel_request = self.travel_request
       booking.created_by_user = user
-
+      if booking.request?
+        set_custom_fields(booking, param[:custom_fields], false)
+      end
       if booking.valid?
         booking.save
         add_message :success, 'Successfully Added Booking'
@@ -94,6 +101,29 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
       else
         add_message :error, booking.errors.full_messages
       end
+    end
+  end
+
+  protected
+
+  def set_custom_fields(booking, custom_fields, save)
+    custom_fields = {custom_fields: custom_fields}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(booking, FieldParentType.id_for(:booking_request), custom_fields)
+  end
+
+  def validate_custom_fields(booking,custom_fields )
+    set_fields = set_custom_fields booking,custom_fields, false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(booking)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
     end
   end
 

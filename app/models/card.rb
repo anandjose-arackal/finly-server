@@ -63,6 +63,7 @@ class Card < ActiveRecord::Base
 
   scope :with_id, -> (id) {where id: id}
   scope :with_user, -> (user_id) {where user_id: user_id}
+  scope :with_user_id, -> (user_id) { where user_id: user_id}
   scope :with_company, -> (company_id) {where company_id: company_id}
   scope :unassigned, -> {where user_id: nil}
   scope :active, -> {where active: true}
@@ -242,7 +243,7 @@ class Card < ActiveRecord::Base
   end
 
   def max_eligibility
-    upgraded? ? 50000 : 20000
+    upgraded? ? 100000 : 20000
   end
 
   def assigned?

@@ -17,6 +17,11 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
       add_message :error, "You cannot reject this travel request"
       return
     end
+
+    if rejection_note.blank?
+      add_message :error, 'Please provide a reason for rejection'
+      return
+    end
   end
 
   def process

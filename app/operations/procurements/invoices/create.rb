@@ -1,11 +1,31 @@
 class Procurements::Invoices::Create < Procurements::Invoices::Base
-  attr_accessor :invoice, :procurement, :invoice_params, :vendor
+  attr_accessor :invoice, :procurement, :invoice_params, :vendor, :template, :inward_invoice_type
 
   def init
     # self.invoice_params = invoice_parameters
     self.procurement = user.company.procurements.find_by id: params[:procurement_id]
-    vendor_id = params[:purchase_order][:vendor_id]
+
+    if params[:purchase_order].present? && params[:purchase_order][:vendor_id].present?
+      vendor_id = params[:purchase_order][:vendor_id]
+    elsif params[:invoice].present? && params[:invoice][:vendor_id].present?
+      vendor_id = params[:invoice][:vendor_id]
+    else
+      vendor_id = nil
+    end
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
+
+    if params[:document_type].present?
+      case params[:document_type]
+        when 'invoice', 'proforma_invoice'
+          self.inward_invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
+        when 'non_po_invoice'
+          self.inward_invoice_type = ::InwardInvoiceType.id_for(:non_po_invoice)
+        else
+          self.inward_invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
+      end
+    else
+      self.inward_invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
+    end
   end
 
   def validate
@@ -19,12 +39,18 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
   end
 
   def process
+
+    if params[:template_id].present?
+      load_invoice_from_template
+      self.invoice.procurement = self.procurement
+    else
+      self.invoice = procurement.invoices.build
+    end
     receiving_account = self.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
-    self.invoice = procurement.invoices.build
     self.invoice.invoice_status_id = InwardInvoiceStatus.id_for(:open)
     self.invoice.created_by = user
     self.invoice.company = user.company
-    self.invoice.invoice_type_id = ::InwardInvoiceType.id_for(:tax_invoice)
+    self.invoice.invoice_type_id = self.inward_invoice_type
     self.invoice.receiving_account = receiving_account
     self.invoice.controlling_user = user
     self.invoice.vendor = vendor
@@ -59,4 +85,14 @@ class Procurements::Invoices::Create < Procurements::Invoices::Base
   # def invoice_parameters
   #   params.require(:invoice).permit!
   # end
+
+  def load_invoice_from_template
+    result = Procurements::Invoices::Templates::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    self.template = result.template
+    self.invoice = self.template.resource.amoeba_dup
+  end
 end

@@ -11,6 +11,7 @@ class TravelRequests::Create < TravelRequests::Base
 
   def pre_validate
     user_present? and params_present?
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -21,28 +22,40 @@ class TravelRequests::Create < TravelRequests::Base
     self.travel_request_parameters[:controlling_user] = user
     self.travel_request_parameters[:controlling_user_role_id] = UserRole.id_for(:employee)
     self.travel_request_parameters[:company_id] = user.company_id
+    self.travel_request_parameters[:created_by_id] = actual_current_user.id if actual_current_user.present?
     #self.travel_request_parameters[:policy_id] = current_company.policies.default.first.id
 
-    if self.travel_request_parameters[:policy_id].blank? and for_user.enforce_policy_enabled?
-      self.travel_request_parameters[:policy_id] = for_user.policies.non_default&.first&.id
-    end
-    if self.travel_request_parameters[:policy_id].blank?
-      self.travel_request_parameters[:policy_id] = user.company.default_policy.id
-    end
+    # if self.travel_request_parameters[:policy_id].blank? and for_user.enforce_policy_enabled?
+    #   self.travel_request_parameters[:policy_id] = for_user.policies.non_default&.first&.id
+    # end
+    # if self.travel_request_parameters[:policy_id].blank?
+    #   self.travel_request_parameters[:policy_id] = user.company.default_policy.id
+    # end
     self.travel_request = self.for_user.travel_requests.build(travel_request_parameters)
   end
 
   def validate
     unless self.travel_request.valid?
       add_message :error, self.travel_request.errors.full_messages
+      return
     end
+    validate_custom_fields
+    return if has_errors?
   end
 
   def process
-    travel_request.save
+    if travel_request.save
+      # add the custom fields associated with this travel request
+      CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), reset_fields: true, save: true)
+    else
+      add_message :error, travel_request.errors.full_messages
+    end
   end
 
   def post_process
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    travel_request.comments.create(user_id: user.id,
+                                   action_id: TravelRequestCommentAction.id_for(:created_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
     add_message :success, 'New trip created'
   end
 
@@ -52,8 +65,30 @@ class TravelRequests::Create < TravelRequests::Base
   end
 
   protected
+
   def strong_params
-    params.permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date)
+    params.permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date, :created_by_id)
+  end
+
+  def validate_custom_fields
+    set_fields = set_custom_fields false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.travel_request)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+  end
+
+  def set_custom_fields(save)
+    custom_fields = {custom_fields: (params[:custom_fields] or params&.dig(:travel_request, :custom_fields))}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), custom_fields)
   end
 
   class TravelRequests::Create::CreatePresenter < BaseOperation::BasePresenter::SuccessPresenter

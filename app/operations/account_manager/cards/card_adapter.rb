@@ -112,4 +112,17 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     op = ItzCash::AccountDetails.(account.user, card: account)
     op.available_card_eligibility rescue 0
   end
+
+
+  def on_completion(options)
+    payment = options[:payment]
+    if PaymentPurpose.ids_for(:medical_benefit, :meal_benefit).include?(payment&.payment_purpose_id)
+      if payment.credit?
+        Event::EWallet::Credit.(payment.initiating_user, payment: payment)
+      elsif payment.debit?
+        Event::EWallet::Debit.(payment.initiating_user, payment: payment)
+      end
+    end
+  end
+
 end

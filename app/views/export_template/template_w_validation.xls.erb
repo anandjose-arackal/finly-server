@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<ss:Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:x="urn:schemas-microsoft-com:office:excel"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="header">
+      <ss:Font ss:Bold="1"/>
+      <ss:Interior ss:Color="#a5ccb0" ss:Pattern="Solid"/>
+    </ss:Style>
+    <ss:Style ss:ID="error">
+      <ss:Interior ss:Color="#ffaaaa" ss:Pattern="Solid"/>
+    </ss:Style>
+    <ss:Style ss:ID="warning">
+      <ss:Interior ss:Color="#ffffaa" ss:Pattern="Solid"/>
+    </ss:Style>
+  </ss:Styles>
+  <% if sheets.present? %>
+    <% sheets.each_with_index do |sheet, index| %>
+      <% item_headers = sheet[:item_headers] %>
+      <% item_contents = sheet[:item_contents] %>
+      <% if sheet[:name].present? %>
+        <ss:Worksheet ss:Name="<%= sheet[:name] %>">
+      <% else %>
+        <ss:Worksheet ss:Name="Sheet<%=index%>">
+      <% end %>
+        <ss:Table>
+          <ss:Row>
+            <% item_headers&.each do |item| %>
+              <ss:Cell ss:StyleID="header">
+                <ss:Data ss:Type="String"><%= item %></ss:Data>
+              </ss:Cell>
+            <% end %>
+          </ss:Row>
+          <% item_contents&.each do |item| %>
+            <ss:Row>
+              <% item.each do |value| %>
+                <% if value.present? && value.to_s.index("---error---") %>
+                  <% value_content = value.to_s.split("---error---")[0] %>
+                  <ss:Cell ss:StyleID="error">
+                    <ss:Data ss:Type="String"><%= value_content %></ss:Data>
+                  </ss:Cell>
+                <% elsif value.present? && value.to_s.index("---warning---") %>
+                  <% value_content = value.to_s.split("---warning---")[0] %>
+                  <ss:Cell ss:StyleID="warning">
+                    <ss:Data ss:Type="String"><%= value_content %></ss:Data>
+                  </ss:Cell>
+                <% else %>
+                  <ss:Cell>
+                    <ss:Data ss:Type="String"><%= value %></ss:Data>
+                  </ss:Cell>
+                <% end %>
+              <% end %>
+            </ss:Row>
+          <% end %>
+        </ss:Table>
+        <% if index == 0 && sheets.count > 1 %>
+          <% item_headers&.each do |item| %>
+            <% sheets.each_with_index do |sheet, index| %>
+              <% next if index == 0 %>
+              <% if item == sheet[:matching_name] %>
+                <x:DataValidation>
+                  <x:Range>A21A100</x:Range>
+                  <x:Type>List</x:Type>
+                  <ss:CellRangeList />
+                  <x:Value>
+                    <%= sheet[:item_contents]&.join(",") %>
+                  </x:Value>
+                  <x:InputHide />
+                  <x:ErrorHide />
+                </x:DataValidation>
+              <% end %>
+            <% end %>
+          <% end %>
+
+        <% end %>
+      </ss:Worksheet>
+      <!--Validations-->
+
+      <!--End Validation-->
+    <% end %>
+  <% else %>
+    <ss:Worksheet ss:Name="Sheet1">
+      <ss:Table>
+        <ss:Row>
+          <% item_headers&.each do |item| %>
+            <ss:Cell ss:StyleID="header">
+              <Data ss:Type="String"><%= item %></Data>
+            </ss:Cell>
+          <% end %>
+        </ss:Row>
+        <% item_contents&.each do |item| %>
+          <ss:Row>
+            <% item.each do |value| %>
+              <% if value.present? && value.to_s.index("---error---") %>
+                <% value_content = value.to_s.split("---error---")[0] %>
+                <ss:Cell ss:StyleID="error">
+                  <ss:Data ss:Type="String"><%= value_content %></ss:Data>
+                </ss:Cell>
+              <% elsif value.present? && value.to_s.index("---warning---") %>
+                <% value_content = value.to_s.split("---warning---")[0] %>
+                <ss:Cell ss:StyleID="warning">
+                  <ss:Data ss:Type="String"><%= value_content %></ss:Data>
+                </ss:Cell>
+              <% else %>
+                <ss:Cell>
+                  <ss:Data ss:Type="String"><%= value %></ss:Data>
+                </ss:Cell>
+              <% end %>
+            <% end %>
+          </ss:Row>
+        <% end %>
+      </ss:Table>
+    </ss:Worksheet>
+  <% end %>
+</ss:Workbook>

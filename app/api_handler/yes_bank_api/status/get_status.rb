@@ -27,6 +27,8 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
         company_name: Company.find_by(id: params&.dig(:company_id))&.name,
         unique_reference_number: params&.dig(:unique_request_number),
         transfer_type: params&.dig(:transfer_type),
+        application_id: self.application_id,
+        customer_id: self.customer_id,
         action: 'get_status'
     }
   end
@@ -85,32 +87,41 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
   def success
     params[:request_status] = request_status
     params[:bank_reference_number] = self.bank_reference_number
+    params[:application_id] = self.application_id
+    params[:customer_id] = self.customer_id
     YesBankApi::Status::GetStatus::SuccessStatusPresenter.new(params)
   end
 
   def failure
     params[:request_status] = request_status
     params[:bank_reference_number] = self.bank_reference_number
+    params[:application_id] = self.application_id
+    params[:customer_id] = self.customer_id
     YesBankApi::Status::GetStatus::FailureStatusPresenter.new(params)
   end
 
   class YesBankApi::Status::GetStatus::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :request_status, :bank_reference_number
+    attr_accessor :request_status, :bank_reference_number, :application_id, :customer_id
 
     def initialize(params)
       self.request_status = params[:request_status]
       self.bank_reference_number = params[:bank_reference_number]
+      self.customer_id = params[:customer_id]
+      self.application_id = params[:application_id]
     end
   end
 
   class YesBankApi::Status::GetStatus::FailureStatusPresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :request_status, :bank_reference_number
+    attr_accessor :request_status, :bank_reference_number, :application_id, :customer_id
+
 
     def initialize(params)
       self.request_status = params[:request_status]
       self.bank_reference_number = params[:bank_reference_number]
+      self.customer_id = params[:customer_id]
+      self.application_id = params[:application_id]
     end
   end
 

@@ -49,6 +49,10 @@ class Report::Reject < Report::Base
     unless reject_to_user.present?
       messages[:error] << 'Reject to user not found'
     end
+    if params[:reject_note].blank?
+      add_message :error, 'Please provide a reason for rejection'
+      return
+    end
   end
 
   def process

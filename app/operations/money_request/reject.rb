@@ -49,6 +49,11 @@ class MoneyRequest::Reject < MoneyRequest::Base
     end
     unless reject_to_user.present?
       add_message :error, 'Reject to user not found'
+      return
+    end
+    if params[:reject_note].blank?
+      add_message :error, 'Please provide the reason for rejection'
+      return
     end
   end
 

@@ -14,6 +14,7 @@
 #  note                  :text(65535)
 #  is_deleted            :boolean          default(FALSE), not null
 #  procurement_type      :string(255)
+#  transaction_id        :string(255)
 #
 
 require 'test_helper'

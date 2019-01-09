@@ -11,12 +11,14 @@
 #  description     :text(65535)
 #  cost_id         :integer
 #  is_deleted      :boolean          default(FALSE)
+#  booking_id      :integer
 #
 
 class BookingOther < ActiveRecord::Base
   include SoftDeletable
 
-  belongs_to :parent, polymorphic: true
+  # belongs_to :parent, polymorphic: true
+  belongs_to :booking, inverse_of: :booking_other
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
 
   def as_json(options={})

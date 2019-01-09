@@ -20,7 +20,7 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.currencies = Currency.all
       self.em_tax_tracking = params[:em_tax_tracking]
       self.tds_slabs = params[:tds_slabs]
-      self.cash_and_credit_pockets = user.user_pockets.cash_and_credit_cards
+      self.cash_and_credit_pockets = user.user_pockets.non_bank_card_transfer_pockets
       self.custom_currency_conversion = user.company.feature_subscription.custom_currency_conversion
     end
 
@@ -136,7 +136,7 @@ class User::AvailableExpenseTypes::Show < User::Base
     params[:time_config] = time_config
     params[:per_diem_config] = per_diem_config
     params[:custom_fields_config] = self.custom_fields_config
-    params[:categories] = self.user.company.categories.active
+    params[:categories] = self.user.company.categories.expense_management_only.active
     params[:cash_on_hand] = self.cash_on_hand
     params[:em_tax_tracking] = self.em_tax_tracking
     params[:tds_slabs] = self.tds_slabs

@@ -42,7 +42,9 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
       if payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
         # mark the respective payment order and the associated payments as credited
         payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
-        payment_request.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:completed))
+        payment_request.payment_order.payments.each do |payment|
+          payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        end
         # create the trail for the same
         payment_request.bank_payment_request_trails.create action_user: user,
                                                           action_user_role_id: self.view_role,
@@ -71,6 +73,15 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
     self.bank_payment_requests.each do |payment_request|
       payment_request.comments.create user_id: user.id,
                                      action_id: BankPaymentRequestCommentAction.id_for(:mark_as_credited)
+
+      Event::EBankPaymentRequest::Credit.(user, bank_payment_request: payment_request)
+
+    end
+
+    # Sending email to procurement initiators about payments against it
+    payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id)).where.not(purchase_order_id: nil)
+    payments.each do |payment|
+      Event::EPurchaseOrder::Credit.(user, {payment: payment})
     end
   end
 end

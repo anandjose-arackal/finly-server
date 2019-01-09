@@ -116,6 +116,10 @@ class User::Balances::Show < User::Base
             return AccountManager::CardTransferPockets::CardTransferPocketsAdapter.new(account)
           when UserPocketType.id_for(:bank_transfer)
             return AccountManager::BankTransferPockets::BankTransferPocketsAdapter.new(account)
+          when UserPocketType.id_for(:reimbursement)
+            return AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter.new(account)
+          when UserPocketType.id_for(:paid_by_company)
+            return AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter.new(account)
           else
             # do nothing?
         end
@@ -233,7 +237,7 @@ class User::Balances::Show < User::Base
   def set_pocket_balances
     # adding pocket balances
     self.balances[:user_pockets] = [] if self.balances[:user_pockets].blank?
-    self.selected_user.user_pockets.each do |pocket|
+    self.selected_user.user_pockets.cash_and_credit_cards.each do |pocket|
       self.balances[:user_pockets] << {
           name: pocket.name,
           type: pocket.user_pocket_type&.name&.humanize,

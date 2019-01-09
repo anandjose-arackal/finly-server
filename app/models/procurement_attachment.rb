@@ -14,6 +14,7 @@
 #  procurement_document_type :string(255)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  user_id                   :integer
 #
 
 class ProcurementAttachment < ActiveRecord::Base
@@ -21,11 +22,16 @@ class ProcurementAttachment < ActiveRecord::Base
 
   belongs_to :procurement_document, polymorphic: true
   belongs_to :company
+  belongs_to :user
 
   CONTENT_TYPES = {content_type: []}
 
   has_attached_file :file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :file, content_type: CONTENT_TYPES
+
+  scope :orphans, -> {
+    where(procurement_document: nil)
+  }
 
   scope :with_id, -> (ids) { where id: ids }
 end

@@ -61,6 +61,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -87,14 +88,14 @@ class User < ActiveRecord::Base
   has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
   has_many :tags, class_name: 'UserTag', dependent: :destroy
-  has_many :expenses, dependent: :destroy
+  has_many :expenses, inverse_of: :user, dependent: :destroy
   has_many :receipts, dependent: :destroy
   has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
-  has_many :reports, dependent: :destroy
+  has_many :reports, inverse_of: :user, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
   has_many :report_tracks, class_name: 'ReportTrack', foreign_key: :action_user_id
   has_many :interacted_reports, -> { distinct }, source: :report, through: :report_tracks
@@ -104,8 +105,8 @@ class User < ActiveRecord::Base
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
-  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
-  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment', dependent: :destroy
+  has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
+  has_many :receiving_payments, foreign_key: 'receiving_user_id', class_name: 'Payment'
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
@@ -132,7 +133,7 @@ class User < ActiveRecord::Base
   has_many :medical_cards, -> { where(card_program_id: CardProgram.id_for(:medical)) }, class_name: 'Card'
   has_many :expense_cards, -> { where(card_program_id: CardProgram.id_for(:expense)) }, class_name: 'Card'
   has_many :card_transactions, dependent: :destroy
-  has_many :money_requests
+  has_many :money_requests, inverse_of: :user
 
   has_many :booking_attachments
 
@@ -185,11 +186,18 @@ class User < ActiveRecord::Base
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+  has_many :resource_templates
+  has_many :purchase_order_templates, -> { filter_resource_type(:purchase_orders) }, class_name: 'ResourceTemplate', foreign_key: :user_id
+  has_many :invoice_templates, -> { filter_resource_type(:invoices) }, class_name: 'ResourceTemplate', foreign_key: :user_id
 
   has_many :user_department_mappings
   has_many :departments, through: :user_department_mappings
 
-  #Budgets
+  # adding a many to many association for user and his/her delegates
+  has_many :user_delegate_mappings
+  has_many :delegated_for_users, class_name: "User", through: :user_delegate_mappings, source: :delegate_for_user
+
+  # Budgets
 
   # many-to-many mapping between user and budget
   has_many :budget_criteria_mappings, as: :budgetable
@@ -199,10 +207,14 @@ class User < ActiveRecord::Base
 
   has_many :procurements
   has_many :level_reviewer_mappings
+  has_many :procurement_attachments
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
   has_one :user_permission, dependent: :destroy
+
+  has_many :tracker_visits
+  has_many :tracker_notifications
 
   # has_one :feature_access, as: :accessible
 
@@ -220,7 +232,7 @@ class User < ActiveRecord::Base
   has_paper_trail
 
   validates :company_id, presence: true
-  validates :email, uniqueness: {allow_blank: true, case_sensitive: false}
+  validates :email, uniqueness: {allow_blank: true, case_sensitive: false}, format: {with: Constants::VALID_EMAIL_FORMAT}
   validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
@@ -228,6 +240,10 @@ class User < ActiveRecord::Base
   validates :user_panel_subscription, presence: true
 
   scope :with_id, ->(user_id) { where id: user_id }
+  scope :with_id_or_email_or_mobile_number, -> (string) {
+    ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
+    where id: ids
+  }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
   scope :filter_name, -> (name) do
@@ -518,6 +534,8 @@ class User < ActiveRecord::Base
 
     # building a default cash on hand pocket, Card Transfer pocket and Bank Transfer pocket
     self.user_pockets.build(name: "Cash on Hand", user_pocket_type_id: UserPocketType.id_for(:cash), atm_withdrawal_pocket: true, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    self.user_pockets.build(name: "Reimbursement", user_pocket_type_id: UserPocketType.id_for(:reimbursement), atm_withdrawal_pocket: false, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
+    self.user_pockets.build(name: "Paid By Company", user_pocket_type_id: UserPocketType.id_for(:paid_by_company), atm_withdrawal_pocket: false, base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     # self.user_pockets.build(name: "Finly Money - Card Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:card_transfer), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
     # self.user_pockets.build(name: "Finly Money - Bank Transfer Pocket", user_pocket_type_id: UserPocketType.id_for(:cash), base_currency_id: Currency.first.id, balance_attributes: {value: 0, currency_id: 1}).save
   end
@@ -545,6 +563,16 @@ class User < ActiveRecord::Base
 
   def roles
     self.user_roles
+  end
+
+  def expense_management_roles
+    role_ids = self.role_mapping.expense_management.pluck(:user_role_id)
+    UserRole.where(id: role_ids)
+  end
+
+  def vendor_payment_roles
+    role_ids = self.role_mapping.vendor_payments.pluck(:user_role_id)
+    UserRole.where(id: role_ids)
   end
 
   def company_admin?
@@ -762,7 +790,7 @@ class User < ActiveRecord::Base
   end
 
   def distance_expense_enabled?
-    if self.company.distance_expense_enabled?
+    if self.company.distance_expense_enabled? && !self.enforce_policy_enabled?
       return true
     end
     policies = self.policies
@@ -776,7 +804,7 @@ class User < ActiveRecord::Base
   end
 
   def time_expense_enabled?
-    if self.company.time_expense_enabled?
+    if self.company.time_expense_enabled? && !self.enforce_policy_enabled?
       return true
     end
     policies = self.policies
@@ -877,6 +905,25 @@ class User < ActiveRecord::Base
 
   def reimbursements_awaiting_confirmation?
 
+  end
+
+  def status
+    "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
+    if self.active and self.invitation_token.blank? and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+      return "Active"
+    elsif self.first_name.blank? || self.invitation_token.present? || self.mobile_only_invite
+      return "Pending"
+    elsif !self.active and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite
+      return "Inactive"
+    end
+  end
+
+  def actual_current_user
+    RequestStore.store[:actual_current_user]
+  end
+
+  def current_user
+    RequestStore.store[:current_user]
   end
 
   private

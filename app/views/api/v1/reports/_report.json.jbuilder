@@ -1,4 +1,4 @@
-json.extract! report, :id, :name, :submitted_at
+json.extract! report, :id, :name, :memo, :submitted_at
 json.status do
   json.id report.report_status_id
   json.name @result.status_name(report)

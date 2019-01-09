@@ -22,4 +22,9 @@ class BankTransfer::AccountOwnersController < ApplicationController
     respond
   end
 
+  def bank_accounts
+    @result = BankTransfer::AccountOwners::BankAccounts.(current_user, params)
+    respond
+  end
+
 end

@@ -32,17 +32,22 @@
 #  sync_type_id                       :integer
 #  report_processor_group_mapping_id  :integer
 #  travel_request_id                  :integer
+#  department_id                      :integer
+#  sub_department_id                  :integer
 #
+
+
 
 
 
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable,
+          FieldCustomizer::CustomizableValidation,
           FindByOrderedIds
 
   has_many :email_authorizations, as: :authorizable
-  belongs_to :user
+  belongs_to :user, inverse_of: :reports
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
   belongs_to :controlling_user, class_name: 'User'
@@ -66,7 +71,11 @@ class Report < ActiveRecord::Base
   belongs_to :sync_status, class_name: 'ReportSyncStatus'
   belongs_to :sync_type, class_name: 'ReportSyncType'
   belongs_to :travel_request
+  belongs_to :created_by, class_name: "User"
+  belongs_to :modified_by, class_name: 'User'
   # belongs_to :money_request
+  belongs_to :department
+  belongs_to :sub_department, class_name: "Department"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -83,6 +92,12 @@ class Report < ActiveRecord::Base
   validate :has_expenses
   validate :controller_has_role
   validates :policy_id, presence: true
+
+  alias_attribute :purpose, :memo
+
+  field_customization_key :report
+  customizable_validate :purpose, presence: false, scope: [:user, :company]
+
 
   default_scope {order(report_status_id: :asc, submitted_at: :desc, created_at: :desc)}
 
@@ -203,7 +218,7 @@ class Report < ActiveRecord::Base
 
   scope :sort_for_personal, -> {joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
 
-  scope :order_by_controlling_user, ->(user_id, manager=false) {
+  scope :order_by_controlling_user, ->(user_id, manager = false) {
     if user_id.present?
       ids = pluck(:id)
       controlling_reports = where(controlling_user_id: user_id)
@@ -216,7 +231,7 @@ class Report < ActiveRecord::Base
     end
   }
 
-  scope :order_by, ->(type, user_id=nil){
+  scope :order_by, ->(type, user_id = nil) {
     case type
     when :created_at
       reorder(created_at: :desc)
@@ -246,6 +261,7 @@ class Report < ActiveRecord::Base
   scope :includes_policy, -> {includes :policy}
   scope :not_settled, -> {where report_processor_group_mapping_id: nil}
   scope :with_processor_group_mapping, -> (id) {where report_processor_group_mapping_id: id}
+  scope :include_details, -> {includes :user, :controlling_user, :policy}
 
   scope :filter_custom_drop_down_selection, ->(drop_down_item_id) do
     drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
@@ -267,6 +283,21 @@ class Report < ActiveRecord::Base
     ids = Report.where(id: original_report_ids, user_id: user_ids).pluck(:id)
     where(id: ids)
   }
+
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where user_id: user_ids
+    end
+  }
+
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      ids = where(department_id: department_ids).pluck(:id)
+      ids = where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
+    end
+  }
+
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount
@@ -555,13 +586,13 @@ class Report < ActiveRecord::Base
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if [ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed])].include?(self.report_status_id)
+    if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report_status_id)
       self.expenses.each do |expense|
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(expense)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
       end
     else
       self.expenses.each do |expense|
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(expense)
       end
     end
   end

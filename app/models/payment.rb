@@ -38,9 +38,14 @@
 #  scheduled_at                   :date
 #  processed_at                   :date
 #  cost_center_id                 :integer
+#  company_id                     :integer
+#  external_reference_id          :string(255)
+#  purchase_order_id              :integer
+#  procurement_id                 :integer
+#  department_id                  :integer
+#  location_id                    :integer
 #  transaction_reference_id       :string(255)
 #
-
 
 
 
@@ -62,6 +67,8 @@ class Payment < ActiveRecord::Base
   belongs_to :receiving_user, polymorphic: true
   belongs_to :reference_resource, polymorphic: true
   belongs_to :original_payment_for_refund, class_name: "Payment"
+  belongs_to :category
+  belongs_to :department
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
@@ -85,6 +92,7 @@ class Payment < ActiveRecord::Base
   belongs_to :payment_order
   belongs_to :payment_status
   belongs_to :payment_purpose
+  belongs_to :purchase_order
 
   belongs_to :destination_pocket, class_name: "UserPocket"
 
@@ -203,8 +211,13 @@ class Payment < ActiveRecord::Base
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
   scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
+  scope :failed, -> { where payment_status_id: PaymentStatus.id_for(:failed) }
   scope :completed, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
   scope :processed, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:processing)] }
+  scope :possible_failure, -> { where payment_status_id: PaymentStatus.id_for(:possible_failure) }
+  scope :pending, -> { where payment_status_id: PaymentStatus.id_for(:pending) }
+  scope :in_progress, -> { where payment_status_id: PaymentStatus.id_for(:in_progress) }
+  scope :pending_approval, -> { where payment_status_id: PaymentStatus.id_for(:pending_approval) }
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }
@@ -248,6 +261,10 @@ class Payment < ActiveRecord::Base
       else
         where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
     end
+  }
+
+  scope :filter_status_id, -> (status_id) {
+    where(payment_status_id: status_id)
   }
 
   scope :filter_user_id, -> (user_id) {
@@ -294,8 +311,73 @@ class Payment < ActiveRecord::Base
     where payment_status_id: [PaymentStatus.id_for(:pending_approval), PaymentStatus.id_for(:failed), PaymentStatus.id_for(:pending_credit)]
   }
 
+  scope :virtual_account_transaction_purpose, -> (purpose_id) {
+    virtual_account_transaction_ids = self.where(reference_resource_type: "VirtualAccountTransaction").pluck(:reference_resource_id)
+    virtual_account_transactions = VirtualAccountTransaction.where(id: virtual_account_transaction_ids)
+    virtual_accounts = VirtualBankAccount.where(id: virtual_account_transactions.pluck(:virtual_account_id))
+    case purpose_id
+      when 1, '1'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return)).pluck(:id)
+      when 2, '2'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:payment_receivable)).pluck(:id)
+      when 3, '3'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:invoice)).pluck(:id)
+      when 4, '4'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:virtual_bank_account)).pluck(:id)
+      when 5, '5'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:corporate_account_reload)).pluck(:id)
+      when 6, '6'
+        virtual_account_ids = virtual_accounts.where(purpose_id: VirtualAccountPurpose.id_for(:finly_money_reload)).pluck(:id)
+      else
+        virtual_account_ids = []
+    end
+    virtual_account_transactions = virtual_account_transactions.where(virtual_account_id: virtual_account_ids)
+    where(reference_resource_type: "VirtualAccountTransaction", reference_resource_id: virtual_account_transactions.pluck(:id))
+  }
+
+  scope :with_budgetable_category_ids, -> (category_ids) {
+    if category_ids.present?
+      category_ids = [category_ids] unless category_ids.is_a?(Array)
+      where(category_id: category_ids)
+    end
+  }
+
+  scope :with_budgetable_cost_center_ids, -> (cost_center_ids) {
+    if cost_center_ids.present?
+      cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
+      where(cost_center_id: cost_center_ids)
+    end
+  }
+
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      where department_id: department_ids
+    end
+  }
+
+  scope :with_budgetable_location_ids, -> (location_ids) {
+    if location_ids.present?
+      where(location_id: location_ids)
+    end
+  }
+
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where(receiving_user_type: "YesBankVendor", receiving_user_id: vendor_ids)
+    end
+  }
+
+  scope :include_for_index, -> {
+        includes( :payment_status, :amount, :department, :category, :system_messages,:initiating_account,:reference_resource,:initiating_user, :receiving_user,
+                  receiving_account: [:account_owner],
+                  invoice: [:original_amount, :advance_amount, :tax_amount, :tds_amount, :freight_amount, :balance_due, :gross_amount, :net_amount, :discount_amount,
+                            :category, :cost_center, :tds_slab, :amount, :invoice_status, :invoice_attachments, :invoice_items],
+                  payment_order: [bank_payment_request: [:status]])
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
+  validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
   # validates :initiating_user_id, presence: true
   # validates :receiving_user_id, presence: true
   validate :initiating_user_presence
@@ -440,7 +522,18 @@ class Payment < ActiveRecord::Base
   end
 
   def company_id
-    self.payment_order.company_id
+    self.payment_order&.company_id
+  end
+
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.id,
+        amount: self.amount.value,
+        document_owner: self.initiating_user&.name,
+        document_status: self.payment_status&.name,
+        document_type: self.class.name
+    }
   end
 
   private
@@ -489,7 +582,7 @@ class Payment < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    if self.completed? || self.processing?
+    if self.completed? || self.processing? || self.possible_failure?
       BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
     else
       # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object

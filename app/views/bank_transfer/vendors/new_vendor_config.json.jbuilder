@@ -20,3 +20,5 @@ json.tds_rates do
     json.extract! tds_rate, :id, :name, :tds
   end
 end
+
+json.custom_fields_config @result.field_configurations

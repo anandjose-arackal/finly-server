@@ -23,6 +23,7 @@
 #  drop_date       :date
 #  drop_time       :time
 #  is_deleted      :boolean          default(FALSE)
+#  booking_id      :integer
 #
 
 require 'test_helper'

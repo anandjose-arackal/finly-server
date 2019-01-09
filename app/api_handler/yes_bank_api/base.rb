@@ -20,13 +20,18 @@ class YesBankApi::Base < BaseHandler
     if Rails.env.production?
       values = Finly::SecureStorage::Connector.read('core/yes_bank')
     else
-      path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
+      path = "#{Rails.root}/config/yes_bank_config.yml"
       values = YAML.load_file(path)
     end
 
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
-    type = (values[self.company_id.to_s]).present? ? self.company_id.to_s : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
-    self.configuration = values[type]
+    company = self.company_id.present? ? Company.find_by_id(self.company_id) : nil
+    if company.present? and company&.feature_subscription&.current_account_connected #and (values[self.company_id.to_s]).present?
+      type = self.company_id.to_s # i.e. if the configuration associated with this particular company's id doesn't exist, use default
+    else
+      type = 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
+    end
+    self.configuration = values[type] || {}
     self.client_id = self.configuration['client_id']
     self.client_secret = self.configuration['client_secret']
     self.auth_username = self.configuration['username']
@@ -52,9 +57,9 @@ class YesBankApi::Base < BaseHandler
     {}
   end
 
-   def file_logger_params(logger_params)
-     file_logger_base_params.merge logger_params
-   end
+  def file_logger_params(logger_params)
+    file_logger_base_params.merge logger_params
+  end
 
   # because this is common for all Yes Bank API calls
   def process
@@ -116,126 +121,130 @@ class YesBankApi::Base < BaseHandler
                                                                  })
         self.payment.update(reference_resource: self.bank_transaction)
       end
-    # temporary - rescue SSL error to simulate various cases
-    # rescue Faraday::SSLError
-    #   simulating different cases
-    #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
-      # self.response.status_code = 500
-      # self.parsed_response = {
-      #     "Envelope" => {
-      #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-      #         "Body" => {
-      #             "Fault" => {
-      #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
-      #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
-      #                 "xmlns:npci" => "http://www.npci.org.in",
-      #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
-      #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
-      #                 "xmlns:pt" => "https://www.puratech.co.in/",
-      #                 "xmlns:http" => "http://www.quantiguous.com/services",
-      #                 "xmlns:ns" => "http://www.quantiguous.com/services",
-      #                 "xmlns:atom" => "http://www.atomtech.in/imps",
-      #                 "xmlns:iib" => "http://www.ibm.com/iib",
-      #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
-      #                 "Code" => {
-      #                     "Value" => "soapenv12:Sender",
-      #                     "Subcode" => {
-      #                         "Value" => "ns:E504",
-      #                         "Subcode" => {
-      #                             "Value" => "ns:E504"
-      #                         }
-      #                     }
-      #                 },
-      #                 "Reason" => {
-      #                     "Text" => "Bad Gateway"
-      #                 },
-      #                 "Detail" => {
-      #                     "ExceptionList" => {
-      #                         "RecoverableException" => {
-      #                             "File" => "/build/slot1/S900_P/src/DataFlowEngine/PluginInterface/ImbJniNode.cpp",
-      #                             "Line" => "1304",
-      #                             "Function" => "ImbJniNode::evaluate",
-      #                             "Type" => "ComIbmRouteNode",
-      #                             "Name" => "gen/fundsTransferByCustomerService2#FCMComposite_1_8.gen/transfer_Request_Response#FCMComposite_1_28.atom/invoke5#FCMComposite_1_1.atom/invoke2#FCMComposite_1_1.atom/invoke#FCMComposite_1_1",
-      #                             "Label" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?",
-      #                             "Catalog" => "BIPmsgs",
-      #                             "Severity" => "3",
-      #                             "Number" => "2230",
-      #                             "Text" => "Caught exception and rethrowing",
-      #                             "Insert" => {
-      #                                 "Type" => "14",
-      #                                 "Text" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?"
-      #                             },
-      #                         }
-      #                     }
-      #                 }
-      #             }
-      #         }
-      #     }
-      # }
-      #
-      # self.parsed_response = {
-      #     "Envelope" => {
-      #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-      #         "Body" => {
-      #             "transferResponse" => {
-      #                 "xmlns:io" => "http://www.quantiguous.com/services",
-      #                 "version" => "2.0",
-      #                 "uniqueResponseNo" => "f7ae85caea2111e7b84a0a0047340000",
-      #                 "attemptNo" => "1",
-      #                 "transferType" => "IMPS",
-      #                 "lowBalanceAlert" => "false",
-      #                 "transactionStatus" => {
-      #                     "statusCode" => "COMPLETED",
-      #                     "subStatusCode" => "0",
-      #                     "bankReferenceNo" => "736015422593",
-      #                     "beneficiaryReferenceNo" => nil
-      #                 },
-      #                 "nameWithBeneficiaryBank" => "GURUKRIPA MILK SUPPL",
-      #                 "requestReferenceNo" => "FINLYIMPS71012974914"
-      #             }
-      #         }
-      #     }
-      # }
-      #
-      # self.parsed_response = {
-      #     "Envelope" => {
-      #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-      #         "Body" => {
-      #             "Fault" => {
-      #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
-      #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
-      #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
-      #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
-      #                 "xmlns:pt" => "https://www.puratech.co.in/",
-      #                 "xmlns:http" => "http://www.quantiguous.com/services",
-      #                 "xmlns:ns" => "http://www.quantiguous.com/services",
-      #                 "xmlns:iib" => "http://www.ibm.com/iib",
-      #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
-      #                 "Code" => {
-      #                     "Value" => "soapenv12:Sender",
-      #                     "Subcode" => {
-      #                         "Value" => "ns:E1001"
-      #                     }
-      #                 },
-      #                 "Reason" => {
-      #                     "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
-      #                 }
-      #             }
-      #         }
-      #     }
-      # }
+        # temporary - rescue SSL error to simulate various cases
+        # rescue Faraday::SSLError
+        #   simulating different cases
+        #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
+        # self.response.status_code = 500
+        # self.parsed_response = {
+        #     "Envelope" => {
+        #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+        #         "Body" => {
+        #             "Fault" => {
+        #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
+        #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
+        #                 "xmlns:npci" => "http://www.npci.org.in",
+        #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
+        #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
+        #                 "xmlns:pt" => "https://www.puratech.co.in/",
+        #                 "xmlns:http" => "http://www.quantiguous.com/services",
+        #                 "xmlns:ns" => "http://www.quantiguous.com/services",
+        #                 "xmlns:atom" => "http://www.atomtech.in/imps",
+        #                 "xmlns:iib" => "http://www.ibm.com/iib",
+        #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
+        #                 "Code" => {
+        #                     "Value" => "soapenv12:Sender",
+        #                     "Subcode" => {
+        #                         "Value" => "ns:E504",
+        #                         "Subcode" => {
+        #                             "Value" => "ns:E504"
+        #                         }
+        #                     }
+        #                 },
+        #                 "Reason" => {
+        #                     "Text" => "Bad Gateway"
+        #                 },
+        #                 "Detail" => {
+        #                     "ExceptionList" => {
+        #                         "RecoverableException" => {
+        #                             "File" => "/build/slot1/S900_P/src/DataFlowEngine/PluginInterface/ImbJniNode.cpp",
+        #                             "Line" => "1304",
+        #                             "Function" => "ImbJniNode::evaluate",
+        #                             "Type" => "ComIbmRouteNode",
+        #                             "Name" => "gen/fundsTransferByCustomerService2#FCMComposite_1_8.gen/transfer_Request_Response#FCMComposite_1_28.atom/invoke5#FCMComposite_1_1.atom/invoke2#FCMComposite_1_1.atom/invoke#FCMComposite_1_1",
+        #                             "Label" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?",
+        #                             "Catalog" => "BIPmsgs",
+        #                             "Severity" => "3",
+        #                             "Number" => "2230",
+        #                             "Text" => "Caught exception and rethrowing",
+        #                             "Insert" => {
+        #                                 "Type" => "14",
+        #                                 "Text" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?"
+        #                             },
+        #                         }
+        #                     }
+        #                 }
+        #             }
+        #         }
+        #     }
+        # }
+        #
+        # self.parsed_response = {
+        #     "Envelope" => {
+        #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+        #         "Body" => {
+        #             "transferResponse" => {
+        #                 "xmlns:io" => "http://www.quantiguous.com/services",
+        #                 "version" => "2.0",
+        #                 "uniqueResponseNo" => "f7ae85caea2111e7b84a0a0047340000",
+        #                 "attemptNo" => "1",
+        #                 "transferType" => "IMPS",
+        #                 "lowBalanceAlert" => "false",
+        #                 "transactionStatus" => {
+        #                     "statusCode" => "COMPLETED",
+        #                     "subStatusCode" => "0",
+        #                     "bankReferenceNo" => "736015422593",
+        #                     "beneficiaryReferenceNo" => nil
+        #                 },
+        #                 "nameWithBeneficiaryBank" => "GURUKRIPA MILK SUPPL",
+        #                 "requestReferenceNo" => "FINLYIMPS71012974914"
+        #             }
+        #         }
+        #     }
+        # }
+        #
+        # self.parsed_response = {
+        #     "Envelope" => {
+        #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+        #         "Body" => {
+        #             "Fault" => {
+        #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
+        #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
+        #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
+        #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
+        #                 "xmlns:pt" => "https://www.puratech.co.in/",
+        #                 "xmlns:http" => "http://www.quantiguous.com/services",
+        #                 "xmlns:ns" => "http://www.quantiguous.com/services",
+        #                 "xmlns:iib" => "http://www.ibm.com/iib",
+        #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
+        #                 "Code" => {
+        #                     "Value" => "soapenv12:Sender",
+        #                     "Subcode" => {
+        #                         "Value" => "ns:E1001"
+        #                     }
+        #                 },
+        #                 "Reason" => {
+        #                     "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
+        #                 }
+        #             }
+        #         }
+        #     }
+        # }
     rescue Faraday::ResourceNotFound
-      file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'}))
+      if Rails.env.production?
+        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'}))
+      end
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
-    rescue Exception => e
-      stack_trace = e.message
-      e.backtrace.each do |line|
-        stack_trace += "\n#{line}"
-      end
-      file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
+    # rescue Exception => e
+    #   stack_trace = e.message
+    #   e.backtrace.each do |line|
+    #     stack_trace += "\n#{line}"
+    #   end
+    #   if Rails.env.production?
+    #     file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
+    #   end
     end
   end
 

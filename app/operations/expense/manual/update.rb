@@ -32,6 +32,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if amount_value.present? and amount_value <= 0
       messages[:error] << 'Amount cannot be less than or equal to 0'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -66,11 +67,30 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
-    pocket_id = self.updated_expense_params[:spent_from_id]
-    self.cash_pocket = self.expense&.user&.user_pockets&.cash_and_credit_cards&.find_by(id: pocket_id)
-
-    if self.cash_pocket.blank?
-      self.cash_pocket = self.expense&.user&.user_pockets&.cash_pockets_only&.first
+    if expense.present?
+      pocket_id = self.params&.dig(:expense, :spent_from_id)
+      # Todo - Jugaad - Legacy support for older version of android/iOS where this is not implemented
+      if pocket_id.blank? and (params[:expense].present? and params[:expense].has_key?(:reimbursable) and params[:expense].has_key?(:from_cash_on_hand))
+        exp_params = params[:expense] || {}
+        reimbursable = StringUtils.to_bool exp_params[:reimbursable]
+        from_cash_on_hand = StringUtils.to_bool exp_params[:from_cash_on_hand]
+        if reimbursable
+          pocket_id = expense.user.user_pockets.reimbursement_pocket_only&.first&.id
+        elsif from_cash_on_hand
+          pocket_id = expense.user.user_pockets.cash_pockets_only&.first&.id
+        elsif exp_params.key?(:reimbursable) || exp_params.key?(:from_cash_on_hand) # Legacy support for android app -> As android only sends the key which has been updated
+          pocket_id = expense.user.user_pockets.paid_by_company_pocket_only&.first&.id
+        end
+        if pocket_id.blank?
+          pocket_id = expense.user.user_pockets.cash_pockets_only.first&.id
+        end
+      end
+      self.cash_pocket = expense.user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
+      # Jugaad End
+      if pocket_id.present?
+        self.cash_pocket = expense.user.user_pockets.non_bank_card_transfer_pockets.find_by(id: pocket_id) || expense&.spent_from
+        self.updated_expense_params[:spent_from_id] = self.cash_pocket&.id
+      end
     end
   end
 
@@ -92,8 +112,13 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
+    # if self.updated_expense_params[:spent_from_id].blank?
+    #   add_message :error, 'Please select the Spend Account'
+    #   return
+    # end
+
     if self.updated_expense_params[:spent_from_id].present? && self.cash_pocket.blank?
-      add_message :error, "Could not find pocket from which this expense was spent"
+      add_message :error, 'Error in Spend Account'
       return
     end
 
@@ -114,6 +139,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if StringUtils.to_bool(updated_expense_params[:reimbursable])
       updated_expense_params[:spent_from_id] = nil
     end
+    updated_expense_params[:modified_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process
@@ -127,12 +153,14 @@ class Expense::Manual::Update < Expense::Manual::Base
       return
     end
     # validating the custom fields here
-    valid = CustomField::Validate.(self.expense.manual_expense)
-    unless valid.success?
-      add_message :error, valid.messages[:error]
-      return false
+    # todo - in android workflow the dependent custom fields is breaking, so need to prevent validation in the app
+    unless RequestStore.store[:request]&.path&.include?('/mobile/v0')
+      valid = CustomField::Validate.(self.expense.manual_expense)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return false
+      end
     end
-
 
     if expense.update(updated_expense_params)
       if self.destroy_receipts
@@ -217,7 +245,7 @@ class Expense::Manual::Update < Expense::Manual::Base
                            category_name: expense.category_name,
                            receipt: expense.receipts.count,
                            from_cash_on_hand: expense.from_cash_on_hand
-                          }
+    }
   end
 
 end

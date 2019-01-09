@@ -78,9 +78,18 @@ class MoneyRequest::Update < MoneyRequest::Base
     end
 
     # to support mobile app
-    if [1, '1'].include?(update_param[:payment_mode_id])
+    if [1, '1'].include?(update_param[:payment_mode_id]) and update_param[:destination_pocket_id].blank?
       update_param[:destination_pocket_id] = self.money_request.user&.user_pockets&.cash_pockets_only&.first&.id
     end
+
+    if [1, '1'].include?(update_param[:payment_mode_id])
+      pocket = self.money_request&.user&.user_pockets.with_id(update_param[:destination_pocket_id])&.first
+
+      update_param&.dig(:items_attributes).each do |item_attr|
+        item_attr[:amount_attributes][:currency_id] = pocket.base_currency_id rescue nil
+      end
+    end
+    update_param[:modified_by_id] = actual_current_user.id if actual_current_user.present? 
   end
 
   def process
@@ -98,6 +107,7 @@ class MoneyRequest::Update < MoneyRequest::Base
 
   def post_process
     save_comments
+    money_request.comments.create(user: user, comment_action_id: MoneyRequestCommentAction.id_for(:updated_by_delegate), delegated_action_user_id: actual_current_user.id) if actual_current_user.present?
   end
 
   protected
@@ -128,7 +138,7 @@ class MoneyRequest::Update < MoneyRequest::Base
   end
 
   def update_params
-    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :destination_pocket_id,
+    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :modified_by_id,:destination_pocket_id,
             items_attributes: [:category_id, :money_request_item_category_id, amount_attributes: [:value, :currency_id]])
   end
 

@@ -59,6 +59,13 @@
 #  controlling_user_role_id     :integer
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
+#  billing_address              :text(65535)
+#  shipping_address             :text(65535)
+#  is_template                  :boolean          default(FALSE)
+#  template_name                :string(255)
+#  is_deleted                   :boolean          default(FALSE)
+#  resource_template_id         :integer
+#  invoice_id                   :string(255)
 #
 
 require 'test_helper'

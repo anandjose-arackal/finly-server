@@ -15,6 +15,7 @@
 #  is_deleted         :boolean          default(FALSE)
 #  reservation_date   :date
 #  reservation_time   :time
+#  booking_id         :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

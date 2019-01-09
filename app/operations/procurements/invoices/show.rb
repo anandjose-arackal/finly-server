@@ -2,8 +2,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   attr_accessor :invoice
 
   def init
-    invoice_id = params[:id] || params[:invoice_id]
-    self.invoice = Invoice.find_by id: invoice_id
+    invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
+    self.invoice = user.company.inward_invoices.find_by id: invoice_id
   end
 
   def validate
@@ -18,12 +18,14 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   end
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies, :tax_rates
+    attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
+                  :tax_rates, :locations, :budgets
 
     def init
       self.invoice = params[:invoice]
       self.departments = user.company.departments.roots
 
+      self.locations = user.company.locations
       if invoice.created_by.departments.present?
         self.sub_departments = invoice.created_by.departments.only_sub_departments
       else
@@ -32,11 +34,19 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
-      self.policies = invoice.created_by.policies.with_application(:vp)
+      policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+
       self.reviewal_chains = []
 
       self.actions = get_actions
 
+      if self.invoice.items.present?
+        op = BudgetsCalculator::RelevantBudgets.(user, object: self.invoice)
+        if op.success?
+          self.budgets = op.budget_data
+        end
+      end
 
       params[:reviewal_document] = invoice
 
@@ -54,10 +64,15 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     def get_actions
       actions = {}
       actions[:audit_trail] = true
+      actions[:export_items] = true
 
+      if self.invoice.items.count > 0
+        actions[:show_comments] = true
+      end
 
       if document_owner? && (self.invoice.open? || self.invoice.retracted? || self.invoice.rejected?)
         actions[:policy_editable] = get_policy_editable
+        actions[:approval_chain_editable] = true
         actions[:submit] = {
             url: Rails.application.routes.url_helpers.procure_inward_invoice_submit_path(inward_invoice_id: invoice.id),
             method: "PUT"
@@ -108,6 +123,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
           }
           actions[:document_editable] = true
           actions[:policy_editable] = false
+          actions[:approval_chain_editable] = false
         end
 
         if document_owner?
@@ -139,6 +155,10 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       else
         true
       end
+    end
+
+    def get_approval_policy_editable
+
     end
 
     def user_in_level?

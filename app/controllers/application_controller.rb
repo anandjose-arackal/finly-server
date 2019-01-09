@@ -15,7 +15,14 @@ class ApplicationController < ActionController::Base
 
   before_action :load_global_variables
 
+  before_action :initialize_query_logger
+
+  before_action :init_elastic_apm
+
   before_filter :store_location
+
+  after_filter :set_queries_counter
+  after_filter :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found
@@ -25,18 +32,18 @@ class ApplicationController < ActionController::Base
   # handles 404 errors
   def not_found
     respond_to do |format|
-      format.html { render file: "#{Rails.root}/public/404", layout: false, status: :not_found }
-      format.xml { head :not_found }
-      format.any { head :not_found }
+      format.html {render file: "#{Rails.root}/public/404", layout: false, status: :not_found}
+      format.xml {head :not_found}
+      format.any {head :not_found}
     end
   end
 
   # handles 500 errors
   def error
     respond_to do |format|
-      format.html { render file: "#{Rails.root}/public/500", layout: false, status: :error }
-      format.xml { head :not_found }
-      format.any { head :not_found }
+      format.html {render file: "#{Rails.root}/public/500", layout: false, status: :error}
+      format.xml {head :not_found}
+      format.any {head :not_found}
     end
   end
 
@@ -57,8 +64,8 @@ class ApplicationController < ActionController::Base
   def respond_to_ajax_with_success(redirect_path = root_path, force = false)
     redirect_path = request.referrer if request.referrer && !force
     respond_to do |format|
-      format.html { redirect_to redirect_path }
-      format.js { redirect_to redirect_path, turbolinks: true }
+      format.html {redirect_to redirect_path}
+      format.js {redirect_to redirect_path, turbolinks: true}
       format.json {}
     end
   end
@@ -146,7 +153,7 @@ class ApplicationController < ActionController::Base
     @curr_user = nil
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
-      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
+      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome') or scopes.include?('api')
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?('admin')
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
@@ -156,6 +163,10 @@ class ApplicationController < ActionController::Base
     if @curr_user.class.name == 'User'
       RequestStoreUtil.set_current_company @curr_user&.company
     end
+
+    # looking for if the particular user is a delegate for someone else
+    retrieve_delegate_user
+
     @curr_user
   end
 
@@ -165,11 +176,25 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
+  def retrieve_delegate_user
+    # header is going to send a 'delegate_for_user_id' attribute
+    delegate_for_user_id = request.headers['Delegate-For-User-Id']
+    delegated_for_user = @curr_user.delegated_for_users.find_by(id: delegate_for_user_id) if delegate_for_user_id.present?
+    if delegated_for_user.present?
+      RequestStore.store[:actual_current_user] = @curr_user # setting the actual current user as this guy
+    end
+    if delegated_for_user.present?
+      @curr_user = delegated_for_user
+      RequestStore.store[:current_user] = delegated_for_user
+    end
+  end
+
   def respond_success_failure
     respond response: (@result.success? ? :success : :failure)
   end
 
-  def respond(type=nil)
+  def respond(type = nil)
     if type.present?
       if type[:response] == :success
         if @result.blank?
@@ -178,7 +203,7 @@ class ApplicationController < ActionController::Base
           @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, messages)
         end
         respond_to do |format|
-          format.json { render 'shared/success' }
+          format.json {render 'shared/success'}
           format.html {}
         end
         return
@@ -189,19 +214,19 @@ class ApplicationController < ActionController::Base
           @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, messages)
         end
         respond_to do |format|
-          format.json { render 'layouts/application' }
+          format.json {render 'layouts/application'}
           format.html {}
         end
         return
       elsif type[:render].present?
         respond_to do |format|
-          format.json { render type[:render] }
+          format.json {render type[:render]}
           format.html {}
         end
         return
       elsif type[:view].present? and type[:view] == false
         respond_to do |format|
-          format.json { render 'layouts/application' }
+          format.json {render 'layouts/application'}
           format.html {}
         end
         return
@@ -221,8 +246,8 @@ class ApplicationController < ActionController::Base
         end
       else
         respond_to do |format|
-          format.js { render 'layouts/application' }
-          format.json { render 'layouts/application' }
+          format.js {render 'layouts/application'}
+          format.json {render 'layouts/application'}
           format.html {}
           format.xls {}
         end
@@ -230,7 +255,7 @@ class ApplicationController < ActionController::Base
     else
       respond_to do |format|
         format.js {}
-        format.json { render 'layouts/application' }
+        format.json {render 'layouts/application'}
         format.html {}
       end
     end
@@ -243,12 +268,12 @@ class ApplicationController < ActionController::Base
     RequestStoreUtil.set_current_device current_device
   end
 
-  def respond_failure(message=nil)
+  def respond_failure(message = nil)
     messages = nil
     messages = [message] unless message.blank? or message.is_a?(Array)
     @result = BaseOperation::BasePresenter::FailurePresenter.new(current_user, params, {error: messages})
     respond_to do |format|
-      format.json { render 'layouts/application' }
+      format.json {render 'layouts/application'}
     end
   end
 
@@ -296,6 +321,65 @@ class ApplicationController < ActionController::Base
     if access_token.present?
       request.headers['Authorization'] = "Bearer #{access_token}"
     end
+  end
+
+  def initialize_query_logger
+    QueryLogger.reset if ENABLE_QUERY_LOGGER
+  end
+
+  FILE_LOGGER = LogStashLogger.new(type: :file, path: 'log/logstash_query_details.log', sync: true)
+
+  def set_queries_counter
+    return unless ENABLE_QUERY_LOGGER
+    return if params[:controller] == 'notifications' && params[:action] == 'unread'
+    log = {
+        path: request.path,
+        controller: request.params[:controller],
+        action: request.params[:action],
+        total_query_time: QueryLogger.time,
+        queries_count: QueryLogger.count,
+        queries_summary: QueryLogger.summary,
+        queries: QueryLogger.queries,
+        current_app: current_app,
+        current_device: current_device,
+    }
+    user = current_user rescue nil
+    if user.present?
+      log[:user_id] = user&.id
+      log[:user_name] = (user&.name rescue nil)
+      log[:user_email] = user&.email
+      log[:user_mobile_number] = user&.mobile_number
+      log[:current_app] = current_app
+      log[:current_device] = current_device
+      log[:company_name] = (current_company&.name rescue nil)
+      log[:company_id] = (current_company&.id rescue nil)
+      view = (params&.dig(:view) rescue nil)
+      log[:current_view] = view
+    end
+    FILE_LOGGER.info(log)
+  end
+
+  def track_request
+    user_id = current_user&.id
+    # Track only if user is present
+    return if user_id.blank? or request.remote_ip.blank?
+    return unless current_user.class.name == User.name
+    # Create new visit in background
+    TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
+  end
+
+  def init_elastic_apm
+    return unless Rails.env.production?
+    return unless current_user
+    return unless current_user.is_a?(User)
+    ElasticAPM.set_user(current_user)
+    ElasticAPM.set_tag(:company_id, current_user.company_id)
+    ElasticAPM.set_tag(:company_name, current_user.company_name)
+    ElasticAPM.set_tag(:user_id, current_user.id)
+    ElasticAPM.set_tag(:user_name, current_user.name)
+    ElasticAPM.set_tag(:app, current_app)
+    ElasticAPM.set_tag(:device, current_device)
+    ElasticAPM.set_tag(:view, params&.dig(:view))
   end
 
 end

@@ -20,16 +20,18 @@ module Constants
     YESBANK_EMAIL_ID = ['sreeram.nr@finly.io']
   end
 
-  # todo - to be removed once companies are done mirating from HDFC to RBL
-  MIGRATING_COMPANIES = [51, 48, 81]
+  # todo - to be removed once companies are done migrating from HDFC to RBL
+  MIGRATING_COMPANIES = [10, 67, 112]
 
-  PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
+  # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
-  RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io', 'venu.reddy@finly.io']
+  # RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io', 'venu.reddy@finly.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
 
-  SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
+  SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'admin@finlytest.io']
 
   DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other']
   DEFAULT_MONEY_REQUEST_CATEGORIES = ['Accommodation', 'Lodging', 'Local Conveyance', 'Others']
@@ -78,7 +80,7 @@ module Constants
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io anushrut.khare@finly.io venky.d@finly.io kartik.k@finly.io abhinandan.k@finly.io)
+    TRANSCRIBER_EMAILS = %w(abhinandan.k@finly.io rakesh.g@finly.io)
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end
@@ -315,5 +317,24 @@ module Constants
   end
 
   ###################### END OF Darwin Box ###########################
+
+
+  ################### Encryption Keys for Remunance ################
+
+  class Constants::Remunance
+    if Rails.env.production?
+      XOR_KEY = ''
+    else
+      XOR_KEY = '666666'
+    end
+
+    if Rails.env.production?
+      SHA512_KEY = ''
+    else
+      SHA512_KEY = '4150fb44a955a5ff0711f9a1c631a3ed'
+    end
+  end
+
+  ###################### END OF Remunance ###########################
 
 end

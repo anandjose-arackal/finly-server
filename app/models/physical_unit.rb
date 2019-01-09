@@ -37,5 +37,12 @@ class PhysicalUnit < ActiveRecord::Base
     5
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 
 end

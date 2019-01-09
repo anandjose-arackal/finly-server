@@ -1,20 +1,26 @@
 class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :payments_count, :bank_payment_request
+  attr_accessor :payments_count, :bank_payment_request, :payments
 
   class BankTransfer::PaymentRequest::PaymentsCount::PaymentsCountPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :count
+    attr_accessor :count, :payments
+
+    has_scope :filter_status_id
+    has_scope :filter_search
 
     def init
-      self.count = params[:payments_count]
+      self.payments = params[:payments]
+      self.payments = apply_scopes(self.payments, params)
+      self.count = self.payments.count
     end
 
   end
 
   def init
     id = params[:id] || params[:bank_payment_request_id]
-    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
+    index_params = params.select { |k,v| ["view", "role_id", :view, :role_id].include? k }
+    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, index_params).payment_requests.find_by(id: id)
   end
 
   def validate
@@ -25,11 +31,12 @@ class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest
   end
 
   def process
-    self.payments_count = self.bank_payment_request.payment_order.payments.count
+    self.payments = self.bank_payment_request.payment_order.payments
   end
 
   def success
-    self.payments_count
+    params[:payments] = self.payments
+    BankTransfer::PaymentRequest::PaymentsCount::PaymentsCountPresenter.new(user, params, messages)
   end
 
 end

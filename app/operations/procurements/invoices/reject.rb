@@ -16,7 +16,7 @@ class Procurements::Invoices::Reject < Procurements::Invoices::Base
     params[:document] = self.invoice
     params[:aasm_event] = 'reject'
     params[:violation_present] = false #todo Check violations
-    op = WorkflowManager::Base.(current_user, params)
+    op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
     end

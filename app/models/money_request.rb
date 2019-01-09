@@ -29,12 +29,8 @@
 #  approved_at                        :datetime
 #  travel_request_id                  :integer
 #  destination_pocket_id              :integer
+#  created_by_id                      :integer
 #
-
-
-
-
-
 
 
 
@@ -45,11 +41,12 @@ class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks,
           MathUtil,
           SoftDeletable,
+          FieldCustomizer::CustomizableValidation,
           FindByOrderedIds
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :status, class_name: 'MoneyRequestStatus'
-  belongs_to :user
+  belongs_to :user, inverse_of: :money_requests
   belongs_to :card
   belongs_to :loaded_by, class_name: 'User'
   belongs_to :controlling_user, class_name: 'User'
@@ -62,6 +59,8 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :payment
   belongs_to :money_request_processor_mapping
   belongs_to :destination_pocket, class_name: "UserPocket"
+  belongs_to :created_by, class_name: "User"
+  belongs_to :modified_by, class_name: 'User'
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -220,6 +219,7 @@ class MoneyRequest < ActiveRecord::Base
       reorder(submitted_at: :desc)
     end
   }
+  scope :include_details, -> {includes(:user, :policy, :status, :payment_mode, :controlling_user, :user, {items: [{amount: [:currency]}]})}
 
   accepts_nested_attributes_for :custom_fields
 
@@ -231,6 +231,12 @@ class MoneyRequest < ActiveRecord::Base
 
   validates :policy_id, presence: true
   validate :cash_pocket_presence
+
+  alias_attribute :purpose, :memo
+
+  field_customization_key :money_request
+  customizable_validate :purpose, presence: false, scope: [:user, :company]
+  customizable_validate :required_by_date, presence: false, scope: [:user, :company]
 
   before_save :handle_name
   before_save :handle_nil_amount

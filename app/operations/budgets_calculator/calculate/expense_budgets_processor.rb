@@ -14,7 +14,9 @@ class BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < BudgetsCalculator:
         entity: expense,
         category_id: expense.category_id,
         user_id: expense.user_id,
-        date: expense.date,
+        date: expense.report.submitted_at&.to_date,
+        department_id: expense.report.department_id,
+        sub_department_id: expense.report.sub_department_id,
         amount_attributes: {
             value: expense.amount&.value,
             currency_id: expense.amount&.currency_id

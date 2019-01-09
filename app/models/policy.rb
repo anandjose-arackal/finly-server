@@ -20,6 +20,10 @@
 
 
 
+
+
+
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -40,6 +44,8 @@ class Policy < ActiveRecord::Base
   has_one :distance_expense_config
   has_one :time_expense_config
   has_one :per_diem_expense_config
+  has_one :cash_expense_config
+  has_one :card_expense_config
 
   has_many :per_diems, as: :configurable
   has_many :vehicle_rates
@@ -62,7 +68,7 @@ class Policy < ActiveRecord::Base
   # has_many :field_configurations, as: :configurable
   has_many :policy_field_mappings
   has_many :field_configurations, through: :policy_field_mappings
-  has_many :levels, class_name: 'ReviewalLevel'
+  has_many :levels, class_name: 'ReviewalLevel', dependent: :destroy
 
   validates :company_id, presence: true
   validate :one_default_per_company
@@ -130,6 +136,8 @@ class Policy < ActiveRecord::Base
     self.build_distance_expense_config(enabled: false).save
     self.build_time_expense_config(enabled: false).save
     self.build_per_diem_expense_config(enabled: false).save
+    self.build_cash_expense_config(enabled: true).save
+    self.build_card_expense_config(enabled: true).save
   end
 
 end

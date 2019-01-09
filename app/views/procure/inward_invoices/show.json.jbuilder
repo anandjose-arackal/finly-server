@@ -51,7 +51,8 @@ end
 
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
-  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id
+  json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
+                :billing_address, :shipping_address, :invoice_id
 
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
@@ -64,7 +65,7 @@ json.invoice do
   json.tds_amount precision_value invoice.tds_amount&.value
   json.tax precision_value invoice.tax
   json.tds precision_value invoice.tds
-  json.gst_type_id invoice.gst_type
+  json.gst_type_id invoice.gst_type_id
   json.discount_amount precision_value invoice.discount_amount&.value
   json.discount precision_value invoice.discount
   json.advance invoice.advance
@@ -84,7 +85,7 @@ json.invoice do
   json.advance_rate precision_value invoice.advance_rate
   #############################
   json.invoice_attachment do
-    json.url invoice.invoice_attachments.first&.attached_file&.url
+    json.url invoice.invoice_attachments.first&.attached_file&.url(:original, timestamp: false)
     json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
     json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
     json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
@@ -204,7 +205,7 @@ json.attachments do
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
-    json.url attachment.file.url
+    json.url attachment.file.url(:original, timestamp: false)
   end
 end
 
@@ -249,5 +250,21 @@ end
 json.tax_rates do
   json.array! @result.tax_rates do |tax_rate|
     json.merge! tax_rate.as_json
+  end
+end
+
+json.locations do
+  json.array! @result.locations do |location|
+    json.extract! location, :id, :name, :gstin, :pan
+    json.address location.address
+  end
+end
+
+json.budgets do
+  json.array! @result.budgets do |budget|
+    json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :purchase_order, :start_date, :end_date
+    json.user budget[:budget].user.as_json
+    json.spent_amount budget[:spent_amount]
+    json.budget_amount budget[:budget].budget_amount.as_json
   end
 end

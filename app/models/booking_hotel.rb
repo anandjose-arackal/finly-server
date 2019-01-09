@@ -18,13 +18,15 @@
 #  checkin_time     :time
 #  checkout_date    :date
 #  checkout_time    :time
+#  booking_id       :integer
 #
 
 class BookingHotel < ActiveRecord::Base
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation
 
-  belongs_to :parent, polymorphic: true
+  # belongs_to :parent, polymorphic: true
+  belongs_to :booking, inverse_of: :booking_hotel
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
   belongs_to :location, dependent: :destroy
 
@@ -34,9 +36,11 @@ class BookingHotel < ActiveRecord::Base
   # As front end calls this comment and not description, have to give an alias for validation purpose
   alias_attribute :comment, :description
 
+  delegate :request?, to: :booking
+
   field_customization_key :booking_hotel
-  # customizable_validate :comment, presence: false
-  validates :comment, presence: true
+  customizable_validate :comment, presence: false, scope: [:booking, :travel_request, :company], if: :request?
+  # validates :comment, presence: true
 
   validates :location, presence: true
   validates :checkin_date, presence: true

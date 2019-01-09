@@ -1,7 +1,13 @@
 json.custom_fields @result&.custom_fields_config&.dig(:manual_expense)
 
 json.categories do
-  json.array!(@result.categories) do |category|
+  cat_result = Company::Configuration::Category::Index.(@result.user, @result.params)
+  if cat_result.success?
+    categories = cat_result.mobile_optimized_categories
+  else
+    categories = []
+  end
+  json.array!(categories) do |category|
     json.extract! category, :id, :name
   end
 end

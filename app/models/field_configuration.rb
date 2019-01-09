@@ -22,6 +22,7 @@
 #  parent_type             :string(255)
 #  root_field              :boolean          default(TRUE)
 #  field_key               :string(255)
+#  sequence_number         :integer
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -88,7 +89,7 @@ class FieldConfiguration < ActiveRecord::Base
   delegate :drop_down?, to: :field_type
   delegate :text?, to: :field_type
 
-  default_scope {unscope(:where)}
+  default_scope {unscope(:where).order(sequence_number: :asc, id: :asc)}
 
   def validate_config
     case field_type_id

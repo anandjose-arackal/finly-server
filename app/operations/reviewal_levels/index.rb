@@ -12,6 +12,7 @@ class ReviewalLevels::Index < ReviewalLevels::Base
 
       if self.reviewal_levels.present?
         self.reviewal_levels = apply_scopes(self.reviewal_levels, params)
+        self.reviewal_levels = self.reviewal_levels.order(:level_number)
       end
 
     end
@@ -19,7 +20,9 @@ class ReviewalLevels::Index < ReviewalLevels::Base
 
 
   def init
-    self.reviewal_levels = ReviewalLevel.all
+    policy_id = params[:filter_policy]
+    policy = user.company.policies.find_by(id: policy_id)
+    self.reviewal_levels = policy.levels.non_deleted
   end
 
   def success

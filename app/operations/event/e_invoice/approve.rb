@@ -84,8 +84,7 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
   end
 
   def mailer_subject(user)
-    approver_id = self.invoice.trails.last.action_user.id rescue nil
-    if approver_id.present? and user.id == approver_id
+    if self.approving_user.present? && user.id == self.approving_user.id
       "Invoice approved : #{self.invoice.invoice_number}"
     else
       if approved and user.id == self.invoice.created_by.id
@@ -101,8 +100,7 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
   end
 
   def mailer_body(user)
-    approver_id = self.invoice.trails.last.action_user.id rescue nil
-    if approver_id.present? and user.id == approver_id
+    if self.approving_user.present? && user.id == self.approving_user.id
       message = "You have successfully approved the invoice : #{self.invoice.invoice_number}"
     else
       if approved and user.id == invoice.created_by.id

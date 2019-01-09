@@ -20,11 +20,12 @@
 #  reimbursable       :boolean
 #  default_account    :boolean          default(FALSE)
 #  is_deleted         :boolean          default(FALSE)
+#  disabled           :boolean          default(FALSE)
 #
 
 class BankAccount < ActiveRecord::Base
   include Accountable
-  # include SoftDeletable
+  include SoftDeletable
 
   belongs_to :account_owner, polymorphic: true
 
@@ -52,6 +53,10 @@ class BankAccount < ActiveRecord::Base
   }
   scope :with_company, -> (company_id) {
     where company_id: company_id
+  }
+
+  scope :with_account_number, -> (account_number) {
+    where account_number: account_number
   }
 
   scope :with_owner_ids, -> (type, ids) {
@@ -92,6 +97,10 @@ class BankAccount < ActiveRecord::Base
     where(id: ids)
   }
 
+  before_save do
+    self.ifsc = self.ifsc.match(Constants::VALID_IFSC).to_s
+  end
+
   after_create do
     if self.account_owner.is_a?(Company)
       self.update(company_id: self.account_owner_id)
@@ -106,8 +115,6 @@ class BankAccount < ActiveRecord::Base
         account_number: account_number,
         ifsc: ifsc,
         name: name,
-        # account_owner_type: account_owner_type,
-        # account_owner: account_owner,
         default_account: default_account
     }
   end

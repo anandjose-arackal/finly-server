@@ -50,13 +50,13 @@ class Report::Base < BaseOperation
   class Report::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
-                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets
+                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets, :approvers
 
     def init
       self.report = params[:report]
       report.reload
       self.categories = report.user.company.categories
-      self.expenses = report.expenses.includes(:amount)
+      self.expenses = report.expenses.includes(:amount,:receipts,:card_expense,:tds_slab,:spent_from,:category,:tds_slab,:expense_tax_type)
       self.status = report.relative_status_name user
       self.total = report.total_amount
       self.dates = report.date_as_string
@@ -71,9 +71,19 @@ class Report::Base < BaseOperation
       self.reimbursable_expenses_total = reimbursable_expenses
       self.non_reimbursable_expenses_total = non_reimbursable_expenses
       self.card_expenses_total = report.total_amount(:only_card_expenses)
-      # budgets_op = BudgetsProcessor::Report.(user, report: self.report)
-      # self.budgets = budgets_op.budgets
-      self.budgets = []
+      op = Report::Approvers.(report: self.report)
+      if op.success?
+        self.approvers = op.approvers
+      else
+        self.approvers = []
+      end
+
+      if self.report.expenses.present?
+        op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
+        if op.success?
+          self.budgets = op.budget_data
+        end
+      end
     end
 
     def retrieve_policies
@@ -234,6 +244,32 @@ class Report::Base < BaseOperation
         Formatter.remove_blanks warning_messages
       end
       warning_messages
+    end
+
+    def cash_pockets
+      list = []
+      report.user.user_pockets.non_bank_card_transfer_pockets.include_details.each do |pocket|
+        hash = {}
+        if pocket.cash_pocket?
+          adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
+          hash[:balance] = adapter&.balance(display_balance: true)
+          hash[:display_balance] = true
+        else
+          hash[:balance] = 0
+          hash[:display_balance] = false
+        end
+        hash[:name] = pocket.name
+        hash[:id] = pocket.id
+
+        currency = pocket.base_currency
+        hash[:base_currency] = {
+            symbol: currency&.symbol,
+            country_code: currency&.country_code,
+            id: currency&.id
+        }
+        list << hash
+      end
+      list
     end
   end
 end

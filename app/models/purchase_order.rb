@@ -42,22 +42,28 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  cost_center_id               :integer
 #  sub_department_id            :integer
+#  billing_address              :text(65535)
+#  shipping_address             :text(65535)
+#  is_template                  :boolean          default(FALSE)
+#  template_name                :string(255)
+#  resource_template_id         :integer
 #
 
 class PurchaseOrder < ActiveRecord::Base
-  include SoftDeletable
+  include SoftDeletable, Templatable
   belongs_to :company
   belongs_to :user
   belongs_to :procurement
-  belongs_to :location, class_name: "BranchLocation"
-  belongs_to :delivery_location, class_name: "BranchLocation"
-  belongs_to :vendor, class_name: "YesBankVendor"
+  belongs_to :location, class_name: 'BranchLocation'
+  belongs_to :delivery_location, class_name: 'BranchLocation'
+  belongs_to :vendor, class_name: 'YesBankVendor'
   belongs_to :payment_term
   belongs_to :procurement_term
   belongs_to :status, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
   belongs_to :department
   belongs_to :sub_department, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center
+  belongs_to :gst_type
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
@@ -82,10 +88,11 @@ class PurchaseOrder < ActiveRecord::Base
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
   # has_many :custom_fields, as: :parent
   has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :advance_payments, class_name: "Payment"
 
   has_many :trails, as: :parent
 
-  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, to: :status
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
@@ -99,20 +106,105 @@ class PurchaseOrder < ActiveRecord::Base
 
   scope :with_id, -> (id) {where id: id}
   scope :with_user_id, -> (user_ids) {where user_id: user_ids}
+  scope :with_status_ids, -> (status_ids) {where purchase_order_status_id: status_ids}
   scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
   scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
-
+  scope :filter_po_number, -> (po_number) {where('purchase_orders.po_number LIKE ?', "%#{po_number}%")}
+  scope :with_vendor_ids, -> (ids) {where vendor_id: ids}
+  scope :with_po_number, -> (po_number) {where po_number: po_number}
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      ids = where(department_id: department_ids).pluck(:id)
+      ids += where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
+    end
+  }
+  scope :with_budgetable_location_ids, -> (location_ids) {
+    if location_ids.present?
+      where location_id: location_ids
+    end
+  }
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where created_by_user_id: user_ids
+    end
+  }
+  scope :with_budgetable_vendor_ids, -> (vendor_ids) {
+    if vendor_ids.present?
+      where vendor_id: vendor_ids
+    end
+  }
   # Used for generating document number
   scope :valid, -> {
-    ids = pluck(:id)
-    ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
-    where(id: ids)
+    status_ids = [
+        PurchaseOrderStatus.id_for(:processing),
+        PurchaseOrderStatus.id_for(:rejected),
+        PurchaseOrderStatus.id_for(:retracted),
+        PurchaseOrderStatus.id_for(:approved),
+        PurchaseOrderStatus.id_for(:auto_approved),
+        PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:closed)
+    ]
+    where purchase_order_status_id: PurchaseOrderStatus.id_for(status_ids)
+    # ids = pluck(:id)
+    # ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
+    # where(id: ids)
+  }
+
+  scope :filter_sub_department_id, -> (ids) {
+    where sub_department_id: ids
+  }
+
+  scope :filter_department_id, -> (ids) {
+    where department_id: ids
+  }
+
+  scope :filter_vendor_id, -> (ids){
+    where vendor_id: ids
+  }
+
+  scope :filter_user_id, -> (ids){
+    where user_id: ids
+  }
+
+  scope :filter_payment_term_id, -> (ids) {
+    where payment_term_id: ids
   }
 
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
+
+
+  template_config do
+    include_association [:policy, :location, :delivery_location, :vendor,
+                          :payment_term, :procurement_term, :department,
+                          :sub_department, :cost_center]
+    clone [:extra_charges, :items, :document_level_reviewer_mappings, :total_before_tax,
+           :tax_amount, :total_after_tax, :discount_amount, :custom_fields]
+
+    customize(lambda { |po,new_po|
+      new_po.trails.destroy_all
+      new_po.comments.destroy_all
+      new_po.attachments.destroy_all
+    })
+
+    nullify :procurement_id
+    nullify :po_number
+    nullify :is_template
+    nullify :template_name
+    nullify :controlling_level_id
+    nullify :controlling_user_id
+    nullify :controlling_for_user_id
+    nullify :controlling_user_role_id
+    nullify :controlling_for_user_role_id
+    nullify :balance_amount_id
+    set :purchase_order_status_id => PurchaseOrderStatus.id_for(:open)
+    nullify :user_id
+  end
+
+  template_merge :procurement_id, :user_id, :vendor_id
 
   def all_items_shipped?
     shipped = true
@@ -125,8 +217,18 @@ class PurchaseOrder < ActiveRecord::Base
     shipped
   end
 
-  private
+  def procurement_index_details
+    {
+        id: id,
+        document_number: self.po_number,
+        amount: self.balance_amount&.value,
+        document_status: self.status&.name,
+        document_owner: self.user&.name,
+        document_type: self.class.name
+    }
+  end
 
+  private
 
   def calculate_line_items
     total_before_tax_amount = 0
@@ -223,19 +325,15 @@ class PurchaseOrder < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    # if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.purchase_order_status_id)
-    #   self.items.each do |item|
-    #     BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
-    #   end
-    # else
-    # i.e. if the purchase order changed statuses to something other than the above, it will destroy
-    # all the line item entries in the budget trail model for this particular purchase order
-    # self.items.each do |item|
-    #   BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
-    # end
-    # end
-    self.items.each do |item|
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+    if self.voided? || self.rejected? || self.retracted? || self.open?
+      # this will delete the trails of all the items within this particular purchase order
+      self.items.each do |item|
+        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+      end
+    else
+      self.items.each do |item|
+        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+      end
     end
   end
 

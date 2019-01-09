@@ -23,9 +23,10 @@
 #  parent_id              :string(255)
 #  inventory_line_item_id :integer
 #  item_info              :text(65535)
-#  comment                :string(255)
+#  comment                :text(65535)
 #  account                :string(255)
 #  tax_rate_id            :integer
+#  cost_center_id         :integer
 #
 
 require 'test_helper'

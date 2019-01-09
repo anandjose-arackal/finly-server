@@ -1,5 +1,5 @@
 class Receipt::Update < Receipt::Base
-  attr_accessor :receipt
+  attr_accessor :receipt, :update_param
 
   def pre_validate
     if params.blank? or user.blank?
@@ -11,6 +11,7 @@ class Receipt::Update < Receipt::Base
     params[:note] = nil if params[:note] == 'nil'
     id = params[:id] or params[:receipt_id]
     self.receipt = user.receipts.find_by_id(id)
+    self.update_param = update_params
   end
 
   def authorize
@@ -22,8 +23,13 @@ class Receipt::Update < Receipt::Base
     end
   end
 
+  def pre_process
+    self.update_param[:modified_by_id] = actual_current_user.id if actual_current_user.present?
+  end
+
+
   def process
-    unless receipt.update_attributes(update_params)
+    unless receipt.update_attributes(update_param)
       messages[:error] = receipt.errors.full_messages
     end
   end
@@ -34,6 +40,6 @@ class Receipt::Update < Receipt::Base
 
   private
   def update_params
-    params.require(:receipt).permit(:image, :note, :to_be_transcribed)
+    params.require(:receipt).permit(:image, :note, :to_be_transcribed, :modified_by_id)
   end
 end
