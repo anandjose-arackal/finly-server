@@ -27,6 +27,8 @@ class ReportComment < ApplicationRecord
   belongs_to :expense, optional: true
   belongs_to :rejected_to, optional: true, class_name: 'User'
   belongs_to :payment, optional: true
+  belongs_to :delegated_action_user, optional: true, class_name: 'User'
+
 
   validates :report_id, presence: true
   validates :report_comment_action_id, presence: true
@@ -44,7 +46,10 @@ class ReportComment < ApplicationRecord
     elsif self.user.present?
       name = self.user.name
     end
-
+    if self.delegated_action_user_id.present?
+      current_user_name = self.user.name
+      delegation_user_name = self.delegated_action_user_id == u.id ? "You" : self.delegated_action_user.name
+    end
     expense = Expense.unscoped.find_by(id: self.expense_id)
 
     type = "" # i.e. will form 'an expense...'
@@ -180,6 +185,14 @@ class ReportComment < ApplicationRecord
         comment = "#{name} submitted hard copy for a receipt."
       when ReportCommentAction.id_for(:hard_copy_receipt_not_submitted)
         comment = "#{name} marked hard copy not submitted for a receipt."
+      when ReportCommentAction.id_for(:report_created_by_delegate)
+        comment = "#{delegation_user_name} created report on behalf of #{current_user_name}"
+      when ReportCommentAction.id_for(:report_submitted_by_delegate)
+        comment = "#{delegation_user_name} submitted report on behalf of #{current_user_name}"
+      when ReportCommentAction.id_for(:report_retracted_by_delegate)
+        comment = "#{delegation_user_name} retracted report on behalf of #{current_user_name}"
+      when ReportCommentAction.id_for(:report_updated_by_delegate)
+        comment = "#{delegation_user_name} updated report on behalf of #{current_user_name}"
       else
         # do nothing
     end

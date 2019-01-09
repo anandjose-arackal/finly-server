@@ -8,6 +8,7 @@ class MoneyRequest::Base < BaseOperation
     if params[:filter_search].present?
       params[:filter_search].strip! if params[:filter_search].is_a?(String)
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init

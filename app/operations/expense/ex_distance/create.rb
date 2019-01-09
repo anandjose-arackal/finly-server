@@ -145,6 +145,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     if StringUtils.to_bool(expense_params[:reimbursable])
       expense_params[:spent_from_id] = nil
     end
+    expenses_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process

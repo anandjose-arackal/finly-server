@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_04_122839) do
+ActiveRecord::Schema.define(version: 2019_01_08_060724) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2276,6 +2276,8 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.integer "spent_from_id"
     t.boolean "custom_conversion_rate", default: false
     t.integer "cost_center_id"
+    t.integer "created_by_id"
+    t.integer "modified_by_id"
     t.index ["amount_id"], name: "index_expenses_on_amount_id"
     t.index ["category_id"], name: "index_expenses_on_category_id"
     t.index ["expense_status_id"], name: "index_expenses_on_expense_status_id"
@@ -3103,6 +3105,7 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.text "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "delegated_action_user_id"
     t.index ["comment_action_id"], name: "index_money_request_comments_on_comment_action_id"
     t.index ["expense_id"], name: "index_money_request_comments_on_expense_id"
     t.index ["money_request_id"], name: "index_money_request_comments_on_money_request_id"
@@ -3219,6 +3222,7 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.datetime "updated_at", null: false
     t.integer "action_id"
     t.integer "action_user_role_id"
+    t.integer "delegated_action_user_id"
     t.index ["action_user_id"], name: "index_money_request_tracks_on_action_user_id"
     t.index ["modified_user_id"], name: "index_money_request_tracks_on_modified_user_id"
     t.index ["modified_user_role_id"], name: "index_money_request_tracks_on_modified_user_role_id"
@@ -3255,6 +3259,8 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.datetime "approved_at"
     t.integer "travel_request_id"
     t.integer "destination_pocket_id"
+    t.integer "created_by_id"
+    t.integer "modified_by_id"
     t.index ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_money_requests_on_controlling_for_user_role_id"
     t.index ["controlling_user_id"], name: "index_money_requests_on_controlling_user_id"
@@ -4311,6 +4317,8 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.integer "sourcable_id"
     t.integer "sourcable_type"
     t.boolean "is_deleted", default: false
+    t.integer "created_by_id"
+    t.integer "modified_by_id"
     t.index ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id"
     t.index ["receipt_email_id"], name: "index_receipts_on_receipt_email_id"
     t.index ["user_id"], name: "index_receipts_on_user_id"
@@ -4341,6 +4349,7 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "payment_id"
+    t.integer "delegated_action_user_id"
     t.index ["expense_id"], name: "index_report_comments_on_expense_id"
     t.index ["rejected_to_id"], name: "index_report_comments_on_rejected_to_id"
     t.index ["report_comment_action_id"], name: "index_report_comments_on_report_comment_action_id"
@@ -4449,6 +4458,7 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.integer "payment_id"
     t.integer "action_user_role_id"
     t.integer "cash_in_hand_deduction_id"
+    t.integer "delegated_action_user_id"
     t.index ["action_user_id"], name: "index_report_tracks_on_action_user_id"
     t.index ["modified_user_id"], name: "index_report_tracks_on_modified_user_id"
     t.index ["modified_user_role_id"], name: "index_report_tracks_on_modified_user_role_id"
@@ -4489,6 +4499,8 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.integer "travel_request_id"
     t.integer "department_id"
     t.integer "sub_department_id"
+    t.integer "created_by_id"
+    t.integer "modified_by_id"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_reports_on_controlling_for_user_role_id"
     t.index ["controlling_user_id"], name: "index_reports_on_controlling_user_id"
@@ -4868,6 +4880,7 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.integer "booking_id"
     t.integer "booking_request_id"
     t.boolean "is_deleted", default: false
+    t.integer "delegated_action_user_id"
     t.index ["travel_request_id"], name: "index_travel_request_comments_on_travel_request_id"
     t.index ["user_id"], name: "index_travel_request_comments_on_user_id"
   end
@@ -4904,6 +4917,7 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false
+    t.integer "delegated_action_user_id"
     t.index ["action_for_user_id"], name: "index_travel_request_trails_on_action_for_user_id"
     t.index ["action_for_user_role_id"], name: "index_travel_request_trails_on_action_for_user_role_id"
     t.index ["action_id"], name: "index_travel_request_trails_on_action_id"
@@ -4939,11 +4953,15 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.datetime "approved_at"
     t.datetime "selection_requested_at"
     t.datetime "booking_confirmed_at"
+    t.integer "created_by_id"
+    t.integer "modified_by_id"
     t.index ["company_id"], name: "index_travel_requests_on_company_id"
     t.index ["controlling_for_user_id"], name: "index_travel_requests_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_travel_requests_on_controlling_for_user_role_id"
     t.index ["controlling_user_id"], name: "index_travel_requests_on_controlling_user_id"
     t.index ["controlling_user_role_id"], name: "index_travel_requests_on_controlling_user_role_id"
+    t.index ["created_by_id"], name: "index_travel_requests_on_created_by_id"
+    t.index ["modified_by_id"], name: "index_travel_requests_on_modified_by_id"
     t.index ["policy_id"], name: "index_travel_requests_on_policy_id"
     t.index ["status_id"], name: "index_travel_requests_on_status_id"
     t.index ["user_id"], name: "index_travel_requests_on_user_id"
@@ -4989,6 +5007,32 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.index ["finly_money_load_id"], name: "index_user_balance_histories_on_finly_money_load_id"
     t.index ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id"
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
+  end
+
+  create_table "user_delegate_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "delegate_for_user_id"
+    t.boolean "expense_create"
+    t.boolean "expense_update"
+    t.boolean "receipt_create"
+    t.boolean "receipt_add_to_expense"
+    t.boolean "receipt_update"
+    t.boolean "report_create"
+    t.boolean "report_submit"
+    t.boolean "report_retract"
+    t.boolean "report_update"
+    t.boolean "money_request_create"
+    t.boolean "money_request_update"
+    t.boolean "money_request_submit"
+    t.boolean "money_request_retract"
+    t.boolean "travel_request_create"
+    t.boolean "travel_request_update"
+    t.boolean "travel_request_submit"
+    t.boolean "travel_request_retract"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["delegate_for_user_id"], name: "index_user_delegate_mappings_on_delegate_for_user_id"
+    t.index ["user_id"], name: "index_user_delegate_mappings_on_user_id"
   end
 
   create_table "user_department_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -5272,6 +5316,7 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
     t.integer "user_delegate_id"
     t.boolean "delegation_enabled"
     t.text "gl_config"
+    t.boolean "vacation_delegate_enabled"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -5881,6 +5926,7 @@ ActiveRecord::Schema.define(version: 2019_01_04_122839) do
   add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_delegate_mappings", "users"
   add_foreign_key "user_department_mappings", "departments"
   add_foreign_key "user_department_mappings", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"

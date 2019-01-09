@@ -24,6 +24,7 @@ class TravelRequestTrail < ApplicationRecord
   belongs_to :action_user, optional: true, class_name: "User"
   belongs_to :modified_user, optional: true, class_name: "User"
   belongs_to :action_for_user, optional: true, class_name: "User"
+  belongs_to :delegated_action_user, optional: true, class_name: 'User'
 
   belongs_to :action_user_role, optional: true, class_name: "UserRole"
   belongs_to :modified_user_role, optional: true, class_name: "UserRole"

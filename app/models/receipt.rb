@@ -19,9 +19,8 @@
 #  sourcable_id       :integer
 #  sourcable_type     :integer
 #  is_deleted         :boolean          default(FALSE)
+#  created_by_id      :integer
 #
-
-
 
 
 
@@ -31,6 +30,8 @@ class Receipt < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :receipt_email, optional: true
   belongs_to :sourcable, optional: true, polymorphic: true
+  belongs_to :created_by, optional: true, class_name: "User"
+  belongs_to :modified_by, optional: true, class_name: 'User'
 
   has_many :expense_data_extracts, as: :extractable
   has_many :system_messages, as: :messagable, dependent: :destroy

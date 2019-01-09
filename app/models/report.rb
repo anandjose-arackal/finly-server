@@ -71,6 +71,9 @@ class Report < ApplicationRecord
   belongs_to :sync_status, optional: true, class_name: 'ReportSyncStatus'
   belongs_to :sync_type, optional: true, class_name: 'ReportSyncType'
   belongs_to :travel_request, optional: true
+  belongs_to :created_by, optional: true, class_name: "User"
+  belongs_to :modified_by, optional: true, class_name: 'User'
+  # belongs_to :money_request
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: "Department"
 

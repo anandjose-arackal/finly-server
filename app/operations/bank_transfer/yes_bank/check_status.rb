@@ -3,7 +3,7 @@
 
 class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
-  attr_accessor :bank_transaction, :company, :payment, :payment_request, :payment_order
+  attr_accessor :bank_transaction, :company, :payment, :payment_request, :payment_order, :error_logger
 
   def self.call(bank_transaction)
     self.new(bank_transaction).run
@@ -14,6 +14,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     self.company = bank_transaction.company
     self.payment = bank_transaction.payment
     self.payment_order = self.payment&.payment_order
+    self.error_logger = Logger.new("#{Rails.root}/log/transactions_msg_queue_errors.log")
   end
 
   def authorized_user_types
@@ -54,21 +55,38 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
-        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        begin
+          bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        rescue => error
+          self.error_logger.error("Following bank transaction has been orphaned: #{self.bank_transaction.id}")
+          error.backtrace.each do |line|
+            error_logger.error "\t #{line}"
+          end
+          Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
+        end
         # destroying previous messages first, before adding the processing message
-        self.payment.system_messages.destroy_all
-        self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
+        self.payment&.system_messages.destroy_all
+        self.payment&.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
                                       content: "Payment processed. Awaiting credit confirmation").save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # elsif true
-        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        begin
+          bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        rescue => error
+          self.error_logger.error("Following bank transaction has been orphaned: #{self.bank_transaction.id}")
+          error.backtrace.each do |line|
+            error_logger.error "\t #{line}"
+          end
+          Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
+        end
+
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         # destroying previous messages first, before adding the failure message
         # self.payment.system_messages.destroy_all # probably not a good idea to destroy previous messages because they contain data about why a particular payment failed
 
         # adding message regarding payment refund
-        self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+        self.payment&.system_messages&.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         # the below will be executed only if the company is using Finly's nodal account for processing transactions
@@ -85,12 +103,12 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def post_process
     # here check if the payment order has associated bank payment requests and accordingly send notification
-    if payment_order.bank_payment_request.present?
+    if payment_order&.bank_payment_request.present?
       # now check if all the payments in this order are either successes or failures.
       # i.e. none processing or awaiting credit confirmation
       completed = true
       bank_payment_request = payment_order.bank_payment_request
-      payment_order.payments.each do |payment|
+      payment_order&.payments&.each do |payment|
         unless [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)].include?(payment.payment_status_id)
           completed = false
         end
@@ -102,10 +120,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
 
     # trigger event for sending mailer to the receiver of the payment
-    if self.payment.completed?
+    if self.payment&.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
       execute_callback(self.payment)
-    elsif payment.failed?
+    elsif payment&.failed?
       execute_callback(self.payment)
     end
   end
@@ -122,18 +140,18 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if op.success?
       refund_payment = op.payment_order.payments.first
       self.bank_transaction.update(refunded: true)
-      refund_payment&.update(original_payment_for_refund_id: self.payment.id)
+      refund_payment&.update(original_payment_for_refund_id: self.payment&.id)
     else
       # op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
 
-    if self.payment.invoice.present?
-      self.payment.invoice.update_invoice_status
+    if self.payment&.invoice&.present?
+      self.payment&.invoice&.update_invoice_status
     end
     # also update the status and processed amount of the payment order from here
-    self.payment.payment_order.update_order_status
-    self.payment.payment_order.update_processed_amount
+    self.payment&.payment_order&.update_order_status
+    self.payment&.payment_order&.update_processed_amount
   end
 
   def handle_successful_transaction
@@ -145,26 +163,29 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       payment.update(application: "em") # because this should show up in the settlement history of this particular user
     end
     # now mark the respective bank transaction and payment as completed
+    if self.payment.blank?
+      Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
+    end
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
-    self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-    if self.payment.note.blank? || self.payment.note == 'Reimbursement processed. Awaiting credit confirmation'
-      self.payment.update(note: "Payment credit confirmed")
+    self.payment&.update(payment_status_id: PaymentStatus.id_for(:completed))
+    if self.payment&.note.blank? || self.payment&.note == 'Reimbursement processed. Awaiting credit confirmation'
+      self.payment&.update(note: "Payment credit confirmed")
     end
 
     # updating the status of the invoice against successful credit of this
-    if self.payment.invoice.present?
-      self.payment.invoice.update_invoice_status
+    if self.payment&.invoice.present?
+      self.payment&.invoice&.update_invoice_status
     end
 
     # marking the payment order as completed if all the payments in it are completed
-    if self.payment.payment_order&.payments&.pluck(:payment_status_id)&.uniq == [PaymentStatus.id_for(:completed)]
-      self.payment.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+    if self.payment&.payment_order&.payments&.pluck(:payment_status_id)&.uniq == [PaymentStatus.id_for(:completed)]
+      self.payment&.payment_order&.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
     end
 
     # update the status of the payment order after this
-    self.payment.payment_order.update_order_status
+    self.payment&.payment_order&.update_order_status
 
-    self.payment.system_messages.destroy_all # deleting the previous system messages
+    self.payment&.system_messages&.destroy_all # deleting the previous system messages
   end
 
   def init_payment_request

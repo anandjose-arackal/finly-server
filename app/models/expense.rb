@@ -37,12 +37,8 @@
 #  spent_from_id          :integer
 #  custom_conversion_rate :boolean          default(FALSE)
 #  cost_center_id         :integer
+#  created_by_id          :integer
 #
-
-
-
-
-
 
 
 
@@ -67,6 +63,8 @@ class Expense < ApplicationRecord
   belongs_to :gst_type, optional: true
   belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
   belongs_to :spent_from, optional: true, class_name: 'UserPocket'
+  belongs_to :created_by, class_name: "User", optional: true
+  belongs_to :modified_by, class_name: "User", optional: true
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy

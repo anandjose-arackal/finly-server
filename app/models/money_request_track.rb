@@ -34,6 +34,7 @@ class MoneyRequestTrack < ApplicationRecord
   belongs_to :action_user_role, optional: true, class_name: 'UserRole'
   belongs_to :modified_user_role, optional: true, class_name: 'UserRole'
   belongs_to :payment, optional: true
+  belongs_to :delegated_action_user, optional: true, class_name: 'User'
 
   default_scope { order('money_request_tracks.created_at ASC') }
 

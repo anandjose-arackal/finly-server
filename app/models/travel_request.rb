@@ -54,6 +54,8 @@ class TravelRequest < ApplicationRecord
   belongs_to :controlling_for_user, optional: true, class_name: 'User'
   belongs_to :controlling_for_user_role, optional: true, class_name: 'UserRole'
   belongs_to :company, optional: true
+  belongs_to :created_by, optional: true, class_name: 'User'
+  belongs_to :modified_by, optional: true, class_name: 'User'
 
   has_many :destinations, class_name: 'TravelRequestDestination'
   has_many :travel_request_trails, dependent: :destroy

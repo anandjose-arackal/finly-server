@@ -35,7 +35,7 @@ class MoneyRequestComment < ApplicationRecord
   belongs_to :expense, optional: true
   belongs_to :rejected_to, optional: true, class_name: 'User'
   belongs_to :payment, optional: true
-
+  belongs_to :delegated_action_user, class_name: 'User', optional: true
   # ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7,
   #            take_control: 8, comment: 9, update: 10, credited: 11}
 
@@ -59,6 +59,10 @@ class MoneyRequestComment < ApplicationRecord
       name_rec = 'your'
     else
       name_rec = "#{self.money_request.user.name}'s"
+    end
+    if self.delegated_action_user_id.present?
+      current_user_name = self.user.name
+      delegation_user_name = self.delegated_action_user_id == u.id ? "You" : self.delegated_action_user.name
     end
     case comment_action_id
       when MoneyRequestCommentAction.id_for(:retract)
@@ -105,6 +109,14 @@ class MoneyRequestComment < ApplicationRecord
         if payment.note.present?
           comment += " , with a note : #{payment.note}"
         end
+      when MoneyRequestCommentAction.id_for(:created_by_delegate)
+        comment = "#{delegation_user_name} created money request on behalf of #{current_user_name}"
+      when MoneyRequestCommentAction.id_for(:updated_by_delegate)
+        comment = "#{delegation_user_name} updated money request on behalf of #{current_user_name}"
+      when MoneyRequestCommentAction.id_for(:submitted_by_delegate)
+        comment = "#{delegation_user_name} submitted money request on behalf of #{current_user_name}"
+      when MoneyRequestCommentAction.id_for(:retracted_by_delegate)
+        comment = "#{delegation_user_name} retracted money request on behalf of #{current_user_name}"
     end
     comment
   end
