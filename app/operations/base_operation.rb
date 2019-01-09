@@ -420,6 +420,13 @@ class BaseOperation
     raise_unauthorized_exception
   end
 
+  def convert_params_to_hash
+    if params.is_a?(ActionController::Parameters)
+      self.params = params.permit!.to_h
+    end
+    self.params
+  end
+
   def add_message(type, message)
     return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
     clear_messages if self.messages.blank?
