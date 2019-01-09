@@ -29,6 +29,7 @@ class ReportTrack < ActiveRecord::Base
   belongs_to :modified_user_role, class_name: 'UserRole'
   belongs_to :payment
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
+  belongs_to :delegated_action_user, class_name: 'User'
 
   default_scope { order('report_tracks.created_at ASC') }
 

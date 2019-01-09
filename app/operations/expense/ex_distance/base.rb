@@ -14,7 +14,7 @@ class Expense::ExDistance::Base < Expense::Base
     p = params.require(:expense).permit(
         :note, :category_id, :date, :expense_type_id,
         :expense_status_id, :report_id,
-        :receipt_id, :receipt,
+        :receipt_id, :receipt, :created_by_id, :modified_by_id,
         distance_expense_attributes: [
             :id, :vehicle_rate_id,
             distance_attributes: [:value, :id],

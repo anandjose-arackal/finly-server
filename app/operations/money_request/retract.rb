@@ -57,7 +57,9 @@ class MoneyRequest::Retract < MoneyRequest::Base
   end
 
   def post_process
-    money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:retract)
+    mr_comment_action = actual_current_user.present? ? :retracted_by_delegate : :retract
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    money_request.comments.create(user: user, comment_action_id: MoneyRequestCommentAction.id_for(mr_comment_action), delegated_action_user_id: delegated_action_user_id)
 
     # destroying the submitted amount field
     money_request.submitted_amount&.destroy

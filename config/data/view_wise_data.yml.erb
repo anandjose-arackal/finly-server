@@ -312,6 +312,7 @@ views:
       - name: Money Requests
         url: requests
         id: requests
+      <% if !current_user.actual_current_user.present? %>
       - name: Settlements
         url: settlements/<%= current_user.id %>
         id: settlements
@@ -321,11 +322,7 @@ views:
       - name: Export
         url: export
         id: export
-      cog:
-      <%# if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      # - name: Trips
-      #   url: '#travel_requests/params={"view": "personal"}'
-      <%# end %>
+      <% end %>
   <% end %>
 
 
