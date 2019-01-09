@@ -54,14 +54,23 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
-        bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:processing))
+        begin
+          bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        rescue => error
+          Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
+        end
         # destroying previous messages first, before adding the processing message
         self.payment.system_messages.destroy_all
         self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
                                       content: "Payment processed. Awaiting credit confirmation").save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # elsif true
-        bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:failed))
+        begin
+          bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        rescue => error
+          Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
+        end
+
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         # destroying previous messages first, before adding the failure message
