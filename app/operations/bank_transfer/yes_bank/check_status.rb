@@ -3,7 +3,7 @@
 
 class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
-  attr_accessor :bank_transaction, :company, :payment, :payment_request, :payment_order
+  attr_accessor :bank_transaction, :company, :payment, :payment_request, :payment_order, :error_logger
 
   def self.call(bank_transaction)
     self.new(bank_transaction).run
@@ -14,6 +14,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     self.company = bank_transaction.company
     self.payment = bank_transaction.payment
     self.payment_order = self.payment&.payment_order
+    self.error_logger = Logger.new("#{Rails.root}/log/transactions_msg_queue_errors.log")
   end
 
   def authorized_user_types
@@ -57,6 +58,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         begin
           bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         rescue => error
+          self.error_logger.error("Following bank transaction has been orphaned: #{self.bank_transaction.id}")
+          error.backtrace.each do |line|
+            error_logger.error "\t #{line}"
+          end
           Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
         end
         # destroying previous messages first, before adding the processing message
@@ -68,6 +73,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         begin
           bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         rescue => error
+          self.error_logger.error("Following bank transaction has been orphaned: #{self.bank_transaction.id}")
+          error.backtrace.each do |line|
+            error_logger.error "\t #{line}"
+          end
           Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
         end
 
