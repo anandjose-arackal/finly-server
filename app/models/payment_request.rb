@@ -4,7 +4,6 @@
 # payment items will most likely be a hash of details that are relevant to that particular payment object
 
 class PaymentRequest < NonPersistentModel
-  self.abstract_class = true
 
   AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name, BankAccount.name, VendorPaymentWallet.name, VirtualBankAccount.name, UserPocket.name]
 
@@ -21,11 +20,11 @@ class PaymentRequest < NonPersistentModel
                 :payment_order,
                 :post_operation_actions
 
-  belongs_to :company
-  belongs_to :initiating_resource, polymorphic: true
-  belongs_to :payment_purpose
-  belongs_to :initiating_account, polymorphic: true
-  belongs_to :currency
+  belongs_to :company, optional: true
+  belongs_to :initiating_resource, optional: true, polymorphic: true
+  belongs_to :payment_purpose, optional: true
+  belongs_to :initiating_account, optional: true, polymorphic: true
+  belongs_to :currency, optional: true
 
   validate :company_id_presence
   validates :initiating_resource, presence: true
