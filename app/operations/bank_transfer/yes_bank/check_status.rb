@@ -60,8 +60,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
           Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
         end
         # destroying previous messages first, before adding the processing message
-        self.payment.system_messages.destroy_all
-        self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
+        self.payment&.system_messages.destroy_all
+        self.payment&.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
                                       content: "Payment processed. Awaiting credit confirmation").save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # elsif true
@@ -154,6 +154,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       payment.update(application: "em") # because this should show up in the settlement history of this particular user
     end
     # now mark the respective bank transaction and payment as completed
+    if self.payment.blank?
+      Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
+    end
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
     self.payment&.update(payment_status_id: PaymentStatus.id_for(:completed))
     if self.payment&.note.blank? || self.payment&.note == 'Reimbursement processed. Awaiting credit confirmation'
