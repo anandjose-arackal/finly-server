@@ -155,25 +155,25 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
     # now mark the respective bank transaction and payment as completed
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
-    self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-    if self.payment.note.blank? || self.payment.note == 'Reimbursement processed. Awaiting credit confirmation'
-      self.payment.update(note: "Payment credit confirmed")
+    self.payment&.update(payment_status_id: PaymentStatus.id_for(:completed))
+    if self.payment&.note.blank? || self.payment&.note == 'Reimbursement processed. Awaiting credit confirmation'
+      self.payment&.update(note: "Payment credit confirmed")
     end
 
     # updating the status of the invoice against successful credit of this
-    if self.payment.invoice.present?
-      self.payment.invoice.update_invoice_status
+    if self.payment&.invoice.present?
+      self.payment&.invoice&.update_invoice_status
     end
 
     # marking the payment order as completed if all the payments in it are completed
-    if self.payment.payment_order&.payments&.pluck(:payment_status_id)&.uniq == [PaymentStatus.id_for(:completed)]
-      self.payment.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+    if self.payment&.payment_order&.payments&.pluck(:payment_status_id)&.uniq == [PaymentStatus.id_for(:completed)]
+      self.payment&.payment_order&.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
     end
 
     # update the status of the payment order after this
-    self.payment.payment_order.update_order_status
+    self.payment&.payment_order&.update_order_status
 
-    self.payment.system_messages.destroy_all # deleting the previous system messages
+    self.payment&.system_messages&.destroy_all # deleting the previous system messages
   end
 
   def init_payment_request
