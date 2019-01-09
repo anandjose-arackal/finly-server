@@ -8,7 +8,7 @@ class BaseHandler
   def initialize(user, params = {})
     self.timeout = false
     self.user = user
-    self.params = (ActionController::Parameters.new(params) or {})
+    self.params = (params&.to_h&.with_indifferent_access or {})
     clear_messages
   end
 
