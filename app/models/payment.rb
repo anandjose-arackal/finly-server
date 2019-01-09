@@ -44,8 +44,8 @@
 #  procurement_id                 :integer
 #  department_id                  :integer
 #  location_id                    :integer
-#  transaction_reference_id       :string(255)
 #
+
 
 
 

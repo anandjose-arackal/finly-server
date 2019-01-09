@@ -37,8 +37,8 @@
 #  spent_from_id          :integer
 #  custom_conversion_rate :boolean          default(FALSE)
 #  cost_center_id         :integer
-#  created_by_id          :integer
 #
+
 
 
 

@@ -12,6 +12,7 @@
 
 
 
+
 class ReportStatus < ActiveRecord::Base
   include Seedable
 

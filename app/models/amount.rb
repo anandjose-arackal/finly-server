@@ -176,6 +176,7 @@
 #  ZMW         :decimal(20, 5)
 #  ZWL         :decimal(20, 5)
 #  is_deleted  :boolean          default(FALSE)
+#  MYR         :decimal(20, 5)
 #
 
 class Amount < ActiveRecord::Base
