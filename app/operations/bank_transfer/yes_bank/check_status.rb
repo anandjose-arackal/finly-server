@@ -86,7 +86,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         # self.payment.system_messages.destroy_all # probably not a good idea to destroy previous messages because they contain data about why a particular payment failed
 
         # adding message regarding payment refund
-        self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+        self.payment&.system_messages&.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         # the below will be executed only if the company is using Finly's nodal account for processing transactions
@@ -103,12 +103,12 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def post_process
     # here check if the payment order has associated bank payment requests and accordingly send notification
-    if payment_order.bank_payment_request.present?
+    if payment_order&.bank_payment_request.present?
       # now check if all the payments in this order are either successes or failures.
       # i.e. none processing or awaiting credit confirmation
       completed = true
       bank_payment_request = payment_order.bank_payment_request
-      payment_order.payments.each do |payment|
+      payment_order&.payments&.each do |payment|
         unless [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)].include?(payment.payment_status_id)
           completed = false
         end
@@ -120,10 +120,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
 
     # trigger event for sending mailer to the receiver of the payment
-    if self.payment.completed?
+    if self.payment&.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
       execute_callback(self.payment)
-    elsif payment.failed?
+    elsif payment&.failed?
       execute_callback(self.payment)
     end
   end
@@ -140,18 +140,18 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if op.success?
       refund_payment = op.payment_order.payments.first
       self.bank_transaction.update(refunded: true)
-      refund_payment&.update(original_payment_for_refund_id: self.payment.id)
+      refund_payment&.update(original_payment_for_refund_id: self.payment&.id)
     else
       # op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
 
-    if self.payment.invoice.present?
-      self.payment.invoice.update_invoice_status
+    if self.payment&.invoice&.present?
+      self.payment&.invoice&.update_invoice_status
     end
     # also update the status and processed amount of the payment order from here
-    self.payment.payment_order.update_order_status
-    self.payment.payment_order.update_processed_amount
+    self.payment&.payment_order&.update_order_status
+    self.payment&.payment_order&.update_processed_amount
   end
 
   def handle_successful_transaction
