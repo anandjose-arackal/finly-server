@@ -32,6 +32,10 @@ class YesBankCompanyAccount < ActiveRecord::Base
     PaymentOrder.with_company_id(self.company_id).with_initiating_account_type("YesBankCompanyAccount").without_id(excluded_payment_order_id).scheduled.joins(:amount_requested).sum(:value)
   end
 
+  scope :with_company_id, -> (company_id) {
+    where company_id: company_id
+  }
+
   def va_config
     {
         enabled: true,

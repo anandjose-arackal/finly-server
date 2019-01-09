@@ -1,4 +1,4 @@
-# cronotab.rb — Crono configuration file
+''# cronotab.rb — Crono configuration file
 #
 # Here you can specify periodic jobs and schedule.
 # You can use ActiveJob's jobs from `app/jobs/`
