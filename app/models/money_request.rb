@@ -334,11 +334,11 @@ class MoneyRequest < ApplicationRecord
   end
 
   def versioned_policy
-    if self.submitted_at.present?
-      if self.policy
-        return self.policy.paper_trail.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
-      end
-    end
+    # if self.submitted_at.present?
+    #   if self.policy
+    #     return self.policy.paper_trail.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
+    #   end
+    # end
     self.policy
   end
 
