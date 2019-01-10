@@ -32,6 +32,8 @@
 class YesBankVendor < ActiveRecord::Base
   include Sequenced::ActsAsSequenced
 
+  include SoftDeletable
+
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
 
   belongs_to :company
@@ -46,6 +48,8 @@ class YesBankVendor < ActiveRecord::Base
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
+
+  default_scope { unscope(:where) }
 
   # Requirement first shared by olx
   # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy

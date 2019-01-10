@@ -7,7 +7,7 @@ class BankTransfer::Vendors::Transfers::Show < BankTransfer::Vendors::Base
   def init
     super()
     id = params[:id] || params[:vendor_id]
-    self.vendor = company.yes_bank_vendors.find_by(id: id)
+    self.vendor = company.yes_bank_vendors.non_deleted.find_by(id: id)
   end
 
   def process
