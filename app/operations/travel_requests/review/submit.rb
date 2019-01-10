@@ -35,6 +35,7 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
     presenter = User::Team::Review::NextReviewer.(travel_request)
     manager = presenter.user
     manager_role_id = presenter.role_id
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     #######################################
     if manager.nil?
       # i.e. if there is no manager, the payment request directly goes to approved state
@@ -43,7 +44,8 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
                                                   action_user_role_id: UserRole.id_for(:employee),
                                                   action_id: TravelRequestTrailAction.id_for(:submit),
                                                   modified_user_id: manager&.id,
-                                                  modified_user_role_id: manager_role_id
+                                                  modified_user_role_id: manager_role_id,
+                                                  delegated_action_user_id: delegated_action_user_id
       approve_op = TravelRequests::Review::Approve.(user, id: travel_request.id, auto_approve: true)
       unless approve_op.success?
         add_message :error, approve_op.messages[:error]
@@ -63,16 +65,19 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
                                                   action_user_role_id: UserRole.id_for(:employee),
                                                   action_id: TravelRequestTrailAction.id_for(:submit),
                                                   modified_user_id: manager&.id,
-                                                  modified_user_role_id: manager_role_id
+                                                  modified_user_role_id: manager_role_id,
+                                                  delegated_action_user_id: delegated_action_user_id
       return true
     end
     add_message :error, travel_request.errors.full_messages
   end
 
   def post_process
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    tr_comment_action = actual_current_user.present? ? :submitted_by_delegate : :submit
     # add comment
-    travel_request.comments.create user_id: user.id,
-                                   action_id: TravelRequestCommentAction.id_for(:submit)
+    travel_request.comments.create(user_id: user.id,
+                                   action_id: TravelRequestCommentAction.id_for(tr_comment_action), delegated_action_user_id: delegated_action_user_id)
     travel_request.money_requests.status_pending.update_all(
         controlling_user_id: travel_request.controlling_user_id,
         controlling_user_role_id: travel_request.controlling_user_role_id

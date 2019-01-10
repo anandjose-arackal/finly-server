@@ -20,6 +20,7 @@ class Report::Submit < Report::Base
     if user.blank? and not params[:auto_approve] and not params[:auto_submit]
       add_message :error, 'User not found'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -130,6 +131,7 @@ class Report::Submit < Report::Base
       submitted_amount_attributes[:id] = report.submitted_amount_id
     end
     submitted_at = DateTime.now
+    delegated_action_user = actual_current_user.present? ? actual_current_user : nil
     if report.update_attributes report_status_id: ReportStatus.processing_id,
                                 controlling_user_id: manager.id,
                                 controlling_for_user_id: nil,
@@ -142,7 +144,9 @@ class Report::Submit < Report::Base
                            modified_user_id: report.controlling_user_id,
                            modified_user_role_id: manager_role_id,
                            report_tracking_action_id: ReportTrackingAction.id_for(:submit),
-                           report_status_id: ReportStatus.processing_id
+                           report_status_id: ReportStatus.processing_id,
+                           delegated_action_user: delegated_action_user 
+
       unless report.approved?
         report.expenses.each do |expense|
           expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
@@ -173,8 +177,14 @@ class Report::Submit < Report::Base
 
     # Email Authorization Ends
 
+    # If deligation performs action
+     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     # adding comment regarding the change in status of this report
-    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
+    if actual_current_user.present?
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submitted_by_delegate), delegated_action_user_id: delegated_action_user_id
+    else
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
+    end
 
     Event::EReport::Submit.(user, {email_authorization: email_authorization, report: report})
 

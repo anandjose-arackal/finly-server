@@ -59,5 +59,6 @@ dump.rdb
 config/secure_storage_config.yml
 config/elastic_apm.yml
 config/deploy/config/*
+.ruby-version
 
 public/tmp

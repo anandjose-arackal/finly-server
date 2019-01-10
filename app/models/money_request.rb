@@ -29,8 +29,8 @@
 #  approved_at                        :datetime
 #  travel_request_id                  :integer
 #  destination_pocket_id              :integer
+#  created_by_id                      :integer
 #
-
 
 
 
@@ -58,6 +58,8 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :payment
   belongs_to :money_request_processor_mapping
   belongs_to :destination_pocket, class_name: "UserPocket"
+  belongs_to :created_by, class_name: "User"
+  belongs_to :modified_by, class_name: 'User'
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
