@@ -981,7 +981,7 @@ GEM
     multi_json (1.13.1)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
-    mysql2 (0.4.9)
+    mysql2 (0.4.10)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (5.0.2)
@@ -1260,7 +1260,7 @@ DEPENDENCIES
   memory_profiler
   meta_request
   mocha (= 1.2.1)
-  mysql2 (= 0.4.9)
+  mysql2 (= 0.4.10)
   nokogiri (= 1.6.8)
   oj (~> 2.18.1)
   omniauth
@@ -1304,6 +1304,3 @@ DEPENDENCIES
   wicked_pdf (= 1.1.0)
   will_paginate (= 3.1.5)
   wkhtmltopdf-binary (= 0.12.3.1)
-
-BUNDLED WITH
-   1.17.1
