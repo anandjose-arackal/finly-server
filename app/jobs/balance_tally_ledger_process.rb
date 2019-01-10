@@ -1,4 +1,4 @@
-class BalanceTallyLedgerProcess
+class BalanceTallyLedgerProcess < ActiveJob::Base
 
   attr_accessor :company
 

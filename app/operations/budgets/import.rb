@@ -61,12 +61,14 @@ class Budgets::Import < Budgets::Base
 
       budget_name = row[import_fields[:budget_name]]
       budget_amount = row[import_fields[:amount]]
+      parent_budget_name = row[import_fields[:parent_budget_name]]
       start_date = row[import_fields[:start_date]]
       end_date = row[import_fields[:end_date]]
       categories_budgetable = row[import_fields[:categories_budgetable]].split(",")
       departments_budgetable = row[import_fields[:departments_budgetable]].split(",")
       locations_budgetable = row[import_fields[:locations_budgetable]].split(",")
       vendors_budgetable = row[import_fields[:vendors_budgetable]].split(",")
+      users_budgetable = row[iport_fields[:users_budgetable]].split(",")
       expense = row[import_fields[:expense_y_n]]
       payment = row[import_fields[:payment_y_n]]
       purchase_order = row[import_fields[:purchase_order_y_n]]
@@ -92,8 +94,16 @@ class Budgets::Import < Budgets::Base
         budget_criteria_mappings << {budgetable_id: vendor.id, budgetable_type: "YesBankVendor"}
       end
 
+      users = company.users.with_id(users_budgetable)
+      users.each do |user|
+        budget_criteria_mappings << {budgetable_id: user.id, budgetable_type: "User"}
+      end
+
+      parent_budget = company.budgets.find_by(name: parent_budget_name)
+
       budget = company.budgets.build(name: budget_name, start_date: start_date, end_date: end_date,
                                      expense: expense, payment: payment, purchase_order: purchase_order,
+                                     parent_id: parent_budget.id,
                                      amounts_attributes: {value: budget_amount, currency_id: 1},
                                      budget_criteria_mappings_attributes: budget_criteria_mappings)
 
@@ -110,6 +120,7 @@ class Budgets::Import < Budgets::Base
     self.header = [
         "Budget Name",
         "Amount",
+        "Parent Budget Name",
         "Start Date (dd-mm-yyyy)",
         "End Date (dd-mm-yyyy)",
         "Categories Budgetable ",
@@ -138,15 +149,17 @@ class Budgets::Import < Budgets::Base
     [
         :budget_name => 0,
         :amount => 1,
-        :start_date => 2,
-        :end_date => 3,
-        :categories_budgetable => 4,
-        :departments_budgetable => 5,
-        :locations_budgetable => 6,
-        :vendors_budgetable => 7,
-        :expense_y_n => 8,
-        :payment_y_n => 9,
-        :purchase_order_y_n => 10
+        :parent_budget_name => 2,
+        :start_date => 3,
+        :end_date => 4,
+        :categories_budgetable => 5,
+        :departments_budgetable => 6,
+        :locations_budgetable => 7,
+        :vendors_budgetable => 8,
+        :users_budgetable => 9,
+        :expense_y_n => 10,
+        :payment_y_n => 11,
+        :purchase_order_y_n => 12
     ]
   end
 
