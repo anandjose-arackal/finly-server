@@ -8,10 +8,6 @@
 #  updated_at :datetime         not null
 #
 
-
-
-
-
 class ExpenseType < ApplicationRecord
 
   validates :name, presence: true

@@ -15,14 +15,10 @@
 #  updated_at              :datetime         not null
 #
 
-
-
 class PolicyConfiguration < ApplicationRecord
-  include PolicyVersion
+  # include PolicyVersion
   belongs_to :policy, optional: true
   belongs_to :report_currency, optional: true, class_name: 'Currency'
-
-  has_paper_trail
 
   scope :for_policy, ->(policy_id) { find_by id: policy_id }
 

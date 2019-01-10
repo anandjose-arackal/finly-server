@@ -113,8 +113,8 @@ gem 'bootstrap-sass', '~> 3.4.0'
 
 gem 'faker', '~> 1.9.1'
 
-gem 'paper_trail', '~> 10.1.0'
-gem 'paper_trail-association_tracking', '~> 1.1.0'
+# gem 'paper_trail', '~> 10.1.0'
+# gem 'paper_trail-association_tracking', '~> 1.1.0'
 # gem 'turboboost'
 
 gem 'remotipart', '~> 1.4'

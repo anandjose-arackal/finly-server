@@ -16,14 +16,6 @@
 #  settlement_currency_id :integer          default(1), not null
 #
 
-
-
-
-
-
-
-
-
 class Policy < ApplicationRecord
   include SoftDeletable
 
@@ -72,8 +64,6 @@ class Policy < ApplicationRecord
 
   validates :company_id, presence: true
   validate :one_default_per_company
-
-  has_paper_trail
 
   # Set base currency ID as INR unless set explicitly
   before_save {self.base_currency_id = Currency.id_for(:INR) if self.base_currency_id.blank?}

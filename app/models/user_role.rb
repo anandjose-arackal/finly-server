@@ -8,14 +8,6 @@
 #  updated_at :datetime         not null
 #
 
-
-
-
-
-
-
-
-
 class UserRole < ApplicationRecord
   has_many :users, through: :user_role_mappings
 

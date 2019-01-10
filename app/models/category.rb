@@ -19,9 +19,6 @@
 #  outward_invoice_line_items :boolean
 #
 
-
-
-
 class Category < ApplicationRecord
   has_ancestry
 

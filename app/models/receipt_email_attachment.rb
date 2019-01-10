@@ -14,9 +14,6 @@
 #  attachment_url_file_name         :string(255)
 #
 
-
-
-
 class ReceiptEmailAttachment < ApplicationRecord
   PDF_CONTENT_TYPES = ['application/pdf'].freeze
   IMAGE_CONTENT_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze

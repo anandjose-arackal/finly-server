@@ -14,13 +14,6 @@
 #  is_deleted             :boolean          default(FALSE)
 #
 
-
-
-
-
-
-
-
 class ExpenseRule < ApplicationRecord
   include SoftDeletable
 
@@ -48,8 +41,6 @@ class ExpenseRule < ApplicationRecord
 
   before_create :update_parent_version
   before_destroy :update_parent_version
-
-  has_paper_trail
 
   scope :warning_rules, -> {
     where rule_type_id: RuleType.warning_rule_id

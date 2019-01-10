@@ -46,11 +46,6 @@
 #  location_id                    :integer
 #
 
-
-
-
-
-
 class Payment < ApplicationRecord
   include PostOperationExecution
 

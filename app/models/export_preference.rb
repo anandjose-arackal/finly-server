@@ -10,7 +10,6 @@
 #  updated_at      :datetime         not null
 #
 
-
 class ExportPreference < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :export_field, optional: true

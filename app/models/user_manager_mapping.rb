@@ -24,17 +24,8 @@
 #  approves_finance_to_violation_only :boolean          default(FALSE)
 #
 
-
-
-
-
-
-
-
-
-
 class UserManagerMapping < ApplicationRecord
-  include PolicyVersion
+  # include PolicyVersion
 
   belongs_to :user, optional: true
   belongs_to :manager, optional: true, class_name: 'User'

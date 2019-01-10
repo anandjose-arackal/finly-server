@@ -10,12 +10,6 @@
 #  is_deleted :boolean          default(FALSE)
 #
 
-
-
-
-
-
-
 class ManualExpense < ApplicationRecord
   include SoftDeletable
 

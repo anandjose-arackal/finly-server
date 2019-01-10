@@ -13,7 +13,6 @@
 #  designation      :string(255)
 #
 
-
 class Contact < ApplicationRecord
   belongs_to :contactable, optional: true, polymorphic: true
 

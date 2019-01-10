@@ -5,7 +5,7 @@
 #  id                :integer          not null, primary key
 #  file_file_name    :string(255)
 #  file_content_type :string(255)
-#  file_file_size    :integer
+#  file_file_size    :bigint(8)
 #  file_updated_at   :datetime
 #  expires_on        :datetime
 #  created_at        :datetime         not null

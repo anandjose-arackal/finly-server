@@ -12,7 +12,6 @@
 #  branch_location_id    :integer
 #
 
-
 class UserRoleMapping < ApplicationRecord
 
   belongs_to :user, optional: true

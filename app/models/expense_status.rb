@@ -9,9 +9,6 @@
 #  updated_at :datetime         not null
 #
 
-
-
-
 class ExpenseStatus < ApplicationRecord
   include Seedable
 

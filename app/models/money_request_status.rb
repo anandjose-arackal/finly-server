@@ -9,12 +9,6 @@
 #  order      :integer          default(1), not null
 #
 
-
-
-
-
-
-
 class MoneyRequestStatus < ApplicationRecord
   include Seedable
 

@@ -17,8 +17,6 @@
 #  without_receipt_amount_id :integer
 #
 
-
-
 # expense_type_id: contains details about whether the budget is scoped to a particular
 # type of expense or not
 # 1 - Manual, 2 - Card, 3 - Distance, 4 - Time, 5 - Per Diem
@@ -61,8 +59,6 @@ class BudgetRule < ApplicationRecord
 
   before_create :update_parent_version
   before_destroy :update_parent_version
-
-  has_paper_trail
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not id: id}

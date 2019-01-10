@@ -2,65 +2,56 @@
 #
 # Table name: users
 #
-#  id                     :integer          not null, primary key
-#  email                  :string(255)      default("")
-#  encrypted_password     :string(255)      default(""), not null
-#  reset_password_token   :string(255)
-#  reset_password_sent_at :datetime
-#  remember_created_at    :datetime
-#  sign_in_count          :integer          default(0), not null
-#  current_sign_in_at     :datetime
-#  last_sign_in_at        :datetime
-#  current_sign_in_ip     :string(255)
-#  last_sign_in_ip        :string(255)
-#  confirmation_token     :string(255)
-#  confirmed_at           :datetime
-#  confirmation_sent_at   :datetime
-#  unconfirmed_email      :string(255)
-#  failed_attempts        :integer          default(0), not null
-#  unlock_token           :string(255)
-#  locked_at              :datetime
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  company_id             :integer          not null
-#  mobile_number          :string(255)
-#  active                 :boolean          default(TRUE), not null
-#  invitation_token       :string(255)
-#  invitation_created_at  :datetime
-#  invitation_sent_at     :datetime
-#  invitation_accepted_at :datetime
-#  invitation_limit       :integer
-#  invited_by_id          :integer
-#  invited_by_type        :string(255)
-#  invitations_count      :integer          default(0)
-#  otp                    :string(255)
-#  otp_sent_at            :datetime
-#  otp_verified_at        :datetime
-#  otp_verified           :boolean          default(FALSE), not null
-#  otp_count              :integer          default(0), not null
-#  first_name             :string(255)
-#  last_name              :string(255)
-#  mobile_only_invite     :boolean          default(FALSE)
-#  mothers_maiden_name    :string(255)
-#  verified               :boolean          default(FALSE)
-#  otp_request_type_id    :integer
-#  default_password       :boolean          default(FALSE)
-#  point_of_contact       :boolean          default(FALSE)
-#  otp_attempts           :integer          default(0)
-#  user_delegate_id       :integer
-#  delegation_enabled     :boolean
-#  gl_config              :text(65535)
+#  id                        :integer          not null, primary key
+#  email                     :string(255)      default("")
+#  encrypted_password        :string(255)      default(""), not null
+#  reset_password_token      :string(255)
+#  reset_password_sent_at    :datetime
+#  remember_created_at       :datetime
+#  sign_in_count             :integer          default(0), not null
+#  current_sign_in_at        :datetime
+#  last_sign_in_at           :datetime
+#  current_sign_in_ip        :string(255)
+#  last_sign_in_ip           :string(255)
+#  confirmation_token        :string(255)
+#  confirmed_at              :datetime
+#  confirmation_sent_at      :datetime
+#  unconfirmed_email         :string(255)
+#  failed_attempts           :integer          default(0), not null
+#  unlock_token              :string(255)
+#  locked_at                 :datetime
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  company_id                :integer          not null
+#  mobile_number             :string(255)
+#  active                    :boolean          default(TRUE), not null
+#  invitation_token          :string(255)
+#  invitation_created_at     :datetime
+#  invitation_sent_at        :datetime
+#  invitation_accepted_at    :datetime
+#  invitation_limit          :integer
+#  invited_by_id             :integer
+#  invited_by_type           :string(255)
+#  invitations_count         :integer          default(0)
+#  otp                       :string(255)
+#  otp_sent_at               :datetime
+#  otp_verified_at           :datetime
+#  otp_verified              :boolean          default(FALSE), not null
+#  otp_count                 :integer          default(0), not null
+#  first_name                :string(255)
+#  last_name                 :string(255)
+#  mobile_only_invite        :boolean          default(FALSE)
+#  mothers_maiden_name       :string(255)
+#  verified                  :boolean          default(FALSE)
+#  otp_request_type_id       :integer
+#  default_password          :boolean          default(FALSE)
+#  point_of_contact          :boolean          default(FALSE)
+#  otp_attempts              :integer          default(0)
+#  user_delegate_id          :integer
+#  delegation_enabled        :boolean
+#  gl_config                 :text(65535)
+#  vacation_delegate_enabled :boolean
 #
-
-
-
-
-
-
-
-
-
-
 
 class User < ApplicationRecord
   include OperationCallbacks
@@ -229,8 +220,6 @@ class User < ApplicationRecord
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
 
-  has_paper_trail
-
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}, format: {with: Constants::VALID_EMAIL_FORMAT}
   validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
@@ -243,6 +232,7 @@ class User < ApplicationRecord
   scope :with_id_or_email_or_mobile_number, -> (string) {
     ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
     where id: ids
+
   }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }

@@ -34,8 +34,6 @@
 #  original_source_updated_at   :datetime
 #
 
-
-
 require 'fileutils'
 class ReceiptEmail < ApplicationRecord
   has_many :receipts, as: :sourcable

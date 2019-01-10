@@ -11,13 +11,8 @@
 #  is_deleted :boolean          default(FALSE), not null
 #
 
-
-
-
-
-
 class PolicyUserMapping < ApplicationRecord
-  include PolicyVersion
+  # include PolicyVersion
   include SoftDeletable
 
   belongs_to :user, optional: true

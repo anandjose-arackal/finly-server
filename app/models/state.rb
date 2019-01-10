@@ -9,12 +9,6 @@
 #  updated_at :datetime         not null
 #
 
-
-
-
-
-
-
 class State < ApplicationRecord
   include Seedable
 

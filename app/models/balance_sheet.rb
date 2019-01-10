@@ -11,9 +11,6 @@
 #  pending_advance_id        :integer
 #
 
-
-
-
 class BalanceSheet < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :cash_in_hand, optional: true, class_name: 'Amount'

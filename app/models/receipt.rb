@@ -20,9 +20,8 @@
 #  sourcable_type     :integer
 #  is_deleted         :boolean          default(FALSE)
 #  created_by_id      :integer
+#  modified_by_id     :integer
 #
-
-
 
 class Receipt < ApplicationRecord
   include SoftDeletable

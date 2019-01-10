@@ -30,11 +30,8 @@
 #  travel_request_id                  :integer
 #  destination_pocket_id              :integer
 #  created_by_id                      :integer
+#  modified_by_id                     :integer
 #
-
-
-
-
 
 class MoneyRequest < ApplicationRecord
   include OperationCallbacks,
