@@ -6,7 +6,15 @@ FactoryBot.define do
   end
 
   sequence :mobile_number do |n|
-    "987654321#{n}"
+    if n > 9
+      number = "98765432#{n}"
+    elsif n > 99
+      number = "9876543#{n}"
+    else
+      number = "987654320#{n}"
+    end
+    p "******", number
+    number
   end
 
 
