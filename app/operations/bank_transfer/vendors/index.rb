@@ -16,11 +16,7 @@ class BankTransfer::Vendors::Index < BankTransfer::Vendors::Base
   end
 
   def init
-    if params[:without_bank_account].present?
-      self.vendors = user.company.yes_bank_vendors
-    else
-      self.vendors = user.company.yes_bank_vendors.includes_bank_accounts
-    end
+    self.vendors = user.company.yes_bank_vendors.non_deleted.includes_bank_accounts
   end
 
   def success

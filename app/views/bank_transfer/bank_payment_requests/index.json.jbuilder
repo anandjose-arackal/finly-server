@@ -1,3 +1,4 @@
+json.count @result.payment_requests.count
 json.results do
   json.array! @result.paginated_requests.include_for_index.each do |payment_request|
     item = payment_request.payment_order
@@ -52,5 +53,3 @@ json.results do
     end
   end
 end
-
-json.count @result.payment_requests.count

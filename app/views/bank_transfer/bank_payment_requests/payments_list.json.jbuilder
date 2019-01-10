@@ -1,5 +1,5 @@
 json.payments do
-  json.array!(@result.paginated_payments) do |payment|
+  json.array!(@result.paginated_payments.include_for_index) do |payment|
     json.owner_name payment.receiving_account&.account_owner&.name
     json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
