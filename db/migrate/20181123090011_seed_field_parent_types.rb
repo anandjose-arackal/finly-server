@@ -1,4 +1,4 @@
-class SeedFieldParentTypes < ActiveRecord::Migration
+class SeedFieldParentTypes < ActiveRecord::Migration[4.2]
   def change
     FieldParentType.seed_data
   end

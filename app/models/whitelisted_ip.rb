@@ -10,9 +10,9 @@
 #  whitelisted_ip_type_id :integer          not null
 #
 
-class WhitelistedIp < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :whitelisted_ip_type
+class WhitelistedIp < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :whitelisted_ip_type, optional: true
 
   scope :with_ip, -> (ip) { where ip_address: ip }
   scope :with_type, -> (type) {where whitelisted_ip_type_id: type}

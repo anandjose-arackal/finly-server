@@ -1,4 +1,4 @@
-class AddCardStatusToCard < ActiveRecord::Migration
+class AddCardStatusToCard < ActiveRecord::Migration[4.2]
   def change
     if Company.count > 0
       CardStatus.seed_data

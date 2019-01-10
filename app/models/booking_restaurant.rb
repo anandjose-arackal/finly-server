@@ -18,13 +18,13 @@
 #  booking_id         :integer
 #
 
-class BookingRestaurant < ActiveRecord::Base
+class BookingRestaurant < ApplicationRecord
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation
 
-  # belongs_to :parent, polymorphic: true
-  belongs_to :booking, inverse_of: :booking_restaurant
-  belongs_to :location, dependent: :destroy
+  # belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :booking, optional: true, inverse_of: :booking_restaurant
+  belongs_to :location, optional: true, dependent: :destroy
 
   accepts_nested_attributes_for :location
 

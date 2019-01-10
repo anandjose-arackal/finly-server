@@ -1,4 +1,4 @@
-class CreateAdminUserRoleMappings < ActiveRecord::Migration
+class CreateAdminUserRoleMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :admin_user_role_mappings do |t|
       t.references :admin_user, index: true, foreign_key: true

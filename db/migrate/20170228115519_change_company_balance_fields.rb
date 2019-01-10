@@ -1,4 +1,4 @@
-class ChangeCompanyBalanceFields < ActiveRecord::Migration
+class ChangeCompanyBalanceFields < ActiveRecord::Migration[4.2]
   def change
     rename_column :company_balance_histories, :company_withdrawal_id, :company_withdrawal_to_card_id
     add_column :company_balance_histories, :company_withdrawal_to_wallet_id, :integer, references: "Amount", foreign_key: true, index: true

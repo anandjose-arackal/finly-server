@@ -1,4 +1,4 @@
-class CreateUserGroupConfigurations < ActiveRecord::Migration
+class CreateUserGroupConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :user_group_configurations do |t|
 

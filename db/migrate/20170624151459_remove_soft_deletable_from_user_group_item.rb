@@ -1,4 +1,4 @@
-class RemoveSoftDeletableFromUserGroupItem < ActiveRecord::Migration
+class RemoveSoftDeletableFromUserGroupItem < ActiveRecord::Migration[4.2]
   def up
 
     # capturing all user group items that have been soft deleted and destroying them one by one

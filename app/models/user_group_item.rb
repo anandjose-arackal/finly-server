@@ -9,9 +9,9 @@
 #  updated_at    :datetime         not null
 #
 
-class UserGroupItem < ActiveRecord::Base
+class UserGroupItem < ApplicationRecord
 
-  belongs_to :user_group
+  belongs_to :user_group, optional: true
   has_many :user_group_item_mappings, dependent: :destroy
   has_many :users, through: :user_group_item_mappings
 

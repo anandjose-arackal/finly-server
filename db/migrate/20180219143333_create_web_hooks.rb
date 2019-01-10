@@ -1,4 +1,4 @@
-class CreateWebHooks < ActiveRecord::Migration
+class CreateWebHooks < ActiveRecord::Migration[4.2]
   def change
     create_table :web_hooks do |t|
       t.text :url, null: false

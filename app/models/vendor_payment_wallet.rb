@@ -9,10 +9,10 @@
 #  updated_at :datetime         not null
 #
 
-class VendorPaymentWallet < ActiveRecord::Base
+class VendorPaymentWallet < ApplicationRecord
   include Accountable
-  belongs_to :user
-  belongs_to :balance, class_name: "Amount"
+  belongs_to :user, optional: true
+  belongs_to :balance, optional: true, class_name: "Amount"
 
   validates :user, presence: true
   validates :balance, presence: true

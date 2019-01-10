@@ -1,4 +1,4 @@
-class AddDefaultPolicyReportsMoneyRequests < ActiveRecord::Migration
+class AddDefaultPolicyReportsMoneyRequests < ActiveRecord::Migration[4.2]
   def change
     Report.unscoped.where(policy_id: nil).each do |report|
       report.update(policy_id: report.user.company.default_policy.id)

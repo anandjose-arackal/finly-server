@@ -1,4 +1,4 @@
-class ReseedPamentStatuses < ActiveRecord::Migration
+class ReseedPamentStatuses < ActiveRecord::Migration[4.2]
   def change
     PaymentStatus.seed_data
   end

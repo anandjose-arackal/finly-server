@@ -82,9 +82,10 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
           message = args['message']
           return 0 unless success
           balance = args['balance']
+          balance = balance if balance.class.name == String.name
           payment_order = options[:payment_order]
           blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
-          return (balance - blocked_amount_for_payments)
+          return (balance.to_f - blocked_amount_for_payments.to_f)
         end
       end
     rescue Timeout::Error

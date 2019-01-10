@@ -15,11 +15,11 @@
 #  updated_at               :datetime         not null
 #
 
-class AutoSyncConfig < ActiveRecord::Base
+class AutoSyncConfig < ApplicationRecord
 
-  belongs_to :company
-  belongs_to :auto_sync_config_type
-  belongs_to :period
+  belongs_to :company, optional: true
+  belongs_to :auto_sync_config_type, optional: true
+  belongs_to :period, optional: true
 
 
   validates :company, presence: true

@@ -1,4 +1,4 @@
-class CreateCardTransactions < ActiveRecord::Migration
+class CreateCardTransactions < ActiveRecord::Migration[4.2]
   def change
     create_table :card_transactions do |t|
       t.references :user, index: true, foreign_key: true

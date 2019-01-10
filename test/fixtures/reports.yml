@@ -34,8 +34,9 @@
 #  travel_request_id                  :integer
 #  department_id                      :integer
 #  sub_department_id                  :integer
+#  created_by_id                      :integer
+#  modified_by_id                     :integer
 #
-
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 

@@ -1,4 +1,4 @@
-class CreateDocumentNumberConfigs < ActiveRecord::Migration
+class CreateDocumentNumberConfigs < ActiveRecord::Migration[4.2]
   def change
     create_table :document_number_configs do |t|
       t.string :prefix

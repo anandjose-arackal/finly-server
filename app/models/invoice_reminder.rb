@@ -12,9 +12,9 @@
 #  name                :string(255)
 #
 
-class InvoiceReminder < ActiveRecord::Base
+class InvoiceReminder < ApplicationRecord
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
   REFERENCE_DATE_TYPES = ["date", "due_date", nil]
   TIMEFRAME_TYPES = ["before", "after", nil]

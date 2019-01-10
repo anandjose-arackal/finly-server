@@ -15,15 +15,15 @@
 #  company_pocket_template_id :integer
 #
 
-class UserPocket < ActiveRecord::Base
+class UserPocket < ApplicationRecord
 
   include Accountable
 
-  belongs_to :user_pocket_type
-  belongs_to :balance, class_name: "Amount"
-  belongs_to :user
-  belongs_to :base_currency, class_name: "Currency"
-  belongs_to :company_pocket_template
+  belongs_to :user_pocket_type, optional: true
+  belongs_to :balance, optional: true, class_name: "Amount"
+  belongs_to :user, optional: true
+  belongs_to :base_currency, optional: true, class_name: "Currency"
+  belongs_to :company_pocket_template, optional: true
 
   # adding associations to payment and Finly Transactions
   has_many :initiating_payments, as: :initiating_account, class_name: "Payment", dependent: :destroy

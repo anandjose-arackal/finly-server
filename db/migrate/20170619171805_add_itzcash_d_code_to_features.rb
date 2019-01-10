@@ -1,4 +1,4 @@
-class AddItzcashDCodeToFeatures < ActiveRecord::Migration
+class AddItzcashDCodeToFeatures < ActiveRecord::Migration[4.2]
   def change
     add_column :feature_subscriptions, :itz_cash_d_code_enabled, :boolean, default: false
     Company.all.each do |company|

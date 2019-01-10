@@ -9,7 +9,7 @@
 #
 
 
-class RuleType < ActiveRecord::Base
+class RuleType < ApplicationRecord
 
   validates :name, presence: true
 

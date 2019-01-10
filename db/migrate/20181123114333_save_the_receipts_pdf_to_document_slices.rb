@@ -1,4 +1,4 @@
-class SaveTheReceiptsPdfToDocumentSlices < ActiveRecord::Migration
+class SaveTheReceiptsPdfToDocumentSlices < ActiveRecord::Migration[4.2]
   def change
     if Rails.env.production?
       # Receipt.all.each do |receipt|

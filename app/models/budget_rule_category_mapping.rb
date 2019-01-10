@@ -9,7 +9,7 @@
 #  updated_at     :datetime         not null
 #
 
-class BudgetRuleCategoryMapping < ActiveRecord::Base
-  belongs_to :budget_rule
-  belongs_to :category
+class BudgetRuleCategoryMapping < ApplicationRecord
+  belongs_to :budget_rule, optional: true
+  belongs_to :category, optional: true
 end

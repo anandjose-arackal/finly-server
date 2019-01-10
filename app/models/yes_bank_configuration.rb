@@ -10,5 +10,5 @@
 #  updated_at           :datetime         not null
 #
 
-class YesBankConfiguration < ActiveRecord::Base
+class YesBankConfiguration < ApplicationRecord
 end

@@ -8,11 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-
-
-
-
-class ExpenseType < ActiveRecord::Base
+class ExpenseType < ApplicationRecord
 
   validates :name, presence: true
 

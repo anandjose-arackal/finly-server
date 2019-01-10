@@ -1,4 +1,4 @@
-class CreateQuickbooksReferences < ActiveRecord::Migration
+class CreateQuickbooksReferences < ActiveRecord::Migration[4.2]
   def change
     create_table :quickbooks_references do |t|
       t.string :name

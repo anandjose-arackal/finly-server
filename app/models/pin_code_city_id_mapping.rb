@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class PinCodeCityIdMapping < ActiveRecord::Base
+class PinCodeCityIdMapping < ApplicationRecord
 
   scope :with_pin_code, -> (pin_code) {where pin_code: pin_code}
   scope :with_city_id, -> (city_id) {where city_id: city_id}

@@ -1,4 +1,4 @@
-class ChangeDateFieldInUserBalanceHistories < ActiveRecord::Migration
+class ChangeDateFieldInUserBalanceHistories < ActiveRecord::Migration[4.2]
   def up
     change_column :user_balance_histories, :date, :date
   end

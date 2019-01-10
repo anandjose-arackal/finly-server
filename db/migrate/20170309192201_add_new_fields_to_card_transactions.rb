@@ -1,4 +1,4 @@
-class AddNewFieldsToCardTransactions < ActiveRecord::Migration
+class AddNewFieldsToCardTransactions < ActiveRecord::Migration[4.2]
   def change
     add_column :card_transactions, :mcc_code, :string
     add_column :card_transactions, :transaction_status, :string

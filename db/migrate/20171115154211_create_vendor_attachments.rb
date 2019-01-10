@@ -1,4 +1,4 @@
-class CreateVendorAttachments < ActiveRecord::Migration
+class CreateVendorAttachments < ActiveRecord::Migration[4.2]
   def change
     create_table :vendor_attachments do |t|
       t.attachment :attached_file

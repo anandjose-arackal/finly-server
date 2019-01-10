@@ -9,9 +9,9 @@
 #  updated_at             :datetime         not null
 #
 
-class FieldParentMapping < ActiveRecord::Base
-  belongs_to :field_configuration
-  belongs_to :field_parent_type
+class FieldParentMapping < ApplicationRecord
+  belongs_to :field_configuration, optional: true
+  belongs_to :field_parent_type, optional: true
 
   scope :pluck_field_parent_type_id, -> { pluck :field_parent_type_id }
 

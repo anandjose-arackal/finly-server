@@ -38,19 +38,19 @@
 #
 
 # parent here will be either the payment receivable, or user, or whatever
-class VirtualBankAccount < ActiveRecord::Base
+class VirtualBankAccount < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :parent, polymorphic: true
-  belongs_to :purpose, class_name: "VirtualAccountPurpose"
-  belongs_to :company
-  belongs_to :initiating_user, class_name: "User"
-  belongs_to :customer
-  belongs_to :receiving_account, polymorphic: true
-  belongs_to :maximum_transaction_amount, class_name: "Amount"
-  belongs_to :minimum_transaction_amount, class_name: "Amount"
-  belongs_to :maximum_amount, class_name: "Amount"
-  belongs_to :exact_transaction_amount, class_name: "Amount"
+  belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :purpose, optional: true, class_name: "VirtualAccountPurpose"
+  belongs_to :company, optional: true
+  belongs_to :initiating_user, optional: true, class_name: "User"
+  belongs_to :customer, optional: true
+  belongs_to :receiving_account, optional: true, polymorphic: true
+  belongs_to :maximum_transaction_amount, optional: true, class_name: "Amount"
+  belongs_to :minimum_transaction_amount, optional: true, class_name: "Amount"
+  belongs_to :maximum_amount, optional: true, class_name: "Amount"
+  belongs_to :exact_transaction_amount, optional: true, class_name: "Amount"
 
   has_many :outward_invoices, foreign_key: :virtual_account_id
 

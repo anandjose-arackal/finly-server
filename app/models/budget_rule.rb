@@ -17,24 +17,22 @@
 #  without_receipt_amount_id :integer
 #
 
-
-
 # expense_type_id: contains details about whether the budget is scoped to a particular
 # type of expense or not
 # 1 - Manual, 2 - Card, 3 - Distance, 4 - Time, 5 - Per Diem
 
-class BudgetRule < ActiveRecord::Base
+class BudgetRule < ApplicationRecord
   include SoftDeletable
 
-  # belongs_to :category
+  # belongs_to :category, optional: true
   has_many :budget_rule_category_mappings
   has_many :categories, through: :budget_rule_category_mappings
-  belongs_to :amount, dependent: :destroy
-  belongs_to :period
-  belongs_to :policy
-  belongs_to :rule_type
-  belongs_to :with_receipt_amount, class_name: 'Amount'
-  belongs_to :without_receipt_amount, class_name: 'Amount'
+  belongs_to :amount, optional: true, dependent: :destroy
+  belongs_to :period, optional: true
+  belongs_to :policy, optional: true
+  belongs_to :rule_type, optional: true
+  belongs_to :with_receipt_amount, optional: true, class_name: 'Amount'
+  belongs_to :without_receipt_amount, optional: true, class_name: 'Amount'
   has_many :budget_rule_field_mappings
   has_many :field_drop_down_items, through: :budget_rule_field_mappings
   has_many :field_configurations, through: :budget_rule_field_mappings
@@ -61,8 +59,6 @@ class BudgetRule < ActiveRecord::Base
 
   before_create :update_parent_version
   before_destroy :update_parent_version
-
-  has_paper_trail
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not id: id}

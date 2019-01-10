@@ -1,4 +1,4 @@
-class CreatePreviewRegistrations < ActiveRecord::Migration
+class CreatePreviewRegistrations < ActiveRecord::Migration[4.2]
   def change
     create_table :preview_registrations do |t|
       t.string :email

@@ -1,4 +1,4 @@
-class AddUserToProcurementAttachments < ActiveRecord::Migration
+class AddUserToProcurementAttachments < ActiveRecord::Migration[4.2]
   def change
     add_reference :procurement_attachments, :user, index: true, foreign_key: true
   end

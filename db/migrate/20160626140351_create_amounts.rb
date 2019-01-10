@@ -1,4 +1,4 @@
-class CreateAmounts < ActiveRecord::Migration
+class CreateAmounts < ActiveRecord::Migration[4.2]
   def change
     create_table :currencies do |t|
       t.string :country

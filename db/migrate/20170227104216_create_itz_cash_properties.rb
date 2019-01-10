@@ -1,4 +1,4 @@
-class CreateItzCashProperties < ActiveRecord::Migration
+class CreateItzCashProperties < ActiveRecord::Migration[4.2]
   def change
     remove_column :companies, :d_code
     create_table :itz_cash_properties do |t|

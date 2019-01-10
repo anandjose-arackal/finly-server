@@ -9,8 +9,8 @@
 #  policy_id  :integer          not null
 #
 
-class PerDiemExpenseConfig < ActiveRecord::Base
-  belongs_to :policy
+class PerDiemExpenseConfig < ApplicationRecord
+  belongs_to :policy, optional: true
 
   validates :policy, presence: true
 end

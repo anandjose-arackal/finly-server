@@ -11,6 +11,6 @@
 #  token      :string(255)
 #
 
-class SsoKey < ActiveRecord::Base
-  belongs_to :company
+class SsoKey < ApplicationRecord
+  belongs_to :company, optional: true
 end

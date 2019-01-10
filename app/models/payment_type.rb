@@ -10,7 +10,7 @@
 
 
 
-class PaymentType < ActiveRecord::Base
+class PaymentType < ApplicationRecord
   include Seedable
 
   def self.values

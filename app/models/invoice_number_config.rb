@@ -12,11 +12,11 @@
 #  purpose_id                    :integer
 #
 
-class InvoiceNumberConfig < ActiveRecord::Base
+class InvoiceNumberConfig < ApplicationRecord
 
-  belongs_to :company
-  belongs_to :invoice_number_config_type
-  belongs_to :purpose
+  belongs_to :company, optional: true
+  belongs_to :invoice_number_config_type, optional: true
+  belongs_to :purpose, optional: true
 
   scope :with_purpose_id, -> (ids) { where purpose_id: ids }
   scope :with_config_type_id, -> (ids) { where invoice_number_config_type_id: ids }

@@ -1,4 +1,4 @@
-class CreateOutwardInvoiceStatuses < ActiveRecord::Migration
+class CreateOutwardInvoiceStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :outward_invoice_statuses do |t|
       t.string :name

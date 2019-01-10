@@ -13,7 +13,7 @@
 #
 
 
-class NotifierType < ActiveRecord::Base
+class NotifierType < ApplicationRecord
 
   ACTIONS = [{key: :report_submit, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},

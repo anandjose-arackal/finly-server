@@ -9,7 +9,7 @@
 #  updated_at  :datetime         not null
 #
 
-class SupplyItemType < ActiveRecord::Base
+class SupplyItemType < ApplicationRecord
   include Seedable
 
   def self.values

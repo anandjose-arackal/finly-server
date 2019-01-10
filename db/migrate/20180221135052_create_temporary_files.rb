@@ -1,4 +1,4 @@
-class CreateTemporaryFiles < ActiveRecord::Migration
+class CreateTemporaryFiles < ActiveRecord::Migration[4.2]
   def change
     create_table :temporary_files do |t|
       t.attachment :file

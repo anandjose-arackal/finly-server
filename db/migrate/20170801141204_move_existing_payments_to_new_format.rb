@@ -1,4 +1,4 @@
-class MoveExistingPaymentsToNewFormat < ActiveRecord::Migration
+class MoveExistingPaymentsToNewFormat < ActiveRecord::Migration[4.2]
   def change
     # first adding the new payment purpose types to db
     PaymentPurpose.seed_data

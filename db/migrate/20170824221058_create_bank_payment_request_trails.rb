@@ -1,4 +1,4 @@
-class CreateBankPaymentRequestTrails < ActiveRecord::Migration
+class CreateBankPaymentRequestTrails < ActiveRecord::Migration[4.2]
   def change
     create_table :bank_payment_request_trails do |t|
       t.references :bank_payment_request, index: true, foreign_key: true

@@ -1,4 +1,4 @@
-class CreateResourceRequests < ActiveRecord::Migration
+class CreateResourceRequests < ActiveRecord::Migration[4.2]
   def change
     create_table :resource_requests do |t|
       t.string :name

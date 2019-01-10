@@ -1,4 +1,4 @@
-class CreateInvoiceReminders < ActiveRecord::Migration
+class CreateInvoiceReminders < ActiveRecord::Migration[4.2]
   def change
     create_table :invoice_reminders do |t|
       t.integer :days

@@ -11,11 +11,11 @@
 #  is_deleted  :boolean
 #
 
-class CostCenter < ActiveRecord::Base
+class CostCenter < ApplicationRecord
 
   include SoftDeletable
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
   has_many :budget_criteria_mappings, as: :budgetable
   has_many :budgets, through: :budget_criteria_mappings

@@ -13,9 +13,9 @@
 #  success     :boolean
 #
 
-class CallbackTrack < ActiveRecord::Base
+class CallbackTrack < ApplicationRecord
 
-  belongs_to :company
-  belongs_to :entity, polymorphic: true
+  belongs_to :company, optional: true
+  belongs_to :entity, optional: true, polymorphic: true
 
 end

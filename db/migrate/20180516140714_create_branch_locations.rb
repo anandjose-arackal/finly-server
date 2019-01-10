@@ -1,4 +1,4 @@
-class CreateBranchLocations < ActiveRecord::Migration
+class CreateBranchLocations < ActiveRecord::Migration[4.2]
   def change
     create_table :branch_locations do |t|
       t.string :name

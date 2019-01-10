@@ -1,4 +1,4 @@
-class CreateBillOfSupplies < ActiveRecord::Migration
+class CreateBillOfSupplies < ActiveRecord::Migration[4.2]
   def change
     create_table :bill_of_supplies do |t|
       t.references :company, index: true, foreign_key: true

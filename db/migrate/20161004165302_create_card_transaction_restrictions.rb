@@ -1,4 +1,4 @@
-class CreateCardTransactionRestrictions < ActiveRecord::Migration
+class CreateCardTransactionRestrictions < ActiveRecord::Migration[4.2]
   def change
     create_table :card_transaction_restrictions do |t|
       t.integer :count

@@ -1,4 +1,4 @@
-class CreateBalanceSheets < ActiveRecord::Migration
+class CreateBalanceSheets < ActiveRecord::Migration[4.2]
   def change
     create_table :balance_sheets do |t|
       t.references :user, index: true, foreign_key: true

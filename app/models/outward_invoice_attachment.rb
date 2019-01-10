@@ -15,10 +15,10 @@
 #  user_id                 :integer
 #
 
-class OutwardInvoiceAttachment < ActiveRecord::Base
+class OutwardInvoiceAttachment < ApplicationRecord
   include Attachable
 
-  belongs_to :outward_invoice
+  belongs_to :outward_invoice, optional: true
 
   CONTENT_TYPES = {content_type: []}
 

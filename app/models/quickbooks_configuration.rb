@@ -18,12 +18,12 @@
 
 # one instance of this will exist for every company
 
-class QuickbooksConfiguration < ActiveRecord::Base
+class QuickbooksConfiguration < ApplicationRecord
 
-  belongs_to :quickbooks_payment_type
-  belongs_to :company
-  belongs_to :reimbursable_account, class_name: 'QuickbooksPaymentType'
-  belongs_to :non_reimbursable_account, class_name: 'QuickbooksPaymentType'
+  belongs_to :quickbooks_payment_type, optional: true
+  belongs_to :company, optional: true
+  belongs_to :reimbursable_account, optional: true, class_name: 'QuickbooksPaymentType'
+  belongs_to :non_reimbursable_account, optional: true, class_name: 'QuickbooksPaymentType'
 
   TRANSACTION_DATE_FIELD_TYPES = {
       1 => "Start Date",

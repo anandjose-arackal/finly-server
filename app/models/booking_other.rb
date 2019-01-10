@@ -14,12 +14,12 @@
 #  booking_id      :integer
 #
 
-class BookingOther < ActiveRecord::Base
+class BookingOther < ApplicationRecord
   include SoftDeletable
 
-  # belongs_to :parent, polymorphic: true
-  belongs_to :booking, inverse_of: :booking_other
-  belongs_to :cost, class_name: 'Amount', dependent: :destroy
+  # belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :booking, optional: true, inverse_of: :booking_other
+  belongs_to :cost, optional: true, class_name: 'Amount', dependent: :destroy
 
   def as_json(options={})
     {

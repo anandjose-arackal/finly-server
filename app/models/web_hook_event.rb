@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class WebHookEvent < ActiveRecord::Base
+class WebHookEvent < ApplicationRecord
   include Seedable
 
   def self.values

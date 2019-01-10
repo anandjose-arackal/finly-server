@@ -20,13 +20,13 @@
 #  status_id                      :integer          not null
 #
 
-class ExpenseDataExtract < ActiveRecord::Base
-  belongs_to :extractable, polymorphic: true
-  belongs_to :amount
-  belongs_to :expense_data_extract_source
-  belongs_to :category
-  belongs_to :sourcable, polymorphic: true
-  belongs_to :status, class_name: 'ExpenseDataExtractStatus'
+class ExpenseDataExtract < ApplicationRecord
+  belongs_to :extractable, optional: true, polymorphic: true
+  belongs_to :amount, optional: true
+  belongs_to :expense_data_extract_source, optional: true
+  belongs_to :category, optional: true
+  belongs_to :sourcable, optional: true, polymorphic: true
+  belongs_to :status, optional: true, class_name: 'ExpenseDataExtractStatus'
 
   accepts_nested_attributes_for :amount
 

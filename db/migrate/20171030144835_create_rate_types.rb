@@ -1,4 +1,4 @@
-class CreateRateTypes < ActiveRecord::Migration
+class CreateRateTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :rate_types do |t|
       t.string :name

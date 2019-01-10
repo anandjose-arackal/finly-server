@@ -1,4 +1,4 @@
-class AddAdditionalDetailsToCardTransaction < ActiveRecord::Migration
+class AddAdditionalDetailsToCardTransaction < ActiveRecord::Migration[4.2]
   def change
     add_column :card_transactions, :success, :boolean
     add_column :card_transactions, :acquirer_id, :string

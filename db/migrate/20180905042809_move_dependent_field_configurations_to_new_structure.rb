@@ -1,4 +1,4 @@
-class MoveDependentFieldConfigurationsToNewStructure < ActiveRecord::Migration
+class MoveDependentFieldConfigurationsToNewStructure < ActiveRecord::Migration[4.2]
   def change
     dependent_field_configurations = FieldConfiguration.where.not(parent_id: nil)
     dependent_field_configurations.each do |field_configuration|

@@ -11,9 +11,9 @@
 #  updated_at        :datetime         not null
 #
 
-class SystemLog < ActiveRecord::Base
-  belongs_to :log_resource, polymorphic: true
-  belongs_to :type, class_name: 'SystemMessageType'
+class SystemLog < ApplicationRecord
+  belongs_to :log_resource, optional: true, polymorphic: true
+  belongs_to :type, optional: true, class_name: 'SystemMessageType'
 
   scope :errors, -> {where type_id: SystemMessageType.id_for(:error)}
   scope :info, -> {where type_id: SystemMessageType.id_for(:info)}

@@ -1,4 +1,4 @@
-class SeedCommentActionDataToCommentActionModels < ActiveRecord::Migration
+class SeedCommentActionDataToCommentActionModels < ActiveRecord::Migration[4.2]
   def change
     ReportCommentAction.seed_data
     TravelRequestCommentAction.seed_data

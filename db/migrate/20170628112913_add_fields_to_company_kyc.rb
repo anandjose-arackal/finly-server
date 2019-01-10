@@ -1,4 +1,4 @@
-class AddFieldsToCompanyKyc < ActiveRecord::Migration
+class AddFieldsToCompanyKyc < ActiveRecord::Migration[4.2]
   def change
     drop_attached_file :company_kycs, :agreement
 

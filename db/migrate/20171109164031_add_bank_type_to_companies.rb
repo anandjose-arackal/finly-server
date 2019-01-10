@@ -1,4 +1,4 @@
-class AddBankTypeToCompanies < ActiveRecord::Migration
+class AddBankTypeToCompanies < ActiveRecord::Migration[4.2]
   def change
     add_column :company_configurations, :bank_type, :string
 

@@ -34,34 +34,34 @@
 #  cash_on_hand_balance_id                 :integer
 #
 
-class CompanyBalanceHistory < ActiveRecord::Base
-  belongs_to :company
+class CompanyBalanceHistory < ApplicationRecord
+  belongs_to :company, optional: true
 
-  belongs_to :neft_transfer, class_name: "Amount"
-  belongs_to :company_balance, class_name: "Amount"
-  belongs_to :company_withdrawal_to_card, class_name: "Amount"
-  belongs_to :company_withdrawal_to_wallet, class_name: "Amount"
-  belongs_to :company_load_from_card, class_name: "Amount"
-  belongs_to :company_load_from_wallet, class_name: "Amount"
-  belongs_to :card_withdrawal_to_virtual_account, class_name: "Amount"
-  belongs_to :card_withdrawal_to_card, class_name: "Amount"
-  belongs_to :card_withdrawal_to_wallet, class_name: "Amount"
-  belongs_to :card_balance, class_name: "Amount"
-  belongs_to :card_load_from_wallet, class_name: "Amount"
-  belongs_to :card_load_from_virtual_account, class_name: "Amount"
-  belongs_to :card_load_from_card, class_name: "Amount"
-  belongs_to :card_expenses, class_name: "Amount"
-  belongs_to :card_atm_withdrawal, class_name: "Amount"
-  belongs_to :wallet_balance, class_name: "Amount"
-  belongs_to :wallet_withdrawal_to_virtual_account, class_name: "Amount"
-  belongs_to :wallet_withdrawal_to_wallet, class_name: "Amount"
-  belongs_to :wallet_withdrawal_to_card, class_name: "Amount"
-  belongs_to :wallet_load_from_virtual_account, class_name: "Amount"
-  belongs_to :wallet_load_from_card, class_name: "Amount"
-  belongs_to :wallet_load_from_wallet, class_name: "Amount"
-  belongs_to :cash_on_hand_load, class_name: "Amount"
-  belongs_to :cash_on_hand_balance, class_name: "Amount"
-  belongs_to :cash_on_hand_withdrawal, class_name: "Amount"
+  belongs_to :neft_transfer, optional: true, class_name: "Amount"
+  belongs_to :company_balance, optional: true, class_name: "Amount"
+  belongs_to :company_withdrawal_to_card, optional: true, class_name: "Amount"
+  belongs_to :company_withdrawal_to_wallet, optional: true, class_name: "Amount"
+  belongs_to :company_load_from_card, optional: true, class_name: "Amount"
+  belongs_to :company_load_from_wallet, optional: true, class_name: "Amount"
+  belongs_to :card_withdrawal_to_virtual_account, optional: true, class_name: "Amount"
+  belongs_to :card_withdrawal_to_card, optional: true, class_name: "Amount"
+  belongs_to :card_withdrawal_to_wallet, optional: true, class_name: "Amount"
+  belongs_to :card_balance, optional: true, class_name: "Amount"
+  belongs_to :card_load_from_wallet, optional: true, class_name: "Amount"
+  belongs_to :card_load_from_virtual_account, optional: true, class_name: "Amount"
+  belongs_to :card_load_from_card, optional: true, class_name: "Amount"
+  belongs_to :card_expenses, optional: true, class_name: "Amount"
+  belongs_to :card_atm_withdrawal, optional: true, class_name: "Amount"
+  belongs_to :wallet_balance, optional: true, class_name: "Amount"
+  belongs_to :wallet_withdrawal_to_virtual_account, optional: true, class_name: "Amount"
+  belongs_to :wallet_withdrawal_to_wallet, optional: true, class_name: "Amount"
+  belongs_to :wallet_withdrawal_to_card, optional: true, class_name: "Amount"
+  belongs_to :wallet_load_from_virtual_account, optional: true, class_name: "Amount"
+  belongs_to :wallet_load_from_card, optional: true, class_name: "Amount"
+  belongs_to :wallet_load_from_wallet, optional: true, class_name: "Amount"
+  belongs_to :cash_on_hand_load, optional: true, class_name: "Amount"
+  belongs_to :cash_on_hand_balance, optional: true, class_name: "Amount"
+  belongs_to :cash_on_hand_withdrawal, optional: true, class_name: "Amount"
 
 
   accepts_nested_attributes_for :neft_transfer

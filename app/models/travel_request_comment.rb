@@ -2,31 +2,32 @@
 #
 # Table name: travel_request_comments
 #
-#  id                 :integer          not null, primary key
-#  travel_request_id  :integer
-#  content            :text(65535)
-#  user_id            :integer
-#  note               :text(65535)
-#  previous_value     :text(65535)
-#  new_value          :text(65535)
-#  edited_field       :text(65535)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  action_id          :integer
-#  booking_id         :integer
-#  booking_request_id :integer
-#  is_deleted         :boolean          default(FALSE)
+#  id                       :integer          not null, primary key
+#  travel_request_id        :integer
+#  content                  :text(65535)
+#  user_id                  :integer
+#  note                     :text(65535)
+#  previous_value           :text(65535)
+#  new_value                :text(65535)
+#  edited_field             :text(65535)
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  action_id                :integer
+#  booking_id               :integer
+#  booking_request_id       :integer
+#  is_deleted               :boolean          default(FALSE)
+#  delegated_action_user_id :integer
 #
 
-class TravelRequestComment < ActiveRecord::Base
+class TravelRequestComment < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :travel_request
-  belongs_to :user
-  belongs_to :action, class_name: "TravelRequestCommentAction"
-  belongs_to :booking
-  belongs_to :booking_request
-  belongs_to :delegated_action_user, class_name: 'User'
+  belongs_to :travel_request, optional: true
+  belongs_to :user, optional: true
+  belongs_to :action, optional: true, class_name: "TravelRequestCommentAction"
+  belongs_to :booking, optional: true
+  belongs_to :booking_request, optional: true
+  belongs_to :delegated_action_user, optional: true, class_name: 'User'
 
   default_scope { order created_at: :desc }
 

@@ -15,12 +15,12 @@
 #  field_key              :string(255)
 #
 
-class CustomField < ActiveRecord::Base
-  belongs_to :field_configuration
-  belongs_to :parent, polymorphic: true
+class CustomField < ApplicationRecord
+  belongs_to :field_configuration, optional: true
+  belongs_to :parent, optional: true, polymorphic: true
 
   # If the custom field is destroyed, destroyed its associated value
-  belongs_to :value, polymorphic: true, dependent: :destroy
+  belongs_to :value, optional: true, polymorphic: true, dependent: :destroy
 
   accepts_nested_attributes_for :value
 

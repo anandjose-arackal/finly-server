@@ -1,4 +1,4 @@
-class AddRuleTypesToRules < ActiveRecord::Migration
+class AddRuleTypesToRules < ActiveRecord::Migration[4.2]
   def change
     add_reference :expense_rules, :rule_type, index: true, foreign_key: true
     add_reference :expense_rules, :expense_rule_type, index: true, foreign_key: true

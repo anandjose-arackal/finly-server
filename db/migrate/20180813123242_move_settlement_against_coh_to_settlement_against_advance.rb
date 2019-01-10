@@ -1,4 +1,4 @@
-class MoveSettlementAgainstCohToSettlementAgainstAdvance < ActiveRecord::Migration
+class MoveSettlementAgainstCohToSettlementAgainstAdvance < ActiveRecord::Migration[4.2]
   def change
     PaymentPurpose.seed_data
 

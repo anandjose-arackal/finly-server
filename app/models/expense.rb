@@ -38,33 +38,30 @@
 #  custom_conversion_rate :boolean          default(FALSE)
 #  cost_center_id         :integer
 #  created_by_id          :integer
+#  modified_by_id         :integer
 #
 
-
-
-
-
-class Expense < ActiveRecord::Base
+class Expense < ApplicationRecord
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
           MathUtil
 
-  belongs_to :amount
-  belongs_to :expense_status
-  belongs_to :user, inverse_of: :expenses
-  belongs_to :expense_type
-  belongs_to :category
-  belongs_to :report
-  belongs_to :rejecting_manager, class_name: 'User'
-  belongs_to :surcharge, class_name: 'Amount'
-  belongs_to :tds_amount, class_name: 'Amount'
-  belongs_to :gst_amount, class_name: 'Amount'
-  belongs_to :expense_tax_type
-  belongs_to :gst_type
-  belongs_to :tds_slab, class_name: 'TdsRatesList'
-  belongs_to :spent_from, class_name: 'UserPocket'
-  belongs_to :created_by, class_name: "User"
-  belongs_to :modified_by, class_name: "User"
+  belongs_to :amount, optional: true
+  belongs_to :expense_status, optional: true
+  belongs_to :user, optional: true, inverse_of: :expenses
+  belongs_to :expense_type, optional: true
+  belongs_to :category, optional: true
+  belongs_to :report, optional: true
+  belongs_to :rejecting_manager, optional: true, class_name: 'User'
+  belongs_to :surcharge, optional: true, class_name: 'Amount'
+  belongs_to :tds_amount, optional: true, class_name: 'Amount'
+  belongs_to :gst_amount, optional: true, class_name: 'Amount'
+  belongs_to :expense_tax_type, optional: true
+  belongs_to :gst_type, optional: true
+  belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
+  belongs_to :spent_from, optional: true, class_name: 'UserPocket'
+  belongs_to :created_by, class_name: "User", optional: true
+  belongs_to :modified_by, class_name: "User", optional: true
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy

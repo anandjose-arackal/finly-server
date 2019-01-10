@@ -14,11 +14,11 @@
 #  identifier                   :string(255)
 #
 
-class KycDocument < ActiveRecord::Base
+class KycDocument < ApplicationRecord
   include Attachable
 
-  belongs_to :company_kyc_document_type
-  belongs_to :company_kyc
+  belongs_to :company_kyc_document_type, optional: true
+  belongs_to :company_kyc, optional: true
 
   has_many :system_messages, as: :messagable, dependent: :destroy
 

@@ -10,8 +10,8 @@
 #  updated_at :datetime         not null
 #
 
-class MoneyRequestItemCategory < ActiveRecord::Base
-  belongs_to :company
+class MoneyRequestItemCategory < ApplicationRecord
+  belongs_to :company, optional: true
 
   validates :name, presence: true
   validates :company, presence: true

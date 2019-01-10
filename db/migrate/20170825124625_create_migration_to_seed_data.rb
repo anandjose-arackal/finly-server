@@ -1,4 +1,4 @@
-class CreateMigrationToSeedData < ActiveRecord::Migration
+class CreateMigrationToSeedData < ActiveRecord::Migration[4.2]
   def change
     BankPaymentRequestStatus.seed_data
     BankPaymentRequestTrailAction.seed_data

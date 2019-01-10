@@ -19,13 +19,10 @@
 #  outward_invoice_line_items :boolean
 #
 
-
-
-
-class Category < ActiveRecord::Base
+class Category < ApplicationRecord
   has_ancestry
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
   has_one :quickbooks_category, dependent: :destroy
 

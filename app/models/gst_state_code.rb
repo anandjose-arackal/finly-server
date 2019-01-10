@@ -9,7 +9,7 @@
 #  state_code :string(255)
 #
 
-class GstStateCode < ActiveRecord::Base
+class GstStateCode < ApplicationRecord
 
 
   scope :with_state_code, -> (state_code) {

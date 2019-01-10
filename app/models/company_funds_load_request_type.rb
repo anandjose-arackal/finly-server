@@ -6,7 +6,7 @@
 #  name :string(255)
 #
 
-class CompanyFundsLoadRequestType < ActiveRecord::Base
+class CompanyFundsLoadRequestType < ApplicationRecord
   include Seedable
 
   def self.values

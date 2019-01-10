@@ -1,4 +1,4 @@
-class CreatePaymentTerms < ActiveRecord::Migration
+class CreatePaymentTerms < ActiveRecord::Migration[4.2]
   def change
     create_table :payment_terms do |t|
       t.text :name

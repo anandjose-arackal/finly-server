@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class InvoiceNumberConfigType < ActiveRecord::Base
+class InvoiceNumberConfigType < ApplicationRecord
 
   include Seedable
 

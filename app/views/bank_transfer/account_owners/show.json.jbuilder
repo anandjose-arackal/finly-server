@@ -67,7 +67,7 @@ if @result.account_owner.is_a?(YesBankVendor)
         json.extract! po, :id, :po_number, :procurement_id
         json.created_by po.user.name
         json.created_at po.created_at.strftime("%d-%b-%Y")
-        json.amount po.balance_amount.value
+        json.amount po.balance_amount&.value
       end
     end
 
@@ -76,7 +76,7 @@ if @result.account_owner.is_a?(YesBankVendor)
         json.extract! invoice, :id, :invoice_id, :invoice_number, :procurement_id
         json.created_by invoice.created_by.name
         json.created_at invoice.created_at.strftime("%d-%b-%Y")
-        json.amount invoice.net_amount.value
+        json.amount invoice.net_amount&.value
       end
     end
 

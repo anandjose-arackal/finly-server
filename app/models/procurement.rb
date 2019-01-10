@@ -17,18 +17,18 @@
 #  transaction_id        :string(255)
 #
 
-class Procurement < ActiveRecord::Base
+class Procurement < ApplicationRecord
   include SoftDeletable, FindByOrderedIds, Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :transaction_id, purpose: :procurement, editable: false
 
   # procurement_type ['purchase_order', 'invoice', 'non_po_invoice'] # will be moved to model
 
-  belongs_to :user
-  belongs_to :company
-  belongs_to :procurement_track
-  belongs_to :procurement_status
-  belongs_to :vendor, class_name: "YesBankVendor"
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
+  belongs_to :procurement_track, optional: true
+  belongs_to :procurement_status, optional: true
+  belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
   has_one :purchase_order, dependent: :destroy
   has_many :inward_documents, dependent: :destroy

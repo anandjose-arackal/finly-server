@@ -21,6 +21,10 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   end
 
   def init
+    # As the processor accesses the request params has a hash, ensure it is converted to hash.
+    # Worked around for feature change in Rails 5
+    convert_params_to_hash
+
     self.payment_order_data = params[:payment_order]
     self.errors = []
     self.payment_order_valid = true # setting it true here for now, so that if it fails later that can be taken up
@@ -60,7 +64,9 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   def process
     if payment_order_data.is_a?(Hash)
       arr = []
-      self.payment_order_data.map {|k, v| arr << v }
+      self.payment_order_data.map do |k, v|
+        arr << v
+      end
       self.payment_order_data = arr
     end
 
@@ -247,19 +253,19 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           end
 
           invoice_items << {
-            description: item_description,
-            tax: item_tax,
-            tax_amount: item_tax_amount,
-            discount: item_discount,
-            discount_amount: item_discount_amount,
-            quantity: item_quantity,
-            rate: item_rate,
-            category_id: item_category_id,
-            amount: item_amount,
-            gst_type_id: item_gst_type,
-            total_amount: total_amount,
-            hsn_sac: item_hsn_sac,
-            net_total: total_amount
+              description: item_description,
+              tax: item_tax,
+              tax_amount: item_tax_amount,
+              discount: item_discount,
+              discount_amount: item_discount_amount,
+              quantity: item_quantity,
+              rate: item_rate,
+              category_id: item_category_id,
+              amount: item_amount,
+              gst_type_id: item_gst_type,
+              total_amount: total_amount,
+              hsn_sac: item_hsn_sac,
+              net_total: total_amount
           }
 
           items_net_total += total_amount
@@ -343,14 +349,14 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       return true
     end
     case rate_type_id
-      when 1, '1'
-        if rate.to_f >= 100
-          return false
-        end
-      when 2, '2'
-        return true
-      else
-        # do nothing?
+    when 1, '1'
+      if rate.to_f >= 100
+        return false
+      end
+    when 2, '2'
+      return true
+    else
+      # do nothing?
     end
     true
   end

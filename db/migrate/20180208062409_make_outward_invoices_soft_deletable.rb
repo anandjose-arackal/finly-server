@@ -1,4 +1,4 @@
-class MakeOutwardInvoicesSoftDeletable < ActiveRecord::Migration
+class MakeOutwardInvoicesSoftDeletable < ActiveRecord::Migration[4.2]
   def change
     add_column :outward_invoices, :is_deleted, :boolean
   end

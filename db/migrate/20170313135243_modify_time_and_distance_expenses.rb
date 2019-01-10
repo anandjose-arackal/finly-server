@@ -1,4 +1,4 @@
-class ModifyTimeAndDistanceExpenses < ActiveRecord::Migration
+class ModifyTimeAndDistanceExpenses < ActiveRecord::Migration[4.2]
   def change
     remove_column :distance_expenses, :distance, :decimal
     remove_column :distance_expenses, :unit, :string

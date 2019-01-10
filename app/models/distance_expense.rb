@@ -19,20 +19,20 @@
 #  distance_unit_id                  :integer
 #
 
-class DistanceExpense < ActiveRecord::Base
+class DistanceExpense < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :expense
-  belongs_to :distance
-  belongs_to :maps_distance, class_name: 'Distance'
+  belongs_to :expense, optional: true
+  belongs_to :distance, optional: true
+  belongs_to :maps_distance, optional: true, class_name: 'Distance'
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :locations, as: :locatable, dependent: :destroy
-  belongs_to :type, class_name: 'DistanceExpenseType'
-  belongs_to :odometer_reading_receipt_start, class_name: 'Receipt'
-  belongs_to :odometer_reading_receipt_end, class_name: 'Receipt'
-  belongs_to :vehicle_rate
-  belongs_to :distance_rate, class_name: 'Amount'
-  belongs_to :distance_unit, class_name: 'PhysicalUnit'
+  belongs_to :type, optional: true, class_name: 'DistanceExpenseType'
+  belongs_to :odometer_reading_receipt_start, optional: true, class_name: 'Receipt'
+  belongs_to :odometer_reading_receipt_end, optional: true, class_name: 'Receipt'
+  belongs_to :vehicle_rate, optional: true
+  belongs_to :distance_rate, optional: true, class_name: 'Amount'
+  belongs_to :distance_unit, optional: true, class_name: 'PhysicalUnit'
 
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations

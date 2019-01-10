@@ -1,4 +1,4 @@
-class AddBalancesToPayments < ActiveRecord::Migration
+class AddBalancesToPayments < ActiveRecord::Migration[4.2]
   def change
     remove_column :payment_trails, :initiating_account_pre_balance_id, :integer
     remove_column :payment_trails, :initiating_account_post_balance_id, :integer

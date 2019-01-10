@@ -1,4 +1,4 @@
-class CreateTransactionDetails < ActiveRecord::Migration
+class CreateTransactionDetails < ActiveRecord::Migration[4.2]
   def up
     create_table :transaction_details do |t|
       t.string :transaction_reference_id

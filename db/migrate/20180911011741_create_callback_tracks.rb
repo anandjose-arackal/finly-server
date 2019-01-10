@@ -1,4 +1,4 @@
-class CreateCallbackTracks < ActiveRecord::Migration
+class CreateCallbackTracks < ActiveRecord::Migration[4.2]
   def change
     create_table :callback_tracks do |t|
       t.references :company, index: true, foreign_key: true

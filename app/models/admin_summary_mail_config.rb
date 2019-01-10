@@ -15,9 +15,9 @@
 #  updated_at             :datetime         not null
 #
 
-class AdminSummaryMailConfig < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :period
+class AdminSummaryMailConfig < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :period, optional: true
 
   DAYS_OF_MONTH = [*1..31] + [nil]
   WEEK_DAYS = [nil, 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class ItzCashDmtSenderStatus < ActiveRecord::Base
+class ItzCashDmtSenderStatus < ApplicationRecord
 
   VALUES = {active: 1, disabled: 2}
 

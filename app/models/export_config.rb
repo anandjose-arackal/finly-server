@@ -15,9 +15,9 @@
 #  updated_at            :datetime         not null
 #
 
-class ExportConfig < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :export_config_type
+class ExportConfig < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :export_config_type, optional: true
 
   scope :with_field_name, ->(name) {where field_name: name}
 

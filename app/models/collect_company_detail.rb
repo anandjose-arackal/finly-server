@@ -16,10 +16,10 @@
 #  pin                       :text(65535)
 #
 
-class CollectCompanyDetail < ActiveRecord::Base
+class CollectCompanyDetail < ApplicationRecord
   include Attachable
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
   has_many :company_branches
 

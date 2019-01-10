@@ -1,4 +1,4 @@
-class ActionUserRoleIdToMonwyRequestTracks < ActiveRecord::Migration
+class ActionUserRoleIdToMonwyRequestTracks < ActiveRecord::Migration[4.2]
   def change
     add_column :money_request_tracks, :action_user_role_id, :integer, references: "UserRole", foreign_key: true, index: true
   end

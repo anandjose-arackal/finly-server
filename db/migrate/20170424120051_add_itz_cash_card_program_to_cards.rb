@@ -1,4 +1,4 @@
-class AddItzCashCardProgramToCards < ActiveRecord::Migration
+class AddItzCashCardProgramToCards < ActiveRecord::Migration[4.2]
   def change
     if ItzCashCardProgram.count == 0 && Company.count > 0
       ItzCashCardProgram.seed_data

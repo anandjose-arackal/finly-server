@@ -1,4 +1,4 @@
-class CreateTravelRequestCommentActions < ActiveRecord::Migration
+class CreateTravelRequestCommentActions < ActiveRecord::Migration[4.2]
   def change
     create_table :travel_request_comment_actions do |t|
       t.string :name

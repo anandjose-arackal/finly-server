@@ -1,4 +1,4 @@
-class AddAddReviewPosToIndividualKycs < ActiveRecord::Migration
+class AddAddReviewPosToIndividualKycs < ActiveRecord::Migration[4.2]
 
   def change
     add_column :individual_kycs, :review_position, :integer

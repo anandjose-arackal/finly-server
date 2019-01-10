@@ -1,4 +1,4 @@
-class AddSyncedWithQuickbooksToExpenses < ActiveRecord::Migration
+class AddSyncedWithQuickbooksToExpenses < ActiveRecord::Migration[4.2]
   def change
     add_column :expenses, :synced_with_quickbooks, :boolean
 

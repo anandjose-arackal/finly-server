@@ -1,4 +1,4 @@
-class RenameMappingPurposeToPurpose < ActiveRecord::Migration
+class RenameMappingPurposeToPurpose < ActiveRecord::Migration[4.2]
   def change
     rename_table :mapping_purposes, :purposes
   end

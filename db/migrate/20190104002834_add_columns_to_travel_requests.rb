@@ -1,4 +1,4 @@
-class AddColumnsToTravelRequests < ActiveRecord::Migration
+class AddColumnsToTravelRequests < ActiveRecord::Migration[4.2]
   def change
     add_column :travel_requests, :created_by_id, :integer
     add_index :travel_requests, :created_by_id

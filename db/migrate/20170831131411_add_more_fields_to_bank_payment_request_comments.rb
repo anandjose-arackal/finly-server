@@ -1,4 +1,4 @@
-class AddMoreFieldsToBankPaymentRequestComments < ActiveRecord::Migration
+class AddMoreFieldsToBankPaymentRequestComments < ActiveRecord::Migration[4.2]
   def change
     add_column :bank_payment_request_comments, :note, :text
     add_column :bank_payment_request_comments, :previous_value, :text

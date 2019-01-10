@@ -14,10 +14,10 @@
 #  transfer_mode        :string(255)
 #
 
-class CompanyFundsAutoTransferConfig < ActiveRecord::Base
-  belongs_to :company
+class CompanyFundsAutoTransferConfig < ApplicationRecord
+  belongs_to :company, optional: true
 
-  belongs_to :threshold_amount, class_name: "Amount"
+  belongs_to :threshold_amount, optional: true, class_name: "Amount"
 
   accepts_nested_attributes_for :threshold_amount
 

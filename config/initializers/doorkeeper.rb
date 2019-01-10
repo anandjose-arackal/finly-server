@@ -45,6 +45,8 @@ Doorkeeper.configure do
     u
   end
 
+  grant_flows %w[password]
+
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
   # admin_authenticator do
   #   # Put your admin authentication logic here.
@@ -146,4 +148,4 @@ Doorkeeper.configure do
   # WWW-Authenticate Realm (default "Doorkeeper").
   # realm "Doorkeeper"
 end
-Doorkeeper.configuration.token_grant_types << 'password'
+# Doorkeeper.configuration.token_grant_types << 'password'

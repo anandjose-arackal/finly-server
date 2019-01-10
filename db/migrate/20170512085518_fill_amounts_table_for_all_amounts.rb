@@ -1,4 +1,4 @@
-class FillAmountsTableForAllAmounts < ActiveRecord::Migration
+class FillAmountsTableForAllAmounts < ActiveRecord::Migration[4.2]
   def change
     return unless Company.count > 0
     Amount.all.each do |amount|

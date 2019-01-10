@@ -1,5 +1,5 @@
 require "#{Rails.root}/app/models/payment"
-class UpdatePaymentToIncludeAccounts < ActiveRecord::Migration
+class UpdatePaymentToIncludeAccounts < ActiveRecord::Migration[4.2]
   def change
     add_column :payments, :initiating_account_id, :integer
     add_column :payments, :initiating_account_type, :string

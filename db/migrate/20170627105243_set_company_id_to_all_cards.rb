@@ -1,4 +1,4 @@
-class SetCompanyIdToAllCards < ActiveRecord::Migration
+class SetCompanyIdToAllCards < ActiveRecord::Migration[4.2]
   def change
     if Company.count > 0
       Card.all.each do |card|

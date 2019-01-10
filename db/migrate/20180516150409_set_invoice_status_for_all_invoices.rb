@@ -1,4 +1,4 @@
-class SetInvoiceStatusForAllInvoices < ActiveRecord::Migration
+class SetInvoiceStatusForAllInvoices < ActiveRecord::Migration[4.2]
   def change
     Invoice.all.each do |invoice|
       payment = invoice.payments.first

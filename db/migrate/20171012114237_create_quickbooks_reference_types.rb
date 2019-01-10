@@ -1,4 +1,4 @@
-class CreateQuickbooksReferenceTypes < ActiveRecord::Migration
+class CreateQuickbooksReferenceTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :quickbooks_reference_types do |t|
       t.string :name

@@ -8,5 +8,5 @@
 #  updated_at :datetime         not null
 #
 
-class RateType < ActiveRecord::Base
+class RateType < ApplicationRecord
 end
