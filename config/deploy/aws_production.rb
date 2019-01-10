@@ -10,7 +10,7 @@
 server '172.32.152.12', user: 'centos', roles: %w{web app db}
 server '172.32.62.170', user: 'centos', roles: %w{web app}
 server '172.32.33.187', user: 'centos', roles: %w{web app}
-server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
+# server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
 server '172.33.215.128', user: 'centos', roles: %w{sidekiq_app}
 
 set :stage, 'production'
