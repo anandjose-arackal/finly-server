@@ -73,6 +73,7 @@ module Transitionable
     end
 
     def get_level(type)
+      # provider_name - todo
       # Provide :next / :prev to get the respective levels
       # current_level_number = self.level.present? ? self.level.level_number : 0
 
@@ -103,12 +104,17 @@ module Transitionable
         end
       end
 
+      # todo add provider_name
+      reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).first&.level_id
 
-      ReviewalLevel.exclude_deleted.where({
-                                              level_number: level_number,
-                                              policy_id: self.policy.id,
-                                              associated_entity_type: self.class.name
-                                          }).first
+      ReviewalLevel.with_id(reviewal_level_id).first
+
+      # ReviewalLevel.exclude_deleted.where({
+      #                                         level_number: level_number,
+      #                                         policy_id: self.policy.id,
+      #                                         associated_entity_type: self.class.name
+      #                                     }).first
+
 
       # Previously it was picked from policy's levels
       # todo - fix it

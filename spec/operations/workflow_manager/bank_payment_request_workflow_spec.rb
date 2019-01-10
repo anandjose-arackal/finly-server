@@ -36,9 +36,9 @@ RSpec.describe "Bank Payment Request Workflow -- " do
     create(:policy_user_mapping, {user_id: @em_employee_user1.id, policy_id: @policy.id})
 
     # Create Levels
-    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'BankPaymentRequest')
-    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'BankPaymentRequest')
-    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'BankPaymentRequest')
+    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'BankPaymentRequestProvider')
+    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'BankPaymentRequestProvider')
+    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'BankPaymentRequestProvider')
 
     # Create level reviewer mappings
     @level1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})

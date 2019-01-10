@@ -48,7 +48,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       params[:reviewal_document] = self.purchase_order.reload
       params[:document_reviewer_mappings] = document_reviewer_mappings_params
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Create.(user, params)
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
         add_message :error, document_reviewer_mappings_op.messages[:error]
         return

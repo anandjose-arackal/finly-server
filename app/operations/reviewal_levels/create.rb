@@ -23,7 +23,8 @@ class ReviewalLevels::Create < ReviewalLevels::Base
       add_message :error, 'Policy not found'
     end
 
-    entity_types = %w( PurchaseOrder Invoice Report MoneyRequest TravelRequest BankPaymentRequest )
+    entity_types = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider BankPaymentRequestProvider )
+    # entity_types = WorkflowManager::Aasm::BaseProvider.providers
 
     unless entity_types.include?(reviewal_level_params[:associated_entity_type])
       add_message :error, 'Invalid Entity Type'
@@ -31,9 +32,9 @@ class ReviewalLevels::Create < ReviewalLevels::Base
   end
 
   def process
-    highest_level = self.policy.levels.
-        with_entity_type(reviewal_level_params[:associated_entity_type]).
-        order(level_number: :desc).first
+    highest_level = self.policy.levels
+        .with_entity_type(reviewal_level_params[:associated_entity_type])
+        .order(level_number: :desc).first
 
     level_number = 1
 

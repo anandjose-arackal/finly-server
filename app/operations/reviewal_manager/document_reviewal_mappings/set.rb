@@ -1,4 +1,4 @@
-class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::DocumentReviewalMappings::Base
+class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::DocumentReviewalMappings::Base
   attr_accessor :mappings_params, :document
 
   def init

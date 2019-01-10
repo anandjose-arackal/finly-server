@@ -15,6 +15,8 @@
 class ReviewalLevel < ActiveRecord::Base
   include SoftDeletable
 
+  after_destroy :reassign_level_numbers
+
   belongs_to :policy
   has_many :level_reviewer_mappings, foreign_key: :level_id, dependent: :destroy
   has_many :reviewers, class_name: 'User', through: :level_reviewer_mappings
@@ -55,5 +57,14 @@ class ReviewalLevel < ActiveRecord::Base
                                             policy_id: self.policy_id,
                                             associated_entity_type: self.associated_entity_type
                         }).first
+  end
+
+  private
+
+  def reassign_level_numbers
+    levels = self.class.exclude_deleted.with_policy_ids(self.policy_id).with_associted_entity_type(self.associated_entity_type).where('level_number > ?', self.level_number)
+    levels.each do |level|
+      level.update(level_number: level_number - 1)
+    end
   end
 end

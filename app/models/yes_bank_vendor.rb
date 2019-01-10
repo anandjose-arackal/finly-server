@@ -31,6 +31,7 @@
 class YesBankVendor < ActiveRecord::Base
   include Sequenced::ActsAsSequenced
 
+
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
 
   belongs_to :company

@@ -311,4 +311,8 @@ class TravelRequest < ActiveRecord::Base
     end
   end
 
+  def self.document_owner_attribute
+    'user_id'
+  end
+
 end

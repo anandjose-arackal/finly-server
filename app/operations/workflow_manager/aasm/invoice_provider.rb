@@ -1,7 +1,5 @@
-class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::Base
+class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvider
   # If policy not present auto approve
-  #
-
   include AASM
   attr_accessor :invoice_state, :invoice, :user, :violations_present, :policy, :current_level, :next_level
 
@@ -64,45 +62,36 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::Base
   end
 
   def change_state
-    # reset levels
-    if [:retract, :reject].include?(aasm.current_event)
-      self.next_level = nil
-    end
+    super
 
-    if [:retract].include?(aasm.current_event)
-      self.current_level = nil
-    end
-
-    # Change state of purchase order
-    invoice_status_id = ::InwardInvoiceStatus.id_for(self.aasm.current_state)
-
+    status_id = ::InwardInvoiceStatus.id_for(self.aasm.current_state)
     update_params = {
-        invoice_status_id: invoice_status_id,
+        invoice_status_id: status_id,
         controlling_level_id: self.next_level&.id
     }
-    self.invoice.update(update_params)
+    self.document.update(update_params)
   end
 
-  def approvers_not_present?
-    if self.policy.present?
-      if self.next_level.present?
-        if self.next_level.level_reviewer_mappings.with_threshold(self.invoice.net_amount.value).present?
-          return false
-        else
-          return true
-        end
-      else
-        return true
-      end
-    else
-      true
-    end
-  end
+  # def approvers_not_present?
+  #   if self.policy.present?
+  #     if self.next_level.present?
+  #       if self.next_level.level_reviewer_mappings.with_threshold(self.invoice.net_amount.value).present?
+  #         return false
+  #       else
+  #         return true
+  #       end
+  #     else
+  #       return true
+  #     end
+  #   else
+  #     true
+  #   end
+  # end
 
-  def set_levels
-    self.current_level = ReviewalLevel.with_id(invoice.controlling_level_id).first
-    level_number = current_level.present? ? (current_level.level_number + 1) : 1
-
-    self.next_level = self.policy.levels.with_entity_type(invoice.class.name).with_level_number(level_number).first
-  end
+  # def set_levels
+  #   self.current_level = ReviewalLevel.with_id(invoice.controlling_level_id).first
+  #   level_number = current_level.present? ? (current_level.level_number + 1) : 1
+  #
+  #   self.next_level = self.policy.levels.with_entity_type(invoice.class.name).with_level_number(level_number).first
+  # end
 end

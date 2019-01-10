@@ -1,4 +1,4 @@
-class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm::Base
+class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm::BaseProvider
   aasm :whiny_transitions => false do
     state :open, initial: true, :before_enter => :set_state
     state :retracted

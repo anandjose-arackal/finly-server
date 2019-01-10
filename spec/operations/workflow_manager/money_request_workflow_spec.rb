@@ -34,9 +34,9 @@ RSpec.describe "Money Request Workflow -- " do
     create(:policy_user_mapping, {user_id: @em_employee_user1.id, policy_id: @policy.id})
 
     # Create Levels
-    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
-    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
-    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequest')
+    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequestProvider')
+    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequestProvider')
+    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'MoneyRequestProvider')
 
     # Create level reviewer mappings
     @level1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})

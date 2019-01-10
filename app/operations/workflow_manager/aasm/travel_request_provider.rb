@@ -1,4 +1,4 @@
-class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
+class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::BaseProvider
 
   aasm :whiny_transitions => false do
     state :open, initial: true, :before_enter => :set_state
@@ -74,18 +74,7 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
 
   private
 
-  # def set_state
-  #   aasm.current_state = self.document_state
-  # end
-
   def change_state
     super
-    # Change state of purchase order
-    money_request_status_id = ::MoneyRequestStatus.id_for(self.aasm.current_state)
-    update_params = {
-        status_id: money_request_status_id,
-        controlling_level_id: self.new_level&.id
-    }
-    self.document.update(update_params)
   end
 end

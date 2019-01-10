@@ -1,5 +1,6 @@
-class WorkflowManager::Aasm::Base
+class WorkflowManager::Aasm::BaseProvider
   include AASM
+
   attr_accessor :document_state, :document, :user, :violations_present, :policy,
                 :current_level, :next_level, :previous_level,
                 :current_level_reviewers, :reviewers, :new_level
@@ -19,9 +20,22 @@ class WorkflowManager::Aasm::Base
     self.reviewers = document.get_next_level_reviewers
   end
 
+  @@providers = []
+
+  def self.providers
+    @@providers
+  end
+
+  def self.register_provider
+    @@providers << self.name.split('::').last
+  end
+
+  self.register_provider
+
   private
 
   def set_state
+    Dir[Rails.root.join("app/operations/workflow_manager/aasm/*.rb")].each {|file| require file }
     aasm.current_state = self.document_state
   end
 
@@ -106,6 +120,15 @@ class WorkflowManager::Aasm::Base
     if [:unapprove].include?(aasm.current_event)
       self.new_level = self.previous_level
     end
+
+
+    status_id = document.status.class.id_for(self.aasm.current_state)
+    update_params = {
+        controlling_level_id: self.new_level&.id
+    }
+    update_params[document.class.document_status_attribute] = status_id
+
+    self.document.update(update_params)
   end
 
   def approvers_not_present?

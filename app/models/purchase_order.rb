@@ -357,4 +357,12 @@ class PurchaseOrder < ActiveRecord::Base
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
     end
   end
+
+  def self.document_owner_attribute
+    'user_id'
+  end
+
+  def self.document_status_attribute
+    'purchase_order_status_id'
+  end
 end

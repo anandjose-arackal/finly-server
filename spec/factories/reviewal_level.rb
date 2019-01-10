@@ -6,7 +6,7 @@ FactoryBot.define do
 
   factory :reviewal_level do
     policy_id {nil}
-    associated_entity_type {'Report'}
+    associated_entity_type {'ReportProvider'}
     level_number {generate(:level_number)}
   end
 

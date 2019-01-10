@@ -81,7 +81,7 @@ class MoneyRequests::Create < MoneyRequests::Base
       # For setting level specific reviewers from reviewal chain for a document
       params[:reviewal_document] = self.money_request.reload
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Create.(user, params)
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
         add_message :error, document_reviewer_mappings_op.messages[:error]
         return

@@ -382,6 +382,14 @@ class MoneyRequest < ActiveRecord::Base
     status_ids.reject { |status_id| status_id.nil? }
   end
 
+  def self.document_owner_attribute
+    'user_id'
+  end
+
+  def self.document_status_attribute
+    'status_id'
+  end
+
   def handle_name
     if self.name.blank?
       self.name = MoneyRequest.get_default_name(self.user)

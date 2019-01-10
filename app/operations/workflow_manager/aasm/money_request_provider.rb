@@ -1,4 +1,4 @@
-class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::Base
+class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseProvider
 
   aasm :whiny_transitions => false do
     state :open, initial: true, :before_enter => :set_state

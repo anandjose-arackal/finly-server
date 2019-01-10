@@ -342,6 +342,10 @@ class BankPaymentRequest < ActiveRecord::Base
     'owner_id'
   end
 
+  def self.document_status_attribute
+    'status_id'
+  end
+
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end

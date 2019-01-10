@@ -65,7 +65,7 @@ RSpec.describe "Report Workflow -- " do
       op = Reports::Update.(@em_employee_user1, {id: @document.id, policy_id: @policy2.id})
 
       if op.failure?
-        p example.description, op.messages[:error]
+        p "UPDATE", op.messages[:error]
         skip
       end
     end
@@ -265,7 +265,7 @@ RSpec.describe "Report Workflow -- " do
     before(:all) do |example|
       op = Reports::TakeControl.(@em_admin_user1, {id: @document.id})
       if op.failure?
-        p example.description, op.messages[:error]
+        p "TAKE CONTROL ON 2ND LEVEL", op.messages[:error]
         skip
       end
       @document.reload
@@ -306,7 +306,7 @@ RSpec.describe "Report Workflow -- " do
       op = Reports::ReturnControl.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
-        p example.description, op.messages[:error]
+        p "RETURN CONTROL TO 2ND LEVEL", op.messages[:error]
         skip
       end
       @document.reload
@@ -341,7 +341,7 @@ RSpec.describe "Report Workflow -- " do
       op = Reports::Approve.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
-        p example.description, op.messages[:error]
+        p 'APPROVE AS ADMIN', op.messages[:error]
         skip
       end
       @document.reload
@@ -381,7 +381,7 @@ RSpec.describe "Report Workflow -- " do
     before(:all) do |example|
       op = Reports::TakeControl.(@em_admin_user1, {id: @document.id})
       if op.failure?
-        p example.description, op.messages[:error]
+        p "TAKE CONTROL ON 3RD LEVEL", op.messages[:error]
         skip
       end
       @document.reload
@@ -422,7 +422,7 @@ RSpec.describe "Report Workflow -- " do
       op = Reports::ReturnControl.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
-        p example.description, op.messages[:error]
+        p "RETURN CONTROL TO 3RD LEVEL", op.messages[:error]
         skip
       end
       @document.reload
@@ -457,7 +457,7 @@ RSpec.describe "Report Workflow -- " do
       op = Reports::Approve.(@em_admin_user1, {id: @document.id})
 
       if op.failure?
-        p example.description, op.messages[:error]
+        p "APPROVE AS ADMIN", op.messages[:error]
         skip
       end
       @document.reload
@@ -503,7 +503,7 @@ RSpec.describe "Report Workflow -- " do
       skip if @document.status.id != ReportStatus.id_for(:processing)
       op = Reports::Approve.(@em_reviewer_user3, {id: @document.id})
       if op.failure?
-        p example.description, op.messages[:error]
+        p "APPROVE 3RD LEVEL", op.messages[:error]
         skip if op.failure?
       end
       @document.reload

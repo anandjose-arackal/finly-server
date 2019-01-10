@@ -593,4 +593,12 @@ class Report < ActiveRecord::Base
     end
   end
 
+  def self.document_status_attribute
+    'report_status_id'
+  end
+
+  def self.document_owner_attribute
+    'user_id'
+  end
+
 end

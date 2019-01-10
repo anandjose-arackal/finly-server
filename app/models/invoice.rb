@@ -409,5 +409,12 @@ class Invoice < ActiveRecord::Base
     end
   end
 
+  def self.document_owner_attribute
+    'created_by_user_id'
+  end
+
+  def self.document_status_attribute
+    'invoice_status_id'
+  end
 
 end
