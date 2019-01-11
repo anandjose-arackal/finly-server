@@ -12,6 +12,7 @@ class BaseOperation
     else
       self.user = user
     end
+    params ||= {}
     if params.class.name == ActionController::Parameters.name
       self.params = params
     else
