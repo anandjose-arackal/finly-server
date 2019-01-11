@@ -48,7 +48,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
     # check whether the respective account has enough balance for this transaction
     requested_amount = self.crediting_payments.joins_amount.sum(:value)
-    if requested_amount > initiating_account_adapter.balance
+    if requested_amount > initiating_account_adapter.balance(payment_process: true)
       add_message :error, "You do not have enough money in your account for this transaction"
       return
     end
