@@ -71,7 +71,6 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     elsif (self.company.vendor_payments_enabled? && self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && self.company.current_account_connected?)
       if options[:payment_process]
         return 99999999999999999
-        debugger
       else
         handle = self.object_id
         YesBankBalanceProvider.perform_async(handle, self.company.id)
