@@ -71,7 +71,7 @@ class PaymentRequest < NonPersistentModel
     if self.scheduled_at.present? && self.scheduled_at > DateUtils.local_date
       PaymentOrderStatus.id_for(:scheduled)
     else
-      PaymentOrderStatus.id_for(:pending)
+      PaymentOrderStatus.id_for(:pending_approval)
     end
   end
 
