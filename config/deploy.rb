@@ -7,7 +7,7 @@ end
 
 set :application, 'finly-server'
 
-set :repo_url, 'ssh://git@altssh.bitbucket.org:443/finlycore/finly-server.git'
+set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
 
 set :branch, ENV['BRANCH'] || :staging
 
