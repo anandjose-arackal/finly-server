@@ -71,7 +71,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     elsif self.company.current_account_connected?
     handle = self.object_id
     YesBankBalanceProvider.perform_async(handle, self.company.id)
-    timeout = 30
+    timeout = 60
     begin
       Timeout.timeout(timeout) do
         loop do
