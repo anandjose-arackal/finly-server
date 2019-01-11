@@ -25,9 +25,9 @@ module Sequenced
     def set
       return if id_set? || skip?
       return if @sequenced_editable and record.send(:"#{column}").present?
-      record.with_lock do
+      # record.with_lock do
         record.send(:"#{column}=", next_id)
-      end
+      # end
     end
 
     def id_set?
