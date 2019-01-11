@@ -5,15 +5,16 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   attr_accessor :payment_order, :receiving_account_adapter, :initiating_account_adapter,
                 :homogenous_accounts, :source_account_adapter, :source_account_name,
-                :receiving_account_name, :crediting_payments
+                :receiving_account_name, :crediting_payments, :options
 
-  def initialize(payment_order, crediting_payments = [])
+  def initialize(payment_order, crediting_payments = [], options = {})
     self.payment_order = payment_order
     self.crediting_payments = crediting_payments
+    self.options = options
   end
 
-  def self.call(payment_order, crediting_payments=[])
-    self.new(payment_order, crediting_payments).run
+  def self.call(payment_order, crediting_payments=[], options = {})
+    self.new(payment_order, crediting_payments, options).run
   end
 
   def pre_validate
@@ -55,11 +56,11 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     # checking if total order amount is less than the company balance amount
     if payment_order.credit?
       order_total = payment_order.request_total
-      unless source_account_adapter.balance(payment_order: payment_order)
+      unless source_account_adapter.balance(payment_order: payment_order, payment_process: self.options[:payment_process])
         add_message :error, "Error retrieving the source account's balance. Try again later"
         return
       end
-      if order_total > source_account_adapter.balance(payment_order: payment_order)
+      if order_total > source_account_adapter.balance(payment_order: payment_order, payment_process: self.options[:payment_process])
         add_message :error, "You do not have enough balance in #{source_account_name} to make this transfer"
         return
       end
