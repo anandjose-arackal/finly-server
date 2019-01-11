@@ -72,6 +72,7 @@ class User::Lookup < User::Base
         self.mobile_number = params[:mobile_number]
       end
     end
+
   end
 
 end
