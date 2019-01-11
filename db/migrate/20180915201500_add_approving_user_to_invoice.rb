@@ -1,4 +1,4 @@
-class AddApprovingUserToInvoice < ActiveRecord::Migration
+class AddApprovingUserToInvoice < ActiveRecord::Migration[4.2]
   def change
     # Seed status tags for invoice processing
     StatusTag.seed_data

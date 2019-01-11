@@ -17,13 +17,13 @@
 #  beneficiary_id          :integer
 #
 
-class BankPaymentRequestComment < ActiveRecord::Base
+class BankPaymentRequestComment < ApplicationRecord
 
-  belongs_to :action, class_name: "BankPaymentRequestCommentAction"
-  belongs_to :bank_payment_request
-  belongs_to :user, class_name: "User"
-  belongs_to :forwarded_to_user, class_name: "User"
-  belongs_to :beneficiary, class_name: "BankAccount"
+  belongs_to :action, optional: true, class_name: "BankPaymentRequestCommentAction"
+  belongs_to :bank_payment_request, optional: true
+  belongs_to :user, optional: true, class_name: "User"
+  belongs_to :forwarded_to_user, optional: true, class_name: "User"
+  belongs_to :beneficiary, optional: true, class_name: "BankAccount"
 
   # this will generate the comment body from the
   # parameters in the DB

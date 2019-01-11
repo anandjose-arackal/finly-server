@@ -521,6 +521,15 @@
 #                                                         PATCH  /api/vp/v1/inward_invoice_attachments/:id(.:format)                                                                 api/vp/v1/inward_invoice_attachments#update
 #                                                         PUT    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                                                 api/vp/v1/inward_invoice_attachments#update
 #                                                         DELETE /api/vp/v1/inward_invoice_attachments/:id(.:format)                                                                 api/vp/v1/inward_invoice_attachments#destroy
+#                          api_vp_v1_bank_account_disable PATCH  /api/vp/v1/bank_accounts/disable(.:format)                                                                          api/vp/v1/bank_accounts#disable
+#                                 api_vp_v1_bank_accounts GET    /api/vp/v1/bank_accounts(.:format)                                                                                  api/vp/v1/bank_accounts#index
+#                                                         POST   /api/vp/v1/bank_accounts(.:format)                                                                                  api/vp/v1/bank_accounts#create
+#                              new_api_vp_v1_bank_account GET    /api/vp/v1/bank_accounts/new(.:format)                                                                              api/vp/v1/bank_accounts#new
+#                             edit_api_vp_v1_bank_account GET    /api/vp/v1/bank_accounts/:id/edit(.:format)                                                                         api/vp/v1/bank_accounts#edit
+#                                  api_vp_v1_bank_account GET    /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#show
+#                                                         PATCH  /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#update
+#                                                         PUT    /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#update
+#                                                         DELETE /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#destroy
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                                           api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                                                junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                                                users#menu_data
@@ -1206,6 +1215,7 @@
 #                                                         PUT    /bank_transfer/vendors/:id(.:format)                                                                                bank_transfer/vendors#update
 #                                                         DELETE /bank_transfer/vendors/:id(.:format)                                                                                bank_transfer/vendors#destroy
 #                       bank_transfer_bank_accounts_count GET    /bank_transfer/bank_accounts/count(.:format)                                                                        bank_transfer/bank_accounts#count
+#                     bank_transfer_bank_accounts_disable PATCH  /bank_transfer/bank_accounts/disable(.:format)                                                                      bank_transfer/bank_accounts#disable
 #                             bank_transfer_bank_accounts GET    /bank_transfer/bank_accounts(.:format)                                                                              bank_transfer/bank_accounts#index
 #                                                         POST   /bank_transfer/bank_accounts(.:format)                                                                              bank_transfer/bank_accounts#create
 #                          new_bank_transfer_bank_account GET    /bank_transfer/bank_accounts/new(.:format)                                                                          bank_transfer/bank_accounts#new
@@ -2497,6 +2507,8 @@ Rails.application.routes.draw do
       namespace :v1 do
         resources :inventory_line_items
         resources :inward_invoice_attachments
+        patch 'bank_accounts/disable', to: 'bank_accounts#disable', as: :bank_account_disable
+        resources :bank_accounts
       end
       scope :vendors do
         post '', to: 'vendors#create'
@@ -2725,6 +2737,8 @@ Rails.application.routes.draw do
     patch 'set_delegate', to: 'users#set_delegate', as: :set_delegate
   end
   get 'company_users', to: 'users#company_users', as: :company_users
+  get 'user_delegates', to: 'users#user_delegates', as: :user_delegates
+  patch 'users/:id/set_delegates', to: 'users#set_delegates', as: :set_delegates
   get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
 
   # routes for testing import
@@ -3087,6 +3101,7 @@ Rails.application.routes.draw do
     end
 
     get 'bank_accounts/count', to: 'bank_accounts#count'
+    patch 'bank_accounts/disable', to: 'bank_accounts#disable', as: :bank_accounts_disable
     resources :bank_accounts
 
     post 'payments/bulk_upload_utr', to: 'payments#bulk_upload_utr', as: :bulk_upload_utr

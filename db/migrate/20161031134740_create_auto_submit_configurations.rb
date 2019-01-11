@@ -1,4 +1,4 @@
-class CreateAutoSubmitConfigurations < ActiveRecord::Migration
+class CreateAutoSubmitConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :auto_submit_configs do |t|
       t.boolean :enabled, null: false, default: false

@@ -25,7 +25,7 @@ class PingController < ApplicationController
     hostname = nil
     case params[:type]
     when 'general'
-      hostname = 'ip-172-33-215-128'
+      hostname = 'ip-172-33-215-128.ap-south-1.compute.internal'
     when 'payments'
       hostname = 'ip-172-32-19-108.ap-south-1.compute.internal'
     else

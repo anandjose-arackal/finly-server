@@ -1,4 +1,4 @@
-class CreateMappingPurposes < ActiveRecord::Migration
+class CreateMappingPurposes < ActiveRecord::Migration[4.2]
   def change
     create_table :mapping_purposes do |t|
       t.string :name

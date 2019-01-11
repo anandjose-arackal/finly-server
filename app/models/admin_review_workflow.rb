@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class AdminReviewWorkflow < ActiveRecord::Base
+class AdminReviewWorkflow < ApplicationRecord
   include Seedable
 
   has_many :levels, class_name: 'AdminReviewWorkflowLevel', dependent: :destroy

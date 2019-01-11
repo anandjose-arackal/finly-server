@@ -8,5 +8,5 @@
 #  updated_at :datetime         not null
 #
 
-class Referrer < ActiveRecord::Base
+class Referrer < ApplicationRecord
 end

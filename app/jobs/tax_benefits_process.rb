@@ -1,4 +1,4 @@
-class TaxBenefitProcess < ActiveJob::Base
+class TaxBenefitProcess < ApplicationJob
 
   def perform
     scheduled_payment_orders = PaymentOrder.from_disburse.scheduled_on_or_before(Date.today)

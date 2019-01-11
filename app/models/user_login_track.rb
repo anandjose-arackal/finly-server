@@ -11,6 +11,6 @@
 #  updated_at  :datetime         not null
 #
 
-class UserLoginTrack < ActiveRecord::Base
-  belongs_to :user
+class UserLoginTrack < ApplicationRecord
+  belongs_to :user, optional: true
 end

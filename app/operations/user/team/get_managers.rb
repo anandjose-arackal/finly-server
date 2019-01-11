@@ -19,15 +19,17 @@ class User::Team::GetManagers < User::Team::Base
     self.team = User::Team::Index.(user, params)
     self.team_admins = []
     if role_id == UserRole.manager_id
-      self.team_managers = team.signed_up.with_roles.only_managers
-      self.team_managers << user
+      team_managers_ids = team.signed_up.with_roles.only_managers.pluck(:id)
+      team_managers_ids << user.id
+      self.team_managers = User.with_id(team_managers_ids)
       self.team_policies = user.admin_policies
     else
       self.team_managers = company.managers.signed_up
     end
     if role_id == UserRole.finance_manager_id
-      self.team_finance_managers = team.signed_up.with_roles.only_finance_managers
-      self.team_finance_managers << user
+      team_finance_managers_ids = team.signed_up.with_roles.only_finance_managers.pluck(:id)
+      team_finance_managers_ids << user.id
+      self.team_finance_managers = User.with_id(team_finance_managers_ids)
       self.team_policies = user.admin_policies
     else
       self.team_finance_managers = company.finance_managers.signed_up

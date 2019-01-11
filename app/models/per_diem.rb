@@ -12,12 +12,12 @@
 #  is_deleted        :boolean          default(FALSE)
 #
 
-class PerDiem < ActiveRecord::Base
+class PerDiem < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :configurable, polymorphic: true
+  belongs_to :configurable, optional: true, polymorphic: true
 
-  belongs_to :rate, class_name: "Amount"
+  belongs_to :rate, optional: true, class_name: "Amount"
 
   validates :rate, presence: true
   validates :configurable, presence: true

@@ -1,4 +1,4 @@
-class CreateReportTracks < ActiveRecord::Migration
+class CreateReportTracks < ActiveRecord::Migration[4.2]
   def change
     create_table :report_tracks do |t|
       t.references :report, index: true, foreign_key: true, null: false

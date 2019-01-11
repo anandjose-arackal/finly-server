@@ -21,13 +21,13 @@
 #  supply_item_type_id :integer
 #
 
-class InventoryLineItem < ActiveRecord::Base
+class InventoryLineItem < ApplicationRecord
   include SoftDeletable
-  belongs_to :company
-  belongs_to :category
-  belongs_to :tax_rate
+  belongs_to :company, optional: true
+  belongs_to :category, optional: true
+  belongs_to :tax_rate, optional: true
 
-  belongs_to :supply_item_type
+  belongs_to :supply_item_type, optional: true
 
 
   validates :rate, presence: true

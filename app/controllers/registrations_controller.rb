@@ -1,5 +1,6 @@
 class RegistrationsController < ApplicationController
-  skip_before_filter :verify_authenticity_token, :only => [:download_resources]
+
+  # skip_before_filter :verify_authenticity_token, :only => [:download_resources]
 
   def preview
     @result = Company::Preview.(nil, params)

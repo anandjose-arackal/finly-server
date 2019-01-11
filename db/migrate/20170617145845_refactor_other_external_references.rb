@@ -1,4 +1,4 @@
-class RefactorOtherExternalReferences < ActiveRecord::Migration
+class RefactorOtherExternalReferences < ActiveRecord::Migration[4.2]
   def change
     rename_column :users, :external_id, :quickbooks_id
     rename_column :users, :external_additional_information, :quickbooks_additional_information

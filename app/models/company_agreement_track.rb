@@ -13,10 +13,10 @@
 #  company_id   :integer
 #
 
-class CompanyAgreementTrack < ActiveRecord::Base
-  belongs_to :agreement
-  belongs_to :user
-  belongs_to :company
+class CompanyAgreementTrack < ApplicationRecord
+  belongs_to :agreement, optional: true
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
 
   scope :with_user, -> (user_id) { where user_id: user_id }
   scope :with_agreement, -> (agreement_id) { where agreement_id: agreement_id }

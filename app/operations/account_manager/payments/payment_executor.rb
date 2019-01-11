@@ -88,6 +88,12 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         # add system message
       end
     end
+
+    # checking to see if the receiving account is a bank account if it has been disabled by any chance
+    if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.disabled?
+      add_message :error, "You cannot make transfers to this bank account as it has been blacklisted"
+      return
+    end
   end
 
   def pre_process

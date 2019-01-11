@@ -10,9 +10,9 @@
 #  updated_at                       :datetime         not null
 #
 
-class ParentDependentFieldConfigurationMapping < ActiveRecord::Base
+class ParentDependentFieldConfigurationMapping < ApplicationRecord
 
-  belongs_to :parent, polymorphic: true
-  belongs_to :dependent_field_configuration, class_name: "FieldConfiguration"
+  belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :dependent_field_configuration, optional: true, class_name: "FieldConfiguration"
 
 end

@@ -16,5 +16,5 @@
 #  prepaid_cards        :string(255)
 #
 
-class ProductPricingQuery < ActiveRecord::Base
+class ProductPricingQuery < ApplicationRecord
 end

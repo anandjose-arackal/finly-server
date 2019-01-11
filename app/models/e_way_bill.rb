@@ -28,14 +28,14 @@
 #  is_deleted                :boolean          default(FALSE), not null
 #
 
-class EWayBill < ActiveRecord::Base
+class EWayBill < ApplicationRecord
   include SoftDeletable
-  belongs_to :company
-  belongs_to :user
-  belongs_to :procurement
-  belongs_to :amount
+  belongs_to :company, optional: true
+  belongs_to :user, optional: true
+  belongs_to :procurement, optional: true
+  belongs_to :amount, optional: true
 
-  belongs_to :vendor, class_name: 'YesBankVendor'
+  belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
 
   has_many :items, class_name: "DocumentItem", as: :parent_document
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document

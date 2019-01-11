@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class GstType < ActiveRecord::Base
+class GstType < ApplicationRecord
   include Seedable
 
   def self.values

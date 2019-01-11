@@ -1,4 +1,4 @@
-class CreateUserPanelSubscriptionsForAllUsers < ActiveRecord::Migration
+class CreateUserPanelSubscriptionsForAllUsers < ActiveRecord::Migration[4.2]
   def up
     User.all.each do |user|
       unless user.user_panel_subscription.present?

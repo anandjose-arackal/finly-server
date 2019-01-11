@@ -20,7 +20,7 @@ class Expense::ExCard::Base < Expense::Base
       end
     end
     receipts = params[:expense][:receipts_attributes] if params[:expense].present?
-    p = params.require(:expense).permit(:note, :category_id,
+    p = params.require(:expense).permit(:note, :category_id, :modified_by_id,
                                         card_expense_attributes: [:editable_merchant, :id],
                                         receipts_attributes: [:image, :user_id, :id])
     # Hack as image upload from API is failing in strong params

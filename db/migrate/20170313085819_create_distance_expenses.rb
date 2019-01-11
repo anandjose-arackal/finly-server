@@ -1,4 +1,4 @@
-class CreateDistanceExpenses < ActiveRecord::Migration
+class CreateDistanceExpenses < ActiveRecord::Migration[4.2]
   def change
     create_table :distance_expenses do |t|
       t.references :expense, index: true, foreign_key: true

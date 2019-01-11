@@ -12,7 +12,7 @@
 #  updated_at                    :datetime         not null
 #
 
-class EnforceBudgetConfiguration < ActiveRecord::Base
+class EnforceBudgetConfiguration < ApplicationRecord
 
-  belongs_to :company
+  belongs_to :company, optional: true
 end

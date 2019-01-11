@@ -1,2 +1,2 @@
-class CompanyBalance < ActiveRecord::Base
+class CompanyBalance < ApplicationRecord
 end

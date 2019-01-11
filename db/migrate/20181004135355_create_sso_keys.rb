@@ -1,4 +1,4 @@
-class CreateSsoKeys < ActiveRecord::Migration
+class CreateSsoKeys < ActiveRecord::Migration[4.2]
   def change
     create_table :sso_keys do |t|
       t.string :xor_key

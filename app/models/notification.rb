@@ -24,12 +24,12 @@
 #  application          :string(255)
 #
 
-class Notification < ActiveRecord::Base
-  belongs_to :notification_type
-  belongs_to :user
-  belongs_to :action_type, class_name: "NotificationActionType"
-  belongs_to :action_user, class_name: "User"
-  belongs_to :amount
+class Notification < ApplicationRecord
+  belongs_to :notification_type, optional: true
+  belongs_to :user, optional: true
+  belongs_to :action_type, optional: true, class_name: "NotificationActionType"
+  belongs_to :action_user, optional: true, class_name: "User"
+  belongs_to :amount, optional: true
 
   scope :user, -> {where(notification_type_id: NotificationType.id_for(:user))}
   scope :payment, -> {where(notification_type_id: NotificationType.id_for(:payment))}

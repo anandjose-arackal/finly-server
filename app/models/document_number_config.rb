@@ -12,10 +12,10 @@
 #  updated_at                     :datetime         not null
 #
 
-class DocumentNumberConfig < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :document_number_config_type
-  belongs_to :purpose
+class DocumentNumberConfig < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :document_number_config_type, optional: true
+  belongs_to :purpose, optional: true
 
   scope :with_purpose_id, -> (ids) { where purpose_id: ids }
   scope :with_config_type_id, -> (ids) { where document_number_config_type_id: ids }

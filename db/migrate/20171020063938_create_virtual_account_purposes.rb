@@ -1,4 +1,4 @@
-class CreateVirtualAccountPurposes < ActiveRecord::Migration
+class CreateVirtualAccountPurposes < ActiveRecord::Migration[4.2]
   def change
     create_table :virtual_account_purposes do |t|
       t.string :name

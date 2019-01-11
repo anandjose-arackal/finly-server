@@ -1,4 +1,4 @@
-class MoveDistanceExpenseConfigToPolicy < ActiveRecord::Migration
+class MoveDistanceExpenseConfigToPolicy < ActiveRecord::Migration[4.2]
   def change
     add_column :distance_expense_configs, :policy_id, :integer, index: true, foreign_key: true, null: false
     add_column :time_expense_configs, :policy_id, :integer, index: true, foreign_key: true, null: false

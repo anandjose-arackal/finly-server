@@ -1,4 +1,4 @@
-class AddingDefaultsToSqlColumns < ActiveRecord::Migration
+class AddingDefaultsToSqlColumns < ActiveRecord::Migration[4.2]
   def change
     change_column_default :users, :first_name, ""
     change_column_default :users, :last_name, ""

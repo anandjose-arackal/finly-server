@@ -16,13 +16,13 @@
 #  payment_id                   :integer
 #
 
-class PaymentReceivable < ActiveRecord::Base
+class PaymentReceivable < ApplicationRecord
 
-  belongs_to :customer
-  belongs_to :amount
-  belongs_to :company
-  belongs_to :initiating_user, class_name: "User"
-  belongs_to :payment_receivable_status
+  belongs_to :customer, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :company, optional: true
+  belongs_to :initiating_user, optional: true, class_name: "User"
+  belongs_to :payment_receivable_status, optional: true
 
   has_one :virtual_bank_account, as: :parent, dependent: :destroy
   has_one :payment

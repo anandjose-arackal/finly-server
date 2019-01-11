@@ -12,10 +12,10 @@
 #  updated_at           :datetime         not null
 #
 
-class IndividualKycTrack < ActiveRecord::Base
-  belongs_to :individual_kyc
-  belongs_to :action_resource, polymorphic: true
-  belongs_to :action, class_name: 'IndividualKycTrackAction'
+class IndividualKycTrack < ApplicationRecord
+  belongs_to :individual_kyc, optional: true
+  belongs_to :action_resource, optional: true, polymorphic: true
+  belongs_to :action, optional: true, class_name: 'IndividualKycTrackAction'
 
   validates :individual_kyc_id, presence: true
   validates :action_id, presence: true

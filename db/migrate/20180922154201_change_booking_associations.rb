@@ -1,4 +1,4 @@
-class ChangeBookingAssociations < ActiveRecord::Migration
+class ChangeBookingAssociations < ActiveRecord::Migration[4.2]
   def change
     add_column :booking_flights, :booking_id, :integer, references: "Booking", foreign_key: true, index: true
     add_column :booking_buses, :booking_id, :integer, references: "Booking", foreign_key: true, index: true

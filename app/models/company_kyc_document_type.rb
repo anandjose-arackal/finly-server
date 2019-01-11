@@ -9,7 +9,7 @@
 #  identifier :string(255)
 #
 
-class CompanyKycDocumentType < ActiveRecord::Base
+class CompanyKycDocumentType < ApplicationRecord
 
 
   scope :with_name, -> (name){where name: name}

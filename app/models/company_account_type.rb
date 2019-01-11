@@ -8,5 +8,5 @@
 #  updated_at :datetime         not null
 #
 
-class CompanyAccountType < ActiveRecord::Base
+class CompanyAccountType < ApplicationRecord
 end

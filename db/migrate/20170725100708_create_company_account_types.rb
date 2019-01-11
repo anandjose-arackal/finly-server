@@ -1,4 +1,4 @@
-class CreateCompanyAccountTypes < ActiveRecord::Migration
+class CreateCompanyAccountTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :company_account_types do |t|
       t.string :name

@@ -1,4 +1,4 @@
-class CreateMoneyRequestComments < ActiveRecord::Migration
+class CreateMoneyRequestComments < ActiveRecord::Migration[4.2]
   def change
     create_table :money_request_comment_actions do |t|
       t.string :name

@@ -1,4 +1,4 @@
-class RemoveUnnecessaryIdsFromTravelRequests < ActiveRecord::Migration
+class RemoveUnnecessaryIdsFromTravelRequests < ActiveRecord::Migration[4.2]
   def change
     remove_column :travel_requests, :booking_id, :integer
     remove_column :travel_requests, :booking_request_id, :integer

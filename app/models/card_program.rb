@@ -20,7 +20,7 @@
 #  non_personal_fund_transfer    :boolean
 #
 
-class CardProgram < ActiveRecord::Base
+class CardProgram < ApplicationRecord
   has_many :cards
 
   scope :with_id, -> (id){ where id: id }

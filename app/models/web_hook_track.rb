@@ -19,10 +19,10 @@
 #  updated_at        :datetime         not null
 #
 
-class WebHookTrack < ActiveRecord::Base
-  belongs_to :web_hook_event
-  belongs_to :company
-  belongs_to :web_hook
+class WebHookTrack < ApplicationRecord
+  belongs_to :web_hook_event, optional: true
+  belongs_to :company, optional: true
+  belongs_to :web_hook, optional: true
 
   serialize :request_header, JSON
   serialize :request_body, JSON

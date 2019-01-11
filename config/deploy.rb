@@ -1,5 +1,5 @@
 # config valid only for current version of Capistrano
-lock '3.10.2'
+lock '3.11.0'
 
 if ['aws_production', 'background_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
@@ -7,9 +7,9 @@ end
 
 set :application, 'finly-server'
 
-set :repo_url, 'ssh://git@altssh.bitbucket.org:443/finlycore/finly-server.git'
+set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
 
-set :branch, ENV['BRANCH'] || :staging
+set :branch, ENV['BRANCH'] || :master
 
 case fetch(:stage)
 when :itzcash_production
@@ -23,10 +23,10 @@ when :itzcash_production
   # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
 when :aws_production, :background_production
-  # branch = fetch :branch
-  # unless ['staging', :staging].include?(branch)
-  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
-  # end
+  branch = fetch :branch
+  unless ['master', :master].include?(branch)
+    raise 'This branch cannot be deploy to production. Please select the correct branch'
+  end
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'production'
 when :itzcash
@@ -38,14 +38,16 @@ when :staging, :development, :combined_development, :insights, :development_2, :
 end
 
 set :pty, false
-linked_dirs = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}
+linked_files = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}
 case fetch(:stage)
-  when :itzcash_production, :aws_production, :background_production
-    linked_dirs << "config/sidekiq.yml"
+when :itzcash_production, :aws_production, :background_production
+  linked_files << "config/sidekiq.yml"
+  linked_files << "config/elastic_apm.yml"
 end
-set :linked_files, linked_dirs
+set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
+
 
 # set :rails_env, "staging"
 # set :rails_env, 'production'
@@ -73,6 +75,7 @@ set :puma_workers, 0
 set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
+
 
 set :slackistrano, {
     channel: '#general',

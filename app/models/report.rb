@@ -32,48 +32,53 @@
 #  sync_type_id                       :integer
 #  report_processor_group_mapping_id  :integer
 #  travel_request_id                  :integer
+#  department_id                      :integer
+#  sub_department_id                  :integer
+#  created_by_id                      :integer
+#  modified_by_id                     :integer
 #
 
-
-
-
-class Report < ActiveRecord::Base
+class Report < ApplicationRecord
   include MathUtil
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
           FindByOrderedIds
 
   has_many :email_authorizations, as: :authorizable
-  belongs_to :user, inverse_of: :reports
-  belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
-  belongs_to :policy
-  belongs_to :controlling_user, class_name: 'User'
-  belongs_to :controlling_user_role, class_name: 'UserRole'
-  belongs_to :controlling_for_user, class_name: 'User'
-  belongs_to :controlling_for_user_role, class_name: 'UserRole'
+  belongs_to :user, optional: true, inverse_of: :reports
+  belongs_to :status, optional: true, class_name: 'ReportStatus', foreign_key: :report_status_id
+  belongs_to :policy, optional: true
+  belongs_to :controlling_user, optional: true, class_name: 'User'
+  belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :controlling_for_user, optional: true, class_name: 'User'
+  belongs_to :controlling_for_user_role, optional: true, class_name: 'UserRole'
   has_many :tracks, class_name: 'ReportTrack', dependent: :destroy
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy
   has_many :receipts, as: :parent
   # Payment made as reimbursement
-  belongs_to :report_status
-  belongs_to :reimbursement, class_name: 'Payment'
-  belongs_to :reimbursable_expenses_total, class_name: 'Amount'
-  belongs_to :non_reimbursable_expenses_total, class_name: 'Amount'
-  belongs_to :card_expenses_total, class_name: 'Amount'
-  belongs_to :cash_in_hand_deduction, class_name: 'Payment'
-  belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
-  belongs_to :sync_status, class_name: 'ReportSyncStatus'
-  belongs_to :report_processor_group_mapping
-  belongs_to :sync_status, class_name: 'ReportSyncStatus'
-  belongs_to :sync_type, class_name: 'ReportSyncType'
-  belongs_to :travel_request
+  belongs_to :report_status, optional: true
+  belongs_to :reimbursement, optional: true, class_name: 'Payment'
+  belongs_to :reimbursable_expenses_total, optional: true, class_name: 'Amount'
+  belongs_to :non_reimbursable_expenses_total, optional: true, class_name: 'Amount'
+  belongs_to :card_expenses_total, optional: true, class_name: 'Amount'
+  belongs_to :cash_in_hand_deduction, optional: true, class_name: 'Payment'
+  belongs_to :cash_in_hand_deduction_amount, optional: true, class_name: 'Amount'
+  belongs_to :sync_status, optional: true, class_name: 'ReportSyncStatus'
+  belongs_to :report_processor_group_mapping, optional: true
+  belongs_to :sync_status, optional: true, class_name: 'ReportSyncStatus'
+  belongs_to :sync_type, optional: true, class_name: 'ReportSyncType'
+  belongs_to :travel_request, optional: true
+  belongs_to :created_by, optional: true, class_name: "User"
+  belongs_to :modified_by, optional: true, class_name: 'User'
   # belongs_to :money_request
+  belongs_to :department, optional: true
+  belongs_to :sub_department, optional: true, class_name: "Department"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   # submission amount for determining the approving manager and finance manager
-  belongs_to :submitted_amount, class_name: 'Amount'
+  belongs_to :submitted_amount, optional: true, class_name: 'Amount'
   accepts_nested_attributes_for :submitted_amount
   accepts_nested_attributes_for :reimbursable_expenses_total
   accepts_nested_attributes_for :non_reimbursable_expenses_total
@@ -276,6 +281,21 @@ class Report < ActiveRecord::Base
     ids = Report.where(id: original_report_ids, user_id: user_ids).pluck(:id)
     where(id: ids)
   }
+
+  scope :with_budgetable_user_ids, -> (user_ids) {
+    if user_ids.present?
+      where user_id: user_ids
+    end
+  }
+
+  scope :with_budgetable_department_ids, -> (department_ids) {
+    if department_ids.present?
+      ids = where(department_id: department_ids).pluck(:id)
+      ids = where(sub_department_id: department_ids).pluck(:id)
+      where(id: ids)
+    end
+  }
+
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount
@@ -419,11 +439,11 @@ class Report < ActiveRecord::Base
   end
 
   def versioned_policy
-    if self.submitted_at.present?
-      if self.policy
-        return self.policy.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
-      end
-    end
+    # if self.submitted_at.present?
+    #   if self.policy
+    #     return self.policy.paper_trail.version_at self.submitted_at, has_many: true, has_one: true, belongs_to: true
+    #   end
+    # end
     self.policy
   end
 
@@ -564,13 +584,13 @@ class Report < ActiveRecord::Base
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if [ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed])].include?(self.report_status_id)
+    if ReportStatus.ids_for([:open, :retracted, :rejected]).include?(self.report_status_id)
       self.expenses.each do |expense|
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(expense)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
       end
     else
       self.expenses.each do |expense|
-        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(expense)
       end
     end
   end

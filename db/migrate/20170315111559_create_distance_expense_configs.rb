@@ -1,4 +1,4 @@
-class CreateDistanceExpenseConfigs < ActiveRecord::Migration
+class CreateDistanceExpenseConfigs < ActiveRecord::Migration[4.2]
   def change
     create_table :distance_expense_configs do |t|
       t.references :parent, polymorphic: true

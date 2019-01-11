@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class BankPaymentRequestCommentAction < ActiveRecord::Base
+class BankPaymentRequestCommentAction < ApplicationRecord
   include Seedable
 
   def self.values

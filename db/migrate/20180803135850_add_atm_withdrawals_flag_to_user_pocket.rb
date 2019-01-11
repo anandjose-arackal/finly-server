@@ -1,4 +1,4 @@
-class AddAtmWithdrawalsFlagToUserPocket < ActiveRecord::Migration
+class AddAtmWithdrawalsFlagToUserPocket < ActiveRecord::Migration[4.2]
   def change
     add_column :user_pockets, :atm_withdrawal_pocket, :boolean, default: false
   end

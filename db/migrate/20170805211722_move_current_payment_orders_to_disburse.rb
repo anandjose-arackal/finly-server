@@ -1,4 +1,4 @@
-class MoveCurrentPaymentOrdersToDisburse < ActiveRecord::Migration
+class MoveCurrentPaymentOrdersToDisburse < ActiveRecord::Migration[4.2]
   def change
     # add_column :payment_orders, :application, :string
     PaymentOrder.all.each do |po|

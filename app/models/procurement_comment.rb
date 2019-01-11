@@ -12,9 +12,9 @@
 #  is_deleted              :boolean          default(FALSE), not null
 #
 
-class ProcurementComment < ActiveRecord::Base
+class ProcurementComment < ApplicationRecord
   include SoftDeletable
-  belongs_to :user
+  belongs_to :user, optional: true
 
-  belongs_to :parent_commentable, polymorphic: true
+  belongs_to :parent_commentable, optional: true, polymorphic: true
 end

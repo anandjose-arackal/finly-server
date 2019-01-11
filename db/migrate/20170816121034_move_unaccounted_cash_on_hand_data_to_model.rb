@@ -1,4 +1,4 @@
-class MoveUnaccountedCashOnHandDataToModel < ActiveRecord::Migration
+class MoveUnaccountedCashOnHandDataToModel < ActiveRecord::Migration[4.2]
   def change
     Payment.where(payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal)).where(receiving_account_id: nil).all.each do |payment|
 

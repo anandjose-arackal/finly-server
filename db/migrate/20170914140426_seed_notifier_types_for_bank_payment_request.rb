@@ -1,4 +1,4 @@
-class SeedNotifierTypesForBankPaymentRequest < ActiveRecord::Migration
+class SeedNotifierTypesForBankPaymentRequest < ActiveRecord::Migration[4.2]
   def change
     NotifierType::ACTIONS.each do |item|
       unless NotifierType.find_by(name: item[:key].to_s)

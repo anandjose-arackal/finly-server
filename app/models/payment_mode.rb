@@ -9,7 +9,7 @@
 #
 
 
-class PaymentMode < ActiveRecord::Base
+class PaymentMode < ApplicationRecord
 
   MODES = {cash: 1, card: 2}
 

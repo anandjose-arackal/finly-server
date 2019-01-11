@@ -1,4 +1,4 @@
-class CreateReportSyncTypes < ActiveRecord::Migration
+class CreateReportSyncTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :report_sync_types do |t|
       t.string :name, null: false, index: true

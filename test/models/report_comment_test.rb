@@ -15,9 +15,8 @@
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  payment_id               :integer
+#  delegated_action_user_id :integer
 #
-
-
 
 require 'test_helper'
 

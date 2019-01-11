@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class BankPaymentRequestTrailAction < ActiveRecord::Base
+class BankPaymentRequestTrailAction < ApplicationRecord
 
   include Seedable
 

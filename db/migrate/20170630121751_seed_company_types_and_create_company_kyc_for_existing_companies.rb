@@ -1,4 +1,4 @@
-class SeedCompanyTypesAndCreateCompanyKycForExistingCompanies < ActiveRecord::Migration
+class SeedCompanyTypesAndCreateCompanyKycForExistingCompanies < ActiveRecord::Migration[4.2]
   def change
     # seeding company types for data
     CompanyType.seed_data

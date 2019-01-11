@@ -1,4 +1,4 @@
-class CreateEWayBills < ActiveRecord::Migration
+class CreateEWayBills < ActiveRecord::Migration[4.2]
   def change
     create_table :e_way_bills do |t|
       t.references :company, index: true, foreign_key: true

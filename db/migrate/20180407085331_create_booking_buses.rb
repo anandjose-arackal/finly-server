@@ -1,4 +1,4 @@
-class CreateBookingBuses < ActiveRecord::Migration
+class CreateBookingBuses < ActiveRecord::Migration[4.2]
   def change
     create_table :booking_buses do |t|
       t.string :journey_source

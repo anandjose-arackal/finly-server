@@ -9,8 +9,8 @@
 #  updated_at :datetime         not null
 #
 
-class CardExpenseConfig < ActiveRecord::Base
-  belongs_to :policy
+class CardExpenseConfig < ApplicationRecord
+  belongs_to :policy, optional: true
 
   validates :policy_id, presence: true
 end

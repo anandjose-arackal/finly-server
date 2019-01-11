@@ -11,9 +11,9 @@
 #  updated_at              :datetime         not null
 #
 
-class NotifierTypeConfiguration < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :notifier_type
+class NotifierTypeConfiguration < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :notifier_type, optional: true
 
   scope :with_event, ->(id) { where event_id: id }
   scope :with_user, ->(id) { where user_id: id }

@@ -1,4 +1,4 @@
-class ChanceColumnNameForTrain < ActiveRecord::Migration
+class ChanceColumnNameForTrain < ActiveRecord::Migration[4.2]
   def change
     rename_column :booking_trains, :boarding_city_id, :from_id
     rename_column :booking_trains, :boarding_station, :boarding_station

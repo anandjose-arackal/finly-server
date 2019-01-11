@@ -1,4 +1,4 @@
-class CreateCardExpenseConfigs < ActiveRecord::Migration
+class CreateCardExpenseConfigs < ActiveRecord::Migration[4.2]
   def change
     create_table :card_expense_configs do |t|
       t.boolean :enabled, default: true

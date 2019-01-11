@@ -11,11 +11,11 @@
 #  updated_at           :datetime         not null
 #
 
-class PostOperationAction < ActiveRecord::Base
+class PostOperationAction < ApplicationRecord
 
   serialize :payload
 
-  belongs_to :post_operatable, polymorphic: true
+  belongs_to :post_operatable, optional: true, polymorphic: true
 
   validates :post_operatable, presence: true
   validates :operation, presence: true

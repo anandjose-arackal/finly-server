@@ -110,7 +110,7 @@ class Expense::Manual::Split < Expense::Manual::Base
   def split_expense_params
     expenses_params = []
     base_params = params.require(:expense).permit(:expense_type_id, :expense_status_id,
-                                                  :report_id, :reimbursable, :date, :spent_from_id,
+                                                  :report_id, :reimbursable, :date, :spent_from_id, :created_by_id,
                                                   manual_expense_attributes: [:merchant],
                                                   card_expense_attributes: [:editable_merchant, :card_transaction_id],
                                                   receipts_attributes: [:image],
@@ -136,6 +136,7 @@ class Expense::Manual::Split < Expense::Manual::Base
       expense_item_params = base_params.deep_dup
       expense_item_params[:note] = split[:note]
       expense_item_params[:category_id] = split[:category_id]
+      expense_item_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
       expense_item_params[:amount_attributes] = split[:amount_attributes] if split[:amount_attributes].present?
       expense_custom_fields = base_custom_fields.deep_dup
       if split[:custom_fields].present?

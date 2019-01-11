@@ -1,4 +1,4 @@
-class CreateDistances < ActiveRecord::Migration
+class CreateDistances < ActiveRecord::Migration[4.2]
   def change
     create_table :distances do |t|
       t.decimal :value

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class QuickbooksReferenceType < ActiveRecord::Base
+class QuickbooksReferenceType < ApplicationRecord
   include Seedable
 
   def self.values

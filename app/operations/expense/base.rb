@@ -9,6 +9,7 @@ class Expense::Base < BaseOperation
     if user.blank?
       messages[:error] << 'User not found'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init

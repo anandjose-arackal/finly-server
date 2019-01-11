@@ -1,4 +1,4 @@
-class CreateCustomFields < ActiveRecord::Migration
+class CreateCustomFields < ActiveRecord::Migration[4.2]
   def change
     create_table :custom_fields do |t|
       t.references :field_configuration, index: true, foreign_key: true, null: false

@@ -11,11 +11,11 @@
 #  money_request_item_category_id :integer
 #
 
-class MoneyRequestItem < ActiveRecord::Base
-  belongs_to :category
-  belongs_to :amount
-  belongs_to :money_request
-  belongs_to :money_request_item_category
+class MoneyRequestItem < ApplicationRecord
+  belongs_to :category, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :money_request, optional: true
+  belongs_to :money_request_item_category, optional: true
 
   scope :with_id, -> (id) {where id: id}
   scope :with_amount, -> {joins :amount}

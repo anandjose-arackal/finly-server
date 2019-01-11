@@ -1,4 +1,4 @@
-class UpdateFieldParentTypeNonmandatory < ActiveRecord::Migration
+class UpdateFieldParentTypeNonmandatory < ActiveRecord::Migration[4.2]
   def change
     change_column_null :field_configurations, :field_parent_type_id, false
     remove_foreign_key :field_configurations, :field_parent_type

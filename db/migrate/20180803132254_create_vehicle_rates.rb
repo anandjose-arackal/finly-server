@@ -1,4 +1,4 @@
-class CreateVehicleRates < ActiveRecord::Migration
+class CreateVehicleRates < ActiveRecord::Migration[4.2]
   def change
     create_table :vehicle_rates do |t|
       t.string :vehicle_name, null: false

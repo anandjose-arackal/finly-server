@@ -1,4 +1,4 @@
-class CreateSystemLogs < ActiveRecord::Migration
+class CreateSystemLogs < ActiveRecord::Migration[4.2]
   def change
     create_table :system_logs do |t|
       t.integer :log_resource_id, null: false, index: true

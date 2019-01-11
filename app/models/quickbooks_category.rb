@@ -14,9 +14,9 @@
 #  company_id                        :integer
 #
 
-class QuickbooksCategory < ActiveRecord::Base
+class QuickbooksCategory < ApplicationRecord
 
-  belongs_to :category
+  belongs_to :category, optional: true
 
   accepts_nested_attributes_for :category
 

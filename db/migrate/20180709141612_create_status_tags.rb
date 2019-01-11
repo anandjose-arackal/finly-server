@@ -1,4 +1,4 @@
-class CreateStatusTags < ActiveRecord::Migration
+class CreateStatusTags < ActiveRecord::Migration[4.2]
   def change
     create_table :status_tags do |t|
       t.string :name

@@ -7,8 +7,17 @@ class BaseOperation
   # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
     clear_messages
-    self.user = user
-    self.params = (ActionController::Parameters.new(params) or {})
+    if actual_current_user.present?
+      self.user = current_user
+    else
+      self.user = user
+    end
+    params ||= {}
+    if params.class.name == ActionController::Parameters.name
+      self.params = params
+    else
+      self.params = (ActionController::Parameters.new(params) or {})
+    end
   end
 
   def self.call(user, params={})
@@ -230,6 +239,10 @@ class BaseOperation
     RequestStore.store[:current_user]
   end
 
+  def actual_current_user
+    RequestStore.store[:actual_current_user]
+  end
+
   def authorized_scopes
     RequestStore.store[:authorized_scopes]
   end
@@ -246,6 +259,20 @@ class BaseOperation
     RequestStore.store[:params]
   end
 
+  # Disallow unauthorized UserDelegateMapping operation
+  def validate_delegator_action
+    delegator_action = "#{request_params["controller"].singularize}_#{request_params["action"]}" rescue nil
+    if delegator_action.present?
+      user_delegate_mapping = actual_current_user.user_delegate_mappings.find_by_delegate_for_user_id(current_user.id)
+      # Allow actions not defined in UserDelegateMapping
+      delegate_authorized = user_delegate_mapping.send(delegator_action) rescue true
+    end
+    unless defined?(delegate_authorized) && delegate_authorized
+      messages[:error] << "You are not authorized to delegate for this action"
+      return
+    end
+  end
+
   # Used to present the data to the UI
   class BaseOperation::BasePresenter
     include MathUtil, HasScope
@@ -255,6 +282,9 @@ class BaseOperation
       self.config = {}
       self.user = user
       self.params = params
+      if self.params.class.name == ActionController::Parameters.name
+        self.params = self.params.permit!.to_h
+      end
       self.messages = messages
       init
     end
@@ -389,6 +419,13 @@ class BaseOperation
       end
     end
     raise_unauthorized_exception
+  end
+
+  def convert_params_to_hash
+    if params.is_a?(ActionController::Parameters)
+      self.params = params.permit!.to_h
+    end
+    self.params
   end
 
   def add_message(type, message)

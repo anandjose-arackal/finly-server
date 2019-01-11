@@ -1,4 +1,4 @@
-class MakeProcurementModelsSoftDeletable < ActiveRecord::Migration
+class MakeProcurementModelsSoftDeletable < ActiveRecord::Migration[4.2]
   def change
     add_column :inventory_line_items, :is_deleted, :boolean, default: false, null: false
     add_column :tax_rates, :is_deleted, :boolean, default: false, null: false

@@ -37,7 +37,7 @@ module FieldCustomizer
         customizable_options[field] = options
 
         validation_method_name = "field_customizer_#{field}"
-        validate validation_method_name
+        validate validation_method_name.to_sym
 
         define_method validation_method_name do
           return if self.skip_customizable_validation

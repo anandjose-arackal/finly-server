@@ -12,10 +12,10 @@
 #  updated_at                  :datetime         not null
 #
 
-class UserWalletTrack < ActiveRecord::Base
-  belongs_to :user_wallet
-  belongs_to :user_wallet_track_action
-  belongs_to :amount
-  belongs_to :action_user, class_name: 'User'
-  belongs_to :balance_after_action, class_name: 'Amount'
+class UserWalletTrack < ApplicationRecord
+  belongs_to :user_wallet, optional: true
+  belongs_to :user_wallet_track_action, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :action_user, optional: true, class_name: 'User'
+  belongs_to :balance_after_action, optional: true, class_name: 'Amount'
 end

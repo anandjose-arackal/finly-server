@@ -1,4 +1,4 @@
-class AddTempFieldsForOlx < ActiveRecord::Migration
+class AddTempFieldsForOlx < ActiveRecord::Migration[4.2]
   def change
 
     # Temporary for olx

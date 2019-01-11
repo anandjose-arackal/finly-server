@@ -25,24 +25,24 @@
 #  sequence_number         :integer
 #
 
-class FieldConfiguration < ActiveRecord::Base
+class FieldConfiguration < ApplicationRecord
   include SoftDeletable
 
   # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
 
-  belongs_to :field_type
-  belongs_to :company
+  belongs_to :field_type, optional: true
+  belongs_to :company, optional: true
   has_many :field_parent_mappings
   has_many :field_parent_types, through: :field_parent_mappings
-  # belongs_to :field_parent_type
+  # belongs_to :field_parent_type, optional: true
   # Applicable for User, Policy, Company
-  belongs_to :configurable, polymorphic: true
+  belongs_to :configurable, optional: true, polymorphic: true
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
   has_many :multiselect_items, class_name: 'FieldMultiselectItem'
   has_many :custom_fields
-  belongs_to :parent, polymorphic: true
-  belongs_to :default_value, polymorphic: true
-  belongs_to :external_reference, polymorphic: true
+  belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :default_value, optional: true, polymorphic: true
+  belongs_to :external_reference, optional: true, polymorphic: true
 
   has_many :policy_field_mappings
   has_many :policies, through: :policy_field_mappings

@@ -11,8 +11,8 @@
 #
 
 
-class UserTag < ActiveRecord::Base
-  belongs_to :user
+class UserTag < ApplicationRecord
+  belongs_to :user, optional: true
 
   validates :name, presence: true
   validates :user_id, presence: true

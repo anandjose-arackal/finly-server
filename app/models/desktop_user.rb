@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class DesktopUser < ActiveRecord::Base
+class DesktopUser < ApplicationRecord
 
   validates :email, presence: true, format: Constants::VALID_EMAIL_FORMAT
   validates :country, presence: true

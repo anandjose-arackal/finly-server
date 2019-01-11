@@ -1,4 +1,4 @@
-class AddCashAndCardTotalForAllReports < ActiveRecord::Migration
+class AddCashAndCardTotalForAllReports < ActiveRecord::Migration[4.2]
   def up
     unless Report.count == 0
       Report.where(report_status_id: [ReportStatus.id_for(:approved), ReportStatus.id_for(:settled), ReportStatus.id_for(:settlement_confirmed), ReportStatus.id_for(:closed)]).each do |report|

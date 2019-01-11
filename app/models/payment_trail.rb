@@ -18,13 +18,13 @@
 #  receiving_user_type     :string(255)
 #
 
-class PaymentTrail < ActiveRecord::Base
+class PaymentTrail < ApplicationRecord
 
-  belongs_to :initiating_account, polymorphic: true
-  belongs_to :receiving_account, polymorphic: true
+  belongs_to :initiating_account, optional: true, polymorphic: true
+  belongs_to :receiving_account, optional: true, polymorphic: true
 
-  belongs_to :initiating_user, polymorphic: true
-  belongs_to :receiving_user, polymorphic: true
+  belongs_to :initiating_user, optional: true, polymorphic: true
+  belongs_to :receiving_user, optional: true, polymorphic: true
 
-  belongs_to :payment_purpose
+  belongs_to :payment_purpose, optional: true
 end

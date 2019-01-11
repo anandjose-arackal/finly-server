@@ -12,9 +12,9 @@
 #  is_deleted  :boolean          default(FALSE), not null
 #
 
-class TaxRate < ActiveRecord::Base
+class TaxRate < ApplicationRecord
   include SoftDeletable
-  belongs_to :company
+  belongs_to :company, optional: true
 
   scope :with_name, -> (name) {where name: name}
   scope :with_rate, -> (rate) {where rate: rate}

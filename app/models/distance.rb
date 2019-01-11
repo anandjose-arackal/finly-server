@@ -9,8 +9,8 @@
 #  updated_at       :datetime         not null
 #
 
-class Distance < ActiveRecord::Base
-  belongs_to :physical_unit
+class Distance < ApplicationRecord
+  belongs_to :physical_unit, optional: true
 
   validates :value, presence: true
   validates :physical_unit_id, presence: true

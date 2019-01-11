@@ -14,10 +14,10 @@
 #  updated_at             :datetime         not null
 #
 
-class ManagerSummaryMailConfig < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :user_mailer_type
-  belongs_to :period
+class ManagerSummaryMailConfig < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :user_mailer_type, optional: true
+  belongs_to :period, optional: true
 
   DAYS_OF_MONTH = [*1..31] + [nil]
   WEEK_DAYS = [nil, 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']

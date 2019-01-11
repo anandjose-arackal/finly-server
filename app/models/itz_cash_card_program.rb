@@ -12,7 +12,7 @@
 #  bank         :string(255)
 #
 
-class ItzCashCardProgram < ActiveRecord::Base
+class ItzCashCardProgram < ApplicationRecord
 
   scope :with_product_code, -> (product_code) { where product_code: product_code }
 

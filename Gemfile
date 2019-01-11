@@ -105,7 +105,7 @@ gem 'gcm', '~> 0.1.1'
 
 # gem 'backbone-on-rails'
 
-# gem 'bootstrap-will_paginate'
+gem 'bootstrap-will_paginate'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
 # Bundle for Bootstrap
@@ -184,7 +184,7 @@ gem 'awesome_print', '~> 1.8.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug'
+  # gem 'byebug'
   gem 'pry', '~> 0.12.2'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 3.1.1'

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class CompanyStatus < ActiveRecord::Base
+class CompanyStatus < ApplicationRecord
   include Seedable
 
   def self.values

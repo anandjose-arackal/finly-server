@@ -17,15 +17,15 @@
 #  date                        :date
 #
 
-class OutwardInvoiceTrail < ActiveRecord::Base
-  belongs_to :customer_account_transaction
-  belongs_to :user
-  belongs_to :amount
-  belongs_to :invoice, class_name: 'OutwardInvoice'
-  belongs_to :action, class_name: 'OutwardInvoiceTrailAction'
+class OutwardInvoiceTrail < ApplicationRecord
+  belongs_to :customer_account_transaction, optional: true
+  belongs_to :user, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :invoice, optional: true, class_name: 'OutwardInvoice'
+  belongs_to :action, optional: true, class_name: 'OutwardInvoiceTrailAction'
 
-  belongs_to :associated_entity, polymorphic: true
-  belongs_to :associated_transaction, polymorphic: true
+  belongs_to :associated_entity, optional: true, polymorphic: true
+  belongs_to :associated_transaction, optional: true, polymorphic: true
 
   accepts_nested_attributes_for :amount
 

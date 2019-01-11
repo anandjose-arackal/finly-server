@@ -1,4 +1,4 @@
-class SeedPaymentPurposes < ActiveRecord::Migration
+class SeedPaymentPurposes < ActiveRecord::Migration[4.2]
   def change
     PaymentPurpose.seed_data
   end

@@ -11,10 +11,10 @@
 #  field_key              :string(255)
 #
 
-class FieldDropDownItem < ActiveRecord::Base
+class FieldDropDownItem < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :field_configuration
+  belongs_to :field_configuration, optional: true
 
   has_many :parent_dependent_field_configuration_mappings, foreign_key: :parent_id
   has_many :dependent_field_configurations, through: :parent_dependent_field_configuration_mappings

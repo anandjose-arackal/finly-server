@@ -19,12 +19,12 @@
 #  bank_transaction_type_id    :integer
 #
 
-class BankTransaction < ActiveRecord::Base
-  belongs_to :amount
-  belongs_to :company
-  belongs_to :beneficiary_bank_account, class_name: "BankAccount"
-  belongs_to :transfer_status, class_name: "BankTransferStatus"
-  belongs_to :bank_transaction_type
+class BankTransaction < ApplicationRecord
+  belongs_to :amount, optional: true
+  belongs_to :company, optional: true
+  belongs_to :beneficiary_bank_account, optional: true, class_name: "BankAccount"
+  belongs_to :transfer_status, optional: true, class_name: "BankTransferStatus"
+  belongs_to :bank_transaction_type, optional: true
 
   has_one :payment, as: :reference_resource
 

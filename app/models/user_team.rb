@@ -10,7 +10,7 @@
 #  application :string(255)
 #
 
-class UserTeam < ActiveRecord::Base
+class UserTeam < ApplicationRecord
 
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id, :case_sensitive => false}

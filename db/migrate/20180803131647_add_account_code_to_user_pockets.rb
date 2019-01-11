@@ -1,4 +1,4 @@
-class AddAccountCodeToUserPockets < ActiveRecord::Migration
+class AddAccountCodeToUserPockets < ActiveRecord::Migration[4.2]
   def change
     add_column :user_pockets, :account_code, :string
 

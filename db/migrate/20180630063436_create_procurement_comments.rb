@@ -1,4 +1,4 @@
-class CreateProcurementComments < ActiveRecord::Migration
+class CreateProcurementComments < ActiveRecord::Migration[4.2]
   def change
     create_table :procurement_comments do |t|
       t.text :body

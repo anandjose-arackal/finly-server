@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class AutoSyncConfigType < ActiveRecord::Base
+class AutoSyncConfigType < ApplicationRecord
 
   VALUES = { quickbooks: 1, tally: 2 }
 

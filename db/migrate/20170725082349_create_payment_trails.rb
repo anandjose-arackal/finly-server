@@ -1,4 +1,4 @@
-class CreatePaymentTrails < ActiveRecord::Migration
+class CreatePaymentTrails < ActiveRecord::Migration[4.2]
   def change
     create_table :payment_trails do |t|
       t.date :date

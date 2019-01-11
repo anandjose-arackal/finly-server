@@ -12,11 +12,11 @@
 #  cost_center_id :integer
 #
 
-class Department < ActiveRecord::Base
+class Department < ApplicationRecord
   include SoftDeletable
   has_ancestry
-  belongs_to :company
-  belongs_to :cost_center
+  belongs_to :company, optional: true
+  belongs_to :cost_center, optional: true
 
   has_many :user_department_mappings
   has_many :users, through: :user_department_mappings

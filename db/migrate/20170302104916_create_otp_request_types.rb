@@ -1,4 +1,4 @@
-class CreateOtpRequestTypes < ActiveRecord::Migration
+class CreateOtpRequestTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :otp_request_types do |t|
       t.string :name

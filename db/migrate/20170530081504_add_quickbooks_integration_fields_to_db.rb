@@ -1,4 +1,4 @@
-class AddQuickbooksIntegrationFieldsToDb < ActiveRecord::Migration
+class AddQuickbooksIntegrationFieldsToDb < ActiveRecord::Migration[4.2]
   def change
     # all migrations required for the quickbooks integration will be done here
 

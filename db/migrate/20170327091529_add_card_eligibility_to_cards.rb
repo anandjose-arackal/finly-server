@@ -1,4 +1,4 @@
-class AddCardEligibilityToCards < ActiveRecord::Migration
+class AddCardEligibilityToCards < ActiveRecord::Migration[4.2]
   def change
     add_column :cards, :card_eligibility_id, :integer, references: 'Amount', foreign_key: true, index: true, null: true
     if Company.count > 0 and Card.count > 0

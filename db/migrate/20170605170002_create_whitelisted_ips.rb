@@ -1,4 +1,4 @@
-class CreateWhitelistedIps < ActiveRecord::Migration
+class CreateWhitelistedIps < ActiveRecord::Migration[4.2]
   def change
     create_table :whitelisted_ips do |t|
       t.string :ip_address, null: false, index: true

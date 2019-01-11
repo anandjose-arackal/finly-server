@@ -1,4 +1,4 @@
-class AddPointOfContactToUsers < ActiveRecord::Migration
+class AddPointOfContactToUsers < ActiveRecord::Migration[4.2]
   def change
     add_column :users, :point_of_contact, :boolean
     remove_column :users, :quickbooks_id, :integer

@@ -10,11 +10,11 @@
 #  user_team_id       :integer
 #
 
-class UserTeamGroupItemMapping < ActiveRecord::Base
+class UserTeamGroupItemMapping < ApplicationRecord
 
-  belongs_to :user_team
-  belongs_to :user_group
-  belongs_to :user_group_item
+  belongs_to :user_team, optional: true
+  belongs_to :user_group, optional: true
+  belongs_to :user_group_item, optional: true
 
   # validates :user_team, presence: true
   validates :user_group_id, presence: true

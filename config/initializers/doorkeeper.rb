@@ -14,7 +14,7 @@ Doorkeeper.configure do
   resource_owner_from_credentials do |routes|
     u = nil
     scopes = params.dig(:scope)&.split(' ')
-    if (params[:username].blank?) || (params[:password].blank? && !(params[:sso_skip_password]))
+    if (params[:username].blank?) || (params[:password].blank?) #&& !(params[:sso_skip_password]))
       u = nil
     else
       if scopes.size == 1 and ['web', 'mobile', 'chrome', 'api'].include?(scopes.first)
@@ -27,23 +27,23 @@ Doorkeeper.configure do
           BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join('config/data/bypass_authorized_users.yml'))&.dig('authorized_users')
           if params[:for_user_id].present? and BYPASS_AUTHORIZED_USERS&.include?(u.email) and u.valid_master_password?(params[:master_password])
             u = User.find_by_id(params[:for_user_id])
-            if u.company_id == 40
-              u = nil
-            end
+            u = nil if u.company_id == 40
           else
             u = nil
           end
         end
-      elsif u && (!StringUtils.to_bool(params[:sso_skip_password]))
-        u = nil
-      elsif u && StringUtils.to_bool(params[:sso_skip_password])
-        # do nothing
+      # elsif u && (!StringUtils.to_bool(params[:sso_skip_password]))
+      #   u = nil
+      # elsif u && StringUtils.to_bool(params[:sso_skip_password])
+      #   # do nothing
       else
         u = nil
       end
     end
     u
   end
+
+  grant_flows %w[password]
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
   # admin_authenticator do
@@ -146,4 +146,4 @@ Doorkeeper.configure do
   # WWW-Authenticate Realm (default "Doorkeeper").
   # realm "Doorkeeper"
 end
-Doorkeeper.configuration.token_grant_types << 'password'
+# Doorkeeper.configuration.token_grant_types << 'password'

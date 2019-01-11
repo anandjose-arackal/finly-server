@@ -1,4 +1,4 @@
-class SeedFieldParentTypeBookingRequest < ActiveRecord::Migration
+class SeedFieldParentTypeBookingRequest < ActiveRecord::Migration[4.2]
   def change
     FieldParentType.seed_data
   end

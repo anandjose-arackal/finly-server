@@ -23,6 +23,7 @@ class Procurements::Index < Procurements::Base
     # Find own procurements
     if user.vendor_payments_initiator?
       procurement_ids += user.company.purchase_orders.with_user_id(user.id).pluck(:procurement_id)
+      procurement_ids += user.company.inward_invoices.with_procurement.with_created_by_user_id(user.id).pluck(:procurement_id)
     end
 
     # If reviewer or awaiting reviewal

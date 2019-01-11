@@ -15,7 +15,7 @@
 #  updated_at      :datetime         not null
 #
 
-class CardFundTransaction < ActiveRecord::Base
-  belongs_to :requesting_user
-  belongs_to :for_user
+class CardFundTransaction < ApplicationRecord
+  belongs_to :requesting_user, optional: true
+  belongs_to :for_user, optional: true
 end

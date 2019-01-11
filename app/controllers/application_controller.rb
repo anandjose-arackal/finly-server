@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
 
   # protect_from_forgery with: :exception
-  before_filter :set_paper_trail_whodunnit
+  # before_action :set_paper_trail_whodunnit
 
   before_action :load_global_variables
 
@@ -19,10 +19,10 @@ class ApplicationController < ActionController::Base
 
   before_action :init_elastic_apm
 
-  before_filter :store_location
+  before_action :store_location
 
-  after_filter :set_queries_counter
-  after_filter :track_request
+  after_action :set_queries_counter
+  after_action :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found
@@ -163,6 +163,10 @@ class ApplicationController < ActionController::Base
     if @curr_user.class.name == 'User'
       RequestStoreUtil.set_current_company @curr_user&.company
     end
+
+    # looking for if the particular user is a delegate for someone else
+    retrieve_delegate_user
+
     @curr_user
   end
 
@@ -172,6 +176,19 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
+  def retrieve_delegate_user
+    # header is going to send a 'delegate_for_user_id' attribute
+    delegate_for_user_id = request.headers['Delegate-For-User-Id']
+    delegated_for_user = @curr_user.delegated_for_users.find_by(id: delegate_for_user_id) if delegate_for_user_id.present?
+    if delegated_for_user.present?
+      RequestStore.store[:actual_current_user] = @curr_user # setting the actual current user as this guy
+    end
+    if delegated_for_user.present?
+      @curr_user = delegated_for_user
+      RequestStore.store[:current_user] = delegated_for_user
+    end
+  end
 
   def respond_success_failure
     respond response: (@result.success? ? :success : :failure)

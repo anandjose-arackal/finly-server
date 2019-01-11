@@ -11,10 +11,10 @@
 #  company_account_type_id :integer
 #
 
-class CompanyAccount < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :wallet_balance, class_name: 'Amount'
-  belongs_to :company_account_type
+class CompanyAccount < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :wallet_balance, optional: true, class_name: 'Amount'
+  belongs_to :company_account_type, optional: true
 
   after_create do
     if self.wallet_balance.blank?

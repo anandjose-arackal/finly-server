@@ -1,4 +1,4 @@
-class CreateFieldConfigurations < ActiveRecord::Migration
+class CreateFieldConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :field_configurations do |t|
       t.boolean :enabled, null: false, default: true

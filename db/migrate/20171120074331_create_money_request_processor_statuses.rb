@@ -1,4 +1,4 @@
-class CreateMoneyRequestProcessorStatuses < ActiveRecord::Migration
+class CreateMoneyRequestProcessorStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :money_request_processor_statuses do |t|
       t.string :name, index: true, null: false

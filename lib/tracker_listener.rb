@@ -49,7 +49,10 @@ class TrackerListener
         started_at: DateTime.now.to_s
     }
 
-    Resque.enqueue TrackerListener, args
+    # Fix for https://rollbar.com/finly007/finly-server/items/1538/
+    # ThreadError: deadlock; recursive locking
+    # It was calling the same tracker_listener enqueue itself
+    Object.const_get('Resque').enqueue TrackerListener, args
   end
 
   def self.send_to_collector(request, session_id=nil)
@@ -177,6 +180,7 @@ class TrackerListener
 
     def location_properties
       result = Geocoder.search(self.remote_ip)&.first
+      begin
       {
           ip_type: result&.data&.dig('type'),
           continent_name: result&.continent_name,
@@ -190,6 +194,9 @@ class TrackerListener
           city: result&.city,
           zip: result&.zip
       }
+      rescue Exception => e
+        {}
+      end
     end
 
     def utm_properties

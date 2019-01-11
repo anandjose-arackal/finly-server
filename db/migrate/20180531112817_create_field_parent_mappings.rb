@@ -1,4 +1,4 @@
-class CreateFieldParentMappings < ActiveRecord::Migration
+class CreateFieldParentMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :field_parent_mappings do |t|
       t.references :field_configuration, index: true, foreign_key: true, null: false

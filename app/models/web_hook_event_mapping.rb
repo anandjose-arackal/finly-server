@@ -10,11 +10,11 @@
 #  updated_at        :datetime         not null
 #
 
-class WebHookEventMapping < ActiveRecord::Base
+class WebHookEventMapping < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :web_hook
-  belongs_to :web_hook_event
+  belongs_to :web_hook, optional: true
+  belongs_to :web_hook_event, optional: true
 
   validates :web_hook_event, presence: true
   # validates :web_hook, presence: true

@@ -9,7 +9,7 @@
 #
 
 
-class CardStatus < ActiveRecord::Base
+class CardStatus < ApplicationRecord
   include Seedable
 
   def self.values

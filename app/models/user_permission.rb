@@ -13,9 +13,9 @@
 #  crud_inventory_item_non_po :boolean          default(TRUE)
 #
 
-class UserPermission < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :company
+class UserPermission < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
 
   def create_beneficiaries
     super || self.user.vendor_payments_admin?

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class OtpRequestType < ActiveRecord::Base
+class OtpRequestType < ApplicationRecord
 
   TYPES = {
       user_activation: 1,
