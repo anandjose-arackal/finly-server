@@ -24,7 +24,7 @@ when :itzcash_production
   # todo - configure this for production once everything is set up
 when :aws_production, :background_production
   branch = fetch :branch
-  unless ['staging', :staging].include?(branch)
+  unless ['master', :master, nil].include?(branch)
     raise 'This branch cannot be deploy to production. Please select the correct branch'
   end
   set :deploy_to, '/home/centos/app'
