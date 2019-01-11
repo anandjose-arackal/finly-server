@@ -72,7 +72,7 @@ module Transitionable
       User.where(id: user_ids)
     end
 
-    def get_level(type)
+    def get_level(type, provider_name=nil)
       # provider_name - todo
       # Provide :next / :prev to get the respective levels
       # current_level_number = self.level.present? ? self.level.level_number : 0
@@ -104,8 +104,11 @@ module Transitionable
         end
       end
 
-      # todo add provider_name
-      reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).first&.level_id
+      if provider_name.present?
+        reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).first&.level_id
+      else
+        reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).with_provider_name(provider_name).first&.level_id
+      end
 
       ReviewalLevel.with_id(reviewal_level_id).first
 
@@ -114,7 +117,6 @@ module Transitionable
       #                                         policy_id: self.policy.id,
       #                                         associated_entity_type: self.class.name
       #                                     }).first
-
 
       # Previously it was picked from policy's levels
       # todo - fix it
@@ -130,7 +132,8 @@ module Transitionable
 
       dlrms = self.document_level_reviewer_mappings.with_level_id(level.id)
       dlrms.each do |dlrm|
-        return false if dlrm.taken_control == false
+        # return false if dlrm.taken_control == false
+        return false unless dlrm.taken_control
       end
 
       return true

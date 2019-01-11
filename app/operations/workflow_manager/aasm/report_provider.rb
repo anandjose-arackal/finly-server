@@ -57,6 +57,11 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
       transitions :from => [:settled], :to => [:settlement_confirmed]
     end
 
+    event :xxx do
+      transitions from: :approved, to: :approved
+      transitions from: :approved, to: :closed, guard: :non_reimbursable_expenses?
+    end
+
     event :close do ## Confirm action
       # Check from what all states it can transition
       transitions :from => [:approved], to: :closed

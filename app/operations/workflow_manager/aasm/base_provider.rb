@@ -20,22 +20,22 @@ class WorkflowManager::Aasm::BaseProvider
     self.reviewers = document.get_next_level_reviewers
   end
 
-  @@providers = []
-
-  def self.providers
-    @@providers
-  end
-
-  def self.register_provider
-    @@providers << self.name.split('::').last
-  end
-
-  self.register_provider
+  # @@providers = []
+  #
+  # def self.providers
+  #   @@providers
+  # end
+  #
+  # def self.register_provider
+  #   @@providers << self.name.split('::').last
+  # end
+  #
+  # self.register_provider
 
   private
 
   def set_state
-    Dir[Rails.root.join("app/operations/workflow_manager/aasm/*.rb")].each {|file| require file }
+    # Dir[Rails.root.join("app/operations/workflow_manager/aasm/*.rb")].each {|file| require file }
     aasm.current_state = self.document_state
   end
 

@@ -1,4 +1,4 @@
-class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::BaseProvider
+class WorkflowManager::Aasm::TravelRequestReviewalProvider < WorkflowManager::Aasm::BaseProvider
 
   aasm :whiny_transitions => false do
     state :open, initial: true, :before_enter => :set_state
@@ -6,20 +6,10 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
     state :processing
     state :approved
     state :rejected
-    state :auto_approved
     state :booked
     state :cancelled
-    state :booking_pending
-    state :selection_requested
-    state :selection_processing
-    state :selection_confirmed
-    state :selection_rejected
-    state :booking_confirmed
-    state :completed
-
-    #:open, :processing, :retracted, :rejected, :booked, :cancelled, :booking_pending,
-    #:selection_requested, :selection_processing, :selection_confirmed, :selection_rejected,
-    #:booking_confirmed, :completed, :approved, :auto_approved
+    state :approved
+    state :auto_approved
 
     event :submit do
       transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
@@ -58,15 +48,6 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
 
     event :retract do
       transitions :from => :processing, :to => :retracted
-    end
-
-    event :credit do ## Confirm the action
-      transitions :from => [:approved, :auto_approved], to: :credited
-      transitions :from => [:approved, :auto_approved], to: :pending
-    end
-
-    event :xxx do #todo write the action for moving from pending to credited
-      transitions from: :pending, to: :credited
     end
 
     after_all_events :change_state

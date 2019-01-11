@@ -17,6 +17,7 @@
 #  became_viewable_at              :datetime
 #  action_taken_by_id              :integer
 #  action_id                       :integer
+#  provider_name                   :string(255)
 #
 
 require 'test_helper'

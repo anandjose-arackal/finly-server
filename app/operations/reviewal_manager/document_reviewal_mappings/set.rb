@@ -64,6 +64,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
                                                                            level_id: level.id,
                                                                            policy_id: document.policy.id,
                                                                            reviewer_id: reviewer.id,
+                                                                           provider_name: provider_name,
                                                                            level_number: level.level_number
                                                                        })
               document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
@@ -79,6 +80,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
               document.document_level_reviewer_mappings.create({
                                                                    level_id: level.id,
                                                                    policy_id: document.policy_id,
+                                                                   provider_name: provider_name,
                                                                    reviewer_id: level_reviewer.id,
                                                                    level_number: level.level_number
                                                                })

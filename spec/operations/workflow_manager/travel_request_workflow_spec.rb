@@ -34,24 +34,16 @@ RSpec.describe "Travel Request Workflow -- " do
     create(:policy_user_mapping, {user_id: @em_employee_user1.id, policy_id: @policy.id})
 
     # Create Levels
-    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestProvider')
-    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestProvider')
-    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestProvider')
+    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestReviewalProvider')
+    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestReviewalProvider')
+    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestReviewalProvider')
 
     # Create level reviewer mappings
     @level1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})
     @level2.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
     @level3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user3.id, threshold: 0, exception: false})
 
-    travel_request_params = {
-        travel_request: {
-            name: "Test Travel request", memo: "Test memo", travel_request_id: nil,
-            required_by_date: "01-01-2019", policy_id: @policy.id,  payment_mode_id: 1,
-            items_attributes: [{
-                                   category_id: @company.categories.first.id, amount_attributes: {value: 1, currency_id: 1}
-                               }]
-        }
-    }
+    travel_request_params = {"from_date"=>"10 Jan 2019", "to_date"=>"11 Jan 2019", "purpose_of_travel"=>"Purpose", "policy_id"=>"5", "view"=>"personal"}
 
     document_op = TravelRequests::Create.(@em_employee_user1, travel_request_params)
     if document_op.success?
