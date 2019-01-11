@@ -9,7 +9,7 @@ set :application, 'finly-server'
 
 set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
 
-set :branch, ENV['BRANCH'] || :staging
+set :branch, ENV['BRANCH'] || :master
 
 case fetch(:stage)
 when :itzcash_production
@@ -24,7 +24,7 @@ when :itzcash_production
   # todo - configure this for production once everything is set up
 when :aws_production, :background_production
   branch = fetch :branch
-  unless ['staging', :staging].include?(branch)
+  unless ['master', :master].include?(branch)
     raise 'This branch cannot be deploy to production. Please select the correct branch'
   end
   set :deploy_to, '/home/centos/app'
