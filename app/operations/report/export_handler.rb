@@ -1,4 +1,4 @@
-require 'RMagick'
+require 'rmagick'
 require 'fileutils'
 
 class Report::ExportHandler < Report::Show

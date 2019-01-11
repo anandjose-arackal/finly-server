@@ -20,7 +20,8 @@ class User::Lookup < User::Base
 
   def process
     if selected_user.nil?
-      add_message :error, 'User not found'
+      # Do not throw an error message if user is not found
+      # add_message :error, 'User not found'
       self.registered = false
       return
     elsif selected_user.first_name.blank?
@@ -51,7 +52,7 @@ class User::Lookup < User::Base
     if selected_user.present?
       number = selected_user.mobile_number
       params[:id] = selected_user.id
-      params[:mobile_number] = "XXXXXXX#{number[(number.length-3)..number.length]}"
+      params[:mobile_number] = "XXXXXXX#{number[(number.length - 3)..number.length]}"
     end
     params[:verified] = self.verified
     params[:otp_verified] = self.otp_verified
@@ -64,12 +65,17 @@ class User::Lookup < User::Base
     attr_accessor :verified, :registered, :otp_verified, :set_password, :mobile_number
 
     def init
-      self.verified = params[:verified]
-      self.registered = params[:registered]
-      self.otp_verified = params[:otp_verified]
-      self.set_password = params[:set_password]
-      if params[:set_password]
-        self.mobile_number = params[:mobile_number]
+      if params[:registered]
+        self.verified = params[:verified]
+        self.registered = params[:registered]
+        self.otp_verified = params[:otp_verified]
+        self.set_password = params[:set_password]
+        self.mobile_number = params[:mobile_number] if params[:set_password]
+      else
+        self.verified = true
+        self.registered = true
+        self.otp_verified = true
+        self.set_password = false
       end
     end
 
