@@ -105,7 +105,7 @@ gem 'gcm', '~> 0.1.1'
 
 # gem 'backbone-on-rails'
 
-# gem 'bootstrap-will_paginate'
+gem 'bootstrap-will_paginate'
 # gem for image manipulation
 gem 'paperclip', '~> 6.1.0'
 # Bundle for Bootstrap
