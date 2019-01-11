@@ -49,7 +49,7 @@ class TrackerListener
         started_at: DateTime.now.to_s
     }
 
-    Resque.enqueue TrackerListener, args
+    Object.const_get('Resque').enqueue TrackerListener, args
   end
 
   def self.send_to_collector(request, session_id=nil)

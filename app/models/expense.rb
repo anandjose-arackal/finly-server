@@ -529,7 +529,7 @@ class Expense < ApplicationRecord
       if self.amount.blank?
         return nil
       else
-        if self.report_id.blank?
+        if self.report.blank?
           return precision_value self.amount.value
         else
           base_currency_code = self.report.base_currency_code
