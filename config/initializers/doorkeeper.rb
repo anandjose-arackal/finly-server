@@ -22,7 +22,10 @@ Doorkeeper.configure do
       elsif (scopes.size == 1 and scopes.include?('admin')) or (scopes.include?('admin_bypass') and scopes.include?('web') and scopes.size == 2)
         u = AdminUser.find_for_database_authentication(:username => params[:username])
       end
-      if u && u.valid_password?(params[:password])
+
+      if u and AccessController::Auth.is_locked?(u)
+        u = nil
+      elsif u && u.valid_password?(params[:password])
         if scopes.include?('admin_bypass')
           BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join('config/data/bypass_authorized_users.yml'))&.dig('authorized_users')
           if params[:for_user_id].present? and BYPASS_AUTHORIZED_USERS&.include?(u.email) and u.valid_master_password?(params[:master_password])
@@ -31,12 +34,15 @@ Doorkeeper.configure do
           else
             u = nil
           end
+        else
+          AccessController::Auth.login(u)
         end
       # elsif u && (!StringUtils.to_bool(params[:sso_skip_password]))
       #   u = nil
       # elsif u && StringUtils.to_bool(params[:sso_skip_password])
       #   # do nothing
       else
+        AccessController::Auth.failed_attempt(u)
         u = nil
       end
     end
