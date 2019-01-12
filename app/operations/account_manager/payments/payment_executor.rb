@@ -1,5 +1,4 @@
 # this class will take a single payment object and executes it using the respective adapters
-#
 class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter, :options,

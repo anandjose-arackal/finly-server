@@ -136,6 +136,7 @@ class Payment < ApplicationRecord
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
   scope :scheduled, -> { where payment_status_id: PaymentStatus.id_for(:scheduled) }
+  scope :creditable, -> { where payment_status_id: [PaymentStatus.id_for(:failed), PaymentStatus.id_for(:pending_approval)] }
   scope :with_receiving_account_type, -> (receiving_account_type) {
     where receiving_account_type: receiving_account_type
   }
