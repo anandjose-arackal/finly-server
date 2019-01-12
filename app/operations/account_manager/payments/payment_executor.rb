@@ -58,7 +58,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
 
       if payment.credit?
-        balance = source_account_adapter.balance(payment_order: payment.payment_order)
+        balance = source_account_adapter.balance(payment_order: payment.payment_order, payment_process: true)
         unless balance and balance >= payment.amount_value
           add_message :error, "The source account does not have enough balance for this transaction"
           payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
@@ -67,7 +67,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
           return
         end
       else
-        balance = receiving_account_adapter.balance(payment_order: payment.payment_order)
+        balance = receiving_account_adapter.balance(payment_order: payment.payment_order, payment_process: true)
         unless balance and balance >= payment.amount_value
           add_message :error, "The source account does not have enough balance for this transaction"
           payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),

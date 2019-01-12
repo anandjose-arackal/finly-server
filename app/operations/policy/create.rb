@@ -7,7 +7,7 @@ class Policy::Create < Policy::Base
   attr_accessor :company, :cloned_policy
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :vendor_payments_admin]
   end
 
   def pre_validate
@@ -30,7 +30,7 @@ class Policy::Create < Policy::Base
   end
 
   def process
-    self.cloned_policy = company.default_policy.deep_clone except: [:users, :user_mapping]
+    self.cloned_policy = company.default_policy.deep_clone
     cloned_policy.name = params[:name]
     cloned_policy.description = params[:description]
     cloned_policy.default = false
