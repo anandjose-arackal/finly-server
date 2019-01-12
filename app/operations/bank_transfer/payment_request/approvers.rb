@@ -25,7 +25,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
   end
 
   def initialize(params = {})
-    self.params = (ActionController::Parameters.new(params) or {})
+    super(nil, params)
   end
 
   def self.call(params = {})
