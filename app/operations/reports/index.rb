@@ -24,6 +24,44 @@ class Reports::Index < Reports::Base
   end
 
   def process
+    # case self.role_id
+    # when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+    #   if self.user.company_admin? || self.user.auditor?
+    #     team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
+    #     self.reports = Report.not_open.with_user(team_ids)
+    #   elsif user.policy_admin?
+    #     team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
+    #     policy_ids = user.admin_policies.pluck(:id)
+    #     self.reports = Report.not_open.with_user(team_ids).with_policy(policy_ids)
+    #   end
+    # when UserRole.id_for(:manager)
+    #   team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
+    #   # controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
+    #   # interacted_reports_query= user.manager_reports
+    #   # sql = Report.connection.unprepared_statement {
+    #   #   "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
+    #   # }
+    #   # self.reports = Report.from([Arel.sql(sql)])
+    #   controlling_reports = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids).pluck(:id)
+    #   interacted_reports = user.manager_reports.pluck(:id)
+    #   self.reports = Report.with_id(controlling_reports + interacted_reports)
+    # when UserRole.id_for(:finance_manager)
+    #   team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
+    #   # controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)
+    #   # interacted_reports_query = user.finance_reports
+    #   # sql = Report.connection.unprepared_statement {
+    #   #   "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
+    #   # }
+    #   # self.reports = Report.from([Arel.sql(sql)])
+    #   controlling_reports = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids).pluck(:id)
+    #   interacted_reports = user.finance_reports.pluck(:id)
+    #   self.reports = Report.with_id(controlling_reports + interacted_reports)
+    # when UserRole.id_for(:auditor)
+    #   # todo auditor
+    # else
+    #   self.reports = user.reports.sort_for_personal
+    # end
+
     case self.role_id
     when UserRole.id_for(:admin), UserRole.id_for(:auditor)
       if self.user.company_admin? || self.user.auditor?

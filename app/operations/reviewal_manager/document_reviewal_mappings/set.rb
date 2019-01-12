@@ -4,6 +4,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
   def init
     self.document = params[:reviewal_document]
     self.mappings_params = mappings_parameters
+    self.provider_name = params[:provider_name]
   end
 
   def validate
