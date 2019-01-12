@@ -8,7 +8,12 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
 
   def initialize(user, params)
     self.user = user
-    self.params = (ActionController::Parameters.new(params) or {})
+    params ||= {}
+    if params.class.name == ActionController::Parameters.name
+      self.params = params
+    else
+      self.params = (ActionController::Parameters.new(params) or {})
+    end
   end
 
   def pre_validate
