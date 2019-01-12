@@ -1,9 +1,5 @@
 class Report::ReportAuthorizer::Base < BaseOperation
   attr_accessor :report, :user, :view_role_id, :email_authorization
-  def initialize(params={})
-    clear_messages
-    self.params = (ActionController::Parameters.new(params) or {})
-  end
 
   def init
     token = params[:token]
