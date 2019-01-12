@@ -1,5 +1,9 @@
 class Report::ReportAuthorizer::Base < BaseOperation
   attr_accessor :report, :user, :view_role_id, :email_authorization
+  def initialize(params={})
+    clear_messages
+    super(nil, params)
+  end
 
   def init
     token = params[:token]
