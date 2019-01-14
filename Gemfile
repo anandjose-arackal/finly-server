@@ -125,6 +125,8 @@ gem 'bootbox-rails', '0.5.0'
 
 gem 'sidekiq', '~> 5.2.3'
 
+gem 'paranoia', '~> 2.4'
+
 # gem for font awesome
 gem 'font-awesome-rails', '~> 4.7.0.4'
 
