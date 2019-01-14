@@ -1,4 +1,4 @@
-class CreateIndividualKycTracks < ActiveRecord::Migration
+class CreateIndividualKycTracks < ActiveRecord::Migration[4.2]
   def change
     create_table :individual_kyc_tracks do |t|
       t.references :individual_kyc, index: true, foreign_key: true, null: false

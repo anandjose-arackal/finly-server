@@ -1,4 +1,4 @@
-class CreateGstTypes < ActiveRecord::Migration
+class CreateGstTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :gst_types do |t|
       t.string :name, index: true

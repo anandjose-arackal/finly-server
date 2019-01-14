@@ -1,4 +1,4 @@
-class CreateTrackerEvents < ActiveRecord::Migration
+class CreateTrackerEvents < ActiveRecord::Migration[4.2]
   def change
     create_table :tracker_events do |t|
       t.integer :tracker_visit_id, index: true, foreign_key: true, references: 'TrackerVisit', null: false

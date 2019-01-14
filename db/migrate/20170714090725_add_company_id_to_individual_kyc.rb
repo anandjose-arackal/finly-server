@@ -1,4 +1,4 @@
-class AddCompanyIdToIndividualKyc < ActiveRecord::Migration
+class AddCompanyIdToIndividualKyc < ActiveRecord::Migration[4.2]
   def change
     add_reference :individual_kycs, :company, index: true, foreign_key: true
     IndividualKyc.all.each do |kyc|

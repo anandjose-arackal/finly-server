@@ -6,7 +6,7 @@
 #  name :string(255)
 #
 
-class OutwardInvoiceType < ActiveRecord::Base
+class OutwardInvoiceType < ApplicationRecord
 
   validates :name, presence: true
 

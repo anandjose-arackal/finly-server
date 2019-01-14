@@ -13,11 +13,11 @@
 #  message_type           :string(255)
 #
 
-class SystemMessage < ActiveRecord::Base
+class SystemMessage < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :system_message_type
-  belongs_to :messagable, polymorphic: true
+  belongs_to :system_message_type, optional: true
+  belongs_to :messagable, optional: true, polymorphic: true
 
   scope :errors, -> {where system_message_type_id: SystemMessageType.id_for(:error)}
   scope :info, -> {where system_message_type_id: SystemMessageType.id_for(:info)}

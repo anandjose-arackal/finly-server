@@ -1,4 +1,4 @@
-class CreateUserManagerMappings < ActiveRecord::Migration
+class CreateUserManagerMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :user_manager_mappings do |t|
       t.references :user, index: true, foreign_key: true

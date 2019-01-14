@@ -1,4 +1,4 @@
-class ChangeQuickbooksConfigToBelongToCompany < ActiveRecord::Migration
+class ChangeQuickbooksConfigToBelongToCompany < ActiveRecord::Migration[4.2]
   def change
     add_column :quickbooks_configurations, :company_id, :integer, references: 'Company', foreign_key: true, index: true
   end

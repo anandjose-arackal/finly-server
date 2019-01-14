@@ -9,7 +9,7 @@
 #  updated_at    :datetime         not null
 #
 
-class UserDepartmentMapping < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :department
+class UserDepartmentMapping < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :department, optional: true
 end

@@ -1,4 +1,4 @@
-class CreateDesktopUsers < ActiveRecord::Migration
+class CreateDesktopUsers < ActiveRecord::Migration[4.2]
   def change
     create_table :desktop_users do |t|
       t.string :email, null: false

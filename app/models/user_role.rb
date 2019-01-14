@@ -8,15 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-
-
-
-
-
-
-
-
-class UserRole < ActiveRecord::Base
+class UserRole < ApplicationRecord
   has_many :users, through: :user_role_mappings
 
   scope :admin, -> { where(id: UserRole.id_for(:admin)) }

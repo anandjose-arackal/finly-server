@@ -10,9 +10,9 @@
 #  updated_at          :datetime         not null
 #
 
-class CompanyPocketTemplate < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :user_pocket_type
+class CompanyPocketTemplate < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :user_pocket_type, optional: true
 
 
   scope :with_id, -> (ids) { where id: ids }

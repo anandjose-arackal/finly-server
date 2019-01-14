@@ -12,10 +12,10 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #
 
-class ReviewalLevel < ActiveRecord::Base
+class ReviewalLevel < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :policy
+  belongs_to :policy, optional: true
   has_many :level_reviewer_mappings, foreign_key: :level_id, dependent: :destroy
   has_many :reviewers, class_name: 'User', through: :level_reviewer_mappings
 

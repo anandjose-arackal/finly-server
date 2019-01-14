@@ -1,4 +1,4 @@
-class CreateOproClientApps < ActiveRecord::Migration
+class CreateOproClientApps < ActiveRecord::Migration[4.2]
   def change
     create_table :opro_client_apps do |t|
       t.string  :name

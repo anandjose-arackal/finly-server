@@ -1,4 +1,4 @@
-class UpdateBalanceHistoryFromPoller < ActiveRecord::Migration
+class UpdateBalanceHistoryFromPoller < ActiveRecord::Migration[4.2]
   def change
     result = BalanceMsgQueueLogParser.parse
     return unless result.present?

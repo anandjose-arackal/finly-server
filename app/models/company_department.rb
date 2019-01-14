@@ -12,11 +12,11 @@
 #  updated_at         :datetime         not null
 #
 
-class CompanyDepartment < ActiveRecord::Base
+class CompanyDepartment < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :company
-  belongs_to :created_by_user, class_name: 'User'
+  belongs_to :company, optional: true
+  belongs_to :created_by_user, optional: true, class_name: 'User'
   has_many :company_location_departments
   has_many :branch_locations, through: :company_location_departments
 

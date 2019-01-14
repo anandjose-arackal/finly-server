@@ -22,18 +22,18 @@
 #  ancestry         :string(255)
 #
 
-class Budget < ActiveRecord::Base
+class Budget < ApplicationRecord
   include SoftDeletable
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
 
 
-  belongs_to :user
-  belongs_to :company
-  belongs_to :period
-  belongs_to :budget_amount, class_name: "Amount"
-  belongs_to :spent_amount, class_name: "Amount"
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
+  belongs_to :period, optional: true
+  belongs_to :budget_amount, optional: true, class_name: "Amount"
+  belongs_to :spent_amount, optional: true, class_name: "Amount"
 
   has_many :budget_criteria_mappings
   has_many :budgetables, through: :budget_criteria_mappings

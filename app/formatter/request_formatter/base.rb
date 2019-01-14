@@ -5,8 +5,13 @@ class RequestFormatter::Base < BaseOperation
     [User, AdminUser]
   end
 
+  def init
+    convert_params_to_hash
+    super
+  end
+
   def success
-    params[:formatted_request] = self.formatted_request
+    params[:formatted_request] = ActionController::Parameters.new(self.formatted_request)
     RequestFormatter::Base::SuccessPresenter.new(user, params, messages)
   end
 

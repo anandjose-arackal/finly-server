@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class FieldParentType < ActiveRecord::Base
+class FieldParentType < ApplicationRecord
 
   TYPES = {
       report: 1,

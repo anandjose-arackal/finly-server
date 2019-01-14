@@ -1,4 +1,4 @@
-class CreateMoneyRequestItemCategories < ActiveRecord::Migration
+class CreateMoneyRequestItemCategories < ActiveRecord::Migration[4.2]
   def change
     create_table :money_request_item_categories do |t|
       t.references :company, index: true, foreign_key: true, null: false

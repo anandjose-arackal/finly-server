@@ -18,6 +18,6 @@
 #  pin                       :string(255)
 #
 
-class CompanyBranch < ActiveRecord::Base
-  belongs_to :collect_company_detail
+class CompanyBranch < ApplicationRecord
+  belongs_to :collect_company_detail, optional: true
 end

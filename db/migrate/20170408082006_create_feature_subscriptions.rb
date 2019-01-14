@@ -1,4 +1,4 @@
-class CreateFeatureSubscriptions < ActiveRecord::Migration
+class CreateFeatureSubscriptions < ActiveRecord::Migration[4.2]
   def change
     create_table :feature_subscriptions do |t|
       t.integer :subscribable_id, index: true, null: false

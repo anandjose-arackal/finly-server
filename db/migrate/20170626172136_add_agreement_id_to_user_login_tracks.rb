@@ -1,4 +1,4 @@
-class AddAgreementIdToUserLoginTracks < ActiveRecord::Migration
+class AddAgreementIdToUserLoginTracks < ActiveRecord::Migration[4.2]
   def change
     create_table :user_agreement_tracks do |t|
       t.references :user, index: true, foreign_key: true, null: false

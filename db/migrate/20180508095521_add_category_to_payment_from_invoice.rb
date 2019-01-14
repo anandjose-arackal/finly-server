@@ -1,4 +1,4 @@
-class AddCategoryToPaymentFromInvoice < ActiveRecord::Migration
+class AddCategoryToPaymentFromInvoice < ActiveRecord::Migration[4.2]
   def change
 
     yes_bank_vendors = YesBankVendor.all

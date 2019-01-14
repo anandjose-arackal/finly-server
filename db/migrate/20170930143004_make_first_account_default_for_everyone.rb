@@ -1,4 +1,4 @@
-class MakeFirstAccountDefaultForEveryone < ActiveRecord::Migration
+class MakeFirstAccountDefaultForEveryone < ActiveRecord::Migration[4.2]
   def change
     YesBankVendor.all.each do |vendor|
       vendor.bank_accounts.first&.update(default_account: true)

@@ -9,10 +9,10 @@
 #  updated_at :datetime         not null
 #
 
-class VendorAccount < ActiveRecord::Base
+class VendorAccount < ApplicationRecord
 
-  belongs_to :balance, class_name: "Amount"
-  belongs_to :vendor, class_name: "YesBankVendor"
+  belongs_to :balance, optional: true, class_name: "Amount"
+  belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
   has_many :finly_transactions, as: :finly_account
 

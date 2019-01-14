@@ -1,4 +1,4 @@
-class CreateYesBankVendors < ActiveRecord::Migration
+class CreateYesBankVendors < ActiveRecord::Migration[4.2]
   def change
     create_table :yes_bank_vendors do |t|
       t.string :name

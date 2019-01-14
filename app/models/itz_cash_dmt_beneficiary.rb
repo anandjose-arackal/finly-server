@@ -26,9 +26,9 @@
 #  reimbursement          :boolean          default(FALSE)
 #
 
-class ItzCashDmtBeneficiary < ActiveRecord::Base
-  belongs_to :itz_cash_dmt_sender
-  belongs_to :status, class_name: 'ItzCashDmtBeneficiaryStatus'
+class ItzCashDmtBeneficiary < ApplicationRecord
+  belongs_to :itz_cash_dmt_sender, optional: true
+  belongs_to :status, optional: true, class_name: 'ItzCashDmtBeneficiaryStatus'
 
   scope :with_id, -> (id) { where id: id }
   scope :reimbursement_accounts, -> { where reimbursement: true }

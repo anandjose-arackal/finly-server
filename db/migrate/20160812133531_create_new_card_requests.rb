@@ -1,4 +1,4 @@
-class CreateNewCardRequests < ActiveRecord::Migration
+class CreateNewCardRequests < ActiveRecord::Migration[4.2]
   def change
     create_table :new_card_requests do |t|
       t.references :company, index: true, foreign_key: true

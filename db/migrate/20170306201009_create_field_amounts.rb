@@ -1,4 +1,4 @@
-class CreateFieldAmounts < ActiveRecord::Migration
+class CreateFieldAmounts < ActiveRecord::Migration[4.2]
   def change
     create_table :field_amounts do |t|
       t.integer :value_id, null: false, references: 'Amount', index: true, foreign_key: true

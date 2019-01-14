@@ -1,4 +1,4 @@
-class SeedDataForGstStateCodes < ActiveRecord::Migration
+class SeedDataForGstStateCodes < ActiveRecord::Migration[4.2]
   def change
     names = [
         "Andaman and Nicobar Islands",

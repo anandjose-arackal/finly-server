@@ -1,4 +1,4 @@
-class CreateDocumentLevelReviewerMappings < ActiveRecord::Migration
+class CreateDocumentLevelReviewerMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :document_level_reviewer_mappings do |t|
       t.references :policy, index: true, foreign_key: true

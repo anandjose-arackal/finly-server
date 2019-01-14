@@ -16,18 +16,18 @@
 #  reject_reason      :text(65535)
 #
 
-class Booking < ActiveRecord::Base
+class Booking < ApplicationRecord
 
-  belongs_to :booking_type
-  belongs_to :booking_status
-  # belongs_to :booking_request
-  belongs_to :destination, class_name: 'TravelRequestDestination'
-  belongs_to :travel_request
-  belongs_to :travel_request_comment
-  belongs_to :created_by_user, class_name: 'User'
+  belongs_to :booking_type, optional: true
+  belongs_to :booking_status, optional: true
+  # belongs_to :booking_request, optional: true
+  belongs_to :destination, optional: true, class_name: 'TravelRequestDestination'
+  belongs_to :travel_request, optional: true
+  belongs_to :travel_request_comment, optional: true
+  belongs_to :created_by_user, optional: true, class_name: 'User'
 
   has_many :bookings, foreign_key: :parent_booking_id, dependent: :destroy
-  belongs_to :parent_booking, class_name: 'Booking'
+  belongs_to :parent_booking, optional: true, class_name: 'Booking'
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

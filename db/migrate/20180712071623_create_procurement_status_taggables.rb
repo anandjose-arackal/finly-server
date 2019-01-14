@@ -1,4 +1,4 @@
-class CreateProcurementStatusTaggables < ActiveRecord::Migration
+class CreateProcurementStatusTaggables < ActiveRecord::Migration[4.2]
   def change
     create_table :procurement_status_taggables do |t|
       t.references :procurement, index: true, foreign_key: true

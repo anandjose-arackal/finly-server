@@ -179,11 +179,11 @@
 #  MYR         :decimal(20, 5)
 #
 
-class Amount < ActiveRecord::Base
+class Amount < ApplicationRecord
   include MathUtil
   include SoftDeletable
 
-  belongs_to :currency
+  belongs_to :currency, optional: true
 
   accepts_nested_attributes_for :currency
 
@@ -326,7 +326,8 @@ class Amount < ActiveRecord::Base
       # calculate the respective currency rate for the date in question
       params = {date: Date.parse(date).strftime("%Y-%m-%d")} rescue nil
       res = Currency::FetchData.(nil, params)
-      rate = CurrencyConversionRate.create(res.currency_data.permit!)
+      currency_data = res.currency_data.as_json.with_indifferent_access
+      rate = CurrencyConversionRate.create(currency_data)
     end
     currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
     orig_curr = self.currency.country_code

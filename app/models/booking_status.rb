@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class BookingStatus < ActiveRecord::Base
+class BookingStatus < ApplicationRecord
   include Seedable
 
   def self.values

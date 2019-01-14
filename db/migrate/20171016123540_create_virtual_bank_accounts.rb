@@ -1,4 +1,4 @@
-class CreateVirtualBankAccounts < ActiveRecord::Migration
+class CreateVirtualBankAccounts < ActiveRecord::Migration[4.2]
   def change
     create_table :virtual_bank_accounts do |t|
       t.string :account_number

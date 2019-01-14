@@ -26,8 +26,8 @@
 #  updated_at       :datetime         not null
 #
 
-class Authentication < ActiveRecord::Base
-  belongs_to :user
+class Authentication < ApplicationRecord
+  belongs_to :user, optional: true
 
   scope :quickbooks, -> { where(provider: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
   scope :valid, -> { where('DATE(expires_at) > ?', Date.today) }

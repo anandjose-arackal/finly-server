@@ -1,4 +1,4 @@
-class CreateBookingFlights < ActiveRecord::Migration
+class CreateBookingFlights < ActiveRecord::Migration[4.2]
   def change
 
 

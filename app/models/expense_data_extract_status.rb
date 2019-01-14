@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class ExpenseDataExtractStatus < ActiveRecord::Base
+class ExpenseDataExtractStatus < ApplicationRecord
   include Seedable
 
   def self.values

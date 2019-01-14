@@ -10,8 +10,8 @@
 #  updated_at      :datetime         not null
 #
 
-class ItzCashProperty < ActiveRecord::Base
+class ItzCashProperty < ApplicationRecord
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
 end

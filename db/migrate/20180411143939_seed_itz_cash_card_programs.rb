@@ -1,4 +1,4 @@
-class SeedItzCashCardPrograms < ActiveRecord::Migration
+class SeedItzCashCardPrograms < ActiveRecord::Migration[4.2]
   def change
     ItzCashCardProgram.seed_data
   end

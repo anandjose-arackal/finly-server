@@ -14,8 +14,8 @@
 #  updated_at    :datetime         not null
 #
 
-class FieldCustomization < ActiveRecord::Base
-  belongs_to :scopable, polymorphic: true
+class FieldCustomization < ApplicationRecord
+  belongs_to :scopable, optional: true, polymorphic: true
 
   validates :scopable, presence: true
   validates :class_name, presence: true

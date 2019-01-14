@@ -29,11 +29,11 @@
 #  signature_title        :string(255)
 #
 
-class UserProfile < ActiveRecord::Base
+class UserProfile < ApplicationRecord
   include Attachable
-  belongs_to :user
-  belongs_to :default_currency, class_name: 'Currency'
-  belongs_to :state
+  belongs_to :user, optional: true
+  belongs_to :default_currency, optional: true, class_name: 'Currency'
+  belongs_to :state, optional: true
 
   has_attached_file :avatar, styles: {large: '2160x2160>', normal: '1080x1080>', thumb: '500x500>'}
 

@@ -1,4 +1,4 @@
-class CreateOutwardInvoiceAttachments < ActiveRecord::Migration
+class CreateOutwardInvoiceAttachments < ActiveRecord::Migration[4.2]
   def change
     create_table :outward_invoice_attachments do |t|
       t.attachment :attachment

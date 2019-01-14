@@ -17,12 +17,12 @@
 #  user_id                   :integer
 #
 
-class ProcurementAttachment < ActiveRecord::Base
+class ProcurementAttachment < ApplicationRecord
   include Attachable
 
-  belongs_to :procurement_document, polymorphic: true
-  belongs_to :company
-  belongs_to :user
+  belongs_to :procurement_document, optional: true, polymorphic: true
+  belongs_to :company, optional: true
+  belongs_to :user, optional: true
 
   CONTENT_TYPES = {content_type: []}
 

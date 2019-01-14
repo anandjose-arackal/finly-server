@@ -2,41 +2,35 @@
 #
 # Table name: money_request_comments
 #
-#  id                :integer          not null, primary key
-#  money_request_id  :integer          not null
-#  comment_action_id :integer          not null
-#  user_id           :integer
-#  expense_id        :integer
-#  payment_id        :integer
-#  updated_field     :string(255)
-#  updated_from      :text(65535)
-#  updated_to        :text(65535)
-#  rejected_to_id    :integer
-#  content           :text(65535)
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
+#  id                       :integer          not null, primary key
+#  money_request_id         :integer          not null
+#  comment_action_id        :integer          not null
+#  user_id                  :integer
+#  expense_id               :integer
+#  payment_id               :integer
+#  updated_field            :string(255)
+#  updated_from             :text(65535)
+#  updated_to               :text(65535)
+#  rejected_to_id           :integer
+#  content                  :text(65535)
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  delegated_action_user_id :integer
 #
 
 
-
-
-
-
-
-
-
 # todo rename rejected_to_id to modified_user_id
-class MoneyRequestComment < ActiveRecord::Base
+class MoneyRequestComment < ApplicationRecord
 
   default_scope {order(created_at: :desc)}
 
-  belongs_to :money_request
-  belongs_to :comment_action, class_name: 'MoneyRequestCommentAction'
-  belongs_to :user
-  belongs_to :expense
-  belongs_to :rejected_to, class_name: 'User'
-  belongs_to :payment
-  belongs_to :delegated_action_user, class_name: 'User'
+  belongs_to :money_request, optional: true
+  belongs_to :comment_action, optional: true, class_name: 'MoneyRequestCommentAction'
+  belongs_to :user, optional: true
+  belongs_to :expense, optional: true
+  belongs_to :rejected_to, optional: true, class_name: 'User'
+  belongs_to :payment, optional: true
+  belongs_to :delegated_action_user, class_name: 'User', optional: true
   # ACTIONS = {create: 1, retract: 2, submit: 3, approve: 4, auto_approve: 5, reject: 6, unapprove: 7,
   #            take_control: 8, comment: 9, update: 10, credited: 11}
 

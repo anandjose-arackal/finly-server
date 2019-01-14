@@ -1,4 +1,4 @@
-class CreateTdsRatesLists < ActiveRecord::Migration
+class CreateTdsRatesLists < ActiveRecord::Migration[4.2]
   def change
     create_table :tds_rates_lists do |t|
       t.string :name

@@ -15,27 +15,20 @@
 #  updated_at                       :datetime         not null
 #  action_id                        :integer
 #  action_user_role_id              :integer
+#  delegated_action_user_id         :integer
 #
 
+class MoneyRequestTrack < ApplicationRecord
 
-
-
-
-
-
-
-
-class MoneyRequestTrack < ActiveRecord::Base
-
-  belongs_to :money_request
-  belongs_to :action_user, class_name: 'User'
-  belongs_to :modified_user, class_name: 'User'
-  belongs_to :money_request_action
-  belongs_to :status, class_name: 'MoneyRequestStatus'
-  belongs_to :action_user_role, class_name: 'UserRole'
-  belongs_to :modified_user_role, class_name: 'UserRole'
-  belongs_to :payment
-  belongs_to :delegated_action_user, class_name: 'User'
+  belongs_to :money_request, optional: true
+  belongs_to :action_user, optional: true, class_name: 'User'
+  belongs_to :modified_user, optional: true, class_name: 'User'
+  belongs_to :money_request_action, optional: true
+  belongs_to :status, optional: true, class_name: 'MoneyRequestStatus'
+  belongs_to :action_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :modified_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :payment, optional: true
+  belongs_to :delegated_action_user, optional: true, class_name: 'User'
 
   default_scope { order('money_request_tracks.created_at ASC') }
 

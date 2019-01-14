@@ -1,4 +1,4 @@
-class CreateUserBalanceHistories < ActiveRecord::Migration
+class CreateUserBalanceHistories < ActiveRecord::Migration[4.2]
   def change
     create_table :user_balance_histories do |t|
       t.datetime :date

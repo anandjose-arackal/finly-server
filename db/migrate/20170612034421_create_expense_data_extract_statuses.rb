@@ -1,4 +1,4 @@
-class CreateExpenseDataExtractStatuses < ActiveRecord::Migration
+class CreateExpenseDataExtractStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :expense_data_extract_statuses do |t|
       t.string :name, null: false

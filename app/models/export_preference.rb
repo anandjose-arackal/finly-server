@@ -10,10 +10,9 @@
 #  updated_at      :datetime         not null
 #
 
-
-class ExportPreference < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :export_field
+class ExportPreference < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :export_field, optional: true
 
   validates :export_field_id, presence: true
 

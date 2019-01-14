@@ -1,4 +1,4 @@
-class CreateSignedupUsers < ActiveRecord::Migration
+class CreateSignedupUsers < ActiveRecord::Migration[4.2]
   def change
     create_table :signedup_users do |t|
       t.string :name

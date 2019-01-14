@@ -1,4 +1,4 @@
-class MoveFinyTransactionToTransactionDetail < ActiveRecord::Migration
+class MoveFinyTransactionToTransactionDetail < ActiveRecord::Migration[4.2]
   def change
     add_column :transaction_details, :sequence_number, :integer
 

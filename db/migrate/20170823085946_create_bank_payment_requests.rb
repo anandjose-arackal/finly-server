@@ -1,4 +1,4 @@
-class CreateBankPaymentRequests < ActiveRecord::Migration
+class CreateBankPaymentRequests < ActiveRecord::Migration[4.2]
   def change
     create_table :bank_payment_requests do |t|
       t.integer :owner_id, references: "User", foreign_key: true, index: true

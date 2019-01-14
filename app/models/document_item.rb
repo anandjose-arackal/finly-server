@@ -25,14 +25,14 @@
 #  product_id             :string(255)
 #
 
-class DocumentItem < ActiveRecord::Base
-  belongs_to :inventory_line_item
-  belongs_to :parent_document, polymorphic: true
+class DocumentItem < ApplicationRecord
+  belongs_to :inventory_line_item, optional: true
+  belongs_to :parent_document, optional: true, polymorphic: true
 
-  belongs_to :tax_amount, class_name: 'Amount'
-  belongs_to :tds_amount, class_name: 'Amount'
-  belongs_to :discount_amount, class_name: 'Amount'
-  belongs_to :total_amount, class_name: 'Amount'
+  belongs_to :tax_amount, optional: true, class_name: 'Amount'
+  belongs_to :tds_amount, optional: true, class_name: 'Amount'
+  belongs_to :discount_amount, optional: true, class_name: 'Amount'
+  belongs_to :total_amount, optional: true, class_name: 'Amount'
 
   accepts_nested_attributes_for :tax_amount, :tds_amount, :discount_amount,
                                 :total_amount

@@ -1,4 +1,4 @@
-class CreateFinlyTransactions < ActiveRecord::Migration
+class CreateFinlyTransactions < ActiveRecord::Migration[4.2]
   def change
     create_table :finly_transactions do |t|
       t.integer :finly_account_id, index: true, null: false

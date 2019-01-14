@@ -1,4 +1,4 @@
-class CreateCardBudgetRestrictions < ActiveRecord::Migration
+class CreateCardBudgetRestrictions < ActiveRecord::Migration[4.2]
   def change
     create_table :card_budget_restrictions do |t|
       t.integer :budget_amount_id, references: 'Amount', index: true, foreign_key: true

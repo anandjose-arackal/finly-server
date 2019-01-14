@@ -1,4 +1,4 @@
-class CreateFeedbackTypes < ActiveRecord::Migration
+class CreateFeedbackTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :feedback_types do |t|
       t.string :name, null: false

@@ -49,34 +49,34 @@
 #  resource_template_id         :integer
 #
 
-class PurchaseOrder < ActiveRecord::Base
+class PurchaseOrder < ApplicationRecord
   include SoftDeletable, Templatable
-  belongs_to :company
-  belongs_to :user
-  belongs_to :procurement
-  belongs_to :location, class_name: 'BranchLocation'
-  belongs_to :delivery_location, class_name: 'BranchLocation'
-  belongs_to :vendor, class_name: 'YesBankVendor'
-  belongs_to :payment_term
-  belongs_to :procurement_term
-  belongs_to :status, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
-  belongs_to :department
-  belongs_to :sub_department, class_name: "Department", foreign_key: :sub_department_id
-  belongs_to :cost_center
-  belongs_to :gst_type
+  belongs_to :company, optional: true
+  belongs_to :user, optional: true
+  belongs_to :procurement, optional: true
+  belongs_to :location, optional: true, class_name: 'BranchLocation'
+  belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
+  belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
+  belongs_to :payment_term, optional: true
+  belongs_to :procurement_term, optional: true
+  belongs_to :status, optional: true, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
+  belongs_to :department, optional: true
+  belongs_to :sub_department, optional: true, class_name: "Department", foreign_key: :sub_department_id
+  belongs_to :cost_center, optional: true
+  belongs_to :gst_type, optional: true
 
-  belongs_to :controlling_user, class_name: 'User'
-  belongs_to :controlling_for_user, class_name: 'User'
-  belongs_to :controlling_user_role, class_name: 'UserRole'
-  belongs_to :controlling_for_user_role, class_name: 'UserRole'
+  belongs_to :controlling_user, optional: true, class_name: 'User'
+  belongs_to :controlling_for_user, optional: true, class_name: 'User'
+  belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :controlling_for_user_role, optional: true, class_name: 'UserRole'
 
-  belongs_to :total_before_tax, class_name: "Amount"
-  belongs_to :tax_amount, class_name: "Amount"
-  belongs_to :total_after_tax, class_name: "Amount"
-  belongs_to :discount_amount, class_name: "Amount", autosave: true
-  belongs_to :balance_amount, class_name: "Amount", autosave: true
-  belongs_to :policy
-  belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+  belongs_to :total_before_tax, optional: true, class_name: "Amount"
+  belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :total_after_tax, optional: true, class_name: "Amount"
+  belongs_to :discount_amount, optional: true, class_name: "Amount", autosave: true
+  belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
+  belongs_to :policy, optional: true
+  belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable

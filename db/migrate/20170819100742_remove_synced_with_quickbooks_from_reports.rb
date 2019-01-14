@@ -1,4 +1,4 @@
-class RemoveSyncedWithQuickbooksFromReports < ActiveRecord::Migration
+class RemoveSyncedWithQuickbooksFromReports < ActiveRecord::Migration[4.2]
   def change
     #first migrate the existing reports from old flag to new
     ReportSyncStatus.seed_data

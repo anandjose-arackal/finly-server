@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class MoneyRequestProcessorStatus < ActiveRecord::Base
+class MoneyRequestProcessorStatus < ApplicationRecord
   include Seedable
 
   def self.values

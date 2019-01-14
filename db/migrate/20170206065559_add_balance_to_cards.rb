@@ -1,4 +1,4 @@
-class AddBalanceToCards < ActiveRecord::Migration
+class AddBalanceToCards < ActiveRecord::Migration[4.2]
   def change
     add_column :cards, :balance_id, :integer, references: "Amount", foreign_key: true, index: true
   end

@@ -1,4 +1,4 @@
-class CreateDummyRestrictions < ActiveRecord::Migration
+class CreateDummyRestrictions < ActiveRecord::Migration[4.2]
   def change
     create_table :card_restrictions do |t|
       t.references :user, index: true, foreign_key: true

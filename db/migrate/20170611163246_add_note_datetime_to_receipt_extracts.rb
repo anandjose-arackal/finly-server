@@ -1,4 +1,4 @@
-class AddNoteDatetimeToReceiptExtracts < ActiveRecord::Migration
+class AddNoteDatetimeToReceiptExtracts < ActiveRecord::Migration[4.2]
   def change
     add_column :expense_data_extracts, :note, :text
     add_column :expense_data_extracts, :datetime, :datetime

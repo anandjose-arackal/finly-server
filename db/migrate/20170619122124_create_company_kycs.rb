@@ -1,4 +1,4 @@
-class CreateCompanyKycs < ActiveRecord::Migration
+class CreateCompanyKycs < ActiveRecord::Migration[4.2]
   def change
     create_table :company_kycs do |t|
       t.attachment :pan_card

@@ -27,7 +27,7 @@ if @result.present?
       json.messages @result.messages
       json.data data
     else
-      unless data.present? and data.is_a?(Array)
+      unless data.is_a?(Array)
         json.success true
         json.messages @result.messages
       end
@@ -36,7 +36,7 @@ if @result.present?
       end
     end
   else
-    unless data.present? and data.is_a?(Array)
+    unless data.is_a?(Array)
       json.success false
       json.messages @result.messages
     end

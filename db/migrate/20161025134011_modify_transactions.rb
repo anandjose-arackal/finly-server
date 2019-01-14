@@ -1,4 +1,4 @@
-class ModifyTransactions < ActiveRecord::Migration
+class ModifyTransactions < ActiveRecord::Migration[4.2]
   def change
     add_column :card_transactions, :reference_id, :string
     add_column :card_transactions, :auth_transaction_id, :string

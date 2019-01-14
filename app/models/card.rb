@@ -27,19 +27,19 @@
 #  replaced_card_id         :integer
 #
 
-class Card < ActiveRecord::Base
+class Card < ApplicationRecord
   include Accountable
   include SoftDeletable
 
-  belongs_to :card_type
-  belongs_to :user
-  belongs_to :company
-  belongs_to :disabled_by_role, class_name: 'UserRole'
-  belongs_to :disabled_by_user, class_name: 'User'
-  belongs_to :card_program
-  belongs_to :itz_cash_card_program
-  belongs_to :card_status
-  belongs_to :replaced_card, class_name: "Card"
+  belongs_to :card_type, optional: true
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
+  belongs_to :disabled_by_role, optional: true, class_name: 'UserRole'
+  belongs_to :disabled_by_user, optional: true, class_name: 'User'
+  belongs_to :card_program, optional: true
+  belongs_to :itz_cash_card_program, optional: true
+  belongs_to :card_status, optional: true
+  belongs_to :replaced_card, optional: true, class_name: "Card"
   has_many :transactions, class_name: 'CardTransaction'
   has_many :initiating_payments, as: :initiating_account
   has_many :initiating_payment_trails, as: :initiating_account
@@ -52,8 +52,8 @@ class Card < ActiveRecord::Base
   has_many :card_balance_history
   has_many :card_assign_requests
 
-  belongs_to :card_balance, class_name: 'Amount'
-  belongs_to :card_eligibility, class_name: 'Amount'
+  belongs_to :card_balance, optional: true, class_name: 'Amount'
+  belongs_to :card_eligibility, optional: true, class_name: 'Amount'
 
   accepts_nested_attributes_for :card_program
   accepts_nested_attributes_for :card_balance

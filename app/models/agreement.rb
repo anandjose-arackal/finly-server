@@ -15,10 +15,10 @@
 #  url               :string(255)
 #
 
-class Agreement < ActiveRecord::Base
+class Agreement < ApplicationRecord
   include Attachable
 
-  belongs_to :agreement_type
+  belongs_to :agreement_type, optional: true
   has_many :login_agreement_mappings
   has_many :users, through: :login_agreement_mappings
   has_many :email_authorizations, as: :authorizable

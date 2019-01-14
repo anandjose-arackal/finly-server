@@ -1,4 +1,4 @@
-class CreateInvoices < ActiveRecord::Migration
+class CreateInvoices < ActiveRecord::Migration[4.2]
   def change
     create_table :invoices do |t|
       t.references :address, index: true, foreign_key: true

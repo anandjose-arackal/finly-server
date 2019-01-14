@@ -8,15 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-
-
-
-
-
-
-
-
-class ExportField < ActiveRecord::Base
+class ExportField < ApplicationRecord
 
   scope :with_id, ->(id) { where id: id }
 

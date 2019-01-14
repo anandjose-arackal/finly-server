@@ -10,11 +10,11 @@
 #  reference_type_id :integer
 #
 
-class QuickbooksReference < ActiveRecord::Base
+class QuickbooksReference < ApplicationRecord
 
-  belongs_to :company
+  belongs_to :company, optional: true
   has_many :field_configurations, as: :external_reference
-  belongs_to :reference_type, class_name: "QuickbooksReferenceType"
+  belongs_to :reference_type, optional: true, class_name: "QuickbooksReferenceType"
 
   def quickbooks_department?
     self.reference_type_id == QuickbooksReferenceType.id_for(:department)

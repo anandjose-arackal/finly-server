@@ -1,4 +1,4 @@
-class CreateReceiptEmails < ActiveRecord::Migration
+class CreateReceiptEmails < ActiveRecord::Migration[4.2]
   def change
     create_table :receipt_emails do |t|
       t.string :subject

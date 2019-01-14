@@ -1,4 +1,4 @@
-class CreateReimbursablePocket < ActiveRecord::Migration
+class CreateReimbursablePocket < ActiveRecord::Migration[4.2]
   def change
     UserPocketType.seed_data
     pocket_type_id = UserPocketType.where(name: 'reimbursement')&.first&.id

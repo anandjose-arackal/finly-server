@@ -1,4 +1,4 @@
-class CreateCashExpenseConfigs < ActiveRecord::Migration
+class CreateCashExpenseConfigs < ActiveRecord::Migration[4.2]
   def change
     create_table :cash_expense_configs do |t|
       t.boolean :enabled, default: true

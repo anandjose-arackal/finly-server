@@ -12,11 +12,11 @@
 #  policy_id           :integer          not null
 #
 
-class TimeExpenseConfig < ActiveRecord::Base
-  belongs_to :default_category, class_name: "Category"
-  belongs_to :rate, class_name: "Amount"
-  belongs_to :period
-  belongs_to :policy
+class TimeExpenseConfig < ApplicationRecord
+  belongs_to :default_category, optional: true, class_name: "Category"
+  belongs_to :rate, optional: true, class_name: "Amount"
+  belongs_to :period, optional: true
+  belongs_to :policy, optional: true
 
   accepts_nested_attributes_for :rate
 

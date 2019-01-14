@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class MccGroup < ActiveRecord::Base
+class MccGroup < ApplicationRecord
 
   CODE_MAP = {
       1 => {code: "ALCOHOL", name: "Liquor/Bar/Clubs"},

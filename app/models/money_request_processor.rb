@@ -24,17 +24,17 @@
 #  updated_at                :datetime         not null
 #
 
-class MoneyRequestProcessor < ActiveRecord::Base
+class MoneyRequestProcessor < ApplicationRecord
   has_many :mappings, class_name: 'MoneyRequestProcessorMapping', foreign_key: :processor_id, dependent: :destroy
   has_many :users, through: :mappings
-  belongs_to :total_amount, class_name: 'Amount', dependent: :destroy
-  belongs_to :processed_amount, class_name: 'Amount', dependent: :destroy
-  belongs_to :created_by_user, class_name: 'User'
-  belongs_to :created_by_user_role, class_name: 'UserRole'
-  belongs_to :status, class_name: 'MoneyRequestProcessorStatus'
-  belongs_to :source_account, polymorphic: true
-  belongs_to :company
-  belongs_to :payment_order
+  belongs_to :total_amount, optional: true, class_name: 'Amount', dependent: :destroy
+  belongs_to :processed_amount, optional: true, class_name: 'Amount', dependent: :destroy
+  belongs_to :created_by_user, optional: true, class_name: 'User'
+  belongs_to :created_by_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :status, optional: true, class_name: 'MoneyRequestProcessorStatus'
+  belongs_to :source_account, optional: true, polymorphic: true
+  belongs_to :company, optional: true
+  belongs_to :payment_order, optional: true
 
   validates :created_by_user_id, presence: true
   validates :status_id, presence: true

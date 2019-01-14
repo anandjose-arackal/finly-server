@@ -9,7 +9,7 @@
 #  updated_at   :datetime         not null
 #
 
-class LoginAgreementMapping < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :agreement
+class LoginAgreementMapping < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :agreement, optional: true
 end

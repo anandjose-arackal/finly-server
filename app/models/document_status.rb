@@ -8,6 +8,6 @@
 #  updated_at :datetime         not null
 #
 
-class DocumentStatus < ActiveRecord::Base
+class DocumentStatus < ApplicationRecord
   
 end

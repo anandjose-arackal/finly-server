@@ -17,10 +17,10 @@
 #  merchant_type_key     :string(255)
 #
 
-class CompanyTransaction < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :transaction_amount, class_name: 'Amount'
-  belongs_to :balance_amount, class_name: 'Amount'
+class CompanyTransaction < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :transaction_amount, optional: true, class_name: 'Amount'
+  belongs_to :balance_amount, optional: true, class_name: 'Amount'
 
   validates :company, presence: true
   validates :transaction_id, uniqueness: true, presence: true

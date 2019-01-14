@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class TravelRequestStatus < ActiveRecord::Base
+class TravelRequestStatus < ApplicationRecord
 
   include Seedable
 

@@ -1,4 +1,4 @@
-class CreatePurchaseOrderItems < ActiveRecord::Migration
+class CreatePurchaseOrderItems < ActiveRecord::Migration[4.2]
   def change
     create_table :purchase_order_items do |t|
       t.references :purchase_order, index: true, foreign_key: true

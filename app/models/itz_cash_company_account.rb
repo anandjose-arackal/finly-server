@@ -10,11 +10,11 @@
 #  balance_id        :integer
 #
 
-class ItzCashCompanyAccount < ActiveRecord::Base
+class ItzCashCompanyAccount < ApplicationRecord
   include Accountable
-  belongs_to :company
-  belongs_to :balance, class_name: "Amount"
-  belongs_to :wallet_balance, class_name: "Amount"
+  belongs_to :company, optional: true
+  belongs_to :balance, optional: true, class_name: "Amount"
+  belongs_to :wallet_balance, optional: true, class_name: "Amount"
 
   delegate :balance_value, to: :balance
 

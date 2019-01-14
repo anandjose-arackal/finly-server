@@ -13,11 +13,11 @@
 #  changed_column_name :string(255)
 #
 
-class BudgetModificationTrail < ActiveRecord::Base
-  belongs_to :budget
-  belongs_to :budget_modification_action
-  belongs_to :action_user, class_name: 'User'
-  belongs_to :action, class_name: 'BudgetModificationAction'
+class BudgetModificationTrail < ApplicationRecord
+  belongs_to :budget, optional: true
+  belongs_to :budget_modification_action, optional: true
+  belongs_to :action_user, optional: true, class_name: 'User'
+  belongs_to :action, optional: true, class_name: 'BudgetModificationAction'
 
   validates :action_user, presence: true
   validates :action, presence: true

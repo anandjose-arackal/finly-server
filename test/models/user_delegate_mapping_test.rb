@@ -18,10 +18,10 @@
 #  money_request_update   :boolean
 #  money_request_submit   :boolean
 #  money_request_retract  :boolean
-#  trip_create            :boolean
-#  trip_update            :boolean
-#  trip_submit            :boolean
-#  trip_retract           :boolean
+#  travel_request_create  :boolean
+#  travel_request_update  :boolean
+#  travel_request_submit  :boolean
+#  travel_request_retract :boolean
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #

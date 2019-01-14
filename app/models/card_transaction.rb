@@ -37,11 +37,11 @@
 #  transaction_message          :text(65535)
 #
 
-class CardTransaction < ActiveRecord::Base
+class CardTransaction < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :user
-  belongs_to :card
+  belongs_to :user, optional: true
+  belongs_to :card, optional: true
 
   has_one :card_expense, dependent: :destroy
   has_one :payment, as: :reference_resource
@@ -49,10 +49,10 @@ class CardTransaction < ActiveRecord::Base
   # i.e. a combination of reference ID, type of details and transaction type should be unique
   validates_uniqueness_of :reference_id, scope: [:transaction_type, :type_of_details], if: lambda { |t| t.success }, conditions: -> { where.not(is_deleted: true) }
 
-  belongs_to :cancelled_against_expense, class_name: 'CardExpense'
-  belongs_to :transaction_amount, class_name: 'Amount', dependent: :destroy
-  belongs_to :card_amount, class_name: 'Amount', dependent: :destroy
-  belongs_to :billing_amount, class_name: 'Amount', dependent: :destroy
+  belongs_to :cancelled_against_expense, optional: true, class_name: 'CardExpense'
+  belongs_to :transaction_amount, optional: true, class_name: 'Amount', dependent: :destroy
+  belongs_to :card_amount, optional: true, class_name: 'Amount', dependent: :destroy
+  belongs_to :billing_amount, optional: true, class_name: 'Amount', dependent: :destroy
 
   delegate :transaction_amount_value, to: :transaction_amount
   delegate :billing_amount_value, to: :billing_amount

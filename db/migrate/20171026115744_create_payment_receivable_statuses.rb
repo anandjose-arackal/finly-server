@@ -1,4 +1,4 @@
-class CreatePaymentReceivableStatuses < ActiveRecord::Migration
+class CreatePaymentReceivableStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :payment_receivable_statuses do |t|
       t.string :name

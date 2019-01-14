@@ -1,4 +1,4 @@
-class CreatePostOperationActions < ActiveRecord::Migration
+class CreatePostOperationActions < ActiveRecord::Migration[4.2]
   def change
     create_table :post_operation_actions do |t|
       t.string :operation, index: true, null: false

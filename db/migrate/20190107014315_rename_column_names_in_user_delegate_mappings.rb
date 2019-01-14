@@ -1,4 +1,4 @@
-class RenameColumnNamesInUserDelegateMappings < ActiveRecord::Migration
+class RenameColumnNamesInUserDelegateMappings < ActiveRecord::Migration[4.2]
   def change
     rename_column :user_delegate_mappings, :trip_create, :travel_request_create
     rename_column :user_delegate_mappings, :trip_update, :travel_request_update

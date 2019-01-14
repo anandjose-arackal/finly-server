@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class AdminUserRole < ActiveRecord::Base
+class AdminUserRole < ApplicationRecord
   include Seedable
 
   validates :name, presence: true

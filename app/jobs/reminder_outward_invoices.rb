@@ -1,4 +1,4 @@
-class ReminderOutwardInvoices < ActiveJob::Base
+class ReminderOutwardInvoices < ApplicationJob
 
   def perform
     outward_invoices = OutwardInvoice.exclude_deleted.unpaid

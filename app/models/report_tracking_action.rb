@@ -13,8 +13,7 @@
 
 
 
-
-class ReportTrackingAction < ActiveRecord::Base
+class ReportTrackingAction < ApplicationRecord
   include Seedable
 
   def self.values

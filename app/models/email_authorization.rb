@@ -11,9 +11,9 @@
 #  view_role_id      :integer
 #
 
-class EmailAuthorization < ActiveRecord::Base
-  belongs_to :authorizable, polymorphic: true
-  belongs_to :user
+class EmailAuthorization < ApplicationRecord
+  belongs_to :authorizable, optional: true, polymorphic: true
+  belongs_to :user, optional: true
 
 
   scope :with_authorizable, -> (authorizable) { where authorizable: authorizable }

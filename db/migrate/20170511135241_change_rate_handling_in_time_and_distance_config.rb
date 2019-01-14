@@ -1,4 +1,4 @@
-class ChangeRateHandlingInTimeAndDistanceConfig < ActiveRecord::Migration
+class ChangeRateHandlingInTimeAndDistanceConfig < ActiveRecord::Migration[4.2]
   def change
     # store the existing time and distance expense configs in a temporary variable
     time_rates = {}

@@ -1,4 +1,4 @@
-class CreateVendorAccountsForAllVendors < ActiveRecord::Migration
+class CreateVendorAccountsForAllVendors < ActiveRecord::Migration[4.2]
   def change
     YesBankVendor.all.each do |vendor|
       if vendor.vendor_account.blank?

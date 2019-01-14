@@ -1,4 +1,4 @@
-class AddCompanyIdToInwardInvoiceAttachments < ActiveRecord::Migration
+class AddCompanyIdToInwardInvoiceAttachments < ActiveRecord::Migration[4.2]
   def change
     add_column :invoice_attachments, :company_id, :integer, references: "Company", foreign_key: true, index: true
 

@@ -23,11 +23,11 @@
 #  disabled           :boolean          default(FALSE)
 #
 
-class BankAccount < ActiveRecord::Base
+class BankAccount < ApplicationRecord
   include Accountable
   include SoftDeletable
 
-  belongs_to :account_owner, polymorphic: true
+  belongs_to :account_owner, optional: true, polymorphic: true
 
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account

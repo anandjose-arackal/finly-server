@@ -15,11 +15,11 @@
 
 # Transaction type: credit, debit
 
-class CustomerAccountTransaction < ActiveRecord::Base
-  belongs_to :customer_account
-  belongs_to :virtual_account_transaction
-  belongs_to :associated_object, polymorphic: true
-  belongs_to :transaction_amount, class_name: 'Amount'
+class CustomerAccountTransaction < ApplicationRecord
+  belongs_to :customer_account, optional: true
+  belongs_to :virtual_account_transaction, optional: true
+  belongs_to :associated_object, optional: true, polymorphic: true
+  belongs_to :transaction_amount, optional: true, class_name: 'Amount'
 
   has_one :outward_invoice_trail, as: :associated_transaction
 

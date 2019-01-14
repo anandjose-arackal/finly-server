@@ -8,7 +8,7 @@ module PolicyVersion
   included do
     before_save :update_parent_version
     # before_save :check_change
-    has_paper_trail
+    # has_paper_trail
   end
 
   # def check_change

@@ -1,4 +1,4 @@
-class CreateUserGroupItemMappings < ActiveRecord::Migration
+class CreateUserGroupItemMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :user_group_item_mappings do |t|
       t.references :user, index: true, foreign_key: true

@@ -25,16 +25,16 @@
 #  booking_id       :integer
 #
 
-class BookingFlight < ActiveRecord::Base
+class BookingFlight < ApplicationRecord
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation
 
-  # belongs_to :parent, polymorphic: true
-  belongs_to :booking, inverse_of: :booking_flight
-  belongs_to :booking_class, class_name: 'BookingFlightClass'
-  belongs_to :cost, class_name: 'Amount', dependent: :destroy
-  belongs_to :from, class_name: 'Location', dependent: :destroy
-  belongs_to :to, class_name: 'Location', dependent: :destroy
+  # belongs_to :parent, optional: true, polymorphic: true
+  belongs_to :booking, optional: true, inverse_of: :booking_flight
+  belongs_to :booking_class, optional: true, class_name: 'BookingFlightClass'
+  belongs_to :cost, optional: true, class_name: 'Amount', dependent: :destroy
+  belongs_to :from, optional: true, class_name: 'Location', dependent: :destroy
+  belongs_to :to, optional: true, class_name: 'Location', dependent: :destroy
 
   accepts_nested_attributes_for :from
   accepts_nested_attributes_for :to

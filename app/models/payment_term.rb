@@ -13,10 +13,10 @@
 #  is_deleted  :boolean          default(FALSE), not null
 #
 
-class PaymentTerm < ActiveRecord::Base
+class PaymentTerm < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
 
   # contains the attributes of a few common payment terms

@@ -15,8 +15,8 @@
 #  payment_id                :integer
 #  action_user_role_id       :integer
 #  cash_in_hand_deduction_id :integer
+#  delegated_action_user_id  :integer
 #
-
 
 require 'test_helper'
 

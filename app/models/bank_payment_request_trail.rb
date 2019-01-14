@@ -16,16 +16,16 @@
 #  action_for_user_role_id :integer
 #
 
-class BankPaymentRequestTrail < ActiveRecord::Base
+class BankPaymentRequestTrail < ApplicationRecord
 
   attr_accessor :excluded_id_ranges
 
-  belongs_to :bank_payment_request
-  belongs_to :action_user, class_name: "User"
-  belongs_to :modified_user, class_name: "User"
-  belongs_to :action_user_role, class_name: "UserRole"
-  belongs_to :modified_user_role, class_name: "UserRole"
-  belongs_to :action, class_name: "BankPaymentRequestTrailAction"
+  belongs_to :bank_payment_request, optional: true
+  belongs_to :action_user, optional: true, class_name: "User"
+  belongs_to :modified_user, optional: true, class_name: "User"
+  belongs_to :action_user_role, optional: true, class_name: "UserRole"
+  belongs_to :modified_user_role, optional: true, class_name: "UserRole"
+  belongs_to :action, optional: true, class_name: "BankPaymentRequestTrailAction"
 
   scope :without_id, -> (id) { where.not id: id }
   scope :manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:manager)}") }

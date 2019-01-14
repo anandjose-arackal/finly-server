@@ -1,4 +1,4 @@
-class AddInvoiceNumberConfigurationForCompanies < ActiveRecord::Migration
+class AddInvoiceNumberConfigurationForCompanies < ActiveRecord::Migration[4.2]
   def change
     create_table :invoice_number_configs do |t|
       t.string :prefix, default: ""

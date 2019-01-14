@@ -1,4 +1,4 @@
-class CreateReceiptEmailAttachments < ActiveRecord::Migration
+class CreateReceiptEmailAttachments < ActiveRecord::Migration[4.2]
   def change
     create_table :receipt_email_attachments do |t|
       t.integer :receipt_email_id

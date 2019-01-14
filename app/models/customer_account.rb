@@ -9,9 +9,9 @@
 #  updated_at  :datetime         not null
 #
 
-class CustomerAccount < ActiveRecord::Base
-  belongs_to :customer
-  belongs_to :balance, class_name: 'Amount'
+class CustomerAccount < ApplicationRecord
+  belongs_to :customer, optional: true
+  belongs_to :balance, optional: true, class_name: 'Amount'
 
   has_many :customer_account_transactions
 

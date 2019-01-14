@@ -9,7 +9,7 @@
 #
 
 
-class CompanyKycTrailAction < ActiveRecord::Base
+class CompanyKycTrailAction < ApplicationRecord
 
   include Seedable
 

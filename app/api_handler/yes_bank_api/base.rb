@@ -3,7 +3,8 @@ class YesBankApi::Base < BaseHandler
   attr_accessor :client_id, :client_secret, :auth_username,
                 :auth_password, :template, :config_path, :application_id,
                 :customer_id, :resource_not_found, :transfer_status_id,
-                :configuration, :company_id, :account_number
+                :configuration, :company_id, :account_number,
+                :start_time, :end_time, :file_logger
 
   ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&', '.']
 
@@ -17,6 +18,7 @@ class YesBankApi::Base < BaseHandler
     # unless config_path.present?
     #   add_message :error, "Server error, try again later"
     # end
+
     if Rails.env.production?
       values = Finly::SecureStorage::Connector.read('core/yes_bank')
     else
@@ -65,8 +67,11 @@ class YesBankApi::Base < BaseHandler
   def process
     p = self.path
     if Rails.env.production?
-      file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_yes_bank_api.log', sync: true)
+      self.file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_yes_bank_api.log', sync: true)
     end
+
+    self.start_time = DateUtils.local_date_time
+
     begin
 
       # printing posting path and params unless it's production environment
@@ -74,6 +79,7 @@ class YesBankApi::Base < BaseHandler
         puts "Posting Path: #{p}"
         puts "Post Params: #{self.template}"
       end
+
 
       self.response = self.connection.post do |req|
         req.url p
@@ -83,16 +89,24 @@ class YesBankApi::Base < BaseHandler
         req.body = template
       end
 
+
+      self.end_time = DateUtils.local_date_time
+
       if Rails.env.production?
         post_params_hash = (Hash.from_xml(template) rescue nil)
         response_hash = (Hash.from_xml(self.response.body) rescue nil)
         status_code = self.response.status rescue nil
-        file_logger.info(file_logger_params({path: p, post_params: post_params_hash, response: response_hash, status: status_code, success: true}))
+        file_logger.info(file_logger_params({path: p, post_params: post_params_hash, response: response_hash, status: status_code, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), success: true}))
       end
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
+      self.end_time = DateUtils.local_date_time
+
+      post_params_hash = (Hash.from_xml(template) rescue nil)
       if Rails.env.production?
-        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Timeout'}))
+        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Timeout'}))
       end
+
+
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -231,9 +245,14 @@ class YesBankApi::Base < BaseHandler
         #     }
         # }
     rescue Faraday::ResourceNotFound
+      self.end_time = DateUtils.local_date_time
+
+      post_params_hash = (Hash.from_xml(template) rescue nil)
+
       if Rails.env.production?
-        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'}))
+        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Resource Not Found'}))
       end
+
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -246,6 +265,7 @@ class YesBankApi::Base < BaseHandler
     #     file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
     #   end
     end
+
   end
 
 

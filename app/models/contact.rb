@@ -13,9 +13,8 @@
 #  designation      :string(255)
 #
 
-
-class Contact < ActiveRecord::Base
-  belongs_to :contactable, polymorphic: true
+class Contact < ApplicationRecord
+  belongs_to :contactable, optional: true, polymorphic: true
 
   # validates_numericality_of :number, allow_nil: true
   validates :email, format: Constants::VALID_EMAIL_FORMAT, uniqueness: {case_sensitive: false}, allow_nil: true

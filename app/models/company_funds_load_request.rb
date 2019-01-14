@@ -15,11 +15,11 @@
 #  is_active            :boolean          default(TRUE)
 #
 
-class CompanyFundsLoadRequest < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :requested_by_user, class_name: 'User'
-  belongs_to :amount
-  belongs_to :bank_type, class_name: CompanyFundsLoadRequestType
+class CompanyFundsLoadRequest < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :requested_by_user, optional: true, class_name: 'User'
+  belongs_to :amount, optional: true
+  belongs_to :bank_type, optional: true, class_name: 'CompanyFundsLoadRequestType'
 
   validates :company, presence: true
   validates :requested_by_user, presence: true

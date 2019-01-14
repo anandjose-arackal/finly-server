@@ -1,7 +1,0 @@
-<div title="Loading..." class="loading-animations">
-  <div class="loading-animation" style="animation-delay: -1.3s;"></div>
-  <div class="loading-animation" style="animation-delay: -1.2s"></div>
-  <div class="loading-animation" style="animation-delay: -1.1s"></div>
-  <div class="loading-animation" style="animation-delay: -1s"></div>
-  <div class="loading-animation" style="animation-delay: -0.9s"></div>
-</div>

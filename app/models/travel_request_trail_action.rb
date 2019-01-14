@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class TravelRequestTrailAction < ActiveRecord::Base
+class TravelRequestTrailAction < ApplicationRecord
   include Seedable
 
   def self.values

@@ -1,4 +1,4 @@
-class CreateBudgetModificationTrails < ActiveRecord::Migration
+class CreateBudgetModificationTrails < ActiveRecord::Migration[4.2]
   def change
     create_table :budget_modification_trails do |t|
       t.references :budget, index: true, foreign_key: true

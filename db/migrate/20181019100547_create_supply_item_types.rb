@@ -1,4 +1,4 @@
-class CreateSupplyItemTypes < ActiveRecord::Migration
+class CreateSupplyItemTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :supply_item_types do |t|
       t.string :name

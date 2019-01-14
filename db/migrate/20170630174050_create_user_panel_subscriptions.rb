@@ -1,4 +1,4 @@
-class CreateUserPanelSubscriptions < ActiveRecord::Migration
+class CreateUserPanelSubscriptions < ActiveRecord::Migration[4.2]
   def change
     create_table :user_panel_subscriptions do |t|
       t.references :user, index: true, foreign_key: true

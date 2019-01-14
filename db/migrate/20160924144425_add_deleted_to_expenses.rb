@@ -1,4 +1,4 @@
-class AddDeletedToExpenses < ActiveRecord::Migration
+class AddDeletedToExpenses < ActiveRecord::Migration[4.2]
   def change
     add_column :expenses, :is_deleted, :boolean, default: false, null: false
     add_column :reports, :is_deleted, :boolean, default: false, null: false

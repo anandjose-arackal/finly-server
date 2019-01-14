@@ -11,8 +11,7 @@
 
 
 
-
-class MoneyRequestCommentAction < ActiveRecord::Base
+class MoneyRequestCommentAction < ApplicationRecord
 
   ACTIONS = {
               create: 1, retract: 2, submit: 3, approve: 4,
