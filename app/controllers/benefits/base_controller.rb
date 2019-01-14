@@ -1,4 +1,4 @@
-class Benefits::BaseController < ApplicationController
+class Benefits::BaseController < BaseControllers::WebBase
 
 
   before_action -> { finly_authorize! :web}

@@ -1,7 +1,3 @@
 class BaseControllers::ChromeBase < ApplicationController
-  before_action -> {finly_authorize! :chrome}
-
-  def verify_authentication
-    true
-  end
+  authentication_scope :chrome
 end

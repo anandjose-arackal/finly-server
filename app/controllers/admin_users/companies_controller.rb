@@ -1,4 +1,4 @@
-class AdminUsers::CompaniesController < ApplicationController
+class AdminUsers::CompaniesController < BaseControllers::AdminBase
 
   # todo - temporary
 

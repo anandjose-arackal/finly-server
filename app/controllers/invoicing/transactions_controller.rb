@@ -1,4 +1,4 @@
-class Invoicing::TransactionsController < ApplicationController
+class Invoicing::TransactionsController < BaseControllers::WebBase
 
   before_action -> { finly_authorize! :web }
 

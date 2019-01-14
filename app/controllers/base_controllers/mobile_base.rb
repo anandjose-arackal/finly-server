@@ -1,7 +1,3 @@
 class BaseControllers::MobileBase < ApplicationController
-  before_action -> {finly_authorize! :mobile}
-
-  def verify_authentication
-    true
-  end
+  authentication_scope :mobile
 end

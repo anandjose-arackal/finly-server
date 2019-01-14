@@ -1,4 +1,4 @@
-class AdminUsers::ExpensesController < ApplicationController
+class AdminUsers::ExpensesController < BaseControllers::AdminBase
 
 
   before_action -> { finly_authorize! :admin}

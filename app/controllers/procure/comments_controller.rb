@@ -1,4 +1,4 @@
-class Procure::CommentsController < ApplicationController
+class Procure::CommentsController < BaseControllers::WebBase
   before_action -> {finly_authorize! :web}
 
   def create

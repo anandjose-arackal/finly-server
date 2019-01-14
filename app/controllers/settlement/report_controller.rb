@@ -1,6 +1,6 @@
-class Settlement::ReportController < ApplicationController
+class Settlement::ReportController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:processing_payment_file]
+  set_tokens_in_header :processing_payment_file
   before_action -> { finly_authorize! :web }
 
   def pending_index

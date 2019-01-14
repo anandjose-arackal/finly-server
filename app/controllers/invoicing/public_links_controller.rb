@@ -1,5 +1,5 @@
 # this controller will be the one serving all the external links for payment receivables and invoices
-class Invoicing::PublicLinksController < ApplicationController
+class Invoicing::PublicLinksController < BaseControllers::PublicBase
 
   def payment_receivable_show
     @result = Invoicing::PaymentReceivable::Public::Show.(current_user, params)

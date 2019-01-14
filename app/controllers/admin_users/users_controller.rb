@@ -1,4 +1,4 @@
-class AdminUsers::UsersController < ApplicationController
+class AdminUsers::UsersController < BaseControllers::AdminBase
   before_action -> { finly_authorize! :admin}
 
   def new

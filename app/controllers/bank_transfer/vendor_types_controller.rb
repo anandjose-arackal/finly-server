@@ -1,4 +1,4 @@
-class BankTransfer::VendorTypesController < ApplicationController
+class BankTransfer::VendorTypesController < BaseControllers::WebBase
   before_action -> {finly_authorize! :web}
 
   def index

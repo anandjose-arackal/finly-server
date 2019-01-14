@@ -1,4 +1,4 @@
-class BankTransfer::AutocompleteController < ApplicationController
+class BankTransfer::AutocompleteController < BaseControllers::PublicBase
 
   def user
     @users = User::Team::Index.(current_user, params)

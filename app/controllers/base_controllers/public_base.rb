@@ -1,5 +1,3 @@
 class BaseControllers::PublicBase < ApplicationController
-  def verify_authentication
-    true
-  end
+  authentication_scope :public
 end

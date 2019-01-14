@@ -1,4 +1,4 @@
-class BankTransfer::VendorsController < ApplicationController
+class BankTransfer::VendorsController < BaseControllers::PublicBase
 
   def create
     @result = BankTransfer::Vendors::Create.(current_user, params)

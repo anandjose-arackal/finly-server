@@ -1,4 +1,4 @@
-class Procure::AttachmentsController < ApplicationController
+class Procure::AttachmentsController < BaseControllers::WebBase
   before_action -> {finly_authorize! :web}
 
   def index

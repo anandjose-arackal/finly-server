@@ -1,4 +1,4 @@
-class Invoicing::PaymentTermsController < ApplicationController
+class Invoicing::PaymentTermsController < BaseControllers::PublicBase
 
   def create
     @result = Invoicing::Company::PaymentTerms::Create.(current_user, params)

@@ -1,4 +1,4 @@
-class Orders::OrderCardsController < ApplicationController
+class Orders::OrderCardsController < BaseControllers::WebBase
 
 
   before_action -> { finly_authorize! :web}

@@ -1,4 +1,4 @@
-class BankTransfer::ConfigurationsController < ApplicationController
+class BankTransfer::ConfigurationsController < BaseControllers::PublicBase
 
 
   # the below action also returns the list of all categories, custom field configurations as well as TDS Slabs

@@ -1,4 +1,4 @@
-class Transcriber::ExpensesController < ApplicationController
+class Transcriber::ExpensesController < BaseControllers::AdminBase
 
 
   before_action -> { finly_authorize! :admin}

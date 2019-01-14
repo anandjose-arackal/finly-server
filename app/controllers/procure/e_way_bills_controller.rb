@@ -1,4 +1,4 @@
-class Procure::EWayBillsController < ApplicationController
+class Procure::EWayBillsController < BaseControllers::WebBase
   before_action -> {finly_authorize! :web}
 
   def create

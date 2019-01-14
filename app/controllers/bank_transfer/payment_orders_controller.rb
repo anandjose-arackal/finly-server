@@ -1,6 +1,6 @@
 # currently this controller is only for admins of companies
 
-class BankTransfer::PaymentOrdersController < ApplicationController
+class BankTransfer::PaymentOrdersController < BaseControllers::WebBase
 
   before_action {finly_authorize! :web}
 

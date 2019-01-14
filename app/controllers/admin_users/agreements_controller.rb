@@ -1,4 +1,4 @@
-class AdminUsers::AgreementsController < ApplicationController
+class AdminUsers::AgreementsController < BaseControllers::AdminBase
 
   before_action -> { finly_authorize! :admin }
 

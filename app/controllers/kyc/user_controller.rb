@@ -1,4 +1,4 @@
-class Kyc::UserController < ApplicationController
+class Kyc::UserController < BaseControllers::WebBase
 
 
   before_action -> { finly_authorize! :web}

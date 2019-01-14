@@ -1,4 +1,4 @@
-class Authorizer::ReportsController < ApplicationController
+class Authorizer::ReportsController < BaseControllers::PublicBase
   def show
     @result = Report::ReportAuthorizer::Show.(params)
     if @result.failure?

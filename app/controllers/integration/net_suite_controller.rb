@@ -1,4 +1,4 @@
-class Integration::NetSuiteController < ApplicationController
+class Integration::NetSuiteController < BaseControllers::WebBase
 
   before_action :set_tokens_in_header, only: [:invoices]
   before_action -> { finly_authorize! :web }

@@ -1,4 +1,4 @@
-class Procure::InwardInvoicesController < ApplicationController
+class Procure::InwardInvoicesController < BaseControllers::WebBase
 
   before_action -> {finly_authorize! :web}
 

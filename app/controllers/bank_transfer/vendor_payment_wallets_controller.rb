@@ -1,4 +1,4 @@
-class BankTransfer::VendorPaymentWalletsController < ApplicationController
+class BankTransfer::VendorPaymentWalletsController < BaseControllers::WebBase
 
   before_action {finly_authorize! :web}
 

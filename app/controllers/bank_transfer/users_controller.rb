@@ -1,4 +1,4 @@
-class BankTransfer::UsersController < ApplicationController
+class BankTransfer::UsersController < BaseControllers::PublicBase
 
   def index
     @result = BankTransfer::Users::Index.(current_user, params)

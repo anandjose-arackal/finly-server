@@ -1,4 +1,4 @@
-class Summary::ConfigurationController < ApplicationController
+class Summary::ConfigurationController < BaseControllers::WebBase
 
   before_action -> { finly_authorize! :web }
 

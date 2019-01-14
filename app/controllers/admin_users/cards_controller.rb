@@ -1,4 +1,4 @@
-class AdminUsers::CardsController < ApplicationController
+class AdminUsers::CardsController < BaseControllers::AdminBase
 
   # todo - temporary
 

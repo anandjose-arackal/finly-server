@@ -1,4 +1,4 @@
-class Invoicing::RemindersController < ApplicationController
+class Invoicing::RemindersController < BaseControllers::WebBase
 
   before_action -> { finly_authorize! :web }
 
