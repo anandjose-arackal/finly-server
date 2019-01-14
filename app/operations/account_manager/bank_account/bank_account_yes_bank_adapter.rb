@@ -19,7 +19,11 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     super
     transfer_type = options[:bank_transfer_type]
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
-    if payment.reference_resource&.retriable?
+
+    if payment.reference_resource.present? && (payment.reference_resource.completed? || payment.reference_resource.processing?)
+      # payment cannot be processed in this case
+      return false
+    elsif payment.reference_resource&.retriable?
       reference_number = payment.reference_resource.unique_request_number
     else
       reference_number = nil

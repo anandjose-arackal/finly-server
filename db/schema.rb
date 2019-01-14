@@ -539,6 +539,7 @@ ActiveRecord::Schema.define(version: 2019_01_14_151717) do
     t.boolean "payment_file_downloaded", default: false
     t.boolean "auto_approved"
     t.boolean "api_initiated", default: false
+    t.integer "controlling_level_id"
     t.datetime "deleted_at"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
@@ -2068,6 +2069,13 @@ ActiveRecord::Schema.define(version: 2019_01_14_151717) do
     t.string "document_reviewer_mappable_type", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "level_number"
+    t.boolean "taken_control", default: false
+    t.integer "taken_control_by_id"
+    t.boolean "viewable", default: false
+    t.datetime "became_viewable_at"
+    t.integer "action_taken_by_id"
+    t.integer "action_id"
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
@@ -3298,6 +3306,7 @@ ActiveRecord::Schema.define(version: 2019_01_14_151717) do
     t.integer "destination_pocket_id"
     t.integer "created_by_id"
     t.integer "modified_by_id"
+    t.integer "controlling_level_id"
     t.datetime "deleted_at"
     t.index ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_money_requests_on_controlling_for_user_role_id"
@@ -4551,6 +4560,7 @@ ActiveRecord::Schema.define(version: 2019_01_14_151717) do
     t.integer "sub_department_id"
     t.integer "created_by_id"
     t.integer "modified_by_id"
+    t.integer "controlling_level_id"
     t.datetime "deleted_at"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_reports_on_controlling_for_user_role_id"
@@ -5013,6 +5023,7 @@ ActiveRecord::Schema.define(version: 2019_01_14_151717) do
     t.datetime "booking_confirmed_at"
     t.integer "created_by_id"
     t.integer "modified_by_id"
+    t.integer "controlling_level_id"
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_travel_requests_on_company_id"
     t.index ["controlling_for_user_id"], name: "index_travel_requests_on_controlling_for_user_id"
@@ -5068,7 +5079,7 @@ ActiveRecord::Schema.define(version: 2019_01_14_151717) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
-  create_table "user_delegate_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "user_delegate_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id"
     t.integer "delegate_for_user_id"
     t.boolean "expense_create"

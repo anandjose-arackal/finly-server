@@ -438,6 +438,16 @@ class BaseOperation
     end
   end
 
+  def add_system_message(type, model, message)
+    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
+    clear_messages if self.messages.blank?
+    message = [message] unless message.is_a?(Array)
+    system_message_type = SystemMessageType.id_for(type)
+    message.each do |m|
+      SystemMessage.create(messagable: model, content: m, system_message_type_id: system_message_type)
+    end
+  end
+
   def raise_unauthorized_exception
     raise NotAuthorizedException
   end
