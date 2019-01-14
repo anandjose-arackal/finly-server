@@ -2,7 +2,6 @@ class AdminUsers::CardsController < BaseControllers::AdminBase
 
   # todo - temporary
 
-  before_action -> { finly_authorize! :admin}
 
   def create
     @result = Admin::Cards::Create.(current_user, params)

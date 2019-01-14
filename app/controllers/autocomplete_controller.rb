@@ -1,5 +1,4 @@
-class AutocompleteController < ApplicationController
-  before_action -> { finly_authorize! :web}
+class AutocompleteController < BaseControllers::WebBase
   def merchant
     merchants = Autocomplete::Merchant.(current_user, params)
     respond_to do |format|

@@ -1,3 +1,5 @@
 class BaseControllers::WebBase < ApplicationController
-  authentication_scope :web
+  def authentication_scope
+    :web
+  end
 end

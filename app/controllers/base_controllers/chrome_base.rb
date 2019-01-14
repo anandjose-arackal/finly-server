@@ -1,3 +1,5 @@
 class BaseControllers::ChromeBase < ApplicationController
-  authentication_scope :chrome
+  def authentication_scope
+    :chrome
+  end
 end

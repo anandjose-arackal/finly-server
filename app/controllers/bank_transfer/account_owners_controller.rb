@@ -1,6 +1,5 @@
 class BankTransfer::AccountOwnersController < BaseControllers::WebBase
 
-  before_action {finly_authorize! :web}
 
   def index
     @result = BankTransfer::AccountOwners::Index.(current_user, params)

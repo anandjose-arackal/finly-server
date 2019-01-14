@@ -1,6 +1,5 @@
 class BankTransfer::BankAccountsController < BaseControllers::WebBase
 
-  before_action {finly_authorize! :web}
 
   def create
     @result = BankTransfer::BankAccounts::Create.(current_user, params)

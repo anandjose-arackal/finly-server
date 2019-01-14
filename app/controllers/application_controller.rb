@@ -305,8 +305,8 @@ class ApplicationController < ActionController::Base
   end
 
   def finly_authorize!
-    scopes = authentication_scope
-    scopes.except!(:public)
+    scopes = *authentication_scope
+    scopes.delete(:public)
     return if scopes.blank?
     return if self.class.skip_authentication_actions.include?(action_name)
 
@@ -318,20 +318,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  @authentication_scope = []
-
-  def self.authentication_scope
-    @authentication_scope ||= []
-  end
-
-  def self.authentication_scope=(*value)
-    @authentication_scope = value
-  end
-
   @skip_authentication_actions = []
 
   def self.skip_authentication_actions
-    self.skip_authentication_actions ||= []
+    @skip_authentication_actions ||= []
   end
 
   def self.skip_authentication_actions=(*value)
@@ -339,10 +329,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authentication_scope
-    if self.class.authentication_scope.blank?
-      raise "IMPORTANT!! Do not extend ApplicationController. Extend one of the BaseController's available in controllers/base_controller"
-    end
-    self.class.authentication_scope
+    raise "IMPORTANT!! Do not extend ApplicationController. Extend one of the BaseController's available in controllers/base_controller"
   end
 
   @required_header_token_actions = []

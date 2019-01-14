@@ -1,6 +1,5 @@
 class Invoicing::CategoriesController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def invoice_categories
     @result = Categories::Invoices::Index.(current_user, params)

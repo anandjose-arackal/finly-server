@@ -2,7 +2,6 @@
 
 class BankTransfer::PaymentOrdersController < BaseControllers::WebBase
 
-  before_action {finly_authorize! :web}
 
   def count
     @result = BankTransfer::YesBank::Count.(current_user, params)

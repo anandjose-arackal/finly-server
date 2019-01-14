@@ -1,6 +1,5 @@
 class BankTransfer::VendorPaymentWalletsController < BaseControllers::WebBase
 
-  before_action {finly_authorize! :web}
 
   def update_balance
     action_type = params[:type] || params[:action_type] rescue nil

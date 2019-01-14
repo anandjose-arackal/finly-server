@@ -1,5 +1,4 @@
 class Procure::AttachmentsController < BaseControllers::WebBase
-  before_action -> {finly_authorize! :web}
 
   def index
     @result = Procurements::Attachments::Index.(current_user, params)

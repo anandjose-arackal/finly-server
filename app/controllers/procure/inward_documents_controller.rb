@@ -1,5 +1,4 @@
 class Procure::InwardDocumentsController < BaseControllers::WebBase
-  before_action -> {finly_authorize! :web}
 
   def show
     @result = Procurements::InwardDocuments::Show.(current_user, params)

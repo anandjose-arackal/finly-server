@@ -1,6 +1,5 @@
 class Invoicing::PaymentReceivablesController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def index
     @result = Invoicing::PaymentReceivable::Index.(current_user, params)

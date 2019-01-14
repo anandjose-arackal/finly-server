@@ -1,3 +1,6 @@
 class BaseControllers::ApiBase < ApplicationController
-  authentication_scope :api
+
+  def authentication_scope
+    :api
+  end
 end

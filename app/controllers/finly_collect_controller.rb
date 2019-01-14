@@ -1,4 +1,4 @@
-class FinlyCollectController < ApplicationController
+class FinlyCollectController < BaseControllers::PublicBase
 
   # before_action { authorize_ip(Finly::SecureStorage::Connector.read('core/finly_collect')&.dig('incoming', 'whitelisted_ip')) }
   # http_basic_authenticate_with :name => Finly::SecureStorage::Connector.read('core/finly_collect')&.dig('incoming', 'username'),

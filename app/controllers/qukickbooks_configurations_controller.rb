@@ -1,4 +1,4 @@
-class QukickbooksConfigurationsController < ApplicationController
+class QukickbooksConfigurationsController < BaseControllers::PublicBase
   def create
   end
 

@@ -1,6 +1,5 @@
 class Invoicing::VirtualBankAccountsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def create
     @result = Invoicing::VirtualBankAccount::Create.(current_user, params)

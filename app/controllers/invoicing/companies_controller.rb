@@ -1,6 +1,5 @@
 class Invoicing::CompaniesController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def withdraw_funds
     @result = Invoicing::Company::CreditsWithdrawal::WithdrawFunds.(current_user, params)

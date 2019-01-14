@@ -1,7 +1,6 @@
 class Integration::TallyController < BaseControllers::WebBase
 
   before_action :set_tokens_in_header, only: [:vouchers, :reimbursements]
-  before_action -> { finly_authorize! :web }
 
   def set_configuration
     @result = Integrations::Tally::SetConfiguration.(current_user, params)

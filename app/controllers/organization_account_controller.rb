@@ -1,7 +1,6 @@
-class OrganizationAccountController < ApplicationController
+class OrganizationAccountController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def policies_list
     @result = Company::Configuration::Show.(current_user, params)

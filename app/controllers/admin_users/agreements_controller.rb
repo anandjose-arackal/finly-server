@@ -1,6 +1,5 @@
 class AdminUsers::AgreementsController < BaseControllers::AdminBase
 
-  before_action -> { finly_authorize! :admin }
 
   def create
     @result = Admin::Agreement::Create.(current_user, params)

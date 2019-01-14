@@ -1,6 +1,5 @@
 class Transcriber::ReceiptsController < BaseControllers::AdminBase
 
-  before_action -> { finly_authorize! :admin }
 
   def show
 

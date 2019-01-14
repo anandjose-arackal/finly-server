@@ -1,5 +1,8 @@
 class BaseControllers::AdminBase < ApplicationController
-  authentication_scope :admin
+
+  def authentication_scope
+    :admin
+  end
 
   def set_tokens_in_header
     if self.class.required_header_token_actions.include?(action_name)

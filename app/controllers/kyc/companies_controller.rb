@@ -1,7 +1,6 @@
 class Kyc::CompaniesController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def show
     @result = KycProcess::Company::Show.(current_user, params)

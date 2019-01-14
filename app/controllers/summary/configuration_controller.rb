@@ -1,6 +1,5 @@
 class Summary::ConfigurationController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def index
     @result = SummaryMailer::Index.(current_user, params)

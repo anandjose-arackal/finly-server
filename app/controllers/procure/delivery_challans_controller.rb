@@ -1,5 +1,4 @@
 class Procure::DeliveryChallansController < BaseControllers::WebBase
-  before_action -> {finly_authorize! :web}
 
   def create
     @result = Procurements::DeliveryChallans::Create.(current_user, params)

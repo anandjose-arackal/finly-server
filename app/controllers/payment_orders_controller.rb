@@ -1,4 +1,4 @@
-class PaymentOrdersController < ApplicationController
+class PaymentOrdersController < BaseControllers::PublicBase
   def index
   end
 

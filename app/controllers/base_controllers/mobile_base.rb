@@ -1,3 +1,5 @@
 class BaseControllers::MobileBase < ApplicationController
-  authentication_scope :mobile
+  def authentication_scope
+    :mobile
+  end
 end
