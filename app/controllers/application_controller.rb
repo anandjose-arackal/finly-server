@@ -13,6 +13,8 @@ class ApplicationController < ActionController::Base
   # protect_from_forgery with: :exception
   # before_action :set_paper_trail_whodunnit
 
+  before_action :verify_authentication
+
   before_action :load_global_variables
 
   before_action :initialize_query_logger
@@ -380,6 +382,11 @@ class ApplicationController < ActionController::Base
     ElasticAPM.set_tag(:app, current_app)
     ElasticAPM.set_tag(:device, current_device)
     ElasticAPM.set_tag(:view, params&.dig(:view))
+  end
+
+  # Ensure that the correct authentication is configured in the controller
+  def verify_authentication
+    raise "IMPORTANT!! Do not extend ApplicationController. Extend one of the BaseController's available in controllers/base_controller"
   end
 
 end
