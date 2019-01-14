@@ -7,7 +7,7 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
     super
     return if has_errors?
     if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the transfer'
+      add_message :error, 'You need to provide your password to initiate this action'
       return
     end
     unless user.valid_password?(params[:password])
