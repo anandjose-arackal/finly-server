@@ -6,6 +6,19 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
   attr_accessor :bank_payment_requests, :processing_status_id,
                 :errors_found, :validate_result
 
+  def pre_validate
+    super
+    return if has_errors?
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate this action'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
+  end
+
   def init
     ids = params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
     unless ids.is_a?(Array)
