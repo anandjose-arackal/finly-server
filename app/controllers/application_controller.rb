@@ -308,7 +308,7 @@ class ApplicationController < ActionController::Base
     scopes = *authentication_scope
     scopes.delete(:public)
     return if scopes.blank?
-    return if self.class.skip_authentication_actions.include?(action_name)
+    return if self.class.get_skip_authentication_actions.include?(action_name&.to_sym)
 
     set_tokens_in_header
     doorkeeper_authorize! *scopes
@@ -320,12 +320,12 @@ class ApplicationController < ActionController::Base
 
   @skip_authentication_actions = []
 
-  def self.skip_authentication_actions
-    @skip_authentication_actions ||= []
+  def self.skip_authentication_actions(*actions)
+    @skip_authentication_actions = actions
   end
 
-  def self.skip_authentication_actions=(*value)
-    @skip_authentication_actions = value
+  def self.get_skip_authentication_actions
+    @skip_authentication_actions || []
   end
 
   def authentication_scope

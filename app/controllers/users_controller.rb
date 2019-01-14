@@ -1,5 +1,7 @@
 class UsersController < BaseControllers::WebBase
 
+  skip_authentication_actions :lookup
+
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
     @result = User::Show.(current_user, params)
