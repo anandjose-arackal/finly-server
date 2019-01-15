@@ -89,14 +89,11 @@ class RequestFormatter::Base < BaseOperation
     end
 
     protected
+
     def set_placeholders(items, placeholder_mapping)
-      case items.class
-        when Array
-          when Hash, ActionController::Parameters
-      end
       if items.is_a?(Array)
         items.each_with_index do |value, position|
-          if [ActionController::Parameters, Hash, Array].include? value.class
+          if [ActionController::Parameters, Hash, Array, ActiveSupport::HashWithIndifferentAccess].include? value.class
             set_placeholders value, placeholder_mapping
           else
             pos = next_pos
@@ -104,9 +101,9 @@ class RequestFormatter::Base < BaseOperation
             items[position] = "#{PLACEHOLDER_KEY}#{pos}"
           end
         end
-      elsif items.is_a?(Hash)
+      elsif items.is_a?(Hash) or items.is_a?(ActiveSupport::HashWithIndifferentAccess)
         items.each do |key, value|
-          if [ActionController::Parameters, Hash, Array].include? value.class
+          if [ActionController::Parameters, Hash, Array, ActiveSupport::HashWithIndifferentAccess].include? value.class
             set_placeholders value, placeholder_mapping
           else
             pos = next_pos
