@@ -89,6 +89,11 @@ module Constants
   BEGINNING_OF_TIME = '10-03-2017'
   ###################################################
 
+  if Rails.env.production?
+    SPECIAL_RESPONSE_EMAIL = 'yb_special_response@finly.io'
+  else
+    SPECIAL_RESPONSE_EMAIL = 'yb_special_response@emaildev.finly.io'
+  end
 
 
   if Rails.env.development?

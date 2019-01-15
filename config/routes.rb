@@ -481,6 +481,7 @@
 #                                                         GET    /admin_users/card_assign_requests/export(.:format)                                                                  admin_users/card_assign_requests#export
 #                                                         GET    /admin_users/card_assign_requests/export/kycs(.:format)                                                             admin_users/card_assign_requests#download_kycs
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                                                    admin_users/card_assign_requests#edit
+#                                 admin_users_bulk_assign POST   /admin_users/cards/bulk_assign(.:format)                                                                            admin_users/cards#bulk_assign
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                                           admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                                              admin_users/users#admin_menus
 #                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                                                  api/callbacks#successful_vendor_payment
@@ -1423,6 +1424,8 @@
 #                                                    ping GET    /ping(.:format)                                                                                                     ping#ping
 #                                                         GET    /ping/sidekiq/:type(.:format)                                                                                       ping#sidekiq
 #                                           ping_database GET    /ping/database(.:format)                                                                                            ping#database
+#                                      sample_import_file GET    /budgets/sample_import_file(.:format)                                                                               budgets#sample_import_file
+#                                           budget_import POST   /budgets/import(.:format)                                                                                           budgets#import
 #                                       budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                    budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
 #                                           budget_trails GET    /budgets/:budget_id/modification_trails(.:format)                                                                   budgets#trails
@@ -2471,6 +2474,8 @@ Rails.application.routes.draw do
     get 'card_assign_requests/export/kycs(.:format)' => 'card_assign_requests#download_kycs'
     get 'card_assign_requests/edit' => 'card_assign_requests#edit'
 
+    post 'cards/bulk_assign', to: 'cards#bulk_assign', as: :bulk_assign
+
     post 'call_center/search', to: 'call_center/users#search', as: :search
   end
 
@@ -3236,6 +3241,10 @@ Rails.application.routes.draw do
   get 'ping/sidekiq/:type', to: 'ping#sidekiq'
   get 'ping/database', to: 'ping#database'
 
+  ######## Budget apis start ######
+
+  get 'budgets/sample_import_file', to: 'budgets#sample_import_file', as: :sample_import_file
+  post 'budgets/import', to: 'budgets#import', as: :budget_import
   ## Budget apis start ##
   resources :budgets do
     patch 'add_budget', to: 'budgets#add_budget', as: :add_budget
@@ -3244,7 +3253,7 @@ Rails.application.routes.draw do
   end
   get 'new_budget_config', to: 'budgets#new_budgets_config', as: :new_budgets_config
 
-## Budget apis end ##
+  ######## Budget apis end #########
 
 
   ## Procurement APIs start ##########################################
