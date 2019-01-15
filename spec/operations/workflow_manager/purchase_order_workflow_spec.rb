@@ -54,12 +54,10 @@ RSpec.describe "Purchase Order Workflow -- " do
     fail if procurement_op.failure?
 
 
-
     # Create level reviewer mappings
     @level1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})
     @level2.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
     @level3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user3.id, threshold: 0, exception: false})
-
 
 
     bank_account = BankAccount.first

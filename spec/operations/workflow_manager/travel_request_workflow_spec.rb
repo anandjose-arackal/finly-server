@@ -27,6 +27,11 @@ RSpec.describe "Travel Request Workflow -- " do
     @em_finance_user1 = create(:em_finance_user, company_id: @company.id)
     @em_admin_user1 = create(:em_admin_user, company_id: @company.id)
 
+    @em_reviewer_user4 = create(:em_reviewer_user, company_id: @company.id)
+    @em_reviewer_user5 = create(:em_reviewer_user, company_id: @company.id)
+    @em_reviewer_user6 = create(:em_reviewer_user, company_id: @company.id)
+
+
     # Create Policy
     @policy = create(:policy, company_id: @company.id)
 
@@ -38,10 +43,19 @@ RSpec.describe "Travel Request Workflow -- " do
     @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestReviewalProvider')
     @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestReviewalProvider')
 
+    @level1 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestBookingProvider')
+    @level2 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestBookingProvider')
+    @level3 = create(:reviewal_level, policy_id: @policy.id, associated_entity_type: 'TravelRequestBookingProvider')
+
     # Create level reviewer mappings
     @level1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})
     @level2.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
     @level3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user3.id, threshold: 0, exception: false})
+
+    # Create level reviewer mappings
+    @level4.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user4.id, threshold: 0, exception: false})
+    @level5.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user5.id, threshold: 0, exception: false})
+    @level6.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user6.id, threshold: 0, exception: false})
 
     travel_request_params = {"from_date"=>"10 Jan 2019", "to_date"=>"11 Jan 2019", "purpose_of_travel"=>"Purpose", "policy_id"=>"5", "view"=>"personal"}
 
@@ -49,7 +63,8 @@ RSpec.describe "Travel Request Workflow -- " do
     if document_op.success?
       @document = TravelRequest.first # Change this, make operation return document instead
     else
-      p example.description, document_op.messages[:error]
+      debugger
+      p "CREATE", document_op.messages[:error]
     end
   end
 

@@ -12,13 +12,13 @@ class Event::EBankPaymentRequest::Retract < Event::EBankPaymentRequest::Base
 
   def affected_users
     # users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.bank_payment_request_trails.last.modified_user)
-    users = self.bank_payment_request.retract_affected_users
+    users = self.bank_payment_request.associated_users(:retract)
     users.reject { |r| r == self.user}
   end
 
   def notification_affected_users
     # users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.bank_payment_request_trails.last.modified_user)
-    users = self.bank_payment_request.retract_affected_users
+    users = self.bank_payment_request.associated_users(:retract)
     users.reject { |r| r == self.user}
   end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190110121412) do
+ActiveRecord::Schema.define(version: 20190114140005) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -360,6 +360,12 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   add_index "approval_routes", ["reviewer_id"], name: "index_approval_routes_on_reviewer_id", using: :btree
   add_index "approval_routes", ["threshold"], name: "index_approval_routes_on_threshold", using: :btree
   add_index "approval_routes", ["user_id"], name: "index_approval_routes_on_user_id", using: :btree
+
+  create_table "ar_internal_metadata", primary_key: "key", force: :cascade do |t|
+    t.string   "value",      limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "authentications", force: :cascade do |t|
     t.integer  "user_id",          limit: 4
@@ -2381,6 +2387,8 @@ ActiveRecord::Schema.define(version: 20190110121412) do
     t.integer  "spent_from_id",          limit: 4
     t.boolean  "custom_conversion_rate",                              default: false
     t.integer  "cost_center_id",         limit: 4
+    t.integer  "created_by_id",          limit: 4
+    t.integer  "modified_by_id",         limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -3147,6 +3155,20 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   add_index "level_reviewer_mappings", ["level_id"], name: "index_level_reviewer_mappings_on_level_id", using: :btree
   add_index "level_reviewer_mappings", ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id", using: :btree
 
+  create_table "level_user_reviewer_mappings", force: :cascade do |t|
+    t.integer  "level_id",    limit: 4
+    t.integer  "user_id",     limit: 4
+    t.integer  "reviewer_id", limit: 4
+    t.integer  "policy_id",   limit: 4
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "level_user_reviewer_mappings", ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id", using: :btree
+  add_index "level_user_reviewer_mappings", ["policy_id"], name: "index_level_user_reviewer_mappings_on_policy_id", using: :btree
+  add_index "level_user_reviewer_mappings", ["reviewer_id"], name: "index_level_user_reviewer_mappings_on_reviewer_id", using: :btree
+  add_index "level_user_reviewer_mappings", ["user_id"], name: "index_level_user_reviewer_mappings_on_user_id", using: :btree
+
   create_table "locations", force: :cascade do |t|
     t.integer  "locatable_id",   limit: 4
     t.string   "locatable_type", limit: 255
@@ -3233,18 +3255,19 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   end
 
   create_table "money_request_comments", force: :cascade do |t|
-    t.integer  "money_request_id",  limit: 4,     null: false
-    t.integer  "comment_action_id", limit: 4,     null: false
-    t.integer  "user_id",           limit: 4
-    t.integer  "expense_id",        limit: 4
-    t.integer  "payment_id",        limit: 4
-    t.string   "updated_field",     limit: 255
-    t.text     "updated_from",      limit: 65535
-    t.text     "updated_to",        limit: 65535
-    t.integer  "rejected_to_id",    limit: 4
-    t.text     "content",           limit: 65535
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.integer  "money_request_id",         limit: 4,     null: false
+    t.integer  "comment_action_id",        limit: 4,     null: false
+    t.integer  "user_id",                  limit: 4
+    t.integer  "expense_id",               limit: 4
+    t.integer  "payment_id",               limit: 4
+    t.string   "updated_field",            limit: 255
+    t.text     "updated_from",             limit: 65535
+    t.text     "updated_to",               limit: 65535
+    t.integer  "rejected_to_id",           limit: 4
+    t.text     "content",                  limit: 65535
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.integer  "delegated_action_user_id", limit: 4
   end
 
   add_index "money_request_comments", ["comment_action_id"], name: "index_money_request_comments_on_comment_action_id", using: :btree
@@ -3367,6 +3390,7 @@ ActiveRecord::Schema.define(version: 20190110121412) do
     t.datetime "updated_at",                                   null: false
     t.integer  "action_id",                        limit: 4
     t.integer  "action_user_role_id",              limit: 4
+    t.integer  "delegated_action_user_id",         limit: 4
   end
 
   add_index "money_request_tracks", ["action_user_id"], name: "index_money_request_tracks_on_action_user_id", using: :btree
@@ -3405,6 +3429,8 @@ ActiveRecord::Schema.define(version: 20190110121412) do
     t.integer  "travel_request_id",                  limit: 4
     t.integer  "destination_pocket_id",              limit: 4
     t.integer  "controlling_level_id",               limit: 4
+    t.integer  "created_by_id",                      limit: 4
+    t.integer  "modified_by_id",                     limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -4010,6 +4036,20 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
 
+  create_table "policy_user_role_purpose_mappings", force: :cascade do |t|
+    t.integer  "policy_id",  limit: 4
+    t.integer  "user_id",    limit: 4
+    t.integer  "role_id",    limit: 4
+    t.integer  "purpose_id", limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "policy_user_role_purpose_mappings", ["policy_id"], name: "index_policy_user_role_purpose_mappings_on_policy_id", using: :btree
+  add_index "policy_user_role_purpose_mappings", ["purpose_id"], name: "index_policy_user_role_purpose_mappings_on_purpose_id", using: :btree
+  add_index "policy_user_role_purpose_mappings", ["role_id"], name: "index_policy_user_role_purpose_mappings_on_role_id", using: :btree
+  add_index "policy_user_role_purpose_mappings", ["user_id"], name: "index_policy_user_role_purpose_mappings_on_user_id", using: :btree
+
   create_table "policy_user_roles", force: :cascade do |t|
     t.integer  "policy_id",    limit: 4
     t.integer  "user_id",      limit: 4
@@ -4501,6 +4541,8 @@ ActiveRecord::Schema.define(version: 20190110121412) do
     t.integer  "sourcable_id",       limit: 4
     t.integer  "sourcable_type",     limit: 4
     t.boolean  "is_deleted",                       default: false
+    t.integer  "created_by_id",      limit: 4
+    t.integer  "modified_by_id",     limit: 4
   end
 
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
@@ -4532,6 +4574,7 @@ ActiveRecord::Schema.define(version: 20190110121412) do
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.integer  "payment_id",               limit: 4
+    t.integer  "delegated_action_user_id", limit: 4
   end
 
   add_index "report_comments", ["expense_id"], name: "index_report_comments_on_expense_id", using: :btree
@@ -4645,6 +4688,7 @@ ActiveRecord::Schema.define(version: 20190110121412) do
     t.integer  "payment_id",                limit: 4
     t.integer  "action_user_role_id",       limit: 4
     t.integer  "cash_in_hand_deduction_id", limit: 4
+    t.integer  "delegated_action_user_id",  limit: 4
   end
 
   add_index "report_tracks", ["action_user_id"], name: "index_report_tracks_on_action_user_id", using: :btree
@@ -4687,6 +4731,8 @@ ActiveRecord::Schema.define(version: 20190110121412) do
     t.integer  "controlling_level_id",               limit: 4
     t.integer  "department_id",                      limit: 4
     t.integer  "sub_department_id",                  limit: 4
+    t.integer  "created_by_id",                      limit: 4
+    t.integer  "modified_by_id",                     limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -5072,19 +5118,20 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   end
 
   create_table "travel_request_comments", force: :cascade do |t|
-    t.integer  "travel_request_id",  limit: 4
-    t.text     "content",            limit: 65535
-    t.integer  "user_id",            limit: 4
-    t.text     "note",               limit: 65535
-    t.text     "previous_value",     limit: 65535
-    t.text     "new_value",          limit: 65535
-    t.text     "edited_field",       limit: 65535
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.integer  "action_id",          limit: 4
-    t.integer  "booking_id",         limit: 4
-    t.integer  "booking_request_id", limit: 4
-    t.boolean  "is_deleted",                       default: false
+    t.integer  "travel_request_id",        limit: 4
+    t.text     "content",                  limit: 65535
+    t.integer  "user_id",                  limit: 4
+    t.text     "note",                     limit: 65535
+    t.text     "previous_value",           limit: 65535
+    t.text     "new_value",                limit: 65535
+    t.text     "edited_field",             limit: 65535
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.integer  "action_id",                limit: 4
+    t.integer  "booking_id",               limit: 4
+    t.integer  "booking_request_id",       limit: 4
+    t.boolean  "is_deleted",                             default: false
+    t.integer  "delegated_action_user_id", limit: 4
   end
 
   add_index "travel_request_comments", ["travel_request_id"], name: "index_travel_request_comments_on_travel_request_id", using: :btree
@@ -5112,17 +5159,18 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   end
 
   create_table "travel_request_trails", force: :cascade do |t|
-    t.integer  "travel_request_id",       limit: 4
-    t.integer  "action_id",               limit: 4
-    t.integer  "action_user_id",          limit: 4
-    t.integer  "action_user_role_id",     limit: 4
-    t.integer  "modified_user_id",        limit: 4
-    t.integer  "modified_user_role_id",   limit: 4
-    t.integer  "action_for_user_id",      limit: 4
-    t.integer  "action_for_user_role_id", limit: 4
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
-    t.boolean  "is_deleted",                        default: false
+    t.integer  "travel_request_id",        limit: 4
+    t.integer  "action_id",                limit: 4
+    t.integer  "action_user_id",           limit: 4
+    t.integer  "action_user_role_id",      limit: 4
+    t.integer  "modified_user_id",         limit: 4
+    t.integer  "modified_user_role_id",    limit: 4
+    t.integer  "action_for_user_id",       limit: 4
+    t.integer  "action_for_user_role_id",  limit: 4
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.boolean  "is_deleted",                         default: false
+    t.integer  "delegated_action_user_id", limit: 4
   end
 
   add_index "travel_request_trails", ["action_for_user_id"], name: "index_travel_request_trails_on_action_for_user_id", using: :btree
@@ -5160,6 +5208,8 @@ ActiveRecord::Schema.define(version: 20190110121412) do
     t.datetime "selection_requested_at"
     t.datetime "booking_confirmed_at"
     t.integer  "controlling_level_id",         limit: 4
+    t.integer  "created_by_id",                limit: 4
+    t.integer  "modified_by_id",               limit: 4
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree
@@ -5167,6 +5217,8 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   add_index "travel_requests", ["controlling_for_user_role_id"], name: "index_travel_requests_on_controlling_for_user_role_id", using: :btree
   add_index "travel_requests", ["controlling_user_id"], name: "index_travel_requests_on_controlling_user_id", using: :btree
   add_index "travel_requests", ["controlling_user_role_id"], name: "index_travel_requests_on_controlling_user_role_id", using: :btree
+  add_index "travel_requests", ["created_by_id"], name: "index_travel_requests_on_created_by_id", using: :btree
+  add_index "travel_requests", ["modified_by_id"], name: "index_travel_requests_on_modified_by_id", using: :btree
   add_index "travel_requests", ["policy_id"], name: "index_travel_requests_on_policy_id", using: :btree
   add_index "travel_requests", ["status_id"], name: "index_travel_requests_on_status_id", using: :btree
   add_index "travel_requests", ["user_id"], name: "index_travel_requests_on_user_id", using: :btree
@@ -5214,6 +5266,33 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   add_index "user_balance_histories", ["finly_money_load_id"], name: "index_user_balance_histories_on_finly_money_load_id", using: :btree
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
+
+  create_table "user_delegate_mappings", force: :cascade do |t|
+    t.integer  "user_id",                limit: 4
+    t.integer  "delegate_for_user_id",   limit: 4
+    t.boolean  "expense_create"
+    t.boolean  "expense_update"
+    t.boolean  "receipt_create"
+    t.boolean  "receipt_add_to_expense"
+    t.boolean  "receipt_update"
+    t.boolean  "report_create"
+    t.boolean  "report_submit"
+    t.boolean  "report_retract"
+    t.boolean  "report_update"
+    t.boolean  "money_request_create"
+    t.boolean  "money_request_update"
+    t.boolean  "money_request_submit"
+    t.boolean  "money_request_retract"
+    t.boolean  "travel_request_create"
+    t.boolean  "travel_request_update"
+    t.boolean  "travel_request_submit"
+    t.boolean  "travel_request_retract"
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "user_delegate_mappings", ["delegate_for_user_id"], name: "index_user_delegate_mappings_on_delegate_for_user_id", using: :btree
+  add_index "user_delegate_mappings", ["user_id"], name: "index_user_delegate_mappings_on_user_id", using: :btree
 
   create_table "user_department_mappings", force: :cascade do |t|
     t.integer  "user_id",       limit: 4
@@ -5465,53 +5544,54 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   add_index "user_wallets", ["user_id"], name: "index_user_wallets_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  limit: 255,   default: ""
-    t.string   "encrypted_password",     limit: 255,   default: "",    null: false
-    t.string   "reset_password_token",   limit: 255
+    t.string   "email",                     limit: 255,   default: ""
+    t.string   "encrypted_password",        limit: 255,   default: "",    null: false
+    t.string   "reset_password_token",      limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          limit: 4,     default: 0,     null: false
+    t.integer  "sign_in_count",             limit: 4,     default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip",     limit: 255
-    t.string   "last_sign_in_ip",        limit: 255
-    t.string   "confirmation_token",     limit: 255
+    t.string   "current_sign_in_ip",        limit: 255
+    t.string   "last_sign_in_ip",           limit: 255
+    t.string   "confirmation_token",        limit: 255
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
-    t.string   "unconfirmed_email",      limit: 255
-    t.integer  "failed_attempts",        limit: 4,     default: 0,     null: false
-    t.string   "unlock_token",           limit: 255
+    t.string   "unconfirmed_email",         limit: 255
+    t.integer  "failed_attempts",           limit: 4,     default: 0,     null: false
+    t.string   "unlock_token",              limit: 255
     t.datetime "locked_at"
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
-    t.integer  "company_id",             limit: 4,                     null: false
-    t.string   "mobile_number",          limit: 255
-    t.boolean  "active",                               default: true,  null: false
-    t.string   "invitation_token",       limit: 255
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
+    t.integer  "company_id",                limit: 4,                     null: false
+    t.string   "mobile_number",             limit: 255
+    t.boolean  "active",                                  default: true,  null: false
+    t.string   "invitation_token",          limit: 255
     t.datetime "invitation_created_at"
     t.datetime "invitation_sent_at"
     t.datetime "invitation_accepted_at"
-    t.integer  "invitation_limit",       limit: 4
-    t.integer  "invited_by_id",          limit: 4
-    t.string   "invited_by_type",        limit: 255
-    t.integer  "invitations_count",      limit: 4,     default: 0
-    t.string   "otp",                    limit: 255
+    t.integer  "invitation_limit",          limit: 4
+    t.integer  "invited_by_id",             limit: 4
+    t.string   "invited_by_type",           limit: 255
+    t.integer  "invitations_count",         limit: 4,     default: 0
+    t.string   "otp",                       limit: 255
     t.datetime "otp_sent_at"
     t.datetime "otp_verified_at"
-    t.boolean  "otp_verified",                         default: false, null: false
-    t.integer  "otp_count",              limit: 4,     default: 0,     null: false
-    t.string   "first_name",             limit: 255
-    t.string   "last_name",              limit: 255
-    t.boolean  "mobile_only_invite",                   default: false
-    t.string   "mothers_maiden_name",    limit: 255
-    t.boolean  "verified",                             default: false
-    t.integer  "otp_request_type_id",    limit: 4
-    t.boolean  "default_password",                     default: false
-    t.boolean  "point_of_contact",                     default: false
-    t.integer  "otp_attempts",           limit: 4,     default: 0
-    t.integer  "user_delegate_id",       limit: 4
+    t.boolean  "otp_verified",                            default: false, null: false
+    t.integer  "otp_count",                 limit: 4,     default: 0,     null: false
+    t.string   "first_name",                limit: 255
+    t.string   "last_name",                 limit: 255
+    t.boolean  "mobile_only_invite",                      default: false
+    t.string   "mothers_maiden_name",       limit: 255
+    t.boolean  "verified",                                default: false
+    t.integer  "otp_request_type_id",       limit: 4
+    t.boolean  "default_password",                        default: false
+    t.boolean  "point_of_contact",                        default: false
+    t.integer  "otp_attempts",              limit: 4,     default: 0
+    t.integer  "user_delegate_id",          limit: 4
     t.boolean  "delegation_enabled"
-    t.text     "gl_config",              limit: 65535
+    t.text     "gl_config",                 limit: 65535
+    t.boolean  "vacation_delegate_enabled"
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -6137,6 +6217,7 @@ ActiveRecord::Schema.define(version: 20190110121412) do
   add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_delegate_mappings", "users"
   add_foreign_key "user_department_mappings", "departments"
   add_foreign_key "user_department_mappings", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"

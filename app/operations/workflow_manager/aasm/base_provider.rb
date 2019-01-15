@@ -17,7 +17,7 @@ class WorkflowManager::Aasm::BaseProvider
     self.next_level = document.get_level(:next)
     self.previous_level = document.get_level(:prev)
     self.current_level_reviewers = document.get_reviewers
-    self.reviewers = document.get_next_level_reviewers
+    self.reviewers = document.get_reviewers(:next)
   end
 
   # @@providers = []

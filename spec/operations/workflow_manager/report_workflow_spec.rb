@@ -35,6 +35,9 @@ RSpec.describe "Report Workflow -- " do
     @level2.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
     @level3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user3.id, threshold: 0, exception: false})
 
+    # Createe LURM for overriding reviewer on a default LRM mapping
+    @level1.level_user_reviewer_mappings.create({user_id: @em_employee_user1.id, reviewer_id: @em_reviewer_user4.id, policy_id: @policy.id})
+
     @level_p2_1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user3.id, threshold: 0, exception: false})
     @level_p2_2.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})
     @level_p2_3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
@@ -54,6 +57,11 @@ RSpec.describe "Report Workflow -- " do
     it "has created document level reviewer mapping" do
       expect(@document.document_level_reviewer_mappings.count).to eq(3)
     end
+
+    it "has set override user as approver on first level dlrm" do
+      debugger
+    end
+
   end
 
   xdescribe "UPDATE -- " do
@@ -93,7 +101,10 @@ RSpec.describe "Report Workflow -- " do
     before(:all) do
       @op2 = Reports::Submit.(@em_employee_user1, {id: @document.id})
       @document.reload
-      skip if @op2.failure?
+      if @op2.failure?
+        p "SUBMIT", @op2.messages[:error]
+        skip
+      end
     end
 
     it "has created last trail with action :submit and action user id" do
@@ -102,9 +113,9 @@ RSpec.describe "Report Workflow -- " do
       expect(last_trail&.action_user_id).to eq(@em_employee_user1.id)
     end
 
-    it "is submitted successfully" do
-      expect(@op2.success?).to eq true
-    end
+    # it "is submitted successfully" do
+    #   expect(@op2.success?).to eq true
+    # end
 
     it "has moved to first level" do
       expect(@document.controlling_level_id).to eq(@level1.id)

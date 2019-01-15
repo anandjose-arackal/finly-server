@@ -15,6 +15,7 @@
 #  updated_at                       :datetime         not null
 #  action_id                        :integer
 #  action_user_role_id              :integer
+#  delegated_action_user_id         :integer
 #
 
 

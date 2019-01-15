@@ -35,6 +35,8 @@
 #  controlling_level_id               :integer
 #  department_id                      :integer
 #  sub_department_id                  :integer
+#  created_by_id                      :integer
+#  modified_by_id                     :integer
 #
 
 

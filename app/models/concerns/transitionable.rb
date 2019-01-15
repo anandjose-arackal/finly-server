@@ -8,68 +8,107 @@ module Transitionable
     has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
     has_many :trails, as: :parent
 
-    # Returns List of Users Who have interacted with the document
-    def interacted_users
-      user_ids = self.document_level_reviewer_mappings.where(
-          viewable: true
-      ).pluck(:action_taken_by_id)
-      User.where(id: user_ids)
-    end
-
-    # All Associated Users for a document (have taken action + yet to take action)
-    def associated_users
-      # Users will be picked from DocumentLevelReviewerMapping
-      dlrm = self.document_level_reviewer_mappings.pluck()
-    end
-
-    # Includes users who have already approved the document
-    def reject_affected_users
+    # New method for users
+    #
+    def associated_users(type=nil)
+      # Valid types [:retract, :reject, :all, :interacted]
       user_ids = []
-      user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id)
-      user_ids.push self.document_owner.id # Check if this has to be added
-
-      User.where(id: user_ids)
-    end
-
-    # Skips users who have already approved the document
-    def retract_affected_users
-      user_ids = []
-      if self.level.present?
-        taken_control_by_ids = []
-        # If the current level has been taken control by someone return their ids else the current reviewers in the level
-        taken_control_by_ids =  self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:taken_control_by_id)
-        taken_control_by_ids.reject! {|user_id| user_id.nil?}
-        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:reviewer_id)
+      case type
+      when 'retract', :retract # Users who will be affected
+        if self.level.present?
+          taken_control_by_ids = []
+          # If the current level has been taken control by someone return their ids else the current reviewers in the level
+          taken_control_by_ids =  self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:taken_control_by_id)
+          taken_control_by_ids.reject! {|user_id| user_id.nil?}
+          user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:reviewer_id)
+        end
+        user_ids = self.document
+      when 'reject', :reject # Users who will be affected
+        user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id).reject {|user_id| user_id.nil?}
+        user_ids.push self.document_owner.id # Check if this has to be added
+      when 'all', :all # Users who have interacted + who will interact in future
+      when 'interacted', :interacted # User who have taken action the document
+        user_ids = self.document_level_reviewer_mappings.where(
+                                                            viewable: true
+        ).pluck(:action_taken_by_id)
+      else # Return all associated users
+        return associated_users(:all)
       end
-      user_ids
+
+      User.where(id: user_ids)
+    end
+
+    # # # Returns List of Users Who have interacted with the document
+    # # def interacted_users
+    # #   user_ids = self.document_level_reviewer_mappings.where(
+    # #       viewable: true
+    # #   ).pluck(:action_taken_by_id)
+    # #   User.where(id: user_ids)
+    # # end
+    #
+    # # # All Associated Users for a document (have taken action + yet to take action)
+    # # def associated_users
+    # #   # Users will be picked from DocumentLevelReviewerMapping
+    # #   dlrm = self.document_level_reviewer_mappings.pluck()
+    # # end
+    #
+    # # Includes users who have already approved the document
+    # def reject_affected_users
+    #
+    #
+    #   User.where(id: user_ids)
+    # end
+    #
+    # # Skips users who have already approved the document
+    # def retract_affected_users
+    #   user_ids = []
+    #
+    #   user_ids
+    # end
+
+    # Get reviewers from current level
+    def get_reviewers(level_details=nil, provider_name=nil)
+      if [:next, :previous, 'next', 'previous', :current, 'current'].include? level_details
+        level = get_level(level_details, provider_name)
+      elsif level_details.is_a?(Integer)
+          level = get_level_with_id(level_details, provider_name)
+      else
+        level = self.level
+      end
+      user_ids = []
+
+      if level.present?
+        taken_control_by_ids = []
+        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id)
+        taken_control_by_ids.reject! {|user_id| user_id.nil?}
+        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
+      end
+
+      User.where(id: user_ids)
     end
 
     # Get reviewers from current level
-    def get_reviewers
-      user_ids = []
-      if self.level.present?
-        taken_control_by_ids = []
-        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:taken_control_by_id)
-        taken_control_by_ids.reject! {|user_id| user_id.nil?}
-        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:reviewer_id)
+    # def get_next_level_reviewers
+    #   user_ids = []
+    #   next_level = get_level(:next)
+    #
+    #   if next_level.present?
+    #     taken_control_by_ids = []
+    #     taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:taken_control_by_id)
+    #     taken_control_by_ids.reject! {|user_id| user_id.nil?}
+    #     user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:reviewer_id)
+    #   end
+    #
+    #   User.where(id: user_ids)
+    # end
+    #
+
+    def get_level_with_id(level_id, provider_name=nil)
+      provider_name = provider_name || get_default_provider
+      if self.document_level_reviewer_mappings.with_provider_name(provider_name).pluck(:level_id).include? level_id
+        return ReviewalLevel.with_id(level_id).first
       end
-
-      User.where(id: user_ids)
-    end
-
-    # Get reviewers from current level
-    def get_next_level_reviewers
-      user_ids = []
-      next_level = get_level(:next)
-
-      if next_level.present?
-        taken_control_by_ids = []
-        taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:taken_control_by_id)
-        taken_control_by_ids.reject! {|user_id| user_id.nil?}
-        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(next_level.id).pluck(:reviewer_id)
-      end
-
-      User.where(id: user_ids)
+      nil
     end
 
     def get_level(type, provider_name=nil)
@@ -104,11 +143,13 @@ module Transitionable
         end
       end
 
-      if provider_name.present?
-        reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).first&.level_id
-      else
-        reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).with_provider_name(provider_name).first&.level_id
-      end
+      provider_name = provider_name || get_default_provider
+
+      # if provider_name.present?
+      #   reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).first&.level_id
+      # else
+      # end
+      reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).with_provider_name(provider_name).first&.level_id
 
       ReviewalLevel.with_id(reviewal_level_id).first
 
@@ -137,6 +178,10 @@ module Transitionable
       end
 
       return true
+    end
+
+    def get_default_provider
+      self.class.name + "Provider"
     end
 
 

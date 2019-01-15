@@ -1,10 +1,10 @@
 class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::DocumentReviewalMappings::Base
-  attr_accessor :mappings_params, :document
+  attr_accessor :mappings_params, :document, :provider_name
 
   def init
     self.document = params[:reviewal_document]
     self.mappings_params = mappings_parameters
-    self.provider_name = params[:provider_name]
+    self.provider_name = mappings_params[:provider_name] || document.get_default_provider
   end
 
   def validate
@@ -12,11 +12,13 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
       add_message :error, 'Document not found'
     end
 
+    all_level_ids = ReviewalLevel.with_policy_ids(document.policy_id).pluck(:id)
+
     if mappings_params[:document_reviewer_mappings].present?
       mappings_params[:document_reviewer_mappings].each do |mapping_params|
         # check if level present in company
         level = ::ReviewalLevel.find_by id: mapping_params[:level_id]
-        unless level&.policy&.company_id == user.company_id
+        unless all_level_ids.include? level.id
           add_message :error, 'Invalid Level Details'
           break
         end
@@ -24,15 +26,18 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         mapping_params[:level] = level
 
         # # check if reviewer present in company
-        reviewer = user.company.users.find_by id: mapping_params[:reviewer_id]
-        #
-        if reviewer.present?
+        # todo Scope reviewers from LRM & LURM
+        reviewer_ids = level.level_user_reviewer_mappings.with_user_id(user.id).pluck(:reviewer_id) +
+                level.level_reviewer_mappings.pluck(:reviewer_id)
+
+        if reviewer_ids.include? mapping_params[:reviewer_id]&.to_i
+          reviewer = user.company.users.find_by id: mapping_params[:reviewer_id]
           mapping_params[:reviewer] = reviewer
         end
       end
     else
       mappings_params[:document_reviewer_mappings] = []
-      document.policy.levels.each do |level|
+      document.policy.levels.with_entity_type(self.provider_name).each do |level|
         mapping_data = {
             level_id: level.id,
             level: level
@@ -75,17 +80,33 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
             end
           else
             document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
-            level.reviewers.each do |level_reviewer|
-              if valid_reviewers.include?(level_reviewer.id)
 
-              document.document_level_reviewer_mappings.create({
-                                                                   level_id: level.id,
-                                                                   policy_id: document.policy_id,
-                                                                   provider_name: provider_name,
-                                                                   reviewer_id: level_reviewer.id,
-                                                                   level_number: level.level_number
-                                                               })
+            # If reviewer overrides are present for level
+            if level.level_user_reviewer_mappings.present?
+              level.level_user_reviewer_mappings.each do |lurm|
+                document.document_level_reviewer_mappings.create({
+                                                                     level_id: level.id,
+                                                                     level_number: level.level_number,
+                                                                     provider_name: level.associated_entity_type,
+                                                                     reviewer_id: lurm.reviewer_id,
+                                                                     policy_id: document.policy_id
+                                                                 })
+
               end
+            else
+              level.reviewers.each do |level_reviewer|
+                if valid_reviewers.include?(level_reviewer.id)
+
+                  document.document_level_reviewer_mappings.create({
+                                                                       level_id: level.id,
+                                                                       policy_id: document.policy_id,
+                                                                       provider_name: level.associated_entity_type,
+                                                                       reviewer_id: level_reviewer.id,
+                                                                       level_number: level.level_number
+                                                                   })
+                end
+              end
+
             end
           end
         end
@@ -127,6 +148,6 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
   private
 
   def mappings_parameters
-    params.permit(document_reviewer_mappings: [:level_id, :reviewer_id])
+    params.permit(:provider_name, document_reviewer_mappings: [:level_id, :reviewer_id])
   end
 end

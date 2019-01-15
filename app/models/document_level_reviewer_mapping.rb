@@ -33,7 +33,6 @@ class DocumentLevelReviewerMapping < ActiveRecord::Base
   belongs_to :action_taken_by, class_name: 'User'
   belongs_to :action, class_name: 'TrailAction'
 
-
   scope :with_level_ids, -> (ids) {where level_id: ids}
   scope :with_level_id, -> (ids) {where level_id: ids}
   scope :with_reviewer_ids, -> (ids) {where reviewer_id: ids}

@@ -1,12 +1,15 @@
 class ReviewalManager::ReviewalChain < ReviewalManager::Base
-  attr_accessor :document, :document_types, :document_class_name, :chain, :policy, :levels
+  attr_accessor :document, :provider_names,
+                :document_class_name, :chain, :policy,
+                :levels, :provider_name
 
   # In params
   # policy_id needs to be present
   def init
     self.document = params[:reviewal_document]
+    self.provider_name = params[:provider_name] || self.document&.get_default_provider
     self.chain = []
-    self.document_types = ['PurchaseOrder', 'Invoice', 'Report', 'MoneyRequest', 'BankPaymentRequest']
+    self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider )
     policy_id = params[:policy_id]
 
     self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
@@ -16,11 +19,10 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
   def validate
     self.document_class_name = document.class.name
 
-    unless document_types.include? document_class_name
+    unless provider_names.include? document_class_name
       add_message :error, 'Invalid Document Provided'
       return
     end
-
   end
 
   def process
@@ -28,10 +30,15 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       return
     end
 
-    self.levels = self.policy.levels.with_entity_type(document_class_name).order(:level_number)
+    # Find over ridden users for a policy level
+    self.levels = self.policy.levels.with_entity_type(provider_name).order(:level_number)
 
     levels.each do |level|
-      mappings = level.level_reviewer_mappings.non_deleted
+      if level.level_user_reviewer_mappings.present?
+        mappings = level.level_user_reviewer_mappings
+      else
+        mappings = level.level_reviewer_mappings.non_deleted
+      end
 
       selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
       level_data = {
@@ -40,12 +47,10 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
           reviewers: mappings
       }
       if selected_reviewer.present?
-
         level_data[:selected_reviewer] = selected_reviewer.reviewer
       end
 
-
-      chain.push(level_data)
+      self.chain.push(level_data)
     end
   end
 

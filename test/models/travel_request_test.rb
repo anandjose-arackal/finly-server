@@ -28,6 +28,8 @@
 #  selection_requested_at       :datetime
 #  booking_confirmed_at         :datetime
 #  controlling_level_id         :integer
+#  created_by_id                :integer
+#  modified_by_id               :integer
 #
 
 require 'test_helper'

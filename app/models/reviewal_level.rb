@@ -21,6 +21,8 @@ class ReviewalLevel < ActiveRecord::Base
   has_many :level_reviewer_mappings, foreign_key: :level_id, dependent: :destroy
   has_many :reviewers, class_name: 'User', through: :level_reviewer_mappings
 
+  has_many :level_user_reviewer_mappings,foreign_key: :level_id
+
   validates :policy_id, presence: true
   validates :level_number, presence: true
   validates :associated_entity_type, presence: true
