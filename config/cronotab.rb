@@ -31,3 +31,4 @@ Crono.perform(BankTransferStatusChecker).every 15.minutes
 end
 Crono.perform(ReminderOutwardInvoices).every 1.day, at: {hour: 9, min: 30}
 Crono.perform(CompanyAccountScheduledTransfer).every 1.day, at: {hour: 9, min: 30}
+Crono.perform(BalanceTallyLedgerProcess).every 1.day, at: {hour: 23, min: 30}

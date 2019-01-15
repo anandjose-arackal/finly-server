@@ -14,10 +14,11 @@ class BalanceTallyLedger < ActiveRecord::Base
 
   belongs_to :api_balance, class_name: "Amount"
   belongs_to :finly_database_balance, class_name: "Amount"
+  belongs_to :calculated_balance, class_name: "Amount"
 
   validates :date, presence: true
   validates :api_balance, presence: true
   validates :finly_database_balance, presence: true
 
-  accepts_nested_attributes_for :api_balance, :finly_database_balance
+  accepts_nested_attributes_for :api_balance, :finly_database_balance, :calculated_balance
 end

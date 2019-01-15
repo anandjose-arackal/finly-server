@@ -481,6 +481,7 @@
 #                                                         GET    /admin_users/card_assign_requests/export(.:format)                                                                  admin_users/card_assign_requests#export
 #                                                         GET    /admin_users/card_assign_requests/export/kycs(.:format)                                                             admin_users/card_assign_requests#download_kycs
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                                                    admin_users/card_assign_requests#edit
+#                                 admin_users_bulk_assign POST   /admin_users/cards/bulk_assign(.:format)                                                                            admin_users/cards#bulk_assign
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                                           admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                                              admin_users/users#admin_menus
 #                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                                                  api/callbacks#successful_vendor_payment
@@ -1423,6 +1424,8 @@
 #                                                    ping GET    /ping(.:format)                                                                                                     ping#ping
 #                                                         GET    /ping/sidekiq/:type(.:format)                                                                                       ping#sidekiq
 #                                           ping_database GET    /ping/database(.:format)                                                                                            ping#database
+#                                      sample_import_file GET    /budgets/sample_import_file(.:format)                                                                               budgets#sample_import_file
+#                                           budget_import POST   /budgets/import(.:format)                                                                                           budgets#import
 #                                       budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                    budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
 #                                           budget_trails GET    /budgets/:budget_id/modification_trails(.:format)                                                                   budgets#trails

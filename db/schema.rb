@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_14_151717) do
+ActiveRecord::Schema.define(version: 2019_01_14_235514) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -437,6 +437,17 @@ ActiveRecord::Schema.define(version: 2019_01_14_151717) do
     t.index ["approved_reports_total_id"], name: "index_balance_sheets_on_approved_reports_total_id"
     t.index ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id"
     t.index ["user_id"], name: "index_balance_sheets_on_user_id"
+  end
+
+  create_table "balance_tally_ledgers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.date "date"
+    t.integer "api_balance_id"
+    t.integer "finly_database_balance_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "calculated_balance_id"
+    t.index ["api_balance_id"], name: "index_balance_tally_ledgers_on_api_balance_id"
+    t.index ["finly_database_balance_id"], name: "index_balance_tally_ledgers_on_finly_database_balance_id"
   end
 
   create_table "bank_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

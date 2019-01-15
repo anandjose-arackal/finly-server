@@ -1,4 +1,4 @@
-class CreateBalanceTallyLedgers < ActiveRecord::Migration
+class CreateBalanceTallyLedgers < ActiveRecord::Migration[4.2]
   def change
     create_table :balance_tally_ledgers do |t|
       t.date :date
