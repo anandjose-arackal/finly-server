@@ -76,6 +76,7 @@ class ExpensesController < ApplicationController
   end
 
   def show
+    e.vlid?
     @result = Expense::Show.(current_user, params)
     respond
   end
