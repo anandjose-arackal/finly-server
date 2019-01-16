@@ -3039,6 +3039,11 @@ Rails.application.routes.draw do
 
   get 'payment_request_configs', to: 'bank_transfer/bank_payment_requests#index_configurations', as: :request_index_configs
   get 'payment_request_filters', to: 'bank_transfer/bank_payment_requests#index_configurations', as: :request_filters
+  get 'payment_request_action_config', to: 'bank_transfer/bank_payment_requests#actions_configuration'
+  get 'account_owner_action_config', to: 'bank_transfer/account_owners#actions_configuration'
+  get 'inward_invoice_action_config', to: 'bank_transfer/inward_invoices#actions_configuration'
+  get 'inventory_line_item_action_config', to: 'invoicing/inventory_line_items#actions_configuration'
+  get 'purchase_order_action_config', to: 'procure/purchase_orders#actions_configuration'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'

@@ -146,4 +146,9 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond response: @result.success? ? :success : :failure
   end
 
+  def actions_configuration
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
 end
