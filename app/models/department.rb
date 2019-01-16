@@ -20,6 +20,9 @@ class Department < ApplicationRecord
 
   has_many :user_department_mappings
   has_many :users, through: :user_department_mappings
+  
+  has_many :budget_rule_department_mappings
+  has_many :budget_rules, through: :budget_rule_department_mappings
 
   has_many :cost_center_department_mappings
   has_many :cost_centers, through: :cost_center_department_mappings

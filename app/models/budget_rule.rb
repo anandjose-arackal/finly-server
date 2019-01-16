@@ -27,6 +27,10 @@ class BudgetRule < ApplicationRecord
   # belongs_to :category, optional: true
   has_many :budget_rule_category_mappings
   has_many :categories, through: :budget_rule_category_mappings
+
+  has_many :budget_rule_department_mappings
+  has_many :departments, through: :budget_rule_department_mappings
+
   belongs_to :amount, optional: true, dependent: :destroy
   belongs_to :period, optional: true
   belongs_to :policy, optional: true
