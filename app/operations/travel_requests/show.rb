@@ -17,8 +17,7 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   def success
-    params[:travel_request] = self.travel_request
-    TravelRequests::Show::ShowPresenter.new(user, params, messages)
+    TravelRequests::Show::ShowPresenter.new(user, {travel_request: self.travel_request}, messages)
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter

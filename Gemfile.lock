@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/sinatra/sinatra.git
-  revision: 7a5c499f0e6099137fd1cb4ee20178af2a125d47
+  revision: f77a0d0baf62c634d089cbc2f0df60049002e247
   branch: master
   specs:
     rack-protection (2.0.5)
@@ -93,13 +93,13 @@ GEM
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.0.1)
-    aws-partitions (1.128.0)
+    aws-partitions (1.131.0)
     aws-sdk-core (3.44.2)
       aws-eventstream (~> 1.0)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-ec2 (1.65.0)
+    aws-sdk-ec2 (1.66.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-kms (1.13.0)
@@ -212,7 +212,7 @@ GEM
       httparty
       json
     geocoder (1.5.0)
-    globalid (0.4.1)
+    globalid (0.4.2)
       activesupport (>= 4.2.0)
     griddler (1.5.2)
       htmlentities
@@ -297,7 +297,7 @@ GEM
     mocha (1.7.0)
       metaclass (~> 0.0.1)
     mono_logger (1.1.0)
-    msgpack (1.2.4)
+    msgpack (1.2.6)
     multi_json (1.13.1)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
@@ -326,6 +326,8 @@ GEM
       mime-types
       mimemagic (~> 0.3.0)
       terrapin (~> 0.6.0)
+    paranoia (2.4.1)
+      activerecord (>= 4.0, < 5.3)
     parslet (1.8.2)
     power_assert (1.1.3)
     pry (0.12.2)
@@ -418,8 +420,9 @@ GEM
     sendgrid-ruby (5.3.0)
       ruby_http_client (~> 3.3.0)
       sinatra (>= 1.4.7, < 3)
-    sidekiq (5.2.3)
+    sidekiq (5.2.5)
       connection_pool (~> 2.2, >= 2.2.2)
+      rack (>= 1.5.0)
       rack-protection (>= 1.5.0)
       redis (>= 3.3.5, < 5)
     sidekiq-logstash (1.0.1)
@@ -553,6 +556,7 @@ DEPENDENCIES
   omniauth (~> 1.9.0)
   omniauth-quickbooks (~> 0.0.2)
   paperclip (~> 6.1.0)
+  paranoia (~> 2.4)
   parslet (~> 1.8.2)
   pry (~> 0.12.2)
   puma (~> 3.12.0)
@@ -593,4 +597,4 @@ RUBY VERSION
    ruby 2.6.0p0
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
