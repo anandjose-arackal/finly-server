@@ -393,6 +393,10 @@ class MoneyRequest < ActiveRecord::Base
     'status_id'
   end
 
+  def self.finance_associated_status_ids
+    MoneyRequestStatus.ids_for(:approved, :credited, :pending, :auto_approved)
+  end
+
   def handle_name
     if self.name.blank?
       self.name = MoneyRequest.get_default_name(self.user)

@@ -89,7 +89,6 @@ RSpec.describe "Travel Request Workflow -- " do
     end
 
     describe "trail, level -- " do
-
       let(:user) {@em_employee_user1}
       let(:level) {@level1}
       let(:action) {:submit}

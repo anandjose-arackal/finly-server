@@ -365,4 +365,8 @@ class PurchaseOrder < ActiveRecord::Base
   def self.document_status_attribute
     'purchase_order_status_id'
   end
+
+  def self.finance_associated_status_ids
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
+  end
 end

@@ -10,6 +10,7 @@ RSpec.describe "Report Workflow -- " do
     @em_reviewer_user1 = create(:em_reviewer_user, company_id: @company.id)
     @em_reviewer_user2 = create(:em_reviewer_user, company_id: @company.id)
     @em_reviewer_user3 = create(:em_reviewer_user, company_id: @company.id)
+    @em_reviewer_user4 = create(:em_reviewer_user, company_id: @company.id)
     @em_finance_user1 = create(:em_finance_user, company_id: @company.id)
     @em_admin_user1 = create(:em_admin_user, company_id: @company.id)
 
@@ -35,12 +36,13 @@ RSpec.describe "Report Workflow -- " do
     @level2.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
     @level3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user3.id, threshold: 0, exception: false})
 
-    # Createe LURM for overriding reviewer on a default LRM mapping
-    @level1.level_user_reviewer_mappings.create({user_id: @em_employee_user1.id, reviewer_id: @em_reviewer_user4.id, policy_id: @policy.id})
-
     @level_p2_1.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user3.id, threshold: 0, exception: false})
     @level_p2_2.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user1.id, threshold: 0, exception: false})
     @level_p2_3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
+
+    # Createe LURM for overriding reviewer on a default LRM mapping
+    @level1.level_user_reviewer_mappings.create({user_id: @em_employee_user1.id, reviewer_id: @em_reviewer_user4.id, policy_id: @policy.id})
+    @em_reviewer_user1 = @em_reviewer_user4
 
     expense = create(:expense, {user_id: @em_employee_user1.id,
                                 spent_from_id: @em_employee_user1.user_pockets.reimbursement_pocket_only.first.id})
@@ -58,10 +60,8 @@ RSpec.describe "Report Workflow -- " do
       expect(@document.document_level_reviewer_mappings.count).to eq(3)
     end
 
-    it "has set override user as approver on first level dlrm" do
-      debugger
+    xit "has set override user as approver on first level dlrm" do
     end
-
   end
 
   xdescribe "UPDATE -- " do
@@ -122,7 +122,8 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "'s reviewer is set to level 1's reviewer" do
-      expect(@document.get_reviewers.pluck(:id)).to include(*@level1.reviewers.pluck(:id))
+      # expect(@document.get_reviewers.pluck(:id)).to include(*@level1.reviewers.pluck(:id))
+      expect(@document.get_reviewers.pluck(:id)).to include(@em_reviewer_user1.id)
     end
 
 

@@ -22,45 +22,62 @@ class MoneyRequests::Index < MoneyRequests::Base
   end
 
   def process
+    # case self.role_id
+    # when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+    #   user_ids = User::Team::Index.(user, params).pluck(:id)
+    #   if self.user.company_admin? || user.auditor?
+    #     self.money_requests = MoneyRequest.not_open.with_user(user_ids)
+    #   elsif user.policy_admin?
+    #     policy_ids = user.admin_policies.pluck(:id)
+    #     self.money_requests = MoneyRequest.not_open.with_user(user_ids).with_policy(policy_ids)
+    #   end
+    #   unless user.admin? || user.auditor?
+    #     messages[:error] << 'User is not an admin'
+    #     return false
+    #   end
+    # when UserRole.id_for(:manager)
+    #   team_ids = User::Team::Index.(user, params)&.pluck(:id)
+    #   # controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids)
+    #   # interacted_money_requests_query= user.manager_money_requests
+    #   # sql = MoneyRequest.connection.unprepared_statement {
+    #   #   "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
+    #   # }
+    #   # self.money_requests = MoneyRequest.from(sql)
+    #   controlling_money_requests = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids).pluck(:id)
+    #   interacted_money_requests = user.manager_money_requests.pluck(:id)
+    #   self.money_requests = MoneyRequest.with_id(controlling_money_requests + interacted_money_requests)
+    # when UserRole.id_for(:finance_manager)
+    #   team_ids = User::Team::Index.(user, params)&.pluck(:id)
+    #   # controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager)).with_user(team_ids)
+    #   # interacted_money_requests_query = user.finance_money_requests
+    #   # sql = MoneyRequest.connection.unprepared_statement {
+    #   #   "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
+    #   # }
+    #   # self.money_requests = MoneyRequest.from(sql)
+    #   controlling_money_requests = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager)).with_user(team_ids).pluck(:id)
+    #   interacted_money_requests = user.finance_money_requests.pluck(:id)
+    #   self.money_requests = MoneyRequest.with_id(interacted_money_requests + controlling_money_requests)
+    # when UserRole.id_for(:auditor)
+    #   # todo auditor
+    # else
+    #   self.money_requests = user.money_requests.sort_for_personal
+    # end
+    # self.money_requests = self.money_requests.exclude_deleted if self.money_requests.present?
+
     case self.role_id
-    when UserRole.id_for(:admin), UserRole.id_for(:auditor)
-      user_ids = User::Team::Index.(user, params).pluck(:id)
-      if self.user.company_admin? || user.auditor?
-        self.money_requests = MoneyRequest.not_open.with_user(user_ids)
+    when UserRole.fid_for(:admin), UserRole.id_for(:auditor)
+      if self.user.company_admin? || self.user.auditor?
+        self.money_requests = MoneyRequest.admin_associated_items(user)
       elsif user.policy_admin?
-        policy_ids = user.admin_policies.pluck(:id)
-        self.money_requests = MoneyRequest.not_open.with_user(user_ids).with_policy(policy_ids)
-      end
-      unless user.admin? || user.auditor?
-        messages[:error] << 'User is not an admin'
-        return false
+        # todo Take care of policy admins
+        self.money_requests = MoneyRequest.admin_associated_items(user)
       end
     when UserRole.id_for(:manager)
-      team_ids = User::Team::Index.(user, params)&.pluck(:id)
-      # controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids)
-      # interacted_money_requests_query= user.manager_money_requests
-      # sql = MoneyRequest.connection.unprepared_statement {
-      #   "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
-      # }
-      # self.money_requests = MoneyRequest.from(sql)
-      controlling_money_requests = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids).pluck(:id)
-      interacted_money_requests = user.manager_money_requests.pluck(:id)
-      self.money_requests = MoneyRequest.with_id(controlling_money_requests + interacted_money_requests)
+      self.money_requests = MoneyRequest.reviewer_associated_items(user)
     when UserRole.id_for(:finance_manager)
-      team_ids = User::Team::Index.(user, params)&.pluck(:id)
-      # controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager)).with_user(team_ids)
-      # interacted_money_requests_query = user.finance_money_requests
-      # sql = MoneyRequest.connection.unprepared_statement {
-      #   "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
-      # }
-      # self.money_requests = MoneyRequest.from(sql)
-      controlling_money_requests = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager)).with_user(team_ids).pluck(:id)
-      interacted_money_requests = user.finance_money_requests.pluck(:id)
-      self.money_requests = MoneyRequest.with_id(interacted_money_requests + controlling_money_requests)
-    when UserRole.id_for(:auditor)
-      # todo auditor
+      self.money_requests = MoneyRequest.finance_associated_items(user, role_id)
     else
-      self.money_requests = user.money_requests.sort_for_personal
+      self.money_requests = user.money_request.sort_for_personal
     end
     self.money_requests = self.money_requests.exclude_deleted if self.money_requests.present?
   end

@@ -12,4 +12,8 @@
 #
 
 class PolicyUserRolePurposeMapping < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :role, class_name: 'UserRole'
+  belongs_to :policy
+  belongs_to :purpose
 end

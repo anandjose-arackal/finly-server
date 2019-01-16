@@ -346,6 +346,10 @@ class BankPaymentRequest < ActiveRecord::Base
     'status_id'
   end
 
+  def self.finance_associated_status_ids
+    BankPaymentRequestStatus.ids_for(:approved, :credited, :pending, :creation_in_progress, :auto_approved)
+  end
+
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end

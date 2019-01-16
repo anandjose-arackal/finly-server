@@ -606,4 +606,8 @@ class Report < ActiveRecord::Base
     'user_id'
   end
 
+  def self.finance_associated_status_ids
+    ReportStatus.ids_for(:approved, :settled, :settlement_confirmed , :closed, :auto_approved)
+  end
+
 end

@@ -246,5 +246,20 @@ module Transitionable
         self.where(id: document_ids)
       end
     end
+
+    def finance_associated_items(user, role_id, purpose_id=1)
+      if user.instance_of?(User)
+        policy_ids = PolicyUserRolePurposeMapping.with_purpose_id(purpose_id).with_role_id(role_id).where(user_id: user.id)
+        self.where(policy_id: policy_ids)
+            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids).pluck(:id)
+      end
+    end
+
+    # todo setup travel request
+    def travel_associated_items(user, role_id, purpose_id=1)
+      if user.instance_of(User)
+
+      end
+    end
   end
 end

@@ -417,4 +417,8 @@ class Invoice < ActiveRecord::Base
     'invoice_status_id'
   end
 
+  def self.finance_associated_status_ids
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+  end
+
 end
