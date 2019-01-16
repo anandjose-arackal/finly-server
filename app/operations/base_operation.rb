@@ -283,7 +283,7 @@ class BaseOperation
       self.user = user
       self.params = params
       if self.params.class.name == ActionController::Parameters.name
-        self.params = self.params.permit!.to_h
+        self.params = self.params.to_unsafe_h
       end
       self.messages = messages
       init
