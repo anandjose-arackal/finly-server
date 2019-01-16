@@ -148,7 +148,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             payment.payment_order.bank_payment_request.status&.name&.humanize,
             payment.payment_order.scheduled_at&.strftime("%d-%m-%Y"),
             payment.payment_order.bank_payment_request.submitted_at&.strftime("%d-%m-%Y"),
-            payment.payment_order.processed_at.strftime("%d-%m-%Y"),
+            payment.payment_order.processed_at&.strftime("%d-%m-%Y"),
             payment.payment_order.bank_payment_request.controlling_user&.name,
             payment.invoice&.invoice_number,
             payment.invoice&.due_date&.strftime("%d-%m-%Y"),
