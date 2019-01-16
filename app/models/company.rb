@@ -299,7 +299,7 @@ class Company < ApplicationRecord
   end
 
   def cards_enabled?
-    expense_card_enabled? || medical_card_enabled? || reimbursement_card_enabled? || gift_card_enabled? || gift_voucher_enabled?
+    expense_card_enabled? || medical_card_enabled? || reimbursement_card_enabled? || gift_card_enabled? || gift_voucher_enabled? || meal_card_enabled?
   end
 
   def vendor_payments_enabled?
