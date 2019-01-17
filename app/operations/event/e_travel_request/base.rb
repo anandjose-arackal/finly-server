@@ -37,7 +37,7 @@ class Event::ETravelRequest::Base < Event::SetNotifier
   	return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    TravelRequestMailer.delay.send_mail(Event::ETravelRequest::Base::MailerPresenter.new(user, params))
+    TravelRequestMailer.send_mail(Event::ETravelRequest::Base::MailerPresenter.new(user, params)).deliver_now
   end
 
   def mailer_subject(user)
