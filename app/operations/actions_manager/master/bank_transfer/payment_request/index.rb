@@ -1,6 +1,6 @@
 class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManager::Master::Base
 
-  register_handle :payment_request_index
+  register_handle :payment_ticket_index
   # validate :input
   register_actions [ :new_orders, :bulk_actions,:export_sap, :mark_as_credited, :credit_payment_order, :approve_selected, :approve_pending, :upload_utr, :bulk_downloads, :download_payment_files, :download_pending, :download_selected, :download_all, :export, :tally, :quickbooks, :sap, :oracle_ns]
 

@@ -4,8 +4,8 @@ class ActionsManager::Master::Base
   attr_accessor :user, :params, :input
 
   MASTERS = {
-    payment_request_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
-    payment_request_show: '::ActionsManager::Master::BankTransfer::PaymentRequest::Show',
+    payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
+    payment_ticket_show: '::ActionsManager::Master::BankTransfer::PaymentRequest::Show',
     account_owners_index: '::ActionsManager::Master::BankTransfer::AccountOwners::Index',
     account_owners_show: '::ActionsManager::Master::BankTransfer::AccountOwners::Show',
     inward_invoices_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::Index',
