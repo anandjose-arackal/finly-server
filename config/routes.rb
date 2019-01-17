@@ -3055,7 +3055,7 @@ Rails.application.routes.draw do
   get 'account_owner_action_config', to: 'bank_transfer/account_owners#actions_configuration'
   get 'inward_invoice_action_config', to: 'bank_transfer/inward_invoices#actions_configuration'
   get 'inventory_line_item_action_config', to: 'invoicing/inventory_line_items#actions_configuration'
-  get 'purchase_order_action_config', to: 'procure/purchase_orders#actions_configuration'
+  get 'non_po_action_config', to: 'procure/purchase_orders#actions_configuration'
   get 'procurement_action_config',to: 'procure/procurements#actions_configuration'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'

@@ -13,8 +13,8 @@ class ActionsManager::Master::Base
     inventory_line_item_index: '::ActionsManager::Master::Invoicing::InventoryLineItem::Index',
     inventory_line_item_show: '::ActionsManager::Master::Invoicing::InventoryLineItem::Show',
     templates_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Templates::Index',
-    purchase_orders_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Index',
-    purchase_orders_show: '::ActionsManager::Master::Procurements::PurchaseOrders::Show',
+    non_po_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Index',
+    non_po_show: '::ActionsManager::Master::Procurements::PurchaseOrders::Show',
     procurements_index: '::ActionsManager::Master::Procurements::Index',
     procurements_show: '::ActionsManager::Master::Procurements::Show' 
 

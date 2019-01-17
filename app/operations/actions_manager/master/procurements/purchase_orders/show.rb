@@ -1,6 +1,6 @@
 class ActionsManager::Master::Procurements::PurchaseOrders::Show < ActionsManager::Master::Base
 
-  register_handle :purchase_orders_show
+  register_handle :non_po_show
 
   register_actions [:delete, :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_invoice_items, :update]
 
