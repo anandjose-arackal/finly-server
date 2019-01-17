@@ -65,8 +65,6 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
       else
         # do nothing?
     end
-    # self.parsed_response = Hash.from_xml(response.body)
-    # set_response_parameters
   end
 
   def success?
@@ -115,7 +113,6 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
   class YesBankApi::Status::GetStatus::FailureStatusPresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :request_status, :bank_reference_number, :application_id, :customer_id
-
 
     def initialize(params)
       self.request_status = params[:request_status]

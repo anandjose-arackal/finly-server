@@ -26,6 +26,8 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
 
   def process
     current_user_role = nil
+    prev_controlling_user = (travel_request.controlling_user or travel_request.controlling_for_user)
+    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.travel_request)
     if travel_request.update status_id: TravelRequestStatus.id_for(:rejected),
                              controlling_user_id: travel_request.user_id,
                              controlling_user_role_id: UserRole.employee_id,
@@ -35,8 +37,8 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
       travel_request.travel_request_trails.create action_user: user,
                                                   action_user_role_id: current_user_role,
                                                   action_id: TravelRequestTrailAction.id_for(:reject),
-                                                  modified_user_id: travel_request.user_id,
-                                                  modified_user_role_id: UserRole.employee_id
+                                                  modified_user: prev_controlling_user,
+                                                  modified_user_role_id: prev_controlling_user_role
       return true
     end
     add_message :error, travel_request.errors.full_messages
@@ -53,7 +55,7 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
     )
 
     # Event::EBankPaymentRequest::Reject.(user, travel_request: travel_request)
-
-    add_message :success, "Payment Request successfully rejected"
+    Event::ETravelRequest::Reject.(user, travel_request: travel_request)
+    add_message :success, "Travel Request successfully rejected"
   end
 end

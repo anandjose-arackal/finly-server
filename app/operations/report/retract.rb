@@ -86,7 +86,7 @@ class Report::Retract < Report::Base
     end
 
     # Invalidate All existing Email Authorizations
-    email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
+    email_auth_invalidate_presenter = EmailAuthorizations::Invalidate.(user, authorizable: report)
 
     Event::EReport::Retract.(user, report: report, from_user: from_user)
 

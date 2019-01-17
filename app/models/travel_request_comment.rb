@@ -73,6 +73,8 @@ class TravelRequestComment < ApplicationRecord
       comment_content += " requested selection  of booking options"
     when TravelRequestCommentAction.id_for(:selection_confirmed)
       comment_content += " confirmed selection"
+    when TravelRequestCommentAction.id_for(:selection_approved)
+      comment_content += " approved selection"
     when TravelRequestCommentAction.id_for(:created_by_delegate)
       comment_content += " created trip on behalf of #{current_user_name}"
     when TravelRequestCommentAction.id_for(:updated_by_delegate)
