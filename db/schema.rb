@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_17_074324) do
+ActiveRecord::Schema.define(version: 2019_01_14_235514) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -439,7 +439,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["user_id"], name: "index_balance_sheets_on_user_id"
   end
 
-  create_table "balance_tally_ledgers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "balance_tally_ledgers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.date "date"
     t.integer "api_balance_id"
     t.integer "finly_database_balance_id"
@@ -884,13 +884,13 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id"
   end
 
-  create_table "budget_modification_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "budget_modification_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "budget_modification_trails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "budget_modification_trails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "budget_id"
     t.integer "action_user_id"
     t.integer "action_id"
@@ -1077,7 +1077,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["prepaid_card_id"], name: "index_card_configurations_on_prepaid_card_id"
   end
 
-  create_table "card_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "card_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.boolean "enabled", default: true
     t.integer "policy_id"
     t.datetime "created_at", null: false
@@ -1245,7 +1245,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["user_id"], name: "index_cards_on_user_id"
   end
 
-  create_table "cash_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "cash_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.boolean "enabled", default: true
     t.integer "policy_id"
     t.datetime "created_at", null: false
@@ -1853,7 +1853,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["date"], name: "index_currency_conversion_rates_on_date"
   end
 
-  create_table "custom_export_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "custom_export_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "configurable_id"
     t.string "configurable_type"
     t.boolean "custom_report"
@@ -2105,7 +2105,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["purpose_id"], name: "index_document_number_configs_on_purpose_id"
   end
 
-  create_table "document_slices", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "document_slices", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "page_number"
     t.string "image_file_name"
     t.string "image_content_type"
@@ -2180,7 +2180,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["user_id"], name: "index_email_authorizations_on_user_id"
   end
 
-  create_table "enforce_budget_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "enforce_budget_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.boolean "enforce_purchase_order_budget"
     t.boolean "enforce_payment_budget"
     t.boolean "enforce_expense_budget"
@@ -3309,7 +3309,6 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.integer "destination_pocket_id"
     t.integer "created_by_id"
     t.integer "modified_by_id"
-    t.integer "delegated_action_user_id"
     t.datetime "deleted_at"
     t.index ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_money_requests_on_controlling_for_user_role_id"
@@ -4559,10 +4558,10 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.integer "sync_type_id"
     t.integer "report_processor_group_mapping_id"
     t.integer "travel_request_id"
-    t.integer "created_by_id"
-    t.integer "modified_by_id"
     t.integer "department_id"
     t.integer "sub_department_id"
+    t.integer "created_by_id"
+    t.integer "modified_by_id"
     t.datetime "deleted_at"
     t.index ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_reports_on_controlling_for_user_role_id"
@@ -4761,7 +4760,8 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id"
   end
 
-  create_table "tracker_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "tracker_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "tracker_visit_id", null: false
     t.string "http_method"
     t.string "app"
     t.string "path"
@@ -4769,15 +4769,15 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.string "action", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "tracker_visit_id"
     t.string "view"
     t.index ["action"], name: "index_tracker_events_on_action"
     t.index ["app"], name: "index_tracker_events_on_app"
     t.index ["controller"], name: "index_tracker_events_on_controller"
     t.index ["path"], name: "index_tracker_events_on_path"
+    t.index ["tracker_visit_id"], name: "index_tracker_events_on_tracker_visit_id"
   end
 
-  create_table "tracker_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "tracker_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "company_id", null: false
     t.string "app"
@@ -4792,19 +4792,24 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["view"], name: "index_tracker_notifications_on_view"
   end
 
-  create_table "tracker_visits", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "tracker_visits", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id"
     t.integer "company_id"
     t.string "ip", null: false
     t.string "ip_type"
-    t.text "user_agent"
+    t.string "user_agent"
     t.text "referrer"
     t.string "referring_domain"
     t.text "landing_page"
     t.string "device"
     t.string "browser"
     t.string "os"
+    t.string "os_version"
+    t.string "app_version"
     t.string "device_type"
+    t.string "platform"
+    t.string "screen_height"
+    t.string "screen_width"
     t.string "continent_name"
     t.string "continent_code"
     t.string "country_name"
@@ -4823,11 +4828,6 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.datetime "started_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "platform"
-    t.string "app_version"
-    t.string "os_version"
-    t.string "screen_height"
-    t.string "screen_width"
     t.index ["company_id"], name: "index_tracker_visits_on_company_id"
     t.index ["device"], name: "index_tracker_visits_on_device"
     t.index ["ip"], name: "index_tracker_visits_on_ip"
@@ -4860,7 +4860,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["parent_type", "parent_id"], name: "index_trails_on_parent_type_and_parent_id"
   end
 
-  create_table "transaction_details", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "transaction_details", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "transaction_reference_id"
     t.string "payment_purpose"
     t.string "merchant", collation: "utf8_bin"
@@ -4875,6 +4875,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.datetime "transaction_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "sequence_number"
     t.index ["amount_id"], name: "fk_rails_12e08cc879"
     t.index ["company_id"], name: "index_transaction_details_on_company_id"
     t.index ["finly_transaction_id"], name: "fk_rails_db0f67a401"
@@ -5078,7 +5079,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
-  create_table "user_delegate_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "user_delegate_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id"
     t.integer "delegate_for_user_id"
     t.boolean "expense_create"
@@ -5472,7 +5473,7 @@ ActiveRecord::Schema.define(version: 2019_01_17_074324) do
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
 
-  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
