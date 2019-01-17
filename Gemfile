@@ -20,7 +20,7 @@ gem 'stomp', '~> 1.4.8'
 gem 'mocha', '~> 1.7.0'
 
 # gem for crash reports
-# gem 'rollbar', '~> 2.18.2'
+gem 'rollbar', '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
 gem 'sentry-raven', '~> 2.8'
