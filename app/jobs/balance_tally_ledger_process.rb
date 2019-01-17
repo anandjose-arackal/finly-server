@@ -43,7 +43,7 @@ class BalanceTallyLedgerProcess < ActiveJob::Base
           message = args['message']
           return 0 unless success
           balance = args['balance']
-          return balance
+          return balance.to_f
         end
       end
     rescue Timeout::Error
