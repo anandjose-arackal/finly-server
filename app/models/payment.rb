@@ -231,6 +231,10 @@ class Payment < ApplicationRecord
     where payment_purpose_id: purpose_id
   }
 
+  scope :with_payment_status, -> (status_ids) {
+    where(payment_status_id: status_ids)
+  }
+
   scope :cash_additions_to_employee, -> { where(payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)]) }
   scope :cash_deductions_from_employee, -> { where(payment_type_id: [PaymentPurpose.id_for(:balance_clearance_outside_finly)]) }
 
