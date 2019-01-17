@@ -2539,6 +2539,7 @@ Rails.application.routes.draw do
     delete 'remove_rule', to: 'rules#destroy', as: :remove_rule
     get 'description', to: 'policies#show_description'
     resources :vehicle_rates, controller: 'vehicle_rates', only: [:create, :destroy]
+    resources :policy_user_role_mappings
   end
 
   resources :user_permissions do
@@ -3310,13 +3311,15 @@ Rails.application.routes.draw do
   resources :reviewal_levels do
     resources :reviewers
   end
-
-
   ######## Reviewal Workflow End ##########
 
   ### Audit Trails ##
   resources :audit_trails, only: [:index]
   ### Audit Trails End ##
+
+  ######## Reviewal Workflow ##########
+  resources :policy_user_role_mappings
+  ######## Reviewal Workflow End ##########
 
 
 

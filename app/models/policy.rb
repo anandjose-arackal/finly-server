@@ -33,6 +33,7 @@ class Policy < ActiveRecord::Base
 
   has_many :expense_rules, dependent: :destroy
   has_many :budget_rules, dependent: :destroy
+  has_many :policy_user_role_mappings, dependent: :destroy
 
   has_one :distance_expense_config
   has_one :time_expense_config

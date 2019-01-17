@@ -11,7 +11,7 @@
 #  updated_at :datetime         not null
 #
 
-class PolicyUserRolePurposeMapping < ActiveRecord::Base
+class PolicyUserRoleMapping < ActiveRecord::Base
   belongs_to :user
   belongs_to :role, class_name: 'UserRole'
   belongs_to :policy

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190114140005) do
+ActiveRecord::Schema.define(version: 20190117113333) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -4036,7 +4036,7 @@ ActiveRecord::Schema.define(version: 20190114140005) do
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
 
-  create_table "policy_user_role_purpose_mappings", force: :cascade do |t|
+  create_table "policy_user_role_mappings", force: :cascade do |t|
     t.integer  "policy_id",  limit: 4
     t.integer  "user_id",    limit: 4
     t.integer  "role_id",    limit: 4
@@ -4045,10 +4045,10 @@ ActiveRecord::Schema.define(version: 20190114140005) do
     t.datetime "updated_at",           null: false
   end
 
-  add_index "policy_user_role_purpose_mappings", ["policy_id"], name: "index_policy_user_role_purpose_mappings_on_policy_id", using: :btree
-  add_index "policy_user_role_purpose_mappings", ["purpose_id"], name: "index_policy_user_role_purpose_mappings_on_purpose_id", using: :btree
-  add_index "policy_user_role_purpose_mappings", ["role_id"], name: "index_policy_user_role_purpose_mappings_on_role_id", using: :btree
-  add_index "policy_user_role_purpose_mappings", ["user_id"], name: "index_policy_user_role_purpose_mappings_on_user_id", using: :btree
+  add_index "policy_user_role_mappings", ["policy_id"], name: "index_policy_user_role_mappings_on_policy_id", using: :btree
+  add_index "policy_user_role_mappings", ["purpose_id"], name: "index_policy_user_role_mappings_on_purpose_id", using: :btree
+  add_index "policy_user_role_mappings", ["role_id"], name: "index_policy_user_role_mappings_on_role_id", using: :btree
+  add_index "policy_user_role_mappings", ["user_id"], name: "index_policy_user_role_mappings_on_user_id", using: :btree
 
   create_table "policy_user_roles", force: :cascade do |t|
     t.integer  "policy_id",    limit: 4
