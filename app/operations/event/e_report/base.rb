@@ -37,7 +37,7 @@ class Event::EReport::Base < Event::SetNotifier
   	return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(user, params)).deliver_now
+    ReportMailer.delay.send_mail(Event::EReport::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
