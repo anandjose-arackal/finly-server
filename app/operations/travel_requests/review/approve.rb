@@ -71,7 +71,8 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     )
     #
     # Event::EBankPaymentRequest::Approve.(user, travel_request: travel_request)
-
+    # Notifications
+    Event::ETravelRequest::Approve.(user, travel_request: travel_request)
     add_message :success, 'Succesfully approved the travel request'
   end
 

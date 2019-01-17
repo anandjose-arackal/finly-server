@@ -25,7 +25,8 @@ class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
     memo = (params[:note] or params[:memo] or travel_request.memo)
     action_for_user_id = travel_request.controlling_for_user_id
     action_for_user_role_id = travel_request.controlling_for_user_role_id
-
+    prev_controlling_user = (travel_request.controlling_user or travel_request.controlling_for_user)
+    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.travel_request)
     if travel_request.update_attributes controlling_user: user,
                                         controlling_for_user: travel_request.controlling_user,
                                         controlling_user_role_id: UserRole.id_for(:admin),
@@ -41,8 +42,8 @@ class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
                                                   action_for_user_id: action_for_user_id,
                                                   action_for_user_role_id: action_for_user_role_id,
                                                   action_id: TravelRequestTrailAction.id_for(:approve),
-                                                  modified_user_id: action_for_user_id,
-                                                  modified_user_role_id: action_for_user_role_id
+                                                  modified_user: prev_controlling_user,
+                                                  modified_user_role_id: prev_controlling_user_role
       # travel_request.comments.create user: user,
       #                               comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
       #                               content: params[:take_control_note]
@@ -57,6 +58,8 @@ class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
         controlling_user_role_id: travel_request.controlling_user_role_id
     )
     # Event::EMoneyRequest::TakeControl.(self.user, travel_request: self.travel_request)
+    Event::ETravelRequest::TakeControl.(user, travel_request: travel_request)
+    add_message :success, "You've taken control of this trip"
   end
 
 end
