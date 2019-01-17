@@ -57,9 +57,9 @@ set :keep_releases, 5
 # set :default_env, { rvm_bin_path: '~/.rvm/bin' }
 
 # setting up rollbar environment variables for deploy tracking
-set :rollbar_token, 'ca504254626b4bf69eb1a1ec0b3aea23'
-set :rollbar_env, Proc.new {fetch :stage}
-set :rollbar_role, Proc.new {:app}
+# set :rollbar_token, 'ca504254626b4bf69eb1a1ec0b3aea23'
+# set :rollbar_env, Proc.new {fetch :stage}
+# set :rollbar_role, Proc.new {:app}
 
 set :puma_rackup, -> {File.join(current_path, 'config.ru')}
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
