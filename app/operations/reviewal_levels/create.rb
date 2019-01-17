@@ -32,7 +32,7 @@ class ReviewalLevels::Create < ReviewalLevels::Base
   end
 
   def process
-    highest_level = self.policy.levels
+    highest_level = self.policy.levels.exclude_deleted
         .with_entity_type(reviewal_level_params[:associated_entity_type])
         .order(level_number: :desc).first
 

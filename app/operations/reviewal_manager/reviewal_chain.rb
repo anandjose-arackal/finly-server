@@ -1,6 +1,6 @@
 class ReviewalManager::ReviewalChain < ReviewalManager::Base
   attr_accessor :document, :provider_names,
-                :document_class_name, :chain, :policy,
+                :chain, :policy,
                 :levels, :provider_name
 
   # In params
@@ -13,13 +13,11 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     policy_id = params[:policy_id]
 
     self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
-    self.policy = user.company.policies.with_application(:vp).with_id(policy_id).first rescue nil
+    # self.policy = user.company.policies.with_application(:vp).with_id(policy_id).first rescue nil
   end
 
   def validate
-    self.document_class_name = document.class.name
-
-    unless provider_names.include? document_class_name
+    unless provider_names.include? provider_name
       add_message :error, 'Invalid Document Provided'
       return
     end
@@ -39,6 +37,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       else
         mappings = level.level_reviewer_mappings.non_deleted
       end
+
 
       selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
       level_data = {

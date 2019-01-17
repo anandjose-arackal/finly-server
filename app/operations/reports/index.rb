@@ -102,7 +102,7 @@ class Reports::Index < Reports::Base
     # end
 
     case self.role_id
-    when UserRole.fid_for(:admin), UserRole.id_for(:auditor)
+    when UserRole.id_for(:admin), UserRole.id_for(:auditor)
       if self.user.company_admin? || self.user.auditor?
         self.reports = Report.admin_associated_items(user)
       elsif user.policy_admin?
@@ -167,6 +167,8 @@ class Reports::Index < Reports::Base
       self.count = self.reports.count
       self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30).include_details
     end
+
+
 
     def get_counts
       type_counts = reports.group(:report_status_id)

@@ -3308,7 +3308,7 @@ Rails.application.routes.draw do
 
   ######## Reviewal Workflow ##########
   resources :reviewal_levels do
-    post 'reviewers', to: 'reviewers#create'
+    resources :reviewers
   end
 
 

@@ -65,7 +65,7 @@ class MoneyRequests::Index < MoneyRequests::Base
     # self.money_requests = self.money_requests.exclude_deleted if self.money_requests.present?
 
     case self.role_id
-    when UserRole.fid_for(:admin), UserRole.id_for(:auditor)
+    when UserRole.id_for(:admin), UserRole.id_for(:auditor)
       if self.user.company_admin? || self.user.auditor?
         self.money_requests = MoneyRequest.admin_associated_items(user)
       elsif user.policy_admin?
@@ -77,7 +77,7 @@ class MoneyRequests::Index < MoneyRequests::Base
     when UserRole.id_for(:finance_manager)
       self.money_requests = MoneyRequest.finance_associated_items(user, role_id)
     else
-      self.money_requests = user.money_request.sort_for_personal
+      self.money_requests = user.money_requests.sort_for_personal
     end
     self.money_requests = self.money_requests.exclude_deleted if self.money_requests.present?
   end

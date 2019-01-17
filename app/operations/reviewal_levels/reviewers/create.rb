@@ -9,7 +9,7 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
     self.reviewal_level = reviewal_levels.find_by id: params[:reviewal_level_id]
 
     # self.reviewer = User.find_by id: reviewer_params[:reviewer_id]
-    self.reviewer = user.company.users.find_by id: reveiwer_params[:reviewer_id]
+    self.reviewer = user.company.users.find_by id: reviewer_params[:reviewer_id]
   end
 
   def validate

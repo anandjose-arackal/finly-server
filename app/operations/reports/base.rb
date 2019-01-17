@@ -50,7 +50,8 @@ class Reports::Base < BaseOperation
   class Reports::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
-                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets, :approvers
+                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets, :approvers,
+                  :reviewal_chains
 
     def init
       self.report = params[:report]
@@ -77,9 +78,32 @@ class Reports::Base < BaseOperation
       else
         self.approvers = []
       end
+
+      self.reviewal_chains = []
+      params[:reviewal_document] = report
+
+      policies.each do |policy|
+        params[:policy_id] = policy.id
+        chain = {
+            policy_id: policy.id,
+            reviewal_chain: get_reviewal_chain
+        }
+        self.reviewal_chains.push(chain)
+      end
+
       # budgets_op = BudgetsProcessor::Report.(user, report: self.report)
       # self.budgets = budgets_op.budgets
       self.budgets = []
+    end
+
+    def get_reviewal_chain
+      op = ::ReviewalManager::ReviewalChain.(user, params)
+      if op.success?
+        return op.chain
+      else
+        return nil
+      end
+
     end
 
     def retrieve_policies

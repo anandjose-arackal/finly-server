@@ -63,7 +63,6 @@ RSpec.describe "Travel Request Workflow -- " do
     if document_op.success?
       @document = TravelRequest.first # Change this, make operation return document instead
     else
-      debugger
       p "CREATE", document_op.messages[:error]
     end
   end

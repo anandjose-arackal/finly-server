@@ -22,10 +22,44 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :travel_request, :manager_user, :travel_manager_user
+    attr_accessor :travel_request, :manager_user, :travel_manager_user, :reviewal_chains, :reviewal_chains_booking
 
     def init
       self.travel_request = params[:travel_request]
+
+      self.reviewal_chains = []
+      self.reviewal_chains_booking = []
+
+
+      params[:reviewal_document] = travel_request
+      policies.each do |policy|
+        params[:policy_id] = policy.id
+        chain = {
+            policy_id: policy.id,
+            reviewal_chain: get_reviewal_chain
+        }
+        self.reviewal_chains.push(chain)
+      end
+
+      params[:provider_name] = "TravelRequestBookingProvider"
+      policies.each do |policy|
+        params[:policy_id] = policy.id
+        chain = {
+            policy_id: policy.id,
+            reviewal_chain: get_reviewal_chain
+        }
+        self.reviewal_chains_booking.push(chain)
+      end
+    end
+
+    def get_reviewal_chain
+      op = ::ReviewalManager::ReviewalChain.(user, params)
+      if op.success?
+        return op.chain
+      else
+        return nil
+      end
+
     end
 
     def booking_types

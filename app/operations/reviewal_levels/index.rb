@@ -13,6 +13,7 @@ class ReviewalLevels::Index < ReviewalLevels::Base
 
       if self.reviewal_levels.present?
         self.reviewal_levels = apply_scopes(self.reviewal_levels, params)
+        self.reviewal_levels = self.reviewal_levels.non_deleted
         self.reviewal_levels = self.reviewal_levels.order(:level_number)
       end
 
@@ -26,7 +27,7 @@ class ReviewalLevels::Index < ReviewalLevels::Base
     # self.reviewal_levels = policy.levels.non_deleted
 
     policy_ids = user.company.policies.pluck(:id)
-    self.reviewal_levels = ReviewalLevel.with_policy_ids(policy_ids).non_deleted
+    self.reviewal_levels = ReviewalLevel.with_policy_ids(policy_ids)
 
   end
 
