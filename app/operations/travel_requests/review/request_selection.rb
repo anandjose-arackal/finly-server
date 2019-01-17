@@ -56,6 +56,7 @@ class TravelRequests::Review::RequestSelection < TravelRequests::Review::Base
         controlling_user_role_id: travel_request.controlling_user_role_id
     )
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
+    Event::ETravelRequest::RequestSelection.(user, travel_request: travel_request)
     add_message :success, 'Selection has been successfully requested'
   end
 

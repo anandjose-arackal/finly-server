@@ -67,6 +67,7 @@ class TravelRequests::Review::ConfirmSelection < TravelRequests::Review::Base
         controlling_user_id: travel_request.controlling_user_id,
         controlling_user_role_id: travel_request.controlling_user_role_id
     )
+    Event::ETravelRequest::ConfirmSelection.(user, travel_request: travel_request)
     add_message :success, 'Selection has been successfully confirmed'
   end
 

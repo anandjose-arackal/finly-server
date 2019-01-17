@@ -37,7 +37,7 @@ class Event::ETravelRequest::Base < Event::SetNotifier
   	return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    TravelRequestMailer.delay.send_mail(Event::ETravelRequest::Base::MailerPresenter.new(user, params))
+    TravelRequestMailer.send_mail(Event::ETravelRequest::Base::MailerPresenter.new(user, params)).deliver_now
   end
 
   def mailer_subject(user)
@@ -68,8 +68,9 @@ class Event::ETravelRequest::Base < Event::SetNotifier
   end
 
   def allow_mailer(user, configuration)
-    val = super(user, configuration)
-    val and (user.manager_summary_mail_configs.travel_requests.blank? or travel_request.user == user)
+    super(user, configuration)
+    # Manager needs summarized email at the end of day
+    # val and (user.manager_summary_mail_configs&.last&.travel_requests&.blank? or self.travel_request&.user == user)
   end
 
   def process
@@ -113,7 +114,7 @@ class Event::ETravelRequest::Base < Event::SetNotifier
 
     def initialize(user, params)
       self.travel_request = params[:travel_request]
-      self.categories = user.company.categories.active
+      # self.categories = user.company.categories.active
       self.user = user
       self.body_val = params[:body]
       self.subject_val = params[:subject]
@@ -123,7 +124,7 @@ class Event::ETravelRequest::Base < Event::SetNotifier
       self.event_id = params[:event_id]
       self.action_name = params[:action_name]
       self.comment_body = params[:comment_body]
-      self.expenses_sorted = expenses_category_sorted
+      # self.expenses_sorted = expenses_category_sorted
       self.role_id = params[:role_id]
       self.view_url = generate_url(role_id).html_safe
       self.company = user.company
