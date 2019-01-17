@@ -43,7 +43,7 @@ class BalanceTallyLedgerProcess < ActiveJob::Base
           message = args['message']
           return 0 unless success
           balance = args['balance']
-          blocked_amount_for_payments = account.blocked_amount_for_pending_payments
+          blocked_amount_for_payments = self.company.yes_bank_company_account.blocked_amount_for_pending_payments
           return (balance - blocked_amount_for_payments)
         end
       end
