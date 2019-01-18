@@ -36,10 +36,10 @@ class ActionsManager::Processor < BaseOperation
 
   def process
     result = self.master.new(user, params).run
-    unless result.present?
-      add_message :error, 'Some error occurred, please try again later'
-      return
-    end
+    # unless result.present?
+    #   add_message :error, 'Some error occurred, please try again later'
+    #   return
+    # end
     self.actions_configuration = result
   end
 

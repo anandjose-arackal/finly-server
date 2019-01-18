@@ -5,39 +5,39 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Show < ActionsManage
   register_actions [:delete, :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_invoice_items, :update]
 
   def delete
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def save_and_submit
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def more_actions
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def make_payment
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def audit_trail
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def download
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def send_btn
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def export_invoice_items
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def update
-    user.admin?
+    user.vendor_payments_admin?
   end
 
 

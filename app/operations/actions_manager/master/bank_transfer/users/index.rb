@@ -4,8 +4,8 @@ class ActionsManager::Master::BankTransfer::Users::Index < ActionsManager::Maste
   register_actions [:add_users]
 
   def add_users
-    user.admin?
+    # Available for all roles expcept for auditor
+    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_initiator?
   end
-
   
 end

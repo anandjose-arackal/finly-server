@@ -86,10 +86,12 @@ class ActionsManager::Master::Base
     end
   end
 
-  def allowed_actions(actions)
+  def allowed_actions(actions=[])
     result = {}
-    actions.each do |action|
-      result[action] = self.send(action) if self.send(action)
+    unless actions.blank?
+      actions.each do |action|
+        result[action] = self.send(action) if self.send(action)
+      end
     end
     return result
   end

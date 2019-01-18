@@ -6,23 +6,23 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
 
 
   def new_procurements
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def bulk_actions
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def approve_purchase_order
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def export
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def bulk_import_advances
-    user.admin?
+    user.vendor_payments_admin?
   end
 
 end

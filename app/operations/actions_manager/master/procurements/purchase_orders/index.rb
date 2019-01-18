@@ -6,23 +6,23 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Index < ActionsManag
 
 
   def new_non_po_invoice
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def bulk_actions
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def approve_invoices
-    user.admin?
+    user.vendor_payments_admin? || user.vendor_payment_reviewer?
   end
 
   def export_all
-    user.admin?
+    user.vendor_payments_admin?
   end
 
   def bulk_import
-    user.admin?
+    user.vendor_payments_admin?
   end
 
 end
