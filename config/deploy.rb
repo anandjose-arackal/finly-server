@@ -32,7 +32,7 @@ when :aws_production, :background_production
 when :itzcash
   set :deploy_to, '/usr/local/app'
   set :rails_env, 'itzcash_uat'
-when :staging, :development, :combined_development, :insights, :development_2, :demo_2, :shapoorji, :olx
+when :staging, :development, :combined_development, :insights, :development_2, :demo_2, :shapoorji, :olx, :development_2
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'staging'
 end
