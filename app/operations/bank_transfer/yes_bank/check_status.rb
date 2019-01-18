@@ -69,7 +69,6 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         self.payment&.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
                                       content: "Payment processed. Awaiting credit confirmation").save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-      # elsif true
         begin
           bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         rescue => error
@@ -87,7 +86,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
         # adding message regarding payment refund
         self.payment&.system_messages&.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "The amount will be refunded to your account shortly").save
+                                      content: "Payment failed. The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         # the below will be executed only if the company is using Finly's nodal account for processing transactions
         unless self.company.current_account_connected?
@@ -97,6 +96,34 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         nullify_reimbursed_reports
       else
         # do nothing for now, will get back to this later
+      end
+    else
+      if Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+        begin
+          bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        rescue => error
+          self.error_logger.error("Following bank transaction has been orphaned: #{self.bank_transaction.id}")
+          error.backtrace.each do |line|
+            error_logger.error "\t #{line}"
+          end
+          Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
+        end
+
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+
+        # destroying previous messages first, before adding the failure message
+        # self.payment.system_messages.destroy_all # probably not a good idea to destroy previous messages because they contain data about why a particular payment failed
+
+        # adding message regarding payment refund
+        self.payment&.system_messages&.build(system_message_type_id: SystemMessageType.id_for(:error),
+                                             content: "Payment failed. The amount will be refunded to your account shortly").save
+        # creating a refund payment for this amount
+        # the below will be executed only if the company is using Finly's nodal account for processing transactions
+        unless self.company.current_account_connected?
+          create_refund_payment
+        end
+        # nulling reimbursements that might have happened through this
+        nullify_reimbursed_reports
       end
     end
   end
