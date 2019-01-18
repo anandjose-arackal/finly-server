@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
   # before_action :set_paper_trail_whodunnit
 
   before_action :load_global_variables
-  before_action :set_raven_context
+  # before_action :set_raven_context
 
   before_action :initialize_query_logger
 
@@ -384,20 +384,20 @@ class ApplicationController < ActionController::Base
   end
 
   # Used by sentry
-  def set_raven_context
-    Raven.user_context(id: current_user&.id) # or anything else in session
-    view = (params&.dig(:view) rescue nil)
-    Raven.extra_context(
-        params: params.to_unsafe_h,
-        url: request.url,
-        company_name: current_company&.name,
-        company_id: current_company&.id,
-        user_name: current_user&.name,
-        user_id: current_user&.id,
-        current_device: current_device,
-        current_app: current_app,
-        current_view: view
-    )
-  end
+  # def set_raven_context
+  #   Raven.user_context(id: current_user&.id) # or anything else in session
+  #   view = (params&.dig(:view) rescue nil)
+  #   Raven.extra_context(
+  #       params: params.to_unsafe_h,
+  #       url: request.url,
+  #       company_name: current_company&.name,
+  #       company_id: current_company&.id,
+  #       user_name: current_user&.name,
+  #       user_id: current_user&.id,
+  #       current_device: current_device,
+  #       current_app: current_app,
+  #       current_view: view
+  #   )
+  # end
 
 end

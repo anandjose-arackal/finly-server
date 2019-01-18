@@ -15,10 +15,10 @@ Rails.application.configure do
   #     error: :exception,
   # }
 
-  Raven.configure do |config|
-    # config.dsn = "https://1366119910394a23b856f9e8334d19ff:8e87d42818e842c189cac4dedb735ace@sentry.finly.io/2"
-    config.dsn = YAML.load_file(Rails.root.join('config/sentry.yml'))['dsn']
-  end
+  # Raven.configure do |config|
+  #   # config.dsn = "https://1366119910394a23b856f9e8334d19ff:8e87d42818e842c189cac4dedb735ace@sentry.finly.io/2"
+  #   config.dsn = YAML.load_file(Rails.root.join('config/sentry.yml'))['dsn']
+  # end
 
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
