@@ -10,6 +10,8 @@
 
 class ExpenseType < ApplicationRecord
 
+  has_and_belongs_to_many :budget_rules
+
   validates :name, presence: true
 
   VALUES = {manual: 1, card: 2, distance: 3, time: 4, per_diem: 5, cash: 1}

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_16_060401) do
+ActiveRecord::Schema.define(version: 2019_01_17_112550) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -952,6 +952,13 @@ ActiveRecord::Schema.define(version: 2019_01_16_060401) do
     t.index ["period_id"], name: "index_budget_rules_on_period_id"
     t.index ["policy_id"], name: "index_budget_rules_on_policy_id"
     t.index ["rule_type_id"], name: "index_budget_rules_on_rule_type_id"
+  end
+
+  create_table "budget_rules_expense_types", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.bigint "budget_rule_id", null: false
+    t.bigint "expense_type_id", null: false
+    t.index ["budget_rule_id", "expense_type_id"], name: "budget_rule_to_expense_type"
+    t.index ["expense_type_id", "budget_rule_id"], name: "expense_type_to_budget_rule"
   end
 
   create_table "budget_trails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

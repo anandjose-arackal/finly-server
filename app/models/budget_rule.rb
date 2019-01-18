@@ -41,6 +41,8 @@ class BudgetRule < ApplicationRecord
   has_many :field_drop_down_items, through: :budget_rule_field_mappings
   has_many :field_configurations, through: :budget_rule_field_mappings
 
+  has_and_belongs_to_many :expense_types
+
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :with_receipt_amount
   accepts_nested_attributes_for :without_receipt_amount
@@ -93,21 +95,11 @@ class BudgetRule < ApplicationRecord
   end
 
   def rule_in_words(options = {})
-    case self.expense_type_id
-    when 1
-      type = "of Cash"
-    when 2
-      type = "of Card"
-    when 3
-      type = "of Distance"
-    when 4
-      type = "of Time"
-    when 5
-      type = "of Per Diem"
-    else
-      type = ""
-    end
-    rule_in_words = "Total #{type} Expenses"
+    rule_in_words = "Total of "
+
+    self.expense_types.each {|et| unless et == (self.expense_types.last) then rule_in_words += et.name + ', ' else rule_in_words += "and #{et.name}" end}
+
+    rule_in_words += " Expenses"
     if self.period_id
       case self.period_id
       when 1
@@ -123,6 +115,7 @@ class BudgetRule < ApplicationRecord
       end
       rule_in_words += " per " + period
     end
+
     if self.categories.present?
       rule_in_words += " belonging to category "
       self.categories.each do |category|
@@ -135,6 +128,20 @@ class BudgetRule < ApplicationRecord
         end
       end
     end
+
+    if self.departments.present?
+      rule_in_words += " and the department "
+      self.departments.each do |department|
+        if department.parent.present?
+          rule_in_words += "#{department.parent.name} - "
+        end
+        rule_in_words += "#{department.name}"
+        unless self.departments.last == department
+          rule_in_words += ', '
+        end
+      end
+    end
+
     # if self.category_id
     #   rule_in_words += " for category " + self.category_name
     # end

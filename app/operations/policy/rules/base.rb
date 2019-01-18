@@ -45,6 +45,8 @@ class Policy::Rules::Base < Policy::Base
       params.require(:budget_rule).permit(:budget_rule_id, :period_id, :rule_type_id,
                                           :policy_id, :include_reimbursable,
                                           {budget_rule_category_mappings_attributes: [:category_id]},
+                                          {budget_rule_department_mappings: [:department_id]},
+                                          {expense_types_ids: []},
                                           {amount_attributes: [:value, :currency_id]},
                                           {with_receipt_amount_attributes: [:value, :currency_id]},
                                           {without_receipt_amount_attributes: [:value, :currency_id]},
