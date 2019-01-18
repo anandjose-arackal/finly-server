@@ -6,8 +6,6 @@ class ActionsManager::Master::Base
   MASTERS = {
     payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
     payment_ticket_show: '::ActionsManager::Master::BankTransfer::PaymentRequest::Show',
-    beneficiaries_index: '::ActionsManager::Master::BankTransfer::AccountOwners::Index',
-    beneficiaries_show: '::ActionsManager::Master::BankTransfer::AccountOwners::Show',
     beneficiaries_vendor_index: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorIndex',
     beneficiaries_vendor_show: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorShow',
     beneficiaries_employee_index: '::ActionsManager::Master::BankTransfer::AccountOwners::EmployeeIndex',
