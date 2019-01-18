@@ -123,6 +123,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
 
       self.payment_order_valid = false unless valid
 
+
       self.processed_order << {user: {identifier: user_email_mob_card, user_details: user}, card: card, amount: amount, valid: valid, messages: messages}
     end
   end
