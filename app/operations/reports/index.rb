@@ -170,7 +170,6 @@ class Reports::Index < Reports::Base
     end
 
     def get_counts
-      debugger
       type_counts = reports.group(:report_status_id)
       self.counts = {}
       counts[:open] = (type_counts[ReportStatus.open_id] or 0)

@@ -253,7 +253,7 @@ module Transitionable
       if user.instance_of?(User)
         policy_ids = PolicyUserRole.with_role_id(UserRole.id_for(:finance_manager)).where(user_id: user.id).pluck(:policy_id)
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids).pluck(:id)
+            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
       end
     end
 
