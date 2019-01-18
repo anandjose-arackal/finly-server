@@ -1,7 +1,7 @@
 class ActionsManager::Master::BankTransfer::AccountOwners::VendorShow < ActionsManager::Master::Base
 
   register_handle :beneficiaries_vendor_show
-  register_actions [:delete_vendor, :add_bank_account, :edit_bank_account, :delete_bank_account, :edit_vendor_details, :edit_attachment]
+  register_actions [:delete_vendor, :add_bank_account, :edit_bank_account, :delete_bank_account, :edit_vendor_details, :edit_attachment, :create_beneficiaries]
 
   def delete_vendor
     user.admin?
@@ -24,6 +24,10 @@ class ActionsManager::Master::BankTransfer::AccountOwners::VendorShow < ActionsM
   end
 
   def edit_attachment
+    user.admin?
+  end
+
+  def create_beneficiaries
     user.admin?
   end
 
