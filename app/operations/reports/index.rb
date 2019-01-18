@@ -112,7 +112,7 @@ class Reports::Index < Reports::Base
     when UserRole.id_for(:manager)
       self.reports = Report.reviewer_associated_items(user)
     when UserRole.id_for(:finance_manager)
-      self.reports = Report.finance_associated_items(user, role_id)
+      self.reports = Report.finance_associated_items(user)
     else
       self.reports = user.reports.sort_for_personal
     end
@@ -151,6 +151,7 @@ class Reports::Index < Reports::Base
     def init
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
       self.reports = params[:reports]
+
       get_counts
       return unless self.reports.present?
       self.reports = apply_scopes(self.reports, params)
@@ -168,9 +169,8 @@ class Reports::Index < Reports::Base
       self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30).include_details
     end
 
-
-
     def get_counts
+      debugger
       type_counts = reports.group(:report_status_id)
       self.counts = {}
       counts[:open] = (type_counts[ReportStatus.open_id] or 0)

@@ -180,24 +180,60 @@ class Reports::Base < BaseOperation
       #   actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])} 
       # end
 
+      # if admin_view?
+      #   if self.report.can_take_control? and not self.report.controlling_user?(user) #and not self.report.user.id == user.id
+      #     actions[:take_control] = {url: Rails.application.routes.url_helpers.report_take_control_path(report_id: report.id, view: params[:view])}
+      #   elsif self.report.processing? and self.report.controlling_user?(user)
+      #     actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
+      #     actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
+      #     actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
+      #     actions[:manager_editable] = {value: true}
+      #   end
+      # elsif finance_view? or manager_view?
+      #   if self.report.processing? and self.report.controlling_user?(user)
+      #     actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
+      #     actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
+      #     actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
+      #     actions[:manager_editable] = {value: true}
+      #   elsif (self.report.can_unapprove?) and Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.report.controlling_user).include?(user)
+      #     actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_unapprove_path(report_id: report.id, view: params[:view])}
+      #   end
+      # else
+      #   if self.report.open? or self.report.retracted? or self.report.rejected?
+      #     actions[:add_expenses] = {url: Rails.application.routes.url_helpers.report_add_expenses_path(report_id: report.id, view: params[:view])}
+      #     actions[:delete] = {url: Rails.application.routes.url_helpers.report_path(id: report.id, view: params[:view])}
+      #     actions[:editable] = {value: true}
+      #     actions[:submit] = {url: Rails.application.routes.url_helpers.report_submit_path(report_id: report.id, view: params[:view])}
+      #     actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
+      #   elsif self.report.can_retract?
+      #     actions[:retract] = {url: Rails.application.routes.url_helpers.report_retract_path(report_id: report.id, view: params[:view])}
+      #   elsif self.report.settled?
+      #     actions[:settlement_confirm] = {url: Rails.application.routes.url_helpers.report_settlement_confirm_path(report_id: report.id, view: params[:view])}
+      #   end
+      # end
+
+      # New Actions
       if admin_view?
-        if self.report.can_take_control? and not self.report.controlling_user?(user) #and not self.report.user.id == user.id
+        if self.report.can_take_control? and not self.report.get_reviewers.include?(user)
           actions[:take_control] = {url: Rails.application.routes.url_helpers.report_take_control_path(report_id: report.id, view: params[:view])}
-        elsif self.report.processing? and self.report.controlling_user?(user)
+          # actions[:return_control] = {url: Rails.application.routes.url_helpers.report_return_control_path(report_id: report.id, view: params[:view])}
+        elsif self.report.processing? and self.report.get_reviewers.include?(user)
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
           actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
           actions[:manager_editable] = {value: true}
         end
-      elsif finance_view? or manager_view?
-        if self.report.processing? and self.report.controlling_user?(user)
+      elsif manager_view?
+        if self.report.processing? && self.report.get_reviewers.include?(user)
+          debugger
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
           actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
           actions[:manager_editable] = {value: true}
-        elsif (self.report.can_unapprove?) and Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.report.controlling_user).include?(user)
+        elsif (self.report.can_unapprove?) && self.report.associated_users(:unapprove).include?(user)
           actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_unapprove_path(report_id: report.id, view: params[:view])}
         end
+      elsif finance_view?
       else
         if self.report.open? or self.report.retracted? or self.report.rejected?
           actions[:add_expenses] = {url: Rails.application.routes.url_helpers.report_add_expenses_path(report_id: report.id, view: params[:view])}

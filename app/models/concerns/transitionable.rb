@@ -11,7 +11,7 @@ module Transitionable
     # New method for users
     #
     def associated_users(type=nil)
-      # Valid types [:retract, :reject, :all, :interacted]
+      # Valid types [:retract, :reject, :all, :interacted, :unapprove]
       user_ids = []
       case type
       when 'retract', :retract # Users who will be affected
@@ -26,6 +26,8 @@ module Transitionable
       when 'reject', :reject # Users who will be affected
         user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id).reject {|user_id| user_id.nil?}
         user_ids.push self.document_owner.id # Check if this has to be added
+      when 'unapprove', :unapprove
+        user_ids += self.document_level_reviewer_mappings.with_apluck(:action_take_by_id)
       when 'all', :all # Users who have interacted + who will interact in future
       when 'interacted', :interacted # User who have taken action the document
         user_ids = self.document_level_reviewer_mappings.where(
@@ -247,9 +249,17 @@ module Transitionable
       end
     end
 
-    def finance_associated_items(user, role_id, purpose_id=1)
+    def finance_associated_items(user)
       if user.instance_of?(User)
-        policy_ids = PolicyUserRolePurposeMapping.with_purpose_id(purpose_id).with_role_id(role_id).where(user_id: user.id)
+        policy_ids = PolicyUserRole.with_role_id(UserRole.id_for(:finance_manager)).where(user_id: user.id).pluck(:policy_id)
+        self.where(policy_id: policy_ids)
+            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids).pluck(:id)
+      end
+    end
+
+    def creditor_associated_items(user)
+      if user.instance_of?(User)
+        policy_ids = PolicyUserRole.with_role_id(UserRole.id_for(:creditor)).where(user_id: user.id)
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids).pluck(:id)
       end

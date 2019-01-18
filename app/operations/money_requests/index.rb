@@ -75,7 +75,7 @@ class MoneyRequests::Index < MoneyRequests::Base
     when UserRole.id_for(:manager)
       self.money_requests = MoneyRequest.reviewer_associated_items(user)
     when UserRole.id_for(:finance_manager)
-      self.money_requests = MoneyRequest.finance_associated_items(user, role_id)
+      self.money_requests = MoneyRequest.finance_associated_items(user)
     else
       self.money_requests = user.money_requests.sort_for_personal
     end

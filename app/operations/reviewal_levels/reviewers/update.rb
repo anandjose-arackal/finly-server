@@ -4,13 +4,19 @@ class ReviewalLevels::Reviewers::Update < ReviewalLevels::Reviewers::Base
   attr_accessor :reviewer_params, :reviewer, :reviewal_level, :level_reviewer_mapping
 
   def init
-    self.reviewer_params = reviewer_parameters
     reviewal_levels = ReviewalLevels::Index.(user, params).reviewal_levels
 
-    id = params[:id] || params[:reviewal_level_id]
+    id = params[:reviewal_level_id]
     self.reviewal_level = reviewal_levels.find_by id: id
 
-    self.level_reviewer_mapping
+    id = params[:id]
+    self.level_reviewer_mapping = reviewal_level.level_reviewer_mappings.find_by id: id
+  end
+
+  def validate
+    unless reviewal_level.present?
+      add_message :error, 'Level not found'
+    end
   end
 
   def process

@@ -73,9 +73,9 @@ class TravelRequests::Index < TravelRequests::Base
     when UserRole.id_for(:manager)
       self.travel_requests = TravelRequest.reviewer_associated_items(user)
     when UserRole.id_for(:finance_manager)
-      self.travel_requests = TravelRequest.finance_associated_items(user, role_id)
+      self.travel_requests = TravelRequest.finance_associated_items(user)
     when UserRole.id_for(:travel_manager)
-      self.travel_requests = TravelRequest.travel_associated_items(user, role_id)
+      self.travel_requests = TravelRequest.travel_associated_items(user)
     else
       self.travel_requests = user.travel_requests
     end
