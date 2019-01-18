@@ -22,10 +22,6 @@ module Finly
       end if File.exists?(env_file)
     end
 
-    Raven.configure do |config|
-      config.dsn = 'https://1366119910394a23b856f9e8334d19ff:8e87d42818e842c189cac4dedb735ace@sentry.finly.io/2'
-    end
-
     # config.autoload_paths += %W(#{config.root}/lib)
 
     config.eager_load_paths << Rails.root.join('lib')
