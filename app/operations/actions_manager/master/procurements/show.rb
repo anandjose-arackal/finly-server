@@ -2,7 +2,39 @@ class ActionsManager::Master::Procurements::Show < ActionsManager::Master::Base
 
   register_handle :procurements_show
 
-  register_actions [:add_document, :retract, :remind_approver, :void, :save_btn, :download, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind ,:add_document, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
+
+  def more_details_button
+    user.vendor_payments_admin?
+  end
+
+  def send_mail
+    user.vendor_payments_admin?
+  end
+
+  def export_items
+    user.vendor_payments_admin?
+  end
+
+  def submit
+    user.vendor_payments_admin?
+  end
+  
+  def reject
+    user.vendor_payments_admin?
+  end
+
+  def close
+    user.vendor_payments_admin?
+  end
+
+  def approve
+    user.vendor_payments_admin?
+  end
+
+  def remind
+    user.vendor_payments_admin?
+  end
 
   def add_document
     user.vendor_payments_admin?
@@ -17,14 +49,10 @@ class ActionsManager::Master::Procurements::Show < ActionsManager::Master::Base
   end
 
   def void
-    user.vendor_payments_admin?
+    user.vendor_payments_admin? 
   end
 
   def save_btn
-    user.vendor_payments_admin?
-  end
-
-  def download
     user.vendor_payments_admin?
   end
 
