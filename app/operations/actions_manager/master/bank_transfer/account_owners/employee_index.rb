@@ -1,0 +1,25 @@
+class ActionsManager::Master::BankTransfer::AccountOwners::EmployeeIndex < ActionsManager::Master::Base
+
+  register_handle :beneficiaries_employee_index
+  register_actions [:create_payment_order, :import_vendors, :export_vendors, :xls, :csv]
+
+  def create_payment_order
+    user.admin?
+  end
+
+  def import_vendors
+    user.admin?
+  end
+
+  def export_vendors
+    user.admin?
+  end
+
+  def xls
+    user.admin?
+  end
+
+  def csv
+    user.admin?
+  end
+end

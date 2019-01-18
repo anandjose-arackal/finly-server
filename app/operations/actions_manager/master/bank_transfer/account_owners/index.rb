@@ -1,6 +1,6 @@
 class ActionsManager::Master::BankTransfer::AccountOwners::Index < ActionsManager::Master::Base
 
-  register_handle :account_owners_index
+  register_handle :beneficiaries_index
 
   register_actions [:create_vendor, :create_payment_order, :import_vendors, :xls, :csv]
 

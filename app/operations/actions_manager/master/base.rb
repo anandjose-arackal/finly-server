@@ -6,8 +6,12 @@ class ActionsManager::Master::Base
   MASTERS = {
     payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
     payment_ticket_show: '::ActionsManager::Master::BankTransfer::PaymentRequest::Show',
-    account_owners_index: '::ActionsManager::Master::BankTransfer::AccountOwners::Index',
-    account_owners_show: '::ActionsManager::Master::BankTransfer::AccountOwners::Show',
+    beneficiaries_index: '::ActionsManager::Master::BankTransfer::AccountOwners::Index',
+    beneficiaries_show: '::ActionsManager::Master::BankTransfer::AccountOwners::Show',
+    beneficiaries_vendor_index: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorIndex',
+    beneficiaries_vendor_show: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorShow',
+    beneficiaries_employee_index: '::ActionsManager::Master::BankTransfer::AccountOwners::EmployeeIndex',
+    beneficiaries_employee_show: '::ActionsManager::Master::BankTransfer::AccountOwners::EmployeeShow',
     inward_invoices_index: '::ActionsManager::Master::BankTransfer::InwardInvoices::Index',
     inward_invoices_show: '::ActionsManager::Master::BankTransfer::InwardInvoices::Show',
     inventory_line_item_index: '::ActionsManager::Master::Invoicing::InventoryLineItem::Index',
@@ -16,7 +20,9 @@ class ActionsManager::Master::Base
     non_po_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Index',
     non_po_show: '::ActionsManager::Master::Procurements::PurchaseOrders::Show',
     procurements_index: '::ActionsManager::Master::Procurements::Index',
-    procurements_show: '::ActionsManager::Master::Procurements::Show' 
+    procurements_show: '::ActionsManager::Master::Procurements::Show',
+    users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
+    users_show: '::ActionsManager::Master::BankTransfer::Users::Show' 
 
   }.with_indifferent_access
 
