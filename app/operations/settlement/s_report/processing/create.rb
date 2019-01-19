@@ -158,6 +158,12 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       return
     end
 
+    # ###################
+    # # todo remove it
+    # policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: UserRole.id_for(:finance_manager)).pluck(:policy_id)
+    # users = User.where(id: PolicyUserMapping.where(policy_id: policy_ids, user_id: user_ids).pluck(:user_id))
+
+
     users = users_presenter.team.include_reimbursable_accounts.with_id(user_ids)
     unless users.count == user_ids.size
       add_message :error, 'Error loading configuration'
@@ -169,7 +175,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
 
     users&.each do |user|
       config = params&.dig(:mappings, user.id.to_s)
-
+      debugger
       processor_accountable_id = config[:processor_accountable_id]
       processor_accountable_type = config[:processor_accountable_type]
       processor_accountable = nil

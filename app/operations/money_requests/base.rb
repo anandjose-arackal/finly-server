@@ -91,6 +91,95 @@ class MoneyRequests::Base < BaseOperation
     end
 
     def load_actions
+      # actions = {meta: {base_url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])},
+      #            credit_actions: {
+      #                initiating_accounts: [],
+      #                receiving_accounts: []}}
+      #
+      # # Load base actions
+      # if admin_view? or finance_view? or manager_view?
+      #   actions[:credit] = true
+      #   actions[:debit] = true
+      #   if admin_view? and self.money_request.can_take_control? and not self.money_request.controlling_user?(user)
+      #     actions[:take_control] = true
+      #   elsif self.money_request.processing? and self.money_request.controlling_user?(user)
+      #     actions[:editable] = true
+      #     if self.money_request.payment_mode_card?
+      #       actions[:approve_and_credit] = true
+      #       actions[:approve_and_forward_to] = true
+      #     else
+      #       actions[:approve] = true
+      #     end
+      #     actions[:reject] = true
+      #   elsif (manager_view? or finance_view?) and self.money_request.can_unapprove? and MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.controlling_user).include?(user)
+      #     actions[:unapprove] = true
+      #   end
+      # else
+      #   # Personal View
+      #   if self.money_request.open? or self.money_request.retracted? or self.money_request.rejected?
+      #     actions[:delete] = true
+      #     actions[:editable] = true
+      #     actions[:submit] = true
+      #   elsif self.money_request.can_retract?
+      #     actions[:retract] = true
+      #   end
+      # end
+      #
+      # # Load credit actions
+      # if actions[:approve_and_credit]
+      #
+      #   from_user_transferable_cards =  user.cards.with_non_personal_fund_transfer
+      #   to_user_creditable_cards = money_request.user.cards.creditable_cards
+      #   from_user_name = 'Your'
+      #   personal_transfer = self.user == self.money_request.user
+      #   to_user_name = personal_transfer ? 'Your' : "#{self.money_request.user.name}'s"
+      #   initiating_actions = actions[:credit_actions][:initiating_accounts]
+      #   receiving_actions = actions[:credit_actions][:receiving_accounts]
+      #
+      #   balances = User::Balance.(user, target_user: money_request.user, target_user_card: true,
+      #       target_user_wallet: true, current_user_card: true, current_user_wallet: true,
+      #       virtual_account: true, view: params[:view]).balances
+      #
+      #   # From Actions
+      #   # Virtual Account
+      #   if user.company_admin?
+      #     balance = balances[:virtual_account][:balance] rescue nil
+      #     initiating_actions << {type: :virtual_account, id: user.company.id, name: 'Company Credits',
+      #                            balance: balance, active: true}
+      #   end
+      #
+      #   # Wallet
+      #   balance = balances[:current_user][:wallet][:balance] rescue nil
+      #   initiating_actions << {type: :wallet, id: user.wallet.id, name: "#{from_user_name} Finly Money",
+      #                          balance: balance, active: true}
+      #
+      #   # Cards
+      #   if from_user_transferable_cards.present?
+      #     from_user_transferable_cards.each do |card|
+      #       balance = balances[:current_user][:card][card.id][:balance] rescue nil
+      #       eligibility = balances[:current_user][:card][card.id][:eligibility] rescue nil
+      #       initiating_actions << {type: :card, id: card.id, name: "#{from_user_name} #{card.card_program.name} Card",
+      #                              balance: balance, eligibility: eligibility, active: card.active}
+      #     end
+      #   end
+      #
+      #   # To Actions
+      #   # Wallet
+      #   balance = balances[:target_user][:wallet][:balance] rescue nil
+      #   receiving_actions << {type: :wallet, id: money_request.user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
+      #
+      #   # Cards
+      #   if to_user_creditable_cards.present?
+      #     to_user_creditable_cards.each do |card|
+      #       balance = balances[:target_user][:card][card.id][:balance] rescue nil
+      #       eligibility = balances[:target_user][:card][card.id][:eligibility] rescue nil
+      #       receiving_actions << {type: :card, id: card.id, name: "#{to_user_name} #{card.card_program.name} Card",
+      #                             balance: balance, eligibility: eligibility, active: card.active}
+      #     end
+      #   end
+      # end
+      # NEW CODE
+
       actions = {meta: {base_url: Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])},
                  credit_actions: {
                      initiating_accounts: [],
@@ -100,19 +189,32 @@ class MoneyRequests::Base < BaseOperation
       if admin_view? or finance_view? or manager_view?
         actions[:credit] = true
         actions[:debit] = true
-        if admin_view? and self.money_request.can_take_control? and not self.money_request.controlling_user?(user)
-          actions[:take_control] = true
-        elsif self.money_request.processing? and self.money_request.controlling_user?(user)
-          actions[:editable] = true
-          if self.money_request.payment_mode_card?
-            actions[:approve_and_credit] = true
-            actions[:approve_and_forward_to] = true
-          else
-            actions[:approve] = true
+        if admin_view?
+          if self.money_request.can_take_control? and not self.money_request.get_reviewers.include?(user)
+            actions[:take_control] = true
+          elsif self.money_request.processing? and self.money_request.get_reviewers.include?(user)
+            actions[:editable] = true
+            if self.money_request.payment_mode_card?
+              actions[:approve_and_credit] = true
+              actions[:approve_and_forward_to] = true
+            else
+              actions[:approve] = true
+            end
+            actions[:reject] = true
           end
-          actions[:reject] = true
-        elsif (manager_view? or finance_view?) and self.money_request.can_unapprove? and MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.controlling_user).include?(user)
-          actions[:unapprove] = true
+        elsif manager_view?
+          if self.money_request.processing? && self.money_request.get_reviewers.include?(user)
+            if self.money_request.payment_mode_card?
+              actions[:approve_and_credit] = true
+              actions[:approve_and_forward_to] = true
+            else
+              actions[:approve] = true
+            end
+            actions[:reject] = true
+          end
+          if self.money_request.can_unapprove? # &&  # todo money request
+            actions[:unapprove] = true
+          end
         end
       else
         # Personal View

@@ -15,6 +15,10 @@ class PolicyUserRole < ActiveRecord::Base
   belongs_to :user
   belongs_to :user_role
 
+  scope :with_user_id, -> (user_id) {
+    where user_id: user_id
+  }
+
   scope :with_role_id, -> (role_id){
     where user_role_id: role_id
   }
