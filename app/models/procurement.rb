@@ -121,7 +121,7 @@ class Procurement < ApplicationRecord
   scope :filter_department, -> (department_name, user_id) {
     user = User.find_by id: user_id
     if user.present?
-      department_ids = user.company.departments.filter_name(department_name).pluck(:id)
+      department_ids = user.company.departments.roots.filter_name(department_name).pluck(:id)
 
       filtered_ids = PurchaseOrder.filter_department_id(department_ids).pluck(:procurement_id)
       filtered_ids += Invoice.filter_department_id(department_ids).pluck(:procurement_id)
