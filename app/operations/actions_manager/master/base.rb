@@ -19,6 +19,9 @@ class ActionsManager::Master::Base
     non_po_show: '::ActionsManager::Master::Procurements::PurchaseOrders::Show',
     procurements_index: '::ActionsManager::Master::Procurements::Index',
     procurements_show: '::ActionsManager::Master::Procurements::Show',
+    inward_document_show: '::ActionsManager::Master::Procurements::InwardDocumentShow',
+    purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrderShow',
+    tax_invoice_show: '::ActionsManager::Master::Procurements::TaxInvoiceShow',
     users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
     users_show: '::ActionsManager::Master::BankTransfer::Users::Show' 
 
