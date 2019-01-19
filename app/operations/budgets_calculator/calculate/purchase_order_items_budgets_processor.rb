@@ -16,6 +16,7 @@ class BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor < Budgets
         location_id: purchase_order_item.purchase_order.location_id,
         department_id: purchase_order_item.purchase_order.sub_department_id,
         date: purchase_order_item.purchase_order.created_at,
+        procurement_id: purchase_order_item.purchase_order.procurement_id,
         amount_attributes: {
             value: purchase_order_item.total_amount&.value,
             currency_id: purchase_order_item.total_amount&.currency_id

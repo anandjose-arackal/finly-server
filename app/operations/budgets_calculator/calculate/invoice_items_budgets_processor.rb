@@ -16,7 +16,9 @@ class BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor < BudgetsCalcul
 
     # additionally check if this invoice is part of a procurement and if it is, the procurement shouldn't already exist
     procurement_id = invoice_item.parent.procurement_id
+    procurement = invoice_item.parent.procurement
     trail_by_procurement = BudgetTrail.find_by(procurement_id: procurement_id)
+    trail_by_procurement = BudgetTrail.with_entity_type(["PurchaseOrderItem"]).with_entity_id(procurement.purchase_order.items.pluck(:id)).first if trail_by_procurement.blank?
     # if this already exists, then it means that the budget has already been considered under a purchase order
     if trail_by_procurement.present? && trail_by_procurement.entity_type == "PurchaseOrderItem"
       return
