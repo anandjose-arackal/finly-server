@@ -15,6 +15,7 @@
 #  is_deleted            :boolean          default(FALSE), not null
 #  procurement_type      :string(255)
 #  transaction_id        :string(255)
+#  deleted_at            :datetime
 #
 
 class Procurement < ActiveRecord::Base

@@ -23,6 +23,7 @@
 #  arrival_date     :date
 #  arrival_time     :time
 #  booking_id       :integer
+#  deleted_at       :datetime
 #
 
 class BookingFlight < ActiveRecord::Base

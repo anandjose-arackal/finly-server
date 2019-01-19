@@ -9,6 +9,7 @@
 #  updated_at  :datetime         not null
 #  company_id  :integer
 #  is_deleted  :boolean          default(FALSE), not null
+#  deleted_at  :datetime
 #
 
 require 'test_helper'

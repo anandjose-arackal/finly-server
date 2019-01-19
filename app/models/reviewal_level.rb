@@ -10,6 +10,7 @@
 #  updated_at             :datetime         not null
 #  name                   :string(255)
 #  is_deleted             :boolean          default(FALSE), not null
+#  deleted_at             :datetime
 #
 
 class ReviewalLevel < ActiveRecord::Base

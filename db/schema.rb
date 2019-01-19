@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190118060206) do
+ActiveRecord::Schema.define(version: 20190119111347) do
 
   create_table "accounting_system_configurations", force: :cascade do |t|
     t.integer  "company_id",        limit: 4,                     null: false
@@ -337,6 +337,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.decimal  "ZWL",                   precision: 20, scale: 5
     t.boolean  "is_deleted",                                      default: false
     t.decimal  "MYR",                   precision: 20, scale: 5
+    t.datetime "deleted_at"
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
@@ -461,6 +462,18 @@ ActiveRecord::Schema.define(version: 20190118060206) do
   add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
+  create_table "balance_tally_ledgers", force: :cascade do |t|
+    t.date     "date"
+    t.integer  "api_balance_id",            limit: 4
+    t.integer  "finly_database_balance_id", limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.integer  "calculated_balance_id",     limit: 4
+  end
+
+  add_index "balance_tally_ledgers", ["api_balance_id"], name: "index_balance_tally_ledgers_on_api_balance_id", using: :btree
+  add_index "balance_tally_ledgers", ["finly_database_balance_id"], name: "index_balance_tally_ledgers_on_finly_database_balance_id", using: :btree
+
   create_table "bank_accounts", force: :cascade do |t|
     t.integer  "yes_bank_vendor_id", limit: 4
     t.string   "account_number",     limit: 255
@@ -480,6 +493,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "default_account",                default: false
     t.boolean  "is_deleted",                     default: false
     t.boolean  "disabled",                       default: false
+    t.datetime "deleted_at"
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
@@ -564,6 +578,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "auto_approved"
     t.boolean  "api_initiated",                              default: false
     t.integer  "controlling_level_id",         limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -634,6 +649,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                                                                  null: false
     t.datetime "updated_at",                                                                  null: false
     t.boolean  "is_deleted",                                                  default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "bill_of_supplies", ["balance_amount_id"], name: "index_bill_of_supplies_on_balance_amount_id", using: :btree
@@ -687,6 +703,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.date     "arrival_date"
     t.time     "arrival_time"
     t.integer  "booking_id",     limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "booking_buses", ["parent_type", "parent_id"], name: "index_booking_buses_on_parent_type_and_parent_id", using: :btree
@@ -713,6 +730,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.time     "drop_time"
     t.boolean  "is_deleted",                    default: false
     t.integer  "booking_id",      limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "booking_car_rentals", ["parent_type", "parent_id"], name: "index_booking_car_rentals_on_parent_type_and_parent_id", using: :btree
@@ -746,6 +764,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.date     "arrival_date"
     t.time     "arrival_time"
     t.integer  "booking_id",       limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "booking_flights", ["parent_type", "parent_id"], name: "index_booking_flights_on_parent_type_and_parent_id", using: :btree
@@ -767,6 +786,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.date     "checkout_date"
     t.time     "checkout_time"
     t.integer  "booking_id",       limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "booking_hotels", ["parent_type", "parent_id"], name: "index_booking_hotels_on_parent_type_and_parent_id", using: :btree
@@ -781,6 +801,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "cost_id",         limit: 4
     t.boolean  "is_deleted",                    default: false
     t.integer  "booking_id",      limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "booking_others", ["parent_type", "parent_id"], name: "index_booking_others_on_parent_type_and_parent_id", using: :btree
@@ -794,6 +815,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.text     "note",                          limit: 65535
     t.boolean  "is_deleted",                                  default: false
     t.integer  "travel_request_id",             limit: 4,                     null: false
+    t.datetime "deleted_at"
   end
 
   add_index "booking_requests", ["booking_status_id"], name: "index_booking_requests_on_booking_status_id", using: :btree
@@ -813,6 +835,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.date     "reservation_date"
     t.time     "reservation_time"
     t.integer  "booking_id",         limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "booking_restaurants", ["parent_type", "parent_id"], name: "index_booking_restaurants_on_parent_type_and_parent_id", using: :btree
@@ -844,6 +867,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.date     "arrival_date"
     t.time     "arrival_time"
     t.integer  "booking_id",          limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "booking_trains", ["parent_type", "parent_id"], name: "index_booking_trains_on_parent_type_and_parent_id", using: :btree
@@ -888,6 +912,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.string   "contact_name",          limit: 255
     t.string   "contact_mobile_number", limit: 255
     t.boolean  "is_deleted",                        default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
@@ -959,6 +984,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "expense_type_id",           limit: 4
     t.integer  "with_receipt_amount_id",    limit: 4
     t.integer  "without_receipt_amount_id", limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree
@@ -1002,6 +1028,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "payment"
     t.boolean  "expense"
     t.string   "ancestry",         limit: 255
+    t.datetime "deleted_at"
   end
 
   add_index "budgets", ["budget_amount_id"], name: "index_budgets_on_budget_amount_id", using: :btree
@@ -1123,6 +1150,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted",                        default: false
     t.boolean  "cancelled",                         default: false
     t.boolean  "atm_surcharge",                     default: false
+    t.datetime "deleted_at"
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -1235,6 +1263,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.string   "mid",                          limit: 255
     t.string   "tid",                          limit: 255
     t.text     "transaction_message",          limit: 65535
+    t.datetime "deleted_at"
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -1270,6 +1299,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "hotlisted",                              default: false
     t.string   "card_processor_status",    limit: 255
     t.integer  "replaced_card_id",         limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -1496,6 +1526,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "created_by_user_id", limit: 4,                   null: false
     t.datetime "created_at",                                     null: false
     t.datetime "updated_at",                                     null: false
+    t.datetime "deleted_at"
   end
 
   add_index "company_departments", ["active"], name: "index_company_departments_on_active", using: :btree
@@ -1704,6 +1735,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
     t.boolean  "is_deleted"
+    t.datetime "deleted_at"
   end
 
   add_index "cost_centers", ["company_id"], name: "index_cost_centers_on_company_id", using: :btree
@@ -1982,6 +2014,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "created_by_id", limit: 4
     t.boolean  "active",                      default: true
     t.boolean  "is_deleted",                  default: false
+    t.datetime "deleted_at"
   end
 
   create_table "delivery_challans", force: :cascade do |t|
@@ -2012,6 +2045,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                                                                  null: false
     t.datetime "updated_at",                                                                  null: false
     t.boolean  "is_deleted",                                                  default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "delivery_challans", ["balance_amount_id"], name: "index_delivery_challans_on_balance_amount_id", using: :btree
@@ -2038,6 +2072,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted",                 default: false, null: false
     t.string   "ancestry",       limit: 255
     t.integer  "cost_center_id", limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "departments", ["company_id"], name: "index_departments_on_company_id", using: :btree
@@ -2084,6 +2119,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "vehicle_rate_id",                   limit: 4
     t.integer  "distance_rate_id",                  limit: 4
     t.integer  "distance_unit_id",                  limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
@@ -2224,6 +2260,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
     t.boolean  "is_deleted",                            default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "e_way_bills", ["amount_id"], name: "index_e_way_bills_on_amount_id", using: :btree
@@ -2323,6 +2360,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "expense_rule_type_id",   limit: 4
     t.integer  "policy_id",              limit: 4
     t.boolean  "is_deleted",                       default: false
+    t.datetime "deleted_at"
   end
 
   add_index "expense_rules", ["category_id"], name: "index_expense_rules_on_category_id", using: :btree
@@ -2389,6 +2427,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "cost_center_id",         limit: 4
     t.integer  "created_by_id",          limit: 4
     t.integer  "modified_by_id",         limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -2524,6 +2563,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "root_field",                          default: true
     t.string   "field_key",               limit: 255
     t.integer  "sequence_number",         limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
@@ -2575,6 +2615,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                                         null: false
     t.boolean  "is_deleted",                         default: false
     t.string   "field_key",              limit: 255
+    t.datetime "deleted_at"
   end
 
   add_index "field_drop_down_items", ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id", using: :btree
@@ -2593,6 +2634,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                         null: false
     t.integer  "field_configuration_id", limit: 4
     t.boolean  "is_deleted"
+    t.datetime "deleted_at"
   end
 
   create_table "field_multiselect_selection_items", force: :cascade do |t|
@@ -2822,6 +2864,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.string   "item_code",           limit: 255
     t.string   "account",             limit: 255
     t.integer  "supply_item_type_id", limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
@@ -2979,6 +3022,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted",                                                           default: false
     t.integer  "resource_template_id",         limit: 4
     t.string   "invoice_id",                   limit: 255
+    t.datetime "deleted_at"
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3001,6 +3045,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.string   "comment",                limit: 255
     t.decimal  "previously_delivered",               precision: 20, scale: 5
     t.boolean  "is_deleted",                                                  default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "inward_document_items", ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id", using: :btree
@@ -3022,6 +3067,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                                              null: false
     t.boolean  "is_deleted",                              default: false, null: false
     t.integer  "user_id",                     limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "inward_documents", ["company_id"], name: "index_inward_documents_on_company_id", using: :btree
@@ -3150,6 +3196,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                                                     null: false
     t.datetime "updated_at",                                                     null: false
     t.boolean  "is_deleted",                                     default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "level_reviewer_mappings", ["level_id"], name: "index_level_reviewer_mappings_on_level_id", using: :btree
@@ -3181,6 +3228,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "order",          limit: 4
     t.string   "maps_id",        limit: 255
     t.boolean  "is_deleted",                                             default: false
+    t.datetime "deleted_at"
   end
 
   add_index "locations", ["locatable_id"], name: "index_locations_on_locatable_id", using: :btree
@@ -3222,6 +3270,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
     t.boolean  "is_deleted",             default: false
+    t.datetime "deleted_at"
   end
 
   add_index "manual_expenses", ["expense_id"], name: "index_manual_expenses_on_expense_id", using: :btree
@@ -3428,9 +3477,10 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "approved_at"
     t.integer  "travel_request_id",                  limit: 4
     t.integer  "destination_pocket_id",              limit: 4
-    t.integer  "controlling_level_id",               limit: 4
     t.integer  "created_by_id",                      limit: 4
     t.integer  "modified_by_id",                     limit: 4
+    t.integer  "controlling_level_id",               limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -3697,6 +3747,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "tds_slab_id",             limit: 4
     t.decimal  "tds",                                   precision: 10, scale: 5
     t.integer  "tds_amount_id",           limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -3849,6 +3900,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "company_id",  limit: 4
     t.boolean  "default"
     t.boolean  "is_deleted",                default: false, null: false
+    t.datetime "deleted_at"
   end
 
   create_table "payment_trails", force: :cascade do |t|
@@ -3942,6 +3994,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted"
     t.datetime "created_at",                                     null: false
     t.datetime "updated_at",                                     null: false
+    t.datetime "deleted_at"
   end
 
   add_index "per_diem_expenses", ["expense_id"], name: "index_per_diem_expenses_on_expense_id", using: :btree
@@ -3955,6 +4008,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "configurable_id",   limit: 4
     t.string   "configurable_type", limit: 255
     t.boolean  "is_deleted",                    default: false
+    t.datetime "deleted_at"
   end
 
   add_index "per_diems", ["rate_id"], name: "index_per_diems_on_rate_id", using: :btree
@@ -3991,6 +4045,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "base_currency_id",       limit: 4,     default: 1
     t.string   "application",            limit: 255
     t.integer  "settlement_currency_id", limit: 4,     default: 1,     null: false
+    t.datetime "deleted_at"
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
@@ -4031,6 +4086,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false
     t.boolean  "is_deleted",           default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
@@ -4117,6 +4173,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
     t.boolean  "is_deleted",                            default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "procurement_comments", ["parent_commentable_type", "parent_commentable_id"], name: "indx_prcurmnt_cmments_on_prnt_cmmentble_typ_n_prnt_cmmentble_id", using: :btree
@@ -4146,6 +4203,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                                null: false
     t.integer  "company_id",  limit: 4
     t.boolean  "is_deleted",                default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "procurement_terms", ["company_id"], name: "index_procurement_terms_on_company_id", using: :btree
@@ -4170,6 +4228,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted",                          default: false, null: false
     t.string   "procurement_type",      limit: 255
     t.string   "transaction_id",        limit: 255
+    t.datetime "deleted_at"
   end
 
   add_index "procurements", ["company_id"], name: "index_procurements_on_company_id", using: :btree
@@ -4225,6 +4284,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted",                                                    default: false, null: false
     t.string   "account",                limit: 255
     t.integer  "tax_rate_id",            limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree
@@ -4285,6 +4345,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_template",                                                         default: false
     t.string   "template_name",                limit: 255
     t.integer  "resource_template_id",         limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -4529,6 +4590,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted",                       default: false
     t.integer  "created_by_id",      limit: 4
     t.integer  "modified_by_id",     limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
@@ -4714,11 +4776,12 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "sync_type_id",                       limit: 4
     t.integer  "report_processor_group_mapping_id",  limit: 4
     t.integer  "travel_request_id",                  limit: 4
-    t.integer  "controlling_level_id",               limit: 4
     t.integer  "department_id",                      limit: 4
     t.integer  "sub_department_id",                  limit: 4
     t.integer  "created_by_id",                      limit: 4
     t.integer  "modified_by_id",                     limit: 4
+    t.integer  "controlling_level_id",               limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -4761,6 +4824,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                                         null: false
     t.string   "name",                   limit: 255
     t.boolean  "is_deleted",                         default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "reviewal_levels", ["policy_id"], name: "index_reviewal_levels_on_policy_id", using: :btree
@@ -4846,6 +4910,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                                           null: false
     t.boolean  "is_deleted",                           default: false
     t.string   "message_type",           limit: 255
+    t.datetime "deleted_at"
   end
 
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
@@ -4870,6 +4935,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                                                       null: false
     t.datetime "updated_at",                                                       null: false
     t.boolean  "is_deleted",                                       default: false, null: false
+    t.datetime "deleted_at"
   end
 
   add_index "tax_rates", ["company_id"], name: "index_tax_rates_on_company_id", using: :btree
@@ -4910,6 +4976,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
     t.integer  "time_object_id", limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "time_expenses", ["expense_id"], name: "index_time_expenses_on_expense_id", using: :btree
@@ -5118,6 +5185,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "booking_request_id",       limit: 4
     t.boolean  "is_deleted",                             default: false
     t.integer  "delegated_action_user_id", limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "travel_request_comments", ["travel_request_id"], name: "index_travel_request_comments_on_travel_request_id", using: :btree
@@ -5157,6 +5225,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                                         null: false
     t.boolean  "is_deleted",                         default: false
     t.integer  "delegated_action_user_id", limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "travel_request_trails", ["action_for_user_id"], name: "index_travel_request_trails_on_action_for_user_id", using: :btree
@@ -5193,9 +5262,10 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "approved_at"
     t.datetime "selection_requested_at"
     t.datetime "booking_confirmed_at"
-    t.integer  "controlling_level_id",         limit: 4
     t.integer  "created_by_id",                limit: 4
     t.integer  "modified_by_id",               limit: 4
+    t.integer  "controlling_level_id",         limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree
@@ -5297,6 +5367,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                                   null: false
     t.boolean  "is_deleted",                   default: false
     t.integer  "user_group_id",      limit: 4
+    t.datetime "deleted_at"
   end
 
   add_index "user_group_item_mappings", ["user_group_id"], name: "index_user_group_item_mappings_on_user_group_id", using: :btree
@@ -5320,6 +5391,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "updated_at",                              null: false
     t.boolean  "is_deleted",              default: false
     t.string   "application", limit: 255
+    t.datetime "deleted_at"
   end
 
   add_index "user_groups", ["company_id"], name: "index_user_groups_on_company_id", using: :btree
@@ -5595,6 +5667,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted",                   default: false
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
+    t.datetime "deleted_at"
   end
 
   add_index "vehicle_rates", ["distance_unit_id"], name: "index_vehicle_rates_on_distance_unit_id", using: :btree
@@ -5754,6 +5827,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.string   "application",                   limit: 255,                   null: false
     t.integer  "customer_id",                   limit: 4
     t.boolean  "default_account"
+    t.datetime "deleted_at"
   end
 
   create_table "web_hook_event_mappings", force: :cascade do |t|
@@ -5762,6 +5836,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.boolean  "is_deleted",                  default: false
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
+    t.datetime "deleted_at"
   end
 
   add_index "web_hook_event_mappings", ["is_deleted"], name: "index_web_hook_event_mappings_on_is_deleted", using: :btree
@@ -5806,6 +5881,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.datetime "created_at",                                       null: false
     t.datetime "updated_at",                                       null: false
     t.text     "headers",            limit: 65535
+    t.datetime "deleted_at"
   end
 
   add_index "web_hooks", ["company_id"], name: "index_web_hooks_on_company_id", using: :btree
@@ -5872,6 +5948,7 @@ ActiveRecord::Schema.define(version: 20190118060206) do
     t.integer  "tds_rates_list_id", limit: 4
     t.string   "vendor_id",         limit: 255
     t.boolean  "disabled",                        default: false
+    t.datetime "deleted_at"
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree

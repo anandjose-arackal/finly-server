@@ -29,10 +29,12 @@
 #  approved_at                        :datetime
 #  travel_request_id                  :integer
 #  destination_pocket_id              :integer
-#  controlling_level_id               :integer
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
+#  controlling_level_id               :integer
+#  deleted_at                         :datetime
 #
+
 
 
 

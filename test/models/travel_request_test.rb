@@ -27,9 +27,10 @@
 #  approved_at                  :datetime
 #  selection_requested_at       :datetime
 #  booking_confirmed_at         :datetime
-#  controlling_level_id         :integer
 #  created_by_id                :integer
 #  modified_by_id               :integer
+#  controlling_level_id         :integer
+#  deleted_at                   :datetime
 #
 
 require 'test_helper'

@@ -26,6 +26,7 @@
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  is_deleted                :boolean          default(FALSE), not null
+#  deleted_at                :datetime
 #
 
 class EWayBill < ActiveRecord::Base

@@ -47,6 +47,7 @@
 #  is_template                  :boolean          default(FALSE)
 #  template_name                :string(255)
 #  resource_template_id         :integer
+#  deleted_at                   :datetime
 #
 
 class PurchaseOrder < ActiveRecord::Base

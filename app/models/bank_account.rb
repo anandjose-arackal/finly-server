@@ -21,6 +21,7 @@
 #  default_account    :boolean          default(FALSE)
 #  is_deleted         :boolean          default(FALSE)
 #  disabled           :boolean          default(FALSE)
+#  deleted_at         :datetime
 #
 
 class BankAccount < ActiveRecord::Base

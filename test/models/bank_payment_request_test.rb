@@ -24,6 +24,7 @@
 #  auto_approved                :boolean
 #  api_initiated                :boolean          default(FALSE)
 #  controlling_level_id         :integer
+#  deleted_at                   :datetime
 #
 
 require 'test_helper'

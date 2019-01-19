@@ -8,6 +8,7 @@
 #  updated_at             :datetime         not null
 #  field_configuration_id :integer
 #  is_deleted             :boolean
+#  deleted_at             :datetime
 #
 
 class FieldMultiselectItem < ActiveRecord::Base

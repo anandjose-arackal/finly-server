@@ -20,6 +20,7 @@
 #  payment          :boolean
 #  expense          :boolean
 #  ancestry         :string(255)
+#  deleted_at       :datetime
 #
 
 class Budget < ActiveRecord::Base

@@ -16,6 +16,8 @@
 
 
 
+
+
 class UserRole < ActiveRecord::Base
   has_many :users, through: :user_role_mappings
 
@@ -29,7 +31,7 @@ class UserRole < ActiveRecord::Base
   VALUES = {
       admin: 1,
       finance_manager: 2,
-      creditor: 2,
+      # creditor: 2,
       manager: 3,
       reviewer: 3,
       employee: 4,
@@ -37,7 +39,8 @@ class UserRole < ActiveRecord::Base
       auditor: 5,
       travel_manager: 6,
       purchaser: 7,
-      receiver: 8
+      receiver: 8,
+      creditor: 9
   }
 
   VALUES_EM = {
@@ -53,18 +56,19 @@ class UserRole < ActiveRecord::Base
 
   VALUES_VP = {
       admin: 1,
-      creditor: 2,
+      # creditor: 2,
       reviewer: 3,
       initiator: 4,
       auditor: 5,
       travel_manager: 6,
       purchaser: 7,
-      receiver: 8
+      receiver: 8,
+      creditor: 9
   }
 
   def self.seed_data
     VALUES.each do |name, value|
-      if UserRole.find_by(value).blank?
+      if UserRole.find_by(id: value).blank?
         UserRole.create id: value, name: name
       end
     end

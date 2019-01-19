@@ -19,6 +19,7 @@
 #  item_code           :string(255)
 #  account             :string(255)
 #  supply_item_type_id :integer
+#  deleted_at          :datetime
 #
 
 class InventoryLineItem < ActiveRecord::Base

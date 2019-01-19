@@ -10,6 +10,7 @@
 #  is_deleted       :boolean          default(FALSE)
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  deleted_at       :datetime
 #
 
 class VehicleRate < ActiveRecord::Base

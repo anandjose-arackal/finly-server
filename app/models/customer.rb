@@ -15,6 +15,7 @@
 #  created_by_id :integer
 #  active        :boolean          default(TRUE)
 #  is_deleted    :boolean          default(FALSE)
+#  deleted_at    :datetime
 #
 
 class Customer < ActiveRecord::Base

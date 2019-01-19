@@ -19,6 +19,7 @@
 #  checkout_date    :date
 #  checkout_time    :time
 #  booking_id       :integer
+#  deleted_at       :datetime
 #
 
 class BookingHotel < ActiveRecord::Base

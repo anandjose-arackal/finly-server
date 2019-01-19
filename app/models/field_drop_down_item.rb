@@ -9,6 +9,7 @@
 #  updated_at             :datetime         not null
 #  is_deleted             :boolean          default(FALSE)
 #  field_key              :string(255)
+#  deleted_at             :datetime
 #
 
 class FieldDropDownItem < ActiveRecord::Base

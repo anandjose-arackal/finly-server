@@ -27,6 +27,7 @@
 #  tds_rates_list_id :integer
 #  vendor_id         :string(255)
 #  disabled          :boolean          default(FALSE)
+#  deleted_at        :datetime
 #
 
 class YesBankVendor < ActiveRecord::Base

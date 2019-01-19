@@ -24,6 +24,7 @@
 #  drop_time       :time
 #  is_deleted      :boolean          default(FALSE)
 #  booking_id      :integer
+#  deleted_at      :datetime
 #
 
 class BookingCarRental < ActiveRecord::Base

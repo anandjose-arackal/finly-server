@@ -16,6 +16,7 @@
 #  reservation_date   :date
 #  reservation_time   :time
 #  booking_id         :integer
+#  deleted_at         :datetime
 #
 
 class BookingRestaurant < ActiveRecord::Base
