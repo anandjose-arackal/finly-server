@@ -55,8 +55,9 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       return
     end
 
-    payment_order_data.each do |item|
-      self.requested_amount += (item[:amount].to_d rescue 0)
+
+    payment_order_data.each do |key, value|
+      self.requested_amount += (value[:amount].to_d rescue 0)
     end
 
     initiating_account_adapter = retrieve_initiating_account_adapter
@@ -77,7 +78,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       self.payment_order_data = arr
     end
 
-    self.payment_order_data.each do |item|
+    self.payment_order_data.each do |key, item|
       user_email_mob_card = item[:user]
       # converting mobile number to a string
       if user_email_mob_card.is_a?(Float)
