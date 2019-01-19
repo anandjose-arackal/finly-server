@@ -17,11 +17,14 @@ class ActionsManager::Master::Base
     templates_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Templates::Index',
     non_po_index: '::ActionsManager::Master::Procurements::PurchaseOrders::Index',
     non_po_show: '::ActionsManager::Master::Procurements::PurchaseOrders::Show',
+    non_po_inward_document_show: '::ActionsManager::Master::Procurements::PurchaseOrders::InwardDocumentShow',
+    non_po_purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow',
+    non_po_tax_invoice_show: '::ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow',
     procurements_index: '::ActionsManager::Master::Procurements::Index',
     procurements_show: '::ActionsManager::Master::Procurements::Show',
-    inward_document_show: '::ActionsManager::Master::Procurements::InwardDocumentShow',
-    purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrderShow',
-    tax_invoice_show: '::ActionsManager::Master::Procurements::TaxInvoiceShow',
+    proc_inward_document_show: '::ActionsManager::Master::Procurements::InwardDocumentShow',
+    proc_purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrderShow',
+    proc_tax_invoice_show: '::ActionsManager::Master::Procurements::TaxInvoiceShow',
     users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
     users_show: '::ActionsManager::Master::BankTransfer::Users::Show' 
 
