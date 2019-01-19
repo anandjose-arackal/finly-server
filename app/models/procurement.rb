@@ -104,13 +104,27 @@ class Procurement < ApplicationRecord
     end
   }
 
+  scope :filter_creation_date_from, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at >= ?", date)
+    end
+  }
+
+  scope :filter_creation_date_to, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at <= ?", date)
+    end
+  }
+
   scope :filter_department, -> (department_name, user_id) {
     user = User.find_by id: user_id
     if user.present?
       department_ids = user.company.departments.filter_name(department_name).pluck(:id)
 
-      filtered_ids = PurchaseOrder.filter_sub_department_id(department_ids).pluck(:procurement_id)
-      filtered_ids += Invoice.filter_sub_department_id(department_ids).pluck(:procurement_id)
+      filtered_ids = PurchaseOrder.filter_department_id(department_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.filter_department_id(department_ids).pluck(:procurement_id)
       where id: filtered_ids
     end
   }
