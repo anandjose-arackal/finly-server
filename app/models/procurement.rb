@@ -107,14 +107,14 @@ class Procurement < ApplicationRecord
   scope :filter_creation_date_from, -> (creation_date){
     date = Date.parse(creation_date) rescue nil
     if date
-      where("created_at >= ?", date)
+      where("created_at >= ?", date.beginning_of_day)
     end
   }
 
   scope :filter_creation_date_to, -> (creation_date){
     date = Date.parse(creation_date) rescue nil
     if date
-      where("created_at <= ?", date)
+      where("created_at <= ?", date.end_of_day)
     end
   }
 
@@ -278,9 +278,9 @@ class Procurement < ApplicationRecord
 
   scope :include_details, -> {
     includes(
-        {invoices: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}]},
+        {invoices: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}, :created_by, {level: :reviewers}, :invoice_status, {net_amount: [:currency]}, :payments, :attachments, :document_level_reviewer_mappings]},
         # {purchase_order: [:department, :sub_department, :cost_center, :vendor, :user, :company]},
-        {purchase_order: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}, :user, {balance_amount: [:currency]}, :status, {level: :reviewers}]},
+        {purchase_order: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}, :user, {balance_amount: [:currency]}, :status, {level: :reviewers}, :attachments, :document_level_reviewer_mappings]},
         {inward_documents: [:vendor, :user, :items]},
         :status_tags, :procurement_status_taggables, :user
     )
