@@ -10,7 +10,7 @@ class ReviewalLevels::Reviewers::Update < ReviewalLevels::Reviewers::Base
     self.reviewal_level = reviewal_levels.find_by id: id
 
     id = params[:id]
-    self.level_reviewer_mapping = reviewal_level.level_reviewer_mappings.find_by id: id
+    self.level_reviewer_mapping = reviewal_level&.level_reviewer_mappings.find_by id: id
   end
 
   def validate
@@ -24,7 +24,7 @@ class ReviewalLevels::Reviewers::Update < ReviewalLevels::Reviewers::Base
   end
 
   def process
-    unless self.level_reviewer_mappings.update(reviewer_parameters)
+    unless self.level_reviewer_mapping.update(reviewer_parameters)
       add_message :error, level_reviewer_mapping.errors.full_messages
     end
   end
