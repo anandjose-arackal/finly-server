@@ -17,24 +17,26 @@ class ReviewalLevels::Reviewers::Update < ReviewalLevels::Reviewers::Base
     unless reviewal_level.present?
       add_message :error, 'Level not found'
     end
+
+    unless level_reviewer_mapping.present?
+      add_message :error, 'Reviewer not found'
+    end
   end
 
   def process
-    level_reviewer_mapping = reviewal_level.level_reviewer_mappings.new(reviewer_params)
-
-    if level_reviewer_mapping.valid?
-      level_reviewer_mapping.save
+    unless self.level_reviewer_mappings.update(reviewer_parameters)
+      add_message :error, level_reviewer_mapping.errors.full_messages
     end
   end
 
   def post_process
-    add_message :success, 'Successfully Added Reviewer'
+    add_message :success, 'Successfully Updated Reviewer'
   end
 
   private
 
   def reviewer_parameters
-    params.require(:level_reviewer_mapping).permit(:level_id, :threshold, :exception)
+    params.require(:level_reviewer_mapping).permit(:threshold, :exception)
   end
 
 end
