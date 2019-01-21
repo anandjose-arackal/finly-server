@@ -56,6 +56,6 @@ class ReviewalLevels::Create < ReviewalLevels::Base
   private
 
   def reviewal_level_parameters
-    params.require(:reviewal_level).permit(:policy_id, :associated_entity_type)
+    params.require(:reviewal_level).permit(:policy_id, :associated_entity_type, :name)
   end
 end
