@@ -10,7 +10,8 @@
 
 class ExpenseType < ApplicationRecord
 
-  has_and_belongs_to_many :budget_rules
+  has_many :budget_rule_expense_type_mappings
+  has_many :budget_rules, through: :budget_rule_expense_type_mappings
 
   validates :name, presence: true
 

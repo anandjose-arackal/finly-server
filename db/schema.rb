@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_17_112550) do
+ActiveRecord::Schema.define(version: 2019_01_20_140408) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -904,6 +904,15 @@ ActiveRecord::Schema.define(version: 2019_01_17_112550) do
     t.index ["budget_id"], name: "index_budget_modification_trails_on_budget_id"
   end
 
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "budget_rule_id", null: false
+    t.integer "branch_location_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_location_id"], name: "index_budget_rule_branch_location_mappings_on_branch_location_id"
+    t.index ["budget_rule_id"], name: "index_budget_rule_branch_location_mappings_on_budget_rule_id"
+  end
+
   create_table "budget_rule_category_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "category_id", null: false
@@ -920,6 +929,15 @@ ActiveRecord::Schema.define(version: 2019_01_17_112550) do
     t.datetime "updated_at", null: false
     t.index ["budget_rule_id"], name: "index_budget_rule_department_mappings_on_budget_rule_id"
     t.index ["department_id"], name: "index_budget_rule_department_mappings_on_department_id"
+  end
+
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "budget_rule_id", null: false
+    t.integer "expense_type_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_rule_id"], name: "index_budget_rule_expense_type_mappings_on_budget_rule_id"
+    t.index ["expense_type_id"], name: "index_budget_rule_expense_type_mappings_on_expense_type_id"
   end
 
   create_table "budget_rule_field_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -952,13 +970,6 @@ ActiveRecord::Schema.define(version: 2019_01_17_112550) do
     t.index ["period_id"], name: "index_budget_rules_on_period_id"
     t.index ["policy_id"], name: "index_budget_rules_on_policy_id"
     t.index ["rule_type_id"], name: "index_budget_rules_on_rule_type_id"
-  end
-
-  create_table "budget_rules_expense_types", id: false, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.bigint "budget_rule_id", null: false
-    t.bigint "expense_type_id", null: false
-    t.index ["budget_rule_id", "expense_type_id"], name: "budget_rule_to_expense_type"
-    t.index ["expense_type_id", "budget_rule_id"], name: "expense_type_to_budget_rule"
   end
 
   create_table "budget_trails", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -5095,6 +5106,15 @@ ActiveRecord::Schema.define(version: 2019_01_17_112550) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "branch_location_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_location_id"], name: "index_user_branch_location_mappings_on_branch_location_id"
+    t.index ["user_id"], name: "index_user_branch_location_mappings_on_user_id"
+  end
+
   create_table "user_delegate_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id"
     t.integer "delegate_for_user_id"
@@ -5735,10 +5755,14 @@ ActiveRecord::Schema.define(version: 2019_01_17_112550) do
   add_foreign_key "branch_locations", "states"
   add_foreign_key "budget_criteria_mappings", "budgets"
   add_foreign_key "budget_modification_trails", "budgets"
+  add_foreign_key "budget_rule_branch_location_mappings", "branch_locations"
+  add_foreign_key "budget_rule_branch_location_mappings", "budget_rules"
   add_foreign_key "budget_rule_category_mappings", "budget_rules"
   add_foreign_key "budget_rule_category_mappings", "categories"
   add_foreign_key "budget_rule_department_mappings", "budget_rules"
   add_foreign_key "budget_rule_department_mappings", "departments"
+  add_foreign_key "budget_rule_expense_type_mappings", "budget_rules"
+  add_foreign_key "budget_rule_expense_type_mappings", "expense_types"
   add_foreign_key "budget_rule_field_mappings", "budget_rules"
   add_foreign_key "budget_rule_field_mappings", "field_configurations"
   add_foreign_key "budget_rule_field_mappings", "field_drop_down_items"
@@ -6021,6 +6045,8 @@ ActiveRecord::Schema.define(version: 2019_01_17_112550) do
   add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_branch_location_mappings", "branch_locations"
+  add_foreign_key "user_branch_location_mappings", "users"
   add_foreign_key "user_delegate_mappings", "users"
   add_foreign_key "user_department_mappings", "departments"
   add_foreign_key "user_department_mappings", "users"

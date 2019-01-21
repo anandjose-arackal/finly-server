@@ -31,7 +31,13 @@ class BudgetRule < ApplicationRecord
   has_many :budget_rule_department_mappings
   has_many :departments, through: :budget_rule_department_mappings
 
-  belongs_to :amount, optional: true, dependent: :destroy
+  # has_many :budget_rule_branch_location_mappings
+  # has_many :branch_locations, through: :budget_rule_branch_location_mappings
+
+  has_many :budget_rule_expense_type_mappings
+  has_many :expense_types, through: :budget_rule_expense_type_mappings
+
+  belongs_to :amount, optional: true #, dependent: :destroy
   belongs_to :period, optional: true
   belongs_to :policy, optional: true
   belongs_to :rule_type, optional: true
@@ -41,13 +47,14 @@ class BudgetRule < ApplicationRecord
   has_many :field_drop_down_items, through: :budget_rule_field_mappings
   has_many :field_configurations, through: :budget_rule_field_mappings
 
-  has_and_belongs_to_many :expense_types
-
-  accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :amount #, allow_destroy: true
   accepts_nested_attributes_for :with_receipt_amount
   accepts_nested_attributes_for :without_receipt_amount
   accepts_nested_attributes_for :budget_rule_field_mappings
   accepts_nested_attributes_for :budget_rule_category_mappings
+  accepts_nested_attributes_for :budget_rule_category_mappings
+  accepts_nested_attributes_for :budget_rule_department_mappings
+  accepts_nested_attributes_for :budget_rule_expense_type_mappings
 
   # delegate :period, to: :period
   delegate :type, to: :rule_type
@@ -60,8 +67,12 @@ class BudgetRule < ApplicationRecord
   validates :policy_id, presence: true
   validates :rule_type_id, presence: true
 
+  validates_presence_of :budget_rule_expense_type_mappings
+
   validate :no_duplicates
   validate :amount_presence
+
+  # validate :department_presence
 
   before_create :update_parent_version
   before_destroy :update_parent_version
@@ -201,11 +212,18 @@ class BudgetRule < ApplicationRecord
 
   def update_parent_version
     self.policy.update_attribute(:updated_at, DateTime.now)
+    # return true
   end
 
   def amount_presence
     if amount.blank? and without_receipt_amount.blank? and with_receipt_amount.blank?
       errors.add :amount, 'is not defined'
+    end
+  end
+
+  def department_presence
+    if budget_rule_department_mappings.blank?
+      errors.add :base, "Please select the department for which this budget rule applies"
     end
   end
 

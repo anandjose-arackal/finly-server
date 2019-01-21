@@ -2172,7 +2172,7 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
-  mount_griddler('/email/incoming')
+  # mount_griddler('/email/incoming')
   # mount_opro_oauth controllers: {
   #     oauth_new: 'oauth/auth',
   #     oauth_token: 'oauth/token'
@@ -2581,6 +2581,10 @@ Rails.application.routes.draw do
   get 'organization_account/sidebar_menu_config' => 'organization_account#sidebar_menu_config'
   get 'organization_account/policies_list' => 'organization_account#policies_list'
   get 'organization_account/categories' => 'organization_account#categories'
+  get 'organization_account/departments' => 'organization_account#departments'
+  get 'organization_account/all_expense_types' => 'organization_account#all_expense_types'
+
+
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
   get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
 
@@ -2698,6 +2702,9 @@ Rails.application.routes.draw do
   end
 
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
+
+  # get 'expenses/all_expense_types', to: 'expenses#all_expense_types'
+  # get 'expenses/all_expense_types' => 'expenses#all_expense_types'
 
   get 'receipts/export', to: 'receipts#export'
   resources :receipts do
