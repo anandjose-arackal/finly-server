@@ -2172,7 +2172,7 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
-  # mount_griddler('/email/incoming')
+  mount_griddler('/email/incoming')
   # mount_opro_oauth controllers: {
   #     oauth_new: 'oauth/auth',
   #     oauth_token: 'oauth/token'
