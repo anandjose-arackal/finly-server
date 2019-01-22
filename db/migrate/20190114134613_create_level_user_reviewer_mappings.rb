@@ -1,4 +1,4 @@
-class CreateLevelUserReviewerMappings < ActiveRecord::Migration
+class CreateLevelUserReviewerMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :level_user_reviewer_mappings do |t|
       t.integer :level_id, references: 'ReviewalLevel', foreign_key: true, index: true

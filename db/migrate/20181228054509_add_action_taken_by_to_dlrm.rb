@@ -1,4 +1,4 @@
-class AddActionTakenByToDlrm < ActiveRecord::Migration
+class AddActionTakenByToDlrm < ActiveRecord::Migration[4.2]
   def change
     add_column :document_level_reviewer_mappings, :action_taken_by_id, :integer, references: 'User', foreign_key: true
     add_column :document_level_reviewer_mappings, :action_id, :integer, references: 'TrailAction', foreign_key: true

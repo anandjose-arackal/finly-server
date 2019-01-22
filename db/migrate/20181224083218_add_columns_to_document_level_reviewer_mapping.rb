@@ -1,4 +1,4 @@
-class AddColumnsToDocumentLevelReviewerMapping < ActiveRecord::Migration
+class AddColumnsToDocumentLevelReviewerMapping < ActiveRecord::Migration[4.2]
   def change
     add_column :document_level_reviewer_mappings, :level_number, :integer
     add_column :document_level_reviewer_mappings, :taken_control, :boolean, default: false

@@ -1,4 +1,4 @@
-class AddViewableToDlrm < ActiveRecord::Migration
+class AddViewableToDlrm < ActiveRecord::Migration[4.2]
   def change
     add_column :document_level_reviewer_mappings, :viewable, :boolean, default: false
     add_column :document_level_reviewer_mappings, :became_viewable_at, :timestamp

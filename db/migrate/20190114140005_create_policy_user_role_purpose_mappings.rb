@@ -1,4 +1,4 @@
-class CreatePolicyUserRolePurposeMappings < ActiveRecord::Migration
+class CreatePolicyUserRolePurposeMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :policy_user_role_purpose_mappings do |t|
       t.integer :policy_id, references: 'Policy', foreign_key: true, index: true
