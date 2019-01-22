@@ -44,8 +44,10 @@ class Settlement::Summary < Settlement::Base
       add_message :error, users_presenter.messages[:error]
       return
     end
+
     users = users_presenter.team
     user_ids = users.pluck(:id)
+
     load_users_summary(users)
     load_cash_on_hand_summary(user_ids)
 

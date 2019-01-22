@@ -225,7 +225,6 @@ class Reports::Base < BaseOperation
         end
       elsif manager_view?
         if self.report.processing? && self.report.get_reviewers.include?(user)
-          debugger
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
           actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}

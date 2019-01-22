@@ -52,6 +52,35 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     # end
 
 
+    case self.role_id
+    when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+      if self.user.vendor_payments_admin? || self.user.auditor?
+        # team_ids = user.company.users.pluck(:id)
+        # self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
+        self.payment_requests = BankPaymentRequest.admin_associated_items(user)
+      end
+    when UserRole.id_for(:manager)
+      # team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:manager))&.pluck(:id)
+      # controlling_payment_requests_query = user.controlling_payment_requests.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
+      # interacted_payment_requests_query = user.manager_payment_requests
+      # sql = BankPaymentRequest.connection.unprepared_statement {
+      #   "((#{controlling_payment_requests_query.to_sql}) UNION (#{interacted_payment_requests_query.to_sql})) AS bank_payment_requests"
+      # }
+      # self.payment_requests = BankPaymentRequest.from([Arel.sql(sql)])
+      self.payment_requests = BankPaymentRequest.reviewer_associated_items(user)
+    when UserRole.id_for(:finance_manager) #todo change it to creditor
+      self.payment_requests = BankPaymentRequest.creditor_associated_items(user)
+      # team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:finance_manager))&.pluck(:id)
+      # controlling_payment_requests_query = user.controlling_payment_requests.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)
+      # interacted_payment_requests_query = user.finance_payment_requests
+      # sql = BankPaymentRequest.connection.unprepared_statement {
+      #   "((#{controlling_payment_requests_query.to_sql}) UNION (#{interacted_payment_requests_query.to_sql})) AS bank_payment_requests"
+      # }
+      # self.payment_requests = BankPaymentRequest.from([Arel.sql(sql)])
+    else
+      self.payment_requests = user.bank_payment_requests
+    end
+
   end
 
   def success
