@@ -1,4 +1,4 @@
-class ReportAutoSubmit < ActiveJob::Base
+class ReportAutoSubmit < ApplicationJob
 
   def perform
     today = Date.today

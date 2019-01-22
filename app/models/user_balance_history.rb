@@ -21,20 +21,20 @@
 #  card_atm_withdrawal_id     :integer
 #
 
-class UserBalanceHistory < ActiveRecord::Base
-  belongs_to :user
+class UserBalanceHistory < ApplicationRecord
+  belongs_to :user, optional: true
 
-  belongs_to :card_balance, class_name: "Amount"
-  belongs_to :card_withdrawal, class_name: "Amount"
-  belongs_to :card_load, class_name: "Amount"
-  belongs_to :finly_money_balance, class_name: "Amount"
-  belongs_to :finly_money_withdrawal, class_name: "Amount"
-  belongs_to :finly_money_load, class_name: "Amount"
-  belongs_to :cash_on_hand_balance, class_name: "Amount"
-  belongs_to :cash_on_hand_withdrawal, class_name: "Amount"
-  belongs_to :cash_on_hand_load, class_name: "Amount"
-  belongs_to :card_expenses, class_name: "Amount"
-  belongs_to :card_atm_withdrawal, class_name: "Amount"
+  belongs_to :card_balance, optional: true, class_name: "Amount"
+  belongs_to :card_withdrawal, optional: true, class_name: "Amount"
+  belongs_to :card_load, optional: true, class_name: "Amount"
+  belongs_to :finly_money_balance, optional: true, class_name: "Amount"
+  belongs_to :finly_money_withdrawal, optional: true, class_name: "Amount"
+  belongs_to :finly_money_load, optional: true, class_name: "Amount"
+  belongs_to :cash_on_hand_balance, optional: true, class_name: "Amount"
+  belongs_to :cash_on_hand_withdrawal, optional: true, class_name: "Amount"
+  belongs_to :cash_on_hand_load, optional: true, class_name: "Amount"
+  belongs_to :card_expenses, optional: true, class_name: "Amount"
+  belongs_to :card_atm_withdrawal, optional: true, class_name: "Amount"
 
   validates :date, presence: true
   validates :date, uniqueness: {scope: [:user_id]}

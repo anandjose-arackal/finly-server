@@ -9,7 +9,7 @@
 #  updated_at  :datetime         not null
 #
 
-class DocumentNumberConfigType < ActiveRecord::Base
+class DocumentNumberConfigType < ApplicationRecord
   include Seedable
 
   # After adding more items here seed and also create DocumentNumberConfig for all existing companies like this:

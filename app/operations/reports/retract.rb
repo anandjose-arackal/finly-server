@@ -23,6 +23,7 @@ class Reports::Retract < Reports::Base
     if id.blank?
       add_message :error, 'Error loading report'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -83,10 +84,11 @@ class Reports::Retract < Reports::Base
   end
 
   def post_process
-    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
+    delegated_action_user = actual_current_user.present? ? actual_current_user : nil
+    report_comment_action = actual_current_user.present? ? :report_retracted_by_delegate : :report_retract
+    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(report_comment_action), delegated_action_user: delegated_action_user
     # destroying the submitted amount field
     report.submitted_amount&.destroy
-
 
     if prev_status.approved? || report.auto_approve
       op = Settlement::SReport::Unapproved.(user, report: report)
@@ -94,7 +96,7 @@ class Reports::Retract < Reports::Base
     end
 
     # Invalidate All existing Email Authorizations
-    email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
+    email_auth_invalidate_presenter = EmailAuthorizations::Invalidate.(user, authorizable: report)
 
     Event::EReport::Retract.(user, report: report, from_user: from_user)
 

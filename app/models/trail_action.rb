@@ -6,7 +6,7 @@
 #  name :string(255)
 #
 
-class TrailAction < ActiveRecord::Base
+class TrailAction < ApplicationRecord
   include Seedable
   def self.values
     [

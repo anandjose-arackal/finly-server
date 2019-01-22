@@ -1,4 +1,4 @@
-class CreateProcurementAttachments < ActiveRecord::Migration
+class CreateProcurementAttachments < ActiveRecord::Migration[4.2]
   def change
     create_table :procurement_attachments do |t|
       t.attachment :file

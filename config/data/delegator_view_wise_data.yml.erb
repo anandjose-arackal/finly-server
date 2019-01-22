@@ -1,0 +1,76 @@
+company:
+  name: <%= current_company.name %>
+  id: <%= current_company.id %>
+  d_code_assigned: <%= current_company.d_code_enabled? ? 1 : 0 %>
+  logo:
+  <% if current_company.configuration.logo.present? %>
+    url: <%= current_company.configuration.logo.url(:thumb)%>
+  <% end %>
+  features:
+    <% if current_company.feature_subscription.expense_card_enabled && current_user.user_panel_subscription.disburse%>
+    expense_card: true
+    <% end %>
+    <% if current_company.feature_subscription.meal_card_enabled && current_user.user_panel_subscription.disburse %>
+    meal_card: true
+    <% end %>
+    <% if current_company.feature_subscription.medical_card_enabled && current_user.user_panel_subscription.disburse %>
+    medical_card: true
+    <% end %>
+    <% if current_company.feature_subscription.reimbursement_card_enabled && current_user.user_panel_subscription.disburse %>
+    reimbursement_card: true
+    <% end %>
+    <% if current_company.feature_subscription.expense_management_enabled && current_user.user_panel_subscription.expense_management %>
+    expense_management: true
+    <% end %>
+    <% if current_company.feature_subscription.invoicing_system && current_user.user_panel_subscription.invoicing_system %>
+    invoicing_system: true
+    <% end %>
+    <% if current_company.feature_subscription.budgeting_system && current_user.admin? %>
+    insights: true
+    <% end %>
+
+user:
+  name: <%= current_user.name %>
+  initials: <%= current_user.initials %>
+  id: <%= current_user.id %>
+  email: <%= current_user.email %>
+  mobile_number: <%= current_user.mobile_number %>
+  roles:
+  <% if current_user.employee? %>
+  - id: personal
+    name: 'Personal'
+    default_url: 'expenses/params={"view":"personal"}'
+  <% end %>
+
+views:
+  <% if current_user.employee? %>
+  personal:
+    menus:
+      navbar:
+      - name: Expenses
+        url: expenses
+        id: expenses
+      - name: Receipts
+        url: receipts
+        id: receipts
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      - name: Trips
+        url: travel_requests
+        id: travel_requests
+      <% end %>
+      - name: Reports
+        url: reports
+        id: reports
+      # - name: Money Requests
+      #   url: requests
+      #   id: requests
+      # - name: Trips
+      #   url: travel_requests
+      #   id: travel_requests
+      - name: Money Requests
+        url: requests
+        id: requests
+  <% end %>
+
+
+

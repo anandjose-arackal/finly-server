@@ -11,7 +11,7 @@
 #  updated_at :datetime         not null
 #
 
-class CompanyTag < ActiveRecord::Base
-  belongs_to :company
+class CompanyTag < ApplicationRecord
+  belongs_to :company, optional: true
 
 end

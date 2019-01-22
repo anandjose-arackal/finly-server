@@ -1,4 +1,4 @@
-class CreateBookingHotels < ActiveRecord::Migration
+class CreateBookingHotels < ActiveRecord::Migration[4.2]
   def change
     create_table :booking_hotels do |t|
       t.string :reservation_destination

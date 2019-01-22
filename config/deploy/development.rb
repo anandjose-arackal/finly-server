@@ -7,11 +7,11 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server 'dev.finly.io', user: 'centos', roles: %w{web app db}, port: 22
+server '13.232.137.15', user: 'centos', roles: %w{web app db}, port: 22
 set :stage, 'development'
 set :use_sudo, false
 set :rbenv_type, :user
-set :rbenv_ruby, '2.3.1' # Edit this if you are using MRI Ruby
+set :rbenv_ruby, '2.6.0' # Edit this if you are using MRI Ruby
 
 # role-based syntax
 # ==================

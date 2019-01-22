@@ -1,4 +1,4 @@
-class AddPointOfContactForAllCompanies < ActiveRecord::Migration
+class AddPointOfContactForAllCompanies < ActiveRecord::Migration[4.2]
   def change
     Company.all.each do |company|
       user = company.users.first

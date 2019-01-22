@@ -89,6 +89,11 @@ module Constants
   BEGINNING_OF_TIME = '10-03-2017'
   ###################################################
 
+  if Rails.env.production?
+    SPECIAL_RESPONSE_EMAIL = 'yb_special_response@finly.io'
+  else
+    SPECIAL_RESPONSE_EMAIL = 'yb_special_response@emaildev.finly.io'
+  end
 
 
   if Rails.env.development?
@@ -288,7 +293,7 @@ module Constants
 
   class Constants::YesBank
     PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN-PROCESS","IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
-    FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
+    FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY", "REQUEST NOT FOUND"]
     SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
 
     YES_BANK_RECEIVING_IFSC = "YESB0000022"

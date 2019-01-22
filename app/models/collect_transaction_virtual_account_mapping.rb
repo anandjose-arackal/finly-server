@@ -9,6 +9,6 @@
 #  updated_at             :datetime         not null
 #
 
-class CollectTransactionVirtualAccountMapping < ActiveRecord::Base
+class CollectTransactionVirtualAccountMapping < ApplicationRecord
 
 end

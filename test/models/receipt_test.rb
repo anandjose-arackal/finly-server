@@ -23,7 +23,6 @@
 #  modified_by_id     :integer
 #
 
-
 require 'test_helper'
 
 class ReceiptTest < ActiveSupport::TestCase

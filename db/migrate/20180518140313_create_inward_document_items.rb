@@ -1,4 +1,4 @@
-class CreateInwardDocumentItems < ActiveRecord::Migration
+class CreateInwardDocumentItems < ActiveRecord::Migration[4.2]
   def change
     create_table :inward_document_items do |t|
       t.references :purchase_order_item, index: true, foreign_key: true

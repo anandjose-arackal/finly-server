@@ -11,8 +11,8 @@
 #  updated_at        :datetime         not null
 #
 
-class AccountingSystemConfiguration < ActiveRecord::Base
-  belongs_to :company
+class AccountingSystemConfiguration < ApplicationRecord
+  belongs_to :company, optional: true
 
   serialize :options
 end

@@ -22,20 +22,20 @@
 #  sequence_number             :integer
 #
 
-class FinlyTransaction < ActiveRecord::Base
+class FinlyTransaction < ApplicationRecord
 
   include ManageTransactionDetail
 
-  belongs_to :finly_account, polymorphic: true
-  belongs_to :transaction_type
-  belongs_to :amount
-  belongs_to :status, class_name: 'TransactionStatus'
-  belongs_to :payment_purpose
-  belongs_to :opening_balance, class_name: 'Amount'
-  belongs_to :closing_balance, class_name: 'Amount'
-  belongs_to :associated_transaction, polymorphic: true
-  belongs_to :payment
-  belongs_to :company
+  belongs_to :finly_account, optional: true, polymorphic: true
+  belongs_to :transaction_type, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :status, optional: true, class_name: 'TransactionStatus'
+  belongs_to :payment_purpose, optional: true
+  belongs_to :opening_balance, optional: true, class_name: 'Amount'
+  belongs_to :closing_balance, optional: true, class_name: 'Amount'
+  belongs_to :associated_transaction, optional: true, polymorphic: true
+  belongs_to :payment, optional: true
+  belongs_to :company, optional: true
   has_many :system_messages, as: :messagable, dependent: :destroy
   has_one :transaction_detail
 
@@ -79,10 +79,8 @@ class FinlyTransaction < ActiveRecord::Base
                                                                                         :vendor_payment,
                                                                                         :balance_clearance_outside_finly, :balance_clearance])}
   scope :include_for_export, -> {includes([:transaction_type, :payment_purpose, :amount, :closing_balance, :status,
-                                           {payment: [:receiving_user, :initiating_account,
-                                                      :receiving_account, {
-                                                          original_payment_for_refund: :receiving_user}]},
-                                           :associated_transaction])}
+                                           {transaction_detail: [:amount, :closing_balance, :opening_balance]},
+                                           :associated_transaction, :system_messages])}
 
   scope :include_for_index, -> { includes(:system_messages) }
   scope :joins_amounts, -> {joins :amount}

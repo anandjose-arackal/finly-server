@@ -1,4 +1,4 @@
-class UpdateBookingFields < ActiveRecord::Migration
+class UpdateBookingFields < ActiveRecord::Migration[4.2]
   def change
     remove_column :booking_flights, :booking_class
     remove_column :booking_flights, :departure_date

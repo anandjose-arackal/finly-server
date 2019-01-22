@@ -1,4 +1,4 @@
-class AddItzCashCompanyAccountForAllCompanies < ActiveRecord::Migration
+class AddItzCashCompanyAccountForAllCompanies < ActiveRecord::Migration[4.2]
   def change
     Company.all.each do |company|
       op = ItzCash::VirtualAccountBalance.(company)

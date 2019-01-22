@@ -11,10 +11,10 @@
 #  application :string(255)
 #
 
-class UserGroup < ActiveRecord::Base
+class UserGroup < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :company
+  belongs_to :company, optional: true
   has_many :user_group_items
 
   accepts_nested_attributes_for :user_group_items

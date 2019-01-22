@@ -155,8 +155,8 @@ class Reports::Approve < Reports::Base
 
       # set the reimbursement amount of the report
       if report.processing?
-        email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
-        email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
+        email_auth_invalidate_presenter = EmailAuthorizations::Invalidate.(user, authorizable: report)
+        email_authorization_presenter = EmailAuthorizations::Create.(user, {authorizable: report})
         if email_authorization_presenter.success?
           email_authorization = email_authorization_presenter.email_authorization
         end
@@ -167,7 +167,7 @@ class Reports::Approve < Reports::Base
         report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:verified))
 
         # Mark all previous tokens as invalid
-        email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
+        email_auth_invalidate_presenter = EmailAuthorizations::Invalidate.(user, authorizable: report)
         # unless email_auth_invalidate_presenter.success?
 
         # end

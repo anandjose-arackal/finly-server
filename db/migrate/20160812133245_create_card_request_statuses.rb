@@ -1,4 +1,4 @@
-class CreateCardRequestStatuses < ActiveRecord::Migration
+class CreateCardRequestStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :card_request_statuses do |t|
       t.string :name

@@ -93,6 +93,7 @@ class Procure::PurchaseOrdersController < ApplicationController
                  layout: "pdf/paginated_bootstrap.html.erb",
                  print_media_type: true,
                  margin: { :bottom => 5 },
+                 dpi: 650,
                  # header: { left: '[page] of [topage]' },
                  footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
                  # header: { html: { template: 'export/header_pagination.html.erb' }}

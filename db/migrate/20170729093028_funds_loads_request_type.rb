@@ -1,4 +1,4 @@
-class FundsLoadsRequestType < ActiveRecord::Migration
+class FundsLoadsRequestType < ActiveRecord::Migration[4.2]
   def up
     create_table :company_funds_load_request_types do |t|
       t.string :name

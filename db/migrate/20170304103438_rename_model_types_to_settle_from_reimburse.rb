@@ -1,4 +1,4 @@
-class RenameModelTypesToSettleFromReimburse < ActiveRecord::Migration
+class RenameModelTypesToSettleFromReimburse < ActiveRecord::Migration[4.2]
   def up
     status_count = ReportStatus.count
     ReportStatus.find(6).update(name: "Settled") if status_count > 5

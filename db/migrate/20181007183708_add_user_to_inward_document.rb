@@ -1,4 +1,4 @@
-class AddUserToInwardDocument < ActiveRecord::Migration
+class AddUserToInwardDocument < ActiveRecord::Migration[4.2]
   def change
     add_reference :inward_documents, :user, index: true, foreign_key: true
   end

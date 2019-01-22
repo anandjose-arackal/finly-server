@@ -1,4 +1,4 @@
-class CreateReceiptEmailParseFailures < ActiveRecord::Migration
+class CreateReceiptEmailParseFailures < ActiveRecord::Migration[4.2]
   def change
     create_table :receipt_email_parse_failures do |t|
       t.references :user, index: true, foreign_key: true

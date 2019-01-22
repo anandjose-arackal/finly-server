@@ -12,9 +12,9 @@
 #
 
 
-class NewCardRequest < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :requesting_user, class_name: "User"
-  belongs_to :card_type
-  belongs_to :status, class_name: "CardRequestStatus"
+class NewCardRequest < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :requesting_user, optional: true, class_name: "User"
+  belongs_to :card_type, optional: true
+  belongs_to :status, optional: true, class_name: "CardRequestStatus"
 end

@@ -1,4 +1,4 @@
-class AddBranchIdToOutwardInvoice < ActiveRecord::Migration
+class AddBranchIdToOutwardInvoice < ActiveRecord::Migration[4.2]
   def change
     add_reference :outward_invoices, :company_branch, index: true, foreign_key: true
   end

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class PaymentPurpose < ActiveRecord::Base
+class PaymentPurpose < ApplicationRecord
   include Seedable
 
   def self.values

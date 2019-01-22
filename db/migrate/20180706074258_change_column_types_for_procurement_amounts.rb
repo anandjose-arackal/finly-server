@@ -1,4 +1,4 @@
-class ChangeColumnTypesForProcurementAmounts < ActiveRecord::Migration
+class ChangeColumnTypesForProcurementAmounts < ActiveRecord::Migration[4.2]
   def change
     change_column :purchase_order_items, :rate, :decimal, :precision => 20, :scale => 5
     change_column :purchase_order_items, :tax, :decimal, :precision => 20, :scale => 5

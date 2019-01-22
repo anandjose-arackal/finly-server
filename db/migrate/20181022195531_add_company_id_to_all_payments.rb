@@ -1,4 +1,4 @@
-class AddCompanyIdToAllPayments < ActiveRecord::Migration
+class AddCompanyIdToAllPayments < ActiveRecord::Migration[4.2]
   def change
     # PaymentOrder.all.each do |po|
     #   company_id = po.company_id

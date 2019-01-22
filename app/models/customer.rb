@@ -17,12 +17,12 @@
 #  is_deleted    :boolean          default(FALSE)
 #
 
-class Customer < ActiveRecord::Base
+class Customer < ApplicationRecord
 
   include SoftDeletable
 
-  belongs_to :company
-  belongs_to :created_by, class_name: "User"
+  belongs_to :company, optional: true
+  belongs_to :created_by, optional: true, class_name: "User"
 
   has_many :addresses, as: :parent
   has_many :customer_attachments

@@ -19,14 +19,15 @@
 #  delegated_action_user_id :integer
 #
 
-class TravelRequestComment < ActiveRecord::Base
+class TravelRequestComment < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :travel_request
-  belongs_to :user
-  belongs_to :action, class_name: "TravelRequestCommentAction"
-  belongs_to :booking
-  belongs_to :booking_request
+  belongs_to :travel_request, optional: true
+  belongs_to :user, optional: true
+  belongs_to :action, optional: true, class_name: "TravelRequestCommentAction"
+  belongs_to :booking, optional: true
+  belongs_to :booking_request, optional: true
+  belongs_to :delegated_action_user, optional: true, class_name: 'User'
 
   default_scope { order created_at: :desc }
 
@@ -37,6 +38,10 @@ class TravelRequestComment < ActiveRecord::Base
       comment_content += "You have"
     else
       comment_content += "#{self.user&.name} has"
+    end
+    if self.delegated_action_user_id.present?
+      current_user_name = self.user.name
+      comment_content = "#{self.delegated_action_user&.name} has"
     end
 
     case self.action_id
@@ -68,6 +73,16 @@ class TravelRequestComment < ActiveRecord::Base
       comment_content += " requested selection  of booking options"
     when TravelRequestCommentAction.id_for(:selection_confirmed)
       comment_content += " confirmed selection"
+    when TravelRequestCommentAction.id_for(:selection_approved)
+      comment_content += " approved selection"
+    when TravelRequestCommentAction.id_for(:created_by_delegate)
+      comment_content += " created trip on behalf of #{current_user_name}"
+    when TravelRequestCommentAction.id_for(:updated_by_delegate)
+      comment_content += " updated trip on behalf of #{current_user_name}"
+    when TravelRequestCommentAction.id_for(:submitted_by_delegate)
+      comment_content += " submitted trip on behalf of #{current_user_name}"
+    when TravelRequestCommentAction.id_for(:retracted_by_delegate)
+      comment_content += " retracted trip on behalf of #{current_user_name}"
     else
       return nil
     end

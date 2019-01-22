@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class KycStatus < ActiveRecord::Base
+class KycStatus < ApplicationRecord
   include Seedable
 
   def self.values

@@ -11,11 +11,11 @@
 #  updated_at          :datetime         not null
 #
 
-class VendorAccountTransaction < ActiveRecord::Base
-  belongs_to :vendor_account
-  belongs_to :amount
-  belongs_to :payment
-  belongs_to :transaction_type
+class VendorAccountTransaction < ApplicationRecord
+  belongs_to :vendor_account, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :payment, optional: true
+  belongs_to :transaction_type, optional: true
 
   accepts_nested_attributes_for :amount
 

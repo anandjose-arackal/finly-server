@@ -14,10 +14,10 @@
 #  mcc_restriction_type :string(255)
 #
 
-class CardRestriction < ActiveRecord::Base
-  belongs_to :card
+class CardRestriction < ApplicationRecord
+  belongs_to :card, optional: true
 
-  belongs_to :mcc_group
+  belongs_to :mcc_group, optional: true
 
   has_many :card_limits, dependent: :destroy
 

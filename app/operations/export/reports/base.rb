@@ -91,6 +91,10 @@ class Export::Reports::Base < Export::Base
           end
         when ExportField.id_for(:expense_type)
           data_arr << expense.expense_type&.exportable_name
+        when ExportField.id_for(:expense_reimbursement)
+          data_arr << expense.reimbursable ? 'YES' : 'NO'
+        when ExportField.id_for(:spent_from_account)
+          data_arr << expense.spent_from.present? ? expense.spent_from.name : "NONE"
         else
           data_arr << ''
       end

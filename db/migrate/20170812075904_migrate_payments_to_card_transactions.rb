@@ -1,4 +1,4 @@
-class MigratePaymentsToCardTransactions < ActiveRecord::Migration
+class MigratePaymentsToCardTransactions < ActiveRecord::Migration[4.2]
   def up
     PaymentPurpose.seed_data
     Payment.where(payment_purpose_id: nil).update_all(payment_purpose_id: PaymentPurpose.id_for(:advance))

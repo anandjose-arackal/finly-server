@@ -1,6 +1,6 @@
-class QuickbooksCompanyTag < ActiveRecord::Base
+class QuickbooksCompanyTag < ApplicationRecord
 
-  belongs_to :company_tag
+  belongs_to :company_tag, optional: true
 
   scope :quickbooks, -> { where(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
 

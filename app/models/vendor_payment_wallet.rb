@@ -9,10 +9,10 @@
 #  updated_at :datetime         not null
 #
 
-class VendorPaymentWallet < ActiveRecord::Base
+class VendorPaymentWallet < ApplicationRecord
   include Accountable
-  belongs_to :user
-  belongs_to :balance, class_name: "Amount"
+  belongs_to :user, optional: true
+  belongs_to :balance, optional: true, class_name: "Amount"
 
   validates :user, presence: true
   validates :balance, presence: true
@@ -28,7 +28,9 @@ class VendorPaymentWallet < ActiveRecord::Base
 
   scope :having_balance_value, -> { joins_balance.where('value > 0') }
   scope :with_user, ->(id) { where user_id: id }
+  scope :with_user_id, ->(id) { where user_id: id }
   scope :sum_balance, -> { joins_balance.sum('amounts.value') }
+  scope :sum_balances, -> { sum_balance }
 
   delegate :balance_value, to: :balance
 

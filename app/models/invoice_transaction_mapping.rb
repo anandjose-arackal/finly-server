@@ -9,8 +9,8 @@
 #  updated_at        :datetime         not null
 #
 
-class InvoiceTransactionMapping < ActiveRecord::Base
+class InvoiceTransactionMapping < ApplicationRecord
 
-  belongs_to :invoice, class_name: "OutwardInvoice"
-  belongs_to :va_transaction, class_name: "VirtualAccountTransaction"
+  belongs_to :invoice, optional: true, class_name: "OutwardInvoice"
+  belongs_to :va_transaction, optional: true, class_name: "VirtualAccountTransaction"
 end

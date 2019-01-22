@@ -1,4 +1,4 @@
-class UpdateCompanyBalances < ActiveJob::Base
+class UpdateCompanyBalances < ApplicationJob
 
   def perform
     Company.all.each do |company|

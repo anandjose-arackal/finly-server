@@ -1,4 +1,4 @@
-class MoveCategoriesFromPurposeToNewSystem < ActiveRecord::Migration
+class MoveCategoriesFromPurposeToNewSystem < ActiveRecord::Migration[4.2]
   def change
     # add flag for outwatd invoice items as well to categories
     rename_column :categories, :invoice_line_items, :inward_invoice_line_items

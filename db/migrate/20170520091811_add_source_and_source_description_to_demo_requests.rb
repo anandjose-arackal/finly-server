@@ -1,4 +1,4 @@
-class AddSourceAndSourceDescriptionToDemoRequests < ActiveRecord::Migration
+class AddSourceAndSourceDescriptionToDemoRequests < ActiveRecord::Migration[4.2]
   def change
     unless PreviewRegistration.column_names.include?('source')
       add_column :preview_registrations, :source, :text

@@ -1,4 +1,4 @@
-class CreateUserPockets < ActiveRecord::Migration
+class CreateUserPockets < ActiveRecord::Migration[4.2]
   def change
     create_table :user_pockets do |t|
       t.string :name

@@ -17,14 +17,14 @@
 #  note                       :text(65535)
 #
 
-class MoneyRequestProcessorMapping < ActiveRecord::Base
+class MoneyRequestProcessorMapping < ApplicationRecord
 
-  belongs_to :user
-  belongs_to :amount, dependent: :destroy
-  belongs_to :processor, class_name: 'MoneyRequestProcessor'
-  belongs_to :processor_accountable, polymorphic: true
-  belongs_to :status, class_name: 'MoneyRequestProcessorStatus'
-  belongs_to :payment
+  belongs_to :user, optional: true
+  belongs_to :amount, optional: true, dependent: :destroy
+  belongs_to :processor, optional: true, class_name: 'MoneyRequestProcessor'
+  belongs_to :processor_accountable, optional: true, polymorphic: true
+  belongs_to :status, optional: true, class_name: 'MoneyRequestProcessorStatus'
+  belongs_to :payment, optional: true
 
   has_many :money_requests
   has_many :system_messages, as: :messagable, dependent: :destroy

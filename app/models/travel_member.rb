@@ -18,7 +18,7 @@
 #  gender             :string(255)
 #
 
-class TravelMember < ActiveRecord::Base
+class TravelMember < ApplicationRecord
 
   validates :first_name, presence: true
   validates :last_name, presence: true
@@ -27,8 +27,8 @@ class TravelMember < ActiveRecord::Base
   # validates :age, presence: true
   # validates :mobile_number, presence: true
 
-  belongs_to :booking
-  belongs_to :booking_request
+  belongs_to :booking, optional: true
+  belongs_to :booking_request, optional: true
 
   scope :without_id_nil, -> { where.not id: nil }
 end

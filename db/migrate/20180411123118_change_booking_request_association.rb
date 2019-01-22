@@ -1,4 +1,4 @@
-class ChangeBookingRequestAssociation < ActiveRecord::Migration
+class ChangeBookingRequestAssociation < ActiveRecord::Migration[4.2]
   def change
     # Remove booking_type reference from booking objects
     remove_reference :booking_flights, :booking_type, index: true, foreign_key: true

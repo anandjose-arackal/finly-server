@@ -1,4 +1,4 @@
-class CreatePerDiemExpenses < ActiveRecord::Migration
+class CreatePerDiemExpenses < ActiveRecord::Migration[4.2]
   def change
     create_table :per_diem_expenses do |t|
       t.references :per_diem, index: true, foreign_key: true

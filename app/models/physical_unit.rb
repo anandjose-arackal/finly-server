@@ -9,7 +9,7 @@
 #  updated_at :datetime         not null
 #
 
-class PhysicalUnit < ActiveRecord::Base
+class PhysicalUnit < ApplicationRecord
 
   VALUES = {1 => {name: "Kilometre", symbol: "km"},
             2 => {name: "Mile", symbol: "mi"},

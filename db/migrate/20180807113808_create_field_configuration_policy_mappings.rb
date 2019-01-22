@@ -1,4 +1,4 @@
-class CreateFieldConfigurationPolicyMappings < ActiveRecord::Migration
+class CreateFieldConfigurationPolicyMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :policy_field_mappings do |t|
       t.references :field_configuration, index: true, foreign_key: true, null: false

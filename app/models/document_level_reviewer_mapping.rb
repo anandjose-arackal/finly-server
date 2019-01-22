@@ -20,18 +20,18 @@
 #  provider_name                   :string(255)
 #
 
-class DocumentLevelReviewerMapping < ActiveRecord::Base
+class DocumentLevelReviewerMapping < ApplicationRecord
 
   # When a single reviewer is selected from each level in the reviewal chain
   # a new mapping is created. If nothing is selected it falls back to reviewer(s) in the
   # level
-  belongs_to :policy
-  belongs_to :level, class_name: 'ReviewalLevel'
-  belongs_to :reviewer, class_name: 'User'
-  belongs_to :document_reviewer_mappable, polymorphic: true
-  belongs_to :taken_control_by, class_name: 'User'
-  belongs_to :action_taken_by, class_name: 'User'
-  belongs_to :action, class_name: 'TrailAction'
+  belongs_to :policy, optional: true
+  belongs_to :level, class_name: 'ReviewalLevel', optional: true
+  belongs_to :reviewer, class_name: 'User', optional: true
+  belongs_to :document_reviewer_mappable, polymorphic: true, optional: true
+  belongs_to :taken_control_by, class_name: 'User', optional: true
+  belongs_to :action_taken_by, class_name: 'User', optional: true
+  belongs_to :action, class_name: 'TrailAction', optional: true
 
   scope :with_level_ids, -> (ids) {where level_id: ids}
   scope :with_level_id, -> (ids) {where level_id: ids}

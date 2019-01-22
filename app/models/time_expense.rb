@@ -10,15 +10,15 @@
 #  time_object_id :integer
 #
 
-class TimeExpense < ActiveRecord::Base
+class TimeExpense < ApplicationRecord
 
   include SoftDeletable
 
-  belongs_to :expense
+  belongs_to :expense, optional: true
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields
 
-  belongs_to :time_object
+  belongs_to :time_object, optional: true
 
   validates :time_object, presence: true
 

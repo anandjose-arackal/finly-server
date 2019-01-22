@@ -13,7 +13,7 @@
 #  updated_at      :datetime         not null
 #
 
-class StatusTag < ActiveRecord::Base
+class StatusTag < ApplicationRecord
   include Seedable
   def self.values
     [

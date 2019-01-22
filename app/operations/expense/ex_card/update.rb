@@ -67,6 +67,10 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     end
   end
 
+  def pre_process
+    updated_expense_params[:modified_by_id] = actual_current_user.id if actual_current_user.present?
+  end
+
   def process
     custom_fields = {custom_fields: params&.dig(:custom_fields)}
     custom_fields[:save] = false

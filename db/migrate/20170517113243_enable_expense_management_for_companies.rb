@@ -1,4 +1,4 @@
-class EnableExpenseManagementForCompanies < ActiveRecord::Migration
+class EnableExpenseManagementForCompanies < ActiveRecord::Migration[4.2]
   def change
     # Enabling Expense Management Feature for all EXISTING Companies
     companies = Company.all

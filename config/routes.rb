@@ -11,47 +11,48 @@
 #                                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                                                                      admin_users/sessions#new
 #                                      admin_user_session POST   /admin_users/sign_in(.:format)                                                                                      admin_users/sessions#create
 #                              destroy_admin_user_session DELETE /admin_users/sign_out(.:format)                                                                                     admin_users/sessions#destroy
-#                                     admin_user_password POST   /admin_users/password(.:format)                                                                                     devise/passwords#create
 #                                 new_admin_user_password GET    /admin_users/password/new(.:format)                                                                                 devise/passwords#new
 #                                edit_admin_user_password GET    /admin_users/password/edit(.:format)                                                                                devise/passwords#edit
-#                                                         PATCH  /admin_users/password(.:format)                                                                                     devise/passwords#update
+#                                     admin_user_password PATCH  /admin_users/password(.:format)                                                                                     devise/passwords#update
 #                                                         PUT    /admin_users/password(.:format)                                                                                     devise/passwords#update
+#                                                         POST   /admin_users/password(.:format)                                                                                     devise/passwords#create
 #                     api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)                                                                      api/v1/configuration/category#index
 #                           api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                                                                            api/v1/configuration#category
 #                                         email_processor POST   /email/incoming(.:format)                                                                                           griddler/emails#create
 #                                        new_user_session GET    /users/sign_in(.:format)                                                                                            sessions#new
 #                                            user_session POST   /users/sign_in(.:format)                                                                                            sessions#create
 #                                    destroy_user_session DELETE /users/sign_out(.:format)                                                                                           sessions#destroy
-#                                           user_password POST   /users/password(.:format)                                                                                           passwords#create
 #                                       new_user_password GET    /users/password/new(.:format)                                                                                       passwords#new
 #                                      edit_user_password GET    /users/password/edit(.:format)                                                                                      passwords#edit
-#                                                         PATCH  /users/password(.:format)                                                                                           passwords#update
+#                                           user_password PATCH  /users/password(.:format)                                                                                           passwords#update
 #                                                         PUT    /users/password(.:format)                                                                                           passwords#update
+#                                                         POST   /users/password(.:format)                                                                                           passwords#create
 #                                cancel_user_registration GET    /users/cancel(.:format)                                                                                             devise_invitable/registrations#cancel
-#                                       user_registration POST   /users(.:format)                                                                                                    devise_invitable/registrations#create
 #                                   new_user_registration GET    /users/sign_up(.:format)                                                                                            devise_invitable/registrations#new
 #                                  edit_user_registration GET    /users/edit(.:format)                                                                                               devise_invitable/registrations#edit
-#                                                         PATCH  /users(.:format)                                                                                                    devise_invitable/registrations#update
+#                                       user_registration PATCH  /users(.:format)                                                                                                    devise_invitable/registrations#update
 #                                                         PUT    /users(.:format)                                                                                                    devise_invitable/registrations#update
 #                                                         DELETE /users(.:format)                                                                                                    devise_invitable/registrations#destroy
-#                                       user_confirmation POST   /users/confirmation(.:format)                                                                                       devise/confirmations#create
+#                                                         POST   /users(.:format)                                                                                                    devise_invitable/registrations#create
 #                                   new_user_confirmation GET    /users/confirmation/new(.:format)                                                                                   devise/confirmations#new
-#                                                         GET    /users/confirmation(.:format)                                                                                       devise/confirmations#show
-#                                             user_unlock POST   /users/unlock(.:format)                                                                                             devise/unlocks#create
+#                                       user_confirmation GET    /users/confirmation(.:format)                                                                                       devise/confirmations#show
+#                                                         POST   /users/confirmation(.:format)                                                                                       devise/confirmations#create
 #                                         new_user_unlock GET    /users/unlock/new(.:format)                                                                                         devise/unlocks#new
-#                                                         GET    /users/unlock(.:format)                                                                                             devise/unlocks#show
+#                                             user_unlock GET    /users/unlock(.:format)                                                                                             devise/unlocks#show
+#                                                         POST   /users/unlock(.:format)                                                                                             devise/unlocks#create
 #                                  accept_user_invitation GET    /users/invitation/accept(.:format)                                                                                  devise/invitations#edit
 #                                  remove_user_invitation GET    /users/invitation/remove(.:format)                                                                                  devise/invitations#destroy
-#                                         user_invitation POST   /users/invitation(.:format)                                                                                         devise/invitations#create
 #                                     new_user_invitation GET    /users/invitation/new(.:format)                                                                                     devise/invitations#new
-#                                                         PATCH  /users/invitation(.:format)                                                                                         devise/invitations#update
+#                                         user_invitation PATCH  /users/invitation(.:format)                                                                                         devise/invitations#update
 #                                                         PUT    /users/invitation(.:format)                                                                                         devise/invitations#update
-#                                                         GET    /oauth/authorize/:code(.:format)                                                                                    doorkeeper/authorizations#show
+#                                                         POST   /users/invitation(.:format)                                                                                         devise/invitations#create
+#                              native_oauth_authorization GET    /oauth/authorize/native(.:format)                                                                                   doorkeeper/authorizations#show
 #                                     oauth_authorization GET    /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#new
-#                                                         POST   /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#create
 #                                                         DELETE /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#destroy
+#                                                         POST   /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#create
 #                                             oauth_token POST   /oauth/token(.:format)                                                                                              oauth/token#create
 #                                            oauth_revoke POST   /oauth/revoke(.:format)                                                                                             oauth/token#revoke
+#                                        oauth_introspect POST   /oauth/introspect(.:format)                                                                                         oauth/token#introspect
 #                                      oauth_applications GET    /oauth/applications(.:format)                                                                                       doorkeeper/applications#index
 #                                                         POST   /oauth/applications(.:format)                                                                                       doorkeeper/applications#create
 #                                   new_oauth_application GET    /oauth/applications/new(.:format)                                                                                   doorkeeper/applications#new
@@ -480,6 +481,7 @@
 #                                                         GET    /admin_users/card_assign_requests/export(.:format)                                                                  admin_users/card_assign_requests#export
 #                                                         GET    /admin_users/card_assign_requests/export/kycs(.:format)                                                             admin_users/card_assign_requests#download_kycs
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                                                    admin_users/card_assign_requests#edit
+#                                 admin_users_bulk_assign POST   /admin_users/cards/bulk_assign(.:format)                                                                            admin_users/cards#bulk_assign
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                                           admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                                              admin_users/users#admin_menus
 #                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                                                  api/callbacks#successful_vendor_payment
@@ -521,6 +523,15 @@
 #                                                         PATCH  /api/vp/v1/inward_invoice_attachments/:id(.:format)                                                                 api/vp/v1/inward_invoice_attachments#update
 #                                                         PUT    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                                                 api/vp/v1/inward_invoice_attachments#update
 #                                                         DELETE /api/vp/v1/inward_invoice_attachments/:id(.:format)                                                                 api/vp/v1/inward_invoice_attachments#destroy
+#                          api_vp_v1_bank_account_disable PATCH  /api/vp/v1/bank_accounts/disable(.:format)                                                                          api/vp/v1/bank_accounts#disable
+#                                 api_vp_v1_bank_accounts GET    /api/vp/v1/bank_accounts(.:format)                                                                                  api/vp/v1/bank_accounts#index
+#                                                         POST   /api/vp/v1/bank_accounts(.:format)                                                                                  api/vp/v1/bank_accounts#create
+#                              new_api_vp_v1_bank_account GET    /api/vp/v1/bank_accounts/new(.:format)                                                                              api/vp/v1/bank_accounts#new
+#                             edit_api_vp_v1_bank_account GET    /api/vp/v1/bank_accounts/:id/edit(.:format)                                                                         api/vp/v1/bank_accounts#edit
+#                                  api_vp_v1_bank_account GET    /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#show
+#                                                         PATCH  /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#update
+#                                                         PUT    /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#update
+#                                                         DELETE /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#destroy
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                                           api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                                                junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                                                users#menu_data
@@ -810,6 +821,8 @@
 #                                                         PUT    /users/:id(.:format)                                                                                                users#update
 #                                                         DELETE /users/:id(.:format)                                                                                                users#destroy
 #                                           company_users GET    /company_users(.:format)                                                                                            users#company_users
+#                                          user_delegates GET    /user_delegates(.:format)                                                                                           users#user_delegates
+#                                           set_delegates PATCH  /users/:id/set_delegates(.:format)                                                                                  users#set_delegates
 #                                 available_expense_types GET    /available_expense_types(.:format)                                                                                  users#available_expense_types
 #                                             user_import POST   /import(.:format)                                                                                                   users#import
 #                                       superadmin_import POST   /superadmin_import(.:format)                                                                                        admin/companies#import
@@ -1206,6 +1219,7 @@
 #                                                         PUT    /bank_transfer/vendors/:id(.:format)                                                                                bank_transfer/vendors#update
 #                                                         DELETE /bank_transfer/vendors/:id(.:format)                                                                                bank_transfer/vendors#destroy
 #                       bank_transfer_bank_accounts_count GET    /bank_transfer/bank_accounts/count(.:format)                                                                        bank_transfer/bank_accounts#count
+#                     bank_transfer_bank_accounts_disable PATCH  /bank_transfer/bank_accounts/disable(.:format)                                                                      bank_transfer/bank_accounts#disable
 #                             bank_transfer_bank_accounts GET    /bank_transfer/bank_accounts(.:format)                                                                              bank_transfer/bank_accounts#index
 #                                                         POST   /bank_transfer/bank_accounts(.:format)                                                                              bank_transfer/bank_accounts#create
 #                          new_bank_transfer_bank_account GET    /bank_transfer/bank_accounts/new(.:format)                                                                          bank_transfer/bank_accounts#new
@@ -1410,6 +1424,8 @@
 #                                                    ping GET    /ping(.:format)                                                                                                     ping#ping
 #                                                         GET    /ping/sidekiq/:type(.:format)                                                                                       ping#sidekiq
 #                                           ping_database GET    /ping/database(.:format)                                                                                            ping#database
+#                                      sample_import_file GET    /budgets/sample_import_file(.:format)                                                                               budgets#sample_import_file
+#                                           budget_import POST   /budgets/import(.:format)                                                                                           budgets#import
 #                                       budget_add_budget PATCH  /budgets/:budget_id/add_budget(.:format)                                                                            budgets#add_budget
 #                                    budget_reduce_budget PATCH  /budgets/:budget_id/reduce_budget(.:format)                                                                         budgets#reduce_budget
 #                                           budget_trails GET    /budgets/:budget_id/modification_trails(.:format)                                                                   budgets#trails
@@ -1546,7 +1562,11 @@
 #                                                         PUT    /reviewal_levels/:id(.:format)                                                                                      reviewal_levels#update
 #                                                         DELETE /reviewal_levels/:id(.:format)                                                                                      reviewal_levels#destroy
 #                                            audit_trails GET    /audit_trails(.:format)                                                                                             audit_trails#index
-#
+#                                      rails_service_blob GET    /rails/active_storage/blobs/:signed_id/*filename(.:format)                                                          active_storage/blobs#show
+#                               rails_blob_representation GET    /rails/active_storage/representations/:signed_blob_id/:variation_key/*filename(.:format)                            active_storage/representations#show
+#                                      rails_disk_service GET    /rails/active_storage/disk/:encoded_key/*filename(.:format)                                                         active_storage/disk#show
+#                               update_rails_disk_service PUT    /rails/active_storage/disk/:encoded_token(.:format)                                                                 active_storage/disk#update
+#                                    rails_direct_uploads POST   /rails/active_storage/direct_uploads(.:format)                                                                      active_storage/direct_uploads#create
 
 #                               crono_web        /crono                                                      Crono::Web
 # transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
@@ -2454,6 +2474,8 @@ Rails.application.routes.draw do
     get 'card_assign_requests/export/kycs(.:format)' => 'card_assign_requests#download_kycs'
     get 'card_assign_requests/edit' => 'card_assign_requests#edit'
 
+    post 'cards/bulk_assign', to: 'cards#bulk_assign', as: :bulk_assign
+
     post 'call_center/search', to: 'call_center/users#search', as: :search
   end
 
@@ -2497,6 +2519,8 @@ Rails.application.routes.draw do
       namespace :v1 do
         resources :inventory_line_items
         resources :inward_invoice_attachments
+        patch 'bank_accounts/disable', to: 'bank_accounts#disable', as: :bank_account_disable
+        resources :bank_accounts
       end
       scope :vendors do
         post '', to: 'vendors#create'
@@ -2726,6 +2750,8 @@ Rails.application.routes.draw do
     patch 'set_delegate', to: 'users#set_delegate', as: :set_delegate
   end
   get 'company_users', to: 'users#company_users', as: :company_users
+  get 'user_delegates', to: 'users#user_delegates', as: :user_delegates
+  patch 'users/:id/set_delegates', to: 'users#set_delegates', as: :set_delegates
   get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
 
   # routes for testing import
@@ -3088,6 +3114,7 @@ Rails.application.routes.draw do
     end
 
     get 'bank_accounts/count', to: 'bank_accounts#count'
+    patch 'bank_accounts/disable', to: 'bank_accounts#disable', as: :bank_accounts_disable
     resources :bank_accounts
 
     post 'payments/bulk_upload_utr', to: 'payments#bulk_upload_utr', as: :bulk_upload_utr
@@ -3215,6 +3242,10 @@ Rails.application.routes.draw do
   get 'ping/sidekiq/:type', to: 'ping#sidekiq'
   get 'ping/database', to: 'ping#database'
 
+  ######## Budget apis start ######
+
+  get 'budgets/sample_import_file', to: 'budgets#sample_import_file', as: :sample_import_file
+  post 'budgets/import', to: 'budgets#import', as: :budget_import
   ## Budget apis start ##
   resources :budgets do
     patch 'add_budget', to: 'budgets#add_budget', as: :add_budget
@@ -3223,7 +3254,7 @@ Rails.application.routes.draw do
   end
   get 'new_budget_config', to: 'budgets#new_budgets_config', as: :new_budgets_config
 
-## Budget apis end ##
+  ######## Budget apis end #########
 
 
   ## Procurement APIs start ##########################################

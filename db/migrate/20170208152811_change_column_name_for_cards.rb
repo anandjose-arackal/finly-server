@@ -1,4 +1,4 @@
-class ChangeColumnNameForCards < ActiveRecord::Migration
+class ChangeColumnNameForCards < ActiveRecord::Migration[4.2]
   def change
     rename_column :cards, :balance_id, :card_balance_id
   end

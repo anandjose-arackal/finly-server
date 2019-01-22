@@ -6,6 +6,7 @@ class RequestStoreUtil
 
   def self.set_request_params(params)
     RequestStore.store[:params] = params
+    RequestStore.store[:request_params] = params&.deep_dup
   end
 
   def self.set_current_user(user)

@@ -11,6 +11,7 @@ class TravelRequests::Create < TravelRequests::Base
 
   def pre_validate
     user_present? and params_present?
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -21,6 +22,7 @@ class TravelRequests::Create < TravelRequests::Base
     self.travel_request_parameters[:controlling_user] = user
     self.travel_request_parameters[:controlling_user_role_id] = UserRole.id_for(:employee)
     self.travel_request_parameters[:company_id] = user.company_id
+    self.travel_request_parameters[:created_by_id] = actual_current_user.id if actual_current_user.present?
     #self.travel_request_parameters[:policy_id] = current_company.policies.default.first.id
 
     # if self.travel_request_parameters[:policy_id].blank? and for_user.enforce_policy_enabled?
@@ -61,6 +63,9 @@ class TravelRequests::Create < TravelRequests::Base
   end
 
   def post_process
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    travel_request.comments.create(user_id: user.id,
+                                   action_id: TravelRequestCommentAction.id_for(:created_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
     add_message :success, 'New trip created'
   end
 
@@ -72,7 +77,7 @@ class TravelRequests::Create < TravelRequests::Base
   protected
 
   def strong_params
-    params.permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date)
+    params.permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date, :created_by_id)
   end
 
   def validate_custom_fields

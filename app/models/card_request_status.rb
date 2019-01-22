@@ -9,5 +9,5 @@
 #
 
 
-class CardRequestStatus < ActiveRecord::Base
+class CardRequestStatus < ApplicationRecord
 end

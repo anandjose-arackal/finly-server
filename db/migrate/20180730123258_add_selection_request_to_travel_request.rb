@@ -1,4 +1,4 @@
-class AddSelectionRequestToTravelRequest < ActiveRecord::Migration
+class AddSelectionRequestToTravelRequest < ActiveRecord::Migration[4.2]
   def change
     TravelRequestStatus.seed_data
     TravelRequestTrailAction.seed_data

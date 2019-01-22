@@ -20,11 +20,11 @@ class PaymentRequest < NonPersistentModel
                 :payment_order,
                 :post_operation_actions
 
-  belongs_to :company
-  belongs_to :initiating_resource, polymorphic: true
-  belongs_to :payment_purpose
-  belongs_to :initiating_account, polymorphic: true
-  belongs_to :currency
+  belongs_to :company, optional: true
+  belongs_to :initiating_resource, optional: true, polymorphic: true
+  belongs_to :payment_purpose, optional: true
+  belongs_to :initiating_account, optional: true, polymorphic: true
+  belongs_to :currency, optional: true
 
   validate :company_id_presence
   validates :initiating_resource, presence: true
@@ -71,7 +71,7 @@ class PaymentRequest < NonPersistentModel
     if self.scheduled_at.present? && self.scheduled_at > DateUtils.local_date
       PaymentOrderStatus.id_for(:scheduled)
     else
-      PaymentOrderStatus.id_for(:pending)
+      PaymentOrderStatus.id_for(:pending_approval)
     end
   end
 
@@ -178,8 +178,8 @@ class PaymentRequest < NonPersistentModel
              :initiating_account, :initiating_account_id, :initiating_account_type, :scheduled_at,
              :payment_type_id, :currency_id, :payment_purpose_id, to: :payment_request, allow_nil: true
 
-    belongs_to :receiving_resource, polymorphic: true
-    belongs_to :receiving_account, polymorphic: true
+    belongs_to :receiving_resource, optional: true, polymorphic: true
+    belongs_to :receiving_account, optional: true, polymorphic: true
 
     validates :amount, presence: true
     validates :payment_request, presence: true

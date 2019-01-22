@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class UserPocketType < ActiveRecord::Base
+class UserPocketType < ApplicationRecord
 
   include Seedable
 

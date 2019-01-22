@@ -11,11 +11,11 @@
 #  status_id        :integer          default(1), not null
 #
 
-class Company < ActiveRecord::Base
+class Company < ApplicationRecord
   include Constants
 
-  belongs_to :base_currency, class_name: 'Currency'
-  belongs_to :status, class_name: 'CompanyStatus'
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :status, optional: true, class_name: 'CompanyStatus'
 
   has_many :users
   has_many :cards
@@ -299,7 +299,7 @@ class Company < ActiveRecord::Base
   end
 
   def cards_enabled?
-    expense_card_enabled? || medical_card_enabled? || reimbursement_card_enabled? || gift_card_enabled? || gift_voucher_enabled?
+    expense_card_enabled? || medical_card_enabled? || reimbursement_card_enabled? || gift_card_enabled? || gift_voucher_enabled? || meal_card_enabled?
   end
 
   def vendor_payments_enabled?

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class WhitelistedIpType < ActiveRecord::Base
+class WhitelistedIpType < ApplicationRecord
 
   TYPES = {api: 1, admin_panel: 2}
 

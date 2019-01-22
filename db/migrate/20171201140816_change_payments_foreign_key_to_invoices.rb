@@ -1,4 +1,4 @@
-class ChangePaymentsForeignKeyToInvoices < ActiveRecord::Migration
+class ChangePaymentsForeignKeyToInvoices < ActiveRecord::Migration[4.2]
   def change
     add_column :payments, :invoice_id, :integer, references: "Invoice", foreign_key: true, index: true
     Payment.all.each do |payment|

@@ -1,4 +1,4 @@
-class CreateTimeObjects < ActiveRecord::Migration
+class CreateTimeObjects < ActiveRecord::Migration[4.2]
   def change
     create_table :time_objects do |t|
       t.decimal :value

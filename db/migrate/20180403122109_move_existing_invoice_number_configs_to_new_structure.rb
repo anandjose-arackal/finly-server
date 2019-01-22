@@ -1,4 +1,4 @@
-class MoveExistingInvoiceNumberConfigsToNewStructure < ActiveRecord::Migration
+class MoveExistingInvoiceNumberConfigsToNewStructure < ActiveRecord::Migration[4.2]
   def change
     InvoiceNumberConfig.update_all(purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:tax_invoice))
     Company.all.each do |company|

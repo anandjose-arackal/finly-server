@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class OutwardInvoiceStatus < ActiveRecord::Base
+class OutwardInvoiceStatus < ApplicationRecord
   include Seedable
 
   def self.values

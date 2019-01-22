@@ -1,4 +1,4 @@
-class AddCompanyIdToAssignCardRequests < ActiveRecord::Migration
+class AddCompanyIdToAssignCardRequests < ActiveRecord::Migration[4.2]
   def change
     add_reference :card_assign_requests, :company, index: true, foreign_key: true
     CardAssignRequest.all.update_all(company_id: 1)

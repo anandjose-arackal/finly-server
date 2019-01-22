@@ -1,4 +1,4 @@
-class CreateBookingAttachments < ActiveRecord::Migration
+class CreateBookingAttachments < ActiveRecord::Migration[4.2]
   def change
     create_table :booking_attachments do |t|
       t.attachment :attachment

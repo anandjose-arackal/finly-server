@@ -1,4 +1,4 @@
-class CreateDeliveryChallans < ActiveRecord::Migration
+class CreateDeliveryChallans < ActiveRecord::Migration[4.2]
   def change
     create_table :delivery_challans do |t|
       t.references :company, index: true, foreign_key: true

@@ -14,7 +14,7 @@
 #  referrer           :string(255)
 #
 
-class PreviewRegistration < ActiveRecord::Base
+class PreviewRegistration < ApplicationRecord
 
   validates :email, presence: true, format: { allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
   validates :phone_number, length: {allow_blank: true, is: 10}, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}

@@ -1,4 +1,4 @@
-class SeedPeriodTableAgain < ActiveRecord::Migration
+class SeedPeriodTableAgain < ActiveRecord::Migration[4.2]
   def change
     Period.seed_data
   end

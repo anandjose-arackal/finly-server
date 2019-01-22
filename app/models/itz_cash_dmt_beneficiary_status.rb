@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class ItzCashDmtBeneficiaryStatus < ActiveRecord::Base
+class ItzCashDmtBeneficiaryStatus < ApplicationRecord
 
   validates :name, presence: true
 

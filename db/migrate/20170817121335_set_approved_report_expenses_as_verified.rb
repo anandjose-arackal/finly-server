@@ -1,4 +1,4 @@
-class SetApprovedReportExpensesAsVerified < ActiveRecord::Migration
+class SetApprovedReportExpensesAsVerified < ActiveRecord::Migration[4.2]
   def change
     ExpenseStatus.seed_data
     status_ids = [ReportStatus.id_for(:approved), ReportStatus.id_for(:settled), ReportStatus.id_for(:settlement_confirmed), ReportStatus.id_for(:closed)]

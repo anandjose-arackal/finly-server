@@ -1,4 +1,4 @@
-class AddDocumentNumberConfigsForCompanies < ActiveRecord::Migration
+class AddDocumentNumberConfigsForCompanies < ActiveRecord::Migration[4.2]
   def change
     # Seed DocumentNumberConfigType
     DocumentNumberConfigType.seed_data

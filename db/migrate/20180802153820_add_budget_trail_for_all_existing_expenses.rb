@@ -1,4 +1,4 @@
-class AddBudgetTrailForAllExistingExpenses < ActiveRecord::Migration
+class AddBudgetTrailForAllExistingExpenses < ActiveRecord::Migration[4.2]
   def change
     Expense.where(expense_status_id: ExpenseStatus.ids_for([:submitted, :verified])).each do |expense|
       # saving all the expenses to the budget trail

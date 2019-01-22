@@ -1,4 +1,4 @@
-class RemoveExpenseIdFromReceipt < ActiveRecord::Migration
+class RemoveExpenseIdFromReceipt < ActiveRecord::Migration[4.2]
   def change
     remove_foreign_key :receipts, :expense
     remove_index :receipts, :expense_id

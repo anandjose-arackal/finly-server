@@ -1,4 +1,4 @@
-class CreateReportCommentActions < ActiveRecord::Migration
+class CreateReportCommentActions < ActiveRecord::Migration[4.2]
   def change
     create_table :report_comment_actions do |t|
       t.string :name, null: false

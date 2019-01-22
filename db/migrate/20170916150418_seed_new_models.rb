@@ -1,4 +1,4 @@
-class SeedNewModels < ActiveRecord::Migration
+class SeedNewModels < ActiveRecord::Migration[4.2]
   def change
     BankPaymentRequestCommentAction.seed_data
 

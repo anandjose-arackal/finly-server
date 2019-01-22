@@ -8,10 +8,10 @@
 #  updated_at :datetime         not null
 #
 
-class FieldDropDownSelection < ActiveRecord::Base
+class FieldDropDownSelection < ApplicationRecord
   has_one :custom_field, as: :value
   has_one :field_configuration, as: :default_value
-  belongs_to :value, class_name: 'FieldDropDownItem'
+  belongs_to :value, optional: true, class_name: 'FieldDropDownItem'
 
   validates :value_id, presence: true
 

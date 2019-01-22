@@ -28,7 +28,7 @@ module CallbackHandler
             model.each do |m|
               receive_callbacks_for m, method_name, &handle
             end
-          elsif model.is_a?(ActiveRecord::Base)
+          elsif model.is_a?(ApplicationRecord)
             receive_callbacks_for model, method_name, &handle
           end
         end
@@ -45,7 +45,7 @@ module CallbackHandler
         m.add_callbacks(handler) rescue nil
         self.callback_classes[m] = handler
       end
-    elsif model.is_a?(ActiveRecord::Base)
+    elsif model.is_a?(ApplicationRecord)
       model.add_callbacks(handler) rescue nil
       self.callback_classes[model] = handler
     end

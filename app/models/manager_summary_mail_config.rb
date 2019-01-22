@@ -14,10 +14,10 @@
 #  updated_at             :datetime         not null
 #
 
-class ManagerSummaryMailConfig < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :user_mailer_type
-  belongs_to :period
+class ManagerSummaryMailConfig < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :user_mailer_type, optional: true
+  belongs_to :period, optional: true
 
   DAYS_OF_MONTH = [*1..31] + [nil]
   WEEK_DAYS = [nil, 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
@@ -48,6 +48,7 @@ class ManagerSummaryMailConfig < ActiveRecord::Base
   scope :group_by_user, -> { group(:user_id) }
   scope :reports, -> { where entity_type: 'report' }
   scope :money_requests, -> { where entity_type: 'money_request' }
+  scope :travel_requests, -> { where entity_type: 'travel_request' }
 
   def validate_scheduled_time
     if scheduled_time.blank?

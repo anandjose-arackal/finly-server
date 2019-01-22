@@ -10,11 +10,11 @@
 #  balance_id        :integer
 #
 
-class YesBankCompanyAccount < ActiveRecord::Base
+class YesBankCompanyAccount < ApplicationRecord
   include Accountable
-  belongs_to :company
-  belongs_to :balance, class_name: "Amount"
-  belongs_to :wallet_balance, class_name: "Amount"
+  belongs_to :company, optional: true
+  belongs_to :balance, optional: true, class_name: "Amount"
+  belongs_to :wallet_balance, optional: true, class_name: "Amount"
 
   delegate :balance_value, to: :balance
 
@@ -32,6 +32,10 @@ class YesBankCompanyAccount < ActiveRecord::Base
     PaymentOrder.with_company_id(self.company_id).with_initiating_account_type("YesBankCompanyAccount").without_id(excluded_payment_order_id).scheduled.joins(:amount_requested).sum(:value)
   end
 
+  scope :with_company_id, -> (company_id) {
+    where company_id: company_id
+  }
+
   def va_config
     {
         enabled: true,
@@ -40,5 +44,9 @@ class YesBankCompanyAccount < ActiveRecord::Base
         application: :em
     }
   end
+
+  scope :sum_balances, -> {
+    joins(:balance).sum(:value)
+  }
 
 end

@@ -1,4 +1,4 @@
-class CreatePerDiems < ActiveRecord::Migration
+class CreatePerDiems < ActiveRecord::Migration[4.2]
   def change
     create_table :per_diems do |t|
       t.string :name

@@ -10,7 +10,7 @@
 #  company_id :integer
 #
 
-class TdsRatesList < ActiveRecord::Base
+class TdsRatesList < ApplicationRecord
 
   def self.seed_data(company_id)
     DEFAULTS.each do |rate|

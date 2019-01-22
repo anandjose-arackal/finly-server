@@ -11,17 +11,12 @@
 #  is_deleted :boolean          default(FALSE), not null
 #
 
-
-
-
-
-
-class PolicyUserMapping < ActiveRecord::Base
-  include PolicyVersion
+class PolicyUserMapping < ApplicationRecord
+  # include PolicyVersion
   include SoftDeletable
 
-  belongs_to :user
-  belongs_to :policy
+  belongs_to :user, optional: true
+  belongs_to :policy, optional: true
 
   default_scope { unscope(:where) }
 

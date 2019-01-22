@@ -1,4 +1,4 @@
-class CreateCardAssignRequestStatuses < ActiveRecord::Migration
+class CreateCardAssignRequestStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :card_assign_request_statuses do |t|
       t.string :name, null: false

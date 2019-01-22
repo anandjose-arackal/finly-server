@@ -1,4 +1,4 @@
-class AddCompanyIdToQuickbooksCategories < ActiveRecord::Migration
+class AddCompanyIdToQuickbooksCategories < ActiveRecord::Migration[4.2]
   def change
     add_column :quickbooks_categories, :company_id, :integer, references: "Company", foreign_key: true, index: true
 

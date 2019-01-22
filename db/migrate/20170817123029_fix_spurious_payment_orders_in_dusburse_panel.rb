@@ -1,4 +1,4 @@
-class FixSpuriousPaymentOrdersInDusbursePanel < ActiveRecord::Migration
+class FixSpuriousPaymentOrdersInDusbursePanel < ActiveRecord::Migration[4.2]
   def change
     PaymentOrder.where(payment_purpose_id: PaymentPurpose.id_for(:corporate_balance_load)).where.not(receiving_account_type: ["ItzCashCompanyAccount", "YesBankCompanyAccount"]).each do |payment_order|
       # first retrieve the card type, and hence the payment purpose

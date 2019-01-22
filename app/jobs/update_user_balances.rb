@@ -1,5 +1,5 @@
 # job that cycles through all users and sets the balances for all of them
-class UpdateUserBalances < ActiveJob::Base
+class UpdateUserBalances < ApplicationJob
 
   def perform
     User.all.each do |user|

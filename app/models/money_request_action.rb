@@ -9,5 +9,5 @@
 #
 
 
-class MoneyRequestAction < ActiveRecord::Base
+class MoneyRequestAction < ApplicationRecord
 end

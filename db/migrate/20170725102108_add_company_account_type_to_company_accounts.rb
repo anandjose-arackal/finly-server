@@ -1,4 +1,4 @@
-class AddCompanyAccountTypeToCompanyAccounts < ActiveRecord::Migration
+class AddCompanyAccountTypeToCompanyAccounts < ActiveRecord::Migration[4.2]
   def change
     add_reference :company_accounts, :company_account_type, index: true, foreign_key: true
   end

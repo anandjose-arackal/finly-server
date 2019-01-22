@@ -7,7 +7,7 @@
 #  abbreviation :string(255)
 #
 
-class ChannelType < ActiveRecord::Base
+class ChannelType < ApplicationRecord
 
   TYPES = {atm: 1, pos: 2, ecom: 3, ecom_pos: 4}
 

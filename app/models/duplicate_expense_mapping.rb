@@ -9,9 +9,9 @@
 #  updated_at           :datetime         not null
 #
 
-class DuplicateExpenseMapping < ActiveRecord::Base
-  belongs_to :expense, class_name: 'Expense'
-  belongs_to :duplicate_expense, class_name: 'Expense'
+class DuplicateExpenseMapping < ApplicationRecord
+  belongs_to :expense, optional: true, class_name: 'Expense'
+  belongs_to :duplicate_expense, optional: true, class_name: 'Expense'
 
   scope :expense_with_duplicates, ->(exp_1, exp_2) { where('(expense_id IN (?) AND duplicate_expense_id IN (?)) OR (expense_id IN (?) AND duplicate_expense_id IN (?))', exp_1, exp_2, exp_2, exp_1) }
   scope :with_expense, ->(exp_id) { where expense_id: exp_id }

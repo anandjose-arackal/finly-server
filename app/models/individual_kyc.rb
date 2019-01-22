@@ -83,15 +83,15 @@
 #
 
 require 'fileutils'
-class IndividualKyc < ActiveRecord::Base
+class IndividualKyc < ApplicationRecord
   include Attachable, Magick
 
-  belongs_to :user
-  belongs_to :kyc_status
-  belongs_to :type, class_name: 'IndividualKycType'
-  belongs_to :admin_review_workflow
-  belongs_to :company
-  belongs_to :upgraded_by_resource, class_name: 'AdminUser'
+  belongs_to :user, optional: true
+  belongs_to :kyc_status, optional: true
+  belongs_to :type, optional: true, class_name: 'IndividualKycType'
+  belongs_to :admin_review_workflow, optional: true
+  belongs_to :company, optional: true
+  belongs_to :upgraded_by_resource, optional: true, class_name: 'AdminUser'
   has_many :tracks, class_name: 'IndividualKycTrack'
   has_many :system_messages, as: :messagable, dependent: :destroy
 

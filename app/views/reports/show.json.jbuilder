@@ -187,14 +187,11 @@ json.custom_fields do
 end
 
 json.budgets do
-  json.array! @result.budgets do |item|
-    json.extract! item[:budget], :id, :start_date, :end_date, :name
-    json.created_at item[:budget].created_at.strftime("%d %b %Y")
-    # json.period item[:budget].period.name
-
-    json.budget_amount item[:budget_amount]
-    json.spent_amount item[:spent_amount]
-    json.associated_item item[:associated_item]
+  json.array! @result.budgets do |budget|
+    json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :purchase_order, :start_date, :end_date
+    json.user budget[:budget].user.as_json
+    json.spent_amount budget[:spent_amount]
+    json.budget_amount budget[:budget].budget_amount.as_json
   end
 end
 

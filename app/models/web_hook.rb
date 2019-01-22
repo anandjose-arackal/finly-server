@@ -13,11 +13,11 @@
 #  headers            :text(65535)
 #
 
-class WebHook < ActiveRecord::Base
+class WebHook < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :created_by_user, class_name: 'User'
-  belongs_to :company
+  belongs_to :created_by_user, optional: true, class_name: 'User'
+  belongs_to :company, optional: true
 
   serialize :headers, Hash
 

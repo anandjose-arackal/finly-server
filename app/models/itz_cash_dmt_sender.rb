@@ -12,10 +12,10 @@
 #  otp_verified    :boolean          default(FALSE), not null
 #
 
-class ItzCashDmtSender < ActiveRecord::Base
+class ItzCashDmtSender < ApplicationRecord
 
-  belongs_to :user
-  belongs_to :status, class_name: 'ItzCashDmtSenderStatus'
+  belongs_to :user, optional: true
+  belongs_to :status, optional: true, class_name: 'ItzCashDmtSenderStatus'
   has_many :beneficiaries, class_name: 'ItzCashDmtBeneficiary'
 
   validates :user_id, presence: true

@@ -37,6 +37,7 @@ class MoneyRequests::Create < MoneyRequests::Base
         item_attr[:amount_attributes][:currency_id] = pocket.base_currency_id rescue nil
       end
     end
+    mr_create_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process
@@ -67,13 +68,15 @@ class MoneyRequests::Create < MoneyRequests::Base
     if self.money_request.travel_request.blank?
       money_request.skip_customizable_validation = true # As validation breaks the creation and loading money request, prevent it during creation
     end
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     if money_request.save
       self.money_request.tracks.create action_user: for_user,
                                        action_user_role_id: UserRole.id_for(:employee),
                                        modified_user: for_user,
                                        modified_user_role_id: param[:controlling_user_role_id],
                                        money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
-                                       status_id: MoneyRequestStatus.id_for(:open)
+                                       status_id: MoneyRequestStatus.id_for(:open),
+                                       delegated_action_user_id: delegated_action_user_id
       CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request),
           custom_fields: params[:custom_fields], reset_fields: true, save: true)
 
@@ -95,13 +98,15 @@ class MoneyRequests::Create < MoneyRequests::Base
     if self.money_request.travel_request.present? and TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.money_request.travel_request.status_id)
       self.money_request.update(status_id: MoneyRequestStatus.id_for(:pending))
     end
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    money_request.comments.create(user: user, comment_action_id: MoneyRequestCommentAction.id_for(:created_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
   end
 
   private
 
   def create_params
     return {} unless params[:money_request].present?
-    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :destination_pocket_id,
+    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :travel_request_id, :payment_mode_id, :created_by_id, :destination_pocket_id,
                                           items_attributes: [:category_id, :money_request_item_category_id, amount_attributes: [:value, :currency_id]])
   end
 

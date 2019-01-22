@@ -1,4 +1,4 @@
-class AddDistanceExpenseConfigsToCompanyAndPolicy < ActiveRecord::Migration
+class AddDistanceExpenseConfigsToCompanyAndPolicy < ActiveRecord::Migration[4.2]
   def change
     Policy.all.each do |policy|
       unless policy.distance_expense_config.present?

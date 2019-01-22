@@ -17,18 +17,18 @@
 #  transaction_id        :string(255)
 #
 
-class Procurement < ActiveRecord::Base
+class Procurement < ApplicationRecord
   include SoftDeletable, FindByOrderedIds, Sequenced::ActsAsSequenced
 
   acts_as_sequenced column: :transaction_id, purpose: :procurement, editable: false
 
   # procurement_type ['purchase_order', 'invoice', 'non_po_invoice'] # will be moved to model
 
-  belongs_to :user
-  belongs_to :company
-  belongs_to :procurement_track
-  belongs_to :procurement_status
-  belongs_to :vendor, class_name: "YesBankVendor"
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
+  belongs_to :procurement_track, optional: true
+  belongs_to :procurement_status, optional: true
+  belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
   has_one :purchase_order, dependent: :destroy
   has_many :inward_documents, dependent: :destroy
@@ -104,13 +104,27 @@ class Procurement < ActiveRecord::Base
     end
   }
 
+  scope :filter_creation_date_from, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at >= ?", date.beginning_of_day)
+    end
+  }
+
+  scope :filter_creation_date_to, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at <= ?", date.end_of_day)
+    end
+  }
+
   scope :filter_department, -> (department_name, user_id) {
     user = User.find_by id: user_id
     if user.present?
-      department_ids = user.company.departments.filter_name(department_name).pluck(:id)
+      department_ids = user.company.departments.roots.filter_name(department_name).pluck(:id)
 
-      filtered_ids = PurchaseOrder.filter_sub_department_id(department_ids).pluck(:procurement_id)
-      filtered_ids += Invoice.filter_sub_department_id(department_ids).pluck(:procurement_id)
+      filtered_ids = PurchaseOrder.filter_department_id(department_ids).pluck(:procurement_id)
+      filtered_ids += Invoice.filter_department_id(department_ids).pluck(:procurement_id)
       where id: filtered_ids
     end
   }
@@ -144,6 +158,7 @@ class Procurement < ActiveRecord::Base
       user_ids = user.company.users.filter_search(user_details).pluck(:id)
 
       filtered_ids = user.company.purchase_orders.filter_user_id(user_ids).pluck(:procurement_id)
+      filtered_ids += user.company.inward_invoices.with_created_by_user_id(user_ids).with_procurement.pluck(:procurement_id)
       where id: filtered_ids
     end
   }
@@ -263,9 +278,9 @@ class Procurement < ActiveRecord::Base
 
   scope :include_details, -> {
     includes(
-        {invoices: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}]},
+        {invoices: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}, :created_by, {level: :reviewers}, :invoice_status, {net_amount: [:currency]}, :payments, :attachments, :document_level_reviewer_mappings]},
         # {purchase_order: [:department, :sub_department, :cost_center, :vendor, :user, :company]},
-        {purchase_order: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}, :user, {balance_amount: [:currency]}, :status, {level: :reviewers}]},
+        {purchase_order: [:cost_center, :department, :sub_department, {vendor: :bank_accounts}, :user, {balance_amount: [:currency]}, :status, {level: :reviewers}, :attachments, :document_level_reviewer_mappings]},
         {inward_documents: [:vendor, :user, :items]},
         :status_tags, :procurement_status_taggables, :user
     )

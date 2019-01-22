@@ -12,8 +12,8 @@
 #  custom_voucher       :boolean          default(FALSE)
 #
 
-class TallyConfiguration < ActiveRecord::Base
-  belongs_to :company
+class TallyConfiguration < ApplicationRecord
+  belongs_to :company, optional: true
 
   validates :voucher_expense_date, inclusion: {in: [nil, 'approval', 'expense']}
 

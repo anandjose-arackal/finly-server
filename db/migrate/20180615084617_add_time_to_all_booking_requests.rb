@@ -1,4 +1,4 @@
-class AddTimeToAllBookingRequests < ActiveRecord::Migration
+class AddTimeToAllBookingRequests < ActiveRecord::Migration[4.2]
   def change
     add_column :booking_flights, :start_time, :text
     add_column :booking_flights, :end_time, :text

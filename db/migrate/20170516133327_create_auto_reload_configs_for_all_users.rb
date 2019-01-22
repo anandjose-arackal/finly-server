@@ -1,4 +1,4 @@
-class CreateAutoReloadConfigsForAllUsers < ActiveRecord::Migration
+class CreateAutoReloadConfigsForAllUsers < ActiveRecord::Migration[4.2]
   def change
     remove_column :auto_reload_configs, :parent_id, :integer
     remove_column :auto_reload_configs, :parent_type, :string

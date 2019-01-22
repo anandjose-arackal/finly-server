@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class VirtualAccountPurpose < ActiveRecord::Base
+class VirtualAccountPurpose < ApplicationRecord
   include Seedable
 
   # cash_on_hand_return - when employees return their cash advance through a bank transfer

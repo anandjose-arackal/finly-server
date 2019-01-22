@@ -1,4 +1,4 @@
-class SeedPaymentOrderStatuses < ActiveRecord::Migration
+class SeedPaymentOrderStatuses < ActiveRecord::Migration[4.2]
   def change
     PaymentOrderStatus.seed_data
   end

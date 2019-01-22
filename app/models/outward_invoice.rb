@@ -51,7 +51,7 @@
 #  gst_type_id: 1 - IGST
 #              2 - CGST + SGST
 
-class OutwardInvoice < ActiveRecord::Base
+class OutwardInvoice < ApplicationRecord
 
   include SoftDeletable
 
@@ -59,31 +59,31 @@ class OutwardInvoice < ActiveRecord::Base
 
   serialize :reminders, Array
 
-  belongs_to :customer
-  belongs_to :user
-  belongs_to :company
-  belongs_to :amount
-  belongs_to :policy
-  belongs_to :discount_amount, class_name: "Amount"
-  belongs_to :tax_amount, class_name: "Amount"
-  belongs_to :original_amount, class_name: "Amount"
-  belongs_to :paid_amount, class_name: "Amount"
-  belongs_to :balance_due, class_name: "Amount"
-  belongs_to :freight_amount, class_name: "Amount"
-  belongs_to :advance_amount, class_name: "Amount"
-  belongs_to :net_amount, class_name: "Amount"
-  belongs_to :gross_amount, class_name: "Amount"
-  belongs_to :tds_amount, class_name: "Amount"
-  belongs_to :total_payable, class_name: "Amount"
-  belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
-  belongs_to :payment_term
-  belongs_to :outward_invoice_type
-  belongs_to :location, class_name: "BranchLocation"
-  belongs_to :gst_type
-  belongs_to :tds_slab, class_name: "TdsRatesList"
+  belongs_to :customer, optional: true
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :policy, optional: true
+  belongs_to :discount_amount, optional: true, class_name: "Amount"
+  belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :original_amount, optional: true, class_name: "Amount"
+  belongs_to :paid_amount, optional: true, class_name: "Amount"
+  belongs_to :balance_due, optional: true, class_name: "Amount"
+  belongs_to :freight_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :net_amount, optional: true, class_name: "Amount"
+  belongs_to :gross_amount, optional: true, class_name: "Amount"
+  belongs_to :tds_amount, optional: true, class_name: "Amount"
+  belongs_to :total_payable, optional: true, class_name: "Amount"
+  belongs_to :invoice_status, optional: true, class_name: "OutwardInvoiceStatus"
+  belongs_to :payment_term, optional: true
+  belongs_to :outward_invoice_type, optional: true
+  belongs_to :location, optional: true, class_name: "BranchLocation"
+  belongs_to :gst_type, optional: true
+  belongs_to :tds_slab, optional: true, class_name: "TdsRatesList"
 
   # has_one :virtual_bank_account, as: :parent
-  belongs_to :virtual_account, class_name: "VirtualBankAccount"
+  belongs_to :virtual_account, optional: true, class_name: "VirtualBankAccount"
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :payments, as: :parent

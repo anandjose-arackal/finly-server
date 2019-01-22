@@ -1,5 +1,4 @@
 # this class will take a single payment object and executes it using the respective adapters
-#
 class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter, :options,
@@ -59,7 +58,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
 
       if payment.credit?
-        balance = source_account_adapter.balance(payment_order: payment.payment_order)
+        balance = source_account_adapter.balance(payment_order: payment.payment_order, payment_process: true)
         unless balance and balance >= payment.amount_value
           add_message :error, "The source account does not have enough balance for this transaction"
           payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
@@ -68,7 +67,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
           return
         end
       else
-        balance = receiving_account_adapter.balance(payment_order: payment.payment_order)
+        balance = receiving_account_adapter.balance(payment_order: payment.payment_order, payment_process: true)
         unless balance and balance >= payment.amount_value
           add_message :error, "The source account does not have enough balance for this transaction"
           payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
@@ -79,21 +78,32 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
-    if self.payment.api_initiated
-      if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
+
+    if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
+      add_system_message :error, self.payment, "Payment cannot be processed in this state"
+      return
+    end
+
+    # checking to see if the receiving account is a bank account if it has been disabled by any chance
+    if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.disabled?
+      add_system_message :error, self.payment, "You cannot make transfers to this bank account as it has been blacklisted"
+      return
+    end
+
+    self.payment.with_lock do
+      self.payment.reload
+      unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
+        add_system_message :error, self.payment, "Payment cannot be processed in this state"
         return
       end
-    else
-      unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
-        add_message :error, "Payment cannot be processed in this state"
-        # add system message
-      end
+      # update payment to in progress
+      payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
     end
+
   end
 
   def pre_process
-    # update payment to in progress
-    payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
+
   end
 
   def process

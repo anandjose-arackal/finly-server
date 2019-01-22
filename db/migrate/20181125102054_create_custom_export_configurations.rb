@@ -1,4 +1,4 @@
-class CreateCustomExportConfigurations < ActiveRecord::Migration
+class CreateCustomExportConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :custom_export_configurations do |t|
       t.references :configurable, polymorphic: true

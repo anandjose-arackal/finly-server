@@ -1,4 +1,4 @@
-class CreateReceiptExtracts < ActiveRecord::Migration
+class CreateReceiptExtracts < ActiveRecord::Migration[4.2]
   def change
     create_table :receipt_extract_sources do |t|
       t.string :name

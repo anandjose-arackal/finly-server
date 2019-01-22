@@ -47,6 +47,13 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
 
   end
 
+  def validate
+    unless self.payment_order.pending?
+      add_message :error, "Payment order cannot be processed at this moment"
+      return
+    end
+  end
+
   def pre_process
     # in progress because technically even though only some payments are being processed in this order,
     # the order is still in progress

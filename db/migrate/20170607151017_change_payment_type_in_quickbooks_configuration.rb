@@ -1,4 +1,4 @@
-class ChangePaymentTypeInQuickbooksConfiguration < ActiveRecord::Migration
+class ChangePaymentTypeInQuickbooksConfiguration < ActiveRecord::Migration[4.2]
   def change
     remove_foreign_key :quickbooks_configurations, column: :payment_type_id
     remove_column :quickbooks_configurations, :payment_type_id, :integer

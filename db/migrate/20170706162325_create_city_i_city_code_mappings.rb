@@ -1,4 +1,4 @@
-class CreateCityICityCodeMappings < ActiveRecord::Migration
+class CreateCityICityCodeMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :city_id_city_code_mappings do |t|
       t.string :city_id

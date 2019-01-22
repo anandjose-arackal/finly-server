@@ -1,4 +1,4 @@
-class UpdateTravelRequestAttributes < ActiveRecord::Migration
+class UpdateTravelRequestAttributes < ActiveRecord::Migration[4.2]
   def change
     remove_column :travel_requests, :required_by_date
     remove_column :travel_requests, :report_id

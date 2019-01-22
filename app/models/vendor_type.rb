@@ -10,6 +10,6 @@
 #  updated_at  :datetime         not null
 #
 
-class VendorType < ActiveRecord::Base
-  belongs_to :company
+class VendorType < ApplicationRecord
+  belongs_to :company, optional: true
 end

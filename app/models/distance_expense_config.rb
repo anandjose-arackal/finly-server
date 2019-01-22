@@ -13,11 +13,11 @@
 #  enforce_category    :boolean          default(FALSE)
 #
 
-class DistanceExpenseConfig < ActiveRecord::Base
-  belongs_to :default_category, class_name: 'Category'
-  belongs_to :rate, class_name: 'Amount'
-  belongs_to :period
-  belongs_to :policy
+class DistanceExpenseConfig < ApplicationRecord
+  belongs_to :default_category, optional: true, class_name: 'Category'
+  belongs_to :rate, optional: true, class_name: 'Amount'
+  belongs_to :period, optional: true
+  belongs_to :policy, optional: true
 
   # validate :rate_exists_for_enabled
   validates :policy_id, presence: true

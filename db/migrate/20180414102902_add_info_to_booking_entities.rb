@@ -1,4 +1,4 @@
-class AddInfoToBookingEntities < ActiveRecord::Migration
+class AddInfoToBookingEntities < ActiveRecord::Migration[4.2]
   def change
     add_column :booking_flights, :journey_date, :date
     add_column :booking_flights, :booking_class, :string

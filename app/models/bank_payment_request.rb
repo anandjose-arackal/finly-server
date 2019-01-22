@@ -26,21 +26,21 @@
 #  controlling_level_id         :integer
 #
 
-class BankPaymentRequest < ActiveRecord::Base
+class BankPaymentRequest < ApplicationRecord
 
   include SoftDeletable,
           FindByOrderedIds,
           Transitionable
 
-  belongs_to :status, class_name: "BankPaymentRequestStatus"
-  belongs_to :payment_order, dependent: :destroy
-  belongs_to :requested_amount, class_name: "Amount"
-  belongs_to :owner, class_name: "User"
-  belongs_to :controlling_user, class_name: "User"
-  belongs_to :controlling_user_role, class_name: "UserRole"
-  belongs_to :controlling_for_user, class_name: "User"
-  belongs_to :controlling_for_user_role, class_name: "UserRole"
-  belongs_to :policy
+  belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
+  belongs_to :payment_order, optional: true, dependent: :destroy
+  belongs_to :requested_amount, optional: true, class_name: "Amount"
+  belongs_to :owner, optional: true, class_name: "User"
+  belongs_to :controlling_user, optional: true, class_name: "User"
+  belongs_to :controlling_user_role, optional: true, class_name: "UserRole"
+  belongs_to :controlling_for_user, optional: true, class_name: "User"
+  belongs_to :controlling_for_user_role, optional: true, class_name: "UserRole"
+  belongs_to :policy, optional: true
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails

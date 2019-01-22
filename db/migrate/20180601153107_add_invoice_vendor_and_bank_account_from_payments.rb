@@ -1,4 +1,4 @@
-class AddInvoiceVendorAndBankAccountFromPayments < ActiveRecord::Migration
+class AddInvoiceVendorAndBankAccountFromPayments < ActiveRecord::Migration[4.2]
   def change
     Invoice.all.each do |invoice|
       payment = invoice.payments.first

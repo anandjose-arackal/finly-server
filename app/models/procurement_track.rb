@@ -9,7 +9,7 @@
 #  updated_at  :datetime         not null
 #
 
-class ProcurementTrack < ActiveRecord::Base
+class ProcurementTrack < ApplicationRecord
   include Seedable
 
   def self.values

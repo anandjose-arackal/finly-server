@@ -16,10 +16,10 @@
 #  is_deleted     :boolean          default(FALSE)
 #
 
-class Location < ActiveRecord::Base
+class Location < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :locatable, polymorphic: true
+  belongs_to :locatable, optional: true, polymorphic: true
 
   default_scope { order(order: :asc) }
 

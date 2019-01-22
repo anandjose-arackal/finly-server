@@ -13,12 +13,12 @@
 #  allowed             :boolean
 #
 
-class CardLimit < ActiveRecord::Base
-  belongs_to :card_restriction
+class CardLimit < ApplicationRecord
+  belongs_to :card_restriction, optional: true
 
-  belongs_to :period
+  belongs_to :period, optional: true
 
-  belongs_to :limit_type, class_name: "ChannelType"
+  belongs_to :limit_type, optional: true, class_name: "ChannelType"
 
   delegate :period_name, to: :period
 

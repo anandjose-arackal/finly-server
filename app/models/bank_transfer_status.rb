@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class BankTransferStatus < ActiveRecord::Base
+class BankTransferStatus < ApplicationRecord
 
   include Seedable
 

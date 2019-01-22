@@ -10,10 +10,10 @@
 #  updated_at   :datetime         not null
 #
 
-class PolicyUserRole < ActiveRecord::Base
-  belongs_to :policy
-  belongs_to :user
-  belongs_to :user_role
+class PolicyUserRole < ApplicationRecord
+  belongs_to :policy, optional: true
+  belongs_to :user, optional: true
+  belongs_to :user_role, optional: true
 
   scope :with_user_id, -> (user_id) {
     where user_id: user_id

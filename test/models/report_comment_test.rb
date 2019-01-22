@@ -18,8 +18,6 @@
 #  delegated_action_user_id :integer
 #
 
-
-
 require 'test_helper'
 
 class ReportCommentTest < ActiveSupport::TestCase

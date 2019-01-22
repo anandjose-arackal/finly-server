@@ -1,4 +1,4 @@
-class AddMoreFieldsToOutwardInvoiceInLightOfNewStructure < ActiveRecord::Migration
+class AddMoreFieldsToOutwardInvoiceInLightOfNewStructure < ActiveRecord::Migration[4.2]
   def change
     add_column :outward_invoices, :billing_address, :text
     add_column :outward_invoices, :shipping_address, :text

@@ -1,4 +1,4 @@
-class RenameReceiptExtractToExpenseDataExtract < ActiveRecord::Migration
+class RenameReceiptExtractToExpenseDataExtract < ActiveRecord::Migration[4.2]
   def change
     rename_table :receipt_extracts, :expense_data_extracts
     remove_foreign_key :expense_data_extracts, :receipt

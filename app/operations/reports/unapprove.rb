@@ -79,8 +79,8 @@ class Reports::Unapprove < Reports::Base
       Settlement::SReport::Unapproved.(user, report: report)
       report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:submitted))
     end
-    EmailAuthorization::Invalidate.(user, authorizable: report)
-    EmailAuthorization::Create.(user, {authorizable: report})
+    EmailAuthorizations::Invalidate.(user, authorizable: report)
+    EmailAuthorizations::Create.(user, {authorizable: report})
 
     # If its sending mail to previous guy, send token again to him, need to pass token todo
     Event::EReport::Unapprove.(self.user, report: report)

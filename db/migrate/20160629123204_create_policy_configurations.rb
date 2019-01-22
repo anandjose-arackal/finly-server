@@ -1,4 +1,4 @@
-class CreatePolicyConfigurations < ActiveRecord::Migration
+class CreatePolicyConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :policy_configurations do |t|
       t.references :policy, index: true, foreign_key: true, null: false

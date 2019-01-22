@@ -1,4 +1,4 @@
-class UpdateProcurementIdsForAllBudgetTrails < ActiveRecord::Migration
+class UpdateProcurementIdsForAllBudgetTrails < ActiveRecord::Migration[4.2]
   def change
     budget_trails = BudgetTrail.where(entity_type: "PurchaseOrderItem")
     budget_trails.each do |budget_trail|
