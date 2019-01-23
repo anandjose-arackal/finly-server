@@ -1,0 +1,2 @@
+class NavBarController < ApplicationController
+end
