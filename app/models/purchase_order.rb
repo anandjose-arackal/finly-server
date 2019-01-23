@@ -47,7 +47,7 @@
 #  is_template                  :boolean          default(FALSE)
 #  template_name                :string(255)
 #  resource_template_id         :integer
-#  submitted_at                 :datetime
+#  deleted_at                   :datetime
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -234,7 +234,7 @@ class PurchaseOrder < ApplicationRecord
 
     last_approve_trail = self.trails.natural_order.only_approve.last
     last_retract_trail = self.trails.natural_order.only_retract.last
-    if last_approve_trail.action_user.id == user.id
+    if last_approve_trail.present? && last_approve_trail.action_user.id == user.id
       if last_retract_trail.present? && last_retract_trail.created_at > last_approve_trail.created_at
         return false
       end
@@ -365,6 +365,15 @@ class PurchaseOrder < ApplicationRecord
 
   def self.document_status_attribute
     'purchase_order_status_id'
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push PurchaseOrderStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
   end
 
   def self.finance_associated_status_ids

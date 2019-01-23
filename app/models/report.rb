@@ -32,7 +32,12 @@
 #  sync_type_id                       :integer
 #  report_processor_group_mapping_id  :integer
 #  travel_request_id                  :integer
+#  department_id                      :integer
+#  sub_department_id                  :integer
 #  created_by_id                      :integer
+#  modified_by_id                     :integer
+#  deleted_at                         :datetime
+#  controlling_level_id               :integer
 #
 
 class Report < ApplicationRecord

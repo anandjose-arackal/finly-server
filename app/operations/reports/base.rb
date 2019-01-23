@@ -51,7 +51,7 @@ class Reports::Base < BaseOperation
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
                   :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets, :approvers,
-                  :reviewal_chains
+                  :reviewal_chains, :reviewal_chain
 
     def init
       self.report = params[:report]
@@ -63,7 +63,6 @@ class Reports::Base < BaseOperation
       self.dates = report.date_as_string
       self.comments = report.comments
       self.actions = load_actions
-      self.policies = retrieve_policies
       self.selected_policy = report.versioned_policy
       self.violations = Reports::Violation.(user, report: self.report)
       self.violations_present = has_warning? || has_blocking?
@@ -72,6 +71,7 @@ class Reports::Base < BaseOperation
       self.reimbursable_expenses_total = reimbursable_expenses
       self.non_reimbursable_expenses_total = non_reimbursable_expenses
       self.card_expenses_total = report.total_amount(:only_card_expenses)
+      self.reviewal_chain = report.get_reviewal_chain
       op = Reports::Approvers.(report: self.report)
       if op.success?
         self.approvers = op.approvers
@@ -79,16 +79,19 @@ class Reports::Base < BaseOperation
         self.approvers = []
       end
 
-      self.reviewal_chains = []
-      params[:reviewal_document] = report
+      if self.actions[:reviewal_chain_editable][:value]
+        self.policies = retrieve_policies
+        self.reviewal_chains = []
+        params[:reviewal_document] = report
 
-      policies.each do |policy|
-        params[:policy_id] = policy.id
-        chain = {
-            policy_id: policy.id,
-            reviewal_chain: get_reviewal_chain
-        }
-        self.reviewal_chains.push(chain)
+        policies.each do |policy|
+          params[:policy_id] = policy.id
+          chain = {
+              policy_id: policy.id,
+              reviewal_chain: get_reviewal_chain
+          }
+          self.reviewal_chains.push(chain)
+        end
       end
 
       # budgets_op = BudgetsProcessor::Report.(user, report: self.report)
@@ -180,7 +183,9 @@ class Reports::Base < BaseOperation
     end
 
     def load_actions
-      actions = {}
+      actions = {
+          reviewal_chain_editable: {value: false}
+      }
       # Editable Receipts
 
       # if self.report.controlling_user?(user) && (self.report.open? || self.report.processing? || self.report.retracted? || self.report.rejected?)
@@ -242,6 +247,7 @@ class Reports::Base < BaseOperation
       elsif finance_view?
       else
         if self.report.open? or self.report.retracted? or self.report.rejected?
+          actions[:reviewal_chain_editable] = {value: true}
           actions[:add_expenses] = {url: Rails.application.routes.url_helpers.report_add_expenses_path(report_id: report.id, view: params[:view])}
           actions[:delete] = {url: Rails.application.routes.url_helpers.report_path(id: report.id, view: params[:view])}
           actions[:editable] = {value: true}

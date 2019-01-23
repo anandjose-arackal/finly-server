@@ -9,6 +9,7 @@
 #  policy_id   :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  threshold   :decimal(20, 5)
 #
 
 FactoryBot.define do

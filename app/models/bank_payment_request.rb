@@ -23,6 +23,7 @@
 #  payment_file_downloaded      :boolean          default(FALSE)
 #  auto_approved                :boolean
 #  api_initiated                :boolean          default(FALSE)
+#  deleted_at                   :datetime
 #  controlling_level_id         :integer
 #
 

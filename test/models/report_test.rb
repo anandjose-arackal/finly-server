@@ -32,15 +32,13 @@
 #  sync_type_id                       :integer
 #  report_processor_group_mapping_id  :integer
 #  travel_request_id                  :integer
-#  controlling_level_id               :integer
 #  department_id                      :integer
 #  sub_department_id                  :integer
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
+#  deleted_at                         :datetime
+#  controlling_level_id               :integer
 #
-
-
-
 
 # requires a report with the following states in the db:
 # a report in the db without expenses

@@ -27,6 +27,10 @@
 #  approved_at                  :datetime
 #  selection_requested_at       :datetime
 #  booking_confirmed_at         :datetime
+#  created_by_id                :integer
+#  modified_by_id               :integer
+#  deleted_at                   :datetime
+#  controlling_level_id         :integer
 #
 
 class TravelRequest < ApplicationRecord

@@ -35,6 +35,7 @@
 #  application                   :string(255)      not null
 #  customer_id                   :integer
 #  default_account               :boolean
+#  deleted_at                    :datetime
 #
 
 # parent here will be either the payment receivable, or user, or whatever
