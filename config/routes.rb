@@ -2533,6 +2533,7 @@ Rails.application.routes.draw do
   get 'junk/show', to: 'junk#show'
 
   get 'menu_data', to: 'users#menu_data'
+  get 'nav_bar/config', to: 'nav_bar#show'
 
   # adding admin oauth token creation for admin login
   post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: {format: 'json'}
