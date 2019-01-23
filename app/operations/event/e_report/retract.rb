@@ -23,11 +23,12 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def send_push_notification(user)
-    last_track = self.report.tracks.last
+    # last_track = self.report.tracks.last
     last_trail = self.reports.trails.last
-    return unless user.id == last_track&.modified_user&.id
+    return unless user.id == last_track&.modified_user&.id # todo get modified user
     message = "#{self.report.user.name} retracted the report: #{self.report.name}"
-    view = UserRole.name_for(last_track.modified_user_role_id)
+    # view = UserRole.name_for(last_track.modified_user_role_id)
+    view = "manager"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 

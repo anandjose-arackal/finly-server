@@ -65,6 +65,19 @@ module Transitionable
 
           user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:reviewer_id)
         end
+      when :submit, 'submit'
+        user_ids.push self.document_owner_id
+        user_ids += self.get_reviewers&.map(&:id)
+      when :take_control, 'take_control'
+        user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
+        user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:taken_control_by_id)
+      when :unapprove
+        if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
+          user_ids += self.get_reviewers(:next)&.map(&:id)
+          user_ids.push self.document_owner_id
+        else
+          user_ids += self.get_reviewers(:nex)&.map(&:id)
+        end
       end
 
       User.with_id(user_ids)
@@ -78,8 +91,12 @@ module Transitionable
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids.push self.send(self.class.document_owner_attribute)
         else
-          user_ids += self.get_reviewers(self.controlling_level_id)&.map(&:id)
+          user_ids += self.get_reviewers&.map(&:id)
         end
+      when :submit, 'submit'
+        user_ids += self.get_reviewers&.map(&:id)
+      when :take_control, 'take_control'
+        user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
       end
 
       User.with_id(user_ids)

@@ -10,29 +10,34 @@ class Event::EReport::TakeControl < Event::EReport::Base
 
   def affected_users
     # [self.report.controlling_user, self.report.controlling_for_user]
-    [self.report.controlling_user, self.report.controlling_for_user]
+    # [self.report.controlling_user, self.report.controlling_for_user]
+    self.report.affected_users(:take_control)
   end
 
   def notification_affected_users
-    [report.controlling_for_user]
+    # [report.controlling_for_user]
+    self.report.notification_affected_users(:take_control)
   end
 
   def send_push_notification(user)
     return unless user.id == report.controlling_for_user_id
-    message = "#{self.report.controlling_user.name} has taken control of the report : #{self.report.name}"
-    view = UserRole.name_for(self.report.controlling_for_user_role_id)
+    last_trail = self.report.trails.last
+    message = "#{last_trail.action_user.name} has taken control of the report : #{self.report.name}"
+    # view = UserRole.name_for(self.report.controlling_for_user_role_id)
+    view = 'manager'
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
-    if report.controlling_for_user_id == user.id
-      view_role_id = report.controlling_for_user_role_id
+    if report.notification_affected_users(:take_control).include? user
+      view_role_id = UserRole.id_for(:manager)
     else
       view_role_id = nil
     end
+    last_trail = report.trails.last
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_take_control),
-                                             action_user_id: (report.tracks.last.action_user.id rescue nil),
+                                             action_user_id: (last_trail.action_user_id rescue nil),
                                              object_id: report.id,
                                              object_type: "Report",
                                              path_object_id: report.id,
@@ -46,18 +51,19 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    if user.id == report.controlling_user_id
+    if user.id == report.trails.last.action_user_id
+    # if user.id == report.controlling_user_id
       "You have taken control of the report: #{self.report.name}"
     else
-      "#{self.report.controlling_user.name} has taken control of the report: #{self.report.name}"
+      "#{self.report.trails.last.action_user.name} has taken control of the report: #{self.report.name}"
     end
   end
 
   def mailer_body(user)
-    if user.id == report.controlling_user_id
+    if user.id == report.trails.last.action_user_id
       "You have taken control of the report.<br/><br/>Report: \"#{self.report.name}\""
     else
-      "#{self.report.controlling_user.name} has taken control of the report which was awaiting your review.<br/><br/>Report: \"#{self.report.name}\""
+      "#{self.report.trails.last.action_user.name} has taken control of the report which was awaiting your review.<br/><br/>Report: \"#{self.report.name}\""
     end
   end
 

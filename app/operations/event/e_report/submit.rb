@@ -9,7 +9,8 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def affected_users
-    [self.report.user, self.report.reload.controlling_user]
+    # [self.report.user, self.report.reload.controlling_user]
+    self.report.affected_users(:submit)
   end
 
   def get_token(user)
@@ -18,17 +19,19 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def notification_affected_users
-    [report.controlling_user]
+    # [report.controlling_user]
+    self.report.notification_affected_users(:submit)
   end
 
   def send_push_notification(user)
     return if user.id == report.user.id
     message = "#{self.report.user.name} has submitted the report: #{self.report.name}"
-    view = UserRole.name_for(report.controlling_user_role_id)
+    view = 'manager'
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
+    view_role_id = UserRole.id_for(:manager)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_submit),
                                              action_user_id: report.user_id,
@@ -38,7 +41,7 @@ class Event::EReport::Submit < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: report.controlling_user_role_id,
+                                             view_role_id: view_role_id,
                                              application: RequestStore.store[:current_app]
                                             )
     notification.save
@@ -63,8 +66,8 @@ class Event::EReport::Submit < Event::EReport::Base
   def report_view_role(user)
     if user.id == report.user_id
       return nil
-    elsif user.id == report.controlling_user_id
-      return report.controlling_user_role_id
+    elsif report.get_reviewers.include? user
+      return UserRole.id_for(:manager)
     end
   end
 end

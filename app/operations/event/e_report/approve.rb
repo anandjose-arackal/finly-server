@@ -20,7 +20,7 @@ class Event::EReport::Approve < Event::EReport::Base
 
   def init
     super
-    self.approving_user = self.report.tracks.last.action_user
+    self.approving_user = self.report.trails.last.action_user
     self.approved = (report.approved? or report.closed?) if report.present?
     self.auto_approve = params[:auto_approve]
   end
@@ -103,7 +103,7 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    approver_id = self.report.tracks.last.action_user.id rescue nil
+    approver_id = self.report.trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
       "Report approved : #{self.report.name}"
     else
@@ -120,7 +120,7 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def mailer_body(user)
-    approver_id = self.report.tracks.last.action_user.id rescue nil
+    approver_id = self.report.trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
       message = "You have successfully approved the report : #{self.report.name}"
     else
