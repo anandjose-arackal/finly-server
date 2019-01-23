@@ -43,13 +43,14 @@ class WorkflowManager::Base < BaseOperation
       add_message :error, "Couldn't perform action"
       return
     end
-
-
+    # If user delegation is allowed
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     # Create Trail
     trail = document.trails.new action_user: user,
                            action_id: TrailAction.id_for(aasm_event),
                            action_level_id: aasm_document.current_level&.id,
-                           modified_level_id: aasm_document.next_level&.id
+                           modified_level_id: aasm_document.next_level&.id,
+                           delegated_action_user_id: delegated_action_user_id
 
     if self.note.present?
       trail.note = self.note
