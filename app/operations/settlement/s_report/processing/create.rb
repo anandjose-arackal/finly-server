@@ -175,7 +175,6 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
 
     users&.each do |user|
       config = params&.dig(:mappings, user.id.to_s)
-      debugger
       processor_accountable_id = config[:processor_accountable_id]
       processor_accountable_type = config[:processor_accountable_type]
       processor_accountable = nil

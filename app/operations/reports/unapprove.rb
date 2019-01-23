@@ -45,31 +45,43 @@ class Reports::Unapprove < Reports::Base
   end
 
   def process
-    prev_controlling_user = (report.controlling_for_user or report.controlling_user)
-    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
-    role_id = nil
-    # Todo verify if the user has approved the report as manager / finance manager
-    if manager_view?
-      role_id = UserRole.id_for(:manager)
-    elsif finance_view?
-      role_id = UserRole.id_for(:finance_manager)
-    end
+    # prev_controlling_user = (report.controlling_for_user or report.controlling_user)
+    # prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
+    # role_id = nil
+    # # Todo verify if the user has approved the report as manager / finance manager
+    # if manager_view?
+    #   role_id = UserRole.id_for(:manager)
+    # elsif finance_view?
+    #   role_id = UserRole.id_for(:finance_manager)
+    # end
     self.prev_status = report.status
-    if report.update_attributes controlling_user_id: user.id,
-                                controlling_for_user_id: nil,
-                                controlling_user_role_id: role_id,
-                                controlling_for_user_role_id: nil,
-                                report_status_id: ReportStatus.processing_id,
-                                approved_at: nil
-      report.tracks.create action_user: user,
-                           action_user_role_id: role_id,
-                           modified_user: prev_controlling_user,
-                           modified_user_role_id: prev_controlling_user_role,
-                           report_tracking_action_id: ReportTrackingAction.id_for(:unapprove),
-                           report_status_id: ReportStatus.processing_id
+    # if report.update_attributes controlling_user_id: user.id,
+    #                             controlling_for_user_id: nil,
+    #                             controlling_user_role_id: role_id,
+    #                             controlling_for_user_role_id: nil,
+    #                             report_status_id: ReportStatus.processing_id,
+    #                             approved_at: nil
+    #   report.tracks.create action_user: user,
+    #                        action_user_role_id: role_id,
+    #                        modified_user: prev_controlling_user,
+    #                        modified_user_role_id: prev_controlling_user_role,
+    #                        report_tracking_action_id: ReportTrackingAction.id_for(:unapprove),
+    #                        report_status_id: ReportStatus.processing_id
+    #   return
+    # end
+    # add_message :error, report.errors.full_messages
+
+    params[:document] = self.report
+    params[:aasm_event] = 'unapprove'
+    params[:violation_present] = false
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
       return
     end
-    add_message :error, report.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

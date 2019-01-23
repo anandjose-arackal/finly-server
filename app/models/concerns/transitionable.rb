@@ -2,8 +2,8 @@ module Transitionable
   extend ActiveSupport::Concern
 
   included do
-    belongs_to :policy
-    belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+    belongs_to :policy, optional: true
+    belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id, optional: true
 
     has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
     has_many :trails, as: :parent
@@ -27,7 +27,7 @@ module Transitionable
         user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id).reject {|user_id| user_id.nil?}
         user_ids.push self.document_owner.id # Check if this has to be added
       when 'unapprove', :unapprove
-        user_ids += self.document_level_reviewer_mappings.with_apluck(:action_take_by_id)
+        user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id)
       when 'all', :all # Users who have interacted + who will interact in future
       when 'interacted', :interacted # User who have taken action the document
         user_ids = self.document_level_reviewer_mappings.where(
