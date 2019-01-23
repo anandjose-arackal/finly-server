@@ -1,4 +1,4 @@
-class WorkflowManager::Aasm::TravelRequestReviewalProvider < WorkflowManager::Aasm::BaseProvider
+class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::BaseProvider
 
   aasm :whiny_transitions => false do
     state :open, initial: true, :before_enter => :set_state

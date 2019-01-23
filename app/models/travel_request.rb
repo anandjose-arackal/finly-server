@@ -302,15 +302,6 @@ class TravelRequest < ApplicationRecord
     Expense.with_report_id(reports.pluck(:id))
   end
 
-  def self.status_ids(*statuses)
-    status_ids = []
-    statuses.each do |status|
-      status_ids.push TravelRequestStatus.id_for(status)
-    end
-
-    status_ids.reject { |status_id| status_id.nil? }
-  end
-
   protected
 
   def acceptable_dates?
@@ -321,8 +312,25 @@ class TravelRequest < ApplicationRecord
     end
   end
 
+  def self.document_status_attribute
+    'status_id'
+  end
+
   def self.document_owner_attribute
     'user_id'
+  end
+
+  def self.finance_associated_status_ids
+    ReportStatus.ids_for(:approved, :settled, :settlement_confirmed , :closed, :auto_approved)
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push TravelRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
   end
 
 end

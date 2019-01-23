@@ -39,7 +39,7 @@ module Transitionable
     end
 
     def get_reviewal_chain
-      self.document_level_reviewer_mappings.includes(:level, :reviewer, :action_taken_by, :taken_control_by)
+      dlrms = self.document_level_reviewer_mappings.includes(:level, :reviewer, :action_taken_by, :taken_control_by)
     end
 
     # Users who can take the current action on the document
@@ -236,7 +236,7 @@ module Transitionable
     end
 
     # todo setup travel request
-    def travel_associated_items(user, role_id, purpose_id=1)
+    def travel_associated_items(user)
       if user.instance_of(User)
 
       end
