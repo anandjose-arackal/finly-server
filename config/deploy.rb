@@ -32,7 +32,7 @@ when :aws_production, :background_production
 when :itzcash
   set :deploy_to, '/usr/local/app'
   set :rails_env, 'itzcash_uat'
-when :staging, :development, :combined_development, :insights, :development_2, :demo_2, :shapoorji, :development_3
+when :staging, :development, :combined_development, :insights, :development_2, :demo_2, :shapoorji, :olx, :development_3
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'staging'
 end
@@ -43,6 +43,7 @@ case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production
   linked_files << "config/sidekiq.yml"
   linked_files << "config/elastic_apm.yml"
+  linked_files << "config/sentry.yml"
 end
 set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}

@@ -14,9 +14,9 @@ class ProcurementMailer < ApplicationMailer
              encoding: 'UTF-8',
              template: "export/purchase_order",
              layout: "pdf/paginated_bootstrap.html.erb",
-             footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
              # print_media_type: true
          ),
+         footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
          dpi: '650'
     )
     if @data.attachments.present? && @data.attachments.is_a?(Array)
