@@ -188,6 +188,7 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   # gem 'byebug'
   gem 'pry', '~> 0.12.2'
+  gem 'rb-readline'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 3.1.1'
   gem 'capistrano-rails', '~> 1.4.0', require: false

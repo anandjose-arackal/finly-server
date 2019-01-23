@@ -384,6 +384,7 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
       ffi (~> 1.0)
+    rb-readline (0.5.5)
     redis (4.1.0)
     redis-namespace (1.6.0)
       redis (>= 3.0.4)
@@ -600,6 +601,7 @@ DEPENDENCIES
   rails (~> 5.2.2)
   rails-perftest (~> 0.0.7)
   rake (~> 12.3.2)
+  rb-readline
   remotipart (~> 1.4)
   request_store (~> 1.4.1)
   require_all (~> 2.0.0)
@@ -632,4 +634,4 @@ RUBY VERSION
    ruby 2.6.0p0
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
