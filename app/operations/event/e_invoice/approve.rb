@@ -8,7 +8,7 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
 
   def init
     super
-    self.approving_user = self.invoice.trails.natural_order.last.action_user
+    self.approving_user = self.invoice.trails.last.action_user
     self.approved = (invoice.approved? or invoice.closed?) if invoice.present?
     #todo add it to params
     self.auto_approve = params[:auto_approve]

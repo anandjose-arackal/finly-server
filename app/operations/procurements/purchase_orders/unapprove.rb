@@ -69,8 +69,8 @@ class Procurements::PurchaseOrders::Unapprove < Procurements::PurchaseOrders::Ba
   def unapprovable?
     # after approval(in previous action by the user)
     # if it has been retracted / approved unapprove action can't be taken
-    last_approve_trail = self.purchase_order.trails.natural_order.only_approve.last
-    last_retract_trail = self.purchase_order.trails.natural_order.only_retract.last
+    last_approve_trail = self.purchase_order.trails.only_approve.last
+    last_retract_trail = self.purchase_order.trails.only_retract.last
     if last_approve_trail.action_user.id == user.id
       if last_retract_trail.present? && last_retract_trail.created_at > last_approve_trail.created_at
         return false

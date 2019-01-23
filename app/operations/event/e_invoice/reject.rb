@@ -3,7 +3,7 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
 
   def init
     super
-    self.rejecting_user = self.invoice.trails.natural_order.last.action_user rescue nil
+    self.rejecting_user = self.invoice.trails.last.action_user rescue nil
   end
 
   def validate

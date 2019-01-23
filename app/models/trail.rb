@@ -50,10 +50,14 @@ class Trail < ApplicationRecord
     where(action_user_id: id)
   }
 
-  default_scope { order created_at: :desc }
+  # default_scope { order created_at: :desc }
 
   scope :natural_order, -> {
       reorder :created_at
+  }
+
+  scope :reverse_order, -> {
+    order created_at: :desc
   }
 
   scope :printable_trails, -> {

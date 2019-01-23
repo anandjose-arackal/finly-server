@@ -108,7 +108,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "has created last trail with action :submit and action user id" do
-      last_trail = @document.trails.natural_order.last
+      last_trail = @document.trails.last
       expect(last_trail&.action_id).to eq(TrailAction.id_for(:submit))
       expect(last_trail&.action_user_id).to eq(@em_employee_user1.id)
     end
@@ -147,7 +147,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "Has created trail with action approve & right action user id" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail&.action_id).to eq(TrailAction.id_for(:approve))
       expect(last_trail&.action_user_id).to eq(@em_reviewer_user1.id)
     end
@@ -215,7 +215,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "creates trail for retract with right data" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail.action_user_id).to eq(@em_employee_user1.id)
       expect(last_trail.action_id).to eq(TrailAction.id_for(:retract))
     end
@@ -233,7 +233,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "trailed with right action user id & action id" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail&.action_id).to eq(TrailAction.id_for(:reject))
       expect(last_trail&.action_user_id).to eq(@em_reviewer_user2.id)
     end
@@ -284,7 +284,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "trailed with right action user id & action id" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail&.action_id).to eq(TrailAction.id_for(:take_control))
       expect(last_trail&.action_user_id).to eq(@em_admin_user1.id)
     end
@@ -325,7 +325,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "trailed with right action user id & action id" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail&.action_user_id).to eq(@em_admin_user1.id)
       expect(last_trail.action_id).to eq(TrailAction.id_for(:return_control))
     end
@@ -360,7 +360,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "trailed with right data" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail.action_user_id).to eq(@em_admin_user1.id)
       expect(last_trail.action_id).to eq(TrailAction.id_for(:approve))
     end
@@ -400,7 +400,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "trailed with right action user id & action id" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail&.action_id).to eq(TrailAction.id_for(:take_control))
       expect(last_trail&.action_user_id).to eq(@em_admin_user1.id)
     end
@@ -441,7 +441,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "trailed with right action user id & action id" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail&.action_user_id).to eq(@em_admin_user1.id)
       expect(last_trail.action_id).to eq(TrailAction.id_for(:return_control))
     end
@@ -476,7 +476,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "trailed with right data" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail.action_user_id).to eq(@em_admin_user1.id)
       expect(last_trail.action_id).to eq(TrailAction.id_for(:approve))
     end
@@ -522,7 +522,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     it "has created trail with action approve & right action user id" do
-      last_trail = @document.trails.natural_order.reload.last
+      last_trail = @document.trails.reload.last
       expect(last_trail&.action_id).to eq(TrailAction.id_for(:approve))
       expect(last_trail&.action_user_id).to eq(@em_reviewer_user3.id)
     end

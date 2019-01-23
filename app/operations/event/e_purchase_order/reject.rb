@@ -3,7 +3,7 @@ class Event::EPurchaseOrder::Reject < Event::EPurchaseOrder::Base
 
   def init
     super
-    self.rejecting_user = self.purchase_order.trails.natural_order.last.action_user rescue nil
+    self.rejecting_user = self.purchase_order.trails.last.action_user rescue nil
   end
 
   def validate

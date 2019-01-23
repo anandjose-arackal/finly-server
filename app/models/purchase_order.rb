@@ -232,8 +232,8 @@ class PurchaseOrder < ApplicationRecord
   def can_unapprove?(user=nil)
     return false if user.blank?
 
-    last_approve_trail = self.trails.natural_order.only_approve.last
-    last_retract_trail = self.trails.natural_order.only_retract.last
+    last_approve_trail = self.trails.only_approve.last
+    last_retract_trail = self.trails.only_retract.last
     if last_approve_trail.present? && last_approve_trail.action_user.id == user.id
       if last_retract_trail.present? && last_retract_trail.created_at > last_approve_trail.created_at
         return false
