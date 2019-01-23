@@ -47,7 +47,7 @@ class BankAccount < ApplicationRecord
   scope :only_vendors, -> {where account_owner_type: "YesBankVendor"}
   scope :only_users, -> {where account_owner_type: "User"}
   scope :default_accounts, -> { where(default_account: true).non_deleted}
-  scope :non_deleted, -> {where is_deleted: [nil, false]}
+  scope :non_deleted, -> {where deleted_at: nil}
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }
