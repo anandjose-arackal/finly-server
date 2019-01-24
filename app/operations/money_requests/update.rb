@@ -94,6 +94,7 @@ class MoneyRequests::Update < MoneyRequests::Base
 
   def process
     original_policy_id = money_request.policy_id
+    money_request.skip_customizable_validation = true
     if money_request.update_attributes(self.update_param)
       updated_policy_id = money_request.policy_id
       if params[:custom_fields].present? or original_policy_id != updated_policy_id

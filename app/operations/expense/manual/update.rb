@@ -221,7 +221,7 @@ class Expense::Manual::Update < Expense::Manual::Base
       pocket = expense.spent_from
       if pocket.cash_pocket?
         pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-        if pocket_adapter.balance(display_balance: true) > expense.amount_value
+        if pocket_adapter.balance(display_balance: true) >= expense.amount_value
           expense.update(cash_on_hand_blocked: true)
         end
         if pocket_adapter.balance(display_balance: true) < 0
