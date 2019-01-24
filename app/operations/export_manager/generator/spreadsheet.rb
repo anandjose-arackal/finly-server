@@ -6,7 +6,7 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
     headers = load_headers
     contents = load_contents
     exporter = Exporter::Spreadsheet.new(user, {headers: headers, contents: contents})
-    file = Tempfile.new(['export', '.xls'])
+    file = Paperclip::Tempfile.new(file_name)
     open(file.path, 'wb') do |f|
       case format
       when :csv
@@ -16,7 +16,7 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
       end
     end
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
-    {file_url: temp_file.file.url(:default, timestamp: false), success: true}
+    {file_url: temp_file.file.url(:original, timestamp: false), success: true}
   end
 
   def format
@@ -26,9 +26,9 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
   def file_name
     case format
     when :xls
-      return 'export.xls'
+      return ['export', '.xls']
     when :csv
-      return 'export.csv'
+      return ['export', '.csv']
     else
       nil
     end
