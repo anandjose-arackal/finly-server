@@ -16,7 +16,7 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
       end
     end
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
-    {file_url: temp_file.file.url(:default, timestamp: false), success: true}
+    {file_url: temp_file.file.url, success: true}
   end
 
   def format
