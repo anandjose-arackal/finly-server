@@ -1,3 +1,5 @@
+# Approve And Forward will not be used as it breaks the approval flow by skipping people in the chain of approval
+
 class BankTransfer::PaymentRequest::Review::ApproveAndForward < BankTransfer::PaymentRequest::Review::Base
 
   attr_accessor :forwarded_to_user, :forwarded_note
@@ -29,6 +31,7 @@ class BankTransfer::PaymentRequest::Review::ApproveAndForward < BankTransfer::Pa
                                                       modified_user_role_id: UserRole.id_for(:admin),
                                                       action_id: BankPaymentRequestTrailAction.id_for(:approve_and_forward)
     end
+
     add_message :error, bank_payment_request.errors.full_messages
   end
 

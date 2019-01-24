@@ -31,8 +31,6 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def send_push_notification(user)
-
-
     return unless user.id == report.user_id
     message = "#{rejecting_user.name} rejected the report: #{self.report.name}"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
@@ -53,7 +51,7 @@ class Event::EReport::Reject < Event::EReport::Base
                                             timestamp: DateUtils.local_date_time,
                                             view_role_id: role_id,
                                             application: RequestStore.store[:current_app]
-                                            )
+    )
     notification.save
   end
 

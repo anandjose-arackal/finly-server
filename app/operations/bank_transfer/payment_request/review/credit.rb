@@ -89,6 +89,11 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
                                                               action_id: BankPaymentRequestTrailAction.id_for(:credit),
                                                               modified_user_id: nil,
                                                               modified_user_role_id: nil
+
+      bank_payment_request.trails.create action_user: user,
+                                         action_user_role_id: self.view_role,
+                                         action_id: TrailAction.id_for(:credit)
+
     else
       add_message :error, op.messages[:error]
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:failed))
