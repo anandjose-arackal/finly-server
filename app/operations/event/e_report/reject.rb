@@ -26,7 +26,13 @@ class Event::EReport::Reject < Event::EReport::Base
     self.report.affected_users(:reject)
   end
 
+  def notification_affected_users
+    self.report.notification_affected_users(:reject)
+  end
+
   def send_push_notification(user)
+
+
     return unless user.id == report.user_id
     message = "#{rejecting_user.name} rejected the report: #{self.report.name}"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id

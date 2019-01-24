@@ -34,7 +34,6 @@ class Event::EMoneyRequests::TakeControl < Event::EMoneyRequests::Base
     # else
     #   view_role_id = nil
     # end
-    if self.
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: NotificationActionType.id_for(:notify_take_control),
                                              action_user_id: (money_request.tracks.last.action_user.id rescue nil),
