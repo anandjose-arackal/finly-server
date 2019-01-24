@@ -16,7 +16,7 @@ class LevelUserReviewerMapping < ActiveRecord::Base
   belongs_to :level, class_name: 'ReviewalLevel', optional: true
   belongs_to :user, class_name: 'User', optional: true
   belongs_to :reviewer, class_name: 'User', optional: true
-  belongs_to :policy, optional: true
+  belongs_to :policy
 
   validates :level_id, presence: true
   validates :reviewer_id, presence: true
