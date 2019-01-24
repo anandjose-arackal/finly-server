@@ -10,10 +10,10 @@ class TravelRequests::Review::ConfirmSelection < TravelRequests::Review::Base
   end
 
   def validate
-    unless self.travel_request.controlling_user_id == user.id
-      add_message :error, 'You cannot perform this action at the moment'
-      return
-    end
+    # unless self.travel_request.controlling_user_id == user.id
+    #   add_message :error, 'You cannot perform this action at the moment'
+    #   return
+    # end
     unless manager_view? or personal_view?
       add_message :error, 'You cannot perform this action at the moment'
       return
@@ -25,6 +25,42 @@ class TravelRequests::Review::ConfirmSelection < TravelRequests::Review::Base
   end
 
   def process
+    # reviewer, reviewer_role_id = travel_booking_reviewer
+    # controlling_user_role_id = travel_request.controlling_user_role_id
+    # if reviewer.present?
+    #   # Set reviewer as controlling user
+    #   if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:selection_processing),
+    #                                       controlling_user_id: reviewer&.id,
+    #                                       controlling_user_role_id: reviewer_role_id
+    #
+    #     travel_request.travel_request_trails.create action_user: user,
+    #                                                 action_user_role_id: controlling_user_role_id,
+    #                                                 action_id: trail_action_id,
+    #                                                 modified_user_id: reviewer&.id,
+    #                                                 modified_user_role_id: reviewer_role_id
+    #     return true
+    #   end
+    #   add_message :error, travel_request.errors.full_messages
+    #   return
+    # end
+    #
+    # travel_manager_user  = travel_manager
+    # travel_manager_role_id = UserRole.id_for(:travel_manager)
+    # # Approved -> Move travel booking back to travel desk
+    # if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:selection_confirmed),
+    #                                     controlling_user_id: travel_manager_user&.id,
+    #                                     controlling_user_role_id: travel_manager_role_id
+    #
+    #   travel_request.travel_request_trails.create action_user: user,
+    #                                               action_user_role_id: controlling_user_role_id,
+    #                                               action_id: trail_action_id,
+    #                                               modified_user_id: travel_manager_user&.id,
+    #                                               modified_user_role_id: travel_manager_role_id
+    #   return true
+    # end
+    # add_message :error, travel_request.errors.full_messages
+
+
     reviewer, reviewer_role_id = travel_booking_reviewer
     controlling_user_role_id = travel_request.controlling_user_role_id
     if reviewer.present?
@@ -43,6 +79,7 @@ class TravelRequests::Review::ConfirmSelection < TravelRequests::Review::Base
       add_message :error, travel_request.errors.full_messages
       return
     end
+
     travel_manager_user  = travel_manager
     travel_manager_role_id = UserRole.id_for(:travel_manager)
     # Approved -> Move travel booking back to travel desk

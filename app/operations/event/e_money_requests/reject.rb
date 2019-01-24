@@ -22,7 +22,7 @@ class Event::EMoneyRequests::Reject < Event::EMoneyRequests::Base
   end
 
   def affected_users
-    MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.user)
+    # MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.user)
   end
 
   def send_push_notification(user)

@@ -73,6 +73,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         if level.present?
           if reviewer.present?
             if valid_reviewers.include?(reviewer.id)
+              document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
               dlrm = document.document_level_reviewer_mappings.new(
                   {
                       level_id: level.id,
@@ -83,7 +84,6 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
                   })
               # Create new level
               dlrm.save
-              document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
             else
               add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount is greater than threshold value"
             end

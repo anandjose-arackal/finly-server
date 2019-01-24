@@ -237,10 +237,4 @@ json.reviewal_chains do
   end
 end
 
-# json.reviewal_chain do
-#   json.array! @result.reviewal_chain do |dlrm|
-#     json.extract! dlrm, :policy_id, :level_id, :level_number, :taken_control
-#     json.level_name dlrm.level.name
-#     json.reviewer_details
-#   end
-# end
+json.reviewal_chain @result.report.get_reviewal_chain
