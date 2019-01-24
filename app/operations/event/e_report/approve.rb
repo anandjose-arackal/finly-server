@@ -87,7 +87,7 @@ class Event::EReport::Approve < Event::EReport::Base
       notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
     # view_role_id = report.controlling_user_role_id
-    view_role_id = UserRole.id_for("manager")
+    # view_role_id = UserRole.id_for("manager")
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                               action_type_id: notify_type,
                                               action_user_id: (report.trails.last.action_user.id rescue nil),
@@ -97,7 +97,7 @@ class Event::EReport::Approve < Event::EReport::Base
                                               path_object_type: "Report",
                                               read: false,
                                               timestamp: DateUtils.local_date_time,
-                                              view_role_id: view_role_id,
+                                              view_role_id: role_id,
                                               application: RequestStore.store[:current_app])
     notification.save
   end

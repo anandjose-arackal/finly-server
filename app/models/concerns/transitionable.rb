@@ -103,6 +103,8 @@ module Transitionable
         user_ids.push self.document_owner_id
       when :take_control, 'take_control'
         user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
+      when :comment, 'comment'
+        user_ids += self.document_owner_id
       end
 
       User.with_id(user_ids)
