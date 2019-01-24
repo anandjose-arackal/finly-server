@@ -6,7 +6,7 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
     headers = load_headers
     contents = load_contents
     exporter = Exporter::Spreadsheet.new(user, {headers: headers, contents: contents})
-    file = Tempfile.new(file_name)
+    file = Tempfile.new(['export', '.xls'])
     open(file.path, 'wb') do |f|
       case format
       when :csv
