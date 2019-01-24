@@ -9,6 +9,7 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
     state :booked
     state :cancelled
     state :approved
+    state :booking_pending
     state :auto_approved
 
     event :submit do
@@ -17,6 +18,7 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
     end
 
     event :approve do
+      transitions :from => :processing, :to => :booking_pending, guard: :tm_and_reviewers_not_present?
       transitions :from => :processing, :to => :approved, guard: :reviewers_not_present?
       transitions :from => :processing, :to => :processing
     end
@@ -54,6 +56,14 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
   end
 
   private
+
+  def tm_and_reviewers_not_present?
+    reviewers_not_present? && travel_managers_not_present?
+  end
+
+  def travel_managers_not_present?
+    self.policy.policy_user_roles.with_role_id(UserRole.id_for(:travel_manager)).blank?
+  end
 
   def change_state
     super

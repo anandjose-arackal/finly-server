@@ -20,18 +20,6 @@ class WorkflowManager::Aasm::BaseProvider
     self.reviewers = document.get_reviewers(:next)
   end
 
-  # @@providers = []
-  #
-  # def self.providers
-  #   @@providers
-  # end
-  #
-  # def self.register_provider
-  #   @@providers << self.name.split('::').last
-  # end
-  #
-  # self.register_provider
-
   private
 
   def set_state
@@ -45,11 +33,24 @@ class WorkflowManager::Aasm::BaseProvider
       when 'Report'
         amount = document.total_amount
     end
-
     amount
   end
 
   def change_state
+    ### :change_state has been broken down into three different methods
+    ### so it can be overridden in any of the providers
+
+    # Update DLRMs for the document
+    update_dlrms
+
+    # Update new level(Usually next level unless its a retract of unapprove)
+    update_levels
+
+    # Update the status of the document
+    update_status
+  end
+
+  def update_dlrms
     # Update Document Level Reviewer Mapping
     # find current document_level_reviewer_mappings
     if [:approve, :reject].include?(aasm.current_event)
@@ -58,12 +59,12 @@ class WorkflowManager::Aasm::BaseProvider
                  .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
 
       if dlrm.present?
-        dlrm.update({
-                        action_id: TrailAction.id_for(aasm.current_event),
-                        viewable: true,
-                        action_taken_by_id: user.id
-
-                    })
+        dlrm.update(
+            {
+                action_id: TrailAction.id_for(aasm.current_event),
+                viewable: true,
+                action_taken_by_id: user.id
+            })
       end
     end
 
@@ -104,35 +105,39 @@ class WorkflowManager::Aasm::BaseProvider
               action_id: nil
       )
     end
+  end
 
-    # reset levels
-    # if [:retract, :reject].include?(aasm.current_event)
-    #   self.new_level = nil
-    # end
+  def update_levels
+    # :retract & :reject should set level to nil; which it already is
+
+    # :submit & :approve should move to next level
     if [:submit, :approve].include?(aasm.current_event)
       self.new_level = self.next_level
     end
 
+    # :take_control and :return_control should remain in the same level
     if [:take_control, :return_control].include?(aasm.current_event)
       self.new_level = self.current_level
     end
 
+    # :unapprove should move one level back
     if [:unapprove].include?(aasm.current_event)
       self.new_level = self.previous_level
     end
+  end
 
-
+  # Update status of the document
+  def update_status
     status_id = document.status.class.id_for(self.aasm.current_state)
     update_params = {
         controlling_level_id: self.new_level&.id
     }
     update_params[document.class.document_status_attribute] = status_id
-
     self.document.update(update_params)
   end
 
-  def approvers_not_present?
-  end
+  # def approvers_not_present?
+  # end
 
   def reviewers_not_present?
     self.reviewers.blank?

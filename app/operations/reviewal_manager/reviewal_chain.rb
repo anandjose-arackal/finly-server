@@ -38,7 +38,6 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
         mappings = level.level_reviewer_mappings.non_deleted
       end
 
-
       selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
       level_data = {
           level_number: level.level_number,

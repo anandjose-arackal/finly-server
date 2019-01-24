@@ -67,6 +67,24 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
       transitions :from => [:approved], to: :closed
     end
 
+    event :mark_as_settled do ## Confirm action
+      transitions from: :approved, to: :settled
+    end
+
     after_all_events :change_state
+  end
+
+  private
+
+  def update_dlrms
+    super
+  end
+
+  def update_levels
+    super
+  end
+
+  def update_status
+    super
   end
 end

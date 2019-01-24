@@ -33,25 +33,38 @@ class Reports::MarkAsSettled < Reports::Base
   end
 
   def process
-    if report.update_attributes controlling_user: nil,
-                                controlling_for_user: nil,
-                                controlling_user_role_id: nil,
-                                controlling_for_user_role_id: nil,
-                                report_status_id: status,
-                                reimbursement: payment,
-                                cash_in_hand_deduction: cash_in_hand_deduction
+    # if report.update_attributes controlling_user: nil,
+    #                             controlling_for_user: nil,
+    #                             controlling_user_role_id: nil,
+    #                             controlling_for_user_role_id: nil,
+    #                             report_status_id: status,
+    #                             reimbursement: payment,
+    #                             cash_in_hand_deduction: cash_in_hand_deduction
+    #
+    #   role_id = self.role_id
+    #   # role_id = (self.user.finance_manager? and params.present? and finance_view?) ? UserRole.id_for(:finance_manager) : UserRole.id_for(:admin)
+    #   report.tracks.create action_user: user,
+    #                        action_user_role_id: role_id,
+    #                        report_tracking_action_id: tracking_status,
+    #                        report_status_id: status,
+    #                        payment: self.payment,
+    #                        cash_in_hand_deduction: cash_in_hand_deduction
+    # else
+    #   add_message :error, report.errors.full_messages
+    # end
 
-      role_id = self.role_id
-      # role_id = (self.user.finance_manager? and params.present? and finance_view?) ? UserRole.id_for(:finance_manager) : UserRole.id_for(:admin)
-      report.tracks.create action_user: user,
-                           action_user_role_id: role_id,
-                           report_tracking_action_id: tracking_status,
-                           report_status_id: status,
-                           payment: self.payment,
-                           cash_in_hand_deduction: cash_in_hand_deduction
-    else
-      add_message :error, report.errors.full_messages
+
+    params[:document] = self.report
+    params[:aasm_event] = 'mark_as_settled'
+    params[:violation_present] = false
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
     end
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

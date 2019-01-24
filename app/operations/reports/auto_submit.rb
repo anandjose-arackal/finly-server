@@ -122,12 +122,18 @@ class Reports::AutoSubmit < Reports::Base
                                 controlling_for_user_role_id: nil,
                                 submitted_at: submitted_at,
                                 submitted_amount_attributes: {value: report.total_amount, currency_id: 1}
-      report.tracks.create action_user: selected_user,
+      # report.tracks.create action_user: selected_user,
+      #                      action_user_role_id: manager_role_id,
+      #                      modified_user_id: report.controlling_user_id,
+      #                      modified_user_role_id: manager_role_id,
+      #                      report_tracking_action_id: ReportTrackingAction.id_for(:submit),
+      #                      report_status_id: ReportStatus.processing_id
+      report.trails.create action_user: selected_user,
                            action_user_role_id: manager_role_id,
-                           modified_user_id: report.controlling_user_id,
-                           modified_user_role_id: manager_role_id,
-                           report_tracking_action_id: ReportTrackingAction.id_for(:submit),
-                           report_status_id: ReportStatus.processing_id
+                           action_id: TrailAction.id_for(:submit)
+
+
+
       report.comments.create user: selected_user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)

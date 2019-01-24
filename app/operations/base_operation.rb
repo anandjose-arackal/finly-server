@@ -283,7 +283,7 @@ class BaseOperation
       self.user = user
       self.params = params
       if self.params.class.name == ActionController::Parameters.name
-        self.params = self.params.permit!.to_h
+        self.params = self.params.to_unsafe_h
       end
       self.messages = messages
       init
@@ -423,7 +423,7 @@ class BaseOperation
 
   def convert_params_to_hash
     if params.is_a?(ActionController::Parameters)
-      self.params = params.permit!.to_h
+      self.params = params.to_unsafe_h
     end
     self.params
   end

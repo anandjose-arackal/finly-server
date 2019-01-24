@@ -73,17 +73,19 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         if level.present?
           if reviewer.present?
             if valid_reviewers.include?(reviewer.id)
+              threshold = level.level_reviewer_mappings.with_reviewer_id(reviewer.id).first.threshold
+              document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
               dlrm = document.document_level_reviewer_mappings.new(
                   {
                       level_id: level.id,
                       policy_id: document.policy.id,
                       reviewer_id: reviewer.id,
                       provider_name: provider_name,
-                      level_number: level.level_number
+                      level_number: level.level_number,
+                      threshold: threshold
                   })
               # Create new level
               dlrm.save
-              document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
             else
               add_message :error, "Couldn't set #{reviewer.name} as reviewer for level #{level.level_number}, as amount is greater than threshold value"
             end
@@ -101,7 +103,8 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
                         level_number: level.level_number,
                         provider_name: level.associated_entity_type,
                         reviewer_id: lurm.reviewer_id,
-                        policy_id: document.policy_id
+                        policy_id: document.policy_id,
+                        threshold: lurm.threshold
                     })
               end
             else
@@ -115,7 +118,8 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
                           policy_id: document.policy_id,
                           provider_name: level.associated_entity_type,
                           reviewer_id: lrm.reviewer_id,
-                          level_number: level.level_number
+                          level_number: level.level_number,
+                          threshold: lrm.threshold
                       })
                 end
               end

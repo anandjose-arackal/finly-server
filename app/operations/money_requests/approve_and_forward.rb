@@ -1,3 +1,5 @@
+# WIll not be used as it breaks the integrity of approval workflow if people skip the approvers and forward to anyone
+
 class MoneyRequests::ApproveAndForward < MoneyRequests::Approve
   attr_accessor :forward_to_user
 

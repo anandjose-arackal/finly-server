@@ -106,6 +106,39 @@ module Transitionable
 
     def get_reviewal_chain
       dlrms = self.document_level_reviewer_mappings.includes(:level, :reviewer, :action_taken_by, :taken_control_by)
+      chain = []
+
+      dlrms.each do |dlrm|
+        level_number = dlrm.level_number
+
+        data = chain[level_number - 1] || {}
+
+        data[:level_number] = dlrm.level_number
+        data[:level_name] = dlrm.level.name
+        data[:policy_id] = dlrm.policy_id
+        data[:awaiting_action] = (self.controlling_level_id == dlrm.level_id)
+        data[:action_taken] = data[:action_taken] || (dlrm.action_taken_by_id.present?)
+        data[:reviewers] = data[:reviewers] || []
+        reviewer = {
+            id: dlrm.reviewer.id,
+            name: dlrm.reviewer.name,
+            threshold: dlrm.threshold,
+            action_taken: (dlrm.reviewer.id == dlrm.action_taken_by_id)
+        }
+        data[:reviewers].push(reviewer)
+
+        if dlrm.taken_control_by_id.present?
+          data[:taken_control_by] = {
+              id: dlrm.taken_control_by_id,
+              name: dlrm.taken_control_by.name,
+              action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id)
+          }
+        end
+
+        chain[level_number - 1] = data
+      end
+
+      chain
     end
 
     # Users who can take the current action on the document

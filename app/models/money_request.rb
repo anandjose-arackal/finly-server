@@ -35,6 +35,7 @@
 #  controlling_level_id               :integer
 #
 
+
 class MoneyRequest < ApplicationRecord
   include OperationCallbacks,
           MathUtil,
