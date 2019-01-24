@@ -2,6 +2,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   register_app :vp
   register_structure(
+      :tabs,
       [
           :dashboard,
           {procure: [:po, :po_vendors, :po_catalogue]},
@@ -11,9 +12,17 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket]}
       ]
   )
+  register_structure(
+      :cog,
+      [
+        :attachments
+      ]
+  )
 
   def self.accept?
-    true or RequestStoreUtil.current_company&.feature_subscription&.procurement
+    return false unless RequestStoreUtil.current_user.user_panel_subscription.yes_bank_account_transfer
+    return false unless RequestStoreUtil.current_company&.feature_subscription&.procurement
+    true
   end
 
   def dashboard

@@ -5,16 +5,38 @@ class Navbar::Master::Base
     set_data_map[:app]
   end
 
-  def self.structure
-    set_data_map[:structure_def]
+  def self.tabs
+    set_data_map[:tabs]
+  end
+
+  def self.default_cog
+    [
+        :cog_users,
+        :cog_statements,
+        :cog_organization_account,
+        :cog_load_company_balance,
+        :cog_fund_disbursement,
+        :cog_expense_management,
+        :cog_vendor_payments,
+        :cog_finly_collect,
+        :cog_finly_insights
+    ]
+  end
+
+  def self.cog
+    default_cog + set_data_map[:cog]
+  end
+
+  def self.structure(type)
+    set_data_map[type]
   end
 
   def self.register_app(app)
     set_data_map[:app] = app
   end
 
-  def self.register_structure(structure)
-    set_data_map[:structure_def] = structure
+  def self.register_structure(type, structure)
+    set_data_map[type] = structure
   end
 
   def self.set_data_map

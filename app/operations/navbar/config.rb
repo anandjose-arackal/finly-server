@@ -39,7 +39,7 @@ class Navbar::Config < BaseOperation
 
   def process_master(klass)
     menu_data = []
-    structure = klass.structure
+    structure = klass.structure(:tabs)
     master = klass.new
     structure.each do |item|
       menu_key = nil
