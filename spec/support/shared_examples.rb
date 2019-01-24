@@ -54,7 +54,7 @@ end
 
 RSpec.shared_examples "trailed with right data" do
   it "trailed with action user & action" do
-    last_trail = @document.trails.natural_order.reload.last
+    last_trail = @document.trails.reload.last
     expect(last_trail&.action_id).to eq(TrailAction.id_for(action))
     expect(last_trail&.action_user_id).to eq(user.id)
   end

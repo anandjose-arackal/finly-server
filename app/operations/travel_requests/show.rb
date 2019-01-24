@@ -92,22 +92,126 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def actions
+      # actions = {editable: editable, destroyable: destroyable}
+      # controlling_user = travel_request.controlling_user # || travel_request.controlling_for_user
+      # controlling_user_role_id = travel_request.controlling_user_role_id # || travel_request.controlling_for_user_role_id
+      # if admin_view?
+      #   # if travel_request.processing? and not travel_request.controlling_user_id == travel_request.user_id
+      #   #   actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   # end
+      #   if self.travel_request.can_take_control? && not self.travel_request.get_reviewers.include?(user)
+      #
+      #     # todo Take Control
+      #     actions[:take_control] = {}
+      #   else
+      #     actions[:approve] = {method: 'patch', type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #     actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #     actions[:confirm_booking] = {method: 'patch', type: 11, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   end
+      #   # todo Approve, Reject, Select Booking, Confirm Booking
+      # end
+      #
+      # if travel_manager_view?
+      #   # Request selection, Confirm Booking
+      #   # if (travel_request.booking_pending? or travel_request.processing? or travel_request.selection_confirmed?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:travel_manager)
+      #   if (travel_request.booking_pending? or travel_request.processing? or travel_request.selection_confirmed?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:travel_manager)
+      #     actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #     actions[:request_selection] = {method: 'patch', type: 9, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #     actions[:confirm_booking] = {method: 'patch', type: 11, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   end
+      #   if travel_request.selection_requested? or travel_request.selection_processing?
+      #     actions[:retract_request_selection] = {method: 'patch', type: 12, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   end
+      # end
+      # if manager_view? or admin_view?
+      #   # Approve, Reject, Reject request
+      #   if travel_request.processing? and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
+      #     actions[:approve] = {method: 'patch', type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #     actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   end
+      # end
+      # # Confirm Selection
+      # if (travel_request.selection_requested? or travel_request.selection_rejected?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
+      #   actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # end
+      # # Approve Selection
+      # if travel_request.selection_processing? and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
+      #   actions[:approve_selection] = {method: 'patch', type: 12, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   actions[:reject_selection] = {method: 'patch', type: 13, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # end
+      # if personal_view?
+      #   # Submit
+      #   if (travel_request.open? || travel_request.retracted? || travel_request.rejected?) && travel_request.user_id == user.id
+      #     actions[:submit] = {method: 'patch', type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   end
+      #   # Retract
+      #   if travel_request.processing? && travel_request.user_id == user.id and personal_view?
+      #     actions[:retract] = {method: 'patch', type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   end
+      #   # Confirm selection
+      #   if (travel_request.selection_requested? or travel_request.selection_rejected?) && travel_request.controlling_user_id == user.id
+      #     actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      #   end
+      # end
+      #
+      # # case travel_request.controlling_user_role_id
+      # # when nil
+      # # when UserRole.id_for(:employee)
+      # #   if (travel_request.open? || travel_request.retracted? || travel_request.rejected?) && travel_request.user_id == user.id
+      # #     actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # #   end
+      # # when UserRole.id_for(:manager)
+      # # when UserRole.id_for(:travel_manager)
+      # # end
+      # # todo associated_users
+      # # if (travel_request.open? || travel_request.retracted? || travel_request.rejected?) && travel_request.user_id == user.id
+      # #   actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # # elsif travel_request.processing?
+      # #   if travel_request.controlling_user_id == user.id && (user.manager?)
+      # #     actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # #     actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # #   elsif user.company_admin? && admin_view?
+      # #     actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # #   elsif user.employee? && self.travel_request.user_id == user.id
+      # #     actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # #   end
+      # # elsif travel_request.approved?
+      # #   if travel_request.controlling_user_id == user.id && user.travel_manager?
+      # #     actions[:finish_booking] = {method: "patch", type: 7, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # #   end
+      # # elsif travel_request.booked?
+      # #   if travel_request.controlling_user_id == user.id && user.travel_manager?
+      # #     actions[:retract_booking] = {method: "patch", type: 8, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      # #   end
+      # # end
+      # actions
+
+
+
+
+
       actions = {editable: editable, destroyable: destroyable}
       controlling_user = travel_request.controlling_user # || travel_request.controlling_for_user
       controlling_user_role_id = travel_request.controlling_user_role_id # || travel_request.controlling_for_user_role_id
       if admin_view?
-        # todo Take Control
+        # if travel_request.processing? and not travel_request.controlling_user_id == travel_request.user_id
+        #   actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        # end
+        if self.travel_request.can_take_control? && !self.travel_request.get_reviewers.include?(user)
 
-        if travel_request.processing? and not travel_request.controlling_user_id == travel_request.user_id
-          actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+          # todo Take Control
+          actions[:take_control] = {}
+        else
+          actions[:approve] = {method: 'patch', type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+          actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+          actions[:confirm_booking] = {method: 'patch', type: 11, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
-
         # todo Approve, Reject, Select Booking, Confirm Booking
       end
 
-      if travel_manager_view? or admin_view?
+      if travel_manager_view?
         # Request selection, Confirm Booking
-        if (travel_request.booking_pending? or travel_request.processing? or travel_request.selection_confirmed?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:travel_manager)
+        if (travel_request.booking_pending? or travel_request.processing? or travel_request.selection_confirmed?) and self.travel_request.get_travel_managers.include?(user)
           actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:request_selection] = {method: 'patch', type: 9, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:confirm_booking] = {method: 'patch', type: 11, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
@@ -116,9 +220,9 @@ class TravelRequests::Show < TravelRequests::Base
           actions[:retract_request_selection] = {method: 'patch', type: 12, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       end
-      if manager_view? or admin_view?
+      if manager_view?
         # Approve, Reject, Reject request
-        if travel_request.processing? and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
+        if travel_request.processing? and self.travel_request.get_reviewers.include?(user)
           actions[:approve] = {method: 'patch', type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end

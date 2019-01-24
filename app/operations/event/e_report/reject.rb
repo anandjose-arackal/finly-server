@@ -3,7 +3,7 @@ class Event::EReport::Reject < Event::EReport::Base
 
   def init
     super
-    self.rejecting_user = self.report.tracks.last.action_user rescue nil
+    self.rejecting_user = self.report.trails.last.action_user rescue nil
   end
 
   def validate
@@ -22,7 +22,8 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def affected_users
-    Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    # Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    self.report.affected_users(:reject)
   end
 
   def send_push_notification(user)
@@ -36,7 +37,7 @@ class Event::EReport::Reject < Event::EReport::Base
     notification = user.notifications.build(user: user,
                                             notification_type_id: NotificationType.id_for(:report),
                                             action_type_id: NotificationActionType.id_for(:notify_reject),
-                                            action_user_id: report.tracks.last.action_user.id,
+                                            action_user_id: report.trails.last.action_user.id,
                                             object_id: report.id,
                                             object_type: "Report",
                                             path_object_id: report.id,

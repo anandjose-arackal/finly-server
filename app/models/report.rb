@@ -543,15 +543,6 @@ class Report < ApplicationRecord
 
   private
 
-  def self.status_ids(*statuses)
-    status_ids = []
-    statuses.each do |status|
-      status_ids.push ReportStatus.id_for(status)
-    end
-
-    status_ids.reject { |status_id| status_id.nil? }
-  end
-
   def controller_has_role
     if controlling_user_id.present?
       unless controlling_user_role_id.present?
@@ -623,6 +614,15 @@ class Report < ApplicationRecord
 
   def self.finance_associated_status_ids
     ReportStatus.ids_for(:approved, :settled, :settlement_confirmed , :closed, :auto_approved)
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push ReportStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
   end
 
 end

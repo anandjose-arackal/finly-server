@@ -19,23 +19,34 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
   end
 
   def process
-    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
-    prev_controlling_user = (travel_request.controlling_user or travel_request.controlling_for_user)
-    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.travel_request)
-    if travel_request.update status_id: TravelRequestStatus.id_for(:retracted),
-                             controlling_user_id: user.id,
-                             controlling_user_role_id: UserRole.id_for(:employee),
-                             controlling_for_user_id: nil,
-                             controlling_for_user_role_id: nil
-      travel_request.travel_request_trails.create action_user: user,
-                                                  action_user_role_id: UserRole.id_for(:employee),
-                                                  action_id: TravelRequestTrailAction.id_for(:retract),
-                                                  delegated_action_user_id: delegated_action_user_id,
-                                                  modified_user: prev_controlling_user,
-                                                  modified_user_role_id: prev_controlling_user_role
-      return true
+    # delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    # prev_controlling_user = (travel_request.controlling_user or travel_request.controlling_for_user)
+    # prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.travel_request)
+    # if travel_request.update status_id: TravelRequestStatus.id_for(:retracted),
+    #                          controlling_user_id: user.id,
+    #                          controlling_user_role_id: UserRole.id_for(:employee),
+    #                          controlling_for_user_id: nil,
+    #                          controlling_for_user_role_id: nil
+    #   travel_request.travel_request_trails.create action_user: user,
+    #                                               action_user_role_id: UserRole.id_for(:employee),
+    #                                               action_id: TravelRequestTrailAction.id_for(:retract),
+    #                                               delegated_action_user_id: delegated_action_user_id,
+    #                                               modified_user: prev_controlling_user,
+    #                                               modified_user_role_id: prev_controlling_user_role
+    #   return true
+    # end
+    # add_message :error, travel_request.errors.full_messages
+    params[:document] = self.travel_request
+    params[:aasm_event] = 'retract'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
     end
-    add_message :error, travel_request.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

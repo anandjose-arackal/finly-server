@@ -8,6 +8,10 @@ module Transitionable
     has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
     has_many :trails, as: :parent
 
+    def document_owner_id
+      self.send(self.class.document_owner_attribute)
+    end
+
     def associated_users(type=nil)
       # Valid types [:retract, :reject, :all, :interacted, :unapprove]
       user_ids = []
@@ -20,10 +24,9 @@ module Transitionable
           taken_control_by_ids.reject! {|user_id| user_id.nil?}
           user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:reviewer_id)
         end
-        user_ids = self.document
       when 'reject', :reject # Users who will be affected
         user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id).reject {|user_id| user_id.nil?}
-        user_ids.push self.document_owner.id # Check if this has to be added
+        user_ids.push self.document_owner_id # Check if this has to be added
       when 'unapprove', :unapprove
         user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id)
       when 'all', :all # Users who have interacted + who will interact in future
@@ -38,8 +41,69 @@ module Transitionable
       User.where(id: user_ids)
     end
 
+    def affected_users(type=nil)
+      # Valid types [:retract, :reject, :all, :interacted, :unapprove]
+      user_ids = []
+      case type
+      when :approve, 'approve'
+        if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
+          user_ids.push self.document_owner_id
+          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+        else
+          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+          user_ids += self.get_reviewers(self.controlling_level_id)&.map(&:id)
+        end
+      when :reject, 'reject'
+        user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id).reject {|user_id| user_id.nil?}
+        user_ids.push self.document_owner_id # Check if this has to be added
+      when :retract, 'retract'
+        if self.level.present?
+          taken_control_by_ids = []
+          # If the current level has been taken control by someone return their ids else the current reviewers in the level
+          taken_control_by_ids =  self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:taken_control_by_id)
+          taken_control_by_ids.reject! {|user_id| user_id.nil?}
+
+          user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(self.level.id).pluck(:reviewer_id)
+        end
+      when :submit, 'submit'
+        user_ids.push self.document_owner_id
+        user_ids += self.get_reviewers&.map(&:id)
+      when :take_control, 'take_control'
+        user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
+        user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:taken_control_by_id)
+      when :unapprove, 'unapprove'
+        if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
+          user_ids += self.get_reviewers(:next)&.map(&:id)
+          user_ids.push self.document_owner_id
+        else
+          user_ids += self.get_reviewers(:nex)&.map(&:id)
+        end
+      end
+
+      User.with_id(user_ids)
+    end
+
+    def notification_affected_users(type=nil)
+      # Valid types [:retract, :reject, :all, :interacted, :unapprove]
+      user_ids = []
+      case type
+      when :approve, 'approve'
+        if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
+          user_ids.push self.send(self.class.document_owner_attribute)
+        else
+          user_ids += self.get_reviewers&.map(&:id)
+        end
+      when :submit, 'submit'
+        user_ids += self.get_reviewers&.map(&:id)
+      when :take_control, 'take_control'
+        user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
+      end
+
+      User.with_id(user_ids)
+    end
+
     def get_reviewal_chain
-      self.document_level_reviewer_mappings.includes(:level, :reviewer, :action_taken_by, :taken_control_by)
+      dlrms = self.document_level_reviewer_mappings.includes(:level, :reviewer, :action_taken_by, :taken_control_by)
     end
 
     # Users who can take the current action on the document
@@ -47,7 +111,7 @@ module Transitionable
       user_ids = []
       case type
       when 'unapprove', :unapprove
-        user_ids += self.trails.with_action_id(TrailAction.id_for(:approve)).natural_order.last.pluck(:action_user_id)
+        user_ids += self.trails.with_action_id(TrailAction.id_for(:approve)).last.pluck(:action_user_id)
       else
         # nothing to do
       end
@@ -62,6 +126,7 @@ module Transitionable
       elsif level_details.is_a?(Integer)
           level = get_level_with_id(level_details, provider_name)
       else
+        # if no level details passed, gives result for current level
         level = self.level
       end
       user_ids = []
@@ -236,7 +301,7 @@ module Transitionable
     end
 
     # todo setup travel request
-    def travel_associated_items(user, role_id, purpose_id=1)
+    def travel_associated_items(user)
       if user.instance_of(User)
 
       end

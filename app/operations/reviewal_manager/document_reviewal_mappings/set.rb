@@ -106,14 +106,15 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
               end
             else
               # Overrides for users not present
-              level.reviewers.each do |level_reviewer|
-                if valid_reviewers.include?(level_reviewer.id)
+              # level.reviewers.each do |level_reviewer|
+              level.level_reviewer_mappings.non_deleted.each do |lrm|
+                if valid_reviewers.include?(lrm.reviewer_id)
                   document.document_level_reviewer_mappings.create(
                       {
                           level_id: level.id,
                           policy_id: document.policy_id,
                           provider_name: level.associated_entity_type,
-                          reviewer_id: level_reviewer.id,
+                          reviewer_id: lrm.reviewer_id,
                           level_number: level.level_number
                       })
                 end
