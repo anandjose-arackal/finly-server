@@ -29,7 +29,12 @@ class TrailAction < ApplicationRecord
         :reimbursement_confirmed,
         :closed,
         :hold,
-        :release
+        :release,
+        # Bank Payment Request
+        :mark_as_credited,
+        :credit
+
+
     ]
   end
 end

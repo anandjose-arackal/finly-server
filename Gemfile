@@ -23,7 +23,7 @@ gem 'mocha', '~> 1.7.0'
 gem 'rollbar', '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
-# gem 'sentry-raven', '~> 2.8'
+# gem '-raven', '~> 2.8'
 
 gem 'health-monitor-rails', '~> 8.4.0'
 
