@@ -120,7 +120,7 @@ module Transitionable
         reviewer = {
             id: dlrm.reviewer.id,
             name: dlrm.reviewer.name,
-            # threshold: dlrm.threshold,
+            threshold: dlrm.threshold,
             action_taken: (dlrm.reviewer.id == dlrm.action_taken_by_id)
         }
         data[:reviewers].push(reviewer)

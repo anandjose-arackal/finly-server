@@ -85,13 +85,17 @@ class Reports::Create < Reports::Base
                                          created_by: delegated_action_user
     report.skip_customizable_validation = true # As validation breaks the creation and loading of report, prevent it during creation
     if report.save
-      report.tracks.create action_user: for_user,
-                           action_user_role_id: role_id,
-                           modified_user: for_user,
-                           modified_user_role_id: role_id,
-                           report_tracking_action_id: ReportTrackingAction.id_for(:create),
-                           report_status_id: ReportStatus.open_id,
-                           delegated_action_user: delegated_action_user
+      # report.tracks.create action_user: for_user,
+      #                      action_user_role_id: role_id,
+      #                      modified_user: for_user,
+      #                      modified_user_role_id: role_id,
+      #                      report_tracking_action_id: ReportTrackingAction.id_for(:create),
+      #                      report_status_id: ReportStatus.open_id,
+      #                      delegated_action_user: delegated_action_user
+      report.trails.create action_user: for_user,
+                           action_id: TrailAction.id_for(:create),
+                           action_user_role_id: role_id
+
       expenses = params[:expenses]
       expense_ids = nil
 

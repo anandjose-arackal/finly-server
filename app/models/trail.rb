@@ -57,7 +57,7 @@ class Trail < ApplicationRecord
   }
 
   scope :desc_order, -> {
-    order created_at: :desc
+    reorder created_at: :desc
   }
 
   scope :printable_trails, -> {
