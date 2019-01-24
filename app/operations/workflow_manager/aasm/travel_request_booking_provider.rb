@@ -18,6 +18,10 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
       transitions from: [:booking_pending], to: :selection_requested
     end
 
+    event :confirm_selection do
+      transitions from: [:booking_pending], to: :selection_processing
+    end
+
     # event :request
 
     after_all_events :change_state
