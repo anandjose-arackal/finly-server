@@ -78,6 +78,8 @@ module Transitionable
         else
           user_ids += self.get_reviewers(:nex)&.map(&:id)
         end
+      when :comment, 'comment'
+        user_ids += self.document_owner_id
       end
 
       User.with_id(user_ids)

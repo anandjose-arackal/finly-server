@@ -22,7 +22,8 @@ class Event::EMoneyRequests::Reject < Event::EMoneyRequests::Base
   end
 
   def affected_users
-    MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.user)
+    # MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.user)
+    self.money_request.affected_users(:reject)
   end
 
   def send_push_notification(user)
@@ -66,8 +67,9 @@ class Event::EMoneyRequests::Reject < Event::EMoneyRequests::Base
   end
 
   def money_request_view_role(user)
-    roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
-    roles.first
+    # roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    # roles.first
+    money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

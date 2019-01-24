@@ -17,8 +17,9 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def affected_users
-    users = Reports::AssociatedUsers.(self.user, report: self.report)
-    users.reject { |r| r == self.user }
+    # users = Reports::AssociatedUsers.(self.user, report: self.report)
+    # users.reject { |r| r == self.user }
+    self.report.affected_users(:comment)
   end
 
   def notification_affected_users
@@ -76,8 +77,9 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def report_view_role(user)
-    self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
-    roles.first
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # roles.first
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end
