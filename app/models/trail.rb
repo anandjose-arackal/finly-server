@@ -56,7 +56,7 @@ class Trail < ApplicationRecord
       reorder :created_at
   }
 
-  scope :reverse_order, -> {
+  scope :desc_order, -> {
     order created_at: :desc
   }
 
