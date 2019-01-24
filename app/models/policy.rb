@@ -63,6 +63,7 @@ class Policy < ApplicationRecord
   has_many :policy_field_mappings
   has_many :field_configurations, through: :policy_field_mappings
   has_many :levels, class_name: 'ReviewalLevel', dependent: :destroy
+  has_many :level_user_reviewer_mappings, dependent: :destroy
 
 
   validates :company_id, presence: true
