@@ -9,31 +9,31 @@ class ActionsManager::Master::BankTransfer::Users::Show < ActionsManager::Master
   end
 
   def debit
-    user.vendor_payments_admin?
+    true
   end
 
   def edit_policies
-    user.vendor_payments_admin?
+    true
   end
 
   def add_bank_accounts
-    user.vendor_payments_admin?
+    true
   end
 
   def edit_bank_accounts
-    user.vendor_payments_admin?    
+    true    
   end
 
   def edit_configuration
-    user.vendor_payments_admin?
+    true
   end
 
   def edit_permission
-    user.vendor_payments_admin?
+    true
   end
 
   def edit_roles
-    user.vendor_payments_admin?
+    true
   end
 
   def resend_invite

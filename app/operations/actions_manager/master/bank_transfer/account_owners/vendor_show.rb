@@ -1,34 +1,46 @@
 class ActionsManager::Master::BankTransfer::AccountOwners::VendorShow < ActionsManager::Master::Base
 
   register_handle :beneficiaries_vendor_show
+  validate :input
   register_actions [:delete_vendor, :add_bank_account, :edit_bank_account, :delete_bank_account, :edit_vendor_details, :edit_attachment, :create_beneficiaries]
 
+  def input
+    result = BankTransfer::AccountOwners::Show.(user, params)
+    if result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    result.account_owner
+  end
+
+  alias_method :account_owner, :input
+
   def delete_vendor
-    user.admin?
+    true
   end
 
   def add_bank_account
-    user.admin?
+    true
   end
 
   def edit_bank_account
-    user.admin?
+    true
   end
 
   def delete_bank_account
-    user.admin?
+    true
   end
 
   def edit_vendor_details
-    user.admin?
+    true
   end
 
   def edit_attachment
-    user.admin?
+    true
   end
 
   def create_beneficiaries
-    user.admin?
+    account_owner.is_a?(YesBankVendor) && user.permission.create_beneficiaries
   end
 
 

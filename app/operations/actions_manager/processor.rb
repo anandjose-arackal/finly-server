@@ -31,7 +31,15 @@ class ActionsManager::Processor < BaseOperation
   end
 
   def validate
-  
+    if self.master.blank?
+      add_message :error, "Invalid Operation"
+      return
+    end
+    m = self.master.new(user, params)
+    unless m.valid?
+      add_message :error, m.messages[:error]
+      return
+    end
   end
 
   def process

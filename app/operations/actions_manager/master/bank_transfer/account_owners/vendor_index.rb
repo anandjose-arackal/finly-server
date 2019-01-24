@@ -4,7 +4,7 @@ class ActionsManager::Master::BankTransfer::AccountOwners::VendorIndex < Actions
   register_actions [:create_beneficiaries]
 
   def create_beneficiaries
-    user.admin?
+    true
   end
 
 end

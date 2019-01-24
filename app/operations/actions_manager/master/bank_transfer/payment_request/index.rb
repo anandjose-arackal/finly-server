@@ -1,80 +1,79 @@
 class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManager::Master::Base
 
   register_handle :payment_ticket_index
-  # validate :input
   register_actions [ :new_orders, :bulk_actions,:export_sap, :mark_as_credited, :credit_payment_order, :approve_selected, :approve_pending, :upload_utr, :bulk_downloads, :download_payment_files, :download_pending, :download_selected, :download_all, :export, :tally, :quickbooks, :sap, :oracle_ns]
 
 
   def new_orders
-    user.admin?
+    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_initiator?
   end
 
   def bulk_actions
-    user.admin?
+    true
   end
 
   def export_sap
-    user.admin?
+    true
   end
 
   def mark_as_credited
-    user.admin?
+    true
   end
 
   def credit_payment_order
-    user.admin?
+    true
   end
 
   def approve_selected
-    user.admin?
+    true
   end
 
   def approve_pending
-    user.admin?
+    true
   end
 
   def upload_utr
-    user.admin?
+    true
   end
 
   def bulk_downloads
-    user.admin?
+    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_auditor? || user.vendor_payments_initiator?
   end
 
   def download_payment_files
-    user.admin?
+    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_auditor? || user.vendor_payments_initiator?
   end
 
   def download_pending
-    user.admin?
+    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_auditor? || user.vendor_payments_initiator?
   end
 
   def download_selected
-    user.admin?
+    true
   end
 
   def download_all
-    user.admin?
+    true
   end
 
   def export
-    user.admin?
+    true
   end
 
   def tally
-    user.admin?
+    true
   end
 
   def quickbooks
-    user.admin?
+    true
   end
 
   def sap
-    user.admin?
+    true
   end
 
   def oracle_ns
-    user.admin?
+    true
   end
 
 

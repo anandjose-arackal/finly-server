@@ -1,16 +1,15 @@
-class ActionsManager::Master::Procurements::PurchaseOrders::Index < ActionsManager::Master::Base
+class ActionsManager::Master::Procurements::PurchaseOrders::Index < ActionsManager::Master::Procurements::PurchaseOrders::Base
 
   register_handle :non_po_index
-
   register_actions [:new_non_po_invoice, :bulk_actions, :approve_invoices, :export_all, :bulk_import]
-
+  alias_method :purchase_order, :input
 
   def new_non_po_invoice
-    user.vendor_payments_admin?
+    true
   end
 
   def bulk_actions
-    user.vendor_payments_admin?
+    true
   end
 
   def approve_invoices
@@ -18,11 +17,11 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Index < ActionsManag
   end
 
   def export_all
-    user.vendor_payments_admin?
+    true
   end
 
   def bulk_import
-    user.vendor_payments_admin?
+    true
   end
 
 end

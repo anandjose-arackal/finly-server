@@ -1,7 +1,7 @@
 class ActionsManager::Master::Base
 
   cattr_accessor :data_map
-  attr_accessor :user, :params, :input
+  attr_accessor :user, :params, :messages
 
   MASTERS = {
     payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
@@ -25,6 +25,7 @@ class ActionsManager::Master::Base
     proc_inward_document_show: '::ActionsManager::Master::Procurements::InwardDocumentShow',
     proc_purchase_order_show: '::ActionsManager::Master::Procurements::PurchaseOrderShow',
     proc_tax_invoice_show: '::ActionsManager::Master::Procurements::TaxInvoiceShow',
+    proc_payment_item_show: '::ActionsManager::Master::Procurements::PaymentItemShow',
     users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
     users_show: '::ActionsManager::Master::BankTransfer::Users::Show' 
 
@@ -39,6 +40,23 @@ class ActionsManager::Master::Base
       self.data_map[self.name] = {}
     end
     self.data_map[self.name]
+  end
+
+  def self.validations
+    self.set_data_map[:validations]
+  end
+
+  def self.validate(method)
+    set_data_map[:validations] = [] if set_data_map[:validations].nil?
+    set_data_map[:validations] << method
+  end
+
+  def valid?
+    clear_messages
+    self.class.validations&.each do |method|
+      self.send method
+    end
+    self.messages[:error].blank?
   end
 
   def self.register_handle(key)
@@ -98,6 +116,10 @@ class ActionsManager::Master::Base
       end
     end
     return result
+  end
+
+  def clear_messages
+    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end
 
 end

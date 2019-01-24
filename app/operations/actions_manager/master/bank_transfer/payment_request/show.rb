@@ -1,7 +1,6 @@
 class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManager::Master::Base
 
   register_handle :payment_ticket_show
-
   register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment ]
 
 
@@ -22,35 +21,35 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def credit_options
-    user.admin?
+    true
   end
 
   def add_payments
-    user.admin?
+    true
   end
 
   def edit_order_summary
-    user.admin?
+    true
   end
 
   def download_payments_file
-    user.admin?
+    true
   end
 
   def payments_history
-    user.admin?
+    true
   end
 
   def edit_payment_history
-    user.admin?
+    true
   end
 
   def delete_payment_history
-    user.admin?
+    true
   end
 
   def attachments_editable
-    user.admin?
+    true
   end
 
   def reject

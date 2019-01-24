@@ -1,91 +1,121 @@
 class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::Master::Base
 
-  register_handle :purchase_order_show
-
+  register_handle :proc_purchase_order_show
+  validate :input
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
 
+  def input
+    result = ::Procurements::PurchaseOrders::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    result.purchase_order
+  end
+
+  alias_method :purchase_order, :input
+
   def more_details_button
-    user.vendor_payments_admin?
+    true
   end
 
   def send_mail
-    user.vendor_payments_admin?
+    (purchase_order.approved? || purchase_order.auto_approved?) &&
+    (user_in_level?) || (document_owner?)
+
   end
 
   def export_items
-    user.vendor_payments_admin?
+    true
   end
 
   def submit
-    user.vendor_payments_admin?
+    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
   end
   
   def reject
-    user.vendor_payments_admin?
+    purchase_order.processing? &&
+    user_in_level?
   end
 
   def close
-    user.vendor_payments_admin?
+    true
   end
 
   def approve
-    user.vendor_payments_admin?
+    purchase_order.processing? &&
+    user_in_level?
   end
 
   def remind
-    user.vendor_payments_admin?
+    purchase_order.processing? &&
+    document_owner?
   end
 
   def retract
-    user.vendor_payments_admin?
+    purchase_order.processing? &&
+    document_owner?
   end
 
   def remind_approver
-    user.vendor_payments_admin?
+    true
   end
 
   def void
-    user.vendor_payments_admin? 
+    PurchaseOrderStatus.status_ids_for_voidable.include?(purchase_order.purchase_order_status_id) &&
+    user.vendor_payment_admin?
   end
 
   def save_btn
-    user.vendor_payments_admin?
+    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ||
+    (purchase_order.processing? && user_in_level?) ||
+    (user.vendor_payment_admin? && purchase_order.voided?)
   end
 
   def save_and_submit
-    user.vendor_payments_admin?
+    true
   end
 
   def delete
-    user.vendor_payments_admin?
+    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
   end
 
   def more_actions
-    user.vendor_payments_admin?
+    true
   end
 
   def make_payment
-    user.vendor_payments_admin?
+    true
   end
 
   def audit_trail
-    user.vendor_payments_admin?
+    true
   end
 
   def download
-    user.vendor_payments_admin?
+    (purchase_order.approved? || purchase_order.auto_approved?)
   end
 
   def send_btn
-    user.vendor_payments_admin?
+    true
   end
 
   def export_po_items
-    user.vendor_payments_admin?
+    true
   end
 
   def update_btn
-    user.vendor_payments_admin?
+    true
+  end
+
+  def document_owner?
+    purchase_order.user_id.eql?(user.id)
+  end
+
+  def user_in_level?
+    level = purchase_order.level
+    amount = purchase_order.balance_amount.value rescue 0
+    level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
   end
 
 end
