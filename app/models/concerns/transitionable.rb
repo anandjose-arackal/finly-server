@@ -57,8 +57,10 @@ module Transitionable
         user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id).reject {|user_id| user_id.nil?}
         user_ids.push self.document_owner_id # Check if this has to be added
       when :retract, 'retract'
-        max_viewable_level_number = self.document_level_reviewer_mappings.with_viewable.maximum(:level_number)
-        dlrms = self.document_level_reviewer_mappings.with_viewable.with_level_number(max_viewable_level_number)
+        dlrms = self.document_level_reviewer_mappings.with_viewable
+        max_viewable_level_number = dlrms.maximum(:level_number)
+
+        dlrms = dlrms.with_level_number(max_viewable_level_number)
 
         taken_control_by_ids = dlrms.pluck(:taken_control_by_id)
         # If the current level has been taken control by someone return their ids else the current reviewers in the level
