@@ -9,15 +9,16 @@ class Event::EMoneyRequests::Retract < Event::EMoneyRequests::Base
   end
 
   def affected_users
-    users = MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.tracks.last.modified_user)
-    users.reject { |r| r == self.user}
+    # users = MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request, user_before: self.money_request.tracks.last.modified_user)
+    # users.reject { |r| r == self.user}
+    self.money_request.affected_users(:retract)
   end
 
   def send_push_notification(user)
-    last_track = self.money_request.tracks.last
-    return unless user.id == last_track.modified_user&.id
+    last_trail = self.money_request.trails.last
+    return unless user.id == last_trail.modified_user&.id
     message = "#{self.money_request.user.name} retracted the Money Request: #{self.money_request.name}"
-    view = UserRole.name_for(last_track.modified_user_role_id)
+    view = UserRole.name_for(last_trail.modified_user_role_id)
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
   end
 
@@ -54,8 +55,9 @@ class Event::EMoneyRequests::Retract < Event::EMoneyRequests::Base
   end
 
   def money_request_view_role(user)
-    roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
-    roles.first
+    # roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    # roles.first
+    money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

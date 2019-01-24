@@ -41,8 +41,14 @@ class Event::EMoneyRequests::Base < Event::SetNotifier
   end
 
   def mailer_button_name(user)
-    if money_request.controlling_user_id.present? and
-        user.id == money_request.controlling_user_id and not user.id == money_request.user.id
+    # if money_request.controlling_user_id.present? and
+    #     user.id == money_request.controlling_user_id and not user.id == money_request.user.id
+    #   'Review Money Request'
+    # else
+    #   'View Money Request'
+    # end
+    if money_request.get_reviewers.include?(user) and not
+      user.id == money_request.user.id
       'Review Money Request'
     else
       'View Money Request'

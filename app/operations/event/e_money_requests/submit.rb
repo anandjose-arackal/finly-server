@@ -9,18 +9,21 @@ class Event::EMoneyRequests::Submit < Event::EMoneyRequests::Base
   end
 
   def affected_users
-    [self.money_request.user, self.money_request.controlling_user]
+    # [self.money_request.user, self.money_request.controlling_user]
+    self.money_request.affected_users(:submit)
   end
 
   def send_push_notification(user)
     return if user.id == money_request.user_id
     message = "#{self.money_request.user.name} has submitted the Money Request: #{self.money_request.name}"
-    view = UserRole.name_for(money_request.controlling_user_role_id)
+    # view = UserRole.name_for(money_request.controlling_user_role_id)
+    view = "manager"
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
   end
 
   def notification_affected_users
-    [self.money_request.controlling_user]
+    # [self.money_request.controlling_user]
+    self.money_request.notification_affected_users(:submit)
   end
 
   def set_notification(user)
@@ -33,7 +36,7 @@ class Event::EMoneyRequests::Submit < Event::EMoneyRequests::Base
                                              path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: money_request.controlling_user_role_id,
+                                             view_role_id: UserRole.id_for("manager"),
                                              application: RequestStore.store[:current_app])
     notification.save
   end
@@ -55,8 +58,9 @@ class Event::EMoneyRequests::Submit < Event::EMoneyRequests::Base
   end
 
   def money_request_view_role(user)
-    roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
-    roles.first
+    # roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    # roles.first
+    money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

@@ -26,6 +26,7 @@ class UserRole < ApplicationRecord
       reviewer: 3,
       employee: 4,
       initiator: 4,
+      personal: 4,
       auditor: 5,
       travel_manager: 6,
       purchaser: 7,

@@ -22,7 +22,8 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def affected_users
-    Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    # Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    report.affected_users(:reject)
   end
 
   def send_push_notification(user)
@@ -49,7 +50,8 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    if user == self.report.controlling_user
+    # if user == self.report.controlling_user
+    if self.report.get_reviewers.include?(user)
       "You rejected the expense : #{rejected_expense.merchant_name}"
     else
       "#{self.report.controlling_user.name} has rejected expense: #{rejected_expense.merchant_name}"
@@ -71,8 +73,9 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def report_view_role(user)
-    roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
-    roles.first
+    # roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # roles.first
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end
