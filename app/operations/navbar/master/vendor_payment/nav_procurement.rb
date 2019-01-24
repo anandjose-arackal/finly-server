@@ -1,6 +1,6 @@
 class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
-  register_type :procurement
+  register_app :vp
   register_structure(
       [
           :dashboard,

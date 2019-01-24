@@ -1,16 +1,16 @@
 class Navbar::Master::Base
   cattr_accessor :data_map
 
-  def self.type
-    set_data_map[:type]
+  def self.app
+    set_data_map[:app]
   end
 
   def self.structure
     set_data_map[:structure_def]
   end
 
-  def self.register_type(type)
-    set_data_map[:type] = type
+  def self.register_app(app)
+    set_data_map[:app] = app
   end
 
   def self.register_structure(structure)

@@ -12,8 +12,8 @@ class Navbar::Config < BaseOperation
   def pre_validate
     return unless user_present? and params_present?
 
-    unless params[:type].present?
-      add_message :error, 'Type not defined'
+    unless params[:app].present?
+      add_message :error, 'App not defined'
       return
     end
 
@@ -29,7 +29,7 @@ class Navbar::Config < BaseOperation
       # Skip unless the master extends Navbar::Master::Base
       next unless klass<= Navbar::Master::Base
       # Verify if the current app is the same as the registed app in the master
-      next unless klass&.type&.to_s == params[:type]
+      next unless klass&.app&.to_s == params[:app]
       next unless klass.accept?
       self.config_data = process_master(klass)
       break
