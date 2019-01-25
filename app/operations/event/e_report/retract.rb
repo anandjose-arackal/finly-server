@@ -24,7 +24,7 @@ class Event::EReport::Retract < Event::EReport::Base
 
   def send_push_notification(user)
     # last_track = self.report.tracks.last
-    last_trail = self.reports.trails.last
+    last_trail = self.report.trails.last
     # return unless user.id == last_trail&.modified_user&.id # todo get modified user
     # return unless user.id == last_trail.action_user.id
     # On retract, eveyone who has viewed the document should get notified

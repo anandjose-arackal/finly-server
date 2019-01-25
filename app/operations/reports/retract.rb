@@ -97,8 +97,8 @@ class Reports::Retract < Reports::Base
 
     # Invalidate All existing Email Authorizations
     email_auth_invalidate_presenter = EmailAuthorizations::Invalidate.(user, authorizable: report)
-
-    Event::EReport::Retract.(user, report: report, from_user: from_user)
+    role_id = self.workflow_output[:role_id]
+    Event::EReport::Retract.(user, report: report, from_user: from_user, role_id: role_id)
 
     add_message :success, 'Report retracted!'
   end
