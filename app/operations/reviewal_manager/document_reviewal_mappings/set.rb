@@ -5,6 +5,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
     self.document = params[:reviewal_document]
     self.mappings_params = mappings_parameters
     self.provider_name = mappings_params[:provider_name] || document.get_default_provider
+
   end
 
   def validate
@@ -73,7 +74,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         if level.present?
           if reviewer.present?
             if valid_reviewers.include?(reviewer.id)
-              threshold = level.level_reviewer_mappings.with_reviewer_id(reviewer.id).first.threshold
+              threshold = level.level_reviewer_mappings.with_reviewer_id(reviewer.id).first&.threshold
               document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
               dlrm = document.document_level_reviewer_mappings.new(
                   {
