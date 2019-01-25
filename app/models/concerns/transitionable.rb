@@ -107,6 +107,13 @@ module Transitionable
         user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
       when :comment, 'comment'
         user_ids += self.document_owner_id
+      when :unapprove, 'unapprove'
+        if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
+          user_ids += self.get_reviewers(:next)&.map(&:id)
+          user_ids.push self.document_owner_id
+        else
+          user_ids += self.get_reviewers(:nex)&.map(&:id)
+        end
       end
 
       User.with_id(user_ids)

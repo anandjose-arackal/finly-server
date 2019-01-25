@@ -31,7 +31,7 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def set_notification(user)
-    view_role_id = UserRole.id_for(:manager)
+    # view_role_id = UserRole.id_for(:manager)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_submit),
                                              action_user_id: report.user_id,
@@ -41,7 +41,7 @@ class Event::EReport::Submit < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
                                             )
     notification.save

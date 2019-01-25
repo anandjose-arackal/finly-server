@@ -26,9 +26,12 @@ class Event::EReport::Retract < Event::EReport::Base
     # last_track = self.report.tracks.last
     last_trail = self.reports.trails.last
     # return unless user.id == last_trail&.modified_user&.id # todo get modified user
-    return unless user.id == last_trail.action_user.id
-    message = "#{self.report.user.name} retracted the report: #{self.report.name}"
+    # return unless user.id == last_trail.action_user.id
+    # On retract, eveyone who has viewed the document should get notified
+    return unless self.report.affected_users(:retract).include?(user.id)
+    message = "#{user.name} retracted the report: #{self.report.name}"
     # view = UserRole.name_for(last_track.modified_user_role_id)
+    #TODO- For Other Roles
     view = "manager"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
