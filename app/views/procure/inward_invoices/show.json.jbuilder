@@ -228,6 +228,8 @@ json.reviewal_chains do
   end
 end
 
+json.reviewal_chain @result.invoice.get_reviewal_chain
+
 json.comments do
   json.array! invoice.comments do |comment|
     json.extract! comment, :id, :body
