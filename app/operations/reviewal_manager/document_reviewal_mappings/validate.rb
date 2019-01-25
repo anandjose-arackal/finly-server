@@ -1,21 +1,21 @@
-class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::DocumentReviewalMappings::Base
+class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::DocumentReviewalMappings::Base
   attr_accessor :document, :dlrms
 
   def init
     self.document = params[:reviewal_document]
-    self.dlrms = document.document_level_reviewer_mappings
+    self.dlrms = self.document.document_level_reviewer_mappings.includes(:level, :reviewer)
   end
 
 
   def process
+    amount = get_document_amount
     dlrms.each do |dlrm|
-      
+      level = dlrm.level
+      valid_reviewer_ids = level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id)
+
+      unless valid_reviewer_ids.include? dlrm.reviewer_id
+        add_message :error, "Cannot set #{dlrm.reviewer.name} for level #{dlrm.level_number} as amount doesn't fall within threshold range of reviewer"
+      end
     end
-  end
-
-  private
-
-  def mappings_parameters
-    params.permit(:provider_name, document_reviewer_mappings: [:level_id, :reviewer_id])
   end
 end
