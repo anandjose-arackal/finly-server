@@ -72,7 +72,7 @@ class YesBankVendor < ApplicationRecord
   scope :with_ids, -> (ids) {where id: ids}
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
-  scope :non_deleted, -> { where is_deleted: [false, nil]}
+  scope :non_deleted, -> {where deleted_at: nil}
   scope :authorized, -> { where authorized: true}
 
   scope :filter_search, -> (term) do
