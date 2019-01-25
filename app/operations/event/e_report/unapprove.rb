@@ -37,7 +37,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save
