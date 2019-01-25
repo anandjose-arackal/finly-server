@@ -21,8 +21,9 @@ class Event::EMoneyRequests::EComment::Create < Event::EMoneyRequests::Base
   end
 
   def affected_users
-    users = MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request)
-    users.reject { |r| r == self.user }
+    # users = MoneyRequests::AssociatedUsers.(self.user, money_request: self.money_request)
+    # users.reject { |r| r == self.user }
+    self.money_request.affected_users(:comment)
   end
 
   def send_push_notification(user)

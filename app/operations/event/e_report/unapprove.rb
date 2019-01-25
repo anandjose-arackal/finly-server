@@ -65,7 +65,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
     # else
     #   return report.tracks.last.modified_user_role_id
     # end
-    UserRole.id_for(:manager)
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

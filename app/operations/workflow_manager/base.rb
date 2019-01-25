@@ -1,5 +1,6 @@
 class WorkflowManager::Base < BaseOperation
-  attr_accessor :document, :aasm_document, :violations_present, :aasm_event, :document_types, :note
+  attr_accessor :document, :aasm_document, :violations_present,
+                :aasm_event, :document_types, :note, :role_id
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
@@ -23,6 +24,13 @@ class WorkflowManager::Base < BaseOperation
         self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
       else
         add_message :error, 'Unknown document type'
+    end
+
+
+    self.role_id = params[:role_id]
+    if self.role_id.blank? and params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+      params[:role_id] = self.role_id
     end
   end
 
@@ -48,6 +56,7 @@ class WorkflowManager::Base < BaseOperation
     # Create Trail
     trail = document.trails.new action_user: user,
                            action_id: TrailAction.id_for(aasm_event),
+                           action_user_role_id: role_id,
                            action_level_id: aasm_document.current_level&.id,
                            modified_level_id: aasm_document.next_level&.id,
                            delegated_action_user_id: delegated_action_user_id

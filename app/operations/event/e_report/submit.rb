@@ -64,10 +64,11 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def report_view_role(user)
-    if user.id == report.user_id
-      return nil
-    elsif report.get_reviewers.include? user
-      return UserRole.id_for(:manager)
-    end
+    # if user.id == report.user_id
+    #   return nil
+    # elsif report.get_reviewers.include? user
+    #   return UserRole.id_for(:manager)
+    # end
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 end

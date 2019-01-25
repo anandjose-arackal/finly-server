@@ -17,7 +17,7 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
 
   def init
     super
-    self.approving_user = self.money_request.tracks.last.action_user
+    self.approving_user = self.money_request.trails.last.action_user
     self.approved = money_request.approved? if money_request.present?
     self.auto_approve = params[:auto_approve]
   end
@@ -38,22 +38,24 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
   end
 
   def affected_users
-    if approved
-      if auto_approve
-        return [self.money_request.user]
-      end
-      [self.money_request.tracks.last.action_user, self.money_request.user]
-    else
-      [self.money_request.tracks.last.action_user, self.money_request.controlling_user]
-    end
+    # if approved
+    #   if auto_approve
+    #     return [self.money_request.user]
+    #   end
+    #   [self.money_request.tracks.last.action_user, self.money_request.user]
+    # else
+    #   [self.money_request.tracks.last.action_user, self.money_request.controlling_user]
+    # end
+    self.money_request.affected_users(:approve)
   end
 
   def notification_affected_users
-    if approved
-      [money_request.user]
-    else
-      [money_request.controlling_user]
-    end
+    # if approved
+    #   [money_request.user]
+    # else
+    #   [money_request.controlling_user]
+    # end
+    self.money_request.notification_affected_users(:approve)
   end
 
   def send_push_notification(user)
@@ -66,9 +68,11 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
         message = "Money Request approved: #{self.money_request.name}"
       end
     else
-      return unless user == money_request.controlling_user
+      return unless money_request.get_reviewers.include?(user)
       message = "Money Request is awaiting your approval: #{self.money_request.name}"
-      view = UserRole.name_for(money_request.controlling_user_role_id)
+      # view = UserRole.name_for(money_request.controlling_user_role_id)
+      # ToDo- Hardcoded
+      view = "manager"
     end
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
   end
@@ -83,10 +87,11 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
     else
       notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
-    view_role_id = money_request.controlling_user_role_id
+    # view_role_id = money_request.controlling_user_role_id
+    view_role_id = UserRole.id_for("manager")
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: notify_type,
-                                             action_user_id: (money_request.tracks.last.action_user.id rescue nil),
+                                             action_user_id: (money_request.trails.last.action_user.id rescue nil),
                                              object_id: money_request.id,
                                              object_type: "Money Request",
                                              path_object_id: money_request.id,
@@ -100,7 +105,7 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
   end
 
   def mailer_subject(user)
-    approver_id = self.money_request.tracks.last.action_user.id rescue nil
+    approver_id = self.money_request.trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
       "Money Request approved : #{self.money_request.name}"
     else
@@ -117,7 +122,7 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
   end
 
   def mailer_body(user)
-    approver_id = self.money_request.tracks.last.action_user.id rescue nil
+    approver_id = self.money_request.trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
       message = "You have successfully approved the money_request : #{self.money_request.name}"
     else
@@ -135,13 +140,14 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
   end
 
   def money_request_view_role(user)
-    if user.id == money_request.user_id
-      return UserRole.id_for(:employee)
-    elsif user.id == money_request.controlling_user_id
-      return money_request.controlling_user_role_id
-    elsif user.id == self.money_request.tracks.last.action_user_id
-      return self.money_request.tracks.last.action_user_role_id
-    end
+    # if user.id == money_request.user_id
+    #   return UserRole.id_for(:employee)
+    # elsif user.id == money_request.controlling_user_id
+    #   return money_request.controlling_user_role_id
+    # elsif user.id == self.money_request.tracks.last.action_user_id
+    #   return self.money_request.tracks.last.action_user_role_id
+    # end
+    money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

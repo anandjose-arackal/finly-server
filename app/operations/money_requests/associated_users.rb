@@ -56,12 +56,16 @@ class MoneyRequests::AssociatedUsers < MoneyRequests::Base
     user_ids = (tracking.map(&:action_user_id) + tracking.map(&:modified_user_id))
 
     # If unapprove, adding the current controlling user
-    if self.money_request.controlling_user_id.present? and (user_before.blank? or user_before.id != self.money_request.controlling_user_id)
-      if self.money_request.controlling_for_user_id.present?
-        user_ids << self.money_request.controlling_for_user_id
-      else
-        user_ids << self.money_request.controlling_user_id
-      end
+    # if self.money_request.controlling_user_id.present? and (user_before.blank? or user_before.id != self.money_request.controlling_user_id)
+    #   if self.money_request.controlling_for_user_id.present?
+    #     user_ids << self.money_request.controlling_for_user_id
+    #   else
+    #     user_ids << self.money_request.controlling_user_id
+    #   end
+    # end
+    if self.money_request.get_reviewers.include?(user) and 
+      (user_before.blank? or !self.money_request.include?(user_before.id))
+      user_ids << user.id
     end
 
     # User IDs was blank when an admin was taking control of his own money_request and rejecting it. This is the fix

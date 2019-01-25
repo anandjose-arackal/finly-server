@@ -43,6 +43,7 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   scope :with_level_number, -> (number) {where level_number: number}
   scope :with_provider_name, -> (name) {where provider_name: name}
   scope :with_action_id, -> (action_id) {where action_id: action_id}
+  scope :with_viewable, -> {where viewable: true}
 
   scope :with_document_id, -> (document_ids) {where document_reviewer_mappable_id: document_ids}
 

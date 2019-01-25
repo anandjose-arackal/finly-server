@@ -20,7 +20,8 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def send_push_notification(user)
-    return unless user.id == report.controlling_for_user_id
+    # return unless user.id == report.controlling_for_user_id
+    return unless self.report.document_level_reviewer_mappings.with_level_id(report.controlling_level_id).pluck(:reviewer_id).include?(user.id)
     last_trail = self.report.trails.last
     message = "#{last_trail.action_user.name} has taken control of the report : #{self.report.name}"
     # view = UserRole.name_for(self.report.controlling_for_user_role_id)
@@ -68,8 +69,9 @@ class Event::EReport::TakeControl < Event::EReport::Base
   end
 
   def report_view_role(user)
-    roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
-    roles.first
+    # roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # roles.first
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

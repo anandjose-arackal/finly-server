@@ -65,8 +65,9 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def report_view_role(user)
-    self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
-    return roles.first
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # return roles.first
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

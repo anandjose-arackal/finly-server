@@ -127,6 +127,8 @@ json.reviewal_chains do
   end
 end
 
+json.reviewal_chain @result.purchase_order.get_reviewal_chain
+
 json.budgets do
   json.array! @result.budgets do |budget|
     json.extract! budget[:budget], :budgetable_id, :budgetable_type, :start_date, :id, :name, :purchase_order, :start_date, :end_date

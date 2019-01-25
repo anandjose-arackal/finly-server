@@ -57,11 +57,12 @@ class Event::EMoneyRequests::Unapprove < Event::EMoneyRequests::Base
   end
 
   def money_request_view_role(user)
-    if money_request.controlling_user_id == user.id
-      return money_request.controlling_user_role_id
-    else
-      return money_request.tracks.last.modified_user_role_id
-    end
+    # if money_request.controlling_user_id == user.id
+    #   return money_request.controlling_user_role_id
+    # else
+    #   return money_request.tracks.last.modified_user_role_id
+    # end
+    money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

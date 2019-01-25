@@ -179,6 +179,7 @@ json.reviewal_chains do
     end
   end
 end
+json.reviewal_chain @result.travel_request.get_reviewal_chain
 
 json.reviewal_chains_booking do
   json.array! @result.reviewal_chains_booking do |chain|
@@ -198,3 +199,4 @@ json.reviewal_chains_booking do
     end
   end
 end
+json.reviewal_chain @result.travel_request.get_reviewal_chain
