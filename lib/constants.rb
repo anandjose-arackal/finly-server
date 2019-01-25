@@ -6,6 +6,7 @@ module Constants
   VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
   VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
+  VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
 
   ENDING_NUMBERS = /\d+$/
 
