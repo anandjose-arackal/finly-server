@@ -108,3 +108,5 @@ json.budgets do
     json.budget_amount budget[:budget].budget_amount.as_json
   end
 end
+
+json.reviewal_chain @result.bank_payment_request.get_reviewal_chain

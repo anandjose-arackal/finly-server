@@ -35,6 +35,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     end
   end
 
+  def edit_config
+    @result = BankTransfer::PaymentRequest::EditConfig.(currencies_path, params)
+    respond
+  end
+
   def update
     update_handler(params[:type])
   end
