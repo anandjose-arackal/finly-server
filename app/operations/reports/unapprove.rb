@@ -96,7 +96,8 @@ class Reports::Unapprove < Reports::Base
     EmailAuthorizations::Create.(user, {authorizable: report})
 
     # If its sending mail to previous guy, send token again to him, need to pass token todo
-    Event::EReport::Unapprove.(self.user, report: report)
+    role_id = self.workflow_output[:role_id]
+    Event::EReport::Unapprove.(self.user, report: report, role_id: role_id)
     add_message :success, 'Report unapproved'
   end
 end

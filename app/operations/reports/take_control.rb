@@ -64,7 +64,8 @@ class Reports::TakeControl < Reports::Base
       comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_take_control), content: params[:take_control_note]
       comment.save
     end
-    Event::EReport::TakeControl.(self.user, report: self.report)
+    role_id = self.workflow_output[:role_id]
+    Event::EReport::TakeControl.(self.user, report: self.report, role_id: role_id)
 
     messages[:success] << "You've taken control of this report."
   end

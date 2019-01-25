@@ -37,8 +37,8 @@ class Event::EReport::EComment::Create < Event::EReport::Base
     view = nil
     if user.id != report.user_id
       # view = UserRole.name_for(report.tracks.with_modified_user(user.id).first.modified_user_role_id) rescue nil
-      #TODO- For Other Roles
-      view = 'manager'
+      # role_id is set in BaseOperation
+      view = UserRole.find_by_id(role_id).name.downcase rescue nil
     end
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end

@@ -26,11 +26,9 @@ class WorkflowManager::Base < BaseOperation
         add_message :error, 'Unknown document type'
     end
 
-
     self.role_id = params[:role_id]
     if self.role_id.blank? and params[:view].present?
       self.role_id = UserRole::VALUES[params[:view].to_sym]
-      params[:role_id] = self.role_id
     end
   end
 
@@ -74,7 +72,8 @@ class WorkflowManager::Base < BaseOperation
         action_user: user,
         action_id: TrailAction.id_for(aasm_event),
         action_level_id: aasm_document.current_level&.id,
-        modified_level_id: aasm_document.next_level&.id
+        modified_level_id: aasm_document.next_level&.id,
+        role_id: self.role_id
     }
 
    WorkflowManager::Base::BasePresenter.new(user, params, messages)

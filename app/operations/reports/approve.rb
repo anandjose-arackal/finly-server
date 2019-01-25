@@ -181,7 +181,9 @@ class Reports::Approve < Reports::Base
         comment.save
       end
       # Send notifications
-      Event::EReport::Approve.(self.user, {report: self.report, auto_approve: auto_approve, email_authorization: email_authorization})
+      # Role is params[:view]
+      role_id = self.workflow_output[:role_id]
+      Event::EReport::Approve.(self.user, {report: self.report, auto_approve: auto_approve, email_authorization: email_authorization, role_id: role_id})
 
       add_message :success, 'Report approved!'
     end

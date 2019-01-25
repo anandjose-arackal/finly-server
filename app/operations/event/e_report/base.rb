@@ -1,5 +1,5 @@
 class Event::EReport::Base < Event::SetNotifier
-  attr_accessor :report, :rejected_expenses
+  attr_accessor :report, :rejected_expenses, :role_id
 
   def pre_validate
     unless user.present?
@@ -21,6 +21,7 @@ class Event::EReport::Base < Event::SetNotifier
 
   def init
     self.report = params[:report]
+    self.role_id = params[:role_id]
   end
 
   def validate
