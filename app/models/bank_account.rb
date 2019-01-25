@@ -33,7 +33,7 @@ class BankAccount < ApplicationRecord
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
 
-  validates :account_number, presence: true
+  validates :account_number, presence: true #, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
 
@@ -100,6 +100,7 @@ class BankAccount < ApplicationRecord
 
   before_save do
     self.ifsc = self.ifsc.match(Constants::VALID_IFSC).to_s
+    self.account_number = self.account_number&.strip
   end
 
   after_create do

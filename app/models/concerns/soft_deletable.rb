@@ -18,7 +18,9 @@ module SoftDeletable
       unless has_attribute? :deleted_at
         ActiveRecord::Migration.add_column self.table_name, :deleted_at, :datetime, index: true
       end
-      self.unscoped.where(is_deleted: true).update_all(deleted_at: DateTime.now)
+      if has_attribute? :is_deleted
+        self.unscoped.where(is_deleted: true).update_all(deleted_at: DateTime.now)
+      end
     end
   end
 
