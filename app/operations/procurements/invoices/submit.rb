@@ -35,6 +35,15 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
         return
       end
     end
+
+    # Set validation of DLRMs
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+        reviewal_document: self.invoice
+    })
+
+    unless dlrm_validation_op.success?
+      add_message :error, dlrm_validation_op.messages[:error]
+    end
   end
 
   def process

@@ -47,6 +47,16 @@ class MoneyRequests::Submit < MoneyRequests::Base
     unless custom_field_validations.success?
       add_message :error, custom_field_validations.messages[:error]
     end
+
+
+    # Set validation of DLRMs
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+        reviewal_document: self.money_request
+    })
+
+    unless dlrm_validation_op.success?
+      add_message :error, dlrm_validation_op.messages[:error]
+    end
   end
 
   def authorize
