@@ -22,19 +22,18 @@ class Event::EReport::TakeControl < Event::EReport::Base
   def send_push_notification(user)
     # return unless user.id == report.controlling_for_user_id
     return unless self.report.document_level_reviewer_mappings.with_level_id(report.controlling_level_id).pluck(:reviewer_id).include?(user.id)
-    last_trail = self.report.trails.last
-    message = "#{last_trail.action_user.name} has taken control of the report : #{self.report.name}"
+    message = "#{user.name} has taken control of the report : #{self.report.name}"
     # view = UserRole.name_for(self.report.controlling_for_user_role_id)
     view = 'manager'
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
-    if report.notification_affected_users(:take_control).include? user
-      view_role_id = UserRole.id_for(:manager)
-    else
-      view_role_id = nil
-    end
+    # if report.notification_affected_users(:take_control).include? user
+    #   view_role_id = UserRole.id_for(:manager)
+    # else
+    #   view_role_id = nil
+    # end
     last_trail = report.trails.last
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_take_control),
@@ -45,7 +44,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
                                             )
     notification.save
