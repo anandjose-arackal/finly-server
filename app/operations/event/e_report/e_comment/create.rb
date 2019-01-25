@@ -23,7 +23,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   end
 
   def notification_affected_users
-    affected_users
+    self.report.notification_affected_users(:comment)
   end
 
   def action_name
@@ -37,13 +37,16 @@ class Event::EReport::EComment::Create < Event::EReport::Base
     view = nil
     if user.id != report.user_id
       # view = UserRole.name_for(report.tracks.with_modified_user(user.id).first.modified_user_role_id) rescue nil
-      view = 'manager'
+      # role_id is set in BaseOperation
+      view = UserRole.find_by_id(role_id).name.downcase rescue nil
     end
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
-    self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    #TODO- For Other Roles
+    # role_id = (user.id == report.user_id) ? UserRole.id_for(:initiator) : UserRole.id_for(:manager)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_comment),
                                              action_user_id: self.user.id,
@@ -53,7 +56,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: roles.first,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app])
     notification.save
   end

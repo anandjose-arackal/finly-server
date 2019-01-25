@@ -37,7 +37,8 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def set_notification(user)
-    self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    role_id = UserRole.id_for(:manager)
     notification = user.notifications.build(user: user,
                                             notification_type_id: NotificationType.id_for(:report),
                                             action_type_id: NotificationActionType.id_for(:notify_reject),
@@ -48,7 +49,7 @@ class Event::EReport::Reject < Event::EReport::Base
                                             path_object_type: "Report",
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
-                                            view_role_id: roles.first,
+                                            view_role_id: role_id,
                                             application: RequestStore.store[:current_app]
     )
     notification.save

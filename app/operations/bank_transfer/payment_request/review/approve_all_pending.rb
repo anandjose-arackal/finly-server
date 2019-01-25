@@ -21,6 +21,9 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
     if op.success?
       self.bank_payment_requests = op.payment_requests
       # now extract all payment requests for which this particular user is the controlling user
+      # self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
+
+
       self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
       self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
     else

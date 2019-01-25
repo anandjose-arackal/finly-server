@@ -92,6 +92,15 @@ class Reports::Submit < Reports::Base
         return
       end
     end
+
+    # Set validation of DLRMs
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+        reviewal_document: self.report
+    })
+
+    unless dlrm_validation_op.success?
+      add_message :error, dlrm_validation_op.messages[:error]
+    end
   end
 
   def authorize
@@ -155,7 +164,6 @@ class Reports::Submit < Reports::Base
     params[:aasm_event] = 'submit'
     params[:violation_present] = false
     op = WorkflowManager::Base.(user, params)
-
     unless op.success?
       add_message :error, op.messages[:error]
       return
@@ -191,8 +199,8 @@ class Reports::Submit < Reports::Base
     else
       report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
     end
-
-    Event::EReport::Submit.(user, {email_authorization: email_authorization, report: report})
+    role_id = self.workflow_output[:role_id]
+    Event::EReport::Submit.(user, {email_authorization: email_authorization, report: report, role_id: role_id})
 
     add_message :success, 'Report Submitted'
 

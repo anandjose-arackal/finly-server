@@ -29,7 +29,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     end
 
     # Find over ridden users for a policy level
-    self.levels = self.policy.levels.with_entity_type(provider_name).order(:level_number)
+    self.levels = self.policy.levels.non_deleted.with_entity_type(provider_name).order(:level_number)
 
     levels.each do |level|
       if level.level_user_reviewer_mappings.present?
@@ -37,8 +37,8 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       else
         mappings = level.level_reviewer_mappings.non_deleted
       end
-
-      selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
+      selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
+      selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
       level_data = {
           level_number: level.level_number,
           level_id: level.id,
@@ -46,6 +46,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       }
       if selected_reviewer.present?
         level_data[:selected_reviewer] = selected_reviewer.reviewer
+        level_data[:selected_reviewer_threshold] = selected_reviewer.threshold
       end
 
       self.chain.push(level_data)

@@ -8,7 +8,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order_id = params[:id] || params[:purchase_order_id]
     # self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
-    self.document_reviewer_mappings_params = purchase_order_params[:document_reviewer_mappings]
+    self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
     purchase_order_params.delete(:document_reviewer_mappings)
 
     self.document_number = purchase_order_params[:po_number]

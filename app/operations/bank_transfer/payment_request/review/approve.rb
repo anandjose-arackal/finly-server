@@ -66,7 +66,6 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     end
 
     self.workflow_output = op.workflow_output
-
   end
 
   def post_process
