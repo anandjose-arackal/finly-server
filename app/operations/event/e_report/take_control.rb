@@ -70,7 +70,14 @@ class Event::EReport::TakeControl < Event::EReport::Base
   def report_view_role(user)
     # roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
     # roles.first
-    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+    if self.user.id == user.id
+      UserRole.id_for(:admin)
+    elsif report.user.id == user.id
+      UserRole.id_for(:employee)
+    else
+      UserRole.id_for(:manager)
+    end
+    # report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

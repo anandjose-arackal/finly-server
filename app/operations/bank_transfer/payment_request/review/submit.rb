@@ -34,6 +34,15 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
       add_message :error, "Only owner can submit a Payment order"
       return false
     end
+
+    # Set validation of DLRMs
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+        reviewal_document: self.bank_payment_request
+    })
+
+    unless dlrm_validation_op.success?
+      add_message :error, dlrm_validation_op.messages[:error]
+    end
   end
 
   def pre_process

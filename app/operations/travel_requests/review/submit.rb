@@ -25,6 +25,16 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
       add_message :error, 'Please add a destination to submit travel request'
       return
     end
+
+    # NOT REQUIRE HERE AS THERE IS NO AMOUNT FOR TRAVEL REQUEST
+    # Set validation of DLRMs
+    # dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+    #     reviewal_document: self.money_request
+    # })
+    #
+    # unless dlrm_validation_op.success?
+    #   add_message :error, dlrm_validation_op.messages[:error]
+    # end
   end
 
   def pre_process

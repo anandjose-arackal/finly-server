@@ -153,7 +153,7 @@ module Transitionable
         chain[level_number - 1] = data
       end
 
-      chain
+      chain.reject {|item| item.blank? }
     end
 
     # Users who can take the current action on the document
@@ -161,7 +161,7 @@ module Transitionable
       user_ids = []
       case type
       when 'unapprove', :unapprove
-        user_ids += self.trails.with_action_id(TrailAction.id_for(:approve)).last.pluck(:action_user_id)
+        user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
       else
         # nothing to do
       end
