@@ -37,8 +37,8 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       else
         mappings = level.level_reviewer_mappings.non_deleted
       end
-
-      selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
+      selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
+      selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
       level_data = {
           level_number: level.level_number,
           level_id: level.id,
