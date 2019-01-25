@@ -54,6 +54,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
   def process
     # find
     if mappings_params[:document_reviewer_mappings].present?
+      document.document_level_reviewer_mappings.destroy_all
       mappings_params[:document_reviewer_mappings].each do |mapping_params|
         reviewer_id = mapping_params[:reviewer_id].to_i
 
@@ -71,11 +72,12 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         # If valid reviewers is empty; document level reviewr mapping will not be created for current level and will be auto approved for the current level
         next if valid_reviewers.empty?
 
+
         if level.present?
           if reviewer.present?
             if valid_reviewers.include?(reviewer.id)
               threshold = level.level_reviewer_mappings.non_deleted.with_reviewer_id(reviewer.id).first&.threshold
-              document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
+              # document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
               dlrm = document.document_level_reviewer_mappings.new(
                   {
                       level_id: level.id,
@@ -92,7 +94,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
             end
           else
             # Delete exisint dlrms
-            document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
+            # document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
 
             # If reviewer overrides are present for level
             lurms = level.level_user_reviewer_mappings.with_threshold(amount)
@@ -111,7 +113,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
             else
               # Overrides for users not present
               # level.reviewers.each do |level_reviewer|
-              level.level_reviewer_mappings.non_deleted.each do |lrm|
+              level.level_reviewer_mappings.non_deleted.with_threshold(amount).each do |lrm|
                 if valid_reviewers.include?(lrm.reviewer_id)
                   document.document_level_reviewer_mappings.create(
                       {
@@ -131,7 +133,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
     end
 
     # find all without current policy and delete
-    document.document_level_reviewer_mappings.where.not(policy_id: document.policy_id).destroy_all
+    # document.document_level_reviewer_mappings.where.not(policy_id: document.policy_id).destroy_all
   end
 
   private

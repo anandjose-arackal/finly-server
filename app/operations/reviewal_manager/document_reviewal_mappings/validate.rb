@@ -1,14 +1,18 @@
 class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::DocumentReviewalMappings::Base
-  attr_accessor :document, :dlrms
+  attr_accessor :document, :dlrms, :policy
 
   def init
     self.document = params[:reviewal_document]
     self.dlrms = self.document.document_level_reviewer_mappings.includes(:level, :reviewer)
+    self.policy = self.document.policy
   end
 
 
   def process
     amount = get_document_amount
+
+
+
     dlrms.each do |dlrm|
       level = dlrm.level
       valid_reviewer_ids = level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id)

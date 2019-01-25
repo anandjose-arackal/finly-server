@@ -33,6 +33,16 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       add_message :error, "You cannot submit this PO because there are not budgets associated with it"
       return
     end
+
+
+    # Set validation of DLRMs
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+        reviewal_document: self.purchase_order
+    })
+
+    unless dlrm_validation_op.success?
+      add_message :error, dlrm_validation_op.messages[:error]
+    end
   end
 
   def process
