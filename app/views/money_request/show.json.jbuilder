@@ -63,26 +63,26 @@ if travel_desk_enabled
   json.associated_trip @result.money_request.travel_request
 end
 
-json.forwardable_users do
-  forwardable_users = @result.forwardable_users
-  if forwardable_users.present?
-    json.array! forwardable_users.each do |item|
-      json.user do
-        user = item[:approver]
-        json.id user.id
-        json.name user.name
-        expenses = []
-        json.email user.email
-      end
-      json.user_role do
-        json.id item[:role_id]
-        json.name UserRole.name_for(item[:role_id])&.to_s&.humanize
-      end
-      json.position item[:pos]
-      json.is_reviewer item[:reviewer]
-    end
-  end
-end
+# json.forwardable_users do
+#   forwardable_users = @result.forwardable_users
+#   if forwardable_users.present?
+#     json.array! forwardable_users.each do |item|
+#       json.user do
+#         user = item[:approver]
+#         json.id user.id
+#         json.name user.name
+#         expenses = []
+#         json.email user.email
+#       end
+#       json.user_role do
+#         json.id item[:role_id]
+#         json.name UserRole.name_for(item[:role_id])&.to_s&.humanize
+#       end
+#       json.position item[:pos]
+#       json.is_reviewer item[:reviewer]
+#     end
+#   end
+# end
 # if @result.money_request.policy
 policy_name = ''
 policy_id = ''

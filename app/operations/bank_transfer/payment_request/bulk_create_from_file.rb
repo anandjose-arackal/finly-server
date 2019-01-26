@@ -118,7 +118,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     bpr_attributes = {
         owner_id: user.id,
         status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
-        controlling_user_id: user.id,
+        # controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
             currency_id: 1

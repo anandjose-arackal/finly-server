@@ -33,8 +33,6 @@ class TrailAction < ApplicationRecord
         # Bank Payment Request
         :mark_as_credited,
         :credit
-
-
     ]
   end
 end

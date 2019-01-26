@@ -44,7 +44,11 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
         errors << "Payment order cannot be approved in this state"
         self.errors_found = true
       end
-      unless payment_request.controlling_user_id == user.id
+      # unless payment_request.controlling_user_id == user.id
+      #   errors << "You are not authorized to approve this payment order"
+      #   self.errors_found = true
+      # end
+      unless payment_request.get_reviewers.include? user
         errors << "You are not authorized to approve this payment order"
         self.errors_found = true
       end
