@@ -34,6 +34,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         transfer_request: transfer_request,
         payment: payment
     })
+
     # bank_transaction = op.bank_transaction
     bank_transaction = op.bank_transaction
     if op.success?
