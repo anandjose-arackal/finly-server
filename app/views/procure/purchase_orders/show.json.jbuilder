@@ -159,4 +159,3 @@ json.locations do
     json.address location.address
   end
 end
-

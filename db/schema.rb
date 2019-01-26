@@ -3808,6 +3808,7 @@ ActiveRecord::Schema.define(version: 2019_01_25_163037) do
     t.integer "procurement_id"
     t.integer "department_id"
     t.integer "location_id"
+    t.datetime "deleted_at"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
     t.index ["initiating_user_id"], name: "index_payments_on_initiating_user_id"
