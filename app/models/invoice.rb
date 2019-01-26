@@ -73,7 +73,7 @@
 #              2 - CGST + SGST
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable
+  include SoftDeletable, Templatable, Transitionable
 
   include Sequenced::ActsAsSequenced
 
