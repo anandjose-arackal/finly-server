@@ -2172,7 +2172,7 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
-  # mount_griddler('/email/incoming')
+  mount_griddler('/email/incoming')
   # mount_opro_oauth controllers: {
   #     oauth_new: 'oauth/auth',
   #     oauth_token: 'oauth/token'
@@ -2630,7 +2630,7 @@ Rails.application.routes.draw do
     post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
   end
 
-  get 'test_take_control' => 'reports#test_take_control', as: :test_take_control
+  # get 'test_take_control' => 'reports#test_take_control', as: :test_take_control
   post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
 
 
@@ -3067,7 +3067,7 @@ Rails.application.routes.draw do
     patch 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
-    patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
+    # patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
     get 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
     post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
