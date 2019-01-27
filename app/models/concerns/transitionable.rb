@@ -154,6 +154,7 @@ module Transitionable
       end
 
       # chain.reject {|item| item.blank? }
+      # chain
       chain.map do |item|
         if item.blank?
           {skipped: true}
@@ -211,6 +212,11 @@ module Transitionable
       # Provide :next / :prev to get the respective levels
       # current_level_number = self.level.present? ? self.level.level_number : 0
 
+      all_level_numbers = self.document_level_reviewer_mappings.pluck(:level_number).uniq.sort
+
+      # Return if dlrm not found
+      return nil if all_level_numbers.blank?
+
       if self.level.present?
         current_level_number = self.level.level_number
         if type == 'next' || type == :next
@@ -228,35 +234,38 @@ module Transitionable
             level_number = 1
           elsif ['previous', :previous, 'prev', :prev].include?(type)
             level_number = nil
+            return
           end
         else
           if type == 'next' || type == :next
             level_number = nil
+            return
           elsif ['previous', :previous, 'prev', :prev].include?(type)
-            level_number = self.document_level_reviewer_mappings.pluck(:level_number).max
+            # level_number = self.document_level_reviewer_mappings.pluck(:level_number).max
+            level_number = all_level_numbers.max
           end
         end
       end
 
+      # If threshold for first level is higher than amount, & there is only one level its gonna give next level as nil and hence auto approve it
+      # Below code will find the next/perv level if present with threshold
+      if [:next, 'next'].include? type
+        loop do
+          break if all_level_numbers.include?(level_number) || (level_number > all_level_numbers.max)
+          level_number += 1
+        end
+      elsif [:prev, :previous, 'prev', 'previous'].include? type
+        loop do
+          break if all_level_numbers.include?(level_number) || (level_number < all_level_numbers.min)
+          level_number -= 1
+        end
+      else
+        return nil
+      end
+
       provider_name = provider_name || get_default_provider
 
-      # if provider_name.present?
-      #   reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).first&.level_id
-      # else
-      # end
-      reviewal_level_id = self.document_level_reviewer_mappings.with_level_number(level_number).with_provider_name(provider_name).first&.level_id
-
-      ReviewalLevel.with_id(reviewal_level_id).first
-
-      # ReviewalLevel.exclude_deleted.where({
-      #                                         level_number: level_number,
-      #                                         policy_id: self.policy.id,
-      #                                         associated_entity_type: self.class.name
-      #                                     }).first
-
-      # Previously it was picked from policy's levels
-      # todo - fix it
-      # Bug: Let's say last level is deleted, it gonna approve without going to the last dlrm
+      self.document_level_reviewer_mappings.with_level_number(level_number).with_provider_name(provider_name).first&.level
     end
 
     # In case reviewer wants to reject it to a particular user who had previously approved
