@@ -24,7 +24,8 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
       # self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
 
 
-      self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
+      # self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
+      self.bank_payment_requests = BankPaymentRequest.awaiting_action_items(user).includes_details
       self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
     else
       add_message :error, op.messages[:error]

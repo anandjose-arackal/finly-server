@@ -111,9 +111,10 @@ class MoneyRequests::Index < MoneyRequests::Base
           self.money_requests = self.money_requests.filter_status(params[:filter_status], user.id)
         end
         if personal_view?
-          self.money_requests = self.money_requests.order_by(:created_at).order_by(:controlling_user, user.id)
+          # self.money_requests = self.money_requests.order_by(:created_at).order_by(:controlling_user, user.id)
+          self.money_requests = self.money_requests.order_by(created_at: :desc)
         else
-          self.money_requests = self.money_requests.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
+          self.money_requests = self.money_requests.order_by(:submitted_at)
         end
       end
       self.count = self.money_requests.count
@@ -124,11 +125,12 @@ class MoneyRequests::Index < MoneyRequests::Base
 
     def status_name(money_request)
       return nil if money_request.blank?
-      if money_request.processing? and money_request.controlling_user?(self.user)
-        'Awaiting Approval'
-      else
-        money_request.status_name
-      end
+      # if money_request.processing? and money_request.controlling_user?(self.user)
+      #   'Awaiting Approval'
+      # else
+      #   money_request.status_name
+      # end
+      money_request.status_name
     end
 
     def get_counts

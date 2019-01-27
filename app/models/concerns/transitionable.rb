@@ -153,7 +153,14 @@ module Transitionable
         chain[level_number - 1] = data
       end
 
-      chain.reject {|item| item.blank? }
+      # chain.reject {|item| item.blank? }
+      chain.map do |item|
+        if item.blank?
+          {skipped: true}
+        else
+          item
+        end
+      end
     end
 
     # Users who can take the current action on the document
@@ -272,6 +279,27 @@ module Transitionable
       self.class.name + "Provider"
     end
 
+    # Gives list of creditors for the document
+    def document_role_users(type=nil)
+      case type
+      when :creditor, 'creditor', :creditors, 'creditors'
+        user_role_id = UserRole.id_for(:creditor)
+      when :finance_manager, 'finance_manager', :finance_managers, 'finance_managers'
+        user_role_id = UserRole.id_for(:finance_manager)
+      when :travel_manager, 'travel_manager', :travel_managers, 'travel_managers'
+        user_role_id = UserRole.id_for(:travel_manager)
+      else
+        return []
+      end
+
+      policy = document.policy
+
+      return [] unless policy.present?
+
+      user_ids = policy.policy_user_roles.with_role_id(user_role_id).pluck(:user_id)
+
+      User.with_id(user_ids)
+    end
   end
 
   module ClassMethods
@@ -322,6 +350,33 @@ module Transitionable
 
     #todo below
     # Displays all document. Need to remove draft state
+    # # Only gives result for admins and reviewers
+    def awaiting_action_items(user)
+      if user.instance_of?(User)
+        # Do nothing
+      elsif user.is_a?(Integer)
+        user = User.find_by id: user
+        return [] unless user.present?
+      else
+        return []
+      end
+
+      if self.column_names.include? 'company_id'
+        document_ids = self.where(company_id: user.company.id).pluck(:id)
+      else
+        user_ids = user.company.users.pluck(:id)
+        document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:id)
+      end
+
+      controlling_level_ids = self.where(id: document_ids).pluck(:controlling_level_id)
+
+      new_document_ids = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id).pluck(:document_reviewer_mappable_id)
+      new_document_ids += DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id).pluck(:document_reviewer_mappable_id)
+
+      self.where(id: new_document_ids)
+    end
+
+
     def admin_associated_items(user)
       if user.instance_of?(User)
         if self.column_names.include? 'company_id'

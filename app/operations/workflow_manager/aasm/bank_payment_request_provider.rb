@@ -86,9 +86,9 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
   def change_state
     super
     # Change state of purchase order
-    report_status_id = ::BankPaymentRequestStatus.id_for(self.aasm.current_state)
+    status_id = ::BankPaymentRequestStatus.id_for(self.aasm.current_state)
     update_params = {
-        status_id: report_status_id,
+        status_id: status_id,
         controlling_level_id: self.new_level&.id
     }
     self.document.update(update_params)
