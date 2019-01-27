@@ -39,8 +39,9 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
       # When document reviewer mappings are not present
       # Create them with current policy of the document
       if self.document.policy_id.present?
+        policy = user.company.policies.find_by id: document.policy_id
         mappings_params[:document_reviewer_mappings] = []
-        self.document.policy.levels.non_deleted.with_entity_type(self.provider_name).each do |level|
+        policy.levels.non_deleted.with_entity_type(self.provider_name).each do |level|
           mapping_data = {
               level_id: level.id,
               level: level
@@ -81,7 +82,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
               dlrm = document.document_level_reviewer_mappings.new(
                   {
                       level_id: level.id,
-                      policy_id: document.policy.id,
+                      policy_id: document.policy_id,
                       reviewer_id: reviewer.id,
                       provider_name: provider_name,
                       level_number: level.level_number,

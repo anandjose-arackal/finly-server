@@ -301,7 +301,7 @@ module Transitionable
         return []
       end
 
-      policy = document.policy
+      policy = Policy.find_by id: document.policy_id
 
       return [] unless policy.present?
 
