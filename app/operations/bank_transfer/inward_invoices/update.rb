@@ -1,12 +1,13 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
-  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments
+  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:invoice, :custom_fields)
+    self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
   end
 
   def validate
@@ -108,6 +109,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
+
+      params[:reviewal_document] = self.inward_invoice.reload
+      params[:document_reviewer_mappings] = document_reviewer_mappings_params
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
 
       self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
       self.invoice_current_attachments.update_all(procurement_document_id: inward_invoice.id, procurement_document_type: inward_invoice.class.name)
