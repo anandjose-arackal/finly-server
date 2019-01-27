@@ -191,6 +191,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def payments_list
+    puts "ROUTES PARAMS FROM BankTransfer PAUYMENT LIST", params.inspect, current_user.inspect
     @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
     respond
   end
@@ -212,6 +213,12 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   def remove_attachment
     @result = BankTransfer::PaymentRequest::RemoveAttachment.(current_user, params)
     respond response: (@result&.success? ? :success : :failure)
+  end
+
+
+  def bulk_take_control
+    @result = BankTransfer::PaymentRequest::Review::BulkTakeControl.(current_user, params)
+    respond
   end
 
   private
