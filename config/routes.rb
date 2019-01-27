@@ -2172,7 +2172,7 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
-  mount_griddler('/email/incoming')
+  # mount_griddler('/email/incoming')
   # mount_opro_oauth controllers: {
   #     oauth_new: 'oauth/auth',
   #     oauth_token: 'oauth/token'
@@ -2629,6 +2629,8 @@ Rails.application.routes.draw do
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
     post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
   end
+
+  get 'test_take_control' => 'reports#test_take_control', as: :test_take_control
   post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
 
 
@@ -2940,6 +2942,8 @@ Rails.application.routes.draw do
 
   resources :departments
 
+  get 'all_users' => 'departments#all_users'
+
   namespace :bank_transfer do
     get 'reimbursements' => 'reimbursement#show'
     patch 'reimbursements' => 'reimbursement#update'
@@ -3063,6 +3067,7 @@ Rails.application.routes.draw do
     patch 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
+    patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
     get 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
     post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
@@ -3076,7 +3081,7 @@ Rails.application.routes.draw do
 
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
-      patch 'review', to: 'bank_payment_requests#review', as: :review
+      patch 'review', to: 'bank_payment_requests#review', as: :review      
       patch 'credit', to: 'bank_payment_requests#credit', as: :credit
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
       patch 'add_invoice', to: 'bank_payment_requests#add_invoice', as: :add_invoice
@@ -3089,6 +3094,8 @@ Rails.application.routes.draw do
       get 'payments_count', to: 'bank_payment_requests#payments_count'
       delete 'remove_attachment', to: 'bank_payment_requests#remove_attachment', as: :remove_attachment
     end
+
+
 
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
 

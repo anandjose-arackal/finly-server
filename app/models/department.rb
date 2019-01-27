@@ -27,6 +27,8 @@ class Department < ApplicationRecord
   has_many :cost_center_department_mappings
   has_many :cost_centers, through: :cost_center_department_mappings
 
+  accepts_nested_attributes_for :user_department_mappings
+
   scope :with_ids, -> (id) { where id: id }
   scope :with_name, -> (name) {where name: name}
   # scope :only_sub_departments, -> {
