@@ -1,5 +1,5 @@
 class Event::EMoneyRequests::Base < Event::SetNotifier
-  attr_accessor :money_request
+  attr_accessor :money_request, :role_id
 
   def pre_validate
     unless user.present?
@@ -19,6 +19,7 @@ class Event::EMoneyRequests::Base < Event::SetNotifier
 
   def init
     self.money_request = params[:money_request]
+    self.role_id = params[:role_id]
   end
 
   def validate

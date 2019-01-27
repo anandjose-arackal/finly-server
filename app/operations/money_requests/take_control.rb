@@ -59,7 +59,8 @@ class MoneyRequests::TakeControl < MoneyRequests::Base
   end
 
   def post_process
-    Event::EMoneyRequests::TakeControl.(self.user, money_request: self.money_request)
+    role_id = self.workflow_output[:role_id]
+    Event::EMoneyRequests::TakeControl.(self.user, money_request: self.money_request, role_id: role_id)
   end
 
 end

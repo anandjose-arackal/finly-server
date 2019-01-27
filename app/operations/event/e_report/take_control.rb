@@ -22,7 +22,8 @@ class Event::EReport::TakeControl < Event::EReport::Base
   def send_push_notification(user)
     # return unless user.id == report.controlling_for_user_id
     return unless self.report.document_level_reviewer_mappings.with_level_id(report.controlling_level_id).pluck(:reviewer_id).include?(user.id)
-    message = "#{user.name} has taken control of the report : #{self.report.name}"
+    last_trail = self.report.order(:created_at).last rescue nil
+    message = "#{last_trail.action_user.name} has taken control of the report : #{self.report.name}"
     # view = UserRole.name_for(self.report.controlling_for_user_role_id)
     view = 'manager'
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
@@ -34,7 +35,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
     # else
     #   view_role_id = nil
     # end
-    last_trail = report.trails.last
+    last_trail = report.trails&.last
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_take_control),
                                              action_user_id: (last_trail.action_user_id rescue nil),

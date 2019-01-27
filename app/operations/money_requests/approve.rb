@@ -119,8 +119,8 @@ class MoneyRequests::Approve < MoneyRequests::Base
       Settlement::MoneyRequests::Approved.(user, money_request: money_request, auto_approve: auto_approve)
       money_request.reload
     end
-
-    Event::EMoneyRequests::Approve.(self.user, money_request: self.money_request, auto_approve: auto_approve)
+    role_id = self.workflow_output[:role_id]
+    Event::EMoneyRequests::Approve.(self.user, money_request: self.money_request, auto_approve: auto_approve, role_id: role_id)
 
     if not has_errors? and money_request.payment_mode_id == PaymentMode.id_for(:cash)
       messages[:success] << 'Successfully approved the money request'

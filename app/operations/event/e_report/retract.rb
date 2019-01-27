@@ -29,7 +29,7 @@ class Event::EReport::Retract < Event::EReport::Base
     # return unless user.id == last_trail.action_user.id
     # On retract, eveyone who has viewed the document should get notified
     return unless self.report.affected_users(:retract).include?(user.id)
-    message = "#{user.name} retracted the report: #{self.report.name}"
+    message = "#{last_trail.action_user.name} retracted the report: #{self.report.name}"
     # view = UserRole.name_for(last_track.modified_user_role_id)
     #TODO- For Other Roles
     view = "manager"
