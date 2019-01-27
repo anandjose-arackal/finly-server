@@ -8,32 +8,32 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
     has_scope :filter_status_id
     has_scope :filter_search
     
-    attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments, :unpaid_payments
+    attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments, :unpaid_payments,
+                  :count_before_filter, :filter_count
 
     def init
-      self.payments = params[:payments]
+      self.payments = params[:payments]      
 
       self.ordered_payments = self.payments
+
       # applying scopes for the payments list
       self.payments = apply_scopes(self.payments, params)
 
-      # self.payments_unverified = []
-      # self.payments_verified = []
-      # # separating the verified and unverified payments
-      # self.payments.each do |payment|
-      #   if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
-      #     self.payments_verified << payment
-      #   else
-      #     self.payments_unverified << payment
-      #   end
-      # end
-      # self.ordered_payments = self.payments_verified + self.payments_unverified
       self.paginated_payments = self.payments.paginate(page: params[:page], per_page: (params[:per_page] || 10))
       if current_company.id == 118
         self.unpaid_payments = []
       else
         self.unpaid_payments = self.payments.unpaid
       end
+
+    end
+
+
+    def filter_count
+      raw_count = self.ordered_payments.group(:payment_status_id).count
+      h = {}
+      PaymentStatus.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = raw_count[ps.id] else h[ps.name] = 0 end}
+      return h
     end
 
   end
