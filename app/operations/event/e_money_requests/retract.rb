@@ -15,15 +15,14 @@ class Event::EMoneyRequests::Retract < Event::EMoneyRequests::Base
   end
 
   def send_push_notification(user)
-    last_trail = self.money_request.trails.last
-    return unless user.id == last_trail.modified_user&.id
+    return unless self.money_request.affected_users(:retract).include?(user.id)
     message = "#{self.money_request.user.name} retracted the Money Request: #{self.money_request.name}"
-    view = UserRole.name_for(last_trail.modified_user_role_id)
+    view = 'manager'
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
-    roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    # roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: NotificationActionType.id_for(:notify_retract),
                                              action_user_id: money_request.user_id,
@@ -33,7 +32,7 @@ class Event::EMoneyRequests::Retract < Event::EMoneyRequests::Base
                                              path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: roles.first,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app])
     notification.save
   end

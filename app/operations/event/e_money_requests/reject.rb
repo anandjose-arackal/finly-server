@@ -3,7 +3,7 @@ class Event::EMoneyRequests::Reject < Event::EMoneyRequests::Base
 
   def init
     super
-    self.rejecting_user = self.money_request.tracks.last.action_user rescue nil
+    self.rejecting_user = self.money_request.trails.last.action_user rescue nil
   end
 
   def validate
@@ -33,18 +33,18 @@ class Event::EMoneyRequests::Reject < Event::EMoneyRequests::Base
   end
 
   def set_notification(user)
-    roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    # roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
     notification = user.notifications.build(user: user,
                                             notification_type_id: NotificationType.id_for(:money_request),
                                             action_type_id: NotificationActionType.id_for(:notify_reject),
-                                            action_user_id: money_request.tracks.last.action_user.id,
+                                            action_user_id: money_request.trails&.last&.action_user&.id,
                                             object_id: money_request.id,
                                             object_type: 'Money Request',
                                             path_object_id: money_request.id,
                                             path_object_type: 'Money Request',
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
-                                            view_role_id: roles.first,
+                                            view_role_id: role_id,
                                             application: RequestStore.store[:current_app]
     )
     notification.save

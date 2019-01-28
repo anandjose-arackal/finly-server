@@ -34,16 +34,17 @@ class Event::EMoneyRequests::TakeControl < Event::EMoneyRequests::Base
     # else
     #   view_role_id = nil
     # end
+    last_trail = money_request.trails&.last
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: NotificationActionType.id_for(:notify_take_control),
-                                             action_user_id: (money_request.tracks.last.action_user.id rescue nil),
+                                             action_user_id: (money_request.trails.last.action_user_id rescue nil),
                                              object_id: money_request.id,
                                              object_type: "Money Request",
                                              path_object_id: money_request.id,
                                              path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save
@@ -61,10 +62,10 @@ class Event::EMoneyRequests::TakeControl < Event::EMoneyRequests::Base
 
   def mailer_body(user)
     # if user.id == money_request.controlling_user_id
-    if money_request.get_reviewers.include?(user)
+    if user.id == report.trails.last.action_user_id
       "You have taken control of the Money Request.<br/><br/>Money Request: \"#{self.money_request.name}\""
     else
-      last_trail = self.money_request.trails.order(:created_at).last rescue nil
+      last_trail = self.money_request.trails.last
       "#{last_trail.action_user.name} has has taken control of the Money Request which was awaiting your review.<br/><br/>Money Request: \"#{self.money_request.name}\""
     end
   end
@@ -72,7 +73,14 @@ class Event::EMoneyRequests::TakeControl < Event::EMoneyRequests::Base
   def money_request_view_role(user)
     # roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
     # roles.first
-    money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+    if self.user.id == user.id
+      UserRole.id_for(:admin)
+    elsif money_request.user.id == user.id
+      UserRole.id_for(:employee)
+    else
+      UserRole.id_for(:manager)
+    end
+    # money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

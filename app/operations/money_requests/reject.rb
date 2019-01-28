@@ -98,8 +98,8 @@ class MoneyRequests::Reject < MoneyRequests::Base
 
     # destroying the submitted amount field
     money_request.submitted_amount&.destroy
-
-    Event::EMoneyRequests::Reject.(self.user, money_request: self.money_request)
+    role_id = self.workflow_output[:role_id]
+    Event::EMoneyRequests::Reject.(self.user, money_request: self.money_request, role_id: role_id)
   end
 
 end

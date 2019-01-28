@@ -103,8 +103,8 @@ class Reports::Reject < Reports::Base
 
     # Invalidate all existing Email Authorizations
     email_auth_invalidate_presenter = EmailAuthorizations::Invalidate.(user, authorizable: report)
-
-    Event::EReport::Reject.(user, report: report)
+    role_id = self.workflow_output[:role_id]
+    Event::EReport::Reject.(user, report: report, role_id: role_id)
     messages[:success] << "Report rejected"
   end
 

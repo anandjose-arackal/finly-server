@@ -76,6 +76,7 @@ class MoneyRequests::Retract < MoneyRequests::Base
 
     # destroying the submitted amount field
     money_request.submitted_amount&.destroy
+    role_id = self.workflow_output[:role_id]
     Event::EMoneyRequests::Retract.(self.user, money_request: self.money_request)
   end
 

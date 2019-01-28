@@ -36,7 +36,7 @@ class Event::EMoneyRequests::Submit < Event::EMoneyRequests::Base
                                              path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: UserRole.id_for("manager"),
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app])
     notification.save
   end
