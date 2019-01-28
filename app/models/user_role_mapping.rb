@@ -26,6 +26,7 @@ class UserRoleMapping < ApplicationRecord
   scope :manager, -> { where(user_role_id: UserRole.manager_id) }
   scope :travel_manager, -> { where user_role_id: UserRole.id_for(:travel_manager) }
   scope :initiator, -> {where user_role_id: UserRole.id_for(:initiator)}
+  scope :creditor, -> { where user_role_id: UserRole.id_for(:creditor) }
   scope :auditor, -> { where(user_role_id: UserRole.id_for(:auditor)) }
   scope :employee, -> { where(user_role_id: UserRole.id_for(:employee)) }
   scope :without_employee, -> {where.not(user_role_id: UserRole.id_for(:employee))}

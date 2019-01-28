@@ -200,7 +200,7 @@ class TravelRequests::Show < TravelRequests::Base
         if self.travel_request.can_take_control? && !self.travel_request.get_reviewers.include?(user)
 
           # todo Take Control
-          actions[:take_control] = {}
+          actions[:take_control] = {method: 'patch', type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         else
           actions[:approve] = {method: 'patch', type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
