@@ -15,6 +15,9 @@ config/deploy/config/*
 lib/tasks/aws.rake
 config/data_store.yml
 config/sentry.yml
+config/aws_config.yml
+config/mailer_config.yml
+config/yes_bank_config.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
