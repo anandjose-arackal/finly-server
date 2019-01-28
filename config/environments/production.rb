@@ -33,7 +33,7 @@ Rails.application.configure do
 
   config.lograge.custom_payload do |controller|
     user = controller.current_user
-    hash = {params: RequestStore.store[:request_params]&.except(:password)}
+    hash = {params: RequestStore.store[:request_params]&.except(:password, :password_confirmation)}
     hash[:current_app] = (controller.current_app rescue nil)
     hash[:current_device] = (controller.current_device rescue nil)
     hash[:ip] = controller.request.ip
