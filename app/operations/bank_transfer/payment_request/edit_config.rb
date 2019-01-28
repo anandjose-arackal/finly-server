@@ -5,7 +5,7 @@ class BankTransfer::PaymentRequest::EditConfig < BankTransfer::PaymentRequest::B
   def init
     id = params[:id] || params[:bank_payment_request_id]
     self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id) rescue nil
-    self.payment_order = bank_payment_request&.payment_order
+    # self.payment_order = bank_payment_request&.payment_order
 
     unless bank_payment_request.present?
       add_message :error, 'Bank Payment Request Not Found'
