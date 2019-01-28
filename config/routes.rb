@@ -7,6 +7,7 @@
 #                                           accept_invite GET    /users/invitation/accept(.:format)                                                                                  pending_invites#edit
 #                                          collect_notify POST   /collect/notify(.:format)                                                                                           finly_collect#notify
 #                                collect_test_transaction POST   /collect/test_transaction(.:format)                                                                                 finly_collect#notify
+#                                             sidekiq_web        /sidekiq                                                                                                            Sidekiq::Web
 #                                               crono_web        /crono                                                                                                              Crono::Web
 #                                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                                                                      admin_users/sessions#new
 #                                      admin_user_session POST   /admin_users/sign_in(.:format)                                                                                      admin_users/sessions#create
@@ -1179,6 +1180,7 @@
 #                      bank_transfer_bulk_credit_validate PATCH  /bank_transfer/bulk_credit_validate(.:format)                                                                       bank_transfer/bank_payment_requests#bulk_credit_validate
 #                               bank_transfer_bulk_credit PATCH  /bank_transfer/bulk_credit(.:format)                                                                                bank_transfer/bank_payment_requests#bulk_credit
 #                        bank_transfer_sample_import_file GET    /bank_transfer/sample_import_format(.:format)                                                                       bank_transfer/bank_payment_requests#sample_import_file
+#          bank_transfer_bank_payment_request_edit_config GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/edit_config(.:format)                                 bank_transfer/bank_payment_requests#edit_config
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)                                     bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)                                      bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)                                      bank_transfer/bank_payment_requests#credit
