@@ -15,6 +15,13 @@ class Admin::BankTransfer::GetStatus < Admin::Base
     if params["unique_request_number"]
       self.unique_request_number = params["unique_request_number"]
       self.bank_transaction = BankTransaction.find_by(unique_request_number: self.unique_request_number)
+      self.bank_transaction = BankTransaction.find_by(bank_reference_number: self.unique_request_number) if self.bank_transaction.blank?
+      if self.bank_transaction.nil?
+        payment = Payment.find_by(id: self.unique_request_number)
+        if payment.present? and payment.reference_resource_type == 'BankTransaction'
+          self.bank_transaction = payment.reference_resource
+        end
+      end
     end
   end
 
@@ -40,11 +47,13 @@ class Admin::BankTransfer::GetStatus < Admin::Base
     while (Time.now - now) < timeout
       result = Resque.reserve(handle)
       next if result.blank?
-      if result.success?
-        success = args&.dig('success')
-        message = args&.dig('message')
+      args = result.args.first
+      success = args&.dig('success')
+      message = args&.dig('message')
+      if success
         self.status = args['status']
       end
+      break
     end
   end
 
