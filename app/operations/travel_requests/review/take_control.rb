@@ -22,37 +22,52 @@ class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
   end
 
   def process
-    memo = (params[:note] or params[:memo] or travel_request.memo)
-    action_for_user_id = travel_request.controlling_for_user_id
-    action_for_user_role_id = travel_request.controlling_for_user_role_id
-    prev_controlling_user = (travel_request.controlling_user or travel_request.controlling_for_user)
-    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.travel_request)
-    if travel_request.update_attributes controlling_user: user,
-                                        controlling_for_user: travel_request.controlling_user,
-                                        controlling_user_role_id: UserRole.id_for(:admin),
-                                        controlling_for_user_role_id: travel_request.controlling_user_role_id
-      travel_request.travel_request_trails.create action_user: user,
-                                   action_user_role_id: UserRole.id_for(:admin),
-                                   modified_user_id: travel_request.controlling_for_user_id,
-                                   modified_user_role_id: travel_request.controlling_for_user_role_id,
-                                   action_id: TravelRequestTrailAction.id_for(:take_control)
+    # memo = (params[:note] or params[:memo] or travel_request.memo)
+    # action_for_user_id = travel_request.controlling_for_user_id
+    # action_for_user_role_id = travel_request.controlling_for_user_role_id
+    # prev_controlling_user = (travel_request.controlling_user or travel_request.controlling_for_user)
+    # prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.travel_request)
+    # if travel_request.update_attributes controlling_user: user,
+    #                                     controlling_for_user: travel_request.controlling_user,
+    #                                     controlling_user_role_id: UserRole.id_for(:admin),
+    #                                     controlling_for_user_role_id: travel_request.controlling_user_role_id
+    #   travel_request.travel_request_trails.create action_user: user,
+    #                                action_user_role_id: UserRole.id_for(:admin),
+    #                                modified_user_id: travel_request.controlling_for_user_id,
+    #                                modified_user_role_id: travel_request.controlling_for_user_role_id,
+    #                                action_id: TravelRequestTrailAction.id_for(:take_control)
+    #
+    #   travel_request.travel_request_trails.create action_user: user,
+    #                                               action_user_role_id: UserRole.id_for(:admin),
+    #                                               action_for_user_id: action_for_user_id,
+    #                                               action_for_user_role_id: action_for_user_role_id,
+    #                                               action_id: TravelRequestTrailAction.id_for(:approve),
+    #                                               modified_user: prev_controlling_user,
+    #                                               modified_user_role_id: prev_controlling_user_role
+    #   # travel_request.comments.create user: user,
+    #   #                               comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
+    #   #                               content: params[:take_control_note]
+    #   return
+    # end
+    # self.messages = travel_request.errors.full_messages
 
-      travel_request.travel_request_trails.create action_user: user,
-                                                  action_user_role_id: UserRole.id_for(:admin),
-                                                  action_for_user_id: action_for_user_id,
-                                                  action_for_user_role_id: action_for_user_role_id,
-                                                  action_id: TravelRequestTrailAction.id_for(:approve),
-                                                  modified_user: prev_controlling_user,
-                                                  modified_user_role_id: prev_controlling_user_role
-      # travel_request.comments.create user: user,
-      #                               comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
-      #                               content: params[:take_control_note]
+
+    #  Workflow Manager
+    params[:document] = self.travel_request
+    params[:aasm_event] = 'take_control'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
       return
     end
-    self.messages = travel_request.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process
+    # todo - check how the workflow should be
     travel_request.money_requests.status_pending.update_all(
         controlling_user_id: travel_request.controlling_user_id,
         controlling_user_role_id: travel_request.controlling_user_role_id

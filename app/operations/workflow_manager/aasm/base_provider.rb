@@ -117,6 +117,7 @@ class WorkflowManager::Aasm::BaseProvider
               action_id: nil
       )
     end
+
   end
 
   def update_levels
