@@ -60,6 +60,7 @@ dump.rdb
 config/secure_storage_config.yml
 config/elastic_apm.yml
 config/deploy/config/*
+config/sidekiq.yml
 .ruby-version
 
 public/tmp

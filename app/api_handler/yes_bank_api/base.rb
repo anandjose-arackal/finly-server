@@ -137,7 +137,7 @@ class YesBankApi::Base < BaseHandler
       end
         # temporary - rescue SSL error to simulate various cases
         # rescue Faraday::SSLError
-        #   simulating different cases
+        #   # simulating different cases
         #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
         # self.response.status_code = 500
         # self.parsed_response = {
@@ -193,6 +193,7 @@ class YesBankApi::Base < BaseHandler
         #     }
         # }
         #
+
         # self.parsed_response = {
         #     "Envelope" => {
         #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
@@ -216,6 +217,7 @@ class YesBankApi::Base < BaseHandler
         #         }
         #     }
         # }
+
         #
         # self.parsed_response = {
         #     "Envelope" => {

@@ -99,6 +99,7 @@ class BankAccount < ApplicationRecord
 
   before_save do
     self.ifsc = self.ifsc.match(Constants::VALID_IFSC).to_s
+    self.account_number = self.account_number&.strip
   end
 
   after_create do
