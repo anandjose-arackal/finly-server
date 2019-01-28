@@ -198,6 +198,7 @@ class User < ApplicationRecord
 
   has_many :procurements
   has_many :level_reviewer_mappings
+  has_many :level_user_reviewer_mappings
   has_many :procurement_attachments
 
   has_one :individual_kyc, dependent: :destroy
@@ -632,7 +633,7 @@ class User < ApplicationRecord
   alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
 
   def vendor_payment_finance?
-    self.role_mapping.vendor_payments.finance_manager.present?
+    self.role_mapping.vendor_payments.creditor.present?
   end
 
   alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
