@@ -12,18 +12,16 @@ class Event::EBankPaymentRequest::Retract < Event::EBankPaymentRequest::Base
 
   def affected_users
     # users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.bank_payment_request_trails.last.modified_user)
-    users = self.bank_payment_request.associated_users(:retract)
-    users.reject { |r| r == self.user}
+    users = self.bank_payment_request.affected_users(:retract)
   end
 
   def notification_affected_users
     # users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.bank_payment_request_trails.last.modified_user)
-    users = self.bank_payment_request.associated_users(:retract)
-    users.reject { |r| r == self.user}
+    users = self.bank_payment_request.notification_affected_users(:retract)
   end
 
   def set_notification(user)
-    self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
+    # self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:bank_payment_request),
                                              action_type_id: NotificationActionType.id_for(:notify_retract),
                                              action_user_id: bank_payment_request.owner_id,
@@ -33,7 +31,7 @@ class Event::EBankPaymentRequest::Retract < Event::EBankPaymentRequest::Base
                                              path_object_type: "PaymentOrder",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: roles.first,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app])
     notification.save
   end
@@ -55,7 +53,8 @@ class Event::EBankPaymentRequest::Retract < Event::EBankPaymentRequest::Base
   end
 
   def bank_payment_request_view_role(user)
-    self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
-    return roles.first
+    # self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
+    # return roles.first
+    bank_payment_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 end

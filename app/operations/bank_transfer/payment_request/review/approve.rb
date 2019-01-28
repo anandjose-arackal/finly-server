@@ -76,8 +76,8 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     end
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: action_id
-
-    Event::EBankPaymentRequest::Approve.(user, bank_payment_request: bank_payment_request)
+    role_id = self.workflow_output[:role_id]
+    Event::EBankPaymentRequest::Approve.(user, bank_payment_request: bank_payment_request, role_id: role_id)
 
     add_message :success, "Succesfully approved the payment request"
   end

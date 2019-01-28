@@ -132,8 +132,8 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
     # add comment
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:submit)
-
-    Event::EBankPaymentRequest::Submit.(user, bank_payment_request: bank_payment_request)
+    role_id = self.workflow_output[:role_id]
+    Event::EBankPaymentRequest::Submit.(user, bank_payment_request: bank_payment_request, role_id: role_id)
     add_message :success, "Payment Order successfully submitted!"
   end
 
