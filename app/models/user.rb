@@ -198,6 +198,7 @@ class User < ApplicationRecord
 
   has_many :procurements
   has_many :level_reviewer_mappings
+  has_many :level_user_reviewer_mappings
   has_many :procurement_attachments
 
   has_one :individual_kyc, dependent: :destroy
