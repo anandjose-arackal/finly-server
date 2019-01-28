@@ -33,6 +33,7 @@ class BalanceMsgQueuePoller
                                timestamp: data[3]
                               }
       log_params = balance_update_params.deep_dup
+      log_params[:request_id] = Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
 
       @rescued = false
       @result = nil
