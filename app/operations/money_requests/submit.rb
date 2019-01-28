@@ -135,7 +135,7 @@ class MoneyRequests::Submit < MoneyRequests::Base
 
     add_message :success, 'Money Request Submitted'
     role_id = self.workflow_output[:role_id]
-    Event::EMoneyRequests::Submit.(user, money_request: money_request, role_id)
+    Event::EMoneyRequests::Submit.(user, money_request: money_request, role_id: role_id)
   end
 
 end
