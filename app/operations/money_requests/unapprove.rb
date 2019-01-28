@@ -33,30 +33,46 @@ class MoneyRequests::Unapprove < MoneyRequests::Base
   end
 
   def process
-    self.prev_status = money_request.status
-    prev_controlling_user = (money_request.controlling_for_user or money_request.controlling_user)
-    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.money_request)
-    role_id = nil
-    # Todo verify if the user has approved the money_request as manager / finance manager
-    if manager_view?
-      role_id = UserRole.id_for(:manager)
-    elsif finance_view?
-      role_id = UserRole.id_for(:finance_manager)
-    end
-    if money_request.update_attributes controlling_user_id: user.id,
-                                       controlling_for_user_id: nil,
-                                       controlling_user_role_id: role_id,
-                                       controlling_for_user_role_id: nil,
-                                       status_id: MoneyRequestStatus.id_for(:processing)
-      money_request.tracks.create action_user: user,
-                                  action_user_role_id: role_id,
-                                  modified_user: prev_controlling_user,
-                                  modified_user_role_id: prev_controlling_user_role,
-                                  money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:unapprove),
-                                  status_id: MoneyRequestStatus.id_for(:processing)
+    # self.prev_status = money_request.status
+    # prev_controlling_user = (money_request.controlling_for_user or money_request.controlling_user)
+    # prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.money_request)
+    # role_id = nil
+    # # Todo verify if the user has approved the money_request as manager / finance manager
+    # if manager_view?
+    #   role_id = UserRole.id_for(:manager)
+    # elsif finance_view?
+    #   role_id = UserRole.id_for(:finance_manager)
+    # end
+    # if money_request.update_attributes controlling_user_id: user.id,
+    #                                    controlling_for_user_id: nil,
+    #                                    controlling_user_role_id: role_id,
+    #                                    controlling_for_user_role_id: nil,
+    #                                    status_id: MoneyRequestStatus.id_for(:processing)
+    #   money_request.tracks.create action_user: user,
+    #                               action_user_role_id: role_id,
+    #                               modified_user: prev_controlling_user,
+    #                               modified_user_role_id: prev_controlling_user_role,
+    #                               money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:unapprove),
+    #                               status_id: MoneyRequestStatus.id_for(:processing)
+    #   return
+    # end
+    # add_message :error, money_request.errors.full_messages
+
+    # NEW CODE
+    #  Workflow Manager
+    params[:document] = self.money_request
+    params[:aasm_event] = 'unapprove'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
       return
     end
-    add_message :error, money_request.errors.full_messages
+
+    self.workflow_output = op.workflow_output
+    # NEW CODE ENDS
+    ####################
   end
 
   def post_process
