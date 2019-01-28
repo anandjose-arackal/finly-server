@@ -114,7 +114,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:credit)
 
-    role_id: self.workflow_output[:role_id]                                     
+    role_id = self.workflow_output[:role_id]                                     
     Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request, role_id: role_id)
 
 
