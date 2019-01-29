@@ -26,7 +26,7 @@ class Event::EBankPaymentRequest::TakeControl < Event::EBankPaymentRequest::Base
     # end
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:bank_payment_request),
                                              action_type_id: NotificationActionType.id_for(:notify_take_control),
-                                             action_user_id: (bank_payment_request.bank_payment_request_trails.last.action_user.id rescue nil),
+                                             action_user_id: (bank_payment_request.trails.last.action_user.id rescue nil),
                                              object_id: bank_payment_request.id,
                                              object_type: "Payment Order",
                                              path_object_id: bank_payment_request.id,

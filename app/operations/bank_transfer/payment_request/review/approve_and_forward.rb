@@ -25,7 +25,7 @@ class BankTransfer::PaymentRequest::Review::ApproveAndForward < BankTransfer::Pa
                                    controlling_user_role_id: UserRole.id_for(:admin),
                                    controlling_for_user: nil,
                                    controlling_for_user_role_id: nil
-      bank_payment_request.bank_payment_request_trails.create action_user: user,
+      bank_payment_request.trails.create action_user: user,
                                                       action_user_role_id: current_user_role,
                                                       modified_user: forwarded_to_user,
                                                       modified_user_role_id: UserRole.id_for(:admin),
