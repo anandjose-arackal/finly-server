@@ -48,7 +48,7 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def mailer_subject(user)
-    if user.id == report.user.id
+    if user.id == report.user_id
       "Report submitted : #{self.report.name}"
     else
       "#{self.report.user.name} has submitted the report: #{self.report.name}"
@@ -56,7 +56,7 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def mailer_body(user)
-    if user.id == report.user.id
+    if user.id == report.user_id
       "Congratulations, you have successfully submitted the report : #{self.report.name}"
     else
       "#{self.report.user.name} has submitted the report: #{self.report.name} and is currently awaiting your approval."

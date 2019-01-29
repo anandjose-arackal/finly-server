@@ -38,7 +38,8 @@ class Event::EMoneyRequests::EComment::Create < Event::EMoneyRequests::Base
   end
 
   def set_notification(user)
-    roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    # roles = MoneyRequests::ActionUserRole.(user, {money_request: money_request, user_id: user.id})
+    role_id = (user.id == money_request.owner_id) ? UserRole.id_for(:initiator) : UserRole.id_for(:manager)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: NotificationActionType.id_for(:notify_comment),
                                              action_user_id: self.user.id,

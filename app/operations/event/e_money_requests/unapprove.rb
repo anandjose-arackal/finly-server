@@ -20,11 +20,11 @@ class Event::EMoneyRequests::Unapprove < Event::EMoneyRequests::Base
   end
 
   def set_notification(user)
-    if money_request.controlling_user_id == user.id
-      view_role_id = money_request.controlling_user_role_id
-    else
-      view_role_id = money_request.tracks.last.modified_user_role_id
-    end
+    # if money_request.controlling_user_id == user.id
+    #   view_role_id = money_request.controlling_user_role_id
+    # else
+    #   view_role_id = money_request.tracks.last.modified_user_role_id
+    # end
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: NotificationActionType.id_for(:notify_unapprove),
                                              action_user_id: self.user.id,
@@ -34,14 +34,14 @@ class Event::EMoneyRequests::Unapprove < Event::EMoneyRequests::Base
                                              path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save
   end
 
   def mailer_subject(user)
-    if money_request.controlling_user.id == user.id
+    if money_request.get_reviewers.include? user
       "Money Request unapproved : #{self.money_request.name}"
     else
       "#{self.money_request.controlling_user.name} has unapproved the Money Request: #{self.money_request.name}"
@@ -49,10 +49,10 @@ class Event::EMoneyRequests::Unapprove < Event::EMoneyRequests::Base
   end
 
   def mailer_body(user)
-    if money_request.controlling_user.id == user.id
+    if money_request.get_reviewers.include? user
       "You have successfully unapproved the Money Request : #{self.money_request.name}"
     else
-      "#{self.money_request.controlling_user.name} has unapproved the Money Request: #{self.money_request.name}"
+      "#{self.money_request.trails.action_user.name} has unapproved the Money Request: #{self.money_request.name}"
     end
   end
 

@@ -105,7 +105,8 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
         controlling_user_role_id: travel_request.controlling_user_role_id
     )
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
-    Event::ETravelRequest::Submit.(user, travel_request: travel_request)
+    role_id = self.workflow_output[:role_id]
+    Event::ETravelRequest::Submit.(user, travel_request: travel_request, role_id: role_id)
     add_message :success, "Travel request successfully submitted!"
   end
 end

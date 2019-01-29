@@ -9,24 +9,40 @@ class Event::ETravelRequest::TakeControl < Event::ETravelRequest::Base
   end
 
   def affected_users
-    [self.travel_request.user, self.travel_request.controlling_user, self.travel_request.controlling_for_user]
+    # [self.travel_request.user, self.travel_request.controlling_user, self.travel_request.controlling_for_user]
+    self.take_control.affected_users(:take_control)
   end
 
   def mailer_subject(user)
-    "#{self.travel_request.controlling_user.name} has taken control of the trip: #{self.travel_request.trip_id}"
+    if user.id == self.travel_request.trails.last.action_user_id
+      "You have taken control of the trip #{self.travel_request.trip_id}"
+    else
+      "#{self.travel_request.trails.last.action_user.name} has taken control of the trip: #{self.travel_request.trip_id}"
+    end
   end
 
   def mailer_body(body)
-    "#{self.travel_request.controlling_user.name} has taken control of the trip which was awaiting review,<br/><br/>Trip: \"#{self.travel_request.trip_id}\""
+    if user.id == self.travel_request.trails.last.action_user_id
+      "You have taken control of the trip.<br/><br/>Report: \"#{self.travel_request.trip_id}\""
+    else
+      "#{self.travel_request.trails.last.action_user.name} has taken control of the trip which was awaiting review,<br/><br/>Trip: \"#{self.travel_request.trip_id}\""
+    end
   end
 
   def travel_request_view_role(user)
-    if user.id == travel_request.user_id
-      return UserRole.id_for(:employee)
-    elsif user.id == travel_request.controlling_user_id
-      return travel_request.controlling_user_role_id
-    elsif user.id == self.travel_request.travel_request_trails.last.action_user_id
-      return self.travel_request.travel_request_trails.last.action_user_role_id
+    # if user.id == travel_request.user_id
+    #   return UserRole.id_for(:employee)
+    # elsif user.id == travel_request.controlling_user_id
+    #   return travel_request.controlling_user_role_id
+    # elsif user.id == self.travel_request.travel_request_trails.last.action_user_id
+    #   return self.travel_request.travel_request_trails.last.action_user_role_id
+    # end
+    if self.user.id == user.id
+      UserRole.id_for(:admin)
+    elsif travel_request.user.id == user.id
+      UserRole.id_for(:employee)
+    else
+      UserRole.id_for(:manager)
     end
   end
 end

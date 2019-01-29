@@ -61,7 +61,8 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
     )
     #
     # Event::EBankPaymentRequest::Retract.(user, travel_request: travel_request)
-    Event::ETravelRequest::Retract.(user, travel_request: travel_request)
+    role_id = self.workflow_output[:role_id]
+    Event::ETravelRequest::Retract.(user, travel_request: travel_request, role_id: role_id)
     add_message :success, "Travel Request retracted successfully"
   end
 

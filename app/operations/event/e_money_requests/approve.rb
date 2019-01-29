@@ -88,7 +88,7 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
       notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
     # view_role_id = money_request.controlling_user_role_id
-    view_role_id = UserRole.id_for("manager")
+    # view_role_id = UserRole.id_for("manager")
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:money_request),
                                              action_type_id: notify_type,
                                              action_user_id: (money_request.trails.last.action_user.id rescue nil),
@@ -98,7 +98,7 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
                                              path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save

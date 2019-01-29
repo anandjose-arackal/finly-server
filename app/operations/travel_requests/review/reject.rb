@@ -67,7 +67,8 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
     )
 
     # Event::EBankPaymentRequest::Reject.(user, travel_request: travel_request)
-    Event::ETravelRequest::Reject.(user, travel_request: travel_request)
+    role_id = self.workflow_output[:role_id]
+    Event::ETravelRequest::Reject.(user, travel_request: travel_request, role_id: role_id)
     add_message :success, "Travel Request successfully rejected"
   end
 end

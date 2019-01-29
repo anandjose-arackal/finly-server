@@ -72,7 +72,8 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def post_process
-    Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output})
+    role_id = self.workflow_output[:role_id]
+    Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})
     add_message :success, 'Successfully submitted invoice'
   end
 end

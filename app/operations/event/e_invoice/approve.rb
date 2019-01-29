@@ -53,11 +53,7 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
   end
 
   def notification_affected_users
-    if approved
-      [invoice.created_by]
-    else
-      self.controlling_users
-    end
+    approved ?  [invoice.created_by] : self.controlling_users
   end
 
   def set_notification(user)

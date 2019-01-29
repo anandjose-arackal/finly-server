@@ -73,7 +73,8 @@ class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
         controlling_user_role_id: travel_request.controlling_user_role_id
     )
     # Event::EMoneyRequest::TakeControl.(self.user, travel_request: self.travel_request)
-    Event::ETravelRequest::TakeControl.(user, travel_request: travel_request)
+    role_id = self.workflow_output[:role_id]
+    Event::ETravelRequest::TakeControl.(user, travel_request: travel_request, role_id: role_id)
     add_message :success, "You've taken control of this trip"
   end
 

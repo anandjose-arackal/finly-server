@@ -46,7 +46,7 @@ class Event::EReport::EComment::Create < Event::EReport::Base
   def set_notification(user)
     # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
     #TODO- For Other Roles
-    # role_id = (user.id == report.user_id) ? UserRole.id_for(:initiator) : UserRole.id_for(:manager)
+    role_id = (user.id == report.user_id) ? UserRole.id_for(:initiator) : UserRole.id_for(:manager)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                              action_type_id: NotificationActionType.id_for(:notify_comment),
                                              action_user_id: self.user.id,

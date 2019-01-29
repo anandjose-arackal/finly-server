@@ -89,7 +89,8 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     #
     # Event::EBankPaymentRequest::Approve.(user, travel_request: travel_request)
     # Notifications
-    Event::ETravelRequest::Approve.(user, travel_request: travel_request)
+    role_id = self.workflow_output[:role_id]
+    Event::ETravelRequest::Approve.(user, travel_request: travel_request, role_id: role_id)
     add_message :success, 'Succesfully approved the travel request'
   end
 

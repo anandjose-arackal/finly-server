@@ -77,8 +77,8 @@ class MoneyRequests::Unapprove < MoneyRequests::Base
 
   def post_process
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:unapprove)
-
-    Event::EMoneyRequests::Unapprove.(self.user, money_request: self.money_request)
+    role_id = self.workflow_output[:role_id]
+    Event::EMoneyRequests::Unapprove.(self.user, money_request: self.money_request, role_id: role_id)
 
     if prev_status.approved?
       # Recalculate settlement when money_request is unapproved from an approved/closed state
