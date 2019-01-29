@@ -51,20 +51,35 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def update_dlrms
+    if[:submit].include?(aasm.current_event)
+      dlrms = document.document_level_reviewer_mappings.with_level_id(next_level&.id).with_policy_id(policy.id)
+
+      # Set viewable true for the next level when document is submitted
+      if dlrms.present?
+        dlrms.update_all(viewable: true)
+      end
+    end
+
+
     # Update Document Level Reviewer Mapping
     # find current document_level_reviewer_mappings
     if [:approve, :reject].include?(aasm.current_event)
-      dlrm = document.document_level_reviewer_mappings
-                 .where(level_id: current_level.id, policy_id: document.policy.id)
+      dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(policy.id)
                  .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
 
       if dlrm.present?
         dlrm.update(
-            {
-                action_id: TrailAction.id_for(aasm.current_event),
-                viewable: true,
-                action_taken_by_id: user.id
-            })
+            action_id: TrailAction.id_for(aasm.current_event),
+            action_taken_by_id: user.id
+        )
+      end
+    end
+
+    if [:approve].include?(aasm.current_event)
+      if next_level.present?
+        next_dlrms = document.document_level_reviewer_mappings.with_level_id(next_level.id).with_policy_id(policy.id)
+
+        next_dlrms.update_all(viewable: true)
       end
     end
 
@@ -73,10 +88,10 @@ class WorkflowManager::Aasm::BaseProvider
       dlrm = document.document_level_reviewer_mappings
         .where(level_id: unapprove_level&.id, policy_id: document.policy.id).where.not(action_taken_by_id: nil).first
 
-      dlrm.update({
-                      action_taken_by_id: nil,
-                      action_id: TrailAction.id_for(aasm.current_event)
-                  })
+      dlrm.update(
+          action_taken_by_id: nil,
+          action_id: TrailAction.id_for(aasm.current_event)
+      )
 
     end
 
