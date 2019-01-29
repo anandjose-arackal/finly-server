@@ -67,6 +67,8 @@ class MoneyRequest < ApplicationRecord
   has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id, dependent: :destroy
   has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy
   has_many :items, class_name: 'MoneyRequestItem', foreign_key: :money_request_id, dependent: :destroy
+  has_many :trails, as: :parent
+
 
   belongs_to :travel_request, optional: true
 

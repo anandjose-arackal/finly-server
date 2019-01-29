@@ -47,6 +47,8 @@ class BankPaymentRequest < ApplicationRecord
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
 
+  has_many :trails, as: :parent
+
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
 
