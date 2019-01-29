@@ -28,7 +28,7 @@ module Observer::Observable
       ensure_method_defined key
     end
 
-    # Allow setting multiple values against the key
+    # Allow setting multiple values against the key. This makes the return value of the key as an array
     def register_multiple(key, value)
       unless observer_map[key]&.respond_to?(:each)
         observer_map[key] = []
