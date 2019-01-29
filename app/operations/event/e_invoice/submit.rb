@@ -59,7 +59,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
                                              path_object_type: "Invoice",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: role_id
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save
