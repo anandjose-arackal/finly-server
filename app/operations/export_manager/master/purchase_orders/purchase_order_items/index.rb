@@ -2,7 +2,7 @@ class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportM
 
   register_master ExportManager::Master::BaseMaster
   register :handle, :purchase_order_items
-  register :generator, ExportManager::Generator::Spreadsheet
+  register :generators, ExportManager::Generator::Spreadsheet
   register :processor, ExportManager::Processor::Synchronous
   validate :input
   register :fields, [

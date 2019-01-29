@@ -4,17 +4,8 @@ class ExportManager::Master::BaseMaster
 
   attr_accessor :user, :params, :input, :messages
 
-  MASTERS = {
-      test: '::ExportManager::Master::Test::Provider',
-      procurement: '::ExportManager::Master::Procurements::Provider',
-      budget_summary: '::ExportManager::Master::Budgets::UsageSummary',
-      budget_entities: '::ExportManager::Master::Budgets::UsageEntities',
-      vendor_details: '::ExportManager::Master::Vendors::DetailsIndex',
-      purchase_order_items: '::ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index',
-      non_po_items: '::ExportManager::Master::Invoices::InvoiceLineItems::Index'
-  }.with_indifferent_access
-
-  DEFAULT_CONFIG = {spreadsheet: true, pdf: true}
+  observer_keys :handle, :generators, :processor, :fields
+  observers_path "#{Rails.root}/app/operations/export_manager/master"
 
   def self.validate(method)
     register_multiple :validations, method

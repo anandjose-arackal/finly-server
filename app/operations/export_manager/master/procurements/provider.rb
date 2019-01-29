@@ -2,7 +2,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
 
   register_master ExportManager::Master::BaseMaster
   register :handle, :procurement
-  register :generator, ExportManager::Generator::Spreadsheet
+  register :generators, ExportManager::Generator::Spreadsheet
   register :processor, ExportManager::Processor::Synchronous
   validate :input
   register :fields, [

@@ -2,7 +2,7 @@ class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::Base
 
   register_master ExportManager::Master::BaseMaster
   register :handle, :vendor_details
-  register :generator, ExportManager::Generator::Spreadsheet
+  register :generators, ExportManager::Generator::Spreadsheet
   register :processor, ExportManager::Processor::Synchronous
   validate :input
   register :fields, [

@@ -4,7 +4,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
 
   register_master ExportManager::Master::BaseMaster
   register :handle, :budget_entities
-  register :generator, ExportManager::Generator::Spreadsheet
+  register :generators, ExportManager::Generator::Spreadsheet
   register :processor, ExportManager::Processor::Synchronous
   validate :input
   register :fields, [

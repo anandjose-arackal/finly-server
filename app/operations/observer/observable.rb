@@ -6,9 +6,15 @@ module Observer::Observable
 
   module ClassMethods
 
-    unless defined?(registered_keys)
-      cattr_accessor :registered_keys
-      self.registered_keys = {}
+    def observer_map
+      OBSERVERS[self.name] = {} if OBSERVERS[self.name].nil?
+      OBSERVERS[self.name]
+    end
+    
+    def observer_keys(*keys)
+      keys.each do |key|
+        ensure_method_defined key
+      end
     end
 
     def register_master(klass)
@@ -17,17 +23,17 @@ module Observer::Observable
 
     # Allow set a single value against a key
     def register(key, value)
-      registered_keys[key] = value
+      observer_map[key] = value
 
       ensure_method_defined key
     end
 
     # Allow setting multiple values against the key
     def register_multiple(key, value)
-      unless registered_keys[key].respond_to(:each)
-        registered_keys[key] = []
+      unless observer_map[key]&.respond_to?(:each)
+        observer_map[key] = []
       end
-      registered_keys[key] << value
+      observer_map[key] << value
 
       ensure_method_defined key
     end
@@ -35,11 +41,10 @@ module Observer::Observable
     def ensure_method_defined(key)
       unless methods.include?(key)
         define_singleton_method key do
-          registered_keys[key]
+          observer_map[key]
         end
       end
     end
-
 
   end
 

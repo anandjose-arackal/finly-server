@@ -70,7 +70,7 @@ class ExportManager::RequestHandler < BaseOperation
 
   def init_master
     ExportManager::Master::BaseMaster.observers.each do |observer|
-      return observer if observer.handle == self.type
+      return observer if observer.handle&.to_s == self.type&.to_s
     end
     nil
   end

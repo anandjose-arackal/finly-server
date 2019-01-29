@@ -2,7 +2,7 @@ class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::
 
   register_master ExportManager::Master::BaseMaster
   register :handle, :non_po_items
-  register :generator, ExportManager::Generator::Spreadsheet
+  register :generators, ExportManager::Generator::Spreadsheet
   register :processor, ExportManager::Processor::Synchronous
   validate :input
   register :fields, [
