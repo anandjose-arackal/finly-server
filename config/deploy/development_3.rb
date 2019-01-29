@@ -9,7 +9,7 @@
 
 # server '13.127.234.0', user: 'centos', roles: %w{web app db}, port: 22
 # server 'demo2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
-server '35.154.209.41', user: 'centos', roles: %w{web app db}, port: 22
+server 'dev.finly.io', user: 'centos', roles: %w{web app db}, port: 22
 set :stage, 'development'
 set :use_sudo, false
 set :rbenv_type, :user
