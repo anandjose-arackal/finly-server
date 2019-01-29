@@ -59,6 +59,7 @@ class Report < ApplicationRecord
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy
   has_many :receipts, as: :parent
+  has_many :trails, as: :parent
   # Payment made as reimbursement
   belongs_to :report_status, optional: true
   belongs_to :reimbursement, optional: true, class_name: 'Payment'
