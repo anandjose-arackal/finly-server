@@ -54,7 +54,7 @@ class User::Show < User::Base
                     finance_manager: self.selected_user.finance_manager?, auditor: self.selected_user.auditor?}
       self.team_mapping = self.selected_user.team_mapping
       # self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
-      self.policies = selected_user.policies
+      self.policies = selected_user.policies.with_application(current_app)
       self.balances = params[:balances]
       self.bank_accounts = selected_user.bank_accounts
       self.mapping = []
