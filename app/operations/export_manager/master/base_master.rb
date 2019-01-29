@@ -1,6 +1,5 @@
 class ExportManager::Master::BaseMaster
   include Observer::Master, Observer::Observable
-  cattr_accessor :data_map
 
   attr_accessor :user, :params, :input, :messages
 
