@@ -17,7 +17,7 @@ class Admin::BankTransfer::GetStatus < Admin::Base
       self.bank_transaction = BankTransaction.find_by(unique_request_number: self.unique_request_number)
       self.bank_transaction = BankTransaction.find_by(bank_reference_number: self.unique_request_number) if self.bank_transaction.blank?
       if self.bank_transaction.nil?
-        payment = Payment.find_by(id: self.unique_request_number)
+        payment = Payment.find_by(id: self.unique_request_number.to_i)
         if payment.present? and payment.reference_resource_type == 'BankTransaction'
           self.bank_transaction = payment.reference_resource
         end
@@ -40,7 +40,6 @@ class Admin::BankTransfer::GetStatus < Admin::Base
         transfer_type: bank_transaction.transfer_type
     }
     handle = self.object_id
-    p handle
     YesBankStatusProvider.perform_async(handle, params)
     timeout = 30
     now = Time.now
@@ -49,10 +48,11 @@ class Admin::BankTransfer::GetStatus < Admin::Base
       next if result.blank?
       args = result.args.first
       success = args&.dig('success')
-      message = args&.dig('message')
+      message = args&.dig('messages')
       if success
         self.status = args['status']
       end
+      add_message :error, message if message
       break
     end
   end
@@ -81,10 +81,10 @@ class Admin::BankTransfer::GetStatus < Admin::Base
 
   attr_accessor :transaction, :status
 
-  def init
-    self.transaction = nil
-    self.status = nil
+    def init
+      self.transaction = nil
+      self.status = nil
+    end
   end
-end
 
 end
