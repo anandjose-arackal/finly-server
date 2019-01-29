@@ -1,10 +1,11 @@
 class ExportManager::Master::Procurements::Provider < ExportManager::Master::BaseMaster
 
-  register_handle :procurement
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  register_master ExportManager::Master::BaseMaster
+  register :handle, :procurement
+  register :generator, ExportManager::Generator::Spreadsheet
+  register :processor, ExportManager::Processor::Synchronous
   validate :input
-  register_fields [
+  register :fields, [
                       procurement_name: {spreadsheet: true, pdf: true},
                       vendor_name: {spreadsheet: true, pdf: true},
                       vendor_business_name: {spreadsheet: false, pdf: true},

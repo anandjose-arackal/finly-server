@@ -2,11 +2,12 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
 
   attr_accessor :entities
 
-  register_handle :budget_entities
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  register_master ExportManager::Master::BaseMaster
+  register :handle, :budget_entities
+  register :generator, ExportManager::Generator::Spreadsheet
+  register :processor, ExportManager::Processor::Synchronous
   validate :input
-  register_fields [
+  register :fields, [
                       entity_name: {spreadsheet: true, pdf: false},
                       entity_type: {spreadsheet: true, pdf: false},
                       po_number: {spreadsheet: true, pdf: false},

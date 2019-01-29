@@ -1,10 +1,11 @@
 class ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index < ExportManager::Master::BaseMaster
 
-  register_handle :purchase_order_items
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  register_master ExportManager::Master::BaseMaster
+  register :handle, :purchase_order_items
+  register :generator, ExportManager::Generator::Spreadsheet
+  register :processor, ExportManager::Processor::Synchronous
   validate :input
-  register_fields [
+  register :fields, [
     procurement_name: {spreadsheet: true, pdf: true},
     po_number: {spreadsheet: true, pdf: true},
     po_date: {spreadsheet: true, pdf: true},

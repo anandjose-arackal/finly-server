@@ -1,5 +1,5 @@
 class ExportManager::Master::BaseMaster
-  include MathUtil
+  include Observer::Master, Observer::Observable
   cattr_accessor :data_map
 
   attr_accessor :user, :params, :input, :messages
@@ -16,70 +16,8 @@ class ExportManager::Master::BaseMaster
 
   DEFAULT_CONFIG = {spreadsheet: true, pdf: true}
 
-
-  def self.key
-    self.set_data_map[:key]
-  end
-
-  def self.fields
-    self.set_data_map[:fields]
-  end
-
-  def self.generators
-    self.set_data_map[:generators]
-  end
-
-  def self.processor
-    self.set_data_map[:processor]
-  end
-
-  def self.config
-    self.set_data_map[:config]
-  end
-
-  def self.validations
-    self.set_data_map[:validations]
-  end
-
-  def self.set_data_map
-    if self.data_map.nil?
-      self.data_map = {}
-    end
-    if self.data_map[self.name].nil?
-      self.data_map[self.name] = {}
-    end
-    self.data_map[self.name]
-  end
-
-  def self.register_handle(key)
-    set_data_map[:key] = key
-    MASTERS[key] = self
-  end
-
-  def self.register_fields(fields)
-    set_data_map[:fields] = fields
-  end
-
-  def self.register_generator(generator, options = {})
-    if set_data_map[:generators].nil?
-      set_data_map[:generators] = []
-    end
-    set_data_map[:generators] << {generator: generator, options: options}
-  end
-
-  def self.register_processor(p)
-    set_data_map[:processor] = p
-  end
-
-  def self.register_config(c)
-    set_data_map[:config] = c
-  end
-
   def self.validate(method)
-    if set_data_map[:validations].nil?
-      set_data_map[:validations] = []
-    end
-    set_data_map[:validations] << method
+    register_multiple :validations, method
   end
 
   def initialize(user, params)

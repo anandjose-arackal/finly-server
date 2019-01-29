@@ -1,10 +1,11 @@
 class ExportManager::Master::Invoices::InvoiceLineItems::Index < ExportManager::Master::BaseMaster
 
-  register_handle :non_po_items
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  register_master ExportManager::Master::BaseMaster
+  register :handle, :non_po_items
+  register :generator, ExportManager::Generator::Spreadsheet
+  register :processor, ExportManager::Processor::Synchronous
   validate :input
-  register_fields [
+  register :fields, [
     procurement_name: {spreadsheet: true, pdf: true},
     invoice_id: {spreadsheet: true, pdf: true},
     invoice_number: {spreadsheet: true, pdf: true},

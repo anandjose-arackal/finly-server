@@ -1,10 +1,11 @@
 class ExportManager::Master::Vendors::DetailsIndex < ExportManager::Master::BaseMaster
 
-  register_handle :vendor_details
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  register_master ExportManager::Master::BaseMaster
+  register :handle, :vendor_details
+  register :generator, ExportManager::Generator::Spreadsheet
+  register :processor, ExportManager::Processor::Synchronous
   validate :input
-  register_fields [
+  register :fields, [
                       vendor_business_name: {spreadsheet: true, pdf: false},
                       vendor_id: {spreadsheet: true, pdf: false},
                       authorized: {spreadsheet: true, pdf: false},
