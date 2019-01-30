@@ -78,7 +78,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
-
     if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
       add_system_message :error, self.payment, "Payment cannot be processed in this state"
       add_message :error, "Payment cannot be processed in this state"
@@ -145,6 +144,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       debit_adapter.on_failure(payment: self.payment)
       return
     end
+
 
     # Credit funds to account
     unless credit_adapter.blank? or credit_adapter.credit(payment, options)

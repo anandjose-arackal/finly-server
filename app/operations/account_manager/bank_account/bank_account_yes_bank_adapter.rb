@@ -28,19 +28,25 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     elsif bank_transaction&.retriable?
       reference_number = bank_transaction.unique_request_number
     else
+      # i.e. it's a whole new payment being initiated for the first time
       reference_number = nil
     end
 
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
     # If the payment doesn't already have a bank transaction, create one before the API call is initiated
-    if payment.reference_resource.blank? && (payment.failed? || payment.pending_approval?)
+    if payment.reference_resource.blank? && payment.in_progress?
       bank_transaction = create_bank_transaction(payment, transfer_request)
-    else
+    elsif payment.in_progress?
       bank_transaction = payment.reference_resource
     end
 
+
     unless bank_transaction
+      payment.system_messages.build(
+                                 content: "Payment cannot be processed at this time",
+                                 system_message_type_id: SystemMessageType.id_for(:error).save
+      )
       return false
     end
 
@@ -69,7 +75,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-        error_message = op.transfer_request.bank_error_message || op.messages[:error] || "Payment could not be processed at this time"
+        error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error) || "Payment could not be processed at this time"
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
         return false
@@ -163,7 +169,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
+    bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
