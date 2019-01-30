@@ -11,6 +11,12 @@ class User::Configuration::EnforcePolicy::Update < User::Configuration::EnforceP
   end
 
   def validate
+
+    unless selected_user.present?
+      messages[:error] << 'User not found'
+      raise_unauthorized_exception
+    end
+
     if selected_user.policies.non_default.count == 0 and update_params[:enabled] == '1'
       add_message :error, "#{selected_user.name} needs to be part of at least one non-default policy to enable this configuration"
     end
