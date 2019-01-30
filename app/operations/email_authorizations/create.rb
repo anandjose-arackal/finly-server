@@ -1,5 +1,5 @@
 class EmailAuthorizations::Create < EmailAuthorizations::Base
-  attr_accessor :authorizable, :token, :email_authorization
+  attr_accessor :authorizable, :token, :email_authorization, :authorizable_view_id, :reviewers
   def init
     self.authorizable = params[:authorizable]
     unless authorizable.instance_of?(Report) || authorizable.instance_of?(MoneyRequest) || authorizable.instance_of?(TravelRequest)
@@ -7,39 +7,53 @@ class EmailAuthorizations::Create < EmailAuthorizations::Base
       return
     end
 
-    user_id = authorizable.controlling_user_id
-    view_role_id = authorizable.controlling_user_role_id
-    e_auth = EmailAuthorization.with_user_id(user_id).with_authorizable(authorizable).with_view_role_id(view_role_id).limit(1)
-    self.email_authorization = e_auth&.first
+    self.authorizable_view_id = UserRole.id_for(params[:authorizable_view]) || UserRole.id_for(:manager)
+
+    self.reviewers = authorizable.get_reviewers
+    # user_id = authorizable.get_reviewers controlling_user_id
+    # view_role_id = authorizable.controlling_user_role_id
+    # e_auth = EmailAuthorization.with_user_id(user_id).with_authorizable(authorizable).with_view_role_id(authorizable_view_id).limit(1)
+    # self.email_authorization = e_auth&.first
   end
 
   def validate
     unless authorizable.processing?
       add_message :error, "Cannot create authorization when authorizable is not in processing state."
+      return
+    end
+    if self.reviewers.blank?
+      add_message :error, "Please add reviewers to policy"
+      return
     end
   end
 
   def process
-    unless self.email_authorization
-      self.token = nil
-      loop do
-        self.token = Digest::SHA1.hexdigest([Time.now, rand].join)
-        break unless EmailAuthorization.with_token(self.token).present?
+    self.reviewers.pluck(:id).each do |user_id|
+      self.email_authorization = EmailAuthorization.with_user_id(user_id).with_authorizable(authorizable).with_view_role_id(authorizable_view_id).limit(1).first
+      unless self.email_authorization
+        create_email_authorization(user_id)
+      else
+        self.email_authorization.update_attributes(is_valid: true)
       end
-
-      self.email_authorization = EmailAuthorization.new(
-        user_id: authorizable.controlling_user_id,
-        authorizable: authorizable,
-        view_role_id: authorizable.controlling_user_role_id,
-        token: token
-      )
-      unless self.email_authorization.save
-        add_message :error, "Couldn't save."
-      end
-    else
-      self.email_authorization.update_attributes(is_valid: true)
     end
-    
+  end
+
+  def create_email_authorization(user_id)
+    self.token = nil
+    loop do
+      self.token = Digest::SHA1.hexdigest([Time.now, rand].join)
+      break unless EmailAuthorization.with_token(self.token).present?
+    end
+
+    self.email_authorization = EmailAuthorization.new(
+      user_id: user_id,
+      authorizable: authorizable,
+      view_role_id: authorizable_view_id,
+      token: token
+    )
+    unless self.email_authorization.save
+      add_message :error, "Couldn't save."
+    end
   end
 
   def post_process
