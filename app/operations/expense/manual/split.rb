@@ -131,7 +131,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     if base_params[:receipt_email_attributes].present?
       base_params[:receipt_email_attributes][:user_id] = user.id
     end
-    splits = params&.dig(:splits)
+    splits = params&.to_unsafe_h&.dig(:splits)
     splits&.each do |index, split|
       expense_item_params = base_params.deep_dup
       expense_item_params[:note] = split[:note]

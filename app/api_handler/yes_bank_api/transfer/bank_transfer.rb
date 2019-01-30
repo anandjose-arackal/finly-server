@@ -131,7 +131,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
                                                                    currency_id: Currency.first.id
                                                                })
       unless self.payment.update(reference_resource: self.bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
       end
     end
   end
