@@ -94,6 +94,7 @@ class User < ApplicationRecord
   has_many :manager_reports, -> { distinct }, source: :report, through: :manager_report_tracks
   has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
+  has_many :policy_user_roles
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
@@ -495,6 +496,28 @@ class User < ApplicationRecord
 
   scope :includes_for_admin_panel, -> {
     includes(:cards, :company)
+  }
+
+  # Gives list of user who are not part of a policy as finance manager
+  scope :filter_unassigned_finance_for_policy, -> (policy_id){
+    user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:finance_manager))
+    without_id(user_ids)
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_travel_for_policy, -> (policy_id){
+    user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:travel_manager))
+    without_id(user_ids)
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_members_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+
+    if policy.present?
+      user_ids = policy.users.pluck(:id)
+      without_id(user_ids)
+    end
   }
 
 

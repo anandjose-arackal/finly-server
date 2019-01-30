@@ -306,7 +306,7 @@ module Transitionable
         return []
       end
 
-      policy = Policy.find_by id: document.policy_id
+      policy = Policy.find_by id: self.policy_id
 
       return [] unless policy.present?
 
@@ -421,8 +421,10 @@ module Transitionable
 
     # todo setup travel request
     def travel_associated_items(user)
-      if user.instance_of(User)
-
+      if user.instance_of?(User)
+        policy_ids = PolicyUserRole.with_role_id(UserRole.id_for(:travel_manager)).where(user_id: user.id).pluck(:policy_id)
+        self.where(policy_id: policy_ids)
+            .where("#{self.document_status_attribute} in (?)", self.travel_associated_status_ids)
       end
     end
   end

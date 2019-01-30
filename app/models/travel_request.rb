@@ -321,7 +321,15 @@ class TravelRequest < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    ReportStatus.ids_for(:approved, :settled, :settlement_confirmed , :closed, :auto_approved)
+    TravelRequestStatus.ids_for(:approved, :settled, :settlement_confirmed , :closed, :auto_approved)
+  end
+
+  def self.travel_associated_status_ids
+    TravelRequestStatus.ids_for(
+        :approved, :booking_pending, :booked, :selection_requested, :selection_processing,
+        :selection_confirmed, :selection_rejected, :booking_confirmed, :completed
+
+        )
   end
 
   def self.status_ids(*statuses)
