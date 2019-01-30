@@ -24,8 +24,9 @@ class User::Team::Index < User::Team::Base
   has_scope :yes_bank_account_transfer
   has_scope :filter_vendor_payments_reviewers
   has_scope :filter_em_reviewers
-  has_scope :without_finance_for_policy
-  has_scope :without_travel_for_policy
+  has_scope :filter_unassigned_travel_for_policy
+  has_scope :filter_unassigned_finance_for_policy
+  has_scope :filter_unassigned_members_for_policy
 
   def pre_validate
     unless user.present?
