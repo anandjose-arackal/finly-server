@@ -2,7 +2,7 @@ class PaymentFiles::SetConfiguration < PaymentFiles::Base
   attr_accessor :update_params, :payment_file_configuration
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :vendor_payments_admin]
   end
 
   def pre_validate
