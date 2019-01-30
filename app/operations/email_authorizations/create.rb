@@ -28,14 +28,17 @@ class EmailAuthorizations::Create < EmailAuthorizations::Base
   end
 
   def process
+    authorization_ids = []
     self.reviewers.pluck(:id).each do |user_id|
-      self.email_authorization = EmailAuthorization.with_user_id(user_id).with_authorizable(authorizable).with_view_role_id(authorizable_view_id).limit(1).first
-      unless self.email_authorization
-        create_email_authorization(user_id)
+      email_authorization = EmailAuthorization.with_user_id(user_id).with_authorizable(authorizable).with_view_role_id(authorizable_view_id).limit(1).first
+      unless email_authorization
+        authorization_ids << create_email_authorization(user_id) if create_email_authorization(user_id).is_a?(Integer)
       else
-        self.email_authorization.update_attributes(is_valid: true)
+        email_authorization.update_attributes(is_valid: true)
+        authorization_ids << email_authorization.id
       end
     end
+    self.email_authorization = EmailAuthorization.where(id: authorization_ids)
   end
 
   def create_email_authorization(user_id)
@@ -45,15 +48,17 @@ class EmailAuthorizations::Create < EmailAuthorizations::Base
       break unless EmailAuthorization.with_token(self.token).present?
     end
 
-    self.email_authorization = EmailAuthorization.new(
+    authorization = EmailAuthorization.new(
       user_id: user_id,
       authorizable: authorizable,
       view_role_id: authorizable_view_id,
       token: token
     )
-    unless self.email_authorization.save
+    unless authorization.save
       add_message :error, "Couldn't save."
+      return
     end
+    return authorization.id
   end
 
   def post_process

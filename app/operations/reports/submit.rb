@@ -180,7 +180,7 @@ class Reports::Submit < Reports::Base
     email_authorization = nil
     if report.processing?
       report.reload
-      email_authorization_presenter = EmailAuthorizations::Create.(user, {authorizable: report})
+      email_authorization_presenter = EmailAuthorizations::Create.(user, {authorizable: report, authorizable_view: 'manager'})
       if email_authorization_presenter.success?
         email_authorization = email_authorization_presenter.email_authorization
       end

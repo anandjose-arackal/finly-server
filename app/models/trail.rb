@@ -22,6 +22,7 @@ class Trail < ApplicationRecord
   belongs_to :action_user_role, optional: true, class_name: 'UserRole'
   belongs_to :action_level, optional: true, class_name: 'ReviewalLevel'
   belongs_to :modified_level, optional: true, class_name: 'ReviewalLevel'
+  belongs_to :payment, optional: true
 
 
   scope :created_before, -> (time) { where 'created_at < ?', time }
