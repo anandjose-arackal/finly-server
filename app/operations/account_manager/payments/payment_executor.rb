@@ -78,27 +78,35 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
-    if self.payment.api_initiated
-      if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
-        return
-      end
-    else
-      unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
-        add_message :error, "Payment cannot be processed in this state"
-        # add system message
-      end
+
+    if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
+      add_system_message :error, self.payment, "Payment cannot be processed in this state"
+      add_message :error, "Payment cannot be processed in this state"
+      return
     end
 
     # checking to see if the receiving account is a bank account if it has been disabled by any chance
     if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.disabled?
+      add_system_message :error, self.payment, "You cannot make transfers to this bank account as it has been blacklisted"
       add_message :error, "You cannot make transfers to this bank account as it has been blacklisted"
       return
     end
+
+    self.payment.with_lock do
+      self.payment.reload
+      unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
+        add_system_message :error, self.payment, "Payment cannot be processed in this state"
+        add_message :error, "Payment cannot be processed in this state"
+        return
+      end
+      # update payment to in progress
+      payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
+    end
+
   end
 
   def pre_process
-    # update payment to in progress
-    payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
+
   end
 
   def process

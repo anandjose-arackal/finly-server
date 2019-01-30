@@ -23,6 +23,8 @@ gem 'mocha', '~> 1.7.0'
 gem 'rollbar', '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
+# gem 'sentry-raven', '~> 2.8'
+
 gem 'health-monitor-rails', '~> 8.4.0'
 
 # puma web server
@@ -125,6 +127,8 @@ gem 'bootbox-rails', '0.5.0'
 
 gem 'sidekiq', '~> 5.2.3'
 
+gem 'paranoia', '~> 2.4'
+
 # gem for font awesome
 gem 'font-awesome-rails', '~> 4.7.0.4'
 
@@ -184,8 +188,9 @@ gem 'awesome_print', '~> 1.8.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  # gem 'byebug'
+  gem 'byebug'
   gem 'pry', '~> 0.12.2'
+  gem 'rb-readline'
   gem 'capistrano', '~> 3.11.0'
   gem 'capistrano3-puma', '~> 3.1.1'
   gem 'capistrano-rails', '~> 1.4.0', require: false

@@ -1,4 +1,4 @@
-# cronotab.rb — Crono configuration file
+''# cronotab.rb — Crono configuration file
 #
 # Here you can specify periodic jobs and schedule.
 # You can use ActiveJob's jobs from `app/jobs/`
@@ -31,3 +31,4 @@ Crono.perform(BankTransferStatusChecker).every 15.minutes
 end
 Crono.perform(ReminderOutwardInvoices).every 1.day, at: {hour: 9, min: 30}
 Crono.perform(CompanyAccountScheduledTransfer).every 1.day, at: {hour: 9, min: 30}
+Crono.perform(BalanceTallyLedgerProcess).every 1.day, at: {hour: 23, min: 30}

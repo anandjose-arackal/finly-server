@@ -47,7 +47,7 @@
 #
 
 class Payment < ApplicationRecord
-  include PostOperationExecution
+  include PostOperationExecution, SoftDeletable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -229,6 +229,10 @@ class Payment < ApplicationRecord
 
   scope :with_payment_purpose, -> (purpose_id) {
     where payment_purpose_id: purpose_id
+  }
+
+  scope :with_payment_status, -> (status_ids) {
+    where(payment_status_id: status_ids)
   }
 
   scope :cash_additions_to_employee, -> { where(payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)]) }

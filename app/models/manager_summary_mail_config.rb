@@ -48,6 +48,7 @@ class ManagerSummaryMailConfig < ApplicationRecord
   scope :group_by_user, -> { group(:user_id) }
   scope :reports, -> { where entity_type: 'report' }
   scope :money_requests, -> { where entity_type: 'money_request' }
+  scope :travel_requests, -> { where entity_type: 'travel_request' }
 
   def validate_scheduled_time
     if scheduled_time.blank?

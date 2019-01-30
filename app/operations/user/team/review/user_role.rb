@@ -9,6 +9,8 @@ class User::Team::Review::UserRole < BaseOperation
       obj_type = :report
     elsif obj.is_a?(BankPaymentRequest)
       obj_type = :payment_request
+    elsif obj.is_a?(TravelRequest)
+      obj_type = :travel_request
     end
     return nil unless obj_type.present?
 
