@@ -169,8 +169,8 @@ class Event::EReport::Base < Event::SetNotifier
         else
           view = "\"personal\""
       end
-      suffix = "/params={\"view\":" + view + ",\"preview\":true}"
-      path = "reports/#{report.id}"
+      suffix = URI.escape("{\"view\":" + view + ",\"preview\":true}")
+      path = "reports/#{report.id}/params="
       url = Constants::BASE_URL + path + suffix
     end
 
@@ -191,8 +191,9 @@ class Event::EReport::Base < Event::SetNotifier
       # if report.controlling_user_id == user.id
       if report.get_reviewers.include?(user)
       # token = params[:email_authorization]
-        suffix = "/params={\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}"
-        path = "report/#{report.id}"
+        suffix = URI.escape("{\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}")
+        # path = "report/#{report.id}"
+        path = "report/#{report.id}/params="
         url = Constants::BASE_URL_AUTHORIZER + path + suffix
       end
       url
