@@ -67,7 +67,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         add_message :error, "The service is temporarily down. Please try again later"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 401
-        add_message :error, "Unauthorized. Please check the credentials being used for the API"
+        add_message :error, "Unauthorized."
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 500
         self.parsed_response = Hash.from_xml(response.body)
@@ -135,20 +135,21 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   def success
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
-    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params)
+    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params, messages)
   end
 
   def failure
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
-    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(params)
+    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(params, messages)
   end
 
   class YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :transfer_request, :bank_transaction
 
-    def initialize(params)
+    def initialize(params, messages)
+      self.messages = messages
       self.transfer_request = params[:transfer_request]
       self.bank_transaction = params[:bank_transaction]
     end
@@ -158,7 +159,8 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
     attr_accessor :transfer_request, :bank_transaction
 
-    def initialize(params)
+    def initialize(params, messages)
+      self.messages = messages
       self.transfer_request = params[:transfer_request]
       self.bank_transaction = params[:bank_transaction]
     end
