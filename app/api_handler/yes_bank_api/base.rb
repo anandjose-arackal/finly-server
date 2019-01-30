@@ -60,7 +60,7 @@ class YesBankApi::Base < BaseHandler
   end
 
   def file_logger_params(logger_params)
-    file_logger_base_params.merge logger_params
+    file_logger_base_params.merge(logger_params).merge(request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s))
   end
 
   # because this is common for all Yes Bank API calls
@@ -96,7 +96,19 @@ class YesBankApi::Base < BaseHandler
         post_params_hash = (Hash.from_xml(template) rescue nil)
         response_hash = (Hash.from_xml(self.response.body) rescue nil)
         status_code = self.response.status rescue nil
-        file_logger.info(file_logger_params({path: p, post_params: post_params_hash, response: response_hash, status: status_code, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), success: true}))
+        file_logger.info(
+            file_logger_params(
+                {
+                    path: p,
+                    post_params: post_params_hash,
+                    response: response_hash,
+                    status: status_code,
+                    yes_bank_action: yes_bank_action,
+                    request_time: (self.end_time - self.start_time),
+                    success: true
+                }
+            )
+        )
       end
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.end_time = DateUtils.local_date_time
@@ -137,7 +149,7 @@ class YesBankApi::Base < BaseHandler
       end
         # temporary - rescue SSL error to simulate various cases
         # rescue Faraday::SSLError
-        #   simulating different cases
+        #   # simulating different cases
         #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
         # self.response.status_code = 500
         # self.parsed_response = {
@@ -193,6 +205,7 @@ class YesBankApi::Base < BaseHandler
         #     }
         # }
         #
+
         # self.parsed_response = {
         #     "Envelope" => {
         #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
@@ -216,6 +229,7 @@ class YesBankApi::Base < BaseHandler
         #         }
         #     }
         # }
+
         #
         # self.parsed_response = {
         #     "Envelope" => {
@@ -256,14 +270,14 @@ class YesBankApi::Base < BaseHandler
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
-    # rescue Exception => e
-    #   stack_trace = e.message
-    #   e.backtrace.each do |line|
-    #     stack_trace += "\n#{line}"
-    #   end
-    #   if Rails.env.production?
-    #     file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
-    #   end
+      # rescue Exception => e
+      #   stack_trace = e.message
+      #   e.backtrace.each do |line|
+      #     stack_trace += "\n#{line}"
+      #   end
+      #   if Rails.env.production?
+      #     file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
+      #   end
     end
 
   end

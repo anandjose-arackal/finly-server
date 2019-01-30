@@ -2165,6 +2165,8 @@ Rails.application.routes.draw do
 
   # mount HealthMonitor::Engine, at: '/health/'
 
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
   mount Crono::Web, at: '/crono'
   devise_for :admin_users, controllers: {sessions: 'admin_users/sessions'}
 

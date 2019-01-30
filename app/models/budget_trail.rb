@@ -86,4 +86,8 @@ class BudgetTrail < ApplicationRecord
     where(entity_type: entity_types)
   }
 
+  scope :with_entity_id, -> (ids) {
+    where entity_id: ids
+  }
+
 end
