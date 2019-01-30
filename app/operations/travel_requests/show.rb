@@ -211,7 +211,7 @@ class TravelRequests::Show < TravelRequests::Base
 
       if travel_manager_view?
         # Request selection, Confirm Booking
-        if (travel_request.booking_pending? or travel_request.processing? or travel_request.selection_confirmed?) and self.travel_request.get_travel_managers.include?(user)
+        if (travel_request.booking_pending? or travel_request.processing? or travel_request.selection_confirmed?) and self.travel_request.document_role_users(:travel_manager).include?(user)
           actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:request_selection] = {method: 'patch', type: 9, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:confirm_booking] = {method: 'patch', type: 11, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
