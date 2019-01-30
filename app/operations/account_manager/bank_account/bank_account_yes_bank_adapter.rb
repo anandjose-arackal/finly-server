@@ -20,18 +20,26 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     transfer_type = options[:bank_transfer_type]
     # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
 
-    if payment.reference_resource.present? && (payment.reference_resource.completed? || payment.reference_resource.processing?)
+    bank_transaction = payment.reference_resource
+
+    if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
       return false
-    elsif payment.reference_resource&.retriable?
-      reference_number = payment.reference_resource.unique_request_number
+    elsif bank_transaction&.retriable?
+      reference_number = bank_transaction.unique_request_number
     else
       reference_number = nil
     end
 
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
 
-    bank_transaction = create_bank_transaction(payment, transfer_request)
+    # If the payment doesn't already have a bank transaction, create one before the API call is initiated
+    if payment.reference_resource.blank? && (payment.failed? || payment.pending_approval?)
+      bank_transaction = create_bank_transaction(payment, transfer_request)
+    else
+      bank_transaction = payment.reference_resource
+    end
+
     unless bank_transaction
       return false
     end
