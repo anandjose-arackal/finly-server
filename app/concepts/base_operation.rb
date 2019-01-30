@@ -14,7 +14,7 @@ class BaseOperation
     end
     params ||= {}
     if params.class.name == ActionController::Parameters.name
-      self.params = params
+      self.params = ActionController::Parameters.new(params.to_unsafe_h)
     else
       self.params = (ActionController::Parameters.new(params) or {})
     end
