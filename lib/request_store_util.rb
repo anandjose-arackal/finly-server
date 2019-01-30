@@ -26,7 +26,7 @@ class RequestStoreUtil
   end
 
   def self.set_current_device(device)
-    RequestStore.store[:current_devise] = device
+    RequestStore.store[:current_device] = device
   end
 
   def self.to_hash
