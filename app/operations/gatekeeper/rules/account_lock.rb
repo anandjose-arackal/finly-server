@@ -1,5 +1,7 @@
 class Gatekeeper::Rules::AccountLock < Gatekeeper::Rules::BaseRule
 
+  book Gatekeeper::Master
+
   rule 'More than 5 failed attempts should lock the account', on: :user_login_failed do |params|
     # user = params[:user]
     # if user.failed_attempts >= 5
