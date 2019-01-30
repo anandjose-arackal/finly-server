@@ -3,10 +3,6 @@ class User::Delegate::Update < User::Base
   attr_accessor :delegated_user, :selected_user, :role_id,
                 :delegation_enabled, :purpose_id
 
-  def authorized_user_types
-    [:company_admin, :employee]
-  end
-
   def init
     delegated_user_id = params[:user_delegate_id]
     self.delegated_user = user.company.users.find_by(id: delegated_user_id)
