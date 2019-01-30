@@ -6,22 +6,29 @@ module Observer::Master
 
   module ClassMethods
 
-    unless defined?(observers)
-      cattr_accessor :observers_list
-      self.observers_list = []
+    def observers_master
+      if OBSERVERS_MASTER[self.name].nil?
+        OBSERVERS_MASTER[self.name] = {observers_list: [], observers_base_path: nil}
+      end
+      OBSERVERS_MASTER[self.name]
     end
 
-    unless defined?(observers_base_path)
-      cattr_accessor :observers_base_path
+    def observers_list
+      observers_master[:observers_list]
+    end
+
+    def observers_base_path
+      observers_master[:observers_base_path]
     end
 
     # For development,
     def observers_path(path)
-      self.observers_base_path = path
+      observers_master[:observers_base_path] = path
     end
 
     def add_observer(item)
-      self.observers_list << item unless self.observers_list.include?(item)
+      list = observers_list
+      list << item unless list.include?(item)
     end
 
     def observers
