@@ -31,10 +31,9 @@ class TravelRequests::Destinations::Show < TravelRequests::Base
   end
 
   def success
-    param = {}
-    param[:travel_request] = self.travel_request
-    param[:destination] = self.destination
-    TravelRequests::Destinations::Show::SuccessPresenter.new(user, param, messages)
+    params[:travel_request] = self.travel_request
+    params[:destination] = self.destination
+    TravelRequests::Destinations::Show::SuccessPresenter.new(user, params, messages)
   end
 
   class TravelRequests::Destinations::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
