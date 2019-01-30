@@ -30,6 +30,12 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     end
 
     transfer_request = create_transfer_request(payment, transfer_type, reference_number)
+
+    bank_transaction = create_bank_transaction(payment, transfer_request)
+    unless bank_transaction
+      return false
+    end
+
     op = YesBankApi::Transfer::BankTransfer.({
         transfer_request: transfer_request,
         payment: payment
@@ -144,10 +150,10 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         transfer_status_id = BankTransferStatus.id_for(:completed)
       when PaymentStatus.id_for(:processing)
         transfer_status_id = BankTransferStatus.id_for(:processing)
-      when PaymentStatus.id_for(:processing)
+      when PaymentStatus.id_for(:failed)
         transfer_status_id = BankTransferStatus.id_for(:failed)
       else
-        transfer_status_id = BankTransferStatus.id_for(:failed)
+        transfer_status_id = BankTransferStatus.id_for(:open)
     end
     bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
                                          transfer_type: transfer_request.transfer_type,
@@ -159,7 +165,14 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                              value: payment.amount_value,
                                              currency_id: Currency.first.id
                                          })
-    payment.update(reference_resource: bank_transaction)
+    payment.with_lock do
+      if payment.reference_resource.present?
+        return false
+      end
+      unless payment.update(reference_resource: bank_transaction)
+        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+      end
+    end
     bank_transaction
   end
 

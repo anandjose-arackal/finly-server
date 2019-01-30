@@ -7,6 +7,7 @@
 #                                           accept_invite GET    /users/invitation/accept(.:format)                                                                                  pending_invites#edit
 #                                          collect_notify POST   /collect/notify(.:format)                                                                                           finly_collect#notify
 #                                collect_test_transaction POST   /collect/test_transaction(.:format)                                                                                 finly_collect#notify
+#                                             sidekiq_web        /sidekiq                                                                                                            Sidekiq::Web
 #                                               crono_web        /crono                                                                                                              Crono::Web
 #                                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                                                                      admin_users/sessions#new
 #                                      admin_user_session POST   /admin_users/sign_in(.:format)                                                                                      admin_users/sessions#create

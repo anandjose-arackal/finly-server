@@ -118,21 +118,9 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
                           bank_response: self.transfer_request.transaction_result
       )
       self.payment.retry_count += 1
-    # otherwise create a new bank transaction
     else
-      self.bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
-                                                               transfer_type: transfer_request.transfer_type,
-                                                               bank_reference_number: transfer_request.bank_reference_number,
-                                                               beneficiary_bank_account: self.account,
-                                                               transfer_status_id: self.transfer_status_id,
-                                                               bank_response: transfer_request.transaction_result,
-                                                               amount_attributes: {
-                                                                   value: self.payment.amount_value,
-                                                                   currency_id: Currency.first.id
-                                                               })
-      unless self.payment.update(reference_resource: self.bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
-      end
+      # this is an anomaly, so send email and flag it
+      Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
     end
   end
 

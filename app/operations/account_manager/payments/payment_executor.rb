@@ -103,6 +103,13 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
     end
 
+    # checking if the particular beneficiary is kept on hold
+    if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.on_hold?
+      add_system_message :error, self.payment, "Transfers to this account have been temporarily put on hold"
+      add_message :error, "Transfers to this account have been temporarily put on hold"
+      return
+    end
+
   end
 
   def pre_process
