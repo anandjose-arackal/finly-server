@@ -7,6 +7,7 @@
 #                                           accept_invite GET    /users/invitation/accept(.:format)                                                                                  pending_invites#edit
 #                                          collect_notify POST   /collect/notify(.:format)                                                                                           finly_collect#notify
 #                                collect_test_transaction POST   /collect/test_transaction(.:format)                                                                                 finly_collect#notify
+#                                             sidekiq_web        /sidekiq                                                                                                            Sidekiq::Web
 #                                               crono_web        /crono                                                                                                              Crono::Web
 #                                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                                                                      admin_users/sessions#new
 #                                      admin_user_session POST   /admin_users/sign_in(.:format)                                                                                      admin_users/sessions#create
@@ -533,7 +534,14 @@
 #                                                         PUT    /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#update
 #                                                         DELETE /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#destroy
 #                                      api_vp_v1_payments GET    /api/vp/v1/payments(.:format)                                                                                       api/vp/v1/payments#index
+#                                                         POST   /api/vp/v1/payments(.:format)                                                                                       api/vp/v1/payments#create
+#                                   new_api_vp_v1_payment GET    /api/vp/v1/payments/new(.:format)                                                                                   api/vp/v1/payments#new
+#                                  edit_api_vp_v1_payment GET    /api/vp/v1/payments/:id/edit(.:format)                                                                              api/vp/v1/payments#edit
 #                                       api_vp_v1_payment GET    /api/vp/v1/payments/:id(.:format)                                                                                   api/vp/v1/payments#show
+#                                                         PATCH  /api/vp/v1/payments/:id(.:format)                                                                                   api/vp/v1/payments#update
+#                                                         PUT    /api/vp/v1/payments/:id(.:format)                                                                                   api/vp/v1/payments#update
+#                                                         DELETE /api/vp/v1/payments/:id(.:format)                                                                                   api/vp/v1/payments#destroy
+#                                api_vp_v1_bank_transfers GET    /api/vp/v1/bank_transfers(.:format)                                                                                 api/vp/v1/payments#all_payments
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                                           api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                                                junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                                                users#menu_data
@@ -2526,6 +2534,7 @@ Rails.application.routes.draw do
         patch 'bank_accounts/disable', to: 'bank_accounts#disable', as: :bank_account_disable
         resources :bank_accounts
         resources :payments
+        get 'bank_transfers', to: 'payments#all_payments'
       end
       scope :vendors do
         post '', to: 'vendors#create'

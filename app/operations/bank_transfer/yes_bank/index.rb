@@ -19,20 +19,20 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
     if self.role_id.blank? and params[:view].present?
       self.role_id = UserRole::VALUES[params[:view].to_sym]
     end
-    params[:with_application] = RequestStore.store[:current_app].to_s
+    params[:with_application] = RequestStore.store[:current_app].to_s unless current_device == :api
     params[:filter_vendor_payments] = '1'
   end
 
   def process
     case role_id
-    when UserRole.id_for(:admin), UserRole.id_for(:auditor)
-      company_not_open = user.company.payment_orders.not_open.pluck(:id)
-      personal_orders = user.payment_orders.pluck(:id)
-      self.payment_orders = PaymentOrder.where(id: (company_not_open + personal_orders))
-    else
-      # i.e. personal view
-      self.payment_orders = user.payment_orders
-    end
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+        company_not_open = user.company.payment_orders.not_open.pluck(:id)
+        personal_orders = user.payment_orders.pluck(:id)
+        self.payment_orders = PaymentOrder.where(id: (company_not_open + personal_orders))
+      else
+        # i.e. personal view
+        self.payment_orders = user.payment_orders
+      end
   end
 
   def success
@@ -45,7 +45,7 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
 
     include HasScope
 
-    has_scope :with_application
+    # has_scope :with_application
     has_scope :filter_vendor_payments
     has_scope :filter_date, using: [:from, :to], type: :hash
 

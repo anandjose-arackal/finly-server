@@ -289,7 +289,7 @@ class Payment < ApplicationRecord
             OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", vendor_ids, user_ids)
   }
 
-  scope :filter_initiating_name, -> (name) {
+  scope :filter_initiating_user_name, -> (name) {
     user_ids = User.where("first_name like ? OR last_name like ?", "%#{name}%", "%#{name}%").pluck(:id)
     where("(initiating_user_type = 'User' AND initiating_user_id IN (?))", user_ids)
   }
