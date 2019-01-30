@@ -1,6 +1,5 @@
 class ExportManager::Master::BaseMaster
-  include Observer::Master, Observer::Observable
-  cattr_accessor :data_map
+  include Observer::Master, Observer::Observable, Supporters::ErrorTracker
 
   attr_accessor :user, :params, :input, :messages
 
@@ -27,20 +26,6 @@ class ExportManager::Master::BaseMaster
   # Input is the what is used for generating the
   def input
     # To be written by every adapter
-  end
-
-  def clear_messages
-    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
-  end
-
-  def add_message(type, message)
-    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
-    clear_messages if self.messages.blank?
-    if message.is_a?(Array)
-      messages[type].concat message
-    elsif message.is_a?(String)
-      messages[type] << message
-    end
   end
 
 end
