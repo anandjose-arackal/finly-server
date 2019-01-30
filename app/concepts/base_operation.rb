@@ -1,6 +1,6 @@
 require 'hooks'
 class BaseOperation
-  include CallbackHandler, MathUtil, HasScope, OperationValidations
+  include CallbackHandler, MathUtil, HasScope, OperationValidations, Supporters::ErrorTracker
   # todo rename user to resource as User is a model and there can be other models such as AdminUser etc
   attr_accessor :user, :company, :params, :messages, :process_complete, :response
 
@@ -209,10 +209,6 @@ class BaseOperation
     else
       execute_failure
     end
-  end
-
-  def has_errors?
-    self.messages.present? and (self.messages[:error].present? or self.messages[:failure].present?)
   end
 
   def processing?
@@ -426,26 +422,6 @@ class BaseOperation
       self.params = params.to_unsafe_h
     end
     self.params
-  end
-
-  def add_message(type, message)
-    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
-    clear_messages if self.messages.blank?
-    if message.is_a?(Array)
-      messages[type].concat message
-    elsif message.is_a?(String)
-      messages[type] << message
-    end
-  end
-
-  def add_system_message(type, model, message)
-    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
-    clear_messages if self.messages.blank?
-    message = [message] unless message.is_a?(Array)
-    system_message_type = SystemMessageType.id_for(type)
-    message.each do |m|
-      SystemMessage.create(messagable: model, content: m, system_message_type_id: system_message_type)
-    end
   end
 
   def raise_unauthorized_exception
