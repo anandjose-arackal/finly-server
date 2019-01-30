@@ -3,7 +3,7 @@ class User::Configuration::EnforcePolicy::Base < BaseOperation
   attr_accessor :selected_user, :enforce_config
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :vendor_payments_admin]
   end
 
   def pre_validate

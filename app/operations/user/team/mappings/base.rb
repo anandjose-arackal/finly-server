@@ -8,7 +8,7 @@ class User::Team::Mappings::Base < User::Team::Base
   end
 
   def pre_authorize
-    if user.company_admin?
+    if user.company_admin? || user.vendor_payments_admin?
       if params[:policy_id].present?
         self.policy = user.company.policies.with_id(params[:policy_id]).first rescue nil
       else
