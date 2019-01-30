@@ -20,7 +20,7 @@ Doorkeeper.configure do
       if scopes.size == 1 and ['web', 'mobile', 'chrome', 'api'].include?(scopes.first)
         u = User.find_for_database_authentication(:username => params[:username])
       elsif (scopes.size == 1 and scopes.include?('admin')) or (scopes.include?('admin_bypass') and scopes.include?('web') and scopes.size == 2)
-        u = AdminUser.find_for_database_authentication(:username => params[:username])
+        u = AdminUser.find_for_database_authentication(:username => paramseval[:username])
       end
       if u && u.valid_password?(params[:password])
         if scopes.include?('admin_bypass')

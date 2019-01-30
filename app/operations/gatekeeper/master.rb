@@ -1,6 +1,6 @@
-class Master
-  include Observer::Master
+class Gatekeeper::Master
+  include RuleBook::Index, Observer::Master
 
-  observers_path "#{Rails.root}/app/gatekeeper/observers"
+  rules_path "#{Rails.root}/app/gatekeeper/rules"
 
 end

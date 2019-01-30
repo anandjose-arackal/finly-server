@@ -1,6 +1,8 @@
 class UsersController < ApplicationController
 
+
   before_action -> { finly_authorize! :web } , except: [:lookup, :send_verification_otp, :verify_user_otp]
+  before_action -> {}
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show

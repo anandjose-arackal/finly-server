@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
-  # protect_from_forgery with: :exception
+  protect_from_forgery with: :null_session
   # before_action :set_paper_trail_whodunnit
 
   before_action :load_global_variables
@@ -21,6 +21,8 @@ class ApplicationController < ActionController::Base
   before_action :init_elastic_apm
 
   before_action :store_location
+
+  before_action {result = Gatekeeper::Trigger.(:before_auth_action)}
 
   after_action :set_queries_counter
   after_action :track_request

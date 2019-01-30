@@ -1,0 +1,2 @@
+class RuleBook::Runner
+end
