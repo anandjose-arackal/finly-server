@@ -89,7 +89,6 @@ class YesBankApi::Base < BaseHandler
         req.body = template
       end
 
-
       self.end_time = DateUtils.local_date_time
 
       if Rails.env.production?
@@ -118,11 +117,10 @@ class YesBankApi::Base < BaseHandler
         file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Timeout'}))
       end
 
-
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      # create a failed bank transacton so that the record is preserved
+      # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
       if self.payment&.reference_resource&.is_a?(BankTransaction)
         # just update the bank transaction with the latest details
@@ -133,19 +131,9 @@ class YesBankApi::Base < BaseHandler
             bank_response: self.transfer_request.transaction_result
         )
         self.payment.retry_count += 1
-        # otherwise create a new bank transaction
       else
-        self.bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
-                                                                 transfer_type: transfer_request.transfer_type,
-                                                                 bank_reference_number: transfer_request.bank_reference_number,
-                                                                 beneficiary_bank_account: self.account,
-                                                                 transfer_status_id: BankTransferStatus.id_for(:possible_failure),
-                                                                 bank_response: transfer_request.transaction_result,
-                                                                 amount_attributes: {
-                                                                     value: self.payment.amount_value,
-                                                                     currency_id: Currency.first.id
-                                                                 })
-        self.payment.update(reference_resource: self.bank_transaction)
+        # this is an anomaly, so send email and flag it
+        Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
       end
         # temporary - rescue SSL error to simulate various cases
         # rescue Faraday::SSLError
