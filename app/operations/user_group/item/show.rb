@@ -2,7 +2,7 @@ class UserGroup::Item::Show < UserGroup::Item::Users::Base
   attr_accessor :item, :group, :users, :addable_users
 
   def authorized_user_types
-    [:company_admin, :auditor]
+    [:company_admin, :auditor, :vendor_payments_admin]
   end
 
   def pre_validate
