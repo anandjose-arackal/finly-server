@@ -4,7 +4,7 @@ class Api::Vp::V1::PaymentsController < ApplicationController
   before_action -> { finly_authorize! :api }
 
   def index
-    @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
+    @result = BankTransfer::Payments::Index.(current_user, params)
     respond
   end
 

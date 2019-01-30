@@ -278,6 +278,32 @@ class Payment < ApplicationRecord
     end
   }
 
+  scope :filter_payment_id, -> (payment_id) {
+    where id: payment_id
+  }
+
+  scope :filter_receiving_user_name, -> (name) {
+    vendor_ids = YesBankVendor.where("name like ?", "%#{name}%").pluck(:id)
+    user_ids = User.where("first_name like ? OR last_name like ?", "%#{name}%", "%#{name}%").pluck(:id)
+    where("(receiving_user_type = 'YesBankVendor' AND receiving_user_id IN (?))
+            OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", vendor_ids, user_ids)
+  }
+
+  scope :filter_initiating_name, -> (name) {
+    user_ids = User.where("first_name like ? OR last_name like ?", "%#{name}%", "%#{name}%").pluck(:id)
+    where("(initiating_user_type = 'User' AND initiating_user_id IN (?))", user_ids)
+  }
+
+  scope :filter_beneficiary_account_number, -> (account_number) {
+    bank_account_ids = BankAccount.where("account_number like ?", "%#{account_number}%").pluck(:id)
+    where("(receiving_account_type = 'BankAccount' AND receiving_account_id IN (?))", bank_account_ids)
+  }
+
+  scope :filter_beneficiary_account_ifsc, -> (ifsc) {
+    bank_account_ids = BankAccount.where("ifsc like ?", "%#{ifsc}%").pluck(:id)
+    where("(receiving_account_type = 'BankAccount' AND receiving_account_id IN (?))", bank_account_ids)
+  }
+
   scope :filter_date, -> (date_from, date_to) {
     type_val = :date
     date_from = "1990-01-01" if date_from.blank?
