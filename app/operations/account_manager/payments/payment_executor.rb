@@ -91,6 +91,14 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
+    # checking if the particular beneficiary is kept on hold
+    if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.on_hold?
+      add_system_message :error, self.payment, "Transfers to this account have been temporarily put on hold"
+      Event::EAlert::Create.(nil, title: 'Payment attempted for on hold account', description: "Payment attempted for on hold account. Details: #{self.payment.receiving_account}", subject: 'Payment attempted for on hold account')
+      add_message :error, "Transfers to this account have been temporarily put on hold"
+      return
+    end
+
     self.payment.with_lock do
       self.payment.reload
       unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
@@ -100,13 +108,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
       # update payment to in progress
       payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
-    end
-
-    # checking if the particular beneficiary is kept on hold
-    if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.on_hold?
-      add_system_message :error, self.payment, "Transfers to this account have been temporarily put on hold"
-      add_message :error, "Transfers to this account have been temporarily put on hold"
-      return
     end
 
   end
