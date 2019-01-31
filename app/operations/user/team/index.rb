@@ -26,6 +26,7 @@ class User::Team::Index < User::Team::Base
   has_scope :filter_em_reviewers
   has_scope :filter_unassigned_travel_for_policy
   has_scope :filter_unassigned_finance_for_policy
+  has_scope :filter_unassigned_creditor_for_policy
   has_scope :filter_unassigned_members_for_policy
 
   def pre_validate

@@ -30,5 +30,4 @@ class PolicyUserRole < ApplicationRecord
   scope :with_policy_id, -> (policy_id){
     where policy_id: policy_id
   }
-
 end

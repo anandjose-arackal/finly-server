@@ -302,6 +302,19 @@ class TravelRequest < ApplicationRecord
     Expense.with_report_id(reports.pluck(:id))
   end
 
+  def get_default_provider
+    if self.class.status_ids(:open, :processing, :retracted, :rejected, :auto_approved, :approved).include?(status_id)
+      self.class.name + "Provider"
+    elsif self.class.status_ids(:booked, :cancelled, :booking_pending, :selection_requested,
+                                :selection_processing, :selection_confirmed, :selection_rejected,
+                                :booking_confirmed, :completed).include?(status_id)
+      self.class.name + "BookingProvider"
+    else
+      self.class.name + "Provider"
+    end
+
+  end
+
   protected
 
   def acceptable_dates?

@@ -7,7 +7,7 @@ json.travel_request do
 end
 
 json.manager_name @result.manager&.name
-json.travel_manager_name @result.travel_manager&.name
+# json.travel_manager_name @result.travel_managers&.name
 json.travel_manager_name @result.travel_managers.map(&:name)
 json.controlling_user_name @result.travel_request&.controlling_user&.name
 json.owner do
@@ -168,6 +168,7 @@ json.reviewal_chains do
     json.reviewal_chain do
       json.array! chain[:reviewal_chain] do |item|
         json.level_number item[:level_number]
+        json.level_name item[:level_name]
         json.level_id item[:level_id]
         if item[:selected_reviewer].present?
           json.selected_reviewer do
@@ -193,6 +194,7 @@ json.reviewal_chains_booking do
     json.reviewal_chain do
       json.array! chain[:reviewal_chain] do |item|
         json.level_number item[:level_number]
+        json.level_name item[:level_name]
         json.level_id item[:level_id]
         json.selected_reviewer item[:selected_reviewer]&.as_json
         json.reviewers do
