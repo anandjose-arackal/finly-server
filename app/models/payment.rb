@@ -47,7 +47,7 @@
 #
 
 class Payment < ApplicationRecord
-  include PostOperationExecution
+  include PostOperationExecution, SoftDeletable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -231,6 +231,10 @@ class Payment < ApplicationRecord
     where payment_purpose_id: purpose_id
   }
 
+  scope :with_payment_status, -> (status_ids) {
+    where(payment_status_id: status_ids)
+  }
+
   scope :cash_additions_to_employee, -> { where(payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)]) }
   scope :cash_deductions_from_employee, -> { where(payment_type_id: [PaymentPurpose.id_for(:balance_clearance_outside_finly)]) }
 
@@ -380,7 +384,7 @@ class Payment < ApplicationRecord
   validate :initiating_account_presence
   validate :receiving_account_presence
 
-  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, to: :payment_status
+  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, :pending_approval?, to: :payment_status
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)

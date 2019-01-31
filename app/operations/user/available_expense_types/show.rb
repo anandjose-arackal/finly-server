@@ -80,9 +80,11 @@ class User::AvailableExpenseTypes::Show < User::Base
           else
             per_diem_config[:per_diems] = []
             policy.per_diems.active.each do |per_diem|
+              currency = per_diem.configurable.base_currency
               per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
                                               id: per_diem.id,
-                                              rate: per_diem.rate_value
+                                              rate: per_diem.rate_value,
+                                              currency: currency
               }
             end
           end
@@ -109,9 +111,11 @@ class User::AvailableExpenseTypes::Show < User::Base
             if user.enforce_policy_enabled? && per_diem.configurable.default
               next
             end
+            currency = per_diem.configurable.base_currency
             per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
                                             id: per_diem.id,
-                                            rate: per_diem.rate_value
+                                            rate: per_diem.rate_value,
+                                            currency: currency
             }
           end
         end

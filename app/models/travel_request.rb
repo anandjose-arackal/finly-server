@@ -50,6 +50,7 @@ class TravelRequest < ApplicationRecord
   has_many :reports
   has_many :money_requests
   has_many :bookings
+  has_many :email_authorizations, as: :authorizable
 
   belongs_to :controlling_user, optional: true, class_name: 'User'
   belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
@@ -291,6 +292,10 @@ class TravelRequest < ApplicationRecord
         destinations_list: destinations_list,
         summary: summary
     }
+  end
+
+  def expenses
+    Expense.with_report_id(reports.pluck(:id))
   end
 
   protected

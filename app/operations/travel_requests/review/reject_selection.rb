@@ -47,6 +47,11 @@ class TravelRequests::Review::RejectSelection < TravelRequests::Review::Base
     end
   end
 
+  def post_process
+    Event::ETravelRequest::RejectSelection.(user, travel_request: travel_request)
+    add_message :success, 'Selection has been successfully confirmed'
+  end
+
   protected
 
   # Check if the user has a selector configured, use the selector. Else the owner becomes the selector

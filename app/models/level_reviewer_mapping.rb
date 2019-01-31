@@ -31,7 +31,7 @@ class LevelReviewerMapping < ApplicationRecord
   scope :with_level_id, -> (ids) {
     where level_id: ids
   }
-  scope :non_deleted, -> { where is_deleted: [nil, false] }
+  scope :non_deleted, -> {where deleted_at: nil}
 
   scope :with_reviewer_id, -> (ids){
     where reviewer_id: ids

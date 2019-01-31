@@ -1,8 +1,8 @@
-class EmailAuthorization::Create < EmailAuthorization::Base
+class EmailAuthorizations::Create < EmailAuthorizations::Base
   attr_accessor :authorizable, :token, :email_authorization
   def init
     self.authorizable = params[:authorizable]
-    unless authorizable.instance_of?(Report) || authorizable.instance_of?(MoneyRequest)
+    unless authorizable.instance_of?(Report) || authorizable.instance_of?(MoneyRequest) || authorizable.instance_of?(TravelRequest)
       add_message :error, "Wrong Authorizable type provided."
       return
     end
@@ -47,10 +47,10 @@ class EmailAuthorization::Create < EmailAuthorization::Base
 
   def success
     params[:email_authorization] = self.email_authorization
-    EmailAuthorization::Create::Presenter.new(user, params, messages)
+    EmailAuthorizations::Create::Presenter.new(user, params, messages)
   end
 
-  class EmailAuthorization::Create::Presenter < BaseOperation::BasePresenter::SuccessPresenter
+  class EmailAuthorizations::Create::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :email_authorization
 
     def init
