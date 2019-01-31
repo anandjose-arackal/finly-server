@@ -32,7 +32,18 @@ class TrailAction < ApplicationRecord
         :release,
         # Bank Payment Request
         :mark_as_credited,
-        :credit
+        :credit,
+
+        # TravelRequestBookingActions
+        :confirm_selection,
+        :approve_selection,
+        :reject_selection,
+        :unapprove_selection,
+        :confirm_booking,
+        :reject_booking_request,
+        :request_selection,
+        :retract_booking
+
     ]
   end
 end

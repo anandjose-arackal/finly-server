@@ -58,13 +58,17 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
       transitions from: :selection_processing, to: :selection_rejected
     end
 
+    event :confirm_booking do
+      transitions from: :selection_confirmed, to: :booking_confirmed
+    end
+
     # event :request
     after_all_events :change_state
   end
 
   private
 
-  def update_dlrm
+  def update_dlrms
     if[:confirm_selection].include?(aasm.current_event)
       dlrms = document.document_level_reviewer_mappings.with_provider_name(provider_name).with_level_id(next_level&.id).with_policy_id(policy.id)
 
@@ -136,7 +140,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
     end
 
     if [:reject_selection].include?(aasm.current_event)
-      dlrm = document.document_level_reviewer_mappings
+      dlrm = document.document_level_reviewer_mappings.with_provider_name(provider_name)
       dlrm.update_all(
               taken_control: false,
               taken_control_by_id: nil,
@@ -180,6 +184,10 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
 
     if [:request_selection].include?(aasm.current_event)
       update_params[:submitted_at] = DateTime.now
+    end
+
+    if [:confirm_booking].include?(aasm.current_event)
+      update_params[:booking_confirmed_at] = DateTime.now
     end
 
     update_params

@@ -68,7 +68,7 @@ class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
 
   def post_process
     travel_request.comments.create user: user,
-                                   comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
+                                   action_id: TravelRequestCommentAction.id_for(:take_control),
                                    content: params[:take_control_note]
 
     # # todo - check how the workflow should be

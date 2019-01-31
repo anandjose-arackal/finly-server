@@ -52,6 +52,8 @@ class WorkflowManager::Base < BaseOperation
   def process
     # Run event
     action = self.aasm_document.send(self.aasm_event)
+
+
     unless action
       add_message :error, "Couldn't perform action"
       return

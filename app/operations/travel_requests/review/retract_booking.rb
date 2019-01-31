@@ -22,10 +22,10 @@ class TravelRequests::Review::RetractBooking < TravelRequests::Review::Base
 
   def validate
 
-    unless travel_request.controlling_user_id == user.id
-      add_message :error, "Cannot retract booking in this state"
-      return
-    end
+    # unless travel_request.controlling_user_id == user.id
+    #   add_message :error, "Cannot retract booking in this state"
+    #   return
+    # end
 
     # checking if the travel request can be confirmed as boked
     unless self.travel_request.can_retract_botraveloking?
@@ -54,6 +54,8 @@ class TravelRequests::Review::RetractBooking < TravelRequests::Review::Base
 
   def post_process
     add_message :success, "Travel booking successfully retracted"
+
+    #todo - abi
     travel_request.money_requests.status_pending.update_all(
         controlling_user_id: travel_request.controlling_user_id,
         controlling_user_role_id: travel_request.controlling_user_role_id
