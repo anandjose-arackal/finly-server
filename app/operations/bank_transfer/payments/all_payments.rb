@@ -24,7 +24,7 @@ class BankTransfer::Payments::AllPayments < BankTransfer::Payments::Base
 
   def success
     params[:payments] = self.payments
-    BankTransfer::Payments::Index::PaymentsPresenter.new(current_user, params)
+    BankTransfer::Payments::Index::PaymentsPresenter.new(current_user, params, messages)
   end
 
   class BankTransfer::Payments::Index::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
