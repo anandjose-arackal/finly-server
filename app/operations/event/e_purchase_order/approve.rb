@@ -52,28 +52,30 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
   end
 
   def affected_users
-    if approved
-      if auto_approve
-        return [self.purchase_order.user]
-      end
-      [self.purchase_order.trails.last.action_user, self.purchase_order.user]
-    else
-      users = [self.purchase_order.trails.last.action_user]
-      if controlling_users.present?
-        controlling_users.each do |user|
-          users.push(user)
-        end
-      end
-      users
-    end
+    # if approved
+    #   if auto_approve
+    #     return [self.purchase_order.user]
+    #   end
+    #   [self.purchase_order.trails.last.action_user, self.purchase_order.user]
+    # else
+    #   users = [self.purchase_order.trails.last.action_user]
+    #   if controlling_users.present?
+    #     controlling_users.each do |user|
+    #       users.push(user)
+    #     end
+    #   end
+    #   users
+    # end
+    self.purchase_order.affected_users(:approve)
   end
 
   def notification_affected_users
-    if approved
-      [purchase_order.user]
-    else
-      self.controlling_users
-    end
+    # if approved
+    #   [purchase_order.user]
+    # else
+    #   self.controlling_users
+    # end
+    self.purchase_order.notification_affected_users(:approve)
   end
 
   def set_notification(user)
@@ -88,13 +90,13 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
     end
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:purchase_order),
                                              action_type_id: notify_type,
-                                             action_user_id: (purchase_order.trails.last.action_user.id rescue nil),
+                                             action_user_id: (purchase_order.trails.last.action_user_id rescue nil),
                                              object_id: purchase_order.id,
                                              object_type: "Purchase Order",
                                              path_object_id: purchase_order.id,
                                              path_object_type: "Purchase Order",
                                              read: false,
-                                             timestamp: DateUtils.local_date_time,
+                                             timestamp: DateUtils,
                                              application: RequestStore.store[:current_app])
     notification.save
   end
