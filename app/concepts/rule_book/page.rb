@@ -18,15 +18,15 @@ module RuleBook::Page
       end
       if on.respond_to?(:each)
         on.each do |event|
-          register_rule(event, description, block)
+          register_rule(event, description, block, options)
         end
       else
-        register_rule(on, description, block)
+        register_rule(on, description, block, options)
       end
     end
 
-    def register_rule(event, description, block)
-      rule = {description: description, block: block, event: event}
+    def register_rule(event, description, block, options)
+      rule = master.rule_class.new({description: description, block: block, event: event, options: options, page: self})
       self.register_multiple event, rule
       self.register_multiple :rules, rule
     end
