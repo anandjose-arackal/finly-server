@@ -43,6 +43,9 @@ set :branch, ENV['BRANCH'] || :master
   when :development_4
     set :deploy_to, '/home/centos/app_4'
     set :rails_env, 'staging'
+  when :development_5
+    set :deploy_to, '/home/centos/app_5'
+    set :rails_env, 'staging'
 end
 
 set :pty, false
