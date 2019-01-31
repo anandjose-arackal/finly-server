@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_28_135757) do
+ActiveRecord::Schema.define(version: 2019_01_31_110717) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -470,6 +470,7 @@ ActiveRecord::Schema.define(version: 2019_01_28_135757) do
     t.boolean "is_deleted", default: false
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
+    t.boolean "on_hold", default: false
     t.index ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id"
   end
 
@@ -4882,6 +4883,8 @@ ActiveRecord::Schema.define(version: 2019_01_28_135757) do
     t.datetime "updated_at", null: false
     t.integer "delegated_action_user_id"
     t.integer "payment_id"
+    t.string "original_track_type"
+    t.integer "original_track_id"
     t.index ["action_id"], name: "index_trails_on_action_id"
     t.index ["action_level_id"], name: "index_trails_on_action_level_id"
     t.index ["action_user_id"], name: "index_trails_on_action_user_id"
