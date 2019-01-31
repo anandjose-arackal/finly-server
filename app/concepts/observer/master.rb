@@ -8,34 +8,29 @@ module Observer::Master
 
     def observers_master
       if OBSERVERS_MASTER[self.name].nil?
-        OBSERVERS_MASTER[self.name] = {observers_list: [], observers_base_path: nil}
+        OBSERVERS_MASTER[self.name] = {observers: [], observers_path: nil}
       end
       OBSERVERS_MASTER[self.name]
     end
 
-    def observers_list
-      observers_master[:observers_list]
-    end
-
-    def observers_base_path
-      observers_master[:observers_base_path]
-    end
-
-    # For development,
-    def observers_path(path)
-      observers_master[:observers_base_path] = path
+    def observers_path(path = NoObject)
+      unless path == NoObject
+        observers_master[:observers_path] = path
+      end
+      observers_master[:observers_path]
     end
 
     def add_observer(item)
-      list = observers_list
+      list = observers_master[:observers]
       list << item unless list.include?(item)
     end
 
     def observers
-      if self.observers_list.blank? and not Rails.env.production? and self.observers_base_path.present?
-        Dir.glob("#{observers_base_path}/**/*.rb").each {|r| load r}
+      observers = observers_master[:observers]
+      if observers.blank? and not Rails.env.production? and self.observers_path.present?
+        Dir.glob("#{observers_path}/**/*.rb").each {|r| load r}
       end
-      self.observers_list
+      observers
     end
 
   end

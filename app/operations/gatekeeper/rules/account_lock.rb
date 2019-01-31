@@ -1,9 +1,9 @@
 class Gatekeeper::Rules::AccountLock < Gatekeeper::Rules::BaseRule
 
-  book Gatekeeper::Master
+  index Gatekeeper::Master
 
   rule 'More than 5 failed attempts should lock the account', on: :user_login_failed do |params|
-    set_response_code 401
+    response_code 401
     # user = params[:user]
     # if user.failed_attempts >= 5
     #   user.update(locked_at: DateTime.now)

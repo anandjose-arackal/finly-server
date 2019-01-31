@@ -1,7 +1,16 @@
 class Gatekeeper::Master
   include RuleBook::Index, Observer::Master
 
-  set_rule_class RuleBook::Rule.with_attrs(:response_code)
-  set_rules_path "#{Rails.root}/app/gatekeeper/rules"
+  # class Gatekeeper::Master::Checker < RuleBook::Verifier
+  #   properties :response_code
+  #
+  #   def success?
+  #     super and [nil, 200].include?(response_code)
+  #   end
+  # end
+
+  # rule_verifier Gatekeeper::Master::Checker
+  rule_verifier RuleBook::Verifier.with_properties(:response_code)
+  rules_path "#{Rails.root}/app/gatekeeper/rules"
 
 end

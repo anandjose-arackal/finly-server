@@ -1,25 +1,22 @@
 class Gatekeeper::Event
   include Supporters::ErrorTracker
 
-  attr_accessor :event, :options
+  attr_accessor :event, :params
 
-  def self.call(event, options)
-    self.new(event, options).run
+  def self.call(event, params)
+    self.new(event, params).run
   end
 
-  def initialize(event, options)
+  def initialize(event, params)
     self.event = event
-    self.options = options
+    self.params = params
   end
 
   def run
     Gatekeeper::Master.observers.each do |observer|
       rules = observer.send(event)
       rules.each do |rule|
-        result = rule.run
-        if result.success?
-
-        end
+        result = rule.verify(self.params)
       end
     end
   end

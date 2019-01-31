@@ -6,9 +6,11 @@ module RuleBook::Page
 
   module ClassMethods
 
-    # Alias method for register_master
-    def book(klass)
-      self.register_master klass
+    def index(klass = NoObject)
+      unless klass == NoObject
+        self.register_master klass
+      end
+      master
     end
 
     def rule(description, options = {}, &block)
@@ -26,7 +28,15 @@ module RuleBook::Page
     end
 
     def register_rule(event, description, block, options)
-      rule = master.rule_class.new({description: description, block: block, event: event, options: options, page: self})
+      rule = RuleBook::Rule.new(
+          {
+              description: description,
+              block: block,
+              event: event,
+              options: options,
+              page: self
+          }
+      )
       self.register_multiple event, rule
       self.register_multiple :rules, rule
     end
