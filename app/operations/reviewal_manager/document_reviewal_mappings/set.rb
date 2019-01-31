@@ -54,8 +54,9 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
   def process
     # find
+    document.document_level_reviewer_mappings.destroy_all
+    
     if mappings_params[:document_reviewer_mappings].present?
-      document.document_level_reviewer_mappings.destroy_all
       mappings_params[:document_reviewer_mappings].each do |mapping_params|
         reviewer_id = mapping_params[:reviewer_id].to_i
 

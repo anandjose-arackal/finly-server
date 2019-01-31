@@ -49,8 +49,8 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def get_token(user)
-    email_authorization = params[:email_authorization]
-    token = email_authorization.token
+    email_authorization = params[:email_authorization].where(user_id: user.id)&.last
+    token = email_authorization&.token
     token
   end
 

@@ -46,17 +46,19 @@ class Settlement::Summary < Settlement::Base
     end
 
     users = users_presenter.team
-    user_ids = users.pluck(:id)
+    user_ids = users&.pluck(:id)
 
-    load_users_summary(users)
-    load_cash_on_hand_summary(user_ids)
+    unless users.blank?
+      load_users_summary(users)
+      load_cash_on_hand_summary(user_ids)
 
-    if cards_enabled or bank_transfer_enabled
-      load_finly_money_summary(user_ids)
-    end
-    if cards_enabled
-      load_expense_cards_summary(user_ids)
-      load_reimbursement_cards_summary(user_ids)
+      if cards_enabled or bank_transfer_enabled
+        load_finly_money_summary(user_ids)
+      end
+      if cards_enabled
+        load_expense_cards_summary(user_ids)
+        load_reimbursement_cards_summary(user_ids)
+      end
     end
   end
 

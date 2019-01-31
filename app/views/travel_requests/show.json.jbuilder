@@ -7,7 +7,7 @@ json.travel_request do
 end
 
 json.manager_name @result.manager&.name
-json.travel_manager_name @result.travel_manager&.name
+# json.travel_manager_name @result.travel_managers&.name
 json.travel_manager_name @result.travel_managers.map(&:name)
 json.controlling_user_name @result.travel_request&.controlling_user&.name
 json.owner do

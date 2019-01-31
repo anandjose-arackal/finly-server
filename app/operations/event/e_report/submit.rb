@@ -14,8 +14,8 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def get_token(user)
-    email_authorization = params[:email_authorization]
-    email_authorization.token
+    email_authorization = params[:email_authorization].where(user_id: user.id)&.last
+    email_authorization&.token
   end
 
   def notification_affected_users
