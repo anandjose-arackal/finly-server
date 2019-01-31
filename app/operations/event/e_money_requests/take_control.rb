@@ -21,7 +21,7 @@ class Event::EMoneyRequests::TakeControl < Event::EMoneyRequests::Base
   def send_push_notification(user)
     # return if user.id == money_request.controlling_user_id
     return unless self.money_request.document_level_reviewer_mappings.with_level_id(self.money_request.controlling_level_id).pluck(:reviewer_id).include?(user.id)
-    last_trail = self.money_request.order(:created_at).last rescue nil
+    last_trail = self.money_request.trails.last rescue nil
     message = "#{last_trail.action_user.name} has taken control of the Money Request : #{self.money_request.name}"
     # view = UserRole.name_for(self.money_request.controlling_for_user_role_id)
     view = 'manager'
@@ -52,7 +52,7 @@ class Event::EMoneyRequests::TakeControl < Event::EMoneyRequests::Base
 
   def mailer_subject(user)
     # if user.id == money_request.controlling_user_id
-    if money_request.get_reviewers.include?(user)
+    if user.id == money_request.trails.last.action_user_id
       "You have taken control of the Money Request: #{self.money_request.name}"
     else
       last_trail = self.money_request.trails.order(:created_at).last rescue nil
@@ -62,7 +62,7 @@ class Event::EMoneyRequests::TakeControl < Event::EMoneyRequests::Base
 
   def mailer_body(user)
     # if user.id == money_request.controlling_user_id
-    if user.id == report.trails.last.action_user_id
+    if user.id == money_request.trails.last.action_user_id
       "You have taken control of the Money Request.<br/><br/>Money Request: \"#{self.money_request.name}\""
     else
       last_trail = self.money_request.trails.last
