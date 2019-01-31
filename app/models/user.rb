@@ -500,14 +500,20 @@ class User < ApplicationRecord
 
   # Gives list of user who are not part of a policy as finance manager
   scope :filter_unassigned_finance_for_policy, -> (policy_id){
-    user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:finance_manager))
-    without_id(user_ids)
+    policy = Policy.find_by id: policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:finance_manager))
+      without_id(user_ids)
+    end
   }
 
   # Gives list of user who are not part of a policy as travel manager
   scope :filter_unassigned_travel_for_policy, -> (policy_id){
-    user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:travel_manager))
-    without_id(user_ids)
+    policy = Policy.find_by id: policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:travel_manager))
+      without_id(user_ids)
+    end
   }
 
   # Gives list of user who are not part of a policy as travel manager
@@ -518,6 +524,17 @@ class User < ApplicationRecord
       user_ids = policy.users.pluck(:id)
       without_id(user_ids)
     end
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_creditor_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy.id).with_role_id(UserRole.id_for(:creditor))
+      without_id(user_ids)
+    end
+
   }
 
 
