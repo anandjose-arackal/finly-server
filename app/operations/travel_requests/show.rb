@@ -236,7 +236,7 @@ class TravelRequests::Show < TravelRequests::Base
         actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       end
       # Approve Selection
-      if travel_request.selection_processing? and travel_request.get_reviewers(:current, provider_name)
+      if travel_request.selection_processing? and travel_request.get_reviewers(:current, provider_name).include?(user)
         actions[:approve_selection] = {method: 'patch', type: 12, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         actions[:reject_selection] = {method: 'patch', type: 13, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       end

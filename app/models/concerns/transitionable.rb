@@ -124,8 +124,9 @@ module Transitionable
       User.with_id(user_ids)
     end
 
-    def get_reviewal_chain
-      dlrms = self.document_level_reviewer_mappings.includes(:level, :reviewer, :action_taken_by, :taken_control_by)
+    def get_reviewal_chain(provider_name=nil)
+      provider_name ||= get_default_provider
+      dlrms = self.document_level_reviewer_mappings.with_provider_name(provider_name).includes(:level, :reviewer, :action_taken_by, :taken_control_by)
       chain = []
 
       dlrms.each do |dlrm|

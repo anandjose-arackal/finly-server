@@ -33,6 +33,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
     end
 
     event :confirm_selection do # Equivalent to submit
+      transitions from: [:selection_requested, :selection_rejected], to: :selection_confirmed, guard: :reviewers_not_present?
       transitions from: [:selection_requested, :selection_rejected], to: :selection_processing
     end
 

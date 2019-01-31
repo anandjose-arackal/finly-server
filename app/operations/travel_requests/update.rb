@@ -73,6 +73,17 @@ class TravelRequests::Update < TravelRequests::Base
       # Create Document Level Reviewer Mapping
       # For setting level specific reviewers from reviewal chain for a document
       params[:reviewal_document] = self.travel_request.reload
+      params[:provider_name] = 'TravelRequestProvider'
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
+      # Create Document Level Reviewer Mapping for Travel Request Booking Provider
+      params[:provider_name] = 'TravelRequestBookingProvider'
+      params[:document_reviewer_mappings] = params[:document_reviewer_mappings_booking]
 
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?

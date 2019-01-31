@@ -12,8 +12,8 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider )
     policy_id = params[:policy_id]
 
-    self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
-    # self.policy = user.company.policies.with_application(:vp).with_id(policy_id).first rescue nil
+    # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
+    self.policy = user.company.policies.with_id(policy_id).first rescue nil
   end
 
   def validate
@@ -42,7 +42,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       level_data = {
           level_number: level.level_number,
           level_id: level.id,
-          level_number: level.name,
+          level_name: level.name,
           reviewers: mappings
       }
       if selected_reviewer.present?
