@@ -78,6 +78,8 @@ class TravelRequestComment < ApplicationRecord
       comment_content += " approved selection"
     when TravelRequestCommentAction.id_for(:selection_rejected)
       comment_content += " rejected selection"
+    when TravelRequestCommentAction.id_for(:booking_confirmed)
+      comment_content += " confirmed bookings"
     when TravelRequestCommentAction.id_for(:created_by_delegate)
       comment_content += " created trip on behalf of #{current_user_name}"
     when TravelRequestCommentAction.id_for(:updated_by_delegate)

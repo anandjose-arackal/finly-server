@@ -396,7 +396,7 @@ class TravelRequests::Show < TravelRequests::Base
     def alert_for(booking)
       highlighted = false
       message = ''
-      if travel_request.user_id == user.id || travel_request.get_reviewers(:current, provider_name).include?(user) || travel_manager.document_role_users(:travel_managers).include?(user)
+      if travel_request.user_id == user.id || travel_request.get_reviewers(:current, provider_name).include?(user) || travel_request.document_role_users(:travel_managers).include?(user)
         if travel_manager_view?
           if travel_request.processing? or travel_request.approved? or travel_request.booking_pending?
             if booking.bookings.options.blank? and booking.bookings.confirmed.blank?
