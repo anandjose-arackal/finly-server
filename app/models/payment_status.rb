@@ -55,4 +55,8 @@ class PaymentStatus < ApplicationRecord
     self.id == PaymentStatus.id_for(:possible_failure)
   end
 
+  def pending_approval?
+    self.id == PaymentStatus.id_for(:pending_approval)
+  end
+
 end

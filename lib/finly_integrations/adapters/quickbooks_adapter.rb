@@ -2,12 +2,12 @@ require_relative 'abstract_adapter'
 module FinlyIntegrations
   module Adapters
     class QuickbooksAdapter < AbstractAdapter
-      ADAPTER_NAME = :quickbooks
-      CATEGORY_LINE_ITEMS_MAPPER = {
+      ADAPTER_NAME ||= :quickbooks
+      CATEGORY_LINE_ITEMS_MAPPER ||= {
           QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0] => ['AccountBasedExpenseLineDetail', :account_based_expense!],
           QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[1] => ['ItemBasedExpenseLineDetail', :item_based_expense!],
       }
-      PAYMENT_TYPES_MAPPER = {
+      PAYMENT_TYPES_MAPPER ||= {
           reimbursable: "Cash",
           non_reimbursable: "CreditCard"
       }
