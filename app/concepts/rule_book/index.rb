@@ -24,6 +24,9 @@ module RuleBook::Index
   module ClassMethods
     # Alias class method for observers_path
     def rules_path(path)
+      unless File.directory?(path)
+        raise "Invalid path #{path}"
+      end
       self.observers_path path
     end
 

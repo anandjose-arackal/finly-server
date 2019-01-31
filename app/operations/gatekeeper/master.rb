@@ -11,6 +11,6 @@ class Gatekeeper::Master
 
   # rule_verifier Gatekeeper::Master::Checker
   rule_verifier RuleBook::Verifier.with_properties(:response_code)
-  rules_path "#{Rails.root}/app/gatekeeper/rules"
+  rules_path "#{Rails.root}/app/operations/gatekeeper/rules"
 
 end
