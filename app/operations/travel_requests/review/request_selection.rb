@@ -15,10 +15,10 @@ class TravelRequests::Review::RequestSelection < TravelRequests::Review::Base
   end
 
   def validate
-    unless self.travel_request.controlling_user_id == user.id
-      add_message :error, 'You cannot perform this action at the moment'
-      return
-    end
+    # unless self.travel_request.controlling_user_id == user.id
+    #   add_message :error, 'You cannot perform this action at the moment'
+    #   return
+    # end
 
     unless self.travel_request.bookings.options.present?
       add_message :error, 'Please add atleast one option to request for selection'
@@ -30,27 +30,45 @@ class TravelRequests::Review::RequestSelection < TravelRequests::Review::Base
   end
 
   def process
-    selector, selector_role_id = travel_booking_selector
-    selection_requested_at = DateTime.now
-    if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:selection_requested),
-                                        controlling_user_id: selector&.id,
-                                        controlling_user_role_id: selector_role_id,
-                                        submitted_at: selection_requested_at
+    # selector, selector_role_id = travel_booking_selector
+    # selection_requested_at = DateTime.now
+    # if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:selection_requested),
+    #                                     controlling_user_id: selector&.id,
+    #                                     controlling_user_role_id: selector_role_id,
+    #                                     submitted_at: selection_requested_at
+    #
+    #   travel_request.travel_request_trails.create action_user: user,
+    #                                               action_user_role_id: UserRole.id_for(:travel_manager),
+    #                                               action_id: TravelRequestTrailAction.id_for(:selection_requested),
+    #                                               modified_user_id: selector&.id,
+    #                                               modified_user_role_id: selector_role_id
+    #   return true
+    # end
+    # add_message :error, travel_request.errors.full_messages
 
-      travel_request.travel_request_trails.create action_user: user,
-                                                  action_user_role_id: UserRole.id_for(:travel_manager),
-                                                  action_id: TravelRequestTrailAction.id_for(:selection_requested),
-                                                  modified_user_id: selector&.id,
-                                                  modified_user_role_id: selector_role_id
-      return true
+
+    # NEW CODE
+    #  Workflow Manager
+    params[:document] = self.travel_request
+    params[:aasm_event] = 'request_selection'
+    params[:provider_name] = 'TravelRequestBookingProvider'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
     end
-    add_message :error, travel_request.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process
     # add comment
     travel_request.comments.create user_id: user.id,
                                    action_id: BankPaymentRequestCommentAction.id_for(:selection_requested)
+
+    # todo - doubt(vivek) understand what to be done.
     travel_request.money_requests.status_pending.update_all(
         controlling_user_id: travel_request.controlling_user_id,
         controlling_user_role_id: travel_request.controlling_user_role_id

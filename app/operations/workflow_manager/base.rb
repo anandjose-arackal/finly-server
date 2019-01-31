@@ -7,23 +7,28 @@ class WorkflowManager::Base < BaseOperation
     self.aasm_event = params[:aasm_event]
     self.note = params[:note]
 
+
     document_class_name = self.document&.class&.name
 
     case document_class_name
-      when 'PurchaseOrder'
-        self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrderProvider.new self.document, violations_present, user
-      when 'Invoice'
-        self.aasm_document = ::WorkflowManager::Aasm::InvoiceProvider.new self.document, violations_present, user
-      when 'Report'
-        self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new self.document, violations_present, user
-      when 'MoneyRequest'
-        self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user
-      when 'TravelRequest'
-        self.aasm_document = ::WorkflowManager::Aasm::TravelRequestProvider.new self.document, violations_present, user
-      when 'BankPaymentRequest'
-        self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
+    when 'PurchaseOrder'
+      self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrderProvider.new self.document, violations_present, user
+    when 'Invoice'
+      self.aasm_document = ::WorkflowManager::Aasm::InvoiceProvider.new self.document, violations_present, user
+    when 'Report'
+      self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new self.document, violations_present, user
+    when 'MoneyRequest'
+      self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user
+    when 'TravelRequest'
+      if params[:provider_name] == 'TravelRequestBookingProvider'
+        self.aasm_document = ::WorkflowManager::Aasm::TravelRequestBookingProvider.new self.document, violations_present, user
       else
-        add_message :error, 'Unknown document type'
+        self.aasm_document = ::WorkflowManager::Aasm::TravelRequestProvider.new self.document, violations_present, user
+      end
+    when 'BankPaymentRequest'
+      self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
+    else
+      add_message :error, 'Unknown document type'
     end
 
     self.role_id = params[:role_id]

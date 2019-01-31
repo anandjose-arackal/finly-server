@@ -329,7 +329,7 @@ class TravelRequest < ApplicationRecord
         :approved, :booking_pending, :booked, :selection_requested, :selection_processing,
         :selection_confirmed, :selection_rejected, :booking_confirmed, :completed
 
-        )
+    )
   end
 
   def self.status_ids(*statuses)
