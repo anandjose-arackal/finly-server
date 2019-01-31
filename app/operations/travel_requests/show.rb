@@ -22,13 +22,16 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :travel_request, :manager_user, :travel_managers, :reviewal_chains, :reviewal_chains_booking
+    attr_accessor :travel_request, :manager_user, :travel_managers, :reviewal_chains, :reviewal_chains_booking, :provider_name
 
     def init
       self.travel_request = params[:travel_request]
 
       self.reviewal_chains = []
       self.reviewal_chains_booking = []
+
+      # todo - Select provider based status
+      self.provider_name = "TravelRequestBookingProvider"
 
 
       params[:reviewal_document] = travel_request
@@ -92,7 +95,7 @@ class TravelRequests::Show < TravelRequests::Base
     # end
 
     def travel_managers
-      self.travel_request.document_user_roles(:travel_managers)
+      self.travel_request.document_role_users(:travel_managers)
     end
 
     def actions
@@ -233,7 +236,7 @@ class TravelRequests::Show < TravelRequests::Base
         actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       end
       # Approve Selection
-      if travel_request.selection_processing? and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
+      if travel_request.selection_processing? and travel_request.get_reviewers(:current, provider_name)
         actions[:approve_selection] = {method: 'patch', type: 12, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         actions[:reject_selection] = {method: 'patch', type: 13, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       end
@@ -247,7 +250,7 @@ class TravelRequests::Show < TravelRequests::Base
           actions[:retract] = {method: 'patch', type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
         # Confirm selection
-        if (travel_request.selection_requested? or travel_request.selection_rejected?) && travel_request.controlling_user_id == user.id
+        if (travel_request.selection_requested? or travel_request.selection_rejected?) && travel_request.controlling_level_id.blank?
           actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       end

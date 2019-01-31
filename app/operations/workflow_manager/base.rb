@@ -1,13 +1,15 @@
 class WorkflowManager::Base < BaseOperation
   attr_accessor :document, :aasm_document, :violations_present,
-                :aasm_event, :document_types, :note, :role_id
+                :aasm_event, :document_types, :note, :role_id, :provider_name
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
     self.aasm_event = params[:aasm_event]
     self.note = params[:note]
+    self.provider_name = self.document.get_default_provider
 
 
+    # todo - The below switch case can be reduced to one line since provider name is already present
     document_class_name = self.document&.class&.name
 
     case document_class_name
@@ -20,7 +22,7 @@ class WorkflowManager::Base < BaseOperation
     when 'MoneyRequest'
       self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user
     when 'TravelRequest'
-      if params[:provider_name] == 'TravelRequestBookingProvider'
+      if provider_name == 'TravelRequestBookingProvider'
         self.aasm_document = ::WorkflowManager::Aasm::TravelRequestBookingProvider.new self.document, violations_present, user
       else
         self.aasm_document = ::WorkflowManager::Aasm::TravelRequestProvider.new self.document, violations_present, user
