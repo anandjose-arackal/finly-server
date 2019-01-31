@@ -67,15 +67,24 @@ class TravelRequests::Review::TakeControl < TravelRequests::Review::Base
   end
 
   def post_process
-    # todo - check how the workflow should be
-    travel_request.money_requests.status_pending.update_all(
-        controlling_user_id: travel_request.controlling_user_id,
-        controlling_user_role_id: travel_request.controlling_user_role_id
-    )
-    # Event::EMoneyRequest::TakeControl.(self.user, travel_request: self.travel_request)
-    role_id = self.workflow_output[:role_id]
-    Event::ETravelRequest::TakeControl.(user, travel_request: travel_request, role_id: role_id)
+    travel_request.comments.create user: user,
+                                   comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
+                                   content: params[:take_control_note]
+
+    # # todo - check how the workflow should be
+    # travel_request.money_requests.status_pending.update_all(
+    #     controlling_user_id: travel_request.controlling_user_id,
+    #     controlling_user_role_id: travel_request.controlling_user_role_id
+    # )
+    # # Event::EMoneyRequest::TakeControl.(self.user, travel_request: self.travel_request)
+    # role_id = self.workflow_output[:role_id]
+    # Event::ETravelRequest::TakeControl.(user, travel_request: travel_request, role_id: role_id)
+
+    travel_request.money_requests.status_pending.each do |money_request|
+      params[:money_request_id] = money_request.id
+      op = MoneyRequests::TakeControl.(user, params)
+    end
+
     add_message :success, "You've taken control of this trip"
   end
-
 end

@@ -26,4 +26,9 @@ class PolicyUserRole < ApplicationRecord
   scope :filter_role_id, -> (role_id) {
     with_role_id(role_id)
   }
+
+  scope :with_policy_id, -> (policy_id){
+    where policy_id: policy_id
+  }
+
 end

@@ -22,7 +22,7 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :travel_request, :manager_user, :travel_manager_user, :reviewal_chains, :reviewal_chains_booking
+    attr_accessor :travel_request, :manager_user, :travel_managers, :reviewal_chains, :reviewal_chains_booking
 
     def init
       self.travel_request = params[:travel_request]
@@ -84,11 +84,15 @@ class TravelRequests::Show < TravelRequests::Base
       self.manager_user
     end
 
-    def travel_manager
-      if self.travel_manager_user.blank?
-        self.travel_manager_user = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :travel_manager)
-      end
-      self.travel_manager_user
+    # def travel_manager
+    #   if self.travel_manager_user.blank?
+    #     self.travel_manager_user = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :travel_manager)
+    #   end
+    #   self.travel_manager_user
+    # end
+
+    def travel_managers
+      self.travel_request.document_user_roles(:travel_managers)
     end
 
     def actions
@@ -197,16 +201,13 @@ class TravelRequests::Show < TravelRequests::Base
         # if travel_request.processing? and not travel_request.controlling_user_id == travel_request.user_id
         #   actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         # end
-        if self.travel_request.can_take_control? && !self.travel_request.get_reviewers.include?(user)
-
-          # todo Take Control
-          actions[:take_control] = {method: 'patch', type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
-        else
+        if self.travel_request.can_take_control? && self.travel_request.get_reviewers.include?(user)
           actions[:approve] = {method: 'patch', type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:reject] = {method: 'patch', type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:confirm_booking] = {method: 'patch', type: 11, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        else
+          actions[:take_control] = {method: 'patch', type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
-        # todo Approve, Reject, Select Booking, Confirm Booking
       end
 
       if travel_manager_view?
@@ -291,7 +292,7 @@ class TravelRequests::Show < TravelRequests::Base
 
     def can_edit_money_request?(money_request)
       # return false unless personal_view?
-      return false unless money_request.controlling_user == user
+      return false unless (money_request.user == user || money_request.get_reviewers.include?(user))
       TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.travel_request.status_id)
     end
 
@@ -299,12 +300,20 @@ class TravelRequests::Show < TravelRequests::Base
       can_add_booking?
     end
 
+    # def can_add_booking?
+    #   travel_manager_view? and (travel_request.controlling_user_id == user.id || travel_request.controlling_user_id == nil) and user.travel_manager?
+    # end
+
     def can_add_booking?
-      travel_manager_view? and (travel_request.controlling_user_id == user.id || travel_request.controlling_user_id == nil) and user.travel_manager?
+      travel_manager_view? && (travel_request.document_role_users(:travel_managers).include?(user)) && user.travel_manager?
     end
 
+    # def can_add_options?
+    #   can_add_booking? and not travel_request.controlling_user_id == nil
+    # end
+
     def can_add_options?
-      can_add_booking? and not travel_request.controlling_user_id == nil
+      can_add_booking?
     end
 
     def can_add_request?
@@ -313,22 +322,29 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def can_select_options?
-      (manager_view? or personal_view?) and (travel_request.selection_requested? or travel_request.selection_rejected?) and travel_request.controlling_user_id == user.id
+      # (manager_view? or personal_view?) and (travel_request.selection_requested? or travel_request.selection_rejected?) and travel_request.controlling_user_id == user.id
+      # NEW CODE
+      (manager_view? or personal_view?) and (travel_request.selection_requested? or travel_request.selection_rejected?) and (travel_request.user_id == user.id || travel_request.associated_users(:interacted).include?(user))
     end
 
     def editable
       if self.travel_request.open? || self.travel_request.rejected? || self.travel_request.retracted?
         return true if self.travel_request.user_id == self.user.id and personal_view?
       else
-        return true if self.travel_request.controlling_user_id == user.id and travel_manager_view?
-        return true if travel_manager_view? and self.travel_request.controlling_user_id.blank?
+        # return true if self.travel_request.controlling_user_id == user.id and travel_manager_view?
+        # return true if travel_manager_view? and self.travel_request.controlling_user_id.blank?
+
+        # New CODE
+        return true if self.travel_request.document_role_users(:travel_managers).include?(user) and travel_manager_view?
       end
       false
     end
 
     def destroyable
       return false unless TravelRequestStatus.ids_for(:open, :retracted, :rejected).include?(self.travel_request.status_id)
-      return false unless self.travel_request.controlling_user_id == self.user.id
+      # return false unless self.travel_request.controlling_user_id == self.user.id
+      # New CODE
+      return false unless self.travel_request.user_id == self.user.id
       return false unless personal_view?
       true
     end
