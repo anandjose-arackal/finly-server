@@ -5,6 +5,7 @@ json.array!(@result.paginated_payments) do |payment|
     json.account_number payment.receiving_account&.account_number
     json.ifsc payment.receiving_account&.ifsc
   end
+  json.date payment.date
   json.payment_mode payment.payment_mode&.upcase
   json.schedule_at payment.scheduled_at
   json.processed_at payment.processed_at
@@ -16,4 +17,5 @@ json.array!(@result.paginated_payments) do |payment|
   end
   json.bank_payment_request_id payment.payment_order.bank_payment_request.id
   json.payment_order_id payment.payment_order.bank_payment_request.id
+  json.api_initiated payment.api_initiated
 end
