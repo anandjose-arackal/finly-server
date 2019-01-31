@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_20_140408) do
+ActiveRecord::Schema.define(version: 2019_01_28_114545) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2634,6 +2634,17 @@ ActiveRecord::Schema.define(version: 2019_01_20_140408) do
     t.index ["name"], name: "index_gst_types_on_name"
   end
 
+  create_table "index_tree_index_nodes", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "root_element_type", null: false
+    t.bigint "root_element_id", null: false
+    t.string "node_element_type", null: false
+    t.bigint "node_element_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["node_element_type", "node_element_id"], name: "node"
+    t.index ["root_element_type", "root_element_id"], name: "root"
+  end
+
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -3810,6 +3821,7 @@ ActiveRecord::Schema.define(version: 2019_01_20_140408) do
     t.integer "procurement_id"
     t.integer "department_id"
     t.integer "location_id"
+    t.datetime "deleted_at"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
     t.index ["initiating_user_id"], name: "index_payments_on_initiating_user_id"
@@ -5709,6 +5721,8 @@ ActiveRecord::Schema.define(version: 2019_01_20_140408) do
     t.string "vendor_id"
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
+    t.boolean "active", default: true
+    t.index ["active"], name: "index_yes_bank_vendors_on_active"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"

@@ -13,6 +13,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def new_pr
+    @result = BankTransfer::PaymentRequest::NewPr.(current_user, params)
+    respond
+  end
+
   def index
     @result = BankTransfer::PaymentRequest::Index.(current_user, params)
     respond
@@ -218,6 +223,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def bulk_take_control
     @result = BankTransfer::PaymentRequest::Review::BulkTakeControl.(current_user, params)
+    respond
+  end
+
+  def configuration_data
+    @result = BankTransfer::PaymentRequest::ConfigurationData.(current_user, params)
     respond
   end
 

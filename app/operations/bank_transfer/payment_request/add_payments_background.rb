@@ -30,6 +30,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   end
 
   def init
+    puts "self.payments_attributes", self.payments_attributes.inspect
     self.company_id = self.bank_payment_request.owner.company_id
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode

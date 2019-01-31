@@ -2184,7 +2184,7 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
-  mount_griddler('/email/incoming')
+  # mount_griddler('/email/incoming')
   # mount_opro_oauth controllers: {
   #     oauth_new: 'oauth/auth',
   #     oauth_token: 'oauth/token'
@@ -3072,6 +3072,7 @@ Rails.application.routes.draw do
     end
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
+    post 'payment_requests', to: 'bank_payment_requests#create'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'
     post 'payment_requests/process_account_ids', to: 'bank_payment_requests#process_account_ids'
     patch 'payment_requests/update_details', to: 'bank_payment_requests#update_details'
@@ -3082,6 +3083,10 @@ Rails.application.routes.draw do
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
     patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
+
+    post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
+
+    get 'configuration_data', to: 'bank_payment_requests#configuration_data', as: :configuration_data
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
     get 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
     post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
