@@ -57,16 +57,21 @@ module Transitionable
         user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id).reject {|user_id| user_id.nil?}
         user_ids.push self.document_owner_id # Check if this has to be added
       when :retract, 'retract'
-        dlrms = self.document_level_reviewer_mappings.with_viewable
-        max_viewable_level_number = dlrms.maximum(:level_number)
+        # dlrms = self.document_level_reviewer_mappings.with_viewable
+        # max_viewable_level_number = dlrms.maximum(:level_number)
+        #
+        # dlrms = dlrms.with_level_number(max_viewable_level_number)
+        #
+        # taken_control_by_ids = dlrms.pluck(:taken_control_by_id)
+        # # If the current level has been taken control by someone return their ids else the current reviewers in the level
+        # taken_control_by_ids.reject! {|user_id| user_id.nil?}
+        #
+        # user_ids += taken_control_by_ids.present? ? taken_control_by_ids : dlrms.pluck(:reviewer_id)
+        #
+        # NEW CODE
+        last_retract_trail = self.trails.reload.with_action_id(TrailAction.id_for(:retract)).last
 
-        dlrms = dlrms.with_level_number(max_viewable_level_number)
-
-        taken_control_by_ids = dlrms.pluck(:taken_control_by_id)
-        # If the current level has been taken control by someone return their ids else the current reviewers in the level
-        taken_control_by_ids.reject! {|user_id| user_id.nil?}
-
-        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : dlrms.pluck(:reviewer_id)
+        user_ids += self.get_reviewers(last_retract_trail.action_level_id)&.map(&:id)
       when :submit, 'submit'
         user_ids.push self.document_owner_id
         user_ids += self.get_reviewers&.map(&:id)

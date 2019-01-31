@@ -59,6 +59,9 @@ class MoneyRequests::TakeControl < MoneyRequests::Base
   end
 
   def post_process
+    money_request.comments.create user: user,
+                                    comment_action_id: MoneyRequestCommentAction.id_for(:take_control),
+                                    content: params[:take_control_note]
     role_id = self.workflow_output[:role_id]
     Event::EMoneyRequests::TakeControl.(self.user, money_request: self.money_request, role_id: role_id)
   end

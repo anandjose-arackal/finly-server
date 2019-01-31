@@ -96,16 +96,17 @@ class Event::EMoneyRequests::Base < Event::SetNotifier
       view = ""
       case role_id
         when 3
-          view = 'manager'
+          view = "\"manager\""
         when 2
-          view = 'finance_manager'
+          view = "\"finance_manager\""
         when 1
-          view = 'admin'
+          view = "\"admin\""
         else
-          view = 'personal'
+          view = "\"personal\""
       end
-      suffix = '/params={"view":"' + view + '","preview":true}'
-      path = 'requests/' + money_request.id.to_s
+
+      suffix = URI.escape("{\"view\":" + view + ",\"preview\":true}")
+      path = "requests/#{money_request.id}/params="
       url = Constants::BASE_URL + path + suffix
       return url
     end

@@ -81,9 +81,9 @@ class MoneyRequests::Base < BaseOperation
 
     def retrieve_policies
       if money_request.user.enforce_policy_enabled?
-        return money_request.user.policies.non_default
+        return money_request.user.policies.with_application(current_app).non_default
       end
-      money_request.user.policies
+      money_request.user.policies.with_application(current_app)
     end
 
     def load_card

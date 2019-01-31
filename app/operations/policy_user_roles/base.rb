@@ -3,7 +3,10 @@ class PolicyUserRoles::Base < BaseOperation
 
   def init
     policy_id = params[:policy_id]
-    self.policy = Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
+    self.policy = user.company.policies.with_id(policy_id).first rescue nil
+
+    # not using policy::index as its scoped to current user's policies.
+    # self.policy = Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
   end
 
   def validate

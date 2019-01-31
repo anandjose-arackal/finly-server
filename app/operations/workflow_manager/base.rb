@@ -61,7 +61,7 @@ class WorkflowManager::Base < BaseOperation
                            action_id: TrailAction.id_for(aasm_event),
                            action_user_role_id: role_id,
                            action_level_id: aasm_document.current_level&.id,
-                           modified_level_id: aasm_document.next_level&.id,
+                           modified_level_id: aasm_document.new_level&.id,
                            delegated_action_user_id: delegated_action_user_id
 
     if self.note.present?
