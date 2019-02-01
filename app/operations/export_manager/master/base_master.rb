@@ -4,7 +4,7 @@ class ExportManager::Master::BaseMaster
 
   attr_accessor :user, :params, :input, :messages
 
-  MASTERS = {
+  MASTERS ||= {
       test: '::ExportManager::Master::Test::Provider',
       procurement: '::ExportManager::Master::Procurements::Provider',
       budget_summary: '::ExportManager::Master::Budgets::UsageSummary',
@@ -14,7 +14,7 @@ class ExportManager::Master::BaseMaster
       non_po_items: '::ExportManager::Master::Invoices::InvoiceLineItems::Index'
   }.with_indifferent_access
 
-  DEFAULT_CONFIG = {spreadsheet: true, pdf: true}
+  DEFAULT_CONFIG ||= {spreadsheet: true, pdf: true}
 
 
   def self.key

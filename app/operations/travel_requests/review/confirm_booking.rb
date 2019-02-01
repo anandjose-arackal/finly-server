@@ -59,6 +59,7 @@ class TravelRequests::Review::ConfirmBooking < TravelRequests::Review::Base
     travel_request.comments.create user_id: user.id,
                                    action_id: TravelRequestCommentAction.id_for(:booking_confirmed)
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
+    Event::ETravelRequest::ConfirmBooking.(user, travel_request: travel_request)
     add_message :success, 'Selection has been successfully requested'
 
     set_money_request_as_approved

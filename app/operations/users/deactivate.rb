@@ -3,7 +3,7 @@ class Users::Deactivate < Users::Base
   attr_accessor :selected_user
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :vendor_payments_admin]
   end
 
   def pre_validate
