@@ -9,7 +9,7 @@ class PolicyUserRoles::Create < PolicyUserRoles::Base
     super
     self.policy_user_role_params = policy_user_role_parameters
 
-    self.role_id = policy_user_role_params[:user_role_id]
+    self.role_id = policy_user_role_params[:user_role_id]&.to_i
 
     user_ids = policy_user_role_params[:user_ids]
     unless user_ids.is_a?(Array)
@@ -39,15 +39,20 @@ class PolicyUserRoles::Create < PolicyUserRoles::Base
       if added_user.role_mapping.with_role_id(self.role_id).present?
         user_added += 1
       else
-        if added_user.role_mapping.create(user_role_id: self.role_id)
+        if added_user.role_mapping.create(user_role_id: self.role_id, purpose_id: get_purpose_id)
           role_created += 1
         end
 
       end
     end
 
-    add_message :success ,"#{user_added} users added as #{UserRole.name_for(role_id)} for the policy"
-    add_message :success ,"#{user_added} users assigned #{UserRole.name_for(role_id)} role & added to the policy"
+    unless user_added == 0
+      add_message :success ,"#{user_added} users added as #{UserRole.name_for(role_id)&.to_s&.humanize} for the policy"
+    end
+
+    unless role_created == 0
+      add_message :success ,"#{role_created} users assigned #{UserRole.name_for(role_id)&.to_s&.humanize} role & added to the policy"
+    end
 
   end
 
@@ -55,5 +60,16 @@ class PolicyUserRoles::Create < PolicyUserRoles::Base
   private
   def policy_user_role_parameters
     params.require(:policy_user_role).permit(:user_role_id, user_ids: [])
+  end
+
+  def get_purpose_id
+    if [UserRole.id_for(:manager), UserRole.id_for(:finance_manager), UserRole.id_for(:travel_manager)].include?(role_id)
+      Purpose.id_for(:expense_management)
+    elsif [UserRole.id_for(:creditor)].include?(role_id)
+      Purpose.id_for(:vendor_payments)
+    else
+      nil
+    end
+
   end
 end
