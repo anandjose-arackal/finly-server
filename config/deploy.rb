@@ -31,7 +31,7 @@ set :branch, ENV['BRANCH'] || :master
   when :itzcash
     set :deploy_to, '/usr/local/app'
     set :rails_env, 'itzcash_uat'
-  when :staging, :development, :combined_development, :insights, :demo_2, :shapoorji, :olx, :testing_migration
+  when :staging, :development, :combined_development, :insights, :demo_2, :shapoorji, :olx, :migrated_test
     set :deploy_to, '/home/centos/app'
     set :rails_env, 'staging'
   when :development_2
@@ -45,6 +45,9 @@ set :branch, ENV['BRANCH'] || :master
     set :rails_env, 'staging'
   when :development_5
     set :deploy_to, '/home/centos/app_5'
+    set :rails_env, 'staging'
+  when :original_test
+    set :deploy_to, '/home/centos/app_2'
     set :rails_env, 'staging'
 end
 
