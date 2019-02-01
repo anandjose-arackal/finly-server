@@ -30,8 +30,7 @@ class TravelRequests::Show < TravelRequests::Base
       self.reviewal_chains = []
       self.reviewal_chains_booking = []
 
-      # todo - Select provider based status
-      self.provider_name = "TravelRequestBookingProvider"
+      self.provider_name = travel_request.get_default_provider
 
 
       params[:reviewal_document] = travel_request
@@ -198,8 +197,8 @@ class TravelRequests::Show < TravelRequests::Base
 
 
       actions = {editable: editable, destroyable: destroyable}
-      controlling_user = travel_request.controlling_user # || travel_request.controlling_for_user
-      controlling_user_role_id = travel_request.controlling_user_role_id # || travel_request.controlling_for_user_role_id
+      # controlling_user = travel_request.controlling_user # || travel_request.controlling_for_user
+      # controlling_user_role_id = travel_request.controlling_user_role_id # || travel_request.controlling_for_user_role_id
       if admin_view?
         # if travel_request.processing? and not travel_request.controlling_user_id == travel_request.user_id
         #   actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
@@ -232,11 +231,11 @@ class TravelRequests::Show < TravelRequests::Base
         end
       end
       # Confirm Selection
-      if (travel_request.selection_requested? or travel_request.selection_rejected?) and controlling_user&.id == user.id and controlling_user_role_id == UserRole.id_for(:manager)
+      if (travel_request.selection_requested? or travel_request.selection_rejected?) and travel_request.get_reviewers(:current, provider_name).include?(user)
         actions[:confirm_selection] = {method: 'patch', type: 10, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       end
       # Approve Selection
-      if travel_request.selection_processing? and travel_request.get_reviewers(:current, provider_name)
+      if travel_request.selection_processing? and travel_request.get_reviewers(:current, provider_name).include?(user)
         actions[:approve_selection] = {method: 'patch', type: 12, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         actions[:reject_selection] = {method: 'patch', type: 13, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       end
@@ -397,7 +396,7 @@ class TravelRequests::Show < TravelRequests::Base
     def alert_for(booking)
       highlighted = false
       message = ''
-      if travel_request.controlling_user_id == user.id
+      if travel_request.user_id == user.id || travel_request.get_reviewers(:current, provider_name).include?(user) || travel_request.document_role_users(:travel_managers).include?(user)
         if travel_manager_view?
           if travel_request.processing? or travel_request.approved? or travel_request.booking_pending?
             if booking.bookings.options.blank? and booking.bookings.confirmed.blank?

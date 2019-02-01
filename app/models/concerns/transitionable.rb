@@ -124,8 +124,9 @@ module Transitionable
       User.with_id(user_ids)
     end
 
-    def get_reviewal_chain
-      dlrms = self.document_level_reviewer_mappings.includes(:level, :reviewer, :action_taken_by, :taken_control_by)
+    def get_reviewal_chain(provider_name=nil)
+      provider_name ||= get_default_provider
+      dlrms = self.document_level_reviewer_mappings.with_provider_name(provider_name).includes(:level, :reviewer, :action_taken_by, :taken_control_by)
       chain = []
 
       dlrms.each do |dlrm|
@@ -187,7 +188,7 @@ module Transitionable
       if [:next, :previous, 'next', 'previous', :current, 'current'].include? level_details
         level = get_level(level_details, provider_name)
       elsif level_details.is_a?(Integer)
-          level = get_level_with_id(level_details, provider_name)
+        level = get_level_with_id(level_details, provider_name)
       else
         # if no level details passed, gives result for current level
         level = self.level
@@ -217,7 +218,10 @@ module Transitionable
       # Provide :next / :prev to get the respective levels
       # current_level_number = self.level.present? ? self.level.level_number : 0
 
-      all_level_numbers = self.document_level_reviewer_mappings.pluck(:level_number).uniq.sort
+      provider_name ||= get_default_provider
+
+      all_level_numbers = self.document_level_reviewer_mappings.with_provider_name(provider_name).pluck(:level_number).uniq.sort
+
 
       # Return if dlrm not found
       return nil if all_level_numbers.blank?
@@ -228,13 +232,15 @@ module Transitionable
           level_number = current_level_number + 1
         elsif ['previous', :previous, 'prev', :prev].include?(type)
           level_number = current_level_number - 1
+        elsif [:current, 'current'].include?(type)
+          return level
         else
           return nil
         end
       else
         # If a document has already approved and you try to get next level, it will give you 1 putting it into loop
         # Or if you try to get previous level of a approved document, it will never be able to find it
-        if self.class.status_ids(:retracted, :rejected, :open, :draft).include? self.status.id
+        if self.class.status_ids(:retracted, :rejected, :open, :draft, :selection_requested, :selection_rejected, :selection_rejected).include? self.status.id
           if type == 'next' || type == :next
             level_number = 1
           elsif ['previous', :previous, 'prev', :prev].include?(type)

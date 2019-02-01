@@ -502,7 +502,7 @@ class User < ApplicationRecord
   scope :filter_unassigned_finance_for_policy, -> (policy_id){
     policy = Policy.find_by id: policy_id
     if policy.present?
-      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:finance_manager))
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:finance_manager)).pluck(:user_id)
       without_id(user_ids)
     end
   }
@@ -511,7 +511,7 @@ class User < ApplicationRecord
   scope :filter_unassigned_travel_for_policy, -> (policy_id){
     policy = Policy.find_by id: policy_id
     if policy.present?
-      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:travel_manager))
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:travel_manager)).pluck(:user_id)
       without_id(user_ids)
     end
   }
@@ -531,7 +531,7 @@ class User < ApplicationRecord
     policy = Policy.find_by id: policy_id
 
     if policy.present?
-      user_ids = PolicyUserRole.with_policy_id(policy.id).with_role_id(UserRole.id_for(:creditor))
+      user_ids = PolicyUserRole.with_policy_id(policy.id).with_role_id(UserRole.id_for(:creditor)).pluck(:user_id)
       without_id(user_ids)
     end
 

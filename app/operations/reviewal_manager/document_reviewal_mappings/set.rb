@@ -4,7 +4,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
   def init
     self.document = params[:reviewal_document]
     self.mappings_params = mappings_parameters
-    self.provider_name = mappings_params[:provider_name] || document.get_default_provider
+    self.provider_name = params[:provider_name] || document.get_default_provider
 
   end
 
@@ -41,7 +41,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
       if self.document.policy_id.present?
         policy = user.company.policies.find_by id: document.policy_id
         mappings_params[:document_reviewer_mappings] = []
-        policy.levels.non_deleted.with_entity_type(self.provider_name).each do |level|
+        policy.levels.with_associted_entity_type(provider_name).non_deleted.with_entity_type(self.provider_name).each do |level|
           mapping_data = {
               level_id: level.id,
               level: level
@@ -54,8 +54,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
   def process
     # find
-    document.document_level_reviewer_mappings.destroy_all
-    
+    document.document_level_reviewer_mappings.with_provider_name(provider_name).destroy_all
     if mappings_params[:document_reviewer_mappings].present?
       mappings_params[:document_reviewer_mappings].each do |mapping_params|
         reviewer_id = mapping_params[:reviewer_id].to_i
@@ -73,7 +72,6 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
         # If valid reviewers is empty; document level reviewr mapping will not be created for current level and will be auto approved for the current level
         next if valid_reviewers.empty?
-
 
         if level.present?
           if reviewer.present?

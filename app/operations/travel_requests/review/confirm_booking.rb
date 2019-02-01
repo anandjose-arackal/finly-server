@@ -15,10 +15,10 @@ class TravelRequests::Review::ConfirmBooking < TravelRequests::Review::Base
   end
 
   def validate
-    unless self.travel_request.controlling_user_id == user.id
-      add_message :error, 'You cannot perform this action at the moment'
-      return
-    end
+    # unless self.travel_request.controlling_user_id == user.id
+    #   add_message :error, 'You cannot perform this action at the moment'
+    #   return
+    # end
     unless travel_manager_view?
       add_message :error, 'You cannot perform this action at the moment'
       return
@@ -39,19 +39,34 @@ class TravelRequests::Review::ConfirmBooking < TravelRequests::Review::Base
   end
 
   def process
-    if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:booking_confirmed),
-                                        controlling_user_id: nil,
-                                        controlling_user_role_id: nil,
-                                        booking_confirmed_at: DateTime.now
+    # if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:booking_confirmed),
+    #                                     controlling_user_id: nil,
+    #                                     controlling_user_role_id: nil,
+    #                                     booking_confirmed_at: DateTime.now
+    #
+    #   travel_request.travel_request_trails.create action_user: user,
+    #                                               action_user_role_id: UserRole.id_for(:travel_manager),
+    #                                               action_id: TravelRequestTrailAction.id_for(:booking_confirmed),
+    #                                               modified_user_id: user,
+    #                                               modified_user_role_id: UserRole.id_for(:travel_manager)
+    #   return true
+    # end
+    # add_message :error, travel_request.errors.full_messages
 
-      travel_request.travel_request_trails.create action_user: user,
-                                                  action_user_role_id: UserRole.id_for(:travel_manager),
-                                                  action_id: TravelRequestTrailAction.id_for(:booking_confirmed),
-                                                  modified_user_id: user,
-                                                  modified_user_role_id: UserRole.id_for(:travel_manager)
-      return true
+
+    # NEW CODE
+    #  Workflow Manager
+    params[:document] = self.travel_request
+    params[:aasm_event] = 'confirm_booking'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
     end
-    add_message :error, travel_request.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

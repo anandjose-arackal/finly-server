@@ -18,7 +18,7 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
     end
 
     event :approve do
-      transitions :from => :processing, :to => :booking_pending, guard: :tm_and_reviewers_not_present?
+      transitions :from => :processing, :to => :booking_pending, guard: [:reviewers_not_present?, :travel_manager_present?]
       transitions :from => :processing, :to => :approved, guard: :reviewers_not_present?
       transitions :from => :processing, :to => :processing
     end
@@ -57,8 +57,8 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
 
   private
 
-  def tm_and_reviewers_not_present?
-    reviewers_not_present? && travel_managers_not_present?
+  def travel_manager_present?
+    self.document.document_role_users(:travel_managers).present?
   end
 
   def travel_managers_not_present?
