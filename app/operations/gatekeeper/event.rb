@@ -13,10 +13,10 @@ class Gatekeeper::Event
   end
 
   def run
-    Gatekeeper::Master.observers.each do |observer|
-      rules = observer.send(event)
-      rules.each do |rule|
-        result = rule.verify(self.params)
+    Gatekeeper::Master.subscribers(event).each do |rule|
+      result = rule.verify(self.params)
+      unless result.success?
+
       end
     end
   end

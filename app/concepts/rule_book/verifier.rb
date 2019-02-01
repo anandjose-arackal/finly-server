@@ -5,20 +5,10 @@ class RuleBook::Verifier
 
   def self.with_properties(*properties)
     Class.new(self) do
-      properties.each do |property|
-        # Setter based on params being sent or not
-        self.send(:define_method, "#{property}=".to_sym) do |value|
-          instance_variable_set("@" + property.to_s, value)
-        end
+      include DynamicProperty
 
-        # Getter/setter based on params being sent or not
-        self.send(:define_method, property.to_sym) do |value = NoObject|
-          if value != NoObject
-            instance_variable_set("@" + property.to_s, value)
-          end
-          instance_variable_get("@" + property.to_s)
-        end
-      end
+      define_property :instance, *properties
+
     end
   end
 
@@ -33,21 +23,6 @@ class RuleBook::Verifier
 
   def init
     # For initializing custom variables in subclasses
-  end
-
-  def self.properties(*props)
-    props.each do |property|
-      define_method "#{property}".to_sym do |value = NoObject|
-        if value != NoObject
-          instance_variable_set("@" + property.to_s, value)
-        end
-        instance_variable_get("@" + property.to_s)
-      end
-
-      define_method "#{property}=" do |value|
-        instance_variable_set("@" + property.to_s, value)
-      end
-    end
   end
 
   def verify

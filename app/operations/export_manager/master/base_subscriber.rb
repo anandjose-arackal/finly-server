@@ -5,8 +5,8 @@ class ExportManager::Master::BaseSubscriber
 
   attr_accessor :user, :params, :input, :messages
 
-  define_property :fields, :processor
-  define_property_array :validate, :generators
+  define_property :singleton, :fields, :processor
+  define_property_array :singleton, :validate, :generators
 
   def initialize(user, params)
     self.user = user

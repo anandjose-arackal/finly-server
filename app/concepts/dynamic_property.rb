@@ -11,9 +11,10 @@ module DynamicProperty
       DEFINABLE_PROPERTY_MAP[self.name]
     end
 
-    def define_property(*attrs)
+    def define_property(scope, *attrs)
+      property_type = property_type_for scope
       attrs.each do |method|
-        define_singleton_method method do |value = NoObject|
+        send property_type, method do |value = NoObject|
           unless value == NoObject
             dynamic_property_map[method] = value
           end
@@ -22,9 +23,10 @@ module DynamicProperty
       end
     end
 
-    def define_property_array(*attrs)
+    def define_property_array(scope, *attrs)
+      property_type = property_type_for scope
       attrs.each do |method|
-        define_singleton_method method do |value = NoObject|
+        send property_type, method do |value = NoObject|
           if dynamic_property_map[method].nil?
             dynamic_property_map[method] = []
           end
@@ -33,6 +35,18 @@ module DynamicProperty
           end
           dynamic_property_map[method]
         end
+      end
+    end
+
+    private
+    def property_type_for(scope)
+      case scope
+      when :singleton
+        return :define_singleton_method
+      when :instance
+        return :define_method
+      else
+        raise "Invalid scope : #{scope}"
       end
     end
     

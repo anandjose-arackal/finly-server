@@ -26,7 +26,7 @@ module RuleBook::Index
     def rule_book_index_setup
       include EventBus::Bus
       include DynamicProperty
-      define_property :rule_class
+      define_property :singleton, :rule_class
     end
 
     # Alias class method for observers_path
