@@ -342,6 +342,10 @@ class Report < ApplicationRecord
     self.status_id == ReportStatus.approved_id
   end
 
+  def auto_approved?
+    self.status_id == ReportStatus.id_for(:auto_approved)
+  end
+
   def settled?
     self.status_id == ReportStatus.settled_id
   end
@@ -373,7 +377,7 @@ class Report < ApplicationRecord
   end
 
   def can_retract?
-    processing? or (approved? and auto_approve) or (closed? and auto_approve)
+    processing? or (approved? and auto_approved?) or (closed? and auto_approved?)
   end
 
   def can_destroy?

@@ -265,8 +265,9 @@ class BankPaymentRequest < ApplicationRecord
   def auto_approved?
     # extracting the last tracks and checking if it was a submit action combined
     # with the next action user being blank
-    trail = self.bank_payment_request_trails.last
-    (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
+    self.status_id == BankPaymentRequestStatus.id_for(:auto_approved)
+    # trail = self.bank_payment_request_trails.last
+    # (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
   end
 
   def user

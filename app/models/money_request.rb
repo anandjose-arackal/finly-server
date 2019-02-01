@@ -270,6 +270,10 @@ class MoneyRequest < ApplicationRecord
     status_id == MoneyRequestStatus.id_for(:credited)
   end
 
+  def auto_approved?
+    status_id == MoneyRequestStatus.id_for(:auto_approved)
+  end
+
   def editable?
     self.status_id == MoneyRequestStatus.id_for(:open) ||
         self.status_id == MoneyRequestStatus.id_for(:rejected) ||
@@ -283,7 +287,7 @@ class MoneyRequest < ApplicationRecord
   end
 
   def can_retract?
-    processing? or (approved? and auto_approve)
+    processing? or (approved? and auto_approved?)
   end
 
   def can_destroy?
