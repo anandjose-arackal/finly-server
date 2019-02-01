@@ -3,7 +3,17 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   register_handle :non_po_tax_invoice_show
   #Validate input if required
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete, :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_invoice_items]
-  alias_method :purchase_order, :input
+
+  def input
+    result = ::Procurements::Invoices::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    result.invoice
+  end
+
+  alias_method :invoice, :input
 
   def more_details_button
     true
@@ -22,7 +32,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def reject
-    true
+    invoice.processing? && user_in_level?
   end
 
   def close
@@ -30,7 +40,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def approve
-    true
+    invoice.processing? && user_in_level?
   end
 
   def remind
@@ -38,7 +48,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def retract
-    true
+    invoice.processing? && document_owner?
   end
 
   def remind_approver
@@ -62,7 +72,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def delete
-    true
+    document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
   end
 
   def save_and_submit
@@ -91,6 +101,16 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
 
   def export_invoice_items
     true
+  end
+
+  def user_in_level?
+    level = invoice.level
+    amount = invoice.net_amount.value rescue 0
+    level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+  end
+
+  def document_owner?
+    invoice.created_by_user_id.eql? user.id
   end
 
 end
