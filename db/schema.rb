@@ -470,6 +470,7 @@ ActiveRecord::Schema.define(version: 2019_01_31_210316) do
     t.boolean "is_deleted", default: false
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
+    t.boolean "on_hold", default: false
     t.index ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id"
   end
 
