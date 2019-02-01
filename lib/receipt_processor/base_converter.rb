@@ -7,10 +7,10 @@ require_relative 'image_converter'
 module ReceiptProcessor
   # encapsulates functionality to convert different content types to images
   class BaseConverter
-    PDF_CONTENT_TYPES = ['application/pdf'].freeze
-    IMAGE_CONTENT_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze
-    HTML_CONTENT_TYPES = ['text/html'].freeze
-    MSWORD_CONTENT_TYPES = ['application/rtf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].freeze
+    PDF_CONTENT_TYPES ||= ['application/pdf'].freeze
+    IMAGE_CONTENT_TYPES ||= ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze
+    HTML_CONTENT_TYPES ||= ['text/html'].freeze
+    MSWORD_CONTENT_TYPES ||= ['application/rtf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].freeze
 
     def initialize(doc, doc_content_type, image_tmp_path)
       @content_type = doc_content_type

@@ -158,7 +158,7 @@ class Reports::Base < BaseOperation
         if category.children.present?
           cat_ids += category.children.pluck(:id)
         end
-        item_expenses = self.expenses.with_category(cat_ids)
+        item_expenses = self.report.expenses.with_category(cat_ids)
         if item_expenses.present?
           item_name = category.name
           item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
@@ -172,7 +172,7 @@ class Reports::Base < BaseOperation
       date_expenses = []
       dates = self.expenses.map(&:date).uniq
       dates.each do |date|
-        item_expenses = self.expenses.with_date(date)
+        item_expenses = self.report.expenses.with_date(date)
         if item_expenses.present?
           item_name = DateUtils.date_formatted date
           item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)

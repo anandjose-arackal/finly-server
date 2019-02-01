@@ -483,6 +483,8 @@
 #                                                         GET    /admin_users/card_assign_requests/export/kycs(.:format)                                                             admin_users/card_assign_requests#download_kycs
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                                                    admin_users/card_assign_requests#edit
 #                                 admin_users_bulk_assign POST   /admin_users/cards/bulk_assign(.:format)                                                                            admin_users/cards#bulk_assign
+#                   admin_users_bank_transfers_get_status GET    /admin_users/bank_transfers/get_status(.:format)                                                                    admin_users/bank_transfers#get_status
+#              admin_users_bank_transfers_get_bulk_status POST   /admin_users/bank_transfers/get_bulk_status(.:format)                                                               admin_users/bank_transfers#get_bulk_status
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                                           admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                                              admin_users/users#admin_menus
 #                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                                                  api/callbacks#successful_vendor_payment
@@ -2503,7 +2505,8 @@ Rails.application.routes.draw do
     get 'card_assign_requests/edit' => 'card_assign_requests#edit'
 
     post 'cards/bulk_assign', to: 'cards#bulk_assign', as: :bulk_assign
-
+    get 'bank_transfers/get_status', to: 'bank_transfers#get_status'
+    post 'bank_transfers/get_bulk_status', to: 'bank_transfers#get_bulk_status'
     post 'call_center/search', to: 'call_center/users#search', as: :search
   end
 
