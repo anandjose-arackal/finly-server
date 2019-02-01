@@ -69,10 +69,7 @@ class ExportManager::RequestHandler < BaseOperation
   protected
 
   def init_master
-    ExportManager::Master::BaseMaster.observers.each do |observer|
-      return observer if observer.handle&.to_s == self.type&.to_s
-    end
-    nil
+    ExportManager::Master::BaseMaster.subscribers(self.type)&.first
   end
 
   def init_processor

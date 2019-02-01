@@ -22,8 +22,6 @@ class ApplicationController < ActionController::Base
 
   before_action :store_location
 
-  before_action {result = Gatekeeper::Trigger.(:before_auth_action)}
-
   after_action :set_queries_counter
   after_action :track_request
 

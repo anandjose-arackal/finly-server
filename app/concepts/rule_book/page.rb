@@ -6,11 +6,16 @@ module RuleBook::Page
 
   module ClassMethods
 
+    def rule_book_page_setup
+      include EventBus::Subscriber
+    end
+
     def index(klass = NoObject)
       unless klass == NoObject
-        self.register_master klass
+        # Event::Subscriber function
+        self.bus klass
       end
-      master
+      bus
     end
 
     def rule(description, options = {}, &block)
@@ -20,14 +25,14 @@ module RuleBook::Page
       end
       if on.respond_to?(:each)
         on.each do |event|
-          register_rule(event, description, block, options)
+          subscribe_rule(event, description, block, options)
         end
       else
-        register_rule(on, description, block, options)
+        subscribe_rule(on, description, block, options)
       end
     end
 
-    def register_rule(event, description, block, options)
+    def subscribe_rule(event, description, block, options)
       rule = RuleBook::Rule.new(
           {
               description: description,
@@ -37,8 +42,8 @@ module RuleBook::Page
               page: self
           }
       )
-      self.register_multiple event, rule
-      self.register_multiple :rules, rule
+      # Event::Subscriber function
+      self.subscribe(event, rule)
     end
   end
 

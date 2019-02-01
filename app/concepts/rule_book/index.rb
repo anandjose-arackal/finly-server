@@ -22,19 +22,26 @@ module RuleBook::Index
   end
 
   module ClassMethods
+
+    def rule_book_index_setup
+      include EventBus::Bus
+      include DynamicProperty
+      define_property :rule_class
+    end
+
     # Alias class method for observers_path
     def rules_path(path)
       unless File.directory?(path)
         raise "Invalid path #{path}"
       end
-      self.observers_path path
+      self.subscribers_path path
     end
 
     def rule_verifier(klass = NoObject)
       if klass != NoObject
-        observers_master[:rule_class] = klass
+        rule_class klass
       end
-      observers_master[:rule_class] || RuleBook::Verifier
+      rule_class || RuleBook::Verifier
     end
 
   end

@@ -1,4 +1,6 @@
 class Gatekeeper::Rules::BaseRule
-  include RuleBook::Page, Observer::Observable
+  include RuleBook::Page
+
+  rule_book_page_setup
 
 end
