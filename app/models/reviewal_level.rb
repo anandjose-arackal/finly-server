@@ -59,7 +59,7 @@ class ReviewalLevel < ApplicationRecord
                                             level_number: level_number,
                                             policy_id: self.policy_id,
                                             associated_entity_type: self.associated_entity_type
-                        }).first
+                                        }).first
   end
 
   private

@@ -74,12 +74,12 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         end
       end
       self.custom_field_config = invoice_custom_field_configurations
-      op = BankTransfer::PaymentRequest::Approvers.(bank_payment_request: self.bank_payment_request)
-      if op.success?
-        self.approvers = op.approvers
-      else
-        self.approvers = []
-      end
+      # op = BankTransfer::PaymentRequest::Approvers.(bank_payment_request: self.bank_payment_request)
+      # if op.success?
+      #   self.approvers = op.approvers
+      # else
+      #   self.approvers = []
+      # end
 
       self.invoice_custom_fields = invoice_custom_field_configurations
       self.invoice_line_items_custom_fields = invoice_line_items_custom_field_configurations
