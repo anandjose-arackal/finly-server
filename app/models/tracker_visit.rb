@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: tracker_visits
@@ -38,7 +40,6 @@
 #  started_at       :datetime         not null
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#
 
 class TrackerVisit < ApplicationRecord
   belongs_to :user, optional: true
@@ -46,9 +47,8 @@ class TrackerVisit < ApplicationRecord
 
   has_many :events, class_name: 'TrackerEvent', dependent: :destroy
 
-  scope :with_user_id, -> (user_id) {where user_id: user_id}
-  scope :with_device, -> (device) {where device: device}
-  scope :with_ip, -> (ip) {where ip: ip}
-  scope :started_after, -> (datetime) {where 'started_at >= ?', datetime}
-
+  scope :with_user_id, ->(user_id) { where user_id: user_id }
+  scope :with_device, ->(device) { where device: device }
+  scope :with_ip, ->(ip) { where ip: ip }
+  scope :started_after, ->(datetime) { where 'started_at >= ?', datetime }
 end
