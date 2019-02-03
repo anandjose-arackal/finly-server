@@ -4,22 +4,22 @@ class ActionsManager::Master::BankTransfer::AccountOwners::EmployeeIndex < Actio
   register_actions [:create_payment_order, :import_vendors, :export_vendors, :xls, :csv]
 
   def create_payment_order
-    true
+    user.vendor_payments_admin? || user.vendor_payments_initiator?
   end
 
   def import_vendors
-    true
+    user.vendor_payments_admin? || user.vendor_payments_initiator?
   end
 
   def export_vendors
-    true
+    user.vendor_payments_admin? || user.vendor_payments_initiator?
   end
 
   def xls
-    true
+    user.vendor_payments_admin? || user.vendor_payments_initiator?
   end
 
   def csv
-    true
+    user.vendor_payments_admin? || user.vendor_payments_initiator?
   end
 end

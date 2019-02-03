@@ -9,7 +9,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManag
   end
 
   def bulk_actions
-    true
+    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer?
   end
 
   def export_sap

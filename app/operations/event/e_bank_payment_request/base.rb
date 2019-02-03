@@ -118,7 +118,8 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
         else
           view = "initiator"
       end
-      url = "#{Constants::BASE_URL_VP}orders/#{bank_payment_request.id}/params={\"view\":\"#{view}\"}"
+      suffix = URI.escape("{}")
+      url = "#{Constants::BASE_URL_VP}orders/#{bank_payment_request.id}/params=" + suffix
     end
 
   end

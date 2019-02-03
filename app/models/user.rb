@@ -623,6 +623,10 @@ class User < ApplicationRecord
     self.role_mapping.vendor_payments.manager.present?
   end
 
+  def vendor_payments_auditor?
+    self.role_mapping.vendor_payments.auditor.present?
+  end
+
   alias_method :vendor_payments_manager?, :vendor_payment_manager?
 
   alias_method :vendor_payment_reviewer?, :vendor_payment_manager?

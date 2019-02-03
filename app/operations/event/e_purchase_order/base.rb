@@ -137,9 +137,9 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     end
 
     def generate_url
-      suffix = "/params={\"show\":\"purchase_order\"}"
+      suffix = URI.escape("{\"show\":\"purchase_order\"}")
       # path = "reports/#{report.id}"
-      path = "procurements/#{purchase_order.procurement.id}"
+      path = "procurements/#{purchase_order.procurement.id}/params="
       url = Constants::BASE_URL_VP + path + suffix
     end
 

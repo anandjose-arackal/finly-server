@@ -146,9 +146,9 @@ class Event::EInvoice::Base < Event::SetNotifier
         view = 'reviewer'
       end
 
-      suffix = "/params={\"view\":\"#{view}\",\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}"
+      suffix = URI.escape("{\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}")
       # path = "reports/#{report.id}"
-      path = "procurements/#{invoice.procurement.id}"
+      path = "procurements/#{invoice.procurement.id}/params="
       url = Constants::BASE_URL_VP + path + suffix
     end
 
