@@ -33,7 +33,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
 
     levels.each do |level|
       if level.level_user_reviewer_mappings.present?
-        mappings = level.level_user_reviewer_mappings
+        mappings = level.level_user_reviewer_mappings.with_user_id(user.id)
       else
         mappings = level.level_reviewer_mappings.non_deleted
       end
