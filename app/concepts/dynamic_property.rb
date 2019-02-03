@@ -4,6 +4,11 @@ module DynamicProperty
     base.extend ClassMethods
   end
 
+  def dynamic_property_map
+    DEFINABLE_PROPERTY_MAP[self.class.name] = {} if DEFINABLE_PROPERTY_MAP[self.class.name].nil?
+    DEFINABLE_PROPERTY_MAP[self.class.name]
+  end
+
   module ClassMethods
 
     def dynamic_property_map
@@ -16,9 +21,9 @@ module DynamicProperty
       attrs.each do |method|
         send property_type, method do |value = NoObject|
           unless value == NoObject
-            dynamic_property_map[method] = value
+            self.dynamic_property_map[method] = value
           end
-          dynamic_property_map[method]
+          self.dynamic_property_map[method]
         end
       end
     end

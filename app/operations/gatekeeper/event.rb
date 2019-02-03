@@ -13,12 +13,12 @@ class Gatekeeper::Event
   end
 
   def run
+    result = nil
     Gatekeeper::Master.subscribers(event).each do |rule|
       result = rule.verify(self.params)
-      unless result.success?
-
-      end
+      return result unless result.success?
     end
+    result
   end
 
 end

@@ -31,12 +31,16 @@ class RuleBook::Verifier
     self
   end
 
+  def executed?
+    !!self.executed
+  end
+
   def success?
-    self.executed and not has_errors?
+    self.executed? and not has_errors?
   end
 
   def failed?
-    self.executed and has_errors?
+    self.executed? and has_errors?
   end
 
 end
