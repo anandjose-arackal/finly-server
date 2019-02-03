@@ -36,8 +36,4 @@ class Gatekeeper::Rules::AccountLock < Gatekeeper::Rules::BaseRule
     end
   end
 
-  rule 'Associate request properties with the generated token', on: :on_new_token_generated do
-
-  end
-
 end
