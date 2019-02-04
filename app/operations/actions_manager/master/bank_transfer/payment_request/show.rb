@@ -444,4 +444,8 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     end
   end
 
+  def associated_users
+      BankTransfer::PaymentRequest::Review::AssociatedUsers.(user, bank_payment_request: bank_payment_request, user_before: bank_payment_request.controlling_user) rescue []
+  end
+
 end
