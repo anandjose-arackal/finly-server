@@ -3,6 +3,18 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   register_handle :proc_inward_document_show
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
 
+
+  def input
+    result = ::Procurements::Invoices::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    result.invoice
+  end
+
+  alias_method :invoice, :input
+
   def more_details_button
     true
   end
@@ -16,11 +28,11 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def submit
-    true
+    document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
   end
   
   def reject
-    true
+    invoice.processing? && user_in_level?
   end
 
   def close
@@ -28,7 +40,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def approve
-    true
+    invoice.processing? && user_in_level?
   end
 
   def remind
@@ -36,7 +48,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def retract
-    true
+    invoice.processing? && document_owner?
   end
 
   def remind_approver
@@ -56,7 +68,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def delete
-    true
+    document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
   end
 
   def more_actions
@@ -64,7 +76,9 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def make_payment
-    true
+    if invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?
+      (user_in_level? && user.vendor_payment_creditor?) || user.vendor_payment_creditor?
+    end
   end
 
   def audit_trail
@@ -84,7 +98,19 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   end
 
   def update_btn
-    true
+    (document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)) || 
+    (invoice.processing? && user_in_level?)
   end
+
+  def user_in_level?
+    level = invoice.level
+    amount = invoice.net_amount.value rescue 0
+    level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+  end
+
+  def document_owner?
+    invoice.created_by_user_id.eql? user.id
+  end
+
 
 end
