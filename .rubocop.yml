@@ -1,0 +1,10 @@
+Metrics/LineLength:
+  Max: 150
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/LambdaCall:
+  Enabled: false
+Style/RedundantSelf:
+  Enabled: false
+Style/RescueModifier:
+  Enabled: false
