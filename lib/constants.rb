@@ -65,7 +65,12 @@ module Constants
 
   # INVITATION_API_KEY = "-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXayCwFWmM0zwoMwaBcMbNlQA0U_wBnz1AjOcjMay1VbI7bl0STMKIVQVrVVOnRe0ahA=="
 
-  WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
+
+  if Rails.env.production?
+    WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
+  else
+    WELCOME_MESSAGE_AUTH_KEY = ""
+  end
 
   # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
   # using the below one because the above one's monthly quota was crossed
