@@ -28,7 +28,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def submit
-    true
+    document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
   end
 
   def reject
@@ -68,7 +68,11 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def update_btn
-    true
+    if document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
+      return true
+    elsif invoice.processing? && user_in_level?
+      return true
+    end
   end
 
   def delete
@@ -84,7 +88,9 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def make_payment
-    true
+    if (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?)
+      (user_in_level? && user.vendor_payment_creditor?) || user.vendor_payment_creditor?
+    end
   end
 
   def audit_trail

@@ -205,6 +205,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def edit_order_summary
+    (user.vendor_payments_initiator?) && (bank_payment_request.open? || bank_payment_request.retracted?)
   end
 
   def download_payments_file
