@@ -41,11 +41,13 @@
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
 
-class TrackerVisit < ApplicationRecord
+class UserSession < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :company, optional: true
+  belongs_to :access_token, class_name: 'Doorkeeper::AccessToken'
+  belongs_to :status, class_name: 'UserSessionStatus'
 
-  has_many :events, class_name: 'TrackerEvent', dependent: :destroy
+  has_many :events, class_name: 'UserSessionEvent', dependent: :destroy
 
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   scope :with_device, ->(device) { where device: device }

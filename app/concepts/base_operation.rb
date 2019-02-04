@@ -321,6 +321,7 @@ class BaseOperation
       type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
     end
 
+
     def success?
       false
     end
@@ -339,6 +340,10 @@ class BaseOperation
 
     def current_user
       RequestStore.store[:current_user]
+    end
+
+    def current_view
+      params&.dig(:view)
     end
 
     def authorized_scopes

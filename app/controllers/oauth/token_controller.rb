@@ -1,11 +1,13 @@
 class Oauth::TokenController < Doorkeeper::TokensController
-  include ActionController::Cookies, ActionController::Helpers,
-          SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
+  include ActionController::Cookies
+  include ActionController::Helpers
+  include SessionsHelper
+  include AccessibilityCheckHelper
+  include ApplicationHelper
 
   def create
-    unless pre_process
-      return
-    end
+    return unless pre_process
+
     response = authorize_response
     headers.merge! response.headers
     self.status = response.status
@@ -14,10 +16,14 @@ class Oauth::TokenController < Doorkeeper::TokensController
       @auth_grant = response
       @token = response.token
       @user = current_user(response&.token)
-      if verify_company_status(@user)
-        User::Track::Login.(@user, params)
-        on_create_success(response)
-      end
+      params[:user] = user
+      params[:response] = response
+      result = UserSession::Create.(:authorized, params)
+      on_create_success(response) if result.success?
+
+      # if verify_company_status(@user)
+      #   User::Track::Login.(@user, params)
+      # end
     else
       self.response_body = response.body.to_json
     end
@@ -25,30 +31,31 @@ class Oauth::TokenController < Doorkeeper::TokensController
     handle_token_exception e
   end
 
-
   protected
+
   def verify_company_status(user)
     company = user&.company rescue nil
+
     if company.present?
       case company.status_id
-        when CompanyStatus.id_for(:active)
-        when CompanyStatus.id_for(:partial_block)
-          if @user.admin? or @user.manager? or @user.finance_manager?
-            json_string = {error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved'}
-            render json: json_string.to_json, status: 401
-            return false
-          end
-        when CompanyStatus.id_for(:deactivated)
-          if @user.admin? or @user.manager? or @user.finance_manager?
-            json_string = {error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved'}
-            render json: json_string.to_json, status: 401
-            return false
-          else
-            json_string = {error: 'invalid_grant', error_description: 'Your account has been disabled. Please contact your admin to login'}
-            render json: json_string.to_json, status: 401
-            return false
-          end
-        when CompanyStatus.id_for(:hidden)
+      when CompanyStatus.id_for(:partial_block)
+        if @user.admin? || @user.manager? || @user.finance_manager?
+          json_string = { error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved' }
+          render json: json_string.to_json, status: 401
+          return false
+        end
+      when CompanyStatus.id_for(:deactivated)
+        if @user.admin? || @user.manager? || @user.finance_manager?
+          json_string = { error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved' }
+          render json: json_string.to_json, status: 401
+          return false
+        else
+          json_string = { error: 'invalid_grant', error_description: 'Your account has been disabled. Please contact your admin to login' }
+          render json: json_string.to_json, status: 401
+          return false
+        end
+        # when CompanyStatus.id_for(:active), CompanyStatus.id_for(:hidden)
+        # Nothing to do
       end
     end
     true
@@ -56,9 +63,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def pre_process
     ### todo TEMP WORKAROUND - MAKE ALL CLIENTS SEND USERNAME AND REMOVE THIS JUGAAD
-    if params.dig(:email).present? and params.dig(:username).blank?
-      params[:username] = params[:email]
-    end
+    params[:username] = params[:email] if params.dig(:email).present? && params.dig(:username).blank?
     ########################
 
     set_grant_type
@@ -70,15 +75,15 @@ class Oauth::TokenController < Doorkeeper::TokensController
     params[:application] = 'web'
     # self.response.set_cookie 'access_token', {:value => response.token.token, :httponly => true}
     # self.response.set_cookie 'refresh_token', {:value => response.token.refresh_token, :httponly => true}
-    cookies["access_token"] = {:value => @token.token, :httponly => true, :expires => 15.days.from_now}
-    cookies["refresh_token"] = {:value => @token.refresh_token, :httponly => true, :expires => 15.days.from_now}
+    cookies['access_token'] = { value: @token.token, httponly: true, expires: 15.days.from_now }
+    cookies['refresh_token'] = { value: @token.refresh_token, httponly: true, expires: 15.days.from_now }
 
     # render json: {}, status: 200
     render_json 'oauth/token/create.json.jbuilder', response.status
   end
 
   def render_json(file_path, response_status)
-    binding_params = {user: @user, auth_grant: @auth_grant, token: @token}
+    binding_params = { user: @user, auth_grant: @auth_grant, token: @token }
     view = ActionView::Base.new(ActionController::Base.view_paths, binding_params)
     render json: JSON.parse(view.render(file: file_path)), status: response_status
   end
@@ -89,25 +94,22 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def set_scope
     scopes = self.auth_scope
-    unless scopes&.is_a?(Array)
-      scopes = [scopes]
-    end
+    scopes = [scopes] unless scopes&.is_a?(Array)
     params[:scope] = scopes&.join(' ')
   end
 
   def auth_scope
     # JUGAARD AS IOS IS CURRENTLY USING THIS ENDPOINT TO GENERATE THE TOKENS
-    if params[:client_id] == '9b342c6060cc1867b371325a469e17e4'
-      return :mobile
-    end
+    return :mobile if params[:client_id] == '9b342c6060cc1867b371325a469e17e4'
+
     # JUGAAD END
     :web
   end
 
   def current_user(doorkeeper_token)
-    if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
+    if doorkeeper_token.present? && doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
-      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome') or scopes.include?('api') or scopes.include?('admin_bypass')
+      if scopes.include?('web') || scopes.include?('mobile') || scopes.include?('chrome') || scopes.include?('api') || scopes.include?('admin_bypass')
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?('admin')
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
@@ -116,5 +118,4 @@ class Oauth::TokenController < Doorkeeper::TokensController
       end
     end
   end
-
 end

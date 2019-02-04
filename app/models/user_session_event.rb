@@ -14,6 +14,7 @@
 #  view             :string(255)
 #
 
-class TrackerEvent < ApplicationRecord
-  belongs_to :tracker_visit, optional: true
+class UserSessionEvent < ApplicationRecord
+  belongs_to :user_session
+  belongs_to :status, class_name: 'UserSessionStatus'
 end
