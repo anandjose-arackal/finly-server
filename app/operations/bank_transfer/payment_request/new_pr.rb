@@ -5,14 +5,14 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note
 
 	def init
-		self.vendor_id = params[:vendor_id]
+		# self.vendor_id = params[:vendor_id]
 
-		if self.vendor_id.present?
-			self.vendor = YesBankVendor.find_by(id: self.vendor_id)
-		end
+		# if self.vendor_id.present?
+		# 	self.vendor = YesBankVendor.find_by(id: self.vendor_id)
+		# end
 
-		self.requested_amount = params[:amount]
-		self.payment_mode = params[:payment_mode]
+		# self.requested_amount = params[:amount]
+		# self.payment_mode = params[:payment_mode]
 
 	
 		params[:payments_attributes].each do |pa|
@@ -78,9 +78,11 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	          payment_status_id: PaymentStatus.id_for(:pending_approval),
 	          payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
 	          purchase_order_id: payment[:purchase_order_id],
-	          payment_mode: self.payment_mode,
+	          # payment_mode: self.payment_mode,
+	          payment_mode: params[:payment_mode,
 	          amount_attributes: {
-	              value: self.requested_amount,
+	              # value: self.requested_amount,
+	              value: params[:original_amount],
 	              currency_id: Currency.first.id
 	          },
 	          note: payment[:note],
@@ -104,7 +106,8 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	              invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
 	              company_id: self.user.company_id,
 	              original_amount_attributes: {
-	                  value: self.requested_amount,
+	                  # value: self.requested_amount,
+	                  value: params[:original_amount],
 	                  currency_id: 1
 	              }
 	          },
@@ -159,10 +162,12 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		    payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
 		    company_id: user.company_id,
 		    amount_requested_attributes: {
-		        value: self.requested_amount,
+		        # value: self.requested_amount,
+		        value: params[:original_amount],
 		        currency_id: 1
 		    },
-		    payment_mode: self.payment_mode,
+		    # payment_mode: self.payment_mode,
+		    payment_mode: params[:payment_mode],
 		    initiating_account_type: YesBankCompanyAccount.name,
 		    receiving_account_type: BankAccount.name,
 		    payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -175,7 +180,8 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		    status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
 		    controlling_user_id: user.id,
 		    requested_amount_attributes: {
-		        value: self.requested_amount,
+		        # value: self.requested_amount,
+		        value: params[:original_amount],
 		        currency_id: 1
 		    },
 		    beneficiary_type_id: 2,
@@ -194,19 +200,39 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
     CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 
+  # def retrieve_bank_account(order_details)
+  #   if order_details[:account_id].present?
+  #     id = order_details[:account_id]
+  #     ba = BankAccount.find_by(id: id)
+  #     return ba
+  #   else
+  #     ba = BankAccount.non_deleted.find_by(account_number: order_details["bank_account_number"]&.strip, ifsc: order_details["ifsc"]&.strip,
+  #                                          company_id: self.company_id, name: order_details["name"]&.strip,
+  #                                          account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
+  #     vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details["name"], company_id: self.company_id)
+  #     ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
+  #     if ba.nil?
+  #       ba = BankAccount.create(name: order_details["name"], account_number: order_details["bank_account_number"]&.strip, ifsc: order_details["ifsc"]&.strip,
+  #                               account_owner: vendor, company_id: self.company_id, default_account: true)
+
+  #     end
+  #     return ba
+  #   end
+  # end
+
   def retrieve_bank_account(order_details)
     if order_details[:account_id].present?
       id = order_details[:account_id]
       ba = BankAccount.find_by(id: id)
       return ba
     else
-      ba = BankAccount.non_deleted.find_by(account_number: order_details["bank_account_number"]&.strip, ifsc: order_details["ifsc"]&.strip,
-                                           company_id: self.company_id, name: order_details["name"]&.strip,
+      ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
+                                           company_id: self.company_id, name: order_details[:name]&.strip,
                                            account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
-      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details["name"], company_id: self.company_id)
+      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
       ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
       if ba.nil?
-        ba = BankAccount.create(name: order_details["name"], account_number: order_details["bank_account_number"]&.strip, ifsc: order_details["ifsc"]&.strip,
+        ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
                                 account_owner: vendor, company_id: self.company_id, default_account: true)
 
       end
