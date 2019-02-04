@@ -79,10 +79,10 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	          payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
 	          purchase_order_id: payment[:purchase_order_id],
 	          # payment_mode: self.payment_mode,
-	          payment_mode: params[:payment_mode,
+	          payment_mode: payment[:payment_mode],
 	          amount_attributes: {
 	              # value: self.requested_amount,
-	              value: params[:original_amount],
+	              value: payment[:original_amount],
 	              currency_id: Currency.first.id
 	          },
 	          note: payment[:note],
@@ -107,7 +107,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	              company_id: self.user.company_id,
 	              original_amount_attributes: {
 	                  # value: self.requested_amount,
-	                  value: params[:original_amount],
+	                  value: payment[:original_amount],
 	                  currency_id: 1
 	              }
 	          },
