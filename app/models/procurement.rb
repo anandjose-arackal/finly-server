@@ -75,6 +75,22 @@ class Procurement < ApplicationRecord
     where id: filtered_ids
   }
 
+  scope :filter_doc_number, -> (doc_number) {
+    filtered_ids = InwardDocument.filter_doc_number(doc_number).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
+  scope :filter_delivery_date, -> (delivery_date) {
+    date = Date.parse(delivery_date) rescue nil
+    puts "DATE=======0", date
+    # binding.pry
+
+    if date
+      filtered_ids = InwardDocument.filter_delivery_date(date).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_invoice_serial, -> (invoice_id) {
     filtered_ids = Invoice.filter_invoice_id(invoice_id).pluck(:procurement_id)
     where id: filtered_ids
@@ -208,6 +224,7 @@ class Procurement < ApplicationRecord
   # }
 
   scope :filter_status_tags, -> (ids) {
+
     all_status_tag_ids = StatusTag.all.pluck(:id)
     status_tag_ids = all_status_tag_ids & ids.map(&:to_i)
 
