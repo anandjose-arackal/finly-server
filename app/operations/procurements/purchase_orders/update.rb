@@ -37,6 +37,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def process
+
+    "PURCHASEORDER UPDATE FROM Process", params.inspect
     # self.purchase_order = procurement.build_purchse_order(purchase_order_params)
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
@@ -52,7 +54,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
 
       purchase_order.save
-      purchase_order.save
+      # purchase_order.save
 
       # Save Custom Fields
       if params[:custom_fields].present?
