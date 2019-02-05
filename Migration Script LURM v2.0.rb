@@ -185,9 +185,9 @@ policies.each do |policy|
       if purpose == 1
         next if policy.policy_user_roles.pluck(:user_id).include?(finance_manager.id)
         policy.policy_user_roles.build(user_id: finance_manager.id, user_role_id: UserRole.id_for(:finance_manager)).save
-      else
+      elsif purpose == 2
         next if policy.policy_user_roles.pluck(:user_id).include?(finance_manager.id)
-        policy.policy_user_roles.build(user_id: finance_manager.id, user_role_id: UserRole.id_for(:finance_manager)).save
+        policy.policy_user_roles.build(user_id: finance_manager.id, user_role_id: UserRole.id_for(:creditor)).save
       end
     end
 	end

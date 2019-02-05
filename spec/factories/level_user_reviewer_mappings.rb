@@ -10,6 +10,7 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  threshold   :decimal(20, 5)
+#  exception   :boolean          default(FALSE)
 #
 
 FactoryBot.define do

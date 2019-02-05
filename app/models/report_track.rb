@@ -29,6 +29,7 @@ class ReportTrack < ApplicationRecord
   belongs_to :payment, optional: true
   belongs_to :cash_in_hand_deduction, optional: true, class_name: 'Payment'
   belongs_to :delegated_action_user, optional: true, class_name: 'User'
+  belongs_to :report_tracking_action, optional: true
 
   default_scope { order('report_tracks.created_at ASC') }
 
