@@ -332,6 +332,9 @@ class Expense < ApplicationRecord
                                                                       ExpenseType.id_for(:distance),
                                                                       ExpenseType.id_for(:time),
                                                                       ExpenseType.id_for(:per_diem)])}
+  
+  scope :selected_expense_types, -> (expense_arrays) {where(expense_type_id: expense_arrays)} # handles multiple expense types for creating budget rules
+  
   scope :only_reimbursable_expenses, -> {where(reimbursable: true)}
   scope :spent_from_cash_on_hand, -> {
     where(from_cash_on_hand: true)
