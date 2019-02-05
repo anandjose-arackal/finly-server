@@ -139,6 +139,7 @@ class Report::Violation < Report::Base
         return false
       end
     end
+
     if rule.days_after
       if manager
         time_elapsed = (expense.report.submitted_at - expense.date).to_i
@@ -231,20 +232,18 @@ class Report::Violation < Report::Base
     end
 
     expenses = Expense.with_report_id(report_ids)
-    case rule.expense_type_id
-    when 1
-      expenses = expenses.only_manual_expenses
-    when 2
-      expenses = expenses.only_card_expenses
-    when 3
-      expenses = expenses.only_distance_expenses
-    when 4
-      expenses = expenses.only_time_expenses
-    when 5
-      expenses = expenses.only_per_diem_expenses
-    else
-      # do nothing
-    end
+
+    expense_arrays  = []
+    expense_types = rule.expense_types.pluck(:id)
+    expense_arrays << ExpenseType.id_for(:manual) if expense_types.include?(1)
+    expense_arrays << ExpenseType.id_for(:card) if expense_types.include?(2)
+    expense_arrays << ExpenseType.id_for(:distance) if expense_types.include?(3)
+    expense_arrays << ExpenseType.id_for(:time) if expense_types.include?(4)
+    expense_arrays << ExpenseType.id_for(:per_diem) if expense_types.include?(5)
+
+    expenses = expenses.selected_expense_types(expense_arrays)
+
+
     # Expenses with different usage_date ranges from expense date
     total_expenses += number_with_precision(expenses.without_usage_date_type.with_date_range(start_date, end_date)
                                                 .filter_category_id(categories&.pluck(:id)).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
@@ -325,6 +324,11 @@ class Report::Violation < Report::Base
             field_drop_down_item_ids = rule.budget_rule_field_mappings.pluck(:field_drop_down_item_id)
           end
           available_budget, violation_type = available_budget(expense, rule, start_date, end_date, categories, field_drop_down_item_ids)
+
+          # return if budget rule has any department but do not return if budget rule department and the user department are same
+          return if rule.departments.present? and not rule.departments.pluck(:id).any? {|department| expense.user.user_department_mappings.pluck(:department_id).include? department }
+          departments = rule.departments
+
           if available_budget < 0
             type = categories.present? ? 'category' : 'total'
             message = rule.rule_in_words(violation: true, violation_type: violation_type, exceeded_by: available_budget.abs)
