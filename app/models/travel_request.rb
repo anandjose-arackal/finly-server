@@ -29,13 +29,17 @@
 #  booking_confirmed_at         :datetime
 #  created_by_id                :integer
 #  modified_by_id               :integer
+#  deleted_at                   :datetime
+#  controlling_level_id         :integer
 #
 
 class TravelRequest < ApplicationRecord
   include SoftDeletable,
           Sequenced::ActsAsSequenced,
           FieldCustomizer::CustomizableValidation,
-          FindByOrderedIds
+          FindByOrderedIds,
+          Transitionable
+
 
   acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false, prefix: 'TR-'
 
@@ -298,6 +302,19 @@ class TravelRequest < ApplicationRecord
     Expense.with_report_id(reports.pluck(:id))
   end
 
+  def get_default_provider
+    if self.class.status_ids(:open, :processing, :retracted, :rejected, :auto_approved, :approved).include?(status_id)
+      self.class.name + "Provider"
+    elsif self.class.status_ids(:booked, :cancelled, :booking_pending, :selection_requested,
+                                :selection_processing, :selection_confirmed, :selection_rejected,
+                                :booking_confirmed, :completed).include?(status_id)
+      self.class.name + "BookingProvider"
+    else
+      self.class.name + "Provider"
+    end
+
+  end
+
   protected
 
   def acceptable_dates?
@@ -306,6 +323,80 @@ class TravelRequest < ApplicationRecord
     unless from_date <= to_date
       errors.add :from_date, 'cannot be after to date'
     end
+  end
+
+  def self.document_status_attribute
+    'status_id'
+  end
+
+  def self.document_owner_attribute
+    'user_id'
+  end
+
+  def self.finance_associated_status_ids
+    TravelRequestStatus.ids_for(:approved, :settled, :settlement_confirmed , :closed, :auto_approved)
+  end
+
+  def self.travel_associated_status_ids
+    TravelRequestStatus.ids_for(
+        :approved, :booking_pending, :booked, :selection_requested, :selection_processing,
+        :selection_confirmed, :selection_rejected, :booking_confirmed, :completed
+
+    )
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push TravelRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.reviewer_associated_booking_items(user)
+    if user.instance_of?(User)
+        # Get controlling level id from all documents
+        if self.column_names.include? 'company_id'
+          controlling_level_ids = self.where(company_id: user.company.id).pluck(:controlling_level_id).reject { |document_id| document_id.nil? }
+          # controlling_level_ids += DocumentLevelReviewerMapping.where(
+          #                                                          document_reviewer_mappable_type: self.name,
+          #                                                          taken_control: true,
+          #                                                          taken_control_by_id: user.id
+          # ).pluck(:level_id)
+        else
+          # Models like Report doesn't has company_id attribute
+          user_ids = user.company.users.pluck(:id)
+
+          controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:controlling_level_id).reject {|document_id| document_id.nil?}
+        end
+
+        # Get all the documents without viewable
+        document_ids = DocumentLevelReviewerMapping.where(
+                                                       reviewer_id: user.id,
+                                                       document_reviewer_mappable_type: self.name,
+                                                       level_id: controlling_level_ids,
+                                                       provider_name: 'TravelRequestBookingProvider'
+        ).pluck(:document_reviewer_mappable_id)
+
+        # Get all the documents where the user had previously interacted with
+        document_ids += DocumentLevelReviewerMapping.where(
+            reviewer_id: user.id,
+            document_reviewer_mappable_type: self.name,
+            viewable: true,
+            provider_name: 'TravelRequestBookingProvider'
+        ).pluck(:document_reviewer_mappable_id)
+
+        # Get all the taken control items for admin user
+        document_ids += DocumentLevelReviewerMapping.where(
+                                                        taken_control: true,
+                                                        document_reviewer_mappable_type: self.name,
+                                                        taken_control_by_id: user.id,
+                                                        provider_name: 'TravelRequestBookingProvider'
+        ).pluck(:document_reviewer_mappable_id)
+
+        self.where(id: document_ids)
+      end
   end
 
 end

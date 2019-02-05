@@ -9,6 +9,7 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  is_deleted  :boolean
+#  deleted_at  :datetime
 #
 
 require 'test_helper'

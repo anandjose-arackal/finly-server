@@ -19,7 +19,7 @@ class TakeControlTest < ActiveSupport::TestCase
     @money_request.stubs(:owner).returns(@owner)
 
     response = nil
-    event = Event::EMoneyRequest::TakeControl.new(@admin, money_request: @money_request)
+    event = Event::EMoneyRequests::TakeControl.new(@admin, money_request: @money_request)
     # Ensure 2 mailers have been triggered
     assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',2 do
       response = event.run
@@ -34,7 +34,7 @@ class TakeControlTest < ActiveSupport::TestCase
 
   test 'behavior when money_request is not passed' do
     response = nil
-    event = Event::EMoneyRequest::TakeControl.new(@admin, money_request: nil)
+    event = Event::EMoneyRequests::TakeControl.new(@admin, money_request: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -43,7 +43,7 @@ class TakeControlTest < ActiveSupport::TestCase
 
   test 'behavior when current user is not passed' do
     response = nil
-    event = Event::EMoneyRequest::TakeControl.new(nil, money_request: @money_request)
+    event = Event::EMoneyRequests::TakeControl.new(nil, money_request: @money_request)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -52,7 +52,7 @@ class TakeControlTest < ActiveSupport::TestCase
 
   test 'behavior when current user is not passed and money_request is not passed ' do
     response = nil
-    event = Event::EMoneyRequest::TakeControl.new(nil, money_request: nil)
+    event = Event::EMoneyRequests::TakeControl.new(nil, money_request: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end

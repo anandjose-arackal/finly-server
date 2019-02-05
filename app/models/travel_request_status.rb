@@ -15,7 +15,7 @@ class TravelRequestStatus < ApplicationRecord
   def self.values
     [:open, :processing, :retracted, :rejected, :booked, :cancelled, :booking_pending,
      :selection_requested, :selection_processing, :selection_confirmed, :selection_rejected,
-     :booking_confirmed, :completed, :approved]
+     :booking_confirmed, :completed, :approved, :auto_approved]
   end
 
   def self.values_new

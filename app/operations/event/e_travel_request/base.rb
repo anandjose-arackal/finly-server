@@ -1,5 +1,5 @@
 class Event::ETravelRequest::Base < Event::SetNotifier
-  attr_accessor :travel_request
+  attr_accessor :travel_request, :role_id
 
   def pre_validate
     unless user.present?
@@ -21,6 +21,7 @@ class Event::ETravelRequest::Base < Event::SetNotifier
 
   def init
     self.travel_request = params[:travel_request]
+    self.role_id = params[:role_id]
   end
 
   def validate

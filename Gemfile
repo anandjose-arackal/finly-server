@@ -23,7 +23,7 @@ gem 'mocha', '~> 1.7.0'
 gem 'rollbar', '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
-# gem 'sentry-raven', '~> 2.8'
+# gem '-raven', '~> 2.8'
 
 gem 'health-monitor-rails', '~> 8.4.0'
 
@@ -210,6 +210,12 @@ group :development, :test do
   # gem 'active_record_query_trace', '~> 1.5.4'
   # gem 'better_errors'
   # gem 'binding_of_caller'
+
+  gem 'rspec-rails', '~> 3.8'
+  gem 'capybara'
+  gem 'factory_bot_rails'
+  gem 'factory_bot'
+  gem 'database_cleaner'
 
 end
 

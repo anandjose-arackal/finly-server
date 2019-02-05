@@ -12,7 +12,7 @@ class Personalizer::Adapters::Company49::BankTransfer49::PaymentRequest49::Revie
     ids = [8095, 889, 8094]
     roles = [UserRole.id_for(:reviewer)]
     action = BankPaymentRequestTrailAction.id_for(:approve)
-    if self.bank_payment_request.bank_payment_request_trails.with_action_user(ids)
+    if self.bank_payment_request.trails.with_action_user(ids)
            .with_action_user_role(roles).with_action(action).present?
       add_message :error, 'The payment ticket cannot be retracted in the current stage'
     end

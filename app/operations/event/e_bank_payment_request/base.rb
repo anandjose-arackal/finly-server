@@ -1,6 +1,6 @@
 class Event::EBankPaymentRequest::Base < Event::SetNotifier
 
-  attr_accessor :bank_payment_request
+  attr_accessor :bank_payment_request, :role_id
 
   def pre_validate
     unless user.present?
@@ -18,6 +18,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
 
   def init
     self.bank_payment_request = params[:bank_payment_request]
+    self.role_id = params[:role_id]
   end
 
   def validate
@@ -30,7 +31,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
-    BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
+    BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params)).deliver_now
     # # todo - temporary, for testing. Will be moved to delay before production
     # BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params)).deliver_now
   end

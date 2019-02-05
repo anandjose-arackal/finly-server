@@ -19,7 +19,7 @@ class RetractTest < ActiveSupport::TestCase
     @money_request.stubs(:associated_users).returns([@manager, @owner])
 
     response = nil
-    event = Event::EMoneyRequest::Retract.new(@owner, money_request: @money_request)
+    event = Event::EMoneyRequests::Retract.new(@owner, money_request: @money_request)
     # Ensure 2 mailers have been triggered
     assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',2 do
       response = event.run
@@ -35,7 +35,7 @@ class RetractTest < ActiveSupport::TestCase
     @money_request.stubs(:associated_users).returns([@second_manager, @manager, @owner])
 
     response = nil
-    event = Event::EMoneyRequest::Retract.new(@owner, money_request: @money_request)
+    event = Event::EMoneyRequests::Retract.new(@owner, money_request: @money_request)
     # Ensure 3 mailers have been triggered
     assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',3 do
       response = event.run
@@ -49,7 +49,7 @@ class RetractTest < ActiveSupport::TestCase
 
   test 'behavior when money_request is not passed' do
     response = nil
-    event = Event::EMoneyRequest::Retract.new(@finance_manager, money_request: nil)
+    event = Event::EMoneyRequests::Retract.new(@finance_manager, money_request: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -58,7 +58,7 @@ class RetractTest < ActiveSupport::TestCase
 
   test 'behavior when current user is not passed' do
     response = nil
-    event = Event::EMoneyRequest::Retract.new(nil, money_request: @money_request)
+    event = Event::EMoneyRequests::Retract.new(nil, money_request: @money_request)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -67,7 +67,7 @@ class RetractTest < ActiveSupport::TestCase
 
   test 'behavior when current user is not passed and money_request is not passed ' do
     response = nil
-    event = Event::EMoneyRequest::Retract.new(nil, money_request: nil)
+    event = Event::EMoneyRequests::Retract.new(nil, money_request: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end

@@ -46,11 +46,14 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
           payment.update(payment_status_id: PaymentStatus.id_for(:completed))
         end
         # create the trail for the same
-        payment_request.bank_payment_request_trails.create action_user: user,
+        payment_request.trails.create action_user: user,
                                                           action_user_role_id: self.view_role,
                                                           action_id: BankPaymentRequestTrailAction.id_for(:mark_as_credited),
                                                           modified_user_id: nil,
                                                           modified_user_role_id: nil
+        payment_request.trails.create action_user: user,
+                                      action_user_role_id: self.view_role,
+                                      action_id: TrailAction.id_for(:mark_as_credited)
 
         # if the payment has an associated invoice, update the status of the invoice
         payments = payment_request.payment_order.payments

@@ -1,5 +1,5 @@
 class Event::EPurchaseOrder::Base < Event::SetNotifier
-  attr_accessor :purchase_order, :controlling_users, :workflow_output
+  attr_accessor :purchase_order, :controlling_users, :workflow_output, :role_id
 
   def pre_validate
     unless user.present?
@@ -23,6 +23,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     self.purchase_order = params[:purchase_order]
     self.workflow_output = params[:workflow_output]
     self.controlling_users = []
+    self.role_id = params[:role_id]
   end
 
   def validate
@@ -39,7 +40,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    ProcurementMailer.delay.send_purchase_order_mail(Event::EPurchaseOrder::Base::MailerPresenter.new(user, params))
+    ProcurementMailer.send_purchase_order_mail(Event::EPurchaseOrder::Base::MailerPresenter.new(user, params)).deliver_now
   end
 
   def mailer_subject(user)

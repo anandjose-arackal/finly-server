@@ -47,6 +47,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def unapprove
+    @result = Procurements::PurchaseOrders::Unapprove.(current_user, params)
+    respond
+  end
+
   def bulk_approve
     @result = Procurements::PurchaseOrders::BulkApprove.(current_user, params)
     respond
