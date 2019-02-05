@@ -178,7 +178,7 @@ module Transitionable
         user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
       when 'return_control', :return_control
         if level.present?
-          document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id).compact
+          user_ids += document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id).compact
         end
       else
         # nothing to do
