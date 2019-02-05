@@ -10,6 +10,9 @@
 
 class ExpenseType < ApplicationRecord
 
+  has_many :budget_rule_expense_type_mappings
+  has_many :budget_rules, through: :budget_rule_expense_type_mappings
+
   validates :name, presence: true
 
   VALUES = {manual: 1, card: 2, distance: 3, time: 4, per_diem: 5, cash: 1}

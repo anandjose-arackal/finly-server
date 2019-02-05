@@ -7,6 +7,11 @@ class DepartmentsController < ApplicationController
     respond
   end
 
+  def all_users
+    @result = Company::Users.(current_user, params)
+    respond
+  end
+
   # todo
 
   def create
