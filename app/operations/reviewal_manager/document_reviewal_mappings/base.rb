@@ -15,7 +15,7 @@ class ReviewalManager::DocumentReviewalMappings::Base < BaseOperation
     when 'Report'
       amount = document&.total_amount rescue 0
     when 'BankPaymentRequest'
-      amount = document&.total_amount rescue 0
+      amount = document&.payment_order&.amount_requested&.value rescue 0
     # when 'TravelRequest'
     #   amount = 0
     else
