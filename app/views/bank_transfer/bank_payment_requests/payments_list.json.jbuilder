@@ -235,10 +235,10 @@ json.unpaid_payments do
         json.item_amounts_total invoice.item_amounts_total
 
         # paid amount for this invoice
-        json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
-        json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+        paid_amount = invoice.payments.successful.joins(:amount).sum(:value)
+        json.paid_amount paid_amount
+        json.remaining_amount (invoice.balance_due&.value.to_f - paid_amount)
 
-        #
 
         json.invoice_items do
           json.array!(invoice.invoice_items) do |item|

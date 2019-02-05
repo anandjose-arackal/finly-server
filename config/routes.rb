@@ -643,6 +643,8 @@
 #                organization_account_sidebar_menu_config GET    /organization_account/sidebar_menu_config(.:format)                                                                 organization_account#sidebar_menu_config
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                                                       organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                                          organization_account#categories
+#                        organization_account_departments GET    /organization_account/departments(.:format)                                                                         organization_account#departments
+#                  organization_account_all_expense_types GET    /organization_account/all_expense_types(.:format)                                                                   organization_account#all_expense_types
 #                 organization_account_export_preferences GET    /organization_account/export_preferences(.:format)                                                                  organization_account#export_preferences
 #                                             state_codes GET    /state_codes(.:format)                                                                                              organization_account#gst_state_codes
 #                                            add_category POST   /add_category(.:format)                                                                                             organization_account#add_category
@@ -1009,6 +1011,7 @@
 #                                                         PATCH  /departments/:id(.:format)                                                                                          departments#update
 #                                                         PUT    /departments/:id(.:format)                                                                                          departments#update
 #                                                         DELETE /departments/:id(.:format)                                                                                          departments#destroy
+#                                               all_users GET    /all_users(.:format)                                                                                                departments#all_users
 #                            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                                                                             bank_transfer/reimbursement#show
 #                                                         PATCH  /bank_transfer/reimbursements(.:format)                                                                             bank_transfer/reimbursement#update
 #                                                         POST   /bank_transfer/reimbursements(.:format)                                                                             bank_transfer/reimbursement#create
