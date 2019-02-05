@@ -5,7 +5,7 @@ class AddSessionDataToTrackerVisit < ActiveRecord::Migration[5.2]
     rename_table :tracker_notifications, :user_session_notifications
     rename_column :user_session_events, :tracker_visit_id, :user_session_id
     add_column :user_sessions, :access_token_id, :integer, references: 'oauth_access_tokens', index: true, foreign_key: true
-    add_column :user_sessions, :device_fingerprint, :string, index: true
+    add_column :user_sessions, :device_fingerprint, :string
     add_column :user_sessions, :storage_decryption_key, :string
     add_column :user_sessions, :last_request_at, :datetime, index: true
     add_column :user_sessions, :duration, :integer, limit: 6

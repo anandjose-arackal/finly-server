@@ -79,27 +79,18 @@ class UserSession::Create < BaseOperation
     args[:landing_page] = RequestStoreUtil.current_request.original_url
   end
 
-  def enrich_user_agent(args)
-    ua_client = DeviceDetector.new(RequestStoreUtil.current_request.user_agent)
+  def enrich_device(args)
+    device = DeviceProperty.new
 
-    args[:user_agent] = StringUtils.force_utf_8_encoding(ua_client.user_agent)
+    args[:user_agent] = device.user_agent
+    args[:device] = device.device
+    args[:device_type] = device.device_type
+    args[:platform] = device.platform
+    args[:platform_version] = device.platform_version
+    args[:app_version] = device.app_version
+    args[:os_name] = device.os_name
+    args[:os_version_name] = device.os_name
 
-    # TODO: Handle mobile device platform, device name etc
-
-    args[:device] = RequestStoreUtil.current_device
-    args[:device_type] = ua_client.device_type
-    args[:platform] = ua_client.name
-    # args[:app_version] = RequestHeader.app_version
-    args[:os_name] = ua_client.os_name
-
-    # Device -> App, Web, API
-    # DeviceType -> Desktop, Mobile in case the device is web
-    # Platform -> Chrome, OkHTTP, Firefox, iOS HTTP Client
-    # App version -> App version
-    # OS Name ->iOS, Android, Mac, Windows, Linux
-    # OS Version -> OS Version
-    # device Screen Height
-    # Screen Width
   end
 
 end
