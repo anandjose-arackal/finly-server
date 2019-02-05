@@ -137,7 +137,7 @@ json.payments_count @result.ordered_payments.size
 # non-paginated payments listing all payments in this payment order
 unless current_company.id == 118
 json.unpaid_payments do
-  json.array!(@result.unpaid_payments.include_for_index) do |payment|
+  json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
     json.owner_name payment.receiving_account&.account_owner&.name
     json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
@@ -155,9 +155,6 @@ json.unpaid_payments do
       json.beneficiary_type "authorized"
     else
       json.beneficiary_type "unauthorized"
-    end
-    json.system_messages do
-      json.array! (payment.system_messages)
     end
   end
 end
