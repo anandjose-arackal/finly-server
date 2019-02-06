@@ -10,7 +10,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   def credit(payment, options = {})
     # this will add money to this company's balance
     self.company = self.account.company
-    if self.company.current_account_connected?
+    if self.company.current_account_connected? && !["fc", :fc].include?(payment.application)
       both_balances = balance
       store_transaction payment, :credit, :success, both_balances, both_balances, account.company_id
       return true
@@ -36,7 +36,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   def debit(payment, options = {})
     # this will debit money from the company balance
     self.company = self.account.company
-    if self.company.current_account_connected?
+    if self.company.current_account_connected? && !["fc", :fc].include?(payment.application)
       both_balances = balance
       store_transaction payment, :debit, :success, both_balances, both_balances, account.company_id
       return true
@@ -63,12 +63,12 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     # can either be an operation or a specific call with
     # a model call
     self.company = self.account.company
-    if (self.company.vendor_payments_enabled? && !self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && !self.company.current_account_connected?)
+    # jugaad here to enable transferring to the current account for Rapido - if the viewing application is Finly Collect, the pool balance is always shown (even if the company has their current account connected)
+    if (self.company.yes_bank_account_enabled? && !self.company.current_account_connected?) || ["fc", :fc].include?(RequestStore.store[:current_app])
       payment_order = options[:payment_order]
       balance = self.account.balance_value
       blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
       return (balance - blocked_amount_for_payments)
-
     elsif (self.company.vendor_payments_enabled? && self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && self.company.current_account_connected?)
       return 99999999999999999 if options[:payment_process]
 
