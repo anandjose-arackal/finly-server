@@ -4,7 +4,7 @@ class YesBankApi::Base < BaseHandler
                 :auth_password, :template, :config_path, :application_id,
                 :customer_id, :resource_not_found, :transfer_status_id,
                 :configuration, :company_id, :account_number,
-                :start_time, :end_time, :file_logger
+                :start_time, :end_time, :file_logger, :payment
 
   ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&', '.']
 
@@ -19,6 +19,7 @@ class YesBankApi::Base < BaseHandler
     #   add_message :error, "Server error, try again later"
     # end
 
+
     if Rails.env.production?
       values = Finly::SecureStorage::Connector.read('core/yes_bank')
     else
@@ -26,9 +27,11 @@ class YesBankApi::Base < BaseHandler
       values = YAML.load_file(path)
     end
 
+
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
     company = self.company_id.present? ? Company.find_by_id(self.company_id) : nil
-    if company.present? and company&.feature_subscription&.current_account_connected #and (values[self.company_id.to_s]).present?
+    if company&.feature_subscription&.current_account_connected and !["fc", :fc].include?(RequestStore.store[:current_app])
+      type = self.company_id.to_s # i.e. if the configuration associated with this particular company's id doesn't exist, use default
       if Rails.env.production?
         type = self.company_id.to_s # i.e. if the configuration associated with this particular company's id doesn't exist, use default
       else
@@ -37,6 +40,8 @@ class YesBankApi::Base < BaseHandler
     else
       type = 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
     end
+
+
     self.configuration = values[type] || {}
     self.client_id = self.configuration['client_id']
     self.client_secret = self.configuration['client_secret']

@@ -7,8 +7,8 @@ class YesBankStatusProvider
   def perform(response_handle, params)
     queue = Struct.new(:queue).new(response_handle)
     begin
-
-      op = YesBankApi::Status::GetStatus.(params)
+      indifferent_params = params.with_indifferent_access
+      op = YesBankApi::Status::GetStatus.(indifferent_params)
       if op.success?
         status = op.status
         Resque.enqueue(queue, {success: true, status: status})
