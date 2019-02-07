@@ -6,6 +6,7 @@ module Constants
   VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
   VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
+  VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
 
   ENDING_NUMBERS = /\d+$/
 
@@ -24,12 +25,12 @@ module Constants
   MIGRATING_COMPANIES = [10, 67, 112]
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
-  PRODUCT_DEMO_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io', 'venu.reddy@finly.io']
-  RESOURCE_DOWNLOAD_EMAIL_ID = ['sachin.kumar@finly.io', 'poojitha.shetty@finly.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['venu.reddy@finly.io']
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'admin@finlytest.io']
 
@@ -64,7 +65,12 @@ module Constants
 
   # INVITATION_API_KEY = "-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXayCwFWmM0zwoMwaBcMbNlQA0U_wBnz1AjOcjMay1VbI7bl0STMKIVQVrVVOnRe0ahA=="
 
-  WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
+
+  if Rails.env.production?
+    WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
+  else
+    WELCOME_MESSAGE_AUTH_KEY = ""
+  end
 
   # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
   # using the below one because the above one's monthly quota was crossed

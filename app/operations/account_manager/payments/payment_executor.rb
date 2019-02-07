@@ -78,15 +78,24 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
-
     if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
       add_system_message :error, self.payment, "Payment cannot be processed in this state"
+      add_message :error, "Payment cannot be processed in this state"
       return
     end
 
     # checking to see if the receiving account is a bank account if it has been disabled by any chance
     if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.disabled?
       add_system_message :error, self.payment, "You cannot make transfers to this bank account as it has been blacklisted"
+      add_message :error, "You cannot make transfers to this bank account as it has been blacklisted"
+      return
+    end
+
+    # checking if the particular beneficiary is kept on hold
+    if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.on_hold?
+      add_system_message :error, self.payment, "Transfers to this account have been temporarily put on hold"
+      Event::EAlert::Create.(nil, title: 'Payment attempted for on hold account', description: "Payment attempted for on hold account. Details: #{self.payment}", subject: 'Payment attempted for on hold account')
+      add_message :error, "Transfers to this account have been temporarily put on hold"
       return
     end
 
@@ -94,6 +103,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       self.payment.reload
       unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
         add_system_message :error, self.payment, "Payment cannot be processed in this state"
+        add_message :error, "Payment cannot be processed in this state"
         return
       end
       # update payment to in progress
@@ -135,6 +145,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       debit_adapter.on_failure(payment: self.payment)
       return
     end
+
 
     # Credit funds to account
     unless credit_adapter.blank? or credit_adapter.credit(payment, options)

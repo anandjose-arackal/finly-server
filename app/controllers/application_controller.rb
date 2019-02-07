@@ -340,9 +340,10 @@ class ApplicationController < ActionController::Base
         total_query_time: QueryLogger.time,
         queries_count: QueryLogger.count,
         queries_summary: QueryLogger.summary,
-        queries: QueryLogger.queries,
+        # queries: QueryLogger.queries,
         current_app: current_app,
         current_device: current_device,
+        request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
     }
     user = current_user rescue nil
     if user.present?
