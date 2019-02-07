@@ -44,6 +44,7 @@
 #  procurement_id                 :integer
 #  department_id                  :integer
 #  location_id                    :integer
+#  deleted_at                     :datetime
 #
 
 class Payment < ApplicationRecord

@@ -18,6 +18,7 @@
 #  action_taken_by_id              :integer
 #  action_id                       :integer
 #  provider_name                   :string(255)
+#  threshold                       :decimal(20, 5)
 #
 
 require 'rails_helper'
