@@ -77,20 +77,4 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     after_all_events :change_state
   end
 
-  private
-
-  # def set_state
-  #   aasm.current_state = self.document_state
-  # end
-
-  def change_state
-    super
-    # Change state of purchase order
-    status_id = ::BankPaymentRequestStatus.id_for(self.aasm.current_state)
-    update_params = {
-        status_id: status_id,
-        controlling_level_id: self.new_level&.id
-    }
-    self.document.update(update_params)
-  end
 end

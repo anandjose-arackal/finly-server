@@ -176,6 +176,10 @@ module Transitionable
       case type
       when 'unapprove', :unapprove
         user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+      when 'return_control', :return_control
+        if level.present?
+          user_ids += document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id).compact
+        end
       else
         # nothing to do
       end
@@ -419,9 +423,9 @@ module Transitionable
 
     def creditor_associated_items(user)
       if user.instance_of?(User)
-        policy_ids = PolicyUserRole.with_role_id(UserRole.id_for(:creditor)).where(user_id: user.id)
+        policy_ids = PolicyUserRole.with_role_id(UserRole.id_for(:creditor)).where(user_id: user.id).pluck(:policy_id)
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids).pluck(:id)
+            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
       end
     end
 

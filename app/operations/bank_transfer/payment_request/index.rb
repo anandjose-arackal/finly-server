@@ -68,7 +68,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       # }
       # self.payment_requests = BankPaymentRequest.from([Arel.sql(sql)])
       self.payment_requests = BankPaymentRequest.reviewer_associated_items(user)
-    when UserRole.id_for(:finance_manager) #todo change it to creditor
+    when UserRole.id_for(:creditor)
       self.payment_requests = BankPaymentRequest.creditor_associated_items(user)
       # team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:finance_manager))&.pluck(:id)
       # controlling_payment_requests_query = user.controlling_payment_requests.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)

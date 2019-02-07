@@ -60,7 +60,7 @@ class Event::EBankPaymentRequest::TakeControl < Event::EBankPaymentRequest::Base
     # roles.first
     if self.user.id == user.id
       UserRole.id_for(:admin)
-    elsif report.user.id == user.id
+    elsif bank_payment_request.owner_id == user.id
       UserRole.id_for(:employee)
     else
       UserRole.id_for(:manager)
