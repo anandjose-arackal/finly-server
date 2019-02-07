@@ -12,7 +12,7 @@ GIT
       tilt (~> 2.0)
 
 GIT
-  remote: git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git
+  remote: git@gitlab.com:finlycore/finly-secure_storage-sdk.git
   revision: 278af4329cbd4f7687177831725e51756ddbc101
   specs:
     finly-secure_storage-sdk (0.1.31)
@@ -99,7 +99,7 @@ GEM
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-ec2 (1.67.0)
+    aws-sdk-ec2 (1.69.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-kms (1.13.0)
