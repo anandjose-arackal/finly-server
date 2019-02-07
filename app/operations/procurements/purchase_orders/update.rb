@@ -1,6 +1,12 @@
+# Update any detail to purchase order LINKED to a procurement
+# This operation is called AFTER a new procurement is created and the corresponding purcose order is created and,
+# the page is redirected to show the purchase order for any updation of details, like adding advance payments to it
+
+
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
-                :po_current_attachments, :document_reviewer_mappings_params, :document_number
+                :po_current_attachments, :document_reviewer_mappings_params, :document_number,
+                :vendor
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -13,6 +19,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     self.document_number = purchase_order_params[:po_number]
     purchase_order_params.delete(:po_number)
+
+    vendor_id = params[:purchase_order][:vendor_id]
+    self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
   end
 
   def validate
@@ -38,7 +47,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def process
 
-    "PURCHASEORDER UPDATE FROM Process", params.inspect
+    puts "PURCHASEORDER UPDATE FROM Process", params.inspect
+    binding.pry
     # self.purchase_order = procurement.build_purchse_order(purchase_order_params)
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
@@ -76,6 +86,18 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         if document_number_op.success?
           self.purchase_order.update(po_number: document_number_op.document_number)
         end
+      end
+
+      params[:purchase_order_id] = self.purchase_order.id
+      params[:receiving_user_type] = self.vendor.class&.name
+      params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id # MODIFY TO ADD ANY BANK ACCOUNT
+      params[:receiving_account_id] = self.vendor.id
+
+      op = Procurements::Payments::AddAdvance.(user, params)
+      if op.success?
+        add_message :success, 'Successfully added advance payment to this purchase order'
+      else
+        add_message :error, op.messages[:error]
       end
 
     else

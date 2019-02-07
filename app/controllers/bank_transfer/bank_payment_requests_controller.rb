@@ -231,6 +231,13 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def validate_beneficiary
+    @result = BankTransfer::PaymentRequest::ValidateBeneficiary.(current_user, params)
+    respond
+  end
+
+
+
   private
 
   def update_handler(type)

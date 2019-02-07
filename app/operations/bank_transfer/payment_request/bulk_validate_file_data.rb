@@ -29,12 +29,16 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
   def init
     self.order_details = params[:order_details]
+    # binding.pry
     self.contents = []
     self.headers = retrieve_header_names
     # setting the valid as true here, so that even if one line item failed in the
     # below validations it will return false
     self.valid = true
     self.requested_amount = 0
+
+    self.issues = []
+    self.issue_item = {}
   end
 
   def validate

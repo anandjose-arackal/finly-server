@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/sinatra/sinatra.git
-  revision: 26fa5c86220890a02cc0f070ddb2696d74a5b843
+  revision: 4ceed83a16ea3f3b018d11004079393baa5c5200
   branch: master
   specs:
     rack-protection (2.0.5)
@@ -89,17 +89,17 @@ GEM
       activerecord (>= 3.2, < 6.0)
       rake (>= 10.4, < 13.0)
     arel (9.0.0)
-    autoprefixer-rails (9.4.6)
+    autoprefixer-rails (9.4.7)
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.0.1)
-    aws-partitions (1.135.0)
+    aws-partitions (1.136.0)
     aws-sdk-core (3.46.0)
       aws-eventstream (~> 1.0)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-ec2 (1.67.0)
+    aws-sdk-ec2 (1.69.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
     aws-sdk-kms (1.13.0)
@@ -240,7 +240,7 @@ GEM
       domain_name (~> 0.5)
     http-form_data (2.1.1)
     http_parser.rb (0.6.0)
-    httparty (0.16.3)
+    httparty (0.16.4)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
     i18n (1.5.3)
@@ -330,7 +330,7 @@ GEM
     public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.6)
-    rack-mini-profiler (1.0.1)
+    rack-mini-profiler (1.0.2)
       rack (>= 1.2.0)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -422,7 +422,7 @@ GEM
     simpleconfig (2.0.1)
     snowplow-tracker (0.6.1)
       contracts (~> 0.7, <= 0.11)
-    spreadsheet (1.1.8)
+    spreadsheet (1.1.9)
       ruby-ole (>= 1.0)
     spring (2.0.2)
       activesupport (>= 4.2)
@@ -436,7 +436,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sshkit (1.18.0)
+    sshkit (1.18.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     sshkit-interactive (0.3.0)

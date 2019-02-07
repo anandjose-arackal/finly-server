@@ -1,8 +1,17 @@
+# This creates a new bankpaymentrequest/payment ticket
+# This handles payments to beneficiries, unauthorized/authorized
+
+# TODO
+# create individual payments in the background
+# handle all type of validations
+# reuse existing bulkvalidation
+
 class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	attr_accessor :vendor_id, :vendor, :requested_amount, :payment_mode, :bank_payment_request_params, :bank_payment_request,
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
-					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note
+					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
+					:content, :headers
 
 	def init
 		# self.vendor_id = params[:vendor_id]
@@ -19,8 +28,10 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 			if pa[:authorized]
 				yes = YesBankVendor.find(pa[:vendor_id])
 				ba = yes.bank_accounts.where(id: pa[:bank_account_id])
-				pa[:bank_account_number] = ba.account_number
-				pa[:ifsc] = ba.ifsc
+				# pa[:bank_account_number] = ba.account_number
+				pa[:bank_account_number] = ba.pluck(:account_number).first
+				# pa[:ifsc] = ba.ifsc
+				pa[:ifsc] = ba.pluck(:ifsc).first
 			end
 		end
 
@@ -42,6 +53,26 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		# 													  "note"=>"I dont know",
 		# 													  "custom_fields"=>{}}]
 		self.payments_attributes = params[:payments_attributes]
+	end
+
+	def validate
+	    if payments_attributes.blank?
+	      add_message :error, 'Nothing to process'
+	      return
+	    end
+
+	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
+
+	    puts "validate_operation", validate_operation.inspect
+	    binding.pry
+	    if validate_operation.success?
+	      self.requested_amount = validate_operation.requested_amount
+	    else
+	      self.contents = validate_operation.contents
+	      self.headers = validate_operation.headers
+	      add_message :error, "Some of the payments have errors, please check the downloaded file to resolve them"
+	    end
+
 	end
 
 	def process
@@ -115,7 +146,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	      }
 	    end
 
-
+	    # for each individual payment params, we build a new payment
 	    self.payment_params.each do |params|
 	      custom_fields = params[:custom_fields]
 	      params.delete(:custom_fields)
@@ -193,12 +224,12 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	end
 
 	def set_custom_fields_invoice(payment, data, save)
-    custom_fields = {custom_fields: data[:custom_fields]}
-    custom_fields[:user] = user
-    custom_fields[:reset_fields] = true
-    custom_fields[:save] = save
-    CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
-  end
+	    custom_fields = {custom_fields: data[:custom_fields]}
+	    custom_fields[:user] = user
+	    custom_fields[:reset_fields] = true
+	    custom_fields[:save] = save
+	    CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+	end
 
   # def retrieve_bank_account(order_details)
   #   if order_details[:account_id].present?

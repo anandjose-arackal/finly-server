@@ -1,3 +1,14 @@
+# This will generate a new advance payment item
+# After procurement is created and a purchase order generated, if the user updates the po with advance payment, this operation will be called
+# this takes in procurement id and the purchase order id and creates a new payment item for it.
+# this individual payment is not yet linked to a bankpaymentrequest/payment ticket.
+# to link this to a bpr, a different operation will be called
+
+# TODO
+# handle multiple advances
+# adding multiple advances should be done in the background
+# add validations
+
 class Procurements::Payments::AddAdvance < Procurements::Payments::Base
 
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy_id,
