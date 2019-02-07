@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount
+                :requested_amount, :issues, :issue_item
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     self.requested_amount = 0
 
     self.issues = []
-    self.issue_item = {}
+    
   end
 
   def validate
@@ -82,22 +82,26 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
 
       self.error_messages = []
+      self.issue_item = {}
       # Check if bank account number is present
       if bank_account_no.blank?
         self.valid = false
         self.error_messages << 'Bank account not found'
+        self.issue_item[:bank_account_number] = 'No bank account entered'
       end
 
       # Check if the amount is present
       unless validate_amount(amount)
         self.valid = false
         self.error_messages << 'Invalid amount'
+        self.issue_item[:original_amount] = 'Invalid amount'
       end
 
       # check if the ifsc is present
       if ifsc.blank?
         self.valid = false
         self.error_messages << 'IFSC cannot be blank'
+        self.issue_item[:ifsc] = 'IFSC cannot be blank'
       end
 
       # check for format of the IFSC
@@ -105,27 +109,32 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       unless ifsc =~ pattern
         self.valid = false
         self.error_messages << "Invalid IFSC"
+        self.issue_item[:ifsc] = 'Invalid IFSC'
       end
 
       # adding all invoice specific validations here for the payment
       unless validate_date invoice_date
         self.valid = false
         self.error_messages << "Invalid invoice date"
+        self.issue_item[:invoice_date] = 'Invalid invoice date'
       end
 
       unless validate_date due_date
         self.valid = false
         self.error_messages << "Invalid due date"
+        self.issue_item[:due_date] = 'Invalid due date'
       end
 
       unless validate_rate tax, 1, amount
         self.valid = false
         self.error_messages << "Invalid tax entered"
+        self.issue_item[:tax] = 'Invalid tax entered'
       end
 
       unless validate_rate discount, 1, amount
         self.valid = false
         self.error_messages << "Invalid discount entered"
+        self.issue_item[:discount] = 'Invalid discount entered'
       end
 
       if self.valid
@@ -135,7 +144,10 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
       self.contents << item.values
+      self.issues << self.issue_item
     end
+    puts "self.issues", self.issues.inspect
+    binding.pry
   end
 
   def success?
