@@ -40,14 +40,14 @@ class MoneyRequests::PrepaidCard::Credit < MoneyRequests::Base
       add_message :error, "This money request has already been credited"
       return
     end
-    if money_request.controlling_user&.id != user.id
-      add_message :error, 'You do not have the permission to transfer the funds'
-      return
-    end
-    unless money_request.processing?
-      add_message :error, 'The money request cannot be credited as it is not in processing state'
-      return
-    end
+    # if money_request.controlling_user&.id != user.id
+    #   add_message :error, 'You do not have the permission to transfer the funds'
+    #   return
+    # end
+    # unless money_request.processing?
+    #   add_message :error, 'The money request cannot be credited as it is not in processing state'
+    #   return
+    # end
     if to_user.blank?
       add_message :error, 'User not found to transfer the funds!'
       return

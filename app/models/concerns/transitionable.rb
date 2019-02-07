@@ -143,8 +143,10 @@ module Transitionable
         reviewer = {
             id: dlrm.reviewer.id,
             name: dlrm.reviewer.name,
+            active: dlrm.active,
             threshold: dlrm.threshold,
-            action_taken: (dlrm.reviewer.id == dlrm.action_taken_by_id)
+            action_taken: (dlrm.reviewer.id == dlrm.action_taken_by_id),
+            action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }
         data[:reviewers].push(reviewer)
 
@@ -152,7 +154,9 @@ module Transitionable
           data[:taken_control_by] = {
               id: dlrm.taken_control_by_id,
               name: dlrm.taken_control_by.name,
-              action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id)
+              action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id),
+              action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
+
           }
         end
 

@@ -33,7 +33,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     if params[:ref] == '1' and params[:n_id].present?
       Event::EBankPaymentRequest::Unset.(user, params)
     end
-
   end
 
   def success

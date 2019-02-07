@@ -50,6 +50,7 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     end
 
     event :credit do ## Confirm the action
+      transitions :from => :processing, to: :credited
       transitions :from => [:approved, :auto_approved], to: :credited
       transitions :from => [:approved, :auto_approved], to: :pending
     end
@@ -67,14 +68,38 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
   #   aasm.current_state = self.document_state
   # end
 
-  def change_state
+  def update_dlrms
     super
-    # Change state of purchase order
-    money_request_status_id = ::MoneyRequestStatus.id_for(self.aasm.current_state)
-    update_params = {
-        status_id: money_request_status_id,
-        controlling_level_id: self.new_level&.id
-    }
-    self.document.update(update_params)
+
+    if [:credit].include?(aasm.current_event)
+      dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(policy.id)
+                .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
+
+      if dlrm.present?
+        dlrm.update(
+                action_id: TrailAction.id_for(aasm.current_event),
+                action_taken_by_id: user.id
+        )
+
+        dlrms = document.document_level_reviewer_mappings.where('level_number > ?', dlrm.level_number)
+
+        dlrms.update_all(active: false)
+      end
+    end
   end
+
+  def update_levels
+    super
+  end
+
+  # def change_state
+  #   super
+  #   # Change state of purchase order
+  #   money_request_status_id = ::MoneyRequestStatus.id_for(self.aasm.current_state)
+  #   update_params = {
+  #       status_id: money_request_status_id,
+  #       controlling_level_id: self.new_level&.id
+  #   }
+  #   self.document.update(update_params)
+  # end
 end
