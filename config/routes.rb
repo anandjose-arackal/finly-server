@@ -3287,8 +3287,8 @@ Rails.application.routes.draw do
     resources :procurements do
     end
 
-    post 'grn_pending', to: 'procurements#grn_pending'
-    post 'grn_received', to: 'procurements#grn_received'
+    get 'grn_pending', to: 'procurements#grn_pending'
+    get 'grn_received', to: 'procurements#grn_received'
 
 
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
