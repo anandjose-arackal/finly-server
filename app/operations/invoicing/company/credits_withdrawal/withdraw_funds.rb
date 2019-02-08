@@ -55,7 +55,7 @@ class Invoicing::Company::CreditsWithdrawal::WithdrawFunds < Invoicing::Company:
   def process
     self.payment_request = build_payment_request
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: self.payment_request, bank_transfer_type: self.transfer_mode, background: false})
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: self.payment_request, bank_transfer_type: self.transfer_mode, background: true})
     if op.success?
       payment = op.payment_order.payments.first
       if payment.reload.processing?

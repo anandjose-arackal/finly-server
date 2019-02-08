@@ -42,7 +42,7 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
 
   def init
     super()
-    self.request_reference_number = params[:request_reference_number]
+    self.request_reference_number = params[:request_reference_number] || params[:unique_request_number]
     set_xml_params
   end
 
