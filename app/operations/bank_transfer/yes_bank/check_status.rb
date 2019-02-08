@@ -52,9 +52,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       # if true
         bank_reference_number = op.bank_reference_number
         bank_transaction.update(bank_reference_number: bank_reference_number) if bank_transaction.bank_reference_number.blank?
+        bank_transaction.update(bank_response: op.request_status.upcase)
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing), bank_response: op.request_status.upcase)
         begin
           bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         rescue => error
@@ -79,7 +80,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
           Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
         end
 
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed), bank_response: op.request_status.upcase)
 
         # destroying previous messages first, before adding the failure message
         # self.payment.system_messages.destroy_all # probably not a good idea to destroy previous messages because they contain data about why a particular payment failed
@@ -109,7 +110,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
           Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
         end
 
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed), bank_response: op.request_status.upcase)
 
         # destroying previous messages first, before adding the failure message
         # self.payment.system_messages.destroy_all # probably not a good idea to destroy previous messages because they contain data about why a particular payment failed

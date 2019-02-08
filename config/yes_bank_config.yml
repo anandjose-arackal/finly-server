@@ -2,7 +2,8 @@ default: &default
   client_id: '7b1f3f3e-c77a-445f-8471-1fe808b7836c'
   client_secret: 'eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM'
   username: 'testclient'
-  password: 'test@123'
+#  password: 'test@123'
+  password: 'OxYcool@123'
   account_number: '000690600003544'
   application_id: '448995'
   customer_id: '448995'
@@ -14,11 +15,20 @@ default: &default
   account_number: '000690600003544'
   application_id: '448995'
   customer_id: '448995'
+2:
+  client_id: '7b1f3f3e-c77a-445f-8471-1fe808b7836c'
+  client_secret: 'eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM'
+  username: 'testclient'
+#  password: 'test@123'
+  password: 'OxYcool@123'
+  account_number: '000690600003544'
+  application_id: '448995'
+  customer_id: '448995'
 
 development:
   default:
     <<: *default
-    74:
+    2:
       client_id: '7b1f3f3e-c77a-445f-8471-1fe808b7836c'
       client_secret: 'eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM'
       username: 'testclient'
