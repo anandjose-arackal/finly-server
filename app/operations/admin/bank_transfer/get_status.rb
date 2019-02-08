@@ -49,7 +49,6 @@ class Admin::BankTransfer::GetStatus < Admin::Base
       args = result.args.first
       success = args&.dig('success')
       message = args&.dig('messages')
-      binding.pry
       if success
         self.status = args['status']
       end

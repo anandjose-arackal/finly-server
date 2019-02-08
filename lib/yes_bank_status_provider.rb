@@ -9,7 +9,6 @@ class YesBankStatusProvider
     begin
       indifferent_params = params.with_indifferent_access
       op = YesBankApi::Status::GetStatus.(indifferent_params)
-      binding.pry
       if op.success?
         status = op.request_status
         Resque.enqueue(queue, {success: true, status: status})
