@@ -88,18 +88,4 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     end
   end
 
-  def update_levels
-    super
-  end
-
-  # def change_state
-  #   super
-  #   # Change state of purchase order
-  #   money_request_status_id = ::MoneyRequestStatus.id_for(self.aasm.current_state)
-  #   update_params = {
-  #       status_id: money_request_status_id,
-  #       controlling_level_id: self.new_level&.id
-  #   }
-  #   self.document.update(update_params)
-  # end
 end
