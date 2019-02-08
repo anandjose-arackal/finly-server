@@ -171,7 +171,7 @@ class WorkflowManager::Aasm::BaseProvider
     self.reviewers.blank?
   end
 
-  def user_can_approve?
-    self.document.action_users(:approve).include?(user)
+  def user_can_review?
+    self.current_level_reviewers.include?(user)
   end
 end

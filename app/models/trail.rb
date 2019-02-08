@@ -29,7 +29,7 @@ class Trail < ApplicationRecord
   belongs_to :modified_level, optional: true, class_name: 'ReviewalLevel'
   belongs_to :payment, optional: true
   belongs_to :cash_on_hand_deduction, optional: true, class_name: "Payment"
-  belongs_to :original_track, polymorphic: true
+  belongs_to :original_track, polymorphic: true, optional: true
 
   scope :created_before, -> (time) { where 'created_at < ?', time }
 
