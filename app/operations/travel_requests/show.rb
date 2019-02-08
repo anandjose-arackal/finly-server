@@ -17,7 +17,8 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   def success
-    TravelRequests::Show::ShowPresenter.new(user, {travel_request: self.travel_request}, messages)
+    params[:travel_request] = self.travel_request
+    TravelRequests::Show::ShowPresenter.new(user, params, messages)
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -203,6 +204,12 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def show_money_requests?
+      true
+    end
+
+    def show_add_money_requests?
+      return false if user.id != travel_request.user_id
+      return false if TravelRequestStatus.ids_for(:open, :retracted, :rejected).exclude?(self.travel_request.status_id)
       true
     end
 

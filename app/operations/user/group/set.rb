@@ -2,7 +2,7 @@ class User::Group::Set < User::Base
   attr_accessor :selected_user, :group_config, :groups
 
   def authorized_user_types
-    :company_admin
+    [:company_admin, :vendor_payments_admin]
   end
 
   def pre_validate

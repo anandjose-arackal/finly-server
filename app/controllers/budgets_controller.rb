@@ -48,4 +48,14 @@ class BudgetsController < BaseControllers::WebBase
     @result = Budgets::NewBudgetsConfig.(current_user, params)
     respond
   end
+
+  def sample_import_file
+    @result = Budgets::GenerateSampleFile.(current_user, params)
+    respond
+  end
+
+  def import
+    @result = Budgets::Import.(current_user, params)
+    respond
+  end
 end

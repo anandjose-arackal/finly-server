@@ -1,6 +1,6 @@
 class Benefits::ExpenseCardsController < Benefits::BaseController
   protected
-  def config
+  def cards_config
     PaymentOrder::CONFIG[:expense_card]
   end
 end

@@ -14,7 +14,7 @@ class BaseOperation
     end
     params ||= {}
     if params.class.name == ActionController::Parameters.name
-      self.params = params
+      self.params = ActionController::Parameters.new(params.to_unsafe_h)
     else
       self.params = (ActionController::Parameters.new(params) or {})
     end
@@ -283,7 +283,7 @@ class BaseOperation
       self.user = user
       self.params = params
       if self.params.class.name == ActionController::Parameters.name
-        self.params = self.params.permit!.to_h
+        self.params = self.params.to_unsafe_h
       end
       self.messages = messages
       init
@@ -423,7 +423,7 @@ class BaseOperation
 
   def convert_params_to_hash
     if params.is_a?(ActionController::Parameters)
-      self.params = params.permit!.to_h
+      self.params = params.to_unsafe_h
     end
     self.params
   end
@@ -435,6 +435,16 @@ class BaseOperation
       messages[type].concat message
     elsif message.is_a?(String)
       messages[type] << message
+    end
+  end
+
+  def add_system_message(type, model, message)
+    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
+    clear_messages if self.messages.blank?
+    message = [message] unless message.is_a?(Array)
+    system_message_type = SystemMessageType.id_for(type)
+    message.each do |m|
+      SystemMessage.create(messagable: model, content: m, system_message_type_id: system_message_type)
     end
   end
 

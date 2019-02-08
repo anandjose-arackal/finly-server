@@ -16,7 +16,7 @@ class User::Invite::Base < BaseOperation
   end
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :vendor_payments_admin]
   end
 
   def success

@@ -37,7 +37,7 @@ json.results do
     end
     json.payment_file_downloaded payment_request.payment_file_downloaded
 
-    json.payments_count payment_request.payment_order.payments.count
+    json.payments_count payment_request.payment_order.payments.size
 
     payments = payment_request.payment_order.payments[0..4]
     json.payments do

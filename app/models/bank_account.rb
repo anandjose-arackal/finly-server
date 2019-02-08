@@ -32,7 +32,7 @@ class BankAccount < ApplicationRecord
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
 
-  validates :account_number, presence: true
+  validates :account_number, presence: true #, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
 
@@ -47,7 +47,7 @@ class BankAccount < ApplicationRecord
   scope :only_vendors, -> {where account_owner_type: "YesBankVendor"}
   scope :only_users, -> {where account_owner_type: "User"}
   scope :default_accounts, -> { where(default_account: true).non_deleted}
-  scope :non_deleted, -> {where is_deleted: [nil, false]}
+  scope :non_deleted, -> {where deleted_at: nil}
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }
@@ -99,6 +99,7 @@ class BankAccount < ApplicationRecord
 
   before_save do
     self.ifsc = self.ifsc.match(Constants::VALID_IFSC).to_s
+    self.account_number = self.account_number&.strip
   end
 
   after_create do

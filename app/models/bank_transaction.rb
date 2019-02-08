@@ -47,6 +47,7 @@ class BankTransaction < ApplicationRecord
     self.transfer_status_id == BankTransferStatus.id_for(:failed)
   end
 
+
   private
 
   def successful?

@@ -47,7 +47,7 @@
 #
 
 class Payment < ApplicationRecord
-  include PostOperationExecution
+  include PostOperationExecution, SoftDeletable
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -136,6 +136,7 @@ class Payment < ApplicationRecord
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
   scope :scheduled, -> { where payment_status_id: PaymentStatus.id_for(:scheduled) }
+  scope :creditable, -> { where payment_status_id: [PaymentStatus.id_for(:failed), PaymentStatus.id_for(:pending_approval)] }
   scope :with_receiving_account_type, -> (receiving_account_type) {
     where receiving_account_type: receiving_account_type
   }
@@ -228,6 +229,10 @@ class Payment < ApplicationRecord
 
   scope :with_payment_purpose, -> (purpose_id) {
     where payment_purpose_id: purpose_id
+  }
+
+  scope :with_payment_status, -> (status_ids) {
+    where(payment_status_id: status_ids)
   }
 
   scope :cash_additions_to_employee, -> { where(payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)]) }
@@ -369,6 +374,10 @@ class Payment < ApplicationRecord
                   payment_order: [bank_payment_request: [:status]])
   }
 
+  scope :include_minimal_for_index, -> {
+        includes( :payment_status, :amount, :receiving_user, receiving_account: [:account_owner])
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
@@ -379,7 +388,7 @@ class Payment < ApplicationRecord
   validate :initiating_account_presence
   validate :receiving_account_presence
 
-  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, to: :payment_status
+  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, :pending_approval?, to: :payment_status
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)

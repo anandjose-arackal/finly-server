@@ -73,7 +73,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
       add_message :error, result.messages[:error]
       return
     end
-    result.procurements
+    result.procurements.include_details
   end
 
   def procurement_name(procurement)
