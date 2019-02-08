@@ -175,7 +175,7 @@ module Transitionable
     end
 
     # Users who can take the current action on the document
-    def action_users(type=nil, provider_name)
+    def action_users(type=nil, provider_name=nil)
       provider_name ||= get_default_provider
       user_ids = []
       case type
