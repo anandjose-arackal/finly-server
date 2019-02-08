@@ -177,8 +177,8 @@
 #  ZWL         :decimal(20, 5)
 #  is_deleted  :boolean          default(FALSE)
 #  MYR         :decimal(20, 5)
+#  deleted_at  :datetime
 #
-
 
 require 'test_helper'
 

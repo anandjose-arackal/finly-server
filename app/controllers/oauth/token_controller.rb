@@ -16,10 +16,17 @@ class Oauth::TokenController < Doorkeeper::TokensController
       @auth_grant = response
       @token = response.token
       @user = current_user(response&.token)
-      params[:user] = user
+      RequestStoreUtil.set_current_request request
+      params[:user] = @user
       params[:response] = response
-      result = UserSession::Create.(:authorized, params)
-      on_create_success(response) if result.success?
+      sessions_result = UserSessions::Create.(:authorized, params)
+      if sessions_result.success?
+        on_create_success(response)
+      else
+        response.token.destroy
+        json_string = {error: 'invalid_grant', error_description: sessions_result.messages[:error]}#'The email / mobile or password you entered is incorrect'}
+        render json: json_string.to_json, status: 401
+      end
 
       # if verify_company_status(@user)
       #   User::Track::Login.(@user, params)
@@ -40,17 +47,17 @@ class Oauth::TokenController < Doorkeeper::TokensController
       case company.status_id
       when CompanyStatus.id_for(:partial_block)
         if @user.admin? || @user.manager? || @user.finance_manager?
-          json_string = { error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved' }
+          json_string = {error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved'}
           render json: json_string.to_json, status: 401
           return false
         end
       when CompanyStatus.id_for(:deactivated)
         if @user.admin? || @user.manager? || @user.finance_manager?
-          json_string = { error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved' }
+          json_string = {error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved'}
           render json: json_string.to_json, status: 401
           return false
         else
-          json_string = { error: 'invalid_grant', error_description: 'Your account has been disabled. Please contact your admin to login' }
+          json_string = {error: 'invalid_grant', error_description: 'Your account has been disabled. Please contact your admin to login'}
           render json: json_string.to_json, status: 401
           return false
         end
@@ -75,15 +82,15 @@ class Oauth::TokenController < Doorkeeper::TokensController
     params[:application] = 'web'
     # self.response.set_cookie 'access_token', {:value => response.token.token, :httponly => true}
     # self.response.set_cookie 'refresh_token', {:value => response.token.refresh_token, :httponly => true}
-    cookies['access_token'] = { value: @token.token, httponly: true, expires: 15.days.from_now }
-    cookies['refresh_token'] = { value: @token.refresh_token, httponly: true, expires: 15.days.from_now }
+    cookies['access_token'] = {value: @token.token, httponly: true, expires: 15.days.from_now}
+    cookies['refresh_token'] = {value: @token.refresh_token, httponly: true, expires: 15.days.from_now}
 
     # render json: {}, status: 200
     render_json 'oauth/token/create.json.jbuilder', response.status
   end
 
   def render_json(file_path, response_status)
-    binding_params = { user: @user, auth_grant: @auth_grant, token: @token }
+    binding_params = {user: @user, auth_grant: @auth_grant, token: @token}
     view = ActionView::Base.new(ActionController::Base.view_paths, binding_params)
     render json: JSON.parse(view.render(file: file_path)), status: response_status
   end

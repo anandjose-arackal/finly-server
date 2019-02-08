@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_03_180911) do
+ActiveRecord::Schema.define(version: 2019_02_08_074216) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -905,6 +905,15 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
     t.index ["budget_id"], name: "index_budget_modification_trails_on_budget_id"
   end
 
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "budget_rule_id", null: false
+    t.integer "branch_location_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_location_id"], name: "index_budget_rule_branch_location_mappings_on_branch_location_id"
+    t.index ["budget_rule_id"], name: "index_budget_rule_branch_location_mappings_on_budget_rule_id"
+  end
+
   create_table "budget_rule_category_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "category_id", null: false
@@ -912,6 +921,24 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
     t.datetime "updated_at", null: false
     t.index ["budget_rule_id"], name: "index_budget_rule_category_mappings_on_budget_rule_id"
     t.index ["category_id"], name: "index_budget_rule_category_mappings_on_category_id"
+  end
+
+  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "budget_rule_id", null: false
+    t.integer "department_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_rule_id"], name: "index_budget_rule_department_mappings_on_budget_rule_id"
+    t.index ["department_id"], name: "index_budget_rule_department_mappings_on_department_id"
+  end
+
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "budget_rule_id", null: false
+    t.integer "expense_type_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["budget_rule_id"], name: "index_budget_rule_expense_type_mappings_on_budget_rule_id"
+    t.index ["expense_type_id"], name: "index_budget_rule_expense_type_mappings_on_expense_type_id"
   end
 
   create_table "budget_rule_field_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -4762,21 +4789,6 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
     t.index ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id"
   end
 
-  create_table "tracker_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "company_id", null: false
-    t.string "app"
-    t.string "device"
-    t.string "view"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["app"], name: "index_tracker_notifications_on_app"
-    t.index ["company_id"], name: "index_tracker_notifications_on_company_id"
-    t.index ["device"], name: "index_tracker_notifications_on_device"
-    t.index ["user_id"], name: "index_tracker_notifications_on_user_id"
-    t.index ["view"], name: "index_tracker_notifications_on_view"
-  end
-
   create_table "trail_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
   end
@@ -5019,6 +5031,15 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "branch_location_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_location_id"], name: "index_user_branch_location_mappings_on_branch_location_id"
+    t.index ["user_id"], name: "index_user_branch_location_mappings_on_user_id"
+  end
+
   create_table "user_delegate_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id"
     t.integer "delegate_for_user_id"
@@ -5241,11 +5262,69 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
     t.index ["user_session_id"], name: "index_user_session_events_on_user_session_id"
   end
 
+  create_table "user_session_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "company_id", null: false
+    t.string "app"
+    t.string "device"
+    t.string "view"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status_id"
+    t.string "message"
+    t.index ["app"], name: "index_user_session_notifications_on_app"
+    t.index ["company_id"], name: "index_user_session_notifications_on_company_id"
+    t.index ["device"], name: "index_user_session_notifications_on_device"
+    t.index ["user_id"], name: "index_user_session_notifications_on_user_id"
+    t.index ["view"], name: "index_user_session_notifications_on_view"
+  end
+
   create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_user_session_statuses_on_name"
+  end
+
+  create_table "user_session_webs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.datetime "timestamp"
+    t.string "user_agent"
+    t.string "timezone"
+    t.string "fingerprint"
+    t.string "language"
+    t.string "system_language"
+    t.string "browser"
+    t.string "browser_version"
+    t.string "browser_engine"
+    t.string "browser_engine_version"
+    t.string "os_name"
+    t.string "os_version"
+    t.integer "screen_width"
+    t.integer "screen_height"
+    t.integer "current_resolution_width"
+    t.integer "current_resolution_height"
+    t.integer "device_x_dpi"
+    t.integer "device_y_dpi"
+    t.integer "color_depth"
+    t.integer "mouse_pos_x"
+    t.integer "mouse_pos_y"
+    t.boolean "java_enabled"
+    t.string "java_version"
+    t.boolean "flash_enabled"
+    t.string "flash_version"
+    t.boolean "silver_light_enabled"
+    t.string "silver_light_version"
+    t.boolean "is_mime_types"
+    t.string "mime_types_list"
+    t.text "fonts_list"
+    t.string "current_font"
+    t.boolean "is_local_storage"
+    t.boolean "is_session_storage"
+    t.boolean "is_cookie"
+    t.text "plugins"
+    t.text "screen_print"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_sessions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -5291,6 +5370,7 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
     t.bigint "duration"
     t.integer "status_id"
     t.string "message"
+    t.string "login_username"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["device"], name: "index_user_sessions_on_device"
     t.index ["ip"], name: "index_user_sessions_on_ip"
@@ -5738,8 +5818,14 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
   add_foreign_key "branch_locations", "states"
   add_foreign_key "budget_criteria_mappings", "budgets"
   add_foreign_key "budget_modification_trails", "budgets"
+  add_foreign_key "budget_rule_branch_location_mappings", "branch_locations"
+  add_foreign_key "budget_rule_branch_location_mappings", "budget_rules"
   add_foreign_key "budget_rule_category_mappings", "budget_rules"
   add_foreign_key "budget_rule_category_mappings", "categories"
+  add_foreign_key "budget_rule_department_mappings", "budget_rules"
+  add_foreign_key "budget_rule_department_mappings", "departments"
+  add_foreign_key "budget_rule_expense_type_mappings", "budget_rules"
+  add_foreign_key "budget_rule_expense_type_mappings", "expense_types"
   add_foreign_key "budget_rule_field_mappings", "budget_rules"
   add_foreign_key "budget_rule_field_mappings", "field_configurations"
   add_foreign_key "budget_rule_field_mappings", "field_drop_down_items"
@@ -6002,8 +6088,6 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
   add_foreign_key "tax_rates", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
-  add_foreign_key "tracker_notifications", "companies"
-  add_foreign_key "tracker_notifications", "users"
   add_foreign_key "transaction_details", "amounts"
   add_foreign_key "transaction_details", "finly_transactions"
   add_foreign_key "transcribed_expenses", "amounts"
@@ -6022,6 +6106,8 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
   add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_branch_location_mappings", "branch_locations"
+  add_foreign_key "user_branch_location_mappings", "users"
   add_foreign_key "user_delegate_mappings", "users"
   add_foreign_key "user_department_mappings", "departments"
   add_foreign_key "user_department_mappings", "users"
@@ -6040,6 +6126,8 @@ ActiveRecord::Schema.define(version: 2019_02_03_180911) do
   add_foreign_key "user_profiles", "users"
   add_foreign_key "user_role_mappings", "user_roles"
   add_foreign_key "user_role_mappings", "users"
+  add_foreign_key "user_session_notifications", "companies"
+  add_foreign_key "user_session_notifications", "users"
   add_foreign_key "user_tags", "users"
   add_foreign_key "user_team_group_item_mappings", "user_group_items"
   add_foreign_key "user_team_group_item_mappings", "user_groups"

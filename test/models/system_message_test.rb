@@ -11,6 +11,7 @@
 #  updated_at             :datetime         not null
 #  is_deleted             :boolean          default(FALSE)
 #  message_type           :string(255)
+#  deleted_at             :datetime
 #
 
 require 'test_helper'

@@ -29,6 +29,7 @@
 #  booking_confirmed_at         :datetime
 #  created_by_id                :integer
 #  modified_by_id               :integer
+#  deleted_at                   :datetime
 #
 
 class TravelRequest < ApplicationRecord

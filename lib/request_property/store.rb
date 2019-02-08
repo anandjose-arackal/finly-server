@@ -15,7 +15,7 @@ module RequestProperty::Store
   def initialize
     self.request = RequestStoreUtil.current_request
     self.device_detector = DeviceDetector.new(self.request.user_agent)
-    self.header_property = DeviceProperty::HeaderProperty.new
+    self.header_property = RequestProperty::HeaderProperty.new
   end
 
   def user_agent
@@ -70,30 +70,24 @@ module RequestProperty::Store
     # todo from header
   end
 
-  class RequestProperty::HeaderProperty
-
-  end
 
   # Headers
   # "X-Finly-BTAI": {}
-  class RequestProperty::HeaderProperty
+  class RequestProperty::Store::HeaderProperty
     attr_accessor :timestamp, :user_agent, :timezone, :fingerprint,
-                  :device, :device_type, :device_vendor, :device_model,
-                  :platform, :platform_version, :platform_engine, :platform_engine_version,
-                  :cpu,
-                  :app_version,
-                  :os_name, :os_versions,
-                  :screen_width, :screen_height, :current_resolution_width, :current_resolution_height,
-                  :mouse_pos_x, :mouse_pos_y,
-                  :screen_print,
-                  :color_depth, :device_x_dpi, :device_y_dpi,
-                  :language, :system_language,
-                  :plugins,
-                  :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled, :silver_light_version,
-                  :is_mime_types, :mime_types_list,
-                  :fonts_list, :current_font,
-                  :is_local_storage, :is_session_storage, :is_cookie,
-                  :is_canvas, :canvas_print
+          :browser, :browser_version, :browser_engine, :browser_engine_version,
+          :os_name, :os_version,
+          :screen_width, :screen_height, :current_resolution_width, :current_resolution_height,
+          :mouse_pos_x, :mouse_pos_y,
+          :screen_print,
+          :color_depth, :device_x_dpi, :device_y_dpi,
+          :language, :system_language,
+          :plugins,
+          :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled, :silver_light_version,
+          :is_mime_types, :mime_types_list,
+          :fonts_list, :current_font,
+          :is_local_storage, :is_session_storage, :is_cookie,
+          :is_canvas
 
     # todo Android
     # StringBuffer buf = new StringBuffer();
@@ -130,23 +124,6 @@ module RequestProperty::Store
 
 
     def initialize
-
-    end
-
-  end
-
-  class RequestProperty::FingerPrint
-    attr_accessor :fingerprint
-
-    def initialize
-
-    end
-
-    def valid?
-
-    end
-
-    def matches_header?
 
     end
 
