@@ -143,8 +143,10 @@ module Transitionable
         reviewer = {
             id: dlrm.reviewer.id,
             name: dlrm.reviewer.name,
+            active: dlrm.active,
             threshold: dlrm.threshold,
-            action_taken: (dlrm.reviewer.id == dlrm.action_taken_by_id)
+            action_taken: (dlrm.reviewer.id == dlrm.action_taken_by_id),
+            action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }
         data[:reviewers].push(reviewer)
 
@@ -152,7 +154,9 @@ module Transitionable
           data[:taken_control_by] = {
               id: dlrm.taken_control_by_id,
               name: dlrm.taken_control_by.name,
-              action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id)
+              action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id),
+              action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
+
           }
         end
 
@@ -175,7 +179,7 @@ module Transitionable
       user_ids = []
       case type
       when 'unapprove', :unapprove
-        user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+        user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last&.action_user_id
       when 'return_control', :return_control
         if level.present?
           user_ids += document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id).compact

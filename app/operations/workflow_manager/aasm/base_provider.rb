@@ -51,7 +51,7 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def update_dlrms
-    if[:submit].include?(aasm.current_event)
+    if [:submit].include?(aasm.current_event)
       dlrms = document.document_level_reviewer_mappings.with_level_id(next_level&.id).with_policy_id(policy.id)
 
       # Set viewable true for the next level when document is submitted
@@ -100,7 +100,7 @@ class WorkflowManager::Aasm::BaseProvider
           .where(level_id: current_level.id, policy_id: document.policy.id)
 
       if dlrm.present?
-        dlrm.update_all(taken_control_by_id: user.id, taken_control: true)
+        dlrm.update_all(taken_control_by_id: user.id, taken_control: true, active: false)
       end
     end
 
@@ -109,7 +109,7 @@ class WorkflowManager::Aasm::BaseProvider
           .where(level_id: current_level.id, policy_id: document.policy.id)
 
       if dlrm.present?
-        dlrm.update_all(taken_control_by_id: nil, taken_control: false)
+        dlrm.update_all(taken_control_by_id: nil, taken_control: false, active: true)
       end
     end
 

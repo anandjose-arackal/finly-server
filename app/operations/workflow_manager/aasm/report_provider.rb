@@ -16,6 +16,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
     end
 
     event :approve do
+      transitions :from => :processing, :to => :closed, guard: [:reviewers_not_present?, :reimbursable_expenses_absent?]
       transitions :from => :processing, :to => :approved, guard: :reviewers_not_present?
       transitions :from => :processing, :to => :processing
     end
@@ -23,6 +24,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
     event :unapprove do
       transitions :from => :processing, :to => :processing
       transitions :from => :approved, :to => :processing
+      transitions :from => :closed, :to => :processing
     end
 
     event :hold do
@@ -57,16 +59,6 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
       transitions :from => [:settled], :to => [:settlement_confirmed]
     end
 
-    event :xxx do
-      transitions from: :approved, to: :approved
-      transitions from: :approved, to: :closed, guard: :non_reimbursable_expenses?
-    end
-
-    event :close do ## Confirm action
-      # Check from what all states it can transition
-      transitions :from => [:approved], to: :closed
-    end
-
     event :mark_as_settled do ## Confirm action
       transitions from: :approved, to: :settled
     end
@@ -86,5 +78,9 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
 
   def update_status
     super
+  end
+
+  def reimbursable_expenses_absent?
+    document.expenses.only_reimbursable_expenses.count == 0
   end
 end
