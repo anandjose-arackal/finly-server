@@ -170,4 +170,8 @@ class WorkflowManager::Aasm::BaseProvider
   def reviewers_not_present?
     self.reviewers.blank?
   end
+
+  def user_can_approve?
+    self.document.action_users(:approve).include?(user)
+  end
 end
