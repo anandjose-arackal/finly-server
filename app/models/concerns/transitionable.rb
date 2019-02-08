@@ -175,14 +175,20 @@ module Transitionable
     end
 
     # Users who can take the current action on the document
-    def action_users(type=nil)
+    def action_users(type=nil, provider_name)
+      provider_name ||= get_default_provider
       user_ids = []
       case type
+      when 'approve', :approve
+        if level.present?
+          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: false).pluck(:reviewer_id)
+          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: true).pluck(:taken_control_by_id)
+        end
       when 'unapprove', :unapprove
         user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last&.action_user_id
       when 'return_control', :return_control
         if level.present?
-          user_ids += document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id).compact
+          user_ids += document_level_reviewer_mappings.with_provider_name(provider_name).with_level_id(level.id).pluck(:taken_control_by_id).compact
         end
       else
         # nothing to do

@@ -20,7 +20,7 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
     event :approve do
       transitions :from => :processing, :to => :booking_pending, guard: [:reviewers_not_present?, :travel_manager_present?]
       transitions :from => :processing, :to => :approved, guard: :reviewers_not_present?
-      transitions :from => :processing, :to => :processing
+      transitions :from => :processing, :to => :processing, guard: [:user_can_approve?]
     end
 
     event :unapprove do

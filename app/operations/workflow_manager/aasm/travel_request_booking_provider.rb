@@ -34,7 +34,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
 
     event :confirm_selection do # Equivalent to submit
       transitions from: [:selection_requested, :selection_rejected], to: :selection_confirmed, guard: :reviewers_not_present?
-      transitions from: [:selection_requested, :selection_rejected], to: :selection_processing
+      transitions from: [:selection_requested, :selection_rejected], to: :selection_processing, guard: [:user_can_approve?]
     end
 
     event :approve_selection do
@@ -191,5 +191,11 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
     end
 
     update_params
+  end
+
+  def user_can_approve?
+    # todo
+    self.document.action_users(:approve, provider_name)
+
   end
 end

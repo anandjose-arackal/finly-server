@@ -31,7 +31,7 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
 
     event :approve do
       transitions :from => :processing, :to => :approved, guard: :approvers_not_present?
-      transitions :from => :processing, :to => :processing
+      transitions :from => :processing, :to => :processing, guard: [:user_can_approve?]
     end
 
     event :reject do
@@ -61,16 +61,16 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
     aasm.current_state = self.invoice_state
   end
 
-  def change_state
-    super
-
-    status_id = ::InwardInvoiceStatus.id_for(self.aasm.current_state)
-    update_params = {
-        invoice_status_id: status_id,
-        controlling_level_id: self.next_level&.id
-    }
-    self.document.update(update_params)
-  end
+  # def change_state
+  #   super
+  #
+  #   status_id = ::InwardInvoiceStatus.id_for(self.aasm.current_state)
+  #   update_params = {
+  #       invoice_status_id: status_id,
+  #       controlling_level_id: self.next_level&.id
+  #   }
+  #   self.document.update(update_params)
+  # end
 
   # def approvers_not_present?
   #   if self.policy.present?

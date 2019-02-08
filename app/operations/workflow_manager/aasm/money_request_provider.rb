@@ -17,7 +17,7 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
 
     event :approve do
       transitions :from => :processing, :to => :approved, guard: :reviewers_not_present?
-      transitions :from => :processing, :to => :processing
+      transitions :from => :processing, :to => :processing, guard: [:user_can_approve?]
     end
 
     event :unapprove do

@@ -18,7 +18,7 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
     event :approve do
       transitions :from => :processing, :to => :closed, guard: [:reviewers_not_present?, :reimbursable_expenses_absent?]
       transitions :from => :processing, :to => :approved, guard: :reviewers_not_present?
-      transitions :from => :processing, :to => :processing
+      transitions :from => :processing, :to => :processing, guard: [:user_can_approve?]
     end
 
     event :unapprove do
