@@ -84,7 +84,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
   protected
 
   def init_reports
-    reports_presenter = Report::Index.(user, params)
+    reports_presenter = Reports::Index.(user, params)
     unless reports_presenter&.success?
       message = reports_presenter&.messages[:error] || 'Unknown error'
       add_message :error, message

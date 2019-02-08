@@ -47,6 +47,27 @@ class TravelRequests::Create < TravelRequests::Base
     if travel_request.save
       # add the custom fields associated with this travel request
       CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), reset_fields: true, save: true)
+
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.travel_request.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
+      # Create Document Level Reviewer Mapping for Travel Request Booking Provider
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.travel_request.reload
+      params[:provider_name] = 'TravelRequestBookingProvider'
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
     else
       add_message :error, travel_request.errors.full_messages
     end

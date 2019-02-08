@@ -74,12 +74,12 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         end
       end
       self.custom_field_config = invoice_custom_field_configurations
-      op = BankTransfer::PaymentRequest::Approvers.(bank_payment_request: self.bank_payment_request)
-      if op.success?
-        self.approvers = op.approvers
-      else
-        self.approvers = []
-      end
+      # op = BankTransfer::PaymentRequest::Approvers.(bank_payment_request: self.bank_payment_request)
+      # if op.success?
+      #   self.approvers = op.approvers
+      # else
+      #   self.approvers = []
+      # end
 
       self.invoice_custom_fields = invoice_custom_field_configurations
       self.invoice_line_items_custom_fields = invoice_line_items_custom_field_configurations
@@ -178,7 +178,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       elsif bank_payment_request.processing? && bank_payment_request.owner_id == user.id
         actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
       elsif bank_payment_request.approved? && bank_payment_request.owner_id == user.id
-        actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        # actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         balance = retrieve_balance(:vendor_payment_wallet, user)
         credit_enabled = false
         admin = false
@@ -244,9 +244,97 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
 
     #################### REVIEWER ACTIONS ######################
+    # def retrieve_reviewer_actions
+    #   actions = {}
+    #   if bank_payment_request.controlling_user_id == user.id
+    #     actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+    #     actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+    #     actions[:summary_editable] = true
+    #     actions[:payments_editable] = true
+    #     actions[:attachments_editable] = true
+    #     actions[:credit] = !bank_payment_request.credit_card?
+    #     balance = retrieve_balance(:vendor_payment_wallet, user)
+    #     enabled = false
+    #     admin = false
+    #     if balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
+    #       enabled = true
+    #     else
+    #       # i.e if the user is an admin, even from the reviewer view, they should be able to
+    #       # credit the payment request from company credits
+    #       if user.vendor_payments_admin?
+    #         balance = retrieve_balance(:company_credits, user)
+    #         if balance >= bank_payment_request.requested_amount_value
+    #           enabled = true
+    #         end
+    #       end
+    #     end
+    #     if user.vendor_payments_admin?
+    #       admin = true
+    #     end
+    #     actions[:credit_options] = {}
+    #     if enabled
+    #       actions[:credit_options] = {
+    #           credit: {
+    #               url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+    #               enabled: enabled,
+    #               messages: "You can directly credit this payment order from your Finly Money",
+    #               require_password: true,
+    #               initiating_account: admin,
+    #               method: "patch"
+    #           }
+    #       }
+    #     end
+    #     # based on whether the configuration for payment file is enabled or not, add this block
+    #     actions[:credit_options][:mark_as_credited] = {
+    #         url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+    #         enabled: true,
+    #         messages: "You can mark this payment order as credited",
+    #         require_password: true,
+    #         method: "patch"
+    #     }
+    #     #######################################################################################
+    #     op = User::Team::Review::NextReviewer.(bank_payment_request)
+    #     reviewer = op.user
+    #     if reviewer.nil?
+    #       button_type = "dropdown"
+    #       message = "You can forward this request to another admin for them to credit it"
+    #       admins = []
+    #       user.company.users.only_vendor_payment_admins.each do |user|
+    #         admins << {
+    #             id: user.id,
+    #             name: user.name
+    #         }
+    #       end
+    #     else
+    #       button_type = "button"
+    #       message = "The payment request will move to #{reviewer.name} for approval"
+    #       admins = []
+    #       actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+    #     end
+    #     if reviewer.nil? && !admins.empty?
+    #       actions[:credit_options][:approve_forward] = {
+    #           url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+    #           messages: message,
+    #           enabled: true,
+    #           require_password: true,
+    #           button_type: button_type,
+    #           users: admins,
+    #           method: "patch",
+    #           type: 7
+    #       }
+    #     end
+    #   elsif associated_users&.include?(user)
+    #     actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+    #   elsif bank_payment_request.scheduled?
+    #     # if the payment request is scheduled, give the option to cancel it here
+    #     actions[:cancel] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_payment_order_path(bank_payment_request.payment_order)}
+    #   end
+    #   actions
+    # end
+
     def retrieve_reviewer_actions
       actions = {}
-      if bank_payment_request.controlling_user_id == user.id
+      if bank_payment_request.get_reviewers.include? user
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:summary_editable] = true
@@ -293,37 +381,38 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             method: "patch"
         }
         #######################################################################################
-        op = User::Team::Review::NextReviewer.(bank_payment_request)
-        reviewer = op.user
-        if reviewer.nil?
-          button_type = "dropdown"
-          message = "You can forward this request to another admin for them to credit it"
-          admins = []
-          user.company.users.only_vendor_payment_admins.each do |user|
-            admins << {
-                id: user.id,
-                name: user.name
-            }
-          end
-        else
-          button_type = "button"
-          message = "The payment request will move to #{reviewer.name} for approval"
-          admins = []
-          actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
-        end
-        if reviewer.nil? && !admins.empty?
-          actions[:credit_options][:approve_forward] = {
-              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
-              messages: message,
-              enabled: true,
-              require_password: true,
-              button_type: button_type,
-              users: admins,
-              method: "patch",
-              type: 7
-          }
-        end
-      elsif associated_users&.include?(user)
+        # op = User::Team::Review::NextReviewer.(bank_payment_request)
+        # reviewer = op.user
+        # if reviewer.nil?
+        #   button_type = "dropdown"
+        #   message = "You can forward this request to another admin for them to credit it"
+        #   admins = []
+        #   user.company.users.only_vendor_payment_admins.each do |user|
+        #     admins << {
+        #         id: user.id,
+        #         name: user.name
+        #     }
+        #   end
+        # else
+        #   button_type = "button"
+        #   message = "The payment request will move to #{reviewer.name} for approval"
+        #   admins = []
+        #   actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        # end
+        # if reviewer.nil? && !admins.empty?
+        #   actions[:credit_options][:approve_forward] = {
+        #       url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+        #       messages: message,
+        #       enabled: true,
+        #       require_password: true,
+        #       button_type: button_type,
+        #       users: admins,
+        #       method: "patch",
+        #       type: 7
+        #   }
+        # end
+      # elsif associated_users&.include?(user)
+      elsif bank_payment_request.get_reviewers.present?
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
       elsif bank_payment_request.scheduled?
         # if the payment request is scheduled, give the option to cancel it here
@@ -335,12 +424,13 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     ################### CREDITOR ACTIONS #######################
     def retrieve_creditor_actions
       actions = {}
-      if bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
-        actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+      # if bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
+      if bank_payment_request.document_role_users(:creditor).include? user && bank_payment_request.approved? # todo check logic
+        # actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:summary_editable] = true
         actions[:payments_editable] = true
         actions[:attachments_editable] = true
-        actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        # actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:credit] = !bank_payment_request.credit_card?
         balance = retrieve_balance(:vendor_payment_wallet, user)
         enabled = false
@@ -382,35 +472,35 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             method: "patch"
         }
         #######################################################################################
-        op = User::Team::Review::NextReviewer.(bank_payment_request)
-        reviewer = op.user
-        if reviewer.nil?
-          button_type = "dropdown"
-          admins = []
-          user.company.users.only_vendor_payment_admins.each do |user|
-            admins << {
-                id: user.id,
-                name: user.name
-            }
-          end
-        else
-          button_type = "button"
-          admins = []
-        end
-        if reviewer.nil? && !admins.empty?
-          actions[:credit_options][:approve_forward] = {
-              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
-              messages: "",
-              enabled: true,
-              require_password: true,
-              button_type: button_type,
-              users: admins,
-              method: "patch",
-              type: 7
-          }
-        end
-      elsif associated_users.include?(user)
-        actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        # op = User::Team::Review::NextReviewer.(bank_payment_request)
+        # reviewer = op.user
+        # if reviewer.nil?
+        #   button_type = "dropdown"
+        #   admins = []
+        #   user.company.users.only_vendor_payment_admins.each do |user|
+        #     admins << {
+        #         id: user.id,
+        #         name: user.name
+        #     }
+        #   end
+        # else
+        #   button_type = "button"
+        #   admins = []
+        # end
+        # if reviewer.nil? && !admins.empty?
+        #   actions[:credit_options][:approve_forward] = {
+        #       url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+        #       messages: "",
+        #       enabled: true,
+        #       require_password: true,
+        #       button_type: button_type,
+        #       users: admins,
+        #       method: "patch",
+        #       type: 7
+        #   }
+        # end
+      # elsif associated_users.include?(user)
+      #   actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
       elsif self.bank_payment_request.credited? && self.bank_payment_request.payment_order.initiating_user_id == user.id
         # further check if the payment order has anu failed payments
         if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
@@ -441,7 +531,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
     def retrieve_admin_actions
       actions = {}
-      if bank_payment_request.processing? && bank_payment_request.controlling_user_id == user.id
+      if bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user)
         actions[:summary_editable] = true
         actions[:payments_editable] = true
         actions[:attachments_editable] = true
@@ -474,18 +564,18 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             method: "patch"
         }
         #######################################################################################
-        unless admins.empty?
-          actions[:credit_options][:approve_forward] = {
-              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
-              messages: "You can forward this payment request to another admin to credit it",
-              enabled: true,
-              require_password: true,
-              button_type: "dropdown",
-              users: admins,
-              method: "patch",
-              type: 7
-          }
-        end
+        # unless admins.empty?
+        #   actions[:credit_options][:approve_forward] = {
+        #       url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+        #       messages: "You can forward this payment request to another admin to credit it",
+        #       enabled: true,
+        #       require_password: true,
+        #       button_type: "dropdown",
+        #       users: admins,
+        #       method: "patch",
+        #       type: 7
+        #   }
+        # end
 
         # adding approve and reject options for admin who has taken control
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
@@ -493,8 +583,11 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
         # for the return control action, first we gotta check if this particular payment order has
         # been taken control of by the admin and then show the action
-        trails = bank_payment_request.bank_payment_request_trails.with_action(BankPaymentRequestTrailAction.id_for(:take_control)).with_action_user(user.id)
-        if trails.present?
+        # trails = bank_payment_request.trails.with_action_id(BankPaymentRequestTrailAction.id_for(:take_control)).with_action_user(user.id)
+        # if trails.present?
+        #   actions[:return_control] = {method: "patch", type: 8, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        # end
+        if bank_payment_request.action_users(:return_control).include? user
           actions[:return_control] = {method: "patch", type: 8, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         end
       elsif bank_payment_request.processing?
@@ -528,16 +621,16 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           }
         end
         actions[:credit_options] = {} unless actions[:credit_options].present?
-        actions[:credit_options][:approve_forward] = {
-            url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
-            messages: "You can forward this payment request to another admin to credit it",
-            enabled: true,
-            require_password: true,
-            button_type: "dropdown",
-            users: admins,
-            method: "patch",
-            type: 7
-        }
+        # actions[:credit_options][:approve_forward] = {
+        #     url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+        #     messages: "You can forward this payment request to another admin to credit it",
+        #     enabled: true,
+        #     require_password: true,
+        #     button_type: "dropdown",
+        #     users: admins,
+        #     method: "patch",
+        #     type: 7
+        # }
         # based on whether the configuration for payment file is enabled or not, add this block
         actions[:credit_options][:mark_as_credited] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),

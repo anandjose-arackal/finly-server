@@ -24,7 +24,7 @@ class MoneyRequestCommentCreateTest < ActiveSupport::TestCase
     @money_request.stubs(:associated_users).returns(User.with_id([@owner.id, @manager.id, @second_manager.id, @finance_manager.id]))
 
     response = nil
-    event = Event::EMoneyRequest::EComment::Create.new(@finance_manager, money_request: @money_request)
+    event = Event::EMoneyRequests::EComment::Create.new(@finance_manager, money_request: @money_request)
     # Ensure 3 mailers have been triggered
     assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size', 3 do
       response = event.run
@@ -39,7 +39,7 @@ class MoneyRequestCommentCreateTest < ActiveSupport::TestCase
 
   test 'behavior when money_request is not passed for comment create' do
     response = nil
-    event = Event::EMoneyRequest::EComment::Create.new(@finance_manager, money_request: nil)
+    event = Event::EMoneyRequests::EComment::Create.new(@finance_manager, money_request: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -48,7 +48,7 @@ class MoneyRequestCommentCreateTest < ActiveSupport::TestCase
 
   test 'behavior when current user is not passed for comment create' do
     response = nil
-    event = Event::EMoneyRequest::EComment::Create.new(nil, money_request: @money_request)
+    event = Event::EMoneyRequests::EComment::Create.new(nil, money_request: @money_request)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -57,7 +57,7 @@ class MoneyRequestCommentCreateTest < ActiveSupport::TestCase
 
   test 'behavior when current user is not passed and money_request is not passed for comment create' do
     response = nil
-    event = Event::EMoneyRequest::EComment::Create.new(nil, money_request: nil)
+    event = Event::EMoneyRequests::EComment::Create.new(nil, money_request: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end

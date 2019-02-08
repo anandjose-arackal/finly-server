@@ -363,7 +363,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
   def post_process
     ###### now marking the selected reports as settled if the operation succeeded
     reports.each do |report|
-      op = Report::MarkAsSettled.(user, {payment: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
+      op = Reports::MarkAsSettled.(user, {payment: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
     end
 
     add_message :success, 'Reports settled'

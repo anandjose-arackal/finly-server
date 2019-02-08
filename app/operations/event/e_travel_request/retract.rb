@@ -9,7 +9,8 @@ class Event::ETravelRequest::Retract < Event::ETravelRequest::Base
   end
 
   def affected_users
-    [self.travel_request.controlling_user, self.travel_request.travel_request_trails&.order(:created_at)&.last&.modified_user]
+    # [self.travel_request.controlling_user, self.travel_request.trails&.order(:created_at)&.last&.modified_user]
+    self.travel_request.affected_users(:retract)
   end
 
   def mailer_subject(user)
@@ -30,13 +31,14 @@ class Event::ETravelRequest::Retract < Event::ETravelRequest::Base
 
   def travel_request_view_role(user)
     # Submission of trip is done by employee himself
-    if user.id == travel_request.user_id
-      return UserRole.id_for(:employee)
-    elsif user.id == travel_request.controlling_user_id
-      return travel_request.controlling_user_role_id
-    elsif user.id == self.travel_request.travel_request_trails.last.action_user_id
-      return self.travel_request.travel_request_trails.last.action_user_role_id
-    end
+    # if user.id == travel_request.user_id
+    #   return UserRole.id_for(:employee)
+    # elsif user.id == travel_request.controlling_user_id
+    #   return travel_request.controlling_user_role_id
+    # elsif user.id == self.travel_request.travel_request_trails.last.action_user_id
+    #   return self.travel_request.travel_request_trails.last.action_user_role_id
+    # end
+    travel_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

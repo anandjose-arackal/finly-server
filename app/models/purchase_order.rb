@@ -47,10 +47,11 @@
 #  is_template                  :boolean          default(FALSE)
 #  template_name                :string(255)
 #  resource_template_id         :integer
+#  deleted_at                   :datetime
 #
 
 class PurchaseOrder < ApplicationRecord
-  include SoftDeletable, Templatable
+  include SoftDeletable, Templatable, Transitionable
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :procurement, optional: true
@@ -228,6 +229,21 @@ class PurchaseOrder < ApplicationRecord
     }
   end
 
+  def can_unapprove?(user=nil)
+    return false if user.blank?
+
+    last_approve_trail = self.trails.only_approve.last
+    last_retract_trail = self.trails.only_retract.last
+    if last_approve_trail.present? && last_approve_trail.action_user.id == user.id
+      if last_retract_trail.present? && last_retract_trail.created_at > last_approve_trail.created_at
+        return false
+      end
+      return true
+    else
+      return false
+    end
+  end
+
   private
 
   def calculate_line_items
@@ -341,5 +357,26 @@ class PurchaseOrder < ApplicationRecord
     self.items.each do |item|
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
     end
+  end
+
+  def self.document_owner_attribute
+    'user_id'
+  end
+
+  def self.document_status_attribute
+    'purchase_order_status_id'
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push PurchaseOrderStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.finance_associated_status_ids
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
   end
 end

@@ -66,6 +66,7 @@
 #  is_deleted                   :boolean          default(FALSE)
 #  resource_template_id         :integer
 #  invoice_id                   :string(255)
+#  deleted_at                   :datetime
 #
 
 require 'test_helper'

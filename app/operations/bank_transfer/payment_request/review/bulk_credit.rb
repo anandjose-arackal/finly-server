@@ -22,17 +22,35 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     unless ids.is_a?(Array)
       ids = ids.split(",")
     end
+    # op = BankTransfer::PaymentRequest::Index.(user, params)
+    # if op.success?
+    #   payment_request_ids = op.payment_requests.with_controlling_user(user.id).with_id(ids).pluck(:id)
+    #   if user.vendor_payments_admin?
+    #     payment_request_ids += op.payment_requests.creditable.with_id(ids).pluck(:id)
+    #   end
+    #   self.payment_requests = op.payment_requests.with_id(payment_request_ids)
+    #   self.payment_orders = PaymentOrder.with_id(self.payment_requests.pluck(:payment_order_id))
+    # else
+    #   add_message :error, op.messages[:error]
+    # end
+
+    # NEW CODE
     op = BankTransfer::PaymentRequest::Index.(user, params)
+
     if op.success?
-      payment_request_ids = op.payment_requests.with_controlling_user(user.id).with_id(ids).pluck(:id)
+      payment_request_ids = BankPaymentRequest.awaiting_action_items(user).pluck(:id)
+
       if user.vendor_payments_admin?
         payment_request_ids += op.payment_requests.creditable.with_id(ids).pluck(:id)
       end
+
       self.payment_requests = op.payment_requests.with_id(payment_request_ids)
       self.payment_orders = PaymentOrder.with_id(self.payment_requests.pluck(:payment_order_id))
     else
       add_message :error, op.messages[:error]
     end
+
+
     self.initiating_account = retrieve_initiating_account
     self.view_role = UserRole.id_for(params[:view].to_sym)
   end
@@ -76,6 +94,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_request.payment_order.payment_mode)
       payment_request.payment_order.update(scheduled_at: next_date)
       payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+      #todo workflow manager can be introduced here; which will also create a trail for it
     end
     # self.creditable_payment_requests = self.payment_requests.without_id(schedulable_payment_request_ids)
     # self.creditable_payment_orders = ::PaymentOrder.with_id(self.creditable_payment_requests.pluck(:payment_order_id))
@@ -86,14 +105,32 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     ids = []
     self.payment_requests.each do |payment_request|
       # update the bank_payment_request to credited
-      payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
-                                  controlling_for_user_id: nil, controlling_for_user_role_id: nil)
-      # create a trail to show that the BPR was credited
-      payment_request.bank_payment_request_trails.create action_user: user,
-                                                         action_user_role_id: self.view_role,
-                                                         action_id: BankPaymentRequestTrailAction.id_for(:credit),
-                                                         modified_user_id: nil,
-                                                         modified_user_role_id: nil
+      # payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
+      #                             controlling_for_user_id: nil, controlling_for_user_role_id: nil)
+      # # create a trail to show that the BPR was credited
+      # payment_request.bank_payment_request_trails.create action_user: user,
+      #                                                    action_user_role_id: self.view_role,
+      #                                                    action_id: BankPaymentRequestTrailAction.id_for(:credit),
+      #                                                    modified_user_id: nil,
+      #                                                    modified_user_role_id: nil
+      # unless payment_request.payment_order.reload.scheduled?
+      #   # accumulating the ids of all the payment orders that are to be processed right away
+      #   ids << payment_request.id
+      # end
+
+      # New Code
+      # NEW CODE
+      params[:document] = self.payment_request
+      params[:aasm_event] = 'credit'
+      params[:violation_present] = false
+      op_2 = WorkflowManager::Base.(user, params)
+
+      # unless op_2.success?
+      #   add_message :error, op.messages[:error]
+      #   return
+      # end
+      #
+      # self.workflow_output = op.workflow_output
       unless payment_request.payment_order.reload.scheduled?
         # accumulating the ids of all the payment orders that are to be processed right away
         ids << payment_request.id

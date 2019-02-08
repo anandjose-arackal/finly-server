@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::Review::Base < BaseOperation
 
-  attr_accessor :bank_payment_request, :payment_order
+  attr_accessor :bank_payment_request, :payment_order, :workflow_output
 
   def pre_validate
     if user.blank? || params.blank?

@@ -135,6 +135,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
     bank_payment_requests.include_for_data_retrieval.each do |pr|
       po = pr.payment_order
       po.payments.each do |payment|
+        reviewer_names = payment.payment_order.bank_payment_request.get_reviewers&.map(&:name)&.join(", ")
         payment_details = [
             pr.id,
             pr.name,
@@ -149,7 +150,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             payment.payment_order.scheduled_at&.strftime("%d-%m-%Y"),
             payment.payment_order.bank_payment_request.submitted_at&.strftime("%d-%m-%Y"),
             payment.payment_order.processed_at&.strftime("%d-%m-%Y"),
-            payment.payment_order.bank_payment_request.controlling_user&.name,
+            # payment.payment_order.bank_payment_request.controlling_user&.name,
+            reviewer_names,
             payment.invoice&.invoice_number,
             payment.invoice&.due_date&.strftime("%d-%m-%Y"),
             payment.invoice&.date&.strftime("%d-%m-%Y")

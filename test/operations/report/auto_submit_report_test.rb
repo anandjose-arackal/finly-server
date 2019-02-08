@@ -21,7 +21,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
   test 'Auto submit should fail if auto submit is not enabled for the user' do
     @user.auto_submit_config.stubs(:enabled).returns(false)
     assert_not @user.auto_submit_config.enabled
-    result = Report::AutoSubmit.(nil, user: @user)
+    result = Reports::AutoSubmit.(nil, user: @user)
     assert result.failure?
   end
 
@@ -31,7 +31,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     result = nil
     Expense::Index.stubs(:call).returns(Expense::Index::ListPresenter.new(@user, {expenses: Expense.none}))
     assert_no_difference 'Report.count' do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.success?
   end
@@ -44,7 +44,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     assert @user.auto_submit_config.enabled
     result = nil
     assert_difference 'Report.count', 1 do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.success?
     report = result.params[:report]
@@ -62,7 +62,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     assert @user.auto_submit_config.enabled
     result = nil
     assert_difference 'Report.count', 1 do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.success?
     report = result.params[:report]
@@ -80,7 +80,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     assert @user.auto_submit_config.enabled
     result = nil
     assert_difference 'Report.count', 1 do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.success?
     report = result.params[:report]
@@ -95,7 +95,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     assert_not @user.auto_submit_config.limit_to_card_expenses
     result = nil
     assert_difference 'Report.count', 1 do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.success?
     report = result.params[:report]
@@ -112,7 +112,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     assert @user.auto_submit_config.limit_to_card_expenses
     result = nil
     assert_difference 'Report.count', 1 do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.success?
     report = result.params[:report]
@@ -129,12 +129,12 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     p = {}
     p[1] = {}
     p[1]['expense_blocking'] = 'Yes blocking'
-    Report::Violation.stubs(:call).returns(p)
+    Reports::Violation.stubs(:call).returns(p)
 
     assert @user.auto_submit_config.enabled
     result = nil
     assert_difference 'Report.count', 1 do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.failure?
   end
@@ -145,12 +145,12 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     p = {}
     p[1] = {}
     p[1]['expense_warning'] = 'Yes warning'
-    Report::Violation.stubs(:call).returns(p)
+    Reports::Violation.stubs(:call).returns(p)
 
     assert @user.auto_submit_config.enabled
     result = nil
     assert_difference 'Report.count', 1 do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.success?
     report = result.params[:report]
@@ -167,7 +167,7 @@ class AutoSubmitReportTest < ActiveSupport::TestCase
     assert @user.auto_submit_config.enabled
     result = nil
     assert_difference 'Report.count', 1 do
-      result = Report::AutoSubmit.(nil, user: @user)
+      result = Reports::AutoSubmit.(nil, user: @user)
     end
     assert result.success?
     report = result.params[:report]

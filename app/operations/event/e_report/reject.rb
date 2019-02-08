@@ -3,7 +3,7 @@ class Event::EReport::Reject < Event::EReport::Base
 
   def init
     super
-    self.rejecting_user = self.report.tracks.last.action_user rescue nil
+    self.rejecting_user = self.report.trails.last.action_user rescue nil
   end
 
   def validate
@@ -22,7 +22,12 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def affected_users
-    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    # Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    self.report.affected_users(:reject)
+  end
+
+  def notification_affected_users
+    self.report.notification_affected_users(:reject)
   end
 
   def send_push_notification(user)
@@ -32,20 +37,21 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def set_notification(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # role_id = UserRole.id_for(:manager)
     notification = user.notifications.build(user: user,
                                             notification_type_id: NotificationType.id_for(:report),
                                             action_type_id: NotificationActionType.id_for(:notify_reject),
-                                            action_user_id: report.tracks.last.action_user.id,
+                                            action_user_id: report.trails.last.action_user.id,
                                             object_id: report.id,
                                             object_type: "Report",
                                             path_object_id: report.id,
                                             path_object_type: "Report",
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
-                                            view_role_id: roles.first,
+                                            view_role_id: role_id,
                                             application: RequestStore.store[:current_app]
-                                            )
+    )
     notification.save
   end
 
@@ -66,8 +72,9 @@ class Event::EReport::Reject < Event::EReport::Base
   end
 
   def report_view_role(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
-    return roles.first
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # return roles.first
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

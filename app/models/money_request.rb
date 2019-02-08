@@ -31,14 +31,18 @@
 #  destination_pocket_id              :integer
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
+#  deleted_at                         :datetime
+#  controlling_level_id               :integer
 #
+
 
 class MoneyRequest < ApplicationRecord
   include OperationCallbacks,
           MathUtil,
           SoftDeletable,
           FieldCustomizer::CustomizableValidation,
-          FindByOrderedIds
+          FindByOrderedIds,
+          Transitionable
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :status, optional: true, class_name: 'MoneyRequestStatus'
@@ -63,6 +67,8 @@ class MoneyRequest < ApplicationRecord
   has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id, dependent: :destroy
   has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy
   has_many :items, class_name: 'MoneyRequestItem', foreign_key: :money_request_id, dependent: :destroy
+  has_many :trails, as: :parent
+
 
   belongs_to :travel_request, optional: true
 
@@ -264,6 +270,10 @@ class MoneyRequest < ApplicationRecord
     status_id == MoneyRequestStatus.id_for(:credited)
   end
 
+  def auto_approved?
+    status_id == MoneyRequestStatus.id_for(:auto_approved)
+  end
+
   def editable?
     self.status_id == MoneyRequestStatus.id_for(:open) ||
         self.status_id == MoneyRequestStatus.id_for(:rejected) ||
@@ -277,7 +287,7 @@ class MoneyRequest < ApplicationRecord
   end
 
   def can_retract?
-    processing? or (approved? and auto_approve)
+    processing? or (approved? and auto_approved?)
   end
 
   def can_destroy?
@@ -361,6 +371,29 @@ class MoneyRequest < ApplicationRecord
   end
 
   private
+
+  # doesn't make it private
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push MoneyRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.document_owner_attribute
+    'user_id'
+  end
+
+  def self.document_status_attribute
+    'status_id'
+  end
+
+  def self.finance_associated_status_ids
+    MoneyRequestStatus.ids_for(:approved, :credited, :pending, :auto_approved)
+  end
+
   def handle_name
     if self.name.blank?
       self.name = MoneyRequest.get_default_name(self.user)

@@ -4,7 +4,7 @@ class Event::EBankPaymentRequest::Reject < Event::EBankPaymentRequest::Base
 
   def init
     super
-    self.rejecting_user = self.bank_payment_request.bank_payment_request_trails.last.action_user rescue nil
+    self.rejecting_user = self.bank_payment_request.trails.last.action_user rescue nil
   end
 
   def validate
@@ -23,22 +23,23 @@ class Event::EBankPaymentRequest::Reject < Event::EBankPaymentRequest::Base
   end
 
   def affected_users
-    BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.user)
+    # BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.user)
+    self.bank_payment_request.affected_users(:reject)
   end
 
   def set_notification(user)
-    self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
+    # self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
     notification = user.notifications.build(user: user,
                                             notification_type_id: NotificationType.id_for(:bank_payment_request),
                                             action_type_id: NotificationActionType.id_for(:notify_reject),
-                                            action_user_id: bank_payment_request.bank_payment_request_trails.last.action_user.id,
+                                            action_user_id: bank_payment_request.trails.last.action_user.id,
                                             object_id: bank_payment_request.id,
                                             object_type: "PaymentOrder",
                                             path_object_id: bank_payment_request.id,
                                             path_object_type: "PaymentOrder",
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
-                                            view_role_id: roles.first,
+                                            view_role_id: role_id,
                                             application: RequestStore.store[:current_app]
     )
     notification.save
@@ -61,7 +62,8 @@ class Event::EBankPaymentRequest::Reject < Event::EBankPaymentRequest::Base
   end
 
   def bank_payment_request_view_role(user)
-    self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
-    return roles.first
+    # self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
+    # return roles.first
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 end
