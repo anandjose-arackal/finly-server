@@ -48,6 +48,7 @@ json.can_create_money_requests @result.can_create_money_requests?
 json.show_money_requests @result.show_money_requests?
 json.can_create_reports @result.can_create_reports?
 json.show_reports @result.show_reports?
+json.show_add_money_requests @result.show_add_money_requests?
 
 # json.summary @result.travel_request.summary
 
