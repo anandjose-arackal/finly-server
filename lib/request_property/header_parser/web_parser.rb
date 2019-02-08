@@ -1,0 +1,2 @@
+class WebParser
+end
