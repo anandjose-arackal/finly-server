@@ -31,7 +31,6 @@ class YesBankApi::Base < BaseHandler
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
     company = self.company_id.present? ? Company.find_by_id(self.company_id) : nil
     if company&.feature_subscription&.current_account_connected and !["fc", :fc].include?(RequestStore.store[:current_app])
-      type = self.company_id.to_s # i.e. if the configuration associated with this particular company's id doesn't exist, use default
       if Rails.env.production?
         type = self.company_id.to_s # i.e. if the configuration associated with this particular company's id doesn't exist, use default
       else
