@@ -70,6 +70,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
 
   def update_dlrms
     if[:confirm_selection].include?(aasm.current_event)
+      self.document_update_params[:booking_submitted_at] = DateTime.now
       dlrms = document.document_level_reviewer_mappings.with_provider_name(provider_name).with_level_id(next_level&.id).with_policy_id(policy.id)
 
       # Set viewable true for the next level when document is submitted
@@ -96,6 +97,8 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
       if next_level.present?
         next_dlrms = document.document_level_reviewer_mappings.with_provider_name(provider_name).with_level_id(next_level.id).with_policy_id(policy.id)
         next_dlrms.update_all(viewable: true)
+      else
+        self.document_update_params[:booking_approved_at] = DateTime.now
       end
     end
 
@@ -171,26 +174,22 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
 
   def update_status
     status_id = document.status.class.id_for(self.aasm.current_state)
-    update_params = generate_update_params
+    generate_update_params
 
-    update_params[:controlling_level_id] = self.new_level&.id
+    self.document_update_params[:controlling_level_id] = self.new_level&.id
 
-    update_params[document.class.document_status_attribute] = status_id
-    self.document.update(update_params)
+    self.document_update_params[document.class.document_status_attribute] = status_id
+    self.document.update(self.document_update_params)
   end
 
   def generate_update_params
-    update_params = {}
-
     if [:request_selection].include?(aasm.current_event)
-      update_params[:submitted_at] = DateTime.now
+      self.document_update_params[:submitted_at] = DateTime.now
     end
 
     if [:confirm_booking].include?(aasm.current_event)
-      update_params[:booking_confirmed_at] = DateTime.now
+      self.document_update_params[:booking_confirmed_at] = DateTime.now
     end
-
-    update_params
   end
 
   def user_can_review?

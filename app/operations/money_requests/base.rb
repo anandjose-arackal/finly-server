@@ -213,7 +213,7 @@ class MoneyRequests::Base < BaseOperation
             end
             actions[:reject] = true
           end
-          if self.money_request.can_unapprove? # &&  # todo money request
+          if self.money_request.can_unapprove? && money_request.action_users(:unapprove).include?(user)
             actions[:unapprove] = true
           end
         end
