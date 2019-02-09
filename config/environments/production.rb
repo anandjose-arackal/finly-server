@@ -125,15 +125,16 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
 
-  ################### SETTINGS FOR SENDGRID ##########################
-  config.action_mailer.default_url_options = {host: 'www.finly.io'}
+  ################### SETTINGS FOR EMAIL ##########################
+  config.mailer_config = config_for(:mailer_config)
+  config.action_mailer.default_url_options = {host: config.mailer_config['email_host']}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-      address: 'email-smtp.us-east-1.amazonaws.com',
-      port: 587,
-      domain: 'www.finly.io',
-      user_name: 'AKIAJ5HL7SQUHLBE4ADA',
-      password: 'Am8pl0148u28SWX7YqsAy5vbJNujSx9qIYIitPcmgH1+',
+      address: config.mailer_config['email_address'],
+      port: config.mailer_config['email_port'],
+      domain: config.mailer_config['email_domain'],
+      user_name: config.mailer_config['email_user_name'],
+      password: config.mailer_config['email_password'],
       # ssl:                  true,
       # tls:                  true,
       authentication: :plain,
@@ -154,16 +155,17 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+  config.aws_config = config_for(:aws_config)
   ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
   config.paperclip_defaults = {
       storage: :s3,
-      s3_region: ENV["aws_region_name"],
+      s3_region: config.aws_config["aws_region_name"],
       s3_credentials: {
-          s3_host_name: ENV["s3_host_name"],
-          bucket: ENV["s3_attachment_bucket_name"],
-          s3_region: ENV["aws_region_name"],
-          access_key_id: ENV["aws_access_key_id"],
-          secret_access_key: ENV["aws_secret_access_key"]
+          s3_host_name: config.aws_config["s3_host_name"],
+          bucket: config.aws_config["s3_attachment_bucket_name"],
+          s3_region: config.aws_config["aws_region_name"],
+          access_key_id: config.aws_config["aws_access_key_id"],
+          secret_access_key: config.aws_config["aws_secret_access_key"]
       },
       :s3_protocol => :https,
       :s3_headers => {

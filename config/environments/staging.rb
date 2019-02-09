@@ -137,13 +137,17 @@ Rails.application.configure do
   ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
   config.paperclip_defaults = {
       storage: :s3,
-      s3_region: ENV["aws_region_name"],
+      s3_region: config.aws_config["aws_region_name"],
       s3_credentials: {
-          s3_host_name: ENV["s3_host_name"],
-          bucket: ENV["s3_attachment_bucket_name"],
-          s3_region: ENV["aws_region_name"],
-          access_key_id: ENV["aws_access_key_id"],
-          secret_access_key: ENV["aws_secret_access_key"]
+          s3_host_name: config.aws_config["s3_host_name"],
+          bucket: config.aws_config["s3_attachment_bucket_name"],
+          s3_region: config.aws_config["aws_region_name"],
+          access_key_id: config.aws_config["aws_access_key_id"],
+          secret_access_key: config.aws_config["aws_secret_access_key"]
+      },
+      :s3_protocol => :https,
+      :s3_headers => {
+          :content_disposition => 'attachment'
       }
   }
   #########################################################################################

@@ -13,7 +13,7 @@ gem 'parslet', '~> 1.8.2'
 
 # adding gems for activeMQ
 gem 'daemons', '~> 1.3.1'
-gem 'stomp', '~> 1.4.8'
+# gem 'stomp', '~> 1.4.8'
 # gem 'activemessaging'
 
 # grm for mocking and stubbing in test cases
