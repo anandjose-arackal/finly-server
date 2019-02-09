@@ -52,7 +52,7 @@ class Policy < ApplicationRecord
   scope :without_id, ->(id) {where.not id: id}
   scope :not_deleted, -> {where is_deleted: false}
   scope :find_from_id, -> (id) {find_by(id: id)}
-  scope :with_application, -> (application) {where application: application}
+  scope :with_application, -> (application) {where( application: application).or(default)}
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
   scope :include_user_mapping, -> { includes :user_mapping }
 

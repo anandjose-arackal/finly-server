@@ -16,6 +16,18 @@ class OrganizationAccountController < ApplicationController
     respond
   end
 
+  def departments
+    @result = Company::Departments::Index.(current_user, params)
+    respond
+  end
+
+  def all_expense_types
+    @result = ExpenseType.select(:id, :name)
+    respond_to do |format|
+      format.json {render json: @result.as_json} # Hack to fix JSON Syntax error
+    end
+  end
+
   def export_preferences
     @result = Company::Configuration::Show.(current_user, params)
     respond_to do |format|

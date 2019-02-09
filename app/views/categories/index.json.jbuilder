@@ -5,7 +5,7 @@ json.categories do
     json.gl_code category.gl_code
     if category.children.present?
       json.sub_categories do
-        json.array!(category.children.active) do |sub_category|
+        json.array!(category.children) do |sub_category|
           json.id sub_category.id
           json.name sub_category.name
           json.expense_management sub_category.expense_management

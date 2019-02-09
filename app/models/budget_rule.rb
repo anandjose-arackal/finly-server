@@ -28,7 +28,17 @@ class BudgetRule < ApplicationRecord
   # belongs_to :category, optional: true
   has_many :budget_rule_category_mappings
   has_many :categories, through: :budget_rule_category_mappings
-  belongs_to :amount, optional: true, dependent: :destroy
+
+  has_many :budget_rule_department_mappings
+  has_many :departments, through: :budget_rule_department_mappings
+
+  # has_many :budget_rule_branch_location_mappings
+  # has_many :branch_locations, through: :budget_rule_branch_location_mappings
+
+  has_many :budget_rule_expense_type_mappings
+  has_many :expense_types, through: :budget_rule_expense_type_mappings
+
+  belongs_to :amount, optional: true #, dependent: :destroy
   belongs_to :period, optional: true
   belongs_to :policy, optional: true
   belongs_to :rule_type, optional: true
@@ -38,11 +48,14 @@ class BudgetRule < ApplicationRecord
   has_many :field_drop_down_items, through: :budget_rule_field_mappings
   has_many :field_configurations, through: :budget_rule_field_mappings
 
-  accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :amount #, allow_destroy: true
   accepts_nested_attributes_for :with_receipt_amount
   accepts_nested_attributes_for :without_receipt_amount
   accepts_nested_attributes_for :budget_rule_field_mappings
   accepts_nested_attributes_for :budget_rule_category_mappings
+  accepts_nested_attributes_for :budget_rule_category_mappings
+  accepts_nested_attributes_for :budget_rule_department_mappings
+  accepts_nested_attributes_for :budget_rule_expense_type_mappings
 
   # delegate :period, to: :period
   delegate :type, to: :rule_type
@@ -55,8 +68,12 @@ class BudgetRule < ApplicationRecord
   validates :policy_id, presence: true
   validates :rule_type_id, presence: true
 
+  validates_presence_of :budget_rule_expense_type_mappings
+
   validate :no_duplicates
   validate :amount_presence
+
+  # validate :department_presence
 
   before_create :update_parent_version
   before_destroy :update_parent_version
@@ -90,21 +107,11 @@ class BudgetRule < ApplicationRecord
   end
 
   def rule_in_words(options = {})
-    case self.expense_type_id
-    when 1
-      type = "of Cash"
-    when 2
-      type = "of Card"
-    when 3
-      type = "of Distance"
-    when 4
-      type = "of Time"
-    when 5
-      type = "of Per Diem"
-    else
-      type = ""
-    end
-    rule_in_words = "Total #{type} Expenses"
+    rule_in_words = "Total of "
+
+    self.expense_types.each {|et| unless et == (self.expense_types.last) then rule_in_words += et.name + ', ' else rule_in_words += "and #{et.name}" end}
+
+    rule_in_words += " Expenses"
     if self.period_id
       case self.period_id
       when 1
@@ -120,6 +127,7 @@ class BudgetRule < ApplicationRecord
       end
       rule_in_words += " per " + period
     end
+
     if self.categories.present?
       rule_in_words += " belonging to category "
       self.categories.each do |category|
@@ -132,6 +140,20 @@ class BudgetRule < ApplicationRecord
         end
       end
     end
+
+    if self.departments.present?
+      rule_in_words += " and the department "
+      self.departments.each do |department|
+        if department.parent.present?
+          rule_in_words += "#{department.parent.name} - "
+        end
+        rule_in_words += "#{department.name}"
+        unless self.departments.last == department
+          rule_in_words += ', '
+        end
+      end
+    end
+
     # if self.category_id
     #   rule_in_words += " for category " + self.category_name
     # end
@@ -191,11 +213,18 @@ class BudgetRule < ApplicationRecord
 
   def update_parent_version
     self.policy.update_attribute(:updated_at, DateTime.now)
+    # return true
   end
 
   def amount_presence
     if amount.blank? and without_receipt_amount.blank? and with_receipt_amount.blank?
       errors.add :amount, 'is not defined'
+    end
+  end
+
+  def department_presence
+    if budget_rule_department_mappings.blank?
+      errors.add :base, "Please select the department for which this budget rule applies"
     end
   end
 

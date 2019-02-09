@@ -30,6 +30,12 @@ class BranchLocation < ApplicationRecord
 
   has_many :budget_trails, as: :location
 
+  has_many :user_branch_location_mappings
+  has_many :users, through: :user_branch_location_mappings
+
+  has_many :budget_rule_branch_location_mappings
+  has_many :budget_rules, through: :budget_rule_branch_location_mappings
+
   def address
     address = ""
     if self.address_1.present?
