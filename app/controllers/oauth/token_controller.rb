@@ -24,7 +24,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
         on_create_success(response)
       else
         response.token.destroy
-        json_string = {error: 'invalid_grant', error_description: sessions_result.messages[:error]}#'The email / mobile or password you entered is incorrect'}
+        json_string = {error: 'invalid_grant', error_description: 'The email / mobile or password you entered is incorrect'}
         render json: json_string.to_json, status: 401
       end
 

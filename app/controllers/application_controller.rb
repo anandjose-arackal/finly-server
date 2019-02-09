@@ -341,8 +341,8 @@ class ApplicationController < ActionController::Base
 
   def invalidate_session(status_id, *reason)
     message = reason&.to_sentence
-    RequestStoreUtil.current_session.update(status_id: status_id, message: message)
-    doorkeeper_token.update(status_id: status_id, revoke_reason: message)
+    RequestStoreUtil.current_session&.update(status_id: status_id, message: message)
+    doorkeeper_token&.update(status_id: status_id, message: message)
     head 401
   end
 
