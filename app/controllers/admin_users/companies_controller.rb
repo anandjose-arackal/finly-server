@@ -1,8 +1,7 @@
-class AdminUsers::CompaniesController < ApplicationController
+class AdminUsers::CompaniesController < BaseControllers::AdminBase
 
   # todo - temporary
 
-  before_action -> { finly_authorize! :admin }
 
   def new
     @states = State.all

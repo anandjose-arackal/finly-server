@@ -1,6 +1,5 @@
-class BankTransfer::InwardInvoicesController < ApplicationController
+class BankTransfer::InwardInvoicesController < BaseControllers::WebBase
 
-  before_action {finly_authorize! :web}
 
   def index
     @result = BankTransfer::InwardInvoices::Index.(current_user, params)

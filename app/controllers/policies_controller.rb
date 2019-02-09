@@ -1,7 +1,6 @@
-class PoliciesController < ApplicationController
+class PoliciesController < BaseControllers::WebBase
   # protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = Policy::Create.(current_user, params)

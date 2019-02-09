@@ -1,9 +1,8 @@
-class AdminUsers::BankTransfersController < ApplicationController
-  before_action -> { finly_authorize! :admin }
+class AdminUsers::BankTransfersController < BaseControllers::AdminBase
 
   def get_status
     @result = Admin::BankTransfer::GetStatus.(current_user, params)
-    @respond
+    respond
   end
 
   def get_bulk_status

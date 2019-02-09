@@ -207,6 +207,12 @@ class TravelRequests::Show < TravelRequests::Base
       true
     end
 
+    def show_add_money_requests?
+      return false if user.id != travel_request.user_id
+      return false if TravelRequestStatus.ids_for(:open, :retracted, :rejected).exclude?(self.travel_request.status_id)
+      true
+    end
+
     def can_create_reports?
       return false unless personal_view?
       not TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected, :cancelled).include?(travel_request.status_id)

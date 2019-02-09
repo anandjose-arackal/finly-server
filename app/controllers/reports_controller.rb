@@ -1,7 +1,6 @@
-class ReportsController < ApplicationController
+class ReportsController < BaseControllers::WebBase
   include MathUtil
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = Report::Create.(current_user, params)

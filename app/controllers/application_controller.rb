@@ -13,6 +13,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :null_session
   # before_action :set_paper_trail_whodunnit
 
+  before_action :finly_authorize!
+
   before_action :load_global_variables
   # before_action :set_raven_context
 
@@ -303,24 +305,50 @@ class ApplicationController < ActionController::Base
     head(403)
   end
 
-  def finly_authorize!(*scopes)
+  def finly_authorize!
+    scopes = *authentication_scope
+    scopes.delete(:public)
+    return if scopes.blank?
+    return if self.class.get_skip_authentication_actions.include?(action_name&.to_sym)
+
+    set_tokens_in_header
     doorkeeper_authorize! *scopes
+
     if current_user.present?
       RequestStoreUtil.set_authorized_scopes scopes
     end
   end
 
-  def set_tokens_in_header
-    access_token = request.cookies['access_token']
-    if access_token.present?
-      request.headers['Authorization'] = "Bearer #{access_token}"
-    end
+  @skip_authentication_actions = []
+
+  def self.skip_authentication_actions(*actions)
+    @skip_authentication_actions = actions
   end
 
-  def set_tokens_in_header_admin
-    access_token = request.cookies['access_token_admin']
-    if access_token.present?
-      request.headers['Authorization'] = "Bearer #{access_token}"
+  def self.get_skip_authentication_actions
+    @skip_authentication_actions || []
+  end
+
+  def authentication_scope
+    raise "IMPORTANT!! Do not extend ApplicationController. Extend one of the BaseController's available in controllers/base_controller"
+  end
+
+  @required_header_token_actions = []
+
+  def self.required_header_token_actions
+    @required_header_token_actions ||= []
+  end
+
+  def self.set_tokens_in_header(*actions)
+    @required_header_token_actions = actions
+  end
+
+  def set_tokens_in_header
+    if self.class.required_header_token_actions.include?(action_name)
+      access_token = request.cookies['access_token']
+      if access_token.present?
+        request.headers['Authorization'] = "Bearer #{access_token}"
+      end
     end
   end
 

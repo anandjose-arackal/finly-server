@@ -1,6 +1,5 @@
-class ExpensesController < ApplicationController
+class ExpensesController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def create
     case params[:type]

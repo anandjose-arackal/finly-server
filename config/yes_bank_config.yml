@@ -2,7 +2,7 @@ default: &default
   client_id: '7b1f3f3e-c77a-445f-8471-1fe808b7836c'
   client_secret: 'eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM'
   username: 'testclient'
-  password: 'test@123'
+  password: 'OxYcool@123'
   account_number: '000690600003544'
   application_id: '448995'
   customer_id: '448995'
@@ -14,11 +14,19 @@ default: &default
   account_number: '000690600003544'
   application_id: '448995'
   customer_id: '448995'
+2:
+  client_id: '7b1f3f3e-c77a-445f-8471-1fe808b7836c'
+  client_secret: 'eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM'
+  username: 'testclient'
+  password: 'OxYcool@123'
+  account_number: '000690600003544'
+  application_id: '448995'
+  customer_id: '448995'
 
 development:
   default:
     <<: *default
-    74:
+    2:
       client_id: '7b1f3f3e-c77a-445f-8471-1fe808b7836c'
       client_secret: 'eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM'
       username: 'testclient'
@@ -26,14 +34,6 @@ development:
       account_number: '000690600003544'
       application_id: '448995'
       customer_id: '448995'
-  # 2:
-  #   client_id: '7b1f3f3e-c77a-445f-8471-1fe808b7836c'
-  #   client_secret: 'eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM'
-  #   username: 'jouskaclient'
-  #   password: 'jouska@123'
-  #   account_number: '12345678964654'
-  #   application_id: '123456'
-  #   customer_id: '123456'
 
 itzcash_uat:
   default:
@@ -42,54 +42,3 @@ itzcash_uat:
 staging:
   default:
     <<: *default
-
-# production:
-#   default: &default_config
-#     client_id: '698b59d5-6f22-4e16-818c-32ccb2f0cfab'
-#     client_secret: 'O2nH7eW5cS7hC3kB3nX3hY5rJ2lM1yS2rE8cU0dV3aX8lB1fY2'
-#     username: '8240621'
-#     password: 'Yesbank@123'
-#     account_number: '002267800001249'
-#     application_id: 'FINLY'
-#     customer_id: '8240621'
-#   2:
-#     client_id: '06ad4774-8095-4fd3-9fc2-c0997c70501a'
-#     client_secret: 'hK0fS3cG7iX7gQ4lS1aS1tX4oO3lF6fD0rX2aN7bY4jA3qK8fH'
-#     username: '2932571'
-#     password: '8javn'
-#     account_number: '019681300000294'
-#     application_id: 'FINLY'
-#     customer_id: '2932571'  
-#   49:
-#     client_id:
-#     client_secret:
-#     username:
-#     password:
-#     account_number:
-#     application_id: 'FINLY'
-#     customer_id: '8240621'
-
-# default:
-#   client_id: '698b59d5-6f22-4e16-818c-32ccb2f0cfab'
-#   client_secret: 'O2nH7eW5cS7hC3kB3nX3hY5rJ2lM1yS2rE8cU0dV3aX8lB1fY2'
-#   username: '8240621'
-#   password: 'Yesbank@123'
-#   account_number: '002267800001249'
-#   application_id: 'FINLY'
-#   customer_id: '8240621'
-# 2:
-#   client_id: '06ad4774-8095-4fd3-9fc2-c0997c70501a'
-#   client_secret: 'hK0fS3cG7iX7gQ4lS1aS1tX4oO3lF6fD0rX2aN7bY4jA3qK8fH'
-#   username: '2932571'
-#   password: 'Yesbank@1'
-#   account_number: '019681300000294'
-#   application_id: 'FINLY'
-#   customer_id: '2932571'
-# 49:
-#   client_id: ''
-#   client_secret: ''
-#   username: ''
-#   password: ''
-#   account_number: ''
-#   application_id: 'FINLY'
-#   customer_id: '8240621'

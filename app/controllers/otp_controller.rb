@@ -1,7 +1,6 @@
-class OtpController < ApplicationController
+class OtpController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def edit
   end

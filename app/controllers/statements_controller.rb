@@ -1,7 +1,6 @@
-class StatementsController < ApplicationController
+class StatementsController < BaseControllers::WebBase
 
   before_action :set_tokens_in_header, only: [:export]
-  before_action -> { finly_authorize! :web}
 
   def index
   end

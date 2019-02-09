@@ -1,6 +1,5 @@
-class DepartmentsController < ApplicationController
+class DepartmentsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def index
     @result = Company::Departments::Index.(current_user, params)
