@@ -55,7 +55,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.update(bank_response: op.request_status.upcase)
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing), bank_response: op.request_status.upcase)
+        bank_reference_number = op.bank_reference_number
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing), bank_response: op.request_status.upcase, bank_reference_number: bank_reference_number)
         begin
           bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         rescue => error
