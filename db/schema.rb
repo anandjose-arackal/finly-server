@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_07_160153) do
+ActiveRecord::Schema.define(version: 2019_02_09_111517) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -553,6 +553,7 @@ ActiveRecord::Schema.define(version: 2019_02_07_160153) do
     t.boolean "api_initiated", default: false
     t.datetime "deleted_at"
     t.integer "controlling_level_id"
+    t.datetime "approved_at"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
@@ -2927,6 +2928,8 @@ ActiveRecord::Schema.define(version: 2019_02_07_160153) do
     t.integer "resource_template_id"
     t.string "invoice_id"
     t.datetime "deleted_at"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["payment_term_id"], name: "index_invoices_on_payment_term_id"
@@ -4139,6 +4142,8 @@ ActiveRecord::Schema.define(version: 2019_02_07_160153) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"
@@ -5088,6 +5093,8 @@ ActiveRecord::Schema.define(version: 2019_02_07_160153) do
     t.integer "modified_by_id"
     t.datetime "deleted_at"
     t.integer "controlling_level_id"
+    t.datetime "booking_submitted_at"
+    t.datetime "booking_approved_at"
     t.index ["company_id"], name: "index_travel_requests_on_company_id"
     t.index ["controlling_for_user_id"], name: "index_travel_requests_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_travel_requests_on_controlling_for_user_role_id"
