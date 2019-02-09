@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_05_122450) do
+ActiveRecord::Schema.define(version: 2019_02_07_160153) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2116,8 +2116,7 @@ ActiveRecord::Schema.define(version: 2019_02_05_122450) do
     t.integer "action_id"
     t.string "provider_name"
     t.decimal "threshold", precision: 20, scale: 5
-    t.boolean "active"
-    t.timestamp "became_viewable_at"
+    t.boolean "active", default: true
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
