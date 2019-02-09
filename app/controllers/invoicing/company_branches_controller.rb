@@ -1,4 +1,4 @@
-class Invoicing::CompanyBranchesController < BaseControllers::PublicBase
+class Invoicing::CompanyBranchesController < BaseControllers::WebBase
   def show
     @result = Company::Collect::CompanyBranches::Show.(current_user, params)
     respond

@@ -1,4 +1,4 @@
-class Invoicing::InventoryLineItemsController < BaseControllers::PublicBase
+class Invoicing::InventoryLineItemsController < BaseControllers::WebBase
 
   def index
     @result = Invoicing::InventoryLineItem::Index.(current_user, params)

@@ -1,4 +1,4 @@
-class Api::V1::BaseApiController < BaseControllers::PublicBase
+class Api::V1::BaseApiController < BaseControllers::ApiBase
   rescue_from NotAuthorizedException, with: :un_authorized
 
   def un_authorized

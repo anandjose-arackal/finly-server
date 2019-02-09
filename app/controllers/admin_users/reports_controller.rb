@@ -1,4 +1,4 @@
-class AdminUsers::ReportsController < BaseControllers::PublicBase
+class AdminUsers::ReportsController < BaseControllers::AdminBase
 
   def show
     @result = Admin::Reports::Show.(current_user, params)

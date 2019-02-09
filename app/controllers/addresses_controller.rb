@@ -1,4 +1,4 @@
-class AddressesController < BaseControllers::PublicBase
+class AddressesController < BaseControllers::WebBase
 
   def index
     @result = Addresses::Index.(current_user, params)

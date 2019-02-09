@@ -1,4 +1,4 @@
-class CostCentersController < BaseControllers::PublicBase
+class CostCentersController < BaseControllers::WebBase
 
   def create
     @result = CostCenters::Create.(current_user, params)
