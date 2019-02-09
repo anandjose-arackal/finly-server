@@ -1,4 +1,4 @@
-class UserSessions::Verify
+class UserSessions::Verify < BaseOperation
 
 
 

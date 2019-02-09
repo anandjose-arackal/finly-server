@@ -314,9 +314,36 @@ class ApplicationController < ActionController::Base
     set_tokens_in_header
     doorkeeper_authorize! *scopes
 
+    unless doorkeeper_token.status_id == UserSessionStatus.id_for(:authorized)
+      head 401
+      return
+    end
+
     if current_user.present?
       RequestStoreUtil.set_authorized_scopes scopes
     end
+
+    user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
+    if user_session.nil? or not user_session.authorized?
+      invalidate_session UserSessionStatus.id_for(:revoked), 'User session is not associated'
+      head 401
+      return
+    end
+
+    RequestStoreUtil.set_current_session user_session
+    result = UserSessions::Verify.(current_user, params)
+    unless result.success?
+      invalidate_session UserSessionStatus.id_for(:revoked), result.messages[:error]
+      return
+    end
+
+  end
+
+  def invalidate_session(status_id, *reason)
+    message = reason&.to_sentence
+    RequestStoreUtil.current_session.update(status_id: status_id, message: message)
+    doorkeeper_token.update(status_id: status_id, revoke_reason: message)
+    head 401
   end
 
   @skip_authentication_actions = []

@@ -66,4 +66,6 @@ class UserSession < ApplicationRecord
   scope :with_ip, ->(ip) { where ip: ip }
   scope :started_after, ->(datetime) { where 'started_at >= ?', datetime }
 
+  delegate :revoked?, :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
+
 end

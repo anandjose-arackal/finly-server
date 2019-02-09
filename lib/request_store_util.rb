@@ -29,6 +29,10 @@ class RequestStoreUtil
     RequestStore.store[:current_device] = device
   end
 
+  def self.set_current_session(session)
+    RequestStore.store[:current_session] = session
+  end
+
   def self.to_hash
     {
         current_app: RequestStore.store[:current_app],
@@ -36,6 +40,7 @@ class RequestStoreUtil
         current_user_id: RequestStore.store[:current_user]&.id,
         current_user_type: RequestStore.store[:current_user]&.class&.name,
         current_company_id: RequestStore.store[:current_company]&.id,
+        current_session_id: RequestStore.store[:current_company]&.id,
         authorized_scopes: RequestStore.store[:authorized_scopes],
         params: RequestStore.store[:params]
     }
@@ -49,6 +54,7 @@ class RequestStoreUtil
     RequestStore.store[:authorized_scopes] = request_store_data[:authorized_scopes]
     RequestStore.store[:params] = request_store_data[:params]
     RequestStore.store[:current_company] = Company.with_id(request_store_data[:current_company_id])&.first
+    RequestStore.store[:current_session] = UserSession.find_by_access_token_id(request_store_data[:current_session_id])
     case request_store_data[:current_user_type]
       when User.name
         RequestStore.store[:current_user] = User.with_id(request_store_data[:current_user_id])&.first
@@ -83,6 +89,10 @@ class RequestStoreUtil
 
   def self.request_params
     RequestStore.store[:params]
+  end
+
+  def self.current_session
+    RequestStore.store[:current_session]
   end
 
 end

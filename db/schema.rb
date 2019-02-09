@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_08_074216) do
+ActiveRecord::Schema.define(version: 2019_02_09_095948) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3448,6 +3448,7 @@ ActiveRecord::Schema.define(version: 2019_02_08_074216) do
     t.datetime "created_at", null: false
     t.string "scopes"
     t.string "previous_refresh_token", default: "", null: false
+    t.integer "status_id", default: 1
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
@@ -5325,6 +5326,7 @@ ActiveRecord::Schema.define(version: 2019_02_08_074216) do
     t.text "screen_print"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_session_id", null: false
   end
 
   create_table "user_sessions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -5371,6 +5373,8 @@ ActiveRecord::Schema.define(version: 2019_02_08_074216) do
     t.integer "status_id"
     t.string "message"
     t.string "login_username"
+    t.integer "accuracy_radius"
+    t.string "username"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["device"], name: "index_user_sessions_on_device"
     t.index ["ip"], name: "index_user_sessions_on_ip"
