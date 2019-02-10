@@ -21,12 +21,19 @@ class Oauth::TokenController < Doorkeeper::TokensController
       params[:response] = response
       sessions_result = UserSessions::Create.(:authorized, params)
       if sessions_result.success?
-        on_create_success(response)
+        RequestStoreUtil.set_current_session sessions_result.session
+        result = Gatekeeper::Event.(:after_session_create, params)
+        if result.success?
+          on_create_success(response)
+          return
+        end
       else
-        response.token.destroy
-        json_string = {error: 'invalid_grant', error_description: 'The email / mobile or password you entered is incorrect'}
-        render json: json_string.to_json, status: 401
+        binding.pry
       end
+
+      response.token.destroy
+      json_string = {error: 'invalid_grant', error_description: 'The email / mobile or password you entered is incorrect'}
+      render json: json_string.to_json, status: 401
 
       # if verify_company_status(@user)
       #   User::Track::Login.(@user, params)

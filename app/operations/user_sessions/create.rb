@@ -1,6 +1,16 @@
 require 'resolv'
 class UserSessions::Create < BaseOperation
-  attr_accessor :oauth_response, :user, :status
+  attr_accessor :oauth_response, :user, :status, :session
+
+  class UserSessions::Create::Success < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :session, :event
+
+    def init
+      self.session = params[:session]
+      self.event = self.session.events.last
+    end
+
+  end
 
   def self.call(status, params)
     self.new(status, params).run
@@ -46,14 +56,21 @@ class UserSessions::Create < BaseOperation
     enrich_access args
     enrich_geo_location args
     enrich_platform args
+    set_event args
     return if has_errors?
-    session = UserSession.new args
-    unless session.valid?
+    self.session = UserSession.new args
+    unless self.session.valid?
       add_message :error, session.errors.full_messages
       return
     end
-    session.save
+    self.session.save(validate: false)
   end
+
+  def success
+    UserSessions::Create::Success.new(user, {session: self.session}, messages)
+  end
+
+  protected
 
   def enrich_user(args)
     args[:company_id] = user&.company_id
@@ -63,12 +80,6 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_access(args)
-    # args[:app] = RequestStoreUtil.current_app
-    # args[:path] = RequestStoreUtil.current_request.path
-    # args[:method] = RequestStoreUtil.current_request.method_symbol
-    # args[:controller] = params[:controller]
-    # args[:action] = params[:action]
-    # args[:view] = current_view
     args[:started_at] = DateTime.now
     args[:last_request_at] = DateTime.now
   end
@@ -112,12 +123,16 @@ class UserSessions::Create < BaseOperation
     request = RequestStoreUtil.current_request
     headers = request.headers
     request_properties = headers['X-Finly-RP']
-    if request_properties.nil?
-      add_message :error, 'Error in request'
-      return
+    # if request_properties.nil?
+    #   add_message :error, 'Error in request'
+    #   return
+    # end
+    if request_properties.present?
+      request_properties = Base64.decode64(request_properties)
+      request_properties = JSON.parse(request_properties) if request_properties.is_a?(String)
+    else
+      request_properties = {}
     end
-    request_properties = Base64.decode64(request_properties)
-    request_properties = JSON.parse(request_properties) if request_properties.is_a?(String)
     request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
     PLATFORMS.each do |platform|
       if request_properties[platform.platform_key.to_s].present?
@@ -125,6 +140,17 @@ class UserSessions::Create < BaseOperation
         break
       end
     end
+  end
+
+  def set_event(args)
+    args[:events_attributes] = [{}]
+    args[:events_attributes][0][:http_method] = RequestStoreUtil.current_request.method_symbol
+    args[:events_attributes][0][:app] = RequestStoreUtil.current_app
+    args[:events_attributes][0][:path] = RequestStoreUtil.current_request.path
+    args[:events_attributes][0][:controller] = params[:controller]
+    args[:events_attributes][0][:action] = params[:action]
+    args[:events_attributes][0][:view] = current_view
+    args[:events_attributes][0][:status_id] = UserSessionStatus.id_for(self.status)
   end
 
   private

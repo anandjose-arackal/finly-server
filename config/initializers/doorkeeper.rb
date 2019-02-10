@@ -18,10 +18,10 @@ Doorkeeper.configure do
       u = nil
       if params[:username].blank?
         Gatekeeper::Event.(:user_login_blank_username)
-        UserSession::Create.(:failed, message: 'Blank username', user: u, request_params: params)
+        UserSessions::Create.(:failed, message: 'Blank username', user: u, request_params: params)
       elsif params[:password].blank?
         Gatekeeper::Event.(:user_login_blank_password)
-        UserSession::Create.(:failed, message: 'Blank password', user: u, request_params: params)
+        UserSessions::Create.(:failed, message: 'Blank password', user: u, request_params: params)
       end
     else
       if scopes.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes.first)
@@ -34,7 +34,7 @@ Doorkeeper.configure do
         if not result.success?
           # Do not attempt login as the user account is locked
           u = nil
-          UserSession::Create.(:blocked, message: result.messages[:error], user: u, request_params: params)
+          UserSessions::Create.(:blocked, message: result.messages[:error], user: u, request_params: params)
         elsif u.valid_password?(params[:password])
           if scopes.include?("admin_bypass")
             BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join("config/data/bypass_authorized_users.yml"))&.dig("authorized_users")
@@ -47,18 +47,18 @@ Doorkeeper.configure do
           else
             result = Gatekeeper::Event.(:user_login_success, user: u)
             unless result.success?
-              UserSession::Create.(:blocked, message: result.messages[:error], user: u, request_params: params)
+              UserSessions::Create.(:blocked, message: result.messages[:error], user: u, request_params: params)
               u = nil
             end
           end
         else
           Gatekeeper::Event.(:user_login_invalid_password, user: u)
-          UserSession::Create.(:failed, message: 'Invalid Password', user: u, request_params: params)
+          UserSessions::Create.(:failed, message: 'Invalid Password', user: u, request_params: params)
           u = nil
         end
       else
         Gatekeeper::Event.(:user_login_invalid_username)
-        UserSession::Create.(:failed, message: 'Invalid Username', request_params: params)
+        UserSessions::Create.(:failed, message: 'Invalid Username', request_params: params)
       end
     end
     u

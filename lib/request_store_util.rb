@@ -40,7 +40,8 @@ class RequestStoreUtil
         current_user_id: RequestStore.store[:current_user]&.id,
         current_user_type: RequestStore.store[:current_user]&.class&.name,
         current_company_id: RequestStore.store[:current_company]&.id,
-        current_session_id: RequestStore.store[:current_company]&.id,
+        current_session_id: RequestStore.store[:current_session]&.id,
+        current_session_event_id: RequestStore.store[:current_session_event]&.id,
         authorized_scopes: RequestStore.store[:authorized_scopes],
         params: RequestStore.store[:params]
     }
@@ -54,7 +55,8 @@ class RequestStoreUtil
     RequestStore.store[:authorized_scopes] = request_store_data[:authorized_scopes]
     RequestStore.store[:params] = request_store_data[:params]
     RequestStore.store[:current_company] = Company.with_id(request_store_data[:current_company_id])&.first
-    RequestStore.store[:current_session] = UserSession.find_by_access_token_id(request_store_data[:current_session_id])
+    RequestStore.store[:current_session] = UserSession.find_by_id(request_store_data[:current_session_id])
+    RequestStore.store[:current_session_event] = UserSessionEvent.find_by_id(request_store_data[:current_session_event_id])
     case request_store_data[:current_user_type]
       when User.name
         RequestStore.store[:current_user] = User.with_id(request_store_data[:current_user_id])&.first
@@ -93,6 +95,10 @@ class RequestStoreUtil
 
   def self.current_session
     RequestStore.store[:current_session]
+  end
+
+  def self.current_session_event
+    RequestStore.store[:current_session_event]
   end
 
 end

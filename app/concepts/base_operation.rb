@@ -465,6 +465,10 @@ class BaseOperation
     type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
   end
 
+  def current_view
+    params&.dig(:view)
+  end
+
   def clear_messages
     self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end

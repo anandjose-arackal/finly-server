@@ -44,22 +44,22 @@
 
 class UserSessionWeb < ApplicationRecord
 
-  validates :timestamp, presence: true
-  validates :user_agent, presence: true
-  validates :timezone, presence: true
-  validates :fingerprint, presence: true
-  validates :language, presence: true
-  validates :browser, presence: true
-  validates :browser, presence: true
-  validates :browser_version, presence: true
-  validates :browser_engine, presence: true
-  validates :browser_engine_version, presence: true
-  validates :os_name, presence: true
-  validates :os_version, presence: true
-  validates :screen_width, presence: true
-  validates :screen_height, presence: true
-  validates :mouse_pos_x, presence: true
-  validates :mouse_pos_y, presence: true
+  # validates :timestamp, presence: true
+  # validates :user_agent, presence: true
+  # validates :timezone, presence: true
+  # validates :fingerprint, presence: true
+  # validates :language, presence: true
+  # validates :browser, presence: true
+  # validates :browser, presence: true
+  # validates :browser_version, presence: true
+  # validates :browser_engine, presence: true
+  # validates :browser_engine_version, presence: true
+  # validates :os_name, presence: true
+  # validates :os_version, presence: true
+  # validates :screen_width, presence: true
+  # validates :screen_height, presence: true
+  # validates :mouse_pos_x, presence: true
+  # validates :mouse_pos_y, presence: true
 
   def self.platform_key
     13

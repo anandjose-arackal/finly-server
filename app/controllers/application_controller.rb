@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
   before_action :finly_authorize!
 
   before_action :load_global_variables
+  before_action :after_finly_authorize
   # before_action :set_raven_context
 
   before_action :initialize_query_logger
@@ -324,16 +325,17 @@ class ApplicationController < ActionController::Base
     end
 
     user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
-    if user_session.nil? or not user_session.authorized?
-      invalidate_session UserSessionStatus.id_for(:revoked), 'User session is not associated'
+    if user_session.nil?
+      # todo better handle how existing logins are associated i.e mobile, API etc
       head 401
       return
     end
 
     RequestStoreUtil.set_current_session user_session
-    result = UserSessions::Verify.(current_user, params)
-    unless result.success?
-      invalidate_session UserSessionStatus.id_for(:revoked), result.messages[:error]
+
+    unless user_session.authorized?
+      invalidate_session UserSessionStatus.id_for(:revoked), "User session is #{user_session.status.name}"
+      head 401
       return
     end
 
@@ -437,6 +439,14 @@ class ApplicationController < ActionController::Base
     ElasticAPM.set_tag(:app, current_app)
     ElasticAPM.set_tag(:device, current_device)
     ElasticAPM.set_tag(:view, params&.dig(:view))
+  end
+
+  def after_finly_authorize
+    result = Gatekeeper::Event.(:after_finly_authorize, params)
+    unless result.success?
+      invalidate_session UserSessionStatus.id_for(:revoked), result.messages[:error]&.to_sentence
+      return
+    end
   end
 
   # Used by sentry
