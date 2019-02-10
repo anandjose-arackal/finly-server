@@ -5,24 +5,26 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :contents, :headers, :order_details, :requested_amount
+    attr_accessor :contents, :headers, :order_details, :requested_amount, :issues
 
     def init
       self.contents = params[:contents]
       self.headers = params[:headers]
       self.order_details = params[:order_details]
       self.requested_amount = params[:requested_amount]
+      self.issues = params[:issues]
     end
 
   end
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :contents, :headers
+    attr_accessor :contents, :headers, :issues
 
     def init
       self.contents = params[:contents]
       self.headers = params[:headers]
+      self.issues = params[:issues]
     end
 
   end
@@ -147,7 +149,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       self.issues << self.issue_item
     end
     puts "self.issues", self.issues.inspect
-    binding.pry
+    # binding.pry
   end
 
   def success?
@@ -163,12 +165,14 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     params[:headers] = self.headers
     params[:order_details] = self.order_details
     params[:requested_amount] = self.requested_amount
+    params[:issues] = self.issues
     BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter.new(user, params, messages)
   end
 
   def failure
     params[:contents] = self.contents
     params[:headers] = self.headers
+    params[:issues] = self.issues
     BankTransfer::PaymentRequest::BulkValidateFileData::FailurePresenter.new(user, params, messages)
   end
 

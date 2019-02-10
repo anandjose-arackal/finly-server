@@ -15,7 +15,15 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def new_pr
     @result = BankTransfer::PaymentRequest::NewPr.(current_user, params)
-    respond
+    if @result.success?
+      respond
+    else
+      respond_to do |format|
+        format.json {
+          render 'new_pr_failure'
+        }
+      end
+    end
   end
 
   def index

@@ -7,11 +7,11 @@
 # reuse existing bulkvalidation
 
 class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
-	attr_accessor :vendor_id, :vendor, :requested_amount, :payment_mode, :bank_payment_request_params, :bank_payment_request,
+	attr_accessor :vendor_id, :vendor, :total_amount, :payment_mode, :bank_payment_request_params, :bank_payment_request,
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:content, :headers
+					:contents, :headers, :issues, :validate_operation
 
 	def init
 		# self.vendor_id = params[:vendor_id]
@@ -20,8 +20,9 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		# 	self.vendor = YesBankVendor.find_by(id: self.vendor_id)
 		# end
 
-		# self.requested_amount = params[:amount]
-		# self.payment_mode = params[:payment_mode]
+		# self.total_amount = params[:amount]
+		self.payment_mode = params[:payment_mode]
+		# self.payment_mode = 'NEFT'
 
 	
 		params[:payments_attributes].each do |pa|
@@ -52,6 +53,10 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		# 													  "due_date"=>"31-01-2019",
 		# 													  "note"=>"I dont know",
 		# 													  "custom_fields"=>{}}]
+		# params[:payments_attributes] = [{"name"=>"new one", "bank_account_number"=>"50000000000", "ifsc"=>"UTIB8888867", "original_amount"=>"1000", "inclusive_of_taxes"=>"y", "gst_type_id"=>"2", "tax"=>"5", "discount"=>"0", "tds_slab_id"=>"46", "category_id"=>"927", "cost_center_id"=>"28", "department_id"=>"41", "invoice_number"=>"no-9999", "invoice_date"=>"30-01-2019", "due_date"=>"31-01-2019", "note"=>"I dont know", "custom_fields"=>{}},
+		# 	{"name"=>"new one", "bank_account_number"=>"50000000000", "ifsc"=>"UTIB8888867", "original_amount"=>"1000", "inclusive_of_taxes"=>"y", "gst_type_id"=>"3", "tax"=>"5", "discount"=>"0", "tds_slab_id"=>"46", "category_id"=>"927", "cost_center_id"=>"28", "department_id"=>"41", "invoice_number"=>"no-9999", "invoice_date"=>"30-01-2019", "due_date"=>"31-01-2019", "note"=>"I dont know", "custom_fields"=>{}},
+		# 	{"name"=>"new one", "bank_account_number"=>"50000000000", "ifsc"=>"UTIB8888867", "original_amount"=>"1000", "inclusive_of_taxes"=>"ny", "gst_type_id"=>"2", "tax"=>"5", "discount"=>"0", "tds_slab_id"=>"46", "category_id"=>"927", "cost_center_id"=>"28", "department_id"=>"41", "invoice_number"=>"no-9999", "invoice_date"=>"30-01-2019", "due_date"=>"31-01-2019", "note"=>"I dont know", "custom_fields"=>{}},
+		# 	{"name"=>'nothing', "bank_account_number"=>"50000000000", "ifsc"=>"UTIB8888867", "original_amount"=>"1000", "inclusive_of_taxes"=>"y", "gst_type_id"=>"2", "tax"=>"5", "discount"=>"0", "tds_slab_id"=>"46", "category_id"=>"927", "cost_center_id"=>nil, "department_id"=>"41", "invoice_number"=>"no-9999", "invoice_date"=>"30-01-2019", "due_date"=>"31-01-2019", "note"=>"I dont know", "custom_fields"=>{}}]
 		self.payments_attributes = params[:payments_attributes]
 	end
 
@@ -63,14 +68,17 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 
 	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})
 
-	    puts "validate_operation", validate_operation.inspect
-	    binding.pry
+	    # puts "validate_operation", validate_operation.inspect
+	    # binding.pry
 	    if validate_operation.success?
-	      self.requested_amount = validate_operation.requested_amount
+	    	# total of all individual payments
+	    	# to be set in bpr
+	      self.total_amount = validate_operation.requested_amount
 	    else
 	      self.contents = validate_operation.contents
 	      self.headers = validate_operation.headers
-	      add_message :error, "Some of the payments have errors, please check the downloaded file to resolve them"
+	      self.issues = validate_operation.issues
+	      add_message :error, "Some of the payments have errors, please verify your vendor data."
 	    end
 
 	end
@@ -79,14 +87,15 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	    # if the validation of the data is successful, it will create a payment order and
 	    # asynchronously add payments to it one by one
 	    self.bank_payment_request_params = parse_payment_order_data
-	    puts "bank_payment_request params", bank_payment_request_params.inspect
+	    # puts "bank_payment_request params", bank_payment_request_params.inspect
 	    self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
-	    puts "bank_payment_request", bank_payment_request.inspect
+	    # puts "bank_payment_request", self.bank_payment_request.inspect
+	    # binding.pry
 
 		# BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: order_details})
 
 
-			puts "self.payments_attributes", self.payments_attributes.inspect
+			# puts "self.payments_attributes", self.payments_attributes.inspect
 	    self.company_id = self.bank_payment_request.owner.company_id
 	    self.user = self.bank_payment_request.owner
 	    self.payment_mode = self.bank_payment_request.payment_mode
@@ -94,7 +103,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	    self.payment_params = []
 	    self.payments_attributes.each do |payment|
 	      bank_account = retrieve_bank_account(payment)
-	      binding.pry
+	      # binding.pry
 	      self.payment_params << {
 	          payment_type_id: PaymentType.id_for(:credit),
 	          application: "vp",
@@ -112,7 +121,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	          # payment_mode: self.payment_mode,
 	          payment_mode: payment[:payment_mode],
 	          amount_attributes: {
-	              # value: self.requested_amount,
+	              # value: self.total_amount,
 	              value: payment[:original_amount],
 	              currency_id: Currency.first.id
 	          },
@@ -135,9 +144,9 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	              tax: payment[:tax],
 	              discount: payment[:discount],
 	              invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
-	              company_id: self.user.company_id,
+	              company_id: user.company_id,
 	              original_amount_attributes: {
-	                  # value: self.requested_amount,
+	                  # value: self.total_amount,
 	                  value: payment[:original_amount],
 	                  currency_id: 1
 	              }
@@ -145,6 +154,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	          custom_fields: payment[:custom_fields]
 	      }
 	    end
+	    # binding.pry
 
 	    # for each individual payment params, we build a new payment
 	    self.payment_params.each do |params|
@@ -174,12 +184,26 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	    BankTransfer::PaymentRequest::NewPr::SuccessPresenter.new(user, params, messages)
 	end
 
+	def failure
+	    params[:issues] = self.issues
+	    BankTransfer::PaymentRequest::NewPr::FailurePresenter.new(user, params, messages)
+	end
+
 	class BankTransfer::PaymentRequest::NewPr::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
 	    attr_accessor :bank_payment_request_id
 
 	    def init
 	      self.bank_payment_request_id = params[:bank_payment_request_id]
+	    end
+	end
+
+	class BankTransfer::PaymentRequest::NewPr::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+
+	    attr_accessor :issues
+
+	    def init
+	      self.issues = params[:issues]
 	    end
 	end
 
@@ -193,12 +217,11 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		    payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
 		    company_id: user.company_id,
 		    amount_requested_attributes: {
-		        # value: self.requested_amount,
-		        value: params[:original_amount],
+		        value: self.total_amount,
 		        currency_id: 1
 		    },
-		    # payment_mode: self.payment_mode,
-		    payment_mode: params[:payment_mode],
+		    payment_mode: self.payment_mode,
+		    # payment_mode: params[:payment_mode],
 		    initiating_account_type: YesBankCompanyAccount.name,
 		    receiving_account_type: BankAccount.name,
 		    payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -211,8 +234,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		    status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
 		    controlling_user_id: user.id,
 		    requested_amount_attributes: {
-		        # value: self.requested_amount,
-		        value: params[:original_amount],
+		        value: self.total_amount,
 		        currency_id: 1
 		    },
 		    beneficiary_type_id: 2,
@@ -221,6 +243,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		    api_initiated: false
 		}
 		bpr_attributes
+		# binding.pry
 	end
 
 	def set_custom_fields_invoice(payment, data, save)
