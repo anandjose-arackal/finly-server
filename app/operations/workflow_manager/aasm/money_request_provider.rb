@@ -55,7 +55,7 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
       transitions :from => [:approved, :auto_approved], to: :pending
     end
 
-    event :xxx do #todo write the action for moving from pending to credited
+    event :mark_as_credited do #todo write the action for moving from pending to credited
       transitions from: :pending, to: :credited
     end
 
