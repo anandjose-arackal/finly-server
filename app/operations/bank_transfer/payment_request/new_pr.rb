@@ -23,12 +23,13 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		# self.total_amount = params[:amount]
 		
 		# self.payment_mode = 'NEFT'
-		
+
 
 		
 		self.payment_mode = params[:payment_mode]
 		# binding.pry
 		# binding.pry
+		puts "params from newper", params.inspect
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
