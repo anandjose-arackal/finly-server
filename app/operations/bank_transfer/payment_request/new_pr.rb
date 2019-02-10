@@ -21,9 +21,14 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		# end
 
 		# self.total_amount = params[:amount]
-		self.payment_mode = params[:payment_mode]
+		
 		# self.payment_mode = 'NEFT'
+		
 
+		
+		self.payment_mode = params[:payment_mode]
+		# binding.pry
+		# binding.pry
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
@@ -58,6 +63,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		# 	{"name"=>"new one", "bank_account_number"=>"50000000000", "ifsc"=>"UTIB8888867", "original_amount"=>"1000", "inclusive_of_taxes"=>"ny", "gst_type_id"=>"2", "tax"=>"5", "discount"=>"0", "tds_slab_id"=>"46", "category_id"=>"927", "cost_center_id"=>"28", "department_id"=>"41", "invoice_number"=>"no-9999", "invoice_date"=>"30-01-2019", "due_date"=>"31-01-2019", "note"=>"I dont know", "custom_fields"=>{}},
 		# 	{"name"=>'nothing', "bank_account_number"=>"50000000000", "ifsc"=>"UTIB8888867", "original_amount"=>"1000", "inclusive_of_taxes"=>"y", "gst_type_id"=>"2", "tax"=>"5", "discount"=>"0", "tds_slab_id"=>"46", "category_id"=>"927", "cost_center_id"=>nil, "department_id"=>"41", "invoice_number"=>"no-9999", "invoice_date"=>"30-01-2019", "due_date"=>"31-01-2019", "note"=>"I dont know", "custom_fields"=>{}}]
 		self.payments_attributes = params[:payments_attributes]
+		# binding.pry
 	end
 
 	def validate
