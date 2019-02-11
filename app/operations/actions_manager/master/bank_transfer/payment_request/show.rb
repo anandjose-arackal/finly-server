@@ -1,7 +1,7 @@
 class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManager::Master::Base
 
   register_handle :payment_ticket_show
-  register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment, :credit_in_credit_options ]
+  register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment, :credit_in_credit_options, :policy_editable ]
 
 
   def initialize(user=nil, params={})
@@ -109,7 +109,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     if user.vendor_payments_creditor?
       if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved?
         return !bank_payment_request.credit_card?
-      elsif bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
+      elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
         return bank_payment_request.payment_order.partially_completed?
       end
     end
@@ -488,6 +488,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
         return !bank_payment_request.credit_card?
       end
     end
+  end
+
+  def policy_editable
+    bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
   end
 
   def reviewer
