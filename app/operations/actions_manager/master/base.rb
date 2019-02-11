@@ -1,9 +1,9 @@
 class ActionsManager::Master::Base
 
   cattr_accessor :data_map
-  attr_accessor :user, :params, :messages
+  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order
 
-  MASTERS = {
+  MASTERS ||= {
     payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
     payment_ticket_show: '::ActionsManager::Master::BankTransfer::PaymentRequest::Show',
     beneficiaries_vendor_index: '::ActionsManager::Master::BankTransfer::AccountOwners::VendorIndex',
@@ -30,7 +30,6 @@ class ActionsManager::Master::Base
     users_show: '::ActionsManager::Master::BankTransfer::Users::Show' 
 
   }.with_indifferent_access
-
 
   def self.set_data_map
     if self.data_map.nil?

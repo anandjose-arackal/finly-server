@@ -1,19 +1,18 @@
 class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManager::Master::Base
 
   register_handle :payment_ticket_show
-  register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment, :credit_in_credit_options ]
+  register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment, :credit_in_credit_options, :policy_editable ]
 
 
-  def input
+  def initialize(user=nil, params={})
+    super
     result = BankTransfer::PaymentRequest::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    return result.bank_payment_request
+    self.bank_payment_request = result.bank_payment_request
   end
-
-  alias_method :bank_payment_request, :input
 
   def mark_as_credited
     ############# Admin logic start ####################
@@ -27,9 +26,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic end ####################    
 
     ############# Reviewer logic start ####################
-    if bank_payment_request.processing?
-      if (bank_payment_request.get_reviewers.include?(user))
-        return true
+    if user.vendor_payments_reviewer?
+      if (!bank_payment_request.processing? && !bank_payment_request.open?)
+        if (bank_payment_request.get_reviewers.include?(user))
+          return true
+        end
       end
     end
     ############# Reviewer logic start ####################
@@ -45,10 +46,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Initiator logic start ####################
     if user.vendor_payments_initiator?
-      (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
-      return user.vendor_payments_admin? ? true : false
-    elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
-      return user.vendor_payments_admin?
+      if (bank_payment_request.open? || bank_payment_request.rejected?) && (bank_payment_request.owner_id == user.id)
+        return user.vendor_payments_admin? ? true : false
+      elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
+        return user.vendor_payments_admin?
+      end
     end
     ############# Initiator logic end ####################
   end
@@ -107,7 +109,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     if user.vendor_payments_creditor?
       if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved?
         return !bank_payment_request.credit_card?
-      elsif bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
+      elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
         return bank_payment_request.payment_order.partially_completed?
       end
     end
@@ -205,19 +207,76 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def edit_order_summary
-    (user.vendor_payments_initiator?) && (bank_payment_request.open? || bank_payment_request.retracted?)
+    ############# Initiator logic start ####################
+    if user.vendor_payments_initiator?
+      if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
+        return true
+      end
+    end
+    ############# Initiator logic end ####################
+
+    ############# Reviewer logic start ###################
+    if user.vendor_payments_reviewer?
+      # When control comes to the user where user is allowed to approve, he can edit the bank payment request too before approval
+      return true if bank_payment_request.action_users(:approve).include?(user)
+    end
+    ############# Reviewer logic end ####################
+
+
+    ############# Admin logic start ####################
+    if user.vendor_payments_admin?
+      return true if bank_payment_request.action_users(:return_control).include?(user)
+    end
+    ############# Admin logic start ####################
   end
 
   def download_payments_file
+    true if bank_payment_request.approved?
   end
 
   def payments_history
+    ############# Reviewer logic start ####################
+    if user.vendor_payments_reviewer?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+      ############# Reviewer logic end ####################
+
+      ############# Initiator logic start ####################
+    elsif (bank_payment_request.owner_id == user.id)
+      if (bank_payment_request.processing? || bank_payment_request.open?)
+        return true
+      end
+    end
+    ############# Initiator logic end ####################
   end
 
   def edit_payment_history
+    ############# Reviewer logic start ####################
+    if user.vendor_payments_reviewer?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+      ############# Reviewer logic end ####################
+
+      ############# Initiator logic start ####################
+    elsif (bank_payment_request.owner_id == user.id)
+      if (bank_payment_request.processing? || bank_payment_request.open?)
+        return true
+      end
+    end
+    ############# Initiator logic end ####################
   end
 
   def delete_payment_history
+    ############# Reviewer logic start ####################
+    if user.vendor_payments_reviewer?
+      return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing?)
+      ############# Reviewer logic end ####################
+
+      ############# Initiator logic start ####################
+    elsif (bank_payment_request.owner_id == user.id)
+      if (bank_payment_request.processing? || bank_payment_request.open?)
+        return true
+      end
+    end
+    ############# Initiator logic end ####################
   end
 
   def attachments_editable
@@ -324,7 +383,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def take_control
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      return true if bank_payment_request.processing?
+      return true if (bank_payment_request.processing? && bank_payment_request.get_reviewers.exclude?(user))
     end
     ############# Admin logic end ####################    
   end
@@ -332,20 +391,21 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def return_control
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
-        trails = bank_payment_request.bank_payment_request_trails.with_action(BankPaymentRequestTrailAction.id_for(:take_control)).with_action_user(user.id)
-        return true if trails.present?
+      if bank_payment_request.processing?
+        return true if bank_payment_request.action_users(:return_control).include?(user)
       end
     end
     ############# Admin logic end ####################
   end
 
   def unapprove
-    # When user role of reviewer
-    # if (user.vendor_payments_reviewer? || user.vendor_payments_creditor?)
-    #   return associated_users.include?(user)
-    # end
-    bank_payment_request.get_reviewers.present? if user.vendor_payments_reviewer?
+    if bank_payment_request.action_users(:unapprove).include?(user)
+      last_trail = bank_payment_request.trails.last rescue nil
+      if (last_trail.action_id == TrailAction.id_for(:approve)) &&
+          (last_trail.action_user_id == user.id)
+        return true
+      end
+    end
   end
 
   def cancel_scheduled_payment
@@ -428,6 +488,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
         return !bank_payment_request.credit_card?
       end
     end
+  end
+
+  def policy_editable
+    bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
   end
 
   def reviewer

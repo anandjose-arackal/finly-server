@@ -4,16 +4,16 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
 
 
-  def input
+  def initializing(user=nil, params={})
     result = ::Procurements::Invoices::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    result.invoice
+    self.invoice = result.invoice
   end
 
-  alias_method :invoice, :input
+  # alias_method :invoice, :input
 
   def more_details_button
     true
