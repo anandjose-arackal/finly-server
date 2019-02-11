@@ -5,6 +5,28 @@ FactoryBot.define do
     "user#{n}@example.com"
   end
 
+  sequence :manager_name do |n|
+    "Manager#{n}"
+  end
+
+  sequence :finance_name do |n|
+    "Finance#{n}"
+  end
+
+  sequence :creditor_name do |n|
+    "Creditor#{n}"
+  end
+
+  sequence :admin_name do |n|
+    "Admin#{n}"
+  end
+
+  sequence :travel_name do |n|
+    "Travel#{n}"
+  end
+
+
+
   sequence :mobile_number do |n|
     if n > 9
       number = "98765432#{n}"
@@ -20,7 +42,7 @@ FactoryBot.define do
 
   factory :user do
     company_id {nil}
-    first_name {"Joe"}
+    first_name {"User"}
     last_name {"Doe"}
     email {generate(:user_email)}
     password {"password"}
@@ -44,6 +66,7 @@ FactoryBot.define do
       end
 
       factory :em_reviewer_user do
+        last_name {generate(:manager_name)}
         role_mapping_attributes {[
             {user_role_id: 4, purpose_id: 1},
             {user_role_id: 3, purpose_id: 1}
@@ -51,6 +74,7 @@ FactoryBot.define do
       end
 
       factory :em_finance_user do
+        last_name {generate(:finance_name)}
         role_mapping_attributes {[
             {user_role_id: 4, purpose_id: 1},
             {user_role_id: 2, purpose_id: 1}
@@ -58,6 +82,7 @@ FactoryBot.define do
       end
 
       factory :em_admin_user do
+        last_name {generate(:admin_name)}
         role_mapping_attributes {[
             {user_role_id: 4, purpose_id: 1},
             {user_role_id: 1, purpose_id: 1}
@@ -65,6 +90,7 @@ FactoryBot.define do
       end
 
       factory :em_travel_user do
+        last_name {generate(:travel_name)}
         role_mapping_attributes {[
             {user_role_id: 4, purpose_id: 1},
             {user_role_id: 6, purpose_id: 1}
