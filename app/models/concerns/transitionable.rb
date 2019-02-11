@@ -71,7 +71,7 @@ module Transitionable
         # NEW CODE
         last_retract_trail = self.trails.reload.with_action_id(TrailAction.id_for(:retract)).last
 
-        user_ids += self.get_reviewers(last_retract_trail.action_level_id)&.map(&:id)
+        user_ids += self.get_reviewers(last_retract_trail&.action_level_id)&.map(&:id)
       when :submit, 'submit'
         user_ids.push self.document_owner_id
         user_ids += self.get_reviewers&.map(&:id)
@@ -129,6 +129,7 @@ module Transitionable
       dlrms = self.document_level_reviewer_mappings.with_provider_name(provider_name).includes(:level, :reviewer, :action_taken_by, :taken_control_by)
       chain = []
 
+
       dlrms.each do |dlrm|
         level_number = dlrm.level_number
 
@@ -141,11 +142,11 @@ module Transitionable
         data[:action_taken] = data[:action_taken] || (dlrm.action_taken_by_id.present?)
         data[:reviewers] = data[:reviewers] || []
         reviewer = {
-            id: dlrm.reviewer.id,
-            name: dlrm.reviewer.name,
+            id: dlrm.reviewer_id,
+            name: dlrm.reviewer&.name,
             active: dlrm.active,
             threshold: dlrm.threshold,
-            action_taken: (dlrm.reviewer.id == dlrm.action_taken_by_id),
+            action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
             action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }
         data[:reviewers].push(reviewer)

@@ -60,7 +60,8 @@ class TravelRequests::Review::RetractBooking < TravelRequests::Review::Base
         controlling_user_id: travel_request.controlling_user_id,
         controlling_user_role_id: travel_request.controlling_user_role_id
     )
-    # add comments and trigger mailer
+    travel_request.comments.create user_id: user.id,
+                                   action_id: TravelRequestCommentAction.id_for(:remove_booking)
   end
 
 end
