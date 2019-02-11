@@ -25,4 +25,18 @@ class Gatekeeper::Rules::SessionsCreate::WebChecks < Gatekeeper::Rules::BaseRule
     end
   end
 
+  rule 'A user cannot have more than 2 active web sessions', on: :after_session_create do
+    authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
+    if authorized_web_sessions.size > 2
+      authorized_web_sessions[0..-3].each do |session|
+        session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
+        session.access_token.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
+      end
+    end
+  end
+
+  rule 'Cannot create 2 sessions with the exact same timestamp', on: :after_session_create do
+    # todo
+  end
+
 end

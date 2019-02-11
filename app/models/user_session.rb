@@ -61,17 +61,13 @@ class UserSession < ApplicationRecord
   accepts_nested_attributes_for :events
   accepts_nested_attributes_for :user_session_web
 
-  scope :with_user_id, ->(user_id) { where user_id: user_id }
-  scope :with_device, ->(device) { where device: device }
-  scope :with_ip, ->(ip) { where ip: ip }
-  scope :started_after, ->(datetime) { where 'started_at >= ?', datetime }
+  scope :with_user_id, ->(user_id) {where user_id: user_id}
+  scope :with_device, ->(device) {where device: device}
+  scope :with_ip, ->(ip) {where ip: ip}
+  scope :started_after, ->(datetime) {where 'started_at >= ?', datetime}
+  scope :web, -> {where platform: 'UserSessionWeb'}
+  scope :authorized, -> {where status_id: UserSessionStatus.id_for(:authorized)}
 
-  delegate :revoked?, :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
-
-  def device_properties
-    if self.user_session_web.present?
-
-    end
-  end
+  delegate :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
 
 end
