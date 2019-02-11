@@ -71,7 +71,7 @@ module Transitionable
         # NEW CODE
         last_retract_trail = self.trails.reload.with_action_id(TrailAction.id_for(:retract)).last
 
-        user_ids += self.get_reviewers(last_retract_trail.action_level_id)&.map(&:id)
+        user_ids += self.get_reviewers(last_retract_trail&.action_level_id)&.map(&:id)
       when :submit, 'submit'
         user_ids.push self.document_owner_id
         user_ids += self.get_reviewers&.map(&:id)
