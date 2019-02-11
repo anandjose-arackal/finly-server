@@ -24,7 +24,7 @@ reports.each do |report|
 
     # now based on the type of track we can decide the attributes to pass to
     # the DLRM creation operation and trails
-    trail_action_id = TrailAction.id_for(track.report_tracking_action.name.to_sym)
+    trail_action_id = TrailAction.id_for(track.report_tracking_action&.name&.to_sym)
     original_track = track
     next_level = levels.find_by(level_number: (level_number + 1))
     modified_level = next_level
@@ -127,7 +127,7 @@ bank_payment_requests.each do |bpr|
 
     # now based on the type of track we can decide the attributes to pass to
     # the DLRM creation operation and trails
-    trail_action_id = TrailAction.id_for(track.action.name.to_sym)
+    trail_action_id = TrailAction.id_for(track.action&.name&.to_sym)
     original_track = track
     next_level = levels.find_by(level_number: (level_number + 1))
     modified_level = next_level
