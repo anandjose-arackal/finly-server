@@ -32,7 +32,7 @@ class Oauth::TokenControllerTest < ActionController::TestCase
   end
 
   test 'Create should throw a 401 unless "X-Finly-RP" is passed in the header' do
-    assert_no_difference 'Doorkeeper::AccessToken.count' do
+    assert_difference 'Doorkeeper::AccessToken.count' do
       assert_difference 'UserSession.count' do
         assert_difference 'UserSessionEvent.count' do
           post :create, params: {
@@ -48,11 +48,14 @@ class Oauth::TokenControllerTest < ActionController::TestCase
     body = JSON.parse(response.body)
     assert_equal body['error'], 'invalid_grant'
     assert_equal body['error_description'], 'The email / mobile or password you entered is incorrect'
+    assert_equal Doorkeeper::AccessToken.last.status_id, UserSessionStatus.id_for(:failed)
+    assert_equal UserSession.last.status_id, UserSessionStatus.id_for(:failed)
+    assert_equal UserSessionEvent.last.status_id, UserSessionStatus.id_for(:failed)
   end
 
   test 'Create should throw a 401 unless the minimum request parameters are met' do
     request.headers.merge!(headers(timestamp: nil))
-    assert_no_difference 'Doorkeeper::AccessToken.count' do
+    assert_difference 'Doorkeeper::AccessToken.count' do
       assert_difference 'UserSession.count' do
         assert_difference 'UserSessionEvent.count' do
           post :create, params: {
@@ -68,6 +71,9 @@ class Oauth::TokenControllerTest < ActionController::TestCase
     body = JSON.parse(response.body)
     assert_equal body['error'], 'invalid_grant'
     assert_equal body['error_description'], 'The email / mobile or password you entered is incorrect'
+    assert_equal Doorkeeper::AccessToken.last.status_id, UserSessionStatus.id_for(:failed)
+    assert_equal UserSession.last.status_id, UserSessionStatus.id_for(:failed)
+    assert_equal UserSessionEvent.last.status_id, UserSessionStatus.id_for(:failed)
   end
 
   test '200 response with access token in response' do

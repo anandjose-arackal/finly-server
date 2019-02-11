@@ -3,7 +3,7 @@ require 'require_all'
 # Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
-  include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
+  include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper, Helpers::UserSessionsHelper
   # include AbstractController::Callbacks
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
@@ -332,6 +332,7 @@ class ApplicationController < ActionController::Base
     end
 
     RequestStoreUtil.set_current_session user_session
+    UserSessions::Events::Create.(user, params)
 
     unless user_session.authorized?
       invalidate_session UserSessionStatus.id_for(:revoked), "User session is #{user_session.status.name}"
@@ -341,10 +342,10 @@ class ApplicationController < ActionController::Base
 
   end
 
-  def invalidate_session(status_id, *reason)
-    message = reason&.to_sentence
-    RequestStoreUtil.current_session&.update(status_id: status_id, message: message)
-    doorkeeper_token&.update(status_id: status_id, message: message)
+  def invalidate_session(status_id, reason)
+    RequestStoreUtil.current_session&.update(status_id: status_id, message: reason)
+    RequestStoreUtil.current_event&.update(status_id: status_id, message: reason)
+    doorkeeper_token&.update(status_id: status_id, message: reason)
     head 401
   end
 
@@ -444,7 +445,7 @@ class ApplicationController < ActionController::Base
   def after_finly_authorize
     result = Gatekeeper::Event.(:after_finly_authorize, params)
     unless result.success?
-      invalidate_session UserSessionStatus.id_for(:revoked), result.messages[:error]&.to_sentence
+      invalidate_session UserSessionStatus.id_for(:revoked), result.message
       return
     end
   end

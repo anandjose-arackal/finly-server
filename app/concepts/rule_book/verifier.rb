@@ -1,7 +1,7 @@
 class RuleBook::Verifier
   include Supporters::ErrorTracker
 
-  attr_accessor :event, :options, :description, :block, :page, :attrs, :executed, :params
+  attr_accessor :rule, :event, :options, :description, :block, :page, :attrs, :executed, :params, :failed
 
   def self.with_properties(*properties)
     Class.new(self) do
@@ -13,6 +13,7 @@ class RuleBook::Verifier
   end
 
   def initialize(rule, params)
+    self.rule = rule
     self.params = params
     rule.to_h.each do |attr, value|
       self.send "#{attr}=", value if respond_to?(attr)
@@ -36,11 +37,19 @@ class RuleBook::Verifier
   end
 
   def success?
-    self.executed? and not has_errors?
+    not failed?
   end
 
   def failed?
-    self.executed? and has_errors?
+    self.executed? and !!self.failed
+  end
+
+  def fail
+    self.failed = true
+  end
+
+  def message
+    self.rule.description
   end
 
 end

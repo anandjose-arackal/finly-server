@@ -52,7 +52,7 @@
 class UserSession < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :company, optional: true
-  belongs_to :access_token, class_name: 'Doorkeeper::AccessToken'
+  belongs_to :access_token, class_name: 'Doorkeeper::AccessToken', optional: true
   belongs_to :status, class_name: 'UserSessionStatus'
 
   has_many :events, class_name: 'UserSessionEvent', dependent: :destroy
@@ -67,5 +67,11 @@ class UserSession < ApplicationRecord
   scope :started_after, ->(datetime) { where 'started_at >= ?', datetime }
 
   delegate :revoked?, :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
+
+  def device_properties
+    if self.user_session_web.present?
+
+    end
+  end
 
 end

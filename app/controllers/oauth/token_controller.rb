@@ -4,6 +4,9 @@ class Oauth::TokenController < Doorkeeper::TokensController
   include SessionsHelper
   include AccessibilityCheckHelper
   include ApplicationHelper
+  include Helpers::UserSessionsHelper
+
+  before_action :load_global_variables
 
   def create
     return unless pre_process
@@ -16,22 +19,19 @@ class Oauth::TokenController < Doorkeeper::TokensController
       @auth_grant = response
       @token = response.token
       @user = current_user(response&.token)
-      RequestStoreUtil.set_current_request request
       params[:user] = @user
       params[:response] = response
       sessions_result = UserSessions::Create.(:authorized, params)
       if sessions_result.success?
-        RequestStoreUtil.set_current_session sessions_result.session
         result = Gatekeeper::Event.(:after_session_create, params)
         if result.success?
           on_create_success(response)
           return
+        else
+          invalidate_session UserSessionStatus.id_for(:failed), result.message
         end
-      else
-        binding.pry
       end
 
-      response.token.destroy
       json_string = {error: 'invalid_grant', error_description: 'The email / mobile or password you entered is incorrect'}
       render json: json_string.to_json, status: 401
 
@@ -131,5 +131,15 @@ class Oauth::TokenController < Doorkeeper::TokensController
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       end
     end
+  end
+
+  def invalidate_session(status_id, reason)
+    RequestStoreUtil.current_session&.update(status_id: status_id, message: reason)
+    RequestStoreUtil.current_session_event&.update(status_id: status_id, message: reason)
+    @token&.update(status_id: status_id, message: reason)
+  end
+
+  def load_global_variables
+    RequestStoreUtil.set_current_request request
   end
 end

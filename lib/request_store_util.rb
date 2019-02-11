@@ -33,6 +33,14 @@ class RequestStoreUtil
     RequestStore.store[:current_session] = session
   end
 
+  def self.set_current_event(session)
+    RequestStore.store[:current_session_event] = session
+  end
+
+  def self.set_current_token(session)
+    RequestStore.store[:current_token] = session
+  end
+
   def self.to_hash
     {
         current_app: RequestStore.store[:current_app],
@@ -42,6 +50,7 @@ class RequestStoreUtil
         current_company_id: RequestStore.store[:current_company]&.id,
         current_session_id: RequestStore.store[:current_session]&.id,
         current_session_event_id: RequestStore.store[:current_session_event]&.id,
+        current_token_id: RequestStore.store[:current_token]&.id,
         authorized_scopes: RequestStore.store[:authorized_scopes],
         params: RequestStore.store[:params]
     }
@@ -57,6 +66,7 @@ class RequestStoreUtil
     RequestStore.store[:current_company] = Company.with_id(request_store_data[:current_company_id])&.first
     RequestStore.store[:current_session] = UserSession.find_by_id(request_store_data[:current_session_id])
     RequestStore.store[:current_session_event] = UserSessionEvent.find_by_id(request_store_data[:current_session_event_id])
+    RequestStore.store[:current_token] = Doorkeeper::AccessToken.find_by_id(request_store_data[:current_token_id])
     case request_store_data[:current_user_type]
       when User.name
         RequestStore.store[:current_user] = User.with_id(request_store_data[:current_user_id])&.first
@@ -98,6 +108,10 @@ class RequestStoreUtil
   end
 
   def self.current_session_event
+    RequestStore.store[:current_session_event]
+  end
+
+  def self.current_token
     RequestStore.store[:current_session_event]
   end
 

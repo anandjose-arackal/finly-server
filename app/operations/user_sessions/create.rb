@@ -66,6 +66,11 @@ class UserSessions::Create < BaseOperation
     self.session.save(validate: false)
   end
 
+  def post_process
+    RequestStoreUtil.set_current_session self.session
+    RequestStoreUtil.set_current_event self.session.events.last
+  end
+
   def success
     UserSessions::Create::Success.new(user, {session: self.session}, messages)
   end
@@ -136,6 +141,7 @@ class UserSessions::Create < BaseOperation
     request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
     PLATFORMS.each do |platform|
       if request_properties[platform.platform_key.to_s].present?
+        args[:platform] = platform.name
         args[platform.create_attributes_key] = reformat_platform_properties platform.platform_map, request_properties[platform.platform_key.to_s]
         break
       end
@@ -157,7 +163,7 @@ class UserSessions::Create < BaseOperation
 
   def reformat_platform_properties(platform_map, headers)
     reformatted_map = {}
-    platform_map.each do |id, attribute|
+    platform_map.each do |attribute, id|
       reformatted_map[attribute] = headers[id]
     end
     # Convert timestamp to datetime

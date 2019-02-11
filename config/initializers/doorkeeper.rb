@@ -34,7 +34,9 @@ Doorkeeper.configure do
         if not result.success?
           # Do not attempt login as the user account is locked
           u = nil
-          UserSessions::Create.(:blocked, message: result.messages[:error], user: u, request_params: params)
+          params[:user] = u
+          params[:message] = result.message
+          UserSessions::Create.(:blocked, params)
         elsif u.valid_password?(params[:password])
           if scopes.include?("admin_bypass")
             BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join("config/data/bypass_authorized_users.yml"))&.dig("authorized_users")
@@ -47,18 +49,24 @@ Doorkeeper.configure do
           else
             result = Gatekeeper::Event.(:user_login_success, user: u)
             unless result.success?
-              UserSessions::Create.(:blocked, message: result.messages[:error], user: u, request_params: params)
+              params[:user] = u
+              params[:message] = result.message
+              UserSessions::Create.(:blocked, params)
               u = nil
             end
           end
         else
           Gatekeeper::Event.(:user_login_invalid_password, user: u)
-          UserSessions::Create.(:failed, message: 'Invalid Password', user: u, request_params: params)
+          params[:user] = u
+          params[:message] = 'Invalid Password'
+          UserSessions::Create.(:failed, params)
           u = nil
         end
       else
         Gatekeeper::Event.(:user_login_invalid_username)
-        UserSessions::Create.(:failed, message: 'Invalid Username', request_params: params)
+        params[:user] = u
+        params[:message] = 'Invalid Password'
+        UserSessions::Create.(:failed, params)
       end
     end
     u

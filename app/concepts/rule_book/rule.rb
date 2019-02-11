@@ -1,5 +1,4 @@
 class RuleBook::Rule < NonPersistentModel
-
   attr_accessor :event, :options, :description, :block, :page
 
   validates :event, presence: true
