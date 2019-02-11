@@ -3,7 +3,7 @@ class AdminUsers::BankTransfersController < ApplicationController
 
   def get_status
     @result = Admin::BankTransfer::GetStatus.(current_user, params)
-    @respond
+    respond
   end
 
   def get_bulk_status

@@ -14,11 +14,11 @@
 #  taken_control                   :boolean          default(FALSE)
 #  taken_control_by_id             :integer
 #  viewable                        :boolean          default(FALSE)
-#  became_viewable_at              :datetime
 #  action_taken_by_id              :integer
 #  action_id                       :integer
 #  provider_name                   :string(255)
 #  threshold                       :decimal(20, 5)
+#  active                          :boolean          default(TRUE)
 #
 
 class DocumentLevelReviewerMapping < ApplicationRecord

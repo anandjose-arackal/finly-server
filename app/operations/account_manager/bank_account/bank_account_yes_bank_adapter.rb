@@ -158,7 +158,11 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   private
 
   def create_bank_transaction(payment, transfer_request)
-    self.company = account.account_owner.company
+    if self.account.account_owner.is_a?(Company)
+      self.company = self.account.account_owner
+    else
+      self.company = account.account_owner.company
+    end
     case payment.payment_status_id
       when PaymentStatus.id_for(:completed)
         transfer_status_id = BankTransferStatus.id_for(:completed)
