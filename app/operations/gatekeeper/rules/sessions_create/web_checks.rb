@@ -9,13 +9,18 @@ class Gatekeeper::Rules::SessionsCreate::WebChecks < Gatekeeper::Rules::BaseRule
     fail
   end
 
-  rule 'Timestamp is required in X-Finly-RP for all web requests', on: :after_session_create do
-    session = RequestStoreUtil.current_session
-    next unless session.platform == 'UserSessionWeb'
-    web = session.user_session_web
-    if web.timestamp.blank?
-      response_code 401
-      fail
+  [:timestamp, :user_agent, :timezone, :fingerprint,
+   :language, :browser, :browser_version,
+   :browser_engine, :browser_engine_version,
+   :os_name, :os_version].each do |property|
+    rule "#{property} is required in X-Finly-RP for all web requests", on: :after_session_create do
+      session = RequestStoreUtil.current_session
+      next unless session.platform == 'UserSessionWeb'
+      web = session.user_session_web
+      if web.send(property).blank?
+        response_code 401
+        fail
+      end
     end
   end
 

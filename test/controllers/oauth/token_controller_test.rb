@@ -9,6 +9,7 @@ class Oauth::TokenControllerTest < ActionController::TestCase
   def setup
     @ip = '49.207.52.165'
     ActionController::TestRequest.any_instance.stubs(:remote_ip => @ip)
+    @email = 'viveka@finly.io'
   end
 
   test 'Create should throw a 401 unless correct username and password is entered' do
@@ -16,8 +17,9 @@ class Oauth::TokenControllerTest < ActionController::TestCase
     assert_no_difference 'Doorkeeper::AccessToken.count' do
       assert_difference 'UserSession.count' do
         assert_difference 'UserSessionEvent.count' do
+          unlock_user @email
           post :create, params: {
-              email: 'viveka@finly.io',
+              email: @email,
               password: 'demo12345',
               client_id: 'ba7eafbefaf117882a2abbc9037054cf',
               client_secret: '1976de370091732175b5661346a68bf7'
@@ -35,8 +37,9 @@ class Oauth::TokenControllerTest < ActionController::TestCase
     assert_difference 'Doorkeeper::AccessToken.count' do
       assert_difference 'UserSession.count' do
         assert_difference 'UserSessionEvent.count' do
+          unlock_user @email
           post :create, params: {
-              email: 'viveka@finly.io',
+              email: @email,
               password: 'demo1234',
               client_id: 'ba7eafbefaf117882a2abbc9037054cf',
               client_secret: '1976de370091732175b5661346a68bf7'
@@ -53,27 +56,35 @@ class Oauth::TokenControllerTest < ActionController::TestCase
     assert_equal UserSessionEvent.last.status_id, UserSessionStatus.id_for(:failed)
   end
 
-  test 'Create should throw a 401 unless the minimum request parameters are met' do
-    request.headers.merge!(headers(timestamp: nil))
-    assert_difference 'Doorkeeper::AccessToken.count' do
-      assert_difference 'UserSession.count' do
-        assert_difference 'UserSessionEvent.count' do
-          post :create, params: {
-              email: 'viveka@finly.io',
-              password: 'demo1234',
-              client_id: 'ba7eafbefaf117882a2abbc9037054cf',
-              client_secret: '1976de370091732175b5661346a68bf7'
-          }
+  [:timestamp, :user_agent, :timezone, :fingerprint,
+   :language, :browser, :browser_version,
+   :browser_engine, :browser_engine_version,
+   :os_name, :os_version].each do |property|
+    test "Create should throw a 401 unless the request parameters #{property} is present" do
+      p = {}
+      p[property] = nil
+      request.headers.merge!(headers(p))
+      assert_difference 'Doorkeeper::AccessToken.count' do
+        assert_difference 'UserSession.count' do
+          assert_difference 'UserSessionEvent.count' do
+            unlock_user @email
+            post :create, params: {
+                email: @email,
+                password: 'demo1234',
+                client_id: 'ba7eafbefaf117882a2abbc9037054cf',
+                client_secret: '1976de370091732175b5661346a68bf7'
+            }
+          end
         end
       end
+      assert_response 401
+      body = JSON.parse(response.body)
+      assert_equal body['error'], 'invalid_grant'
+      assert_equal body['error_description'], 'The email / mobile or password you entered is incorrect'
+      assert_equal Doorkeeper::AccessToken.last.status_id, UserSessionStatus.id_for(:failed)
+      assert_equal UserSession.last.status_id, UserSessionStatus.id_for(:failed)
+      assert_equal UserSessionEvent.last.status_id, UserSessionStatus.id_for(:failed)
     end
-    assert_response 401
-    body = JSON.parse(response.body)
-    assert_equal body['error'], 'invalid_grant'
-    assert_equal body['error_description'], 'The email / mobile or password you entered is incorrect'
-    assert_equal Doorkeeper::AccessToken.last.status_id, UserSessionStatus.id_for(:failed)
-    assert_equal UserSession.last.status_id, UserSessionStatus.id_for(:failed)
-    assert_equal UserSessionEvent.last.status_id, UserSessionStatus.id_for(:failed)
   end
 
   test '200 response with access token in response' do
@@ -81,8 +92,9 @@ class Oauth::TokenControllerTest < ActionController::TestCase
     assert_difference 'Doorkeeper::AccessToken.count' do
       assert_difference 'UserSession.count' do
         assert_difference 'UserSessionEvent.count' do
+          unlock_user @email
           post :create, params: {
-              email: 'viveka@finly.io',
+              email: @email,
               password: 'demo1234',
               client_id: 'ba7eafbefaf117882a2abbc9037054cf',
               client_secret: '1976de370091732175b5661346a68bf7'
@@ -142,6 +154,10 @@ class Oauth::TokenControllerTest < ActionController::TestCase
     args[id]["22"] = params.has_key?(:is_cookie) ? params[:is_cookie] : true
     args[id]["28"] = params.has_key?(:plugins) ? params[:plugins] : "Chrome PDF Plugin, Chrome PDF Viewer, Native Client"
     args
+  end
+
+  def unlock_user(email)
+    User.find_by_email(email).update(locked_at: nil)
   end
 
 end
