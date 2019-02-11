@@ -58,7 +58,7 @@ class BankTransfer::PaymentRequest::Review::TakeControl < BankTransfer::PaymentR
     role_id = self.workflow_output[:role_id]
     Event::EBankPaymentRequest::TakeControl.(user, bank_payment_request: bank_payment_request, role_id: role_id)
 
-    add_message :success, "Report taken control of successfully!"
+    add_message :success, "Report taken control successfully!"
   end
 
 

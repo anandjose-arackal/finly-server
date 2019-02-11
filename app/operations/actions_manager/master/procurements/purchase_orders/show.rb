@@ -2,7 +2,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Show < ActionsManage
 
   register_handle :non_po_show
   register_actions [:add_document]
-  alias_method :purchase_order, :input
+  # alias_method :purchase_order, :input
   
   def add_document
     true
