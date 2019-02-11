@@ -32,6 +32,30 @@ json.results do
       json.po_number po.po_number
       json.po_status po.status&.name
       json.po_amount po.balance_amount
+
+      if po.items.present?
+        json.items do
+          json.array! po.items do |item|
+            json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
+                          :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
+            json.tax_amount do
+              json.value item.tax_amount&.value
+              json.id item.tax_amount&.id
+              json.currency_id item.tax_amount&.currency&.id
+            end
+            json.discount_amount do
+              json.value item.discount_amount&.value
+              json.id item.discount_amount&.id
+              json.currency_id item.discount_amount&.currency&.id
+            end
+            json.total_amount do
+              json.value item.total_amount&.value
+              json.id item.total_amount&.id
+              json.currency_id item.total_amount&.currency&.id
+            end
+          end
+        end
+      end
     end
 
     invoice = p.invoices.last
