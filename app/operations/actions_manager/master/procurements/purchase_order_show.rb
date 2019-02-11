@@ -4,16 +4,17 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   validate :input
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
 
-  def input
+  def initialize(user=nil, params={})
+    super
     result = ::Procurements::PurchaseOrders::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    result.purchase_order
+    self.purchase_order = result.purchase_order
   end
 
-  alias_method :purchase_order, :input
+  # alias_method :purchase_order, :input
 
   def more_details_button
     true

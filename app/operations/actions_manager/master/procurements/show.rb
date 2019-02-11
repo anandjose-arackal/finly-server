@@ -4,16 +4,17 @@ class ActionsManager::Master::Procurements::Show < ActionsManager::Master::Base
   validate :input
   register_actions [:add_document]
 
-  def input
+  def initialize(user=nil, params={})
+    super
     result = ::Procurements::PurchaseOrders::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    result.purchase_order
+    self.purchase_order = result.purchase_order
   end
 
-  alias_method :purchase_order, :input
+  # alias_method :purchase_order, :input
 
   def add_document
     (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)

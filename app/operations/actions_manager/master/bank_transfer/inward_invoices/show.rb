@@ -3,16 +3,15 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::Show < ActionsManage
   register_handle :inward_invoices_show
   register_actions [:view_payments, :update_invoice, :make_payment, :delete_invoice]
 
-  def input
+  def initialize(user=nil, params={})
+    super
     result = BankTransfer::InwardInvoices::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    result.inward_invoice
+    self.invoice = result.inward_invoice
   end
-
-  alias_method :invoice, :input
 
   def view_payments
     true

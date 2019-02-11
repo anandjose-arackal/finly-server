@@ -13,7 +13,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
     result.invoice
   end
 
-  alias_method :invoice, :input
+  # alias_method :invoice, :input
 
   def more_details_button
     true

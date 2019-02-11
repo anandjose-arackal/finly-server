@@ -4,16 +4,15 @@ class ActionsManager::Master::BankTransfer::AccountOwners::VendorShow < ActionsM
   validate :input
   register_actions [:delete_vendor, :add_bank_account, :edit_bank_account, :delete_bank_account, :edit_vendor_details, :edit_attachment, :create_beneficiaries]
 
-  def input
+  def initialize(user=nil, params={})
+    super
     result = BankTransfer::AccountOwners::Show.(user, params)
     if result.success?
       add_message :error, result.messages[:error]
       return
     end
-    result.account_owner
+    self.account_owner = result.account_owner
   end
-
-  alias_method :account_owner, :input
 
   def delete_vendor
     true
