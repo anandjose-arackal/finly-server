@@ -104,7 +104,7 @@ end
 
 ############################# PAYMENT TICKET START ##########################
 bank_payment_requests = BankPaymentRequest.all
-bank_payment_requests = BankPaymentRequest.where(id: [124557])
+# bank_payment_requests = BankPaymentRequest.where(id: [124557])
 bank_payment_requests.each do |bpr|
   level_number = 1
   policy = bpr.policy
