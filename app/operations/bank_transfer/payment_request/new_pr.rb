@@ -13,6 +13,21 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
 					:contents, :headers, :issues, :validate_operation
 
+	def pre_validate
+	    if user.blank?
+	      add_message :error, 'User not found'
+	      return
+	    end
+	    if params.blank?
+	      add_message :error, 'No params sent at all.'
+	      return
+	    end
+	    if params[:payments_attributes].blank?
+	      add_message :error, 'Vendor params not sent for processing.'
+	      return
+	    end
+	  end
+
 	def init
 		# self.vendor_id = params[:vendor_id]
 
@@ -29,7 +44,8 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		self.payment_mode = params[:payment_mode]
 		# binding.pry
 		# binding.pry
-		puts "params from newper", params.inspect
+		Rails.logger.info "checking params inside operation"
+		Rails.logger.fatal "params from newper, #{params.inspect}"
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
