@@ -20,14 +20,20 @@
 #  is_deleted            :boolean          default(FALSE), not null
 #
 
-class BranchLocation < ActiveRecord::Base
+class BranchLocation < ApplicationRecord
   include SoftDeletable
-  belongs_to :company
-  belongs_to :state
+  belongs_to :company, optional: true
+  belongs_to :state, optional: true
   has_many :company_location_departments
   has_many :company_departments, through: :company_location_departments
 
   has_many :budget_trails, as: :location
+
+  has_many :user_branch_location_mappings
+  has_many :users, through: :user_branch_location_mappings
+
+  has_many :budget_rule_branch_location_mappings
+  has_many :budget_rules, through: :budget_rule_branch_location_mappings
 
   def address
     address = ""

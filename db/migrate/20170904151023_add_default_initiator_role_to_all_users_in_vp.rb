@@ -1,4 +1,4 @@
-class AddDefaultInitiatorRoleToAllUsersInVp < ActiveRecord::Migration
+class AddDefaultInitiatorRoleToAllUsersInVp < ActiveRecord::Migration[4.2]
   def change
     User.all.each do |user|
       unless user.vendor_payment_initiator?

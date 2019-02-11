@@ -1,4 +1,4 @@
-class CreateCardFundTransactions < ActiveRecord::Migration
+class CreateCardFundTransactions < ActiveRecord::Migration[4.2]
   def change
     create_table :card_fund_transactions do |t|
       t.string :transaction_id, null: false

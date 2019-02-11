@@ -16,7 +16,7 @@ class Expense::Manual::Base < Expense::Base
         :expense_type_id, :expense_status_id, :note, :receipt, :custom_conversion_rate,
         :receipt_id, :report_id, :category_id, :date,
         :expense_tax_type_id, :gst_type_id, :gst_percentage, :tds_slab_id,
-        :usage_date_start, :usage_date_end, :usage_date_type,
+        :usage_date_start, :usage_date_end, :usage_date_type, :created_by_id, :modified_by_id,
         amount_attributes: [:value, :currency_id],
         manual_expense_attributes: [:merchant],
         receipts_attributes: [:image, :user_id, :id],

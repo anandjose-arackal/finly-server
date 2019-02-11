@@ -8,13 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-
-
-
-
-
-
-class ExportField < ActiveRecord::Base
+class ExportField < ApplicationRecord
 
   scope :with_id, ->(id) { where id: id }
 
@@ -39,7 +33,9 @@ class ExportField < ActiveRecord::Base
       20 => "Distance In Km",
       21 => "Maps Distance in Km",
       22 => "Distance Expense Locations",
-      23 => "Expense Type"
+      23 => "Expense Type",
+      24 => "Expense Reimbursement",
+      25 => "Spent from Account"
   }
 
   def self.id_for(name_in_sym)

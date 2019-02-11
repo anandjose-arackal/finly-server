@@ -14,11 +14,11 @@
 #  updated_at :datetime         not null
 #
 
-class TranscribedExpense < ActiveRecord::Base
-  belongs_to :amount
-  belongs_to :receipt
-  belongs_to :expense
-  belongs_to :user
+class TranscribedExpense < ApplicationRecord
+  belongs_to :amount, optional: true
+  belongs_to :receipt, optional: true
+  belongs_to :expense, optional: true
+  belongs_to :user, optional: true
 
   validates :amount, presence: true
   validates :receipt, presence: true

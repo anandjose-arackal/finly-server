@@ -1,4 +1,4 @@
-class ChangeEmailBodyToAttachment < ActiveRecord::Migration
+class ChangeEmailBodyToAttachment < ActiveRecord::Migration[4.2]
   def change
     remove_column :receipt_emails, :body
     remove_column :receipt_emails, :raw_text

@@ -43,8 +43,8 @@
 #  source_updated_at            :datetime
 #
 
-class ReceiptEmailParseFailure < ActiveRecord::Base
-  belongs_to :user
+class ReceiptEmailParseFailure < ApplicationRecord
+  belongs_to :user, optional: true
 
   has_attached_file :body
   do_not_validate_attachment_file_type :body

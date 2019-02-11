@@ -1,4 +1,4 @@
-class CreateIndividualKycTrackActions < ActiveRecord::Migration
+class CreateIndividualKycTrackActions < ActiveRecord::Migration[4.2]
   def change
     create_table :individual_kyc_track_actions do |t|
       t.string :name, null: false, index: true

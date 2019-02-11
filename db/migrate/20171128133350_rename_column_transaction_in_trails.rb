@@ -1,4 +1,4 @@
-class RenameColumnTransactionInTrails < ActiveRecord::Migration
+class RenameColumnTransactionInTrails < ActiveRecord::Migration[4.2]
   def change
   end
 end

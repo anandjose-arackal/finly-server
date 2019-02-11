@@ -1,4 +1,4 @@
-class CreateAccountingSystemConfigurations < ActiveRecord::Migration
+class CreateAccountingSystemConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :accounting_system_configurations do |t|
       t.references :company, index: true, foreign_key: true, null: false

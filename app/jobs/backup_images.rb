@@ -1,4 +1,4 @@
-class BackupImages < ActiveJob::Base
+class BackupImages < ApplicationJob
 
   def perform
     #system 'nohup sudo s3cmd sync /images s3://finly-production-backup/images/ > log/production_images_backup.log &'

@@ -19,9 +19,9 @@
 #  landmark     :text(65535)
 #
 
-class Address < ActiveRecord::Base
-  belongs_to :state, class_name: "GstStateCode"
-  belongs_to :parent, polymorphic: true
+class Address < ApplicationRecord
+  belongs_to :state, optional: true, class_name: "GstStateCode"
+  belongs_to :parent, optional: true, polymorphic: true
 
   # validates :pin_code, presence: true
   # validates :name, presence: true

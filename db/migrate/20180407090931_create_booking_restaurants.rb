@@ -1,4 +1,4 @@
-class CreateBookingRestaurants < ActiveRecord::Migration
+class CreateBookingRestaurants < ActiveRecord::Migration[4.2]
   def change
     create_table :booking_restaurants do |t|
       t.string :reservation_destination

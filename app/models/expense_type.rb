@@ -8,11 +8,10 @@
 #  updated_at :datetime         not null
 #
 
+class ExpenseType < ApplicationRecord
 
-
-
-
-class ExpenseType < ActiveRecord::Base
+  has_many :budget_rule_expense_type_mappings
+  has_many :budget_rules, through: :budget_rule_expense_type_mappings
 
   validates :name, presence: true
 

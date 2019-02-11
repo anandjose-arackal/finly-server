@@ -94,7 +94,9 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     self.payment_params.each do |params|
       custom_fields = params[:custom_fields]
       params.delete(:custom_fields)
-      payment = self.bank_payment_request.payment_order.payments.build(params)
+      params[:payment_order_id] = self.bank_payment_request.payment_order.id
+      payment = ::Payment.new(params)
+      # payment = self.bank_payment_request.payment_order.payments.build(params)
       if payment.save
         # perform the required calculations
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)

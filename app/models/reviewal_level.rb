@@ -12,10 +12,10 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #
 
-class ReviewalLevel < ActiveRecord::Base
+class ReviewalLevel < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :policy
+  belongs_to :policy, optional: true
   has_many :level_reviewer_mappings, foreign_key: :level_id, dependent: :destroy
   has_many :reviewers, class_name: 'User', through: :level_reviewer_mappings
 
@@ -29,7 +29,7 @@ class ReviewalLevel < ActiveRecord::Base
   scope :with_entity_type, -> (type) { where associated_entity_type: type }
   scope :with_level_number, -> (number) { where level_number: number }
   scope :with_policy_ids, -> (ids) {where policy_id: ids}
-  scope :non_deleted, -> { where is_deleted: [false, nil] }
+  # scope :non_deleted, -> { where is_deleted: [false, nil] }
 
   # alias_method :filter_associated_entity_type, :with_entity_type
   # alias_method :filter_policy, :with_policy_ids

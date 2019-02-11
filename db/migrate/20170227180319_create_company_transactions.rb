@@ -1,4 +1,4 @@
-class CreateCompanyTransactions < ActiveRecord::Migration
+class CreateCompanyTransactions < ActiveRecord::Migration[4.2]
   def change
     create_table :company_transactions do |t|
       t.integer :company_id, :references => 'company', index: true, foreign_key: true, null: false

@@ -47,11 +47,11 @@ class Expense::Index < Expense::Base
       # If viewed from expense index screen
       team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
       report_ids = Report::Index.(user, params).reports.pluck(:id)
-      self.expenses = Expense.with_user_or_report(team_user_ids, report_ids).uniq if team_user_ids.present? or report_ids.present?
+      self.expenses = Expense.with_user_or_report(team_user_ids, report_ids) if team_user_ids.present? or report_ids.present?
     else
       team_user_ids = User::Index.(user, params).team.map(&:id) rescue nil
       report_ids = Report::Index.(user, params).reports.pluck(:id)
-      self.expenses = Expense.with_user_or_report(team_user_ids, report_ids).uniq if team_user_ids.present? or report_ids.present?
+      self.expenses = Expense.with_user_or_report(team_user_ids, report_ids) if team_user_ids.present? or report_ids.present?
     end
     self.expenses = Expense.none if self.expenses.nil?
   end

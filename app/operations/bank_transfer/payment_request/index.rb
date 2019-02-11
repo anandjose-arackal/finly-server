@@ -33,6 +33,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       end
     when UserRole.id_for(:manager)
       team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:manager))&.pluck(:id)
+      # self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
       controlling_payment_requests_query = user.controlling_payment_requests.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
       interacted_payment_requests_query = user.manager_payment_requests
       sql = BankPaymentRequest.connection.unprepared_statement {
@@ -41,6 +42,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       self.payment_requests = BankPaymentRequest.from([Arel.sql(sql)])
     when UserRole.id_for(:finance_manager)
       team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:finance_manager))&.pluck(:id)
+      # self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
       controlling_payment_requests_query = user.controlling_payment_requests.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)
       interacted_payment_requests_query = user.finance_payment_requests
       sql = BankPaymentRequest.connection.unprepared_statement {
@@ -77,9 +79,9 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       per_page = params[:per_page] || 30
       if self.payment_requests.present?
         if personal_view?
-          self.payment_requests = self.payment_requests.order_by(:created_at).order_by(:controlling_user, user.id)
+          self.payment_requests = self.payment_requests.order_by(:created_at)#.order_by(:controlling_user, user.id)
         else
-          self.payment_requests = self.payment_requests.order_by(:submitted_at).order_by(:manager_controlling_user, user.id)
+          self.payment_requests = self.payment_requests.order_by(:submitted_at)#.order_by(:manager_controlling_user, user.id)
         end
       end
       self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page)

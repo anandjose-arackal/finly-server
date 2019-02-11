@@ -1,4 +1,4 @@
-class CreatePaymentOrders < ActiveRecord::Migration
+class CreatePaymentOrders < ActiveRecord::Migration[4.2]
   def change
     create_table :payment_orders do |t|
       # t.references :payment_order_type, index: true, foreign_key: true, null: false

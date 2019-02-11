@@ -1,4 +1,4 @@
-class CreateGroupItemConfigurationMappings < ActiveRecord::Migration
+class CreateGroupItemConfigurationMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :group_item_configuration_mappings do |t|
       t.integer :configuration_id, references: 'UserGroupConfiguration', null: false, index: true, foreign_key: true

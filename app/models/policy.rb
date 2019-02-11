@@ -16,20 +16,12 @@
 #  settlement_currency_id :integer          default(1), not null
 #
 
-
-
-
-
-
-
-
-
-class Policy < ActiveRecord::Base
+class Policy < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :company
-  belongs_to :base_currency, class_name: 'Currency'
-  belongs_to :settlement_currency, class_name: 'Currency'
+  belongs_to :company, optional: true
+  belongs_to :base_currency, optional: true, class_name: 'Currency'
+  belongs_to :settlement_currency, optional: true, class_name: 'Currency'
   has_one :configuration, class_name: 'PolicyConfiguration', dependent: :destroy
   has_many :user_mapping, class_name: 'PolicyUserMapping', dependent: :destroy
   has_many :users, through: :user_mapping
@@ -58,7 +50,7 @@ class Policy < ActiveRecord::Base
   scope :without_id, ->(id) {where.not id: id}
   scope :not_deleted, -> {where is_deleted: false}
   scope :find_from_id, -> (id) {find_by(id: id)}
-  scope :with_application, -> (application) {where application: application}
+  scope :with_application, -> (application) {where( application: application).or(default)}
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
   scope :include_user_mapping, -> { includes :user_mapping }
 
@@ -72,8 +64,6 @@ class Policy < ActiveRecord::Base
 
   validates :company_id, presence: true
   validate :one_default_per_company
-
-  has_paper_trail
 
   # Set base currency ID as INR unless set explicitly
   before_save {self.base_currency_id = Currency.id_for(:INR) if self.base_currency_id.blank?}

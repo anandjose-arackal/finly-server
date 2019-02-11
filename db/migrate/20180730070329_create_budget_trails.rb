@@ -1,4 +1,4 @@
-class CreateBudgetTrails < ActiveRecord::Migration
+class CreateBudgetTrails < ActiveRecord::Migration[4.2]
   def change
     create_table :budget_trails do |t|
       t.references :entity, polymorphic: true

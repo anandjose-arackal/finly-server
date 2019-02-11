@@ -1,4 +1,4 @@
-class UpdateExpenseAmountsWithAllCurrencies < ActiveRecord::Migration
+class UpdateExpenseAmountsWithAllCurrencies < ActiveRecord::Migration[4.2]
   def change
     # adding all 169 currencies to the conversion table
     %w(AED AFN ALL AMD ANG AOA ARS AWG AZN BAM BBD BDT BHD BIF BMD BND BOB BSD BTC BTN BWP BYN BYR BZD CDF CLF CLP COP CRC CUC CUP CVE DJF DOP DZD EEK EGP ERN

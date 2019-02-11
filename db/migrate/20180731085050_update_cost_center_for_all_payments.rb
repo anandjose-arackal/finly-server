@@ -1,4 +1,4 @@
-class UpdateCostCenterForAllPayments < ActiveRecord::Migration
+class UpdateCostCenterForAllPayments < ActiveRecord::Migration[4.2]
   def change
     Payment.all.each do |payment|
       invoice = payment.invoice

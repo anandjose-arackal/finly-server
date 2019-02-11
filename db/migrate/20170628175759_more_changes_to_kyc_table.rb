@@ -1,4 +1,4 @@
-class MoreChangesToKycTable < ActiveRecord::Migration
+class MoreChangesToKycTable < ActiveRecord::Migration[4.2]
   def change
     remove_column :company_kycs, :customer_type_name, :string
 

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class ExportConfigType < ActiveRecord::Base
+class ExportConfigType < ApplicationRecord
   include Seedable
 
   def self.values

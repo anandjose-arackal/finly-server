@@ -1,4 +1,4 @@
-class AddPaymentPurposeToPaymentOrder < ActiveRecord::Migration
+class AddPaymentPurposeToPaymentOrder < ActiveRecord::Migration[4.2]
   def change
     add_column :payment_orders, :payment_purpose_id, :integer, references: 'PaymentPurpose', index: true, foreign_key: true
     if PaymentOrder.column_names.include?('payment_order_type_id')

@@ -36,7 +36,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     unless payment_ids.is_a?(Array)
       payment_ids = payment_ids&.split(",")
     end
-    self.crediting_payments = self.bank_payment_request.payments.with_id(payment_ids)
+    self.crediting_payments = self.bank_payment_request.payments.creditable.with_id(payment_ids) # this ensures only failed or pending approval payments can be processed
     self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
   end
 
@@ -48,7 +48,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
     # check whether the respective account has enough balance for this transaction
     requested_amount = self.crediting_payments.joins_amount.sum(:value)
-    if requested_amount > initiating_account_adapter.balance
+    if requested_amount > initiating_account_adapter.balance(payment_process: true)
       add_message :error, "You do not have enough money in your account for this transaction"
       return
     end
@@ -70,8 +70,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
       self.crediting_payments.update_all(scheduled_at: next_date)
     end
-
-    # if the payment order is being credited, we have to mark it as approved as well first
 
   end
 

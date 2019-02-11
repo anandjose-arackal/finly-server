@@ -1,4 +1,4 @@
-class CreateDocumentNumberConfigTypes < ActiveRecord::Migration
+class CreateDocumentNumberConfigTypes < ActiveRecord::Migration[4.2]
   def change
     create_table :document_number_config_types do |t|
       t.string :name

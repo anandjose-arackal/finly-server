@@ -14,6 +14,6 @@
 #  view             :string(255)
 #
 
-class TrackerEvent < ActiveRecord::Base
-  belongs_to :tracker_visit
+class TrackerEvent < ApplicationRecord
+  belongs_to :tracker_visit, optional: true
 end

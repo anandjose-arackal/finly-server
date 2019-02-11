@@ -11,10 +11,10 @@
 #  is_deleted  :boolean          default(FALSE), not null
 #
 
-class ProcurementTerm < ActiveRecord::Base
+class ProcurementTerm < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
   validates :name, presence: true
   validates :description, presence: true

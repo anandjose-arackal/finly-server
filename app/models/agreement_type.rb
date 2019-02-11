@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class AgreementType < ActiveRecord::Base
+class AgreementType < ApplicationRecord
   include Seedable
 
   validates :name, presence: true

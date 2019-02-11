@@ -1,9 +1,0 @@
-<div class="row no-margin no-padding">
-  <div class="col-sm-12 no-padding">
-    <ul class="nav navbar-nav">
-      <li><button class="btn-primary btn-sm btn btn-employee-statement" data-user-id="{{item.id}}">{{item.name}}'s Statements</button></li>
-      <li><p class="navbar-text"><label>Email:&nbsp;</label>{{#if item.email}}{{item.email}}{{else}}--{{/if}}<label style="margin-left: 15px;">Mobile:&nbsp;</label>{{#if item.mobile}}{{item.mobile}}{{else}}--{{/if}}</p></p></li>
-    </ul>
-  </div>
-</div>
-

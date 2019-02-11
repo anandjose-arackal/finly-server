@@ -1,4 +1,4 @@
-class MakeExpenseRelatedModelsSoftDeletable < ActiveRecord::Migration
+class MakeExpenseRelatedModelsSoftDeletable < ActiveRecord::Migration[4.2]
   def change
     add_column :card_expenses, :is_deleted, :boolean, default: false
     add_column :manual_expenses, :is_deleted, :boolean, default: false

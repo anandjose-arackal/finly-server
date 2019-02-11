@@ -1,4 +1,4 @@
-class CreateAdminReviewWorkflowLevels < ActiveRecord::Migration
+class CreateAdminReviewWorkflowLevels < ActiveRecord::Migration[4.2]
   def change
     create_table :admin_review_workflow_levels do |t|
       t.references :admin_review_workflow, index: true, foreign_key: true, null: false

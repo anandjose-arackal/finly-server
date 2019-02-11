@@ -10,8 +10,8 @@
 #  updated_at  :datetime         not null
 #
 
-class PaymentFileConfiguration < ActiveRecord::Base
-  belongs_to :company
+class PaymentFileConfiguration < ApplicationRecord
+  belongs_to :company, optional: true
 
   validates :company_id, presence: true
   validates :file_format, inclusion: {in: PaymentFiles::Config.available_keys}

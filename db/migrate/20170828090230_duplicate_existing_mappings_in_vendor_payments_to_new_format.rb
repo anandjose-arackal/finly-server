@@ -1,4 +1,4 @@
-class DuplicateExistingMappingsInVendorPaymentsToNewFormat < ActiveRecord::Migration
+class DuplicateExistingMappingsInVendorPaymentsToNewFormat < ActiveRecord::Migration[4.2]
   def change
     # creating one default team mapping for all users ion vendor payment system
     User.all.each do |user|

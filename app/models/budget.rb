@@ -22,18 +22,18 @@
 #  ancestry         :string(255)
 #
 
-class Budget < ActiveRecord::Base
+class Budget < ApplicationRecord
   include SoftDeletable
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
 
 
-  belongs_to :user
-  belongs_to :company
-  belongs_to :period
-  belongs_to :budget_amount, class_name: "Amount"
-  belongs_to :spent_amount, class_name: "Amount"
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
+  belongs_to :period, optional: true
+  belongs_to :budget_amount, optional: true, class_name: "Amount"
+  belongs_to :spent_amount, optional: true, class_name: "Amount"
 
   has_many :budget_criteria_mappings
   has_many :budgetables, through: :budget_criteria_mappings
@@ -71,48 +71,72 @@ class Budget < ActiveRecord::Base
 
   scope :with_budgetable_vendors, -> (vendor_ids) {
     if vendor_ids.present?
+      # extracting all budgets that don't have a vendor criteria
+      ids = joins(:budget_criteria_mappings).where.not('budget_criteria_mappings.budgetable_type = ?', "YesBankVendor").pluck(:budget_id) - joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "YesBankVendor").pluck(:budget_id)
+
+      # now extracting all budgets with a vendor criteria and filtered to just the relevant ones
       vendor_ids = [vendor_ids] unless vendor_ids.is_a?(Array)
-      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "YesBankVendor").where('budget_criteria_mappings.budgetable_id IN (?)', vendor_ids).pluck(:budget_id)
+      ids += joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "YesBankVendor").where('budget_criteria_mappings.budgetable_id IN (?)', vendor_ids).pluck(:budget_id)
       where(id: ids)
     end
   }
 
   scope :with_budgetable_cost_centers, -> (cost_center_ids) {
     if cost_center_ids.present?
+      # extracting all budgets that don't have a cost center criteria
+      ids = joins(:budget_criteria_mappings).where.not('budget_criteria_mappings.budgetable_type = ?', "CostCenter").pluck(:budget_id) - joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "CostCenter").pluck(:budget_id)
+
+      # now extracting all budgets with a cost center criteria and filtered to just the relevant ones
       cost_center_ids = [cost_center_ids] unless cost_center_ids.is_a?(Array)
-      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "CostCenter").where('budget_criteria_mappings.budgetable_id IN (?)', cost_center_ids).pluck(:budget_id)
+      ids += joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "CostCenter").where('budget_criteria_mappings.budgetable_id IN (?)', cost_center_ids).pluck(:budget_id)
       where(id: ids)
     end
   }
 
   scope :with_budgetable_categories, -> (category_ids) {
     if category_ids.present?
+      # extracting all budgets that don't have a Category criteria
+      ids = joins(:budget_criteria_mappings).where.not('budget_criteria_mappings.budgetable_type = ?', "Category").pluck(:budget_id) - joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Category").pluck(:budget_id)
+
+      # now extracting all budgets with a Category criteria and filtered to just the relevant ones
       category_ids = [category_ids] unless category_ids.is_a?(Array)
-      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Category").where('budget_criteria_mappings.budgetable_id IN (?)', category_ids).pluck(:budget_id)
+      ids += joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Category").where('budget_criteria_mappings.budgetable_id IN (?)', category_ids).pluck(:budget_id)
       where(id: ids)
     end
   }
 
   scope :with_budgetable_locations, -> (location_ids) {
     if location_ids.present?
+      # extracting all budgets that don't have a Location criteria
+      ids = joins(:budget_criteria_mappings).where.not('budget_criteria_mappings.budgetable_type = ?', "BranchLocation").pluck(:budget_id) - joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "BranchLocation").pluck(:budget_id)
+
+      # now extracting all budgets with a Location criteria and filtered to just the relevant ones
       location_ids = [location_ids] unless location_ids.is_a?(Array)
-      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "BranchLocation").where('budget_criteria_mappings.budgetable_id IN (?)', location_ids).pluck(:budget_id)
+      ids += joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "BranchLocation").where('budget_criteria_mappings.budgetable_id IN (?)', location_ids).pluck(:budget_id)
       where(id: ids)
     end
   }
 
   scope :with_budgetable_users, -> (user_ids) {
     if user_ids.present?
+      # extracting all budgets that don't have a User criteria
+      ids = joins(:budget_criteria_mappings).where.not('budget_criteria_mappings.budgetable_type = ?', "User").pluck(:budget_id) - joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "User").pluck(:budget_id)
+
+      # now extracting all budgets with a User criteria and filtered to just the relevant ones
       user_ids = [user_ids] unless user_ids.is_a?(Array)
-      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "User").where('budget_criteria_mappings.budgetable_id IN (?)', user_ids).pluck(:budget_id)
+      ids += joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "User").where('budget_criteria_mappings.budgetable_id IN (?)', user_ids).pluck(:budget_id)
       where(id: ids)
     end
   }
 
   scope :with_budgetable_departments, -> (department_ids) {
     if department_ids.present?
+      # extracting all budgets that don't have a Department criteria
+      ids = joins(:budget_criteria_mappings).where.not('budget_criteria_mappings.budgetable_type = ?', "Department").pluck(:budget_id) - joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Department").pluck(:budget_id)
+
+      # now extracting all budgets with a Department criteria and filtered to just the relevant ones
       department_ids = [department_ids] unless department_ids.is_a?(Array)
-      ids = joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Department").where('budget_criteria_mappings.budgetable_id IN (?)', department_ids).pluck(:budget_id)
+      ids += joins(:budget_criteria_mappings).where('budget_criteria_mappings.budgetable_type = ?', "Department").where('budget_criteria_mappings.budgetable_id IN (?)', department_ids).pluck(:budget_id)
       where(id: ids)
     end
   }

@@ -27,9 +27,11 @@
 #  approved_at                  :datetime
 #  selection_requested_at       :datetime
 #  booking_confirmed_at         :datetime
+#  created_by_id                :integer
+#  modified_by_id               :integer
 #
 
-class TravelRequest < ActiveRecord::Base
+class TravelRequest < ApplicationRecord
   include SoftDeletable,
           Sequenced::ActsAsSequenced,
           FieldCustomizer::CustomizableValidation,
@@ -42,18 +44,21 @@ class TravelRequest < ActiveRecord::Base
   customizable_validate :to_date, presence: true
   customizable_validate :purpose_of_travel, presence: false
 
-  belongs_to :user
-  belongs_to :policy
-  belongs_to :status, class_name: 'TravelRequestStatus'
+  belongs_to :user, optional: true
+  belongs_to :policy, optional: true
+  belongs_to :status, optional: true, class_name: 'TravelRequestStatus'
   has_many :reports
   has_many :money_requests
   has_many :bookings
+  has_many :email_authorizations, as: :authorizable
 
-  belongs_to :controlling_user, class_name: 'User'
-  belongs_to :controlling_user_role, class_name: 'UserRole'
-  belongs_to :controlling_for_user, class_name: 'User'
-  belongs_to :controlling_for_user_role, class_name: 'UserRole'
-  belongs_to :company
+  belongs_to :controlling_user, optional: true, class_name: 'User'
+  belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :controlling_for_user, optional: true, class_name: 'User'
+  belongs_to :controlling_for_user_role, optional: true, class_name: 'UserRole'
+  belongs_to :company, optional: true
+  belongs_to :created_by, optional: true, class_name: 'User'
+  belongs_to :modified_by, optional: true, class_name: 'User'
 
   has_many :destinations, class_name: 'TravelRequestDestination'
   has_many :travel_request_trails, dependent: :destroy
@@ -287,6 +292,10 @@ class TravelRequest < ActiveRecord::Base
         destinations_list: destinations_list,
         summary: summary
     }
+  end
+
+  def expenses
+    Expense.with_report_id(reports.pluck(:id))
   end
 
   protected

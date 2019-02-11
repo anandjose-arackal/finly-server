@@ -1,4 +1,4 @@
-class ChangeExternalToQuickbooksExternalEverywhere < ActiveRecord::Migration
+class ChangeExternalToQuickbooksExternalEverywhere < ActiveRecord::Migration[4.2]
   def change
     create_table :quickbooks_categories do |t|
       t.references :categories

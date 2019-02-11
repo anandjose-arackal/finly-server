@@ -1,4 +1,4 @@
-class AddParentIdToInvoiceLineItems < ActiveRecord::Migration
+class AddParentIdToInvoiceLineItems < ActiveRecord::Migration[4.2]
   def change
     add_column :invoice_line_items, :parent_type, :string, polymorphic: true
     add_column :invoice_line_items, :parent_id, :string, polymorphic: true

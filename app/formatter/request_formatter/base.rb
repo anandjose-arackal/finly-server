@@ -5,8 +5,13 @@ class RequestFormatter::Base < BaseOperation
     [User, AdminUser]
   end
 
+  def init
+    convert_params_to_hash
+    super
+  end
+
   def success
-    params[:formatted_request] = self.formatted_request
+    params[:formatted_request] = ActionController::Parameters.new(self.formatted_request)
     RequestFormatter::Base::SuccessPresenter.new(user, params, messages)
   end
 
@@ -84,14 +89,11 @@ class RequestFormatter::Base < BaseOperation
     end
 
     protected
+
     def set_placeholders(items, placeholder_mapping)
-      case items.class
-        when Array
-          when Hash, ActionController::Parameters
-      end
       if items.is_a?(Array)
         items.each_with_index do |value, position|
-          if [ActionController::Parameters, Hash, Array].include? value.class
+          if [ActionController::Parameters, Hash, Array, ActiveSupport::HashWithIndifferentAccess].include? value.class
             set_placeholders value, placeholder_mapping
           else
             pos = next_pos
@@ -99,9 +101,9 @@ class RequestFormatter::Base < BaseOperation
             items[position] = "#{PLACEHOLDER_KEY}#{pos}"
           end
         end
-      elsif items.is_a?(Hash)
+      elsif items.is_a?(Hash) or items.is_a?(ActiveSupport::HashWithIndifferentAccess)
         items.each do |key, value|
-          if [ActionController::Parameters, Hash, Array].include? value.class
+          if [ActionController::Parameters, Hash, Array, ActiveSupport::HashWithIndifferentAccess].include? value.class
             set_placeholders value, placeholder_mapping
           else
             pos = next_pos

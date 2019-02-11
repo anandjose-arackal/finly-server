@@ -1,4 +1,4 @@
-class CreateSummaryMailConfigurations < ActiveRecord::Migration
+class CreateSummaryMailConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :admin_summary_mail_configs do |t|
       t.references :user, index: true, foreign_key: true, null: false

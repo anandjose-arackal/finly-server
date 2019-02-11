@@ -20,12 +20,11 @@
 #  sso_enabled                      :boolean          default(FALSE)
 #  address                          :text(65535)
 #  cash_money_requests_enabled      :boolean          default(TRUE)
-#  budget_date_configuration_id     :integer
 #
 
-class CompanyConfiguration < ActiveRecord::Base
-  belongs_to :company
-  belongs_to :default_card_expense_category, class_name: "Category"
+class CompanyConfiguration < ApplicationRecord
+  belongs_to :company, optional: true
+  belongs_to :default_card_expense_category, optional: true, class_name: "Category"
 
   # associating receipt with the particular expense
   has_attached_file :logo, styles: {large: "2160x2160>", normal: "1080x1080>", thumb: "500x500>"}

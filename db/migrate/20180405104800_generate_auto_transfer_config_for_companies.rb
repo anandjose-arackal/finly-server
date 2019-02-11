@@ -1,4 +1,4 @@
-class GenerateAutoTransferConfigForCompanies < ActiveRecord::Migration
+class GenerateAutoTransferConfigForCompanies < ActiveRecord::Migration[4.2]
   def change
     companies = Company.all
 

@@ -1,4 +1,4 @@
-class CreateIndividualKycsForAllUsers < ActiveRecord::Migration
+class CreateIndividualKycsForAllUsers < ActiveRecord::Migration[4.2]
   def change
     User.all.each do |user|
       if user.individual_kyc.nil?

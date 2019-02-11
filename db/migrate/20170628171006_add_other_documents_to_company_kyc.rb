@@ -1,4 +1,4 @@
-class AddOtherDocumentsToCompanyKyc < ActiveRecord::Migration
+class AddOtherDocumentsToCompanyKyc < ActiveRecord::Migration[4.2]
   def change
     change_table :company_kycs do |t|
       t.attachment :aadhar_card

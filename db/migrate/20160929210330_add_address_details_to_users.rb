@@ -1,4 +1,4 @@
-class AddAddressDetailsToUsers < ActiveRecord::Migration
+class AddAddressDetailsToUsers < ActiveRecord::Migration[4.2]
   create_table :states do |t|
     t.string :name, null:false
     t.string :code, null: false

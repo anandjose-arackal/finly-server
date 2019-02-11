@@ -4,7 +4,7 @@ class AccountManager::VendorAccount::VendorAccountAdapter < AccountManager::Base
     VendorAccount
   end
 
-  def balance
+  def balance(options = {})
     self.account.balance.value
   end
 

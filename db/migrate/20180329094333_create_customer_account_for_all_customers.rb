@@ -1,4 +1,4 @@
-class CreateCustomerAccountForAllCustomers < ActiveRecord::Migration
+class CreateCustomerAccountForAllCustomers < ActiveRecord::Migration[4.2]
   def change
     add_column :customers, :is_deleted, :boolean, default: false
 

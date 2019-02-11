@@ -1,4 +1,4 @@
-class AddNoteInVirtualAccountTrails < ActiveRecord::Migration
+class AddNoteInVirtualAccountTrails < ActiveRecord::Migration[4.2]
   def change
   end
 end

@@ -1,4 +1,4 @@
-class CreateProcurementTracks < ActiveRecord::Migration
+class CreateProcurementTracks < ActiveRecord::Migration[4.2]
   def change
     create_table :procurement_tracks do |t|
       t.string :name

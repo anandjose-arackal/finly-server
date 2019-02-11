@@ -11,11 +11,11 @@
 #  updated_at  :datetime         not null
 #
 
-class PerDiemExpense < ActiveRecord::Base
+class PerDiemExpense < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :expense
-  belongs_to :per_diem
+  belongs_to :expense, optional: true
+  belongs_to :per_diem, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields

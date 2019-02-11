@@ -1,4 +1,4 @@
-class CreateTrackerVisits < ActiveRecord::Migration
+class CreateTrackerVisits < ActiveRecord::Migration[4.2]
   def change
     create_table :tracker_visits do |t|
       # user

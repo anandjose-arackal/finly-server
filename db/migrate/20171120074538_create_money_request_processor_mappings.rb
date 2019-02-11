@@ -1,4 +1,4 @@
-class CreateMoneyRequestProcessorMappings < ActiveRecord::Migration
+class CreateMoneyRequestProcessorMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :money_request_processor_mappings do |t|
       t.integer :processor_id, references: 'MoneyRequestProcessor', index: true, foreign_key: true, null: false

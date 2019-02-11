@@ -1,4 +1,4 @@
-class CreatePaymentsReceivables < ActiveRecord::Migration
+class CreatePaymentsReceivables < ActiveRecord::Migration[4.2]
   def change
     create_table :payments_receivables do |t|
       t.references :customer, index: true, foreign_key: true

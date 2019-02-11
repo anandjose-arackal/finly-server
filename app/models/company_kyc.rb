@@ -55,12 +55,12 @@
 #  user_confirmed                            :boolean          default(FALSE)
 #
 
-class CompanyKyc < ActiveRecord::Base
+class CompanyKyc < ApplicationRecord
   include Attachable
 
-  belongs_to :company
-  belongs_to :kyc_status
-  belongs_to :company_type
+  belongs_to :company, optional: true
+  belongs_to :kyc_status, optional: true
+  belongs_to :company_type, optional: true
   has_many :system_messages, as: :messagable, dependent: :destroy
   has_many :kyc_documents
   has_many :company_kyc_trails

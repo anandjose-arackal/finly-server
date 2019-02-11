@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class TransactionStatus < ActiveRecord::Base
+class TransactionStatus < ApplicationRecord
   include Seedable
 
   def self.values

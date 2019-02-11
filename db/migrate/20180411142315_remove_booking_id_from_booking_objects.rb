@@ -1,4 +1,4 @@
-class RemoveBookingIdFromBookingObjects < ActiveRecord::Migration
+class RemoveBookingIdFromBookingObjects < ActiveRecord::Migration[4.2]
   def change
     remove_reference :booking_flights, :booking, index: true, foreign_key: true
     remove_reference :booking_trains, :booking, index: true, foreign_key: true

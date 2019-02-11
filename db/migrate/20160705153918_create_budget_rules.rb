@@ -1,4 +1,4 @@
-class CreateBudgetRules < ActiveRecord::Migration
+class CreateBudgetRules < ActiveRecord::Migration[4.2]
   def change
     create_table :budget_rules do |t|
       t.references :category, index: true, foreign_key: true

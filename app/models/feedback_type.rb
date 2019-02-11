@@ -9,7 +9,7 @@
 #  updated_at  :datetime         not null
 #
 
-class FeedbackType < ActiveRecord::Base
+class FeedbackType < ApplicationRecord
 
   VALUES = {issue_report: 1, feature_request: 2, appreciation: 3, others: 4}
 

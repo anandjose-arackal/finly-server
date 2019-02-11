@@ -9,10 +9,10 @@
 #  field_multiselect_selection_id :integer
 #
 
-class FieldMultiselectSelectionItem < ActiveRecord::Base
-  belongs_to :field_multiselect_selection
+class FieldMultiselectSelectionItem < ApplicationRecord
+  belongs_to :field_multiselect_selection, optional: true
 
-  belongs_to :value, class_name: 'FieldMultiselectItem'
+  belongs_to :value, optional: true, class_name: 'FieldMultiselectItem'
 
   scope :with_value, -> (value_id) { where value_id: value_id}
   scope :with_id, -> (id) { where id: id}

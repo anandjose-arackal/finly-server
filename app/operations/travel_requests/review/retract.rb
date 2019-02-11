@@ -1,5 +1,7 @@
 class TravelRequests::Review::Retract < TravelRequests::Review::Base
 
+  attr_accessor :from_user
+
   def authorized_user_types
     [:employee]
   end
@@ -17,7 +19,9 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
   end
 
   def process
-
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    prev_controlling_user = (travel_request.controlling_user or travel_request.controlling_for_user)
+    prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.travel_request)
     if travel_request.update status_id: TravelRequestStatus.id_for(:retracted),
                              controlling_user_id: user.id,
                              controlling_user_role_id: UserRole.id_for(:employee),
@@ -25,22 +29,28 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
                              controlling_for_user_role_id: nil
       travel_request.travel_request_trails.create action_user: user,
                                                   action_user_role_id: UserRole.id_for(:employee),
-                                                  action_id: TravelRequestTrailAction.id_for(:retract)
+                                                  action_id: TravelRequestTrailAction.id_for(:retract),
+                                                  delegated_action_user_id: delegated_action_user_id,
+                                                  modified_user: prev_controlling_user,
+                                                  modified_user_role_id: prev_controlling_user_role
       return true
     end
     add_message :error, travel_request.errors.full_messages
   end
 
   def post_process
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    tr_comment_action = actual_current_user.present? ? :retracted_by_delegate : :retract
     # add comments
-    self.travel_request.comments.create user_id: user.id,
-                                         action_id: TravelRequestCommentAction.id_for(:retract)
+    self.travel_request.comments.create(user_id: user.id,
+                                         action_id: TravelRequestCommentAction.id_for(tr_comment_action), delegated_action_user_id: delegated_action_user_id)
     travel_request.money_requests.status_pending.update_all(
         controlling_user_id: travel_request.controlling_user_id,
         controlling_user_role_id: travel_request.controlling_user_role_id
     )
     #
     # Event::EBankPaymentRequest::Retract.(user, travel_request: travel_request)
+    Event::ETravelRequest::Retract.(user, travel_request: travel_request)
     add_message :success, "Travel Request retracted successfully"
   end
 

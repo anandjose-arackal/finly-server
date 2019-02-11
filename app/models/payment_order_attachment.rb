@@ -14,10 +14,10 @@
 #  uploader_id                :integer
 #
 
-class PaymentOrderAttachment < ActiveRecord::Base
+class PaymentOrderAttachment < ApplicationRecord
   include Attachable
 
-  belongs_to :payment_order
+  belongs_to :payment_order, optional: true
 
   CONTENT_TYPES = {content_type: []}
 

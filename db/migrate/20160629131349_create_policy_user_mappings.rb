@@ -1,4 +1,4 @@
-class CreatePolicyUserMappings < ActiveRecord::Migration
+class CreatePolicyUserMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :policy_user_mappings do |t|
       t.references :user, index: true, foreign_key: true, null: false

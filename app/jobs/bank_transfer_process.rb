@@ -1,4 +1,4 @@
-class BankTransferProcess < ActiveJob::Base
+class BankTransferProcess < ApplicationJob
 
   def perform
     scheduled_payment_orders = PaymentOrder.with_receiving_account_type("BankAccount").scheduled_on_or_before(Date.tomorrow)

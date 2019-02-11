@@ -13,9 +13,9 @@
 #  email_triggered_at       :datetime
 #
 
-class AdminReviewWorkflowLevel < ActiveRecord::Base
-  belongs_to :admin_review_workflow
-  belongs_to :admin_user
+class AdminReviewWorkflowLevel < ApplicationRecord
+  belongs_to :admin_review_workflow, optional: true
+  belongs_to :admin_user, optional: true
 
   default_scope { order position: :asc }
 

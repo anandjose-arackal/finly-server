@@ -1,4 +1,4 @@
-class CreateWebHookEventMappings < ActiveRecord::Migration
+class CreateWebHookEventMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :web_hook_event_mappings do |t|
       t.references :web_hook, index: true, foreign_key: true, null: false

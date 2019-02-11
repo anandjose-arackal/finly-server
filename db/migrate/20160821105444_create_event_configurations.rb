@@ -1,4 +1,4 @@
-class CreateEventConfigurations < ActiveRecord::Migration
+class CreateEventConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :event_configurations do |t|
       t.references :user, index: true, foreign_key: true, null: false

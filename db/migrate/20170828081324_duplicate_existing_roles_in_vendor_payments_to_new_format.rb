@@ -1,4 +1,4 @@
-class DuplicateExistingRolesInVendorPaymentsToNewFormat < ActiveRecord::Migration
+class DuplicateExistingRolesInVendorPaymentsToNewFormat < ActiveRecord::Migration[4.2]
   def change
     # by default, all users will be initiators, can be changed by the admin if he or she desires
     User.with_vendor_payments_enabled.each do |user|

@@ -10,7 +10,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   def credit(payment, options = {})
     # this will add money to this company's balance
     self.company = self.account.company
-    if self.company.current_account_connected?
+    if self.company.current_account_connected? && !["fc", :fc].include?(payment.application)
       both_balances = balance
       store_transaction payment, :credit, :success, both_balances, both_balances, account.company_id
       return true
@@ -36,7 +36,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   def debit(payment, options = {})
     # this will debit money from the company balance
     self.company = self.account.company
-    if self.company.current_account_connected?
+    if self.company.current_account_connected? && !["fc", :fc].include?(payment.application)
       both_balances = balance
       store_transaction payment, :debit, :success, both_balances, both_balances, account.company_id
       return true
@@ -63,44 +63,37 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     # can either be an operation or a specific call with
     # a model call
     self.company = self.account.company
-    if (self.company.vendor_payments_enabled? && !self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && !self.company.current_account_connected?)
+    # jugaad here to enable transferring to the current account for companies whose current account is connected -
+    # if the viewing application is Finly Collect, the pool balance is always shown (even if the company has their current account connected)
+    if (self.company.yes_bank_account_enabled? && !self.company.current_account_connected?) || ["fc", :fc].include?(RequestStore.store[:current_app])
       payment_order = options[:payment_order]
       balance = self.account.balance_value
       blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
       return (balance - blocked_amount_for_payments)
-    elsif self.company.current_account_connected?
-    handle = self.object_id
-    YesBankBalanceProvider.perform_async(handle, self.company.id)
-    timeout = 30
-    begin
-      Timeout.timeout(timeout) do
-        loop do
-          result = Resque.reserve(handle)
-          next if result.blank?
-          args = result.args.first
-          success = args['success']
-          message = args['message']
-          return 0 unless success
-          balance = args['balance']
-          payment_order = options[:payment_order]
-          blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
-          return (balance - blocked_amount_for_payments)
-        end
+    elsif (self.company.vendor_payments_enabled? && self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && self.company.current_account_connected?)
+      return 99999999999999999 if options[:payment_process]
+
+      handle = self.object_id
+      YesBankBalanceProvider.perform_async(handle, self.company.id)
+      timeout = 30
+      now = Time.now
+      while (Time.now - now) < timeout
+        result = Resque.reserve(handle)
+        next if result.blank?
+
+        args = result.args.first
+        success = args&.dig('success')
+        message = args&.dig('message')
+        return 0 unless success
+
+        balance = args['balance']
+        balance = balance if balance.class.name == String.name
+        payment_order = options[:payment_order]
+        blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
+        return (balance.to_f - blocked_amount_for_payments.to_f)
       end
-    rescue Timeout::Error
       return 0
     end
-    end
-    # op = YesBankApi::Balance::GetBalance.(self.company)
-    # return the balance given by the API
-    # if op.success?
-    #   payment_order = options[:payment_order]
-    #   balance = op.balance&.to_d
-    #   blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
-    #   return (balance - blocked_amount_for_payments)
-    # else
-    #   return 0
-    # end
   end
 
   def database_balance

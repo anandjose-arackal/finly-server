@@ -13,8 +13,8 @@
 #  travel_request            :boolean          default(FALSE)
 #
 
-class UserPanelSubscription < ActiveRecord::Base
-  belongs_to :user
+class UserPanelSubscription < ApplicationRecord
+  belongs_to :user, optional: true
 
   validate :at_least_one_panel
 

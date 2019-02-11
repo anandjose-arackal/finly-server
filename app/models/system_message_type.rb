@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class SystemMessageType < ActiveRecord::Base
+class SystemMessageType < ApplicationRecord
 
   VALUES = {
       info: 1,

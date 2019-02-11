@@ -1,4 +1,4 @@
-class CreateAuthenticationsForAllFinanceManagers < ActiveRecord::Migration
+class CreateAuthenticationsForAllFinanceManagers < ActiveRecord::Migration[4.2]
   def change
     Authentication.with_provider('quickbooks').each do |auth|
       user = auth.user

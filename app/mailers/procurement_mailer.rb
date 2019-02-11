@@ -14,9 +14,10 @@ class ProcurementMailer < ApplicationMailer
              encoding: 'UTF-8',
              template: "export/purchase_order",
              layout: "pdf/paginated_bootstrap.html.erb",
-             footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-             print_media_type: true
-         )
+             # print_media_type: true
+         ),
+         footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
+         dpi: '650'
     )
     if @data.attachments.present? && @data.attachments.is_a?(Array)
       @data.attachments.each do |attachment|
@@ -45,13 +46,15 @@ class ProcurementMailer < ApplicationMailer
       attachments["purchase_order-#{@data.purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
          render_to_string(
              pdf: "purchase-order-#{@data.purchase_order.po_number}",
+             # dpi: '650',
              encoding: 'UTF-8',
              template: "export/purchase_order",
              layout: "pdf/paginated_bootstrap.html.erb",
              # layout: "pdf.html.erb",
              footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-             print_media_type: true
-         )
+             # print_media_type: true
+         ),
+         dpi: '650'
       )
       mail to: presenter.to, subject: presenter.subject, template_name: 'template'
       # mail to: 'abinash.b2@gmail.com', subject: presenter.subject, template_name: 'template'
@@ -77,8 +80,9 @@ class ProcurementMailer < ApplicationMailer
              layout: "pdf/paginated_bootstrap.html.erb",
              # layout: "pdf.html.erb",
              footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
-             print_media_type: true
-         )
+             # print_media_type: true
+         ),
+         dpi: '650'
       )
       ########################################################
       # attachments["invoice-#{@data.invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(

@@ -15,6 +15,7 @@ json.per_diem_config do
       json.name per_diem[:name]
       json.id per_diem[:id]
       json.rate per_diem[:rate]
+      json.currency per_diem[:currency]
     end
   end
 end

@@ -8,5 +8,5 @@
 #  updated_at        :datetime         not null
 #
 
-class UserWalletTrackAction < ActiveRecord::Base
+class UserWalletTrackAction < ApplicationRecord
 end

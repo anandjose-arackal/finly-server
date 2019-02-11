@@ -6,6 +6,7 @@
 
 class Report::Submit < Report::Base
   attr_accessor :has_violations
+  attr_accessor :budgets
 
   def authorized_user_types
     return nil if params.present? and (params[:auto_approve] or params[:auto_submit])
@@ -19,11 +20,13 @@ class Report::Submit < Report::Base
     if user.blank? and not params[:auto_approve] and not params[:auto_submit]
       add_message :error, 'User not found'
     end
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
     id = (params[:report_id] or params[:id])
     self.report = user.reports.find_by(id: id)
+    self.budgets = []
   end
 
   def validate
@@ -62,6 +65,33 @@ class Report::Submit < Report::Base
     custom_field_validations = CustomField::Validate.(report)
     unless custom_field_validations.success?
       add_message :error, custom_field_validations.messages[:error]
+      return
+    end
+
+    # checking for configuration on whether this particular company
+    # has budgeting enforced or not
+    if self.report.expenses.present?
+      op = BudgetsCalculator::RelevantBudgets.(user, object: self.report)
+      if op.success?
+        self.budgets = op.budget_data
+      end
+    end
+    if current_company.enforce_budget_configuration.enforce_expense_budget? && self.budgets.empty?
+      add_message :error, "You cannot submit this report because there are no budgets associated with it"
+      return
+    end
+
+    # also checking if the budgets are being exceeded here
+    self.budgets.each do |budget|
+      budget_amount = budget[:budget].budget_amount.value
+      budget_spent_amount = budget[:spent_amount]
+
+      spent_amount = budget_spent_amount
+
+      if spent_amount > budget_amount
+        add_message :error, "Report Amount exceeding Budget - #{budget[:budget].name}"
+        return
+      end
     end
   end
 
@@ -101,6 +131,7 @@ class Report::Submit < Report::Base
       submitted_amount_attributes[:id] = report.submitted_amount_id
     end
     submitted_at = DateTime.now
+    delegated_action_user = actual_current_user.present? ? actual_current_user : nil
     if report.update_attributes report_status_id: ReportStatus.processing_id,
                                 controlling_user_id: manager.id,
                                 controlling_for_user_id: nil,
@@ -113,7 +144,9 @@ class Report::Submit < Report::Base
                            modified_user_id: report.controlling_user_id,
                            modified_user_role_id: manager_role_id,
                            report_tracking_action_id: ReportTrackingAction.id_for(:submit),
-                           report_status_id: ReportStatus.processing_id
+                           report_status_id: ReportStatus.processing_id,
+                           delegated_action_user: delegated_action_user 
+
       unless report.approved?
         report.expenses.each do |expense|
           expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
@@ -130,10 +163,9 @@ class Report::Submit < Report::Base
 
     # If report is processing
     email_authorization = nil
-    # email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
     if report.processing?
       report.reload
-      email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
+      email_authorization_presenter = EmailAuthorizations::Create.(user, {authorizable: report})
       if email_authorization_presenter.success?
         email_authorization = email_authorization_presenter.email_authorization
       end
@@ -144,8 +176,14 @@ class Report::Submit < Report::Base
 
     # Email Authorization Ends
 
+    # If deligation performs action
+     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     # adding comment regarding the change in status of this report
-    report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
+    if actual_current_user.present?
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submitted_by_delegate), delegated_action_user_id: delegated_action_user_id
+    else
+      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
+    end
 
     Event::EReport::Submit.(user, {email_authorization: email_authorization, report: report})
 

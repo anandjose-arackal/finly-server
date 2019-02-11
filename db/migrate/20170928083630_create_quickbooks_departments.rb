@@ -1,4 +1,4 @@
-class CreateQuickbooksDepartments < ActiveRecord::Migration
+class CreateQuickbooksDepartments < ActiveRecord::Migration[4.2]
   def change
     create_table :quickbooks_departments do |t|
       t.string :name

@@ -1,4 +1,4 @@
-class SeedExportFieldsData < ActiveRecord::Migration
+class SeedExportFieldsData < ActiveRecord::Migration[4.2]
   def change
     ExportField.seed_data
   end

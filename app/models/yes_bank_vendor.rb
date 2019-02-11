@@ -26,25 +26,30 @@
 #  currency_id       :integer
 #  tds_rates_list_id :integer
 #  vendor_id         :string(255)
+#  disabled          :boolean          default(FALSE)
 #
 
-class YesBankVendor < ActiveRecord::Base
+class YesBankVendor < ApplicationRecord
   include Sequenced::ActsAsSequenced
+
+  include SoftDeletable
 
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'
 
-  belongs_to :company
-  belongs_to :state_code, class_name: "GstStateCode"
-  belongs_to :created_by, class_name: "User"
-  belongs_to :vendor_type
+  belongs_to :company, optional: true
+  belongs_to :state_code, optional: true, class_name: "GstStateCode"
+  belongs_to :created_by, optional: true, class_name: "User"
+  belongs_to :vendor_type, optional: true
 
-  belongs_to :currency
-  belongs_to :payment_term
+  belongs_to :currency, optional: true
+  belongs_to :payment_term, optional: true
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
+
+  default_scope { unscope(:where) }
 
   # Requirement first shared by olx
   # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy
@@ -67,7 +72,7 @@ class YesBankVendor < ActiveRecord::Base
   scope :with_ids, -> (ids) {where id: ids}
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
-  scope :non_deleted, -> { where is_deleted: [false, nil]}
+  scope :non_deleted, -> {where deleted_at: nil}
   scope :authorized, -> { where authorized: true}
 
   scope :filter_search, -> (term) do

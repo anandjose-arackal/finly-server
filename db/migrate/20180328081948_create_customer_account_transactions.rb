@@ -1,4 +1,4 @@
-class CreateCustomerAccountTransactions < ActiveRecord::Migration
+class CreateCustomerAccountTransactions < ActiveRecord::Migration[4.2]
   def change
     create_table :customer_account_transactions do |t|
       t.references :customer_account, index: true, foreign_key: true

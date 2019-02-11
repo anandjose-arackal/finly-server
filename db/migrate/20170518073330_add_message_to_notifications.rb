@@ -1,4 +1,4 @@
-class AddMessageToNotifications < ActiveRecord::Migration
+class AddMessageToNotifications < ActiveRecord::Migration[4.2]
   def change
     add_column :notifications, :message, :text
   end

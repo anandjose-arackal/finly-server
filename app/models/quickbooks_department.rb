@@ -12,9 +12,9 @@
 #  updated_at             :datetime         not null
 #
 
-class QuickbooksDepartment < ActiveRecord::Base
+class QuickbooksDepartment < ApplicationRecord
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
   scope :with_name, -> (name) {where name: name}
 end

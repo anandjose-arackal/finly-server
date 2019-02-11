@@ -18,6 +18,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
   end
 
   def init
+    convert_params_to_hash
     self.payment_order_data = params[:payment_order]
     self.errors = []
     self.payment_order_valid = true
@@ -27,6 +28,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
     self.initiating_account_name = retrieve_initiating_account_name
     self.initiating_account_type_id = params[:initiating_account_type]
+
 
     if scheduled_at.present? and scheduled_at < Date.today
       self.scheduled_at = Date.today
@@ -55,8 +57,9 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       return
     end
 
-    payment_order_data.each do |item|
-      self.requested_amount += (item[:amount].to_d rescue 0)
+
+    payment_order_data.each do |value|
+      self.requested_amount += (value[:amount].to_d rescue 0)
     end
 
     initiating_account_adapter = retrieve_initiating_account_adapter
@@ -122,6 +125,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       end
 
       self.payment_order_valid = false unless valid
+
 
       self.processed_order << {user: {identifier: user_email_mob_card, user_details: user}, card: card, amount: amount, valid: valid, messages: messages}
     end

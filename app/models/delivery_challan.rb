@@ -32,15 +32,15 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #
 
-class DeliveryChallan < ActiveRecord::Base
+class DeliveryChallan < ApplicationRecord
   include SoftDeletable
-  belongs_to :company
-  belongs_to :user
-  belongs_to :procurement
-  belongs_to :location
-  belongs_to :payment_term
-  belongs_to :procurement_term
-  belongs_to :document_status
+  belongs_to :company, optional: true
+  belongs_to :user, optional: true
+  belongs_to :procurement, optional: true
+  belongs_to :location, optional: true
+  belongs_to :payment_term, optional: true
+  belongs_to :procurement_term, optional: true
+  belongs_to :document_status, optional: true
 
 
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable

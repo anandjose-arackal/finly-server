@@ -12,11 +12,11 @@
 #  is_deleted  :boolean          default(FALSE), not null
 #
 
-class LevelReviewerMapping < ActiveRecord::Base
+class LevelReviewerMapping < ApplicationRecord
   include SoftDeletable
 
-  belongs_to :level, class_name: 'ReviewalLevel'
-  belongs_to :reviewer, class_name: 'User'
+  belongs_to :level, optional: true, class_name: 'ReviewalLevel'
+  belongs_to :reviewer, optional: true, class_name: 'User'
 
   validates :level_id, presence: true
   validates :reviewer_id, presence: true
@@ -31,7 +31,7 @@ class LevelReviewerMapping < ActiveRecord::Base
   scope :with_level_id, -> (ids) {
     where level_id: ids
   }
-  scope :non_deleted, -> { where is_deleted: [nil, false] }
+  scope :non_deleted, -> {where deleted_at: nil}
 
   scope :with_reviewer_id, -> (ids){
     where reviewer_id: ids

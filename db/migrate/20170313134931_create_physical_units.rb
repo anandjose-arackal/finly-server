@@ -1,4 +1,4 @@
-class CreatePhysicalUnits < ActiveRecord::Migration
+class CreatePhysicalUnits < ActiveRecord::Migration[4.2]
   def change
     create_table :physical_units do |t|
       t.string :name

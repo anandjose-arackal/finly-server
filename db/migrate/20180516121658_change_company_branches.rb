@@ -1,4 +1,4 @@
-class ChangeCompanyBranches < ActiveRecord::Migration
+class ChangeCompanyBranches < ActiveRecord::Migration[4.2]
   def change
     add_reference :company_branches, :company, index: true, foreign_key: true
     add_column :company_branches, :address_1, :string

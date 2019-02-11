@@ -11,8 +11,8 @@
 #  updated_at    :datetime         not null
 #
 
-class ResourceTemplate < ActiveRecord::Base
-  belongs_to :user
+class ResourceTemplate < ApplicationRecord
+  belongs_to :user, optional: true
 
   validates :name, presence: true
   validates :resource_type, presence: true

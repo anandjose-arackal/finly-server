@@ -1,4 +1,4 @@
-class CreateReportSyncStatuses < ActiveRecord::Migration
+class CreateReportSyncStatuses < ActiveRecord::Migration[4.2]
   def change
     create_table :report_sync_statuses do |t|
       t.string :name

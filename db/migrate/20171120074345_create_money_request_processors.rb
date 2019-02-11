@@ -1,4 +1,4 @@
-class CreateMoneyRequestProcessors < ActiveRecord::Migration
+class CreateMoneyRequestProcessors < ActiveRecord::Migration[4.2]
   def change
     create_table :money_request_processors do |t|
       t.integer :status_id, references: 'MoneyRequestProcessorStatus', index: true, foreign_key: true, null: false

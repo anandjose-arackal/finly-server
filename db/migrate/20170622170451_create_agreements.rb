@@ -1,4 +1,4 @@
-class CreateAgreements < ActiveRecord::Migration
+class CreateAgreements < ActiveRecord::Migration[4.2]
   def change
     create_table :agreements do |t|
       t.references :agreement_type, index: true, foreign_key: true, null: false

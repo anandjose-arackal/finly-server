@@ -40,9 +40,9 @@
 #  updated_at       :datetime         not null
 #
 
-class TrackerVisit < ActiveRecord::Base
-  belongs_to :user
-  belongs_to :company
+class TrackerVisit < ApplicationRecord
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
 
   has_many :events, class_name: 'TrackerEvent', dependent: :destroy
 

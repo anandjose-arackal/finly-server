@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class BankTransactionType < ActiveRecord::Base
+class BankTransactionType < ApplicationRecord
 
   include Seedable
 

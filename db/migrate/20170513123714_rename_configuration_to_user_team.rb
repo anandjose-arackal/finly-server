@@ -1,4 +1,4 @@
-class RenameConfigurationToUserTeam < ActiveRecord::Migration
+class RenameConfigurationToUserTeam < ActiveRecord::Migration[4.2]
   def change
     remove_index :user_team_group_item_mappings, :configuration_id
     remove_column :user_team_group_item_mappings, :configuration_id

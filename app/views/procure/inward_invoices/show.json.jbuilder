@@ -85,7 +85,7 @@ json.invoice do
   json.advance_rate precision_value invoice.advance_rate
   #############################
   json.invoice_attachment do
-    json.url invoice.invoice_attachments.first&.attached_file&.url
+    json.url invoice.invoice_attachments.first&.attached_file&.url(:original, timestamp: false)
     json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
     json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
     json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
@@ -205,7 +205,7 @@ json.attachments do
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
-    json.url attachment.file.url
+    json.url attachment.file.url(:original, timestamp: false)
   end
 end
 

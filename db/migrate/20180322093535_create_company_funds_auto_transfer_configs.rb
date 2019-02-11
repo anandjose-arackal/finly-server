@@ -1,4 +1,4 @@
-class CreateCompanyFundsAutoTransferConfigs < ActiveRecord::Migration
+class CreateCompanyFundsAutoTransferConfigs < ActiveRecord::Migration[4.2]
   def change
     create_table :company_funds_auto_transfer_configs do |t|
       t.references :company, index: true, foreign_key: true

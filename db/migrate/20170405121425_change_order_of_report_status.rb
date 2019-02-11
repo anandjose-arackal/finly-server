@@ -1,4 +1,4 @@
-class ChangeOrderOfReportStatus < ActiveRecord::Migration
+class ChangeOrderOfReportStatus < ActiveRecord::Migration[4.2]
   def change
     if ReportStatus.count > 0
       processing = ReportStatus.with_name('Processing').first rescue nil

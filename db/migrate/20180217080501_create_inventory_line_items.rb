@@ -1,4 +1,4 @@
-class CreateInventoryLineItems < ActiveRecord::Migration
+class CreateInventoryLineItems < ActiveRecord::Migration[4.2]
   def change
     create_table :inventory_line_items do |t|
       t.decimal :tax, precision: 10, scale: 5

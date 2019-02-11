@@ -1,4 +1,4 @@
-class CreateItzCashDmtBeneficiaries < ActiveRecord::Migration
+class CreateItzCashDmtBeneficiaries < ActiveRecord::Migration[4.2]
   def change
     create_table :itz_cash_dmt_beneficiaries do |t|
       t.string :first_name, null: false

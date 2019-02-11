@@ -1,12 +1,12 @@
 json.warning_rules do
-  json.array!(@result.policy.budget_rules.non_deleted.warning_rules) do |rule|
+  json.array!(@result.policy.budget_rules.warning_rules.non_deleted) do |rule|
     json.id rule.id
     json.rule_in_words rule.rule_in_words
   end
 end
 
 json.blocking_rules do
-  json.array!(@result.policy.budget_rules.non_deleted.blocking_rules) do |rule|
+  json.array!(@result.policy.budget_rules.blocking_rules.non_deleted) do |rule|
     json.id rule.id
     json.rule_in_words rule.rule_in_words
   end

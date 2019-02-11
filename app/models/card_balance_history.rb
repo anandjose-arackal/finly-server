@@ -10,9 +10,9 @@
 #  updated_at :datetime         not null
 #
 
-class CardBalanceHistory < ActiveRecord::Base
-  belongs_to :card
-  belongs_to :amount
+class CardBalanceHistory < ApplicationRecord
+  belongs_to :card, optional: true
+  belongs_to :amount, optional: true
 
   validates :card_id, presence: true
   validates :amount_id, presence: true

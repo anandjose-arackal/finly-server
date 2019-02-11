@@ -13,6 +13,11 @@
 config/finly_collect.yml
 config/deploy/config/*
 lib/tasks/aws.rake
+config/data_store.yml
+config/sentry.yml
+config/aws_config.yml
+config/mailer_config.yml
+.rubocop.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -56,6 +61,9 @@ Thumbs.db
 dump.rdb
 .idea/
 config/secure_storage_config.yml
+config/elastic_apm.yml
 config/deploy/config/*
+config/sidekiq.yml
+.ruby-version
 
 public/tmp

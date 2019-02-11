@@ -145,6 +145,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     if StringUtils.to_bool(expense_params[:reimbursable])
       expense_params[:spent_from_id] = nil
     end
+    expenses_params[:created_by_id] = actual_current_user.id if actual_current_user.present?
   end
 
   def process
@@ -208,7 +209,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       pocket = expense.spent_from
       if pocket.cash_pocket?
         pocket_adapter = AccountManager::CashPockets::CashPocketsAdapter.new(pocket)
-        if pocket_adapter.balance(display_balance: true) > expense.amount_value
+        if pocket_adapter.balance(display_balance: true) >= expense.amount_value
           expense.update(cash_on_hand_blocked: true)
         end
         if pocket_adapter.balance(display_balance: true) < 0

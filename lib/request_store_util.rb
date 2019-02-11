@@ -6,6 +6,7 @@ class RequestStoreUtil
 
   def self.set_request_params(params)
     RequestStore.store[:params] = params
+    RequestStore.store[:request_params] = params&.deep_dup
   end
 
   def self.set_current_user(user)
@@ -25,7 +26,7 @@ class RequestStoreUtil
   end
 
   def self.set_current_device(device)
-    RequestStore.store[:current_devise] = device
+    RequestStore.store[:current_device] = device
   end
 
   def self.to_hash

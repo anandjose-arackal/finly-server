@@ -1,4 +1,4 @@
-class CreateProcurementCharges < ActiveRecord::Migration
+class CreateProcurementCharges < ActiveRecord::Migration[4.2]
   def change
     create_table :procurement_charges do |t|
       t.integer :charge_type

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class DistanceExpenseType < ActiveRecord::Base
+class DistanceExpenseType < ApplicationRecord
   include Seedable
 
   validates :name, presence: true

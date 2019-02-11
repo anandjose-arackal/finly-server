@@ -1,4 +1,4 @@
-class CreateCashOnHands < ActiveRecord::Migration
+class CreateCashOnHands < ActiveRecord::Migration[4.2]
   def change
     create_table :cash_on_hands do |t|
       t.references :user, index: true, foreign_key: true

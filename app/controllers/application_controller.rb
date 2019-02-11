@@ -11,18 +11,19 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
 
   # protect_from_forgery with: :exception
-  before_filter :set_paper_trail_whodunnit
+  # before_action :set_paper_trail_whodunnit
 
   before_action :load_global_variables
+  # before_action :set_raven_context
 
   before_action :initialize_query_logger
 
   before_action :init_elastic_apm
 
-  before_filter :store_location
+  before_action :store_location
 
-  after_filter :set_queries_counter
-  after_filter :track_request
+  after_action :set_queries_counter
+  after_action :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found
@@ -163,6 +164,10 @@ class ApplicationController < ActionController::Base
     if @curr_user.class.name == 'User'
       RequestStoreUtil.set_current_company @curr_user&.company
     end
+
+    # looking for if the particular user is a delegate for someone else
+    retrieve_delegate_user
+
     @curr_user
   end
 
@@ -172,6 +177,19 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
+  def retrieve_delegate_user
+    # header is going to send a 'delegate_for_user_id' attribute
+    delegate_for_user_id = request.headers['Delegate-For-User-Id']
+    delegated_for_user = @curr_user.delegated_for_users.find_by(id: delegate_for_user_id) if delegate_for_user_id.present?
+    if delegated_for_user.present?
+      RequestStore.store[:actual_current_user] = @curr_user # setting the actual current user as this guy
+    end
+    if delegated_for_user.present?
+      @curr_user = delegated_for_user
+      RequestStore.store[:current_user] = delegated_for_user
+    end
+  end
 
   def respond_success_failure
     respond response: (@result.success? ? :success : :failure)
@@ -322,9 +340,10 @@ class ApplicationController < ActionController::Base
         total_query_time: QueryLogger.time,
         queries_count: QueryLogger.count,
         queries_summary: QueryLogger.summary,
-        queries: QueryLogger.queries,
+        # queries: QueryLogger.queries,
         current_app: current_app,
         current_device: current_device,
+        request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
     }
     user = current_user rescue nil
     if user.present?
@@ -364,5 +383,22 @@ class ApplicationController < ActionController::Base
     ElasticAPM.set_tag(:device, current_device)
     ElasticAPM.set_tag(:view, params&.dig(:view))
   end
+
+  # Used by sentry
+  # def set_raven_context
+  #   Raven.user_context(id: current_user&.id) # or anything else in session
+  #   view = (params&.dig(:view) rescue nil)
+  #   Raven.extra_context(
+  #       params: params.to_unsafe_h,
+  #       url: request.url,
+  #       company_name: current_company&.name,
+  #       company_id: current_company&.id,
+  #       user_name: current_user&.name,
+  #       user_id: current_user&.id,
+  #       current_device: current_device,
+  #       current_app: current_app,
+  #       current_view: view
+  #   )
+  # end
 
 end

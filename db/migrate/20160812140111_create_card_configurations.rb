@@ -1,4 +1,4 @@
-class CreateCardConfigurations < ActiveRecord::Migration
+class CreateCardConfigurations < ActiveRecord::Migration[4.2]
   def change
     create_table :card_configurations do |t|
       t.integer :prepaid_card_id, references: 'user', index: true, foreign_key: true

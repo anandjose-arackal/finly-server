@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class ExpenseTaxType < ActiveRecord::Base
+class ExpenseTaxType < ApplicationRecord
   include Seedable
 
   def self.values

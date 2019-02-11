@@ -69,4 +69,9 @@ class AdminUsers::CardsController < ApplicationController
     end
   end
 
+  def bulk_assign
+    @result = Admin::Cards::BulkAssign.(current_user, params)
+    respond
+  end
+
 end

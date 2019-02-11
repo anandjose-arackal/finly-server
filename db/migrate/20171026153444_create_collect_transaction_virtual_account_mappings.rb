@@ -1,4 +1,4 @@
-class CreateCollectTransactionVirtualAccountMappings < ActiveRecord::Migration
+class CreateCollectTransactionVirtualAccountMappings < ActiveRecord::Migration[4.2]
   def change
     create_table :collect_transaction_virtual_account_mappings do |t|
       t.integer :virtual_account_id, references: "VirtualBankAccount", foreign_key: true

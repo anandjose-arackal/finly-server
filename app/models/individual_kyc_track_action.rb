@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class IndividualKycTrackAction < ActiveRecord::Base
+class IndividualKycTrackAction < ApplicationRecord
   include Seedable
 
   validates :name, presence: true

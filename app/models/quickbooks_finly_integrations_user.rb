@@ -18,15 +18,15 @@
 #  updated_at                        :datetime         not null
 #
 
-class QuickbooksFinlyIntegrationsUser < ActiveRecord::Base
+class QuickbooksFinlyIntegrationsUser < ApplicationRecord
   QUICKBOOKS_USER_TYPES = ['Employee', 'Vendor']
 
   validates :email, presence: true
 
   validates :quickbooks_user_type, inclusion: { in: QUICKBOOKS_USER_TYPES }, if: proc {|finly_external_user| finly_external_user.quickbooks_integration_type == QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
 
-  belongs_to :user
-  belongs_to :company
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
 
   # adds the relevant details to the User model and saves it in the db
   def save

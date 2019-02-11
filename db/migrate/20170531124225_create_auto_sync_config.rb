@@ -1,4 +1,4 @@
-class CreateAutoSyncConfig < ActiveRecord::Migration
+class CreateAutoSyncConfig < ActiveRecord::Migration[4.2]
   def change
 
     # creating auto sync config types

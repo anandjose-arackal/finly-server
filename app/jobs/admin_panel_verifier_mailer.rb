@@ -1,4 +1,4 @@
-class AdminPanelVerifierMailer < ActiveJob::Base
+class AdminPanelVerifierMailer < ApplicationJob
 
   def perform
     check_for_assigned_cards

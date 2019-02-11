@@ -1,4 +1,4 @@
-class CreateTravelRequestDestinations < ActiveRecord::Migration
+class CreateTravelRequestDestinations < ActiveRecord::Migration[4.2]
   def change
     create_table :travel_request_destinations do |t|
       t.string :name

@@ -9,6 +9,6 @@
 #  updated_at  :datetime         not null
 #
 
-class MccCategoryMapping < ActiveRecord::Base
-  belongs_to :category
+class MccCategoryMapping < ApplicationRecord
+  belongs_to :category, optional: true
 end

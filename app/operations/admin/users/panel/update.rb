@@ -27,6 +27,7 @@ class Admin::Users::Panel::Update < Admin::Users::Base
   end
 
   def process
+    p subscription_params
     unless panel_subscription.update(subscription_params)
       add_message :error, panel_subscription.errors.full_messages
     end
@@ -39,6 +40,6 @@ class Admin::Users::Panel::Update < Admin::Users::Base
   private
 
   def subscription_params
-    params.require(:user_panel_config).permit(:disburse, :expense_management, :yes_bank_account_transfer, :invoicing_system)
+    params.require(:user_panel_config).permit(:disburse, :expense_management, :yes_bank_account_transfer, :invoicing_system, :travel_request)
   end
 end

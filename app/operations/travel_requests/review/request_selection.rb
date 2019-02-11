@@ -50,12 +50,13 @@ class TravelRequests::Review::RequestSelection < TravelRequests::Review::Base
   def post_process
     # add comment
     travel_request.comments.create user_id: user.id,
-                                   action_id: BankPaymentRequestCommentAction.id_for(:selection_requested)
+                                   action_id: TravelRequestCommentAction.id_for(:selection_requested)
     travel_request.money_requests.status_pending.update_all(
         controlling_user_id: travel_request.controlling_user_id,
         controlling_user_role_id: travel_request.controlling_user_role_id
     )
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
+    Event::ETravelRequest::RequestSelection.(user, travel_request: travel_request)
     add_message :success, 'Selection has been successfully requested'
   end
 

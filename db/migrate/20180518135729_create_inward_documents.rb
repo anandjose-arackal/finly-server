@@ -1,4 +1,4 @@
-class CreateInwardDocuments < ActiveRecord::Migration
+class CreateInwardDocuments < ActiveRecord::Migration[4.2]
   def change
     create_table :inward_documents do |t|
       t.references :company, index: true, foreign_key: true

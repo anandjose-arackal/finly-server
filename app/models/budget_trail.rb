@@ -17,22 +17,20 @@
 #  date              :date
 #  sub_department_id :integer
 #  procurement_id    :integer
-#  created_at_date   :date
-#  submitted_at_date :date
 #
 
-class BudgetTrail < ActiveRecord::Base
+class BudgetTrail < ApplicationRecord
 
-  belongs_to :entity, polymorphic: true
-  belongs_to :category
-  belongs_to :cost_center
-  belongs_to :amount
-  belongs_to :vendor, class_name: "YesBankVendor"
-  belongs_to :location, class_name: "BranchLocation"
-  belongs_to :department
-  belongs_to :sub_department, class_name: "Department"
-  belongs_to :user
-  belongs_to :procurement
+  belongs_to :entity, optional: true, polymorphic: true
+  belongs_to :category, optional: true
+  belongs_to :cost_center, optional: true
+  belongs_to :amount, optional: true
+  belongs_to :vendor, optional: true, class_name: "YesBankVendor"
+  belongs_to :location, optional: true, class_name: "BranchLocation"
+  belongs_to :department, optional: true
+  belongs_to :sub_department, optional: true, class_name: "Department"
+  belongs_to :user, optional: true
+  belongs_to :procurement, optional: true
 
   accepts_nested_attributes_for :amount
 
@@ -86,6 +84,10 @@ class BudgetTrail < ActiveRecord::Base
   # more or less the same as with_budgetable_entities
   scope :with_entity_type, -> (entity_types) {
     where(entity_type: entity_types)
+  }
+
+  scope :with_entity_id, -> (ids) {
+    where entity_id: ids
   }
 
 end

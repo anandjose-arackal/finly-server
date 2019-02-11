@@ -20,15 +20,15 @@
 #  company_id                :integer          not null
 #
 
-class CardAssignRequest < ActiveRecord::Base
-  belongs_to :card
-  belongs_to :card_program
-  belongs_to :status, class_name: 'CardAssignRequestStatus'
-  belongs_to :card_owner, class_name: 'User'
-  belongs_to :initiating_resource, polymorphic: true
-  belongs_to :assigned_by_resource, polymorphic: true
-  belongs_to :admin_review_workflow
-  belongs_to :company
+class CardAssignRequest < ApplicationRecord
+  belongs_to :card, optional: true
+  belongs_to :card_program, optional: true
+  belongs_to :status, optional: true, class_name: 'CardAssignRequestStatus'
+  belongs_to :card_owner, optional: true, class_name: 'User'
+  belongs_to :initiating_resource, optional: true, polymorphic: true
+  belongs_to :assigned_by_resource, optional: true, polymorphic: true
+  belongs_to :admin_review_workflow, optional: true
+  belongs_to :company, optional: true
 
   has_many :tracks, class_name: 'CardAssignRequestTrack', dependent: :destroy
 

@@ -9,8 +9,8 @@
 #  updated_at       :datetime         not null
 #
 
-class TimeObject < ActiveRecord::Base
-  belongs_to :physical_unit
+class TimeObject < ApplicationRecord
+  belongs_to :physical_unit, optional: true
 
   validate :non_zero_value
   validates :physical_unit, presence: true

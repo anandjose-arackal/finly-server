@@ -1,4 +1,4 @@
-class CreateCollectCompanyDetails < ActiveRecord::Migration
+class CreateCollectCompanyDetails < ActiveRecord::Migration[4.2]
   def change
     create_table :collect_company_details do |t|
       t.string :gst

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class FieldNumber < ActiveRecord::Base
+class FieldNumber < ApplicationRecord
   has_one :custom_field, as: :value
   has_one :field_configuration, as: :default_value
 

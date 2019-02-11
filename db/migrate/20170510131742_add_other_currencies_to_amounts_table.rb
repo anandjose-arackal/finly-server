@@ -1,4 +1,4 @@
-class AddOtherCurrenciesToAmountsTable < ActiveRecord::Migration
+class AddOtherCurrenciesToAmountsTable < ActiveRecord::Migration[4.2]
   def change
     add_column :amounts, :HRK, :decimal, precision: 20, scale: 5
     add_column :amounts, :RUB, :decimal, precision: 20, scale: 5

@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class Purpose < ActiveRecord::Base
+class Purpose < ApplicationRecord
 
   include Seedable
 

@@ -13,7 +13,7 @@
 
 
 
-class ReportTrackingAction < ActiveRecord::Base
+class ReportTrackingAction < ApplicationRecord
   include Seedable
 
   def self.values
@@ -28,7 +28,7 @@ class ReportTrackingAction < ActiveRecord::Base
         :take_control,
         :settled,
         :settlement_confirmed,
-        :closed,
+        :closed
     ]
   end
 

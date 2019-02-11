@@ -15,7 +15,7 @@
 
 require 'bcrypt'
 
-class SignedupUser < ActiveRecord::Base
+class SignedupUser < ApplicationRecord
   attr_accessor :password
   before_save :encrypt_password
   after_save :clear_password

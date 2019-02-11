@@ -1,4 +1,4 @@
-class MakeCustomFieldValuePolymorphic < ActiveRecord::Migration
+class MakeCustomFieldValuePolymorphic < ActiveRecord::Migration[4.2]
   def change
     remove_column :field_configurations, :default_value
     add_column :field_configurations, :default_value_id, :integer, index: true

@@ -1,4 +1,4 @@
-class CreateIndividualKycs < ActiveRecord::Migration
+class CreateIndividualKycs < ActiveRecord::Migration[4.2]
   def change
     create_table :individual_kycs do |t|
       t.attachment :id_proof

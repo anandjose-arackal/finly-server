@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class PaymentStatus < ActiveRecord::Base
+class PaymentStatus < ApplicationRecord
 
   VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5, cancelled: 6, processing: 7, pending_approval: 8, possible_failure: 9, pending_credit: 10, pending_retry: 11}
 
@@ -53,6 +53,10 @@ class PaymentStatus < ActiveRecord::Base
 
   def possible_failure?
     self.id == PaymentStatus.id_for(:possible_failure)
+  end
+
+  def pending_approval?
+    self.id == PaymentStatus.id_for(:pending_approval)
   end
 
 end

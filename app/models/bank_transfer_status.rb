@@ -8,12 +8,12 @@
 #  updated_at :datetime         not null
 #
 
-class BankTransferStatus < ActiveRecord::Base
+class BankTransferStatus < ApplicationRecord
 
   include Seedable
 
   def self.values
-    [:completed, :processing, :failed, :possible_failure]
+    [:completed, :processing, :failed, :possible_failure, :open]
   end
 
   def completed?
@@ -30,6 +30,10 @@ class BankTransferStatus < ActiveRecord::Base
 
   def failed?
     self.id == BankTransferStatus.id_for(:failed)
+  end
+
+  def open?
+    self.id == BankTransferStatus.id_for(:open)
   end
 
   def possible_failure?

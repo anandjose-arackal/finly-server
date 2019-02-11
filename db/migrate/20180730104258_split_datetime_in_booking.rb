@@ -1,4 +1,4 @@
-class SplitDatetimeInBooking < ActiveRecord::Migration
+class SplitDatetimeInBooking < ActiveRecord::Migration[4.2]
   def change
     remove_column :booking_flights, :departure_datetime
     remove_column :booking_flights, :arrival_datetime

@@ -1,4 +1,4 @@
-class CreateExpenseRules < ActiveRecord::Migration
+class CreateExpenseRules < ActiveRecord::Migration[4.2]
   def change
     create_table :expense_rules do |t|
       t.integer :greater_than_amount_id, :references => "amount", index: true, foreign_key: true

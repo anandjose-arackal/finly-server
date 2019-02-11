@@ -121,6 +121,7 @@ class TransactionsMsgQueuePoller
       log_params[:user_name] = user&.name
       log_params[:company_id] = user&.company&.id
       log_params[:company_name] = user&.company&.name
+      log_params[:request_id] = Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s)
 
       trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
       trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes

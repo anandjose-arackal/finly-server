@@ -14,8 +14,8 @@
 #  updated_at         :datetime         not null
 #
 
-class ApprovalRoute < ActiveRecord::Base
-  belongs_to :purpose
-  belongs_to :user
-  belongs_to :created_by_user, class_name: 'User'
+class ApprovalRoute < ApplicationRecord
+  belongs_to :purpose, optional: true
+  belongs_to :user, optional: true
+  belongs_to :created_by_user, optional: true, class_name: 'User'
 end

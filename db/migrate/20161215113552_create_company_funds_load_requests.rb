@@ -1,4 +1,4 @@
-class CreateCompanyFundsLoadRequests < ActiveRecord::Migration
+class CreateCompanyFundsLoadRequests < ActiveRecord::Migration[4.2]
   def change
     create_table :company_funds_load_requests do |t|
       t.references :company, index: true, foreign_key: true

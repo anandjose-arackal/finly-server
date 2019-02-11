@@ -1,4 +1,4 @@
-class CreateCardAssignRequests < ActiveRecord::Migration
+class CreateCardAssignRequests < ActiveRecord::Migration[4.2]
   def change
     create_table :card_assign_requests do |t|
       t.references :card, index: true, foreign_key: true

@@ -1,4 +1,4 @@
-class ChangeTaxToTaxRateIdForAll < ActiveRecord::Migration
+class ChangeTaxToTaxRateIdForAll < ActiveRecord::Migration[4.2]
   def change
     # Moving taxes in model
     # taxes = [0, 0.1, 0.25, 3, 5, 12, 18, 28]

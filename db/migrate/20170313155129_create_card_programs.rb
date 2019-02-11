@@ -1,4 +1,4 @@
-class CreateCardPrograms < ActiveRecord::Migration
+class CreateCardPrograms < ActiveRecord::Migration[4.2]
   def change
     create_table :card_programs do |t|
       t.string :name

@@ -13,11 +13,11 @@
 
  *= require font-awesome
  *= require jquery-ui
- *= require animate
+ * require animate
  *= require_self
  *= require_tree "."
  *= stub 'application_static'
- *= stub 'application_backbone'
+ * stub 'application_backbone'
 */
 
 @font-face {

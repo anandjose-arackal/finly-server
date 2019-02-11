@@ -14,9 +14,9 @@
 #  quickbooks_additional_information :text(65535)
 #
 
-class QuickbooksPaymentType < ActiveRecord::Base
+class QuickbooksPaymentType < ApplicationRecord
 
-  belongs_to :company
+  belongs_to :company, optional: true
 
   scope :quickbooks, -> { where(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
   scope :checking_account_with_company, -> (id) {

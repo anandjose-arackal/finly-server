@@ -11,6 +11,7 @@ class TravelRequests::Update < TravelRequests::Base
 
   def pre_validate
     user_present? and params_present?
+    validate_delegator_action if actual_current_user.present?
   end
 
   def init
@@ -45,6 +46,10 @@ class TravelRequests::Update < TravelRequests::Base
     end
   end
 
+  def pre_process
+    travel_request_parameters[:modified_by_id] = actual_current_user.id if actual_current_user.present?
+  end
+
   def process
     self.travel_request.assign_attributes(travel_request_parameters)
 
@@ -70,13 +75,16 @@ class TravelRequests::Update < TravelRequests::Base
   end
 
   def post_process
-    add_message :success, 'Successfully updated travel request'
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    travel_request.comments.create(user_id: user.id,
+                                   action_id: TravelRequestCommentAction.id_for(:updated_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
+    add_message :success, 'Successfully updated trip'
   end
 
   protected
 
   def strong_params
-    params.require(:travel_request).permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date)
+    params.require(:travel_request).permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date, :modified_by_id)
   end
 
 end

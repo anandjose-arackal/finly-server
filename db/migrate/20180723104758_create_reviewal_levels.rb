@@ -1,4 +1,4 @@
-class CreateReviewalLevels < ActiveRecord::Migration
+class CreateReviewalLevels < ActiveRecord::Migration[4.2]
   def change
     create_table :reviewal_levels do |t|
       t.integer :level_number

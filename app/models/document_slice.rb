@@ -13,8 +13,8 @@
 #  updated_at         :datetime         not null
 #
 
-class DocumentSlice < ActiveRecord::Base
-  belongs_to :receipt
+class DocumentSlice < ApplicationRecord
+  belongs_to :receipt, optional: true
 
   validates :image, presence: true
 

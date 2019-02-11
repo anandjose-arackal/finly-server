@@ -1,4 +1,4 @@
-class AddPhysicalUnitsToDb < ActiveRecord::Migration
+class AddPhysicalUnitsToDb < ActiveRecord::Migration[4.2]
   def change
     if PhysicalUnit.count == 0
       PhysicalUnit::VALUES.each do |k, v|

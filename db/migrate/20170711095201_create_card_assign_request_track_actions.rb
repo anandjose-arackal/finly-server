@@ -1,4 +1,4 @@
-class CreateCardAssignRequestTrackActions < ActiveRecord::Migration
+class CreateCardAssignRequestTrackActions < ActiveRecord::Migration[4.2]
   def change
     create_table :card_assign_request_track_actions do |t|
       t.string :name, null: false

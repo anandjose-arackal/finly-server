@@ -1,4 +1,4 @@
-class CreateFieldCustomizations < ActiveRecord::Migration
+class CreateFieldCustomizations < ActiveRecord::Migration[4.2]
   def change
     create_table :field_customizations do |t|
       t.string :class_name, index: true, null: false

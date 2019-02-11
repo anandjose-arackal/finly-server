@@ -1,4 +1,4 @@
-class AddInvoiceIdToInvoices < ActiveRecord::Migration
+class AddInvoiceIdToInvoices < ActiveRecord::Migration[4.2]
   def change
     add_column :invoices, :invoice_id, :string
   end

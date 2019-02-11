@@ -14,10 +14,10 @@
 #  updated_at             :datetime         not null
 #
 
-class AutoSubmitConfig < ActiveRecord::Base
-  belongs_to :period
-  belongs_to :submitable, polymorphic: true
-  belongs_to :default_policy, class_name: 'Policy'
+class AutoSubmitConfig < ApplicationRecord
+  belongs_to :period, optional: true
+  belongs_to :submitable, optional: true, polymorphic: true
+  belongs_to :default_policy, optional: true, class_name: 'Policy'
 
   validates :period_id, presence: true
   validates :submitable_id, presence: true
