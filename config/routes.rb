@@ -3290,7 +3290,6 @@ Rails.application.routes.draw do
     get 'grn_pending', to: 'procurements#grn_pending'
     get 'grn_received', to: 'procurements#grn_received'
 
-
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
 
     get 'purchase_orders/templates', to: 'purchase_orders#template_index'

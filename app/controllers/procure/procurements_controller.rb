@@ -57,7 +57,7 @@ class Procure::ProcurementsController < ApplicationController
 
   def count
     @result = Procurements::Count.(current_user, params)
-    render json: @result.count.as_json
+    render json: { count: @result.count.as_json, status_count: @result.status_count.as_json }
   end
 
   def show

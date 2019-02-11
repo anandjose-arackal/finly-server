@@ -45,8 +45,8 @@ gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
 gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
-gem 'finly-secure_storage-sdk', git: 'git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git'
-# gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_storage-sdk.git'
+# gem 'finly-secure_storage-sdk', git: 'git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git'
+gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_storage-sdk.git'
 
 
 

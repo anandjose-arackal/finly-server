@@ -127,6 +127,13 @@ class Procurements::Index < Procurements::Base
 
     end
 
+    def get_status_counts
+      st_ids = StatusTag.all.pluck(:id)
+      pr_ids = self.procurements.filter_procurement_type("purchase_order").pluck(:id)
+      # ProcurementStatusTaggable.group(:status_tag_id).where(status_tag_id: st_ids).with_procurement_ids(pr_ids).size
+      ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).group(:status_tag_id).count
+    end
+
     def awaiting_action?(procurement)
     end
     
