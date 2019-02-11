@@ -75,7 +75,7 @@ class Reports::Submit < Reports::Base
         self.budgets = op.budget_data
       end
     end
-    if current_company.enforce_budget_configuration.enforce_expense_budget? && self.budgets.empty?
+    if user.company.enforce_budget_configuration.enforce_expense_budget? && self.budgets.empty?
       add_message :error, "You cannot submit this report because there are no budgets associated with it"
       return
     end
