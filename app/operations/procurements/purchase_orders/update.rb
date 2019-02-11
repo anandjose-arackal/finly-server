@@ -48,7 +48,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   def process
 
     puts "PURCHASEORDER UPDATE FROM Process", params.inspect
-    binding.pry
+    # binding.pry
     # self.purchase_order = procurement.build_purchse_order(purchase_order_params)
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?

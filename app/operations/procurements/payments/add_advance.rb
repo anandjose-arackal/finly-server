@@ -37,7 +37,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
     # self.receiving_account = user.company.bank_accounts.find_by(id: params[:receiving_account_id])
     puts "ADDADVANCE from init params", params.inspect
 
-    binding.pry
+    # binding.pry
   end
 
   def validate
