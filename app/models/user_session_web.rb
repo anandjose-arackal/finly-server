@@ -61,6 +61,14 @@ class UserSessionWeb < ApplicationRecord
   # validates :mouse_pos_x, presence: true
   # validates :mouse_pos_y, presence: true
 
+  def self.accept_request?
+    true
+  end
+
+  def self.authentication_scope
+    :web
+  end
+
   def self.platform_key
     13
   end

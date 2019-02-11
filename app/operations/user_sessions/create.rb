@@ -136,11 +136,12 @@ class UserSessions::Create < BaseOperation
       request_properties = Base64.decode64(request_properties)
       request_properties = JSON.parse(request_properties) if request_properties.is_a?(String)
     else
+      # todo fallback to user-agent instead of not creating the properties
       request_properties = {}
     end
     request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
     PLATFORMS.each do |platform|
-      if request_properties[platform.platform_key.to_s].present?
+      if params[:scope].include?(platform.authentication_scope.to_s) and platform.accept_request?
         args[:platform] = platform.name
         args[platform.create_attributes_key] = reformat_platform_properties platform.platform_map, request_properties[platform.platform_key.to_s]
         break
@@ -162,6 +163,7 @@ class UserSessions::Create < BaseOperation
   private
 
   def reformat_platform_properties(platform_map, headers)
+    headers={} if headers.nil?
     reformatted_map = {}
     platform_map.each do |attribute, id|
       reformatted_map[attribute] = headers[id]

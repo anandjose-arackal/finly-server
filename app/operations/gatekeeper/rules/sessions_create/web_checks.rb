@@ -4,6 +4,7 @@ class Gatekeeper::Rules::SessionsCreate::WebChecks < Gatekeeper::Rules::BaseRule
   # Web specific checks
   rule 'X-Finly-RP has to be set for all web requests', on: :after_session_create do
     headers = RequestStoreUtil.current_request.headers
+    next unless RequestStoreUtil.current_session.platform == 'UserSessionWeb'
     next if headers['X-Finly-RP'].present?
     response_code 401
     fail
