@@ -40,7 +40,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    ProcurementMailer.send_purchase_order_mail(Event::EPurchaseOrder::Base::MailerPresenter.new(user, params)).deliver_now
+    ProcurementMailer.delay.send_purchase_order_mail(Event::EPurchaseOrder::Base::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)

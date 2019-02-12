@@ -1,5 +1,7 @@
-reports = Report.where.not(report_status_id: Report.status_ids(:open, :auto_approved))
-reports = Report.where(id: 7836)
+############################## REPORTS START ##############################
+
+reports = Report.all
+# reports = Report.where(id: 25849)
 reports.each do |report|
   level_number = 1
   policy = report.policy
@@ -7,23 +9,22 @@ reports.each do |report|
   user = report.user
 
   # create DLRM for this particular document
-  op = ReviewalManager::DocumentReviewalMappings::Set.(reviewal_document: report)
+  op = ReviewalManager::DocumentReviewalMappings::Set.(report.user, reviewal_document: report)
 
   report.tracks.each do |track|
     # extract the LURM or LRM for this particular user
     mappings = user.level_user_reviewer_mappings.where(policy_id: policy.id, level_id: levels)
     if mappings.empty?
-      mappings = policy.level_reviewer_mappings.where(level_id: levels)
+      mappings = LevelReviewerMapping.where(level_id: levels)
     end
-
 
     level = levels.find_by(level_number: level_number)
 
-    reviewer = mappings.where(level_id: level.id).first&.reviewer
+    reviewer = mappings.where(level_id: level&.id).first&.reviewer
 
     # now based on the type of track we can decide the attributes to pass to
     # the DLRM creation operation and trails
-    trail_action_id = TrailAction.id_for(track.report_tracking_action.name.to_sym)
+    trail_action_id = TrailAction.id_for(track.report_tracking_action&.name&.to_sym)
     original_track = track
     next_level = levels.find_by(level_number: (level_number + 1))
     modified_level = next_level
@@ -62,8 +63,12 @@ reports.each do |report|
 
 
     # traverse the DLRM and mark the respective ones as viewable if it has touched that user
-    current_dlrm = report.document_level_reviewer_mappings.where(level_id: level.id)
-    current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id)
+    current_dlrm = report.document_level_reviewer_mappings.where(level_id: level&.id)
+    current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id) if current_dlrm.pluck(:reviewer_id).include?(action_user&.id)
+    next_dlrm = report.document_level_reviewer_mappings.where(level_id: next_level&.id)
+    next_dlrm.update_all(viewable: true)
+    report.update(controlling_level_id: next_level&.id)
+
 
     # now creating the trail
     report.trails.build(
@@ -78,11 +83,111 @@ reports.each do |report|
     ).save
 
     # incrementing the level number so that the next one will be at the level that is next
-    level_number += 1 unless track.report_tracking_action_id == ReportTrackingAction.id_for(:create)
+    level_number += 1 unless [ReportTrackingAction.id_for(:create), ReportTrackingAction.id_for(:submit)].include?(track.report_tracking_action_id)
 
     if ReportTrackingAction.ids_for([:reject, :retract]).include?(track.report_tracking_action_id)
       # this will reset the level number because it is going to go through the levels all over again
       level_number = 1
+      report.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
     end
   end
+
+  if report.approved? || report.settled? || report.settlement_confirmed?
+    report.update(controlling_level_id: nil)
+    report.document_level_reviewer_mappings.update_all(viewable: true)
+  end
 end
+
+
+######################### REPORTS END #########################
+
+
+############################# PAYMENT TICKET START ##########################
+bank_payment_requests = BankPaymentRequest.all
+# bank_payment_requests = BankPaymentRequest.where(id: [124557])
+bank_payment_requests.each do |bpr|
+  level_number = 1
+  policy = bpr.policy
+  levels = policy.levels.where(associated_entity_type: "BankPaymentRequestProvider")
+  user = bpr.user
+
+  # create DLRM for this particular document
+  op = ReviewalManager::DocumentReviewalMappings::Set.(bpr.user, reviewal_document: bpr)
+
+  bpr.bank_payment_request_trails.each do |track|
+    # extract the LURM or LRM for this particular user
+    mappings = user.level_user_reviewer_mappings.where(policy_id: policy.id, level_id: levels)
+    if mappings.empty?
+      mappings = LevelReviewerMapping.where(level_id: levels)
+    end
+
+    level = levels.find_by(level_number: level_number)
+
+    reviewer = mappings.where(level_id: level&.id).first&.reviewer
+
+    # now based on the type of track we can decide the attributes to pass to
+    # the DLRM creation operation and trails
+    trail_action_id = TrailAction.id_for(track.action&.name&.to_sym)
+    original_track = track
+    next_level = levels.find_by(level_number: (level_number + 1))
+    modified_level = next_level
+    action_user = nil
+    modified_user = nil
+    taken_control_by = nil
+    action_user_role_id = UserRole.id_for(:reviewer)
+    case track.action_id
+      when BankPaymentRequestTrailAction.id_for(:submit), BankPaymentRequestTrailAction.id_for(:retract),
+          BankPaymentRequestTrailAction.id_for(:reject), BankPaymentRequestTrailAction.id_for(:unapprove),
+          BankPaymentRequestTrailAction.id_for(:approve), BankPaymentRequestTrailAction.id_for(:approve_and_forward)
+        action_user = track.action_user
+        modified_user = track.modified_user
+        modified_level = mappings.where(reviewer_id: modified_user&.id).first&.level
+      when BankPaymentRequestTrailAction.id_for(:credit), BankPaymentRequestTrailAction.id_for(:mark_as_credited)
+        action_user = track.action_user
+        modified_user = nil
+        modified_level = nil
+        action_user_role_id = track.action_user_role_id
+      when BankPaymentRequestTrailAction.id_for(:take_control), BankPaymentRequestTrailAction.id_for(:return_control)
+        action_user = track.action_user
+        taken_control_by = track.action_user
+        modified_user = reviewer
+        action_user_role_id = UserRole.id_for(:admin)
+      else
+        # do nothing?
+    end
+
+
+    # traverse the DLRM and mark the respective ones as viewable if it has touched that user
+    current_dlrm = bpr.document_level_reviewer_mappings.where(level_id: level&.id)
+    current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id) if current_dlrm.pluck(:reviewer_id).include?(action_user&.id)
+    next_dlrm = bpr.document_level_reviewer_mappings.where(level_id: next_level&.id)
+    next_dlrm.update_all(viewable: true)
+    bpr.update(controlling_level_id: next_level&.id)
+
+    # now creating the trail
+    bpr.trails.build(
+        action_id: trail_action_id,
+        action_user_id: action_user&.id,
+        action_user_role_id: action_user_role_id,
+        action_level: level,
+        modified_level: modified_level,
+        original_track: original_track
+    ).save
+
+    level_number += 1 unless [BankPaymentRequestTrailAction.id_for(:submit)].include?(track.action_id)
+
+    if BankPaymentRequestTrailAction.ids_for([:reject, :retract]).include?(track.action_id)
+      # this will reset the level number because it is going to go through the levels all over again
+      level_number = 1
+      bpr.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
+    end
+  end
+
+  if bpr.approved? || bpr.credited?
+    bpr.update(controlling_level_id: nil)
+    bpr.document_level_reviewer_mappings.update_all(viewable: true)
+  end
+
+end
+
+######################### PAYMENT TICKET START #########################
