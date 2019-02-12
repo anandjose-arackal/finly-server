@@ -32,7 +32,7 @@ class AccountManager::Payments::RetryPaymentBackground < AccountManager::Base
   end
 
   def validate
-    unless payment.failed?
+    unless payment.failed? || self.payment.pending_retry?
       add_message :error, "Only failed payments can be retried"
       return
     end
@@ -69,6 +69,8 @@ class AccountManager::Payments::RetryPaymentBackground < AccountManager::Base
         # this is partially completed
         self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       end
+      # update the retry count for this particular payment
+      self.payment.update(retry_count: (payment.retry_count + 1))
     else
       # no change in the payment order or payment anyway. So do nothing?
     end

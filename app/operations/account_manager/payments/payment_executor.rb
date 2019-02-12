@@ -151,7 +151,9 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     unless credit_adapter.blank? or credit_adapter.credit(payment, options)
       # Credit failed
         add_message :error, credit_adapter.errors
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        unless self.payment.pending_retry?
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        end
         payment.system_messages.destroy_all
         credit_adapter.errors.each do |content|
           payment.system_messages.build(content: content,
