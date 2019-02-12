@@ -39,6 +39,11 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
       transitions :from => :processing, :to => :processing, guard: :user_can_review?
     end
 
+    event :confirm_booking do
+      transitions :from => :pending, :to => :approved, guard: [:travel_request_present?, :travel_request_booking_confirmed?]
+    end
+
+
     event :unapprove do
       transitions :from => :processing, :to => :processing
       transitions :from => :approved, :to => :processing
@@ -109,5 +114,9 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
 
   def travel_request_present?
     self.document.travel_request.present?
+  end
+
+  def travel_request_booking_confirmed?
+    self.document.travel_request.status.id == TravelRequestStatus.id_for(:booking_confirmed)
   end
 end

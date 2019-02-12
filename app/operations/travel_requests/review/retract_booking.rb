@@ -55,11 +55,10 @@ class TravelRequests::Review::RetractBooking < TravelRequests::Review::Base
   def post_process
     add_message :success, "Travel booking successfully retracted"
 
-    #todo - abi
-    travel_request.money_requests.status_pending.update_all(
-        controlling_user_id: travel_request.controlling_user_id,
-        controlling_user_role_id: travel_request.controlling_user_role_id
-    )
+    #travel_request.money_requests.status_pending.update_all(
+    #    controlling_user_id: travel_request.controlling_user_id,
+    #    controlling_user_role_id: travel_request.controlling_user_role_id
+    #)
     travel_request.comments.create user_id: user.id,
                                    action_id: TravelRequestCommentAction.id_for(:remove_booking)
   end

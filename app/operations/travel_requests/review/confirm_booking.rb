@@ -81,18 +81,28 @@ class TravelRequests::Review::ConfirmBooking < TravelRequests::Review::Base
   end
 
   def set_money_request_as_approved
-    return if travel_request.money_requests.blank?
-    finance_manager = User::Team::Approver.(travel_request.user, money_request: travel_request.money_requests.first, type: :finance_manager)
-    role_id = finance_manager.present? ? UserRole.id_for(:finance_manager) : nil
-    status_id = finance_manager.present? ? MoneyRequestStatus.id_for(:processing) : MoneyRequestStatus.id_for(:approved)
-    travel_request.money_requests.status_pending.each do |money_request|
-      money_request.update(status_id: status_id, controlling_user_id: finance_manager&.id, controlling_user_role_id: role_id)
-      money_request.tracks.create action_user: user,
-                                  action_user_role_id: UserRole.id_for(:travel_manager),
-                                  modified_user_id: finance_manager&.id,
-                                  modified_user_role_id: role_id,
-                                  money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:approve),
-                                  status_id: status_id
+    #return if travel_request.money_requests.blank?
+    #finance_manager = User::Team::Approver.(travel_request.user, money_request: travel_request.money_requests.first, type: :finance_manager)
+    #role_id = finance_manager.present? ? UserRole.id_for(:finance_manager) : nil
+    #status_id = finance_manager.present? ? MoneyRequestStatus.id_for(:processing) : MoneyRequestStatus.id_for(:approved)
+    #travel_request.money_requests.status_pending.each do |money_request|
+    #  money_request.update(status_id: status_id, controlling_user_id: finance_manager&.id, controlling_user_role_id: role_id)
+    #  money_request.tracks.create action_user: user,
+    #                              action_user_role_id: UserRole.id_for(:travel_manager),
+    #                              modified_user_id: finance_manager&.id,
+    #                              modified_user_role_id: role_id,
+    #                              money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:approve),
+    #                              status_id: status_id
+    #end
+
+    travel_request.money_requests.each do |money_request|
+      parameters = {
+        document: money_request,
+        aasm_event: 'confirm_booking',
+        provider: 'TravelRequestProvider'
+      }
+
+      money_request_op = WorkflowManager::Base.(user, parameters)
     end
   end
 
