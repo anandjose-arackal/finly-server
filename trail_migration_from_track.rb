@@ -8,7 +8,7 @@ class TrailMigrationFromTrack
     reports = Report.all
     remaining_report_ids = reports.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "Report").pluck(:document_reviewer_mappable_id)
     remaining_reports = Report.where(id: remaining_report_ids)
-# reports = Report.where(id: 25849)
+    # reports = Report.where(id: 25849)
     remaining_reports.each do |report|
       level_number = 1
       policy = report.policy
@@ -115,7 +115,7 @@ class TrailMigrationFromTrack
     remaining_bank_payment_ids = bank_payment_requests.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "BankPaymentRequest").pluck(:document_reviewer_mappable_id)
     remaining_bank_payments = BankPaymentRequest.where(id: remaining_bank_payment_ids)
     # bank_payment_requests = BankPaymentRequest.where(id: [124557])
-    bank_payment_requests.each do |bpr|
+    remaining_bank_payments.each do |bpr|
       level_number = 1
       policy = bpr.policy
       levels = policy.levels.where(associated_entity_type: "BankPaymentRequestProvider")
@@ -193,7 +193,12 @@ class TrailMigrationFromTrack
         end
       end
 
-      if bpr.approved? || bpr.credited?
+      begin
+        if bpr.approved? || bpr.credited?
+          bpr.update(controlling_level_id: nil)
+          bpr.document_level_reviewer_mappings.update_all(viewable: true)
+        end
+      rescue
         bpr.update(controlling_level_id: nil)
         bpr.document_level_reviewer_mappings.update_all(viewable: true)
       end
