@@ -257,7 +257,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
       ############# Initiator logic start ####################
     elsif (bank_payment_request.owner_id == user.id)
-      if (bank_payment_request.processing? || bank_payment_request.open? || bank_payment_request.rejected?)
+      if (bank_payment_request.retracted? || bank_payment_request.open? || bank_payment_request.rejected?)
         return true
       end
     end
@@ -272,7 +272,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
       ############# Initiator logic start ####################
     elsif (bank_payment_request.owner_id == user.id)
-      if (bank_payment_request.processing? || bank_payment_request.open? || bank_payment_request.rejected?)
+      if (bank_payment_request.retracted? || bank_payment_request.open? || bank_payment_request.rejected?)
         return true
       end
     end
