@@ -1,5 +1,5 @@
 # Provides bread crumbs
-class RuleBookDSL::PageTree
+class RuleBook::PageTree
   attr_accessor :tree
 
   def initialize(klass, page_tree=nil)

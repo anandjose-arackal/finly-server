@@ -1,6 +1,6 @@
-class Gatekeeper::Checker < RuleBookDSL::Chapter
+class Gatekeeper::Checker < RuleBook::Chapter
 
-  class Gatekeeper::Checker::Verdict < RuleBookDSL::Verdict
+  class Gatekeeper::Checker::Verdict < RuleBook::Verdict
 
     define_property :instance, :response_code, :require_otp
 

@@ -15,7 +15,7 @@ class Gatekeeper::Event
   def run
     result = nil
     Gatekeeper::Registry.subscribers(event)&.each do |rule|
-      result = rule.verify(self.params)
+      result = rule.verdict(self.params)
       return result unless result.success?
     end
     result

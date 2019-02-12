@@ -1,4 +1,4 @@
-class RuleBookDSL::Act < RuleBookDSL::API
+class RuleBook::Act < RuleBook::API
   include EventBus::Bus
 
   attr_accessor :rules, :page_tree, :context

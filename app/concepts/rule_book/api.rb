@@ -1,4 +1,4 @@
-class RuleBookDSL::API
+class RuleBook::API
   attr_accessor :block, :chapter, :sections, :rules, :page_tree, :act, :premises, :name
 
   def initialize(act, chapter, page_tree, section_name, &block)
@@ -19,12 +19,12 @@ class RuleBookDSL::API
   end
 
   def section(context_name, &block)
-    RuleBookDSL::Section.new(self.act, self.chapter, self.page_tree, context_name, &block)
+    RuleBook::Section.new(self.act, self.chapter, self.page_tree, context_name, &block)
   end
 
   def premise(*premise_names, &block)
     premise_names.each do |premise_name|
-      RuleBookDSL::Premise.new(self.act, self.chapter, self.page_tree, premise_name, &block)
+      RuleBook::Premise.new(self.act, self.chapter, self.page_tree, premise_name, &block)
     end
   end
 
