@@ -1,5 +1,4 @@
 class Gatekeeper::Checker < RuleBookDSL::Chapter
-  act Gatekeeper::Registry
 
   class Gatekeeper::Checker::Verdict < RuleBookDSL::Verdict
 
@@ -7,6 +6,7 @@ class Gatekeeper::Checker < RuleBookDSL::Chapter
 
   end
 
+  act Gatekeeper::Registry
   verdict Gatekeeper::Checker::Verdict
 
 end
