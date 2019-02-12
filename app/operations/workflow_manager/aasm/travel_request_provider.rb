@@ -1,5 +1,24 @@
 class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::BaseProvider
 
+  def initialize(document, violation_present, user, provider_name=nil)
+    self.document = document
+    self.violations_present = violations_present
+    self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
+    self.user = user
+    self.policy = self.document.policy ## Have to take care where status is stored in a different attribute
+
+    self.provider_name = provider_name || self.document.get_default_provider
+
+    # get reviewers
+    self.current_level = document.get_level(:current, provider_name)
+    self.next_level = document.get_level(:next, provider_name)
+    self.previous_level = document.get_level(:prev, provider_name)
+    self.current_level_reviewers = document.get_reviewers(:current, provider_name)
+    self.reviewers = document.get_reviewers(:next, provider_name)
+    self.document_update_params = {}
+  end
+
+
   aasm :whiny_transitions => false do
     state :open, initial: true, :before_enter => :set_state
     state :retracted

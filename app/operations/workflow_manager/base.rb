@@ -6,7 +6,7 @@ class WorkflowManager::Base < BaseOperation
     self.violations_present = params[:violations_present]
     self.aasm_event = params[:aasm_event]
     self.note = params[:note]
-    self.provider_name = self.document.get_default_provider
+    self.provider_name = params[:provider_name] || self.document.get_default_provider
 
 
     # todo - The below switch case can be reduced to one line since provider name is already present
@@ -20,7 +20,11 @@ class WorkflowManager::Base < BaseOperation
     when 'Report'
       self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new self.document, violations_present, user
     when 'MoneyRequest'
-      self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user
+      if provider_name == 'TravelRequestProvider'
+        self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user, provider_name
+      else
+        self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user
+      end
     when 'TravelRequest'
       if provider_name == 'TravelRequestBookingProvider'
         self.aasm_document = ::WorkflowManager::Aasm::TravelRequestBookingProvider.new self.document, violations_present, user
@@ -43,6 +47,7 @@ class WorkflowManager::Base < BaseOperation
     # Check if it can run
     # doable events are all the events which are possible at the current state; provided by AASM
     doable_events = self.aasm_document.aasm.events.map(&:name)
+    debugger
     unless doable_events.include?(self.aasm_event.to_sym)
       add_message :error, 'Cannot perform this action at this state'
       return

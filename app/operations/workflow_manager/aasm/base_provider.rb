@@ -3,14 +3,15 @@ class WorkflowManager::Aasm::BaseProvider
 
   attr_accessor :document_state, :document, :user, :violations_present, :policy,
                 :current_level, :next_level, :previous_level,
-                :current_level_reviewers, :reviewers, :new_level, :document_update_params
+                :current_level_reviewers, :reviewers, :new_level, :document_update_params, :provider_name
 
-  def initialize(document, violations_present, user)
+  def initialize(document, violations_present, user, provider_name=nil)
     self.document = document
     self.violations_present = violations_present
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
     self.user = user
     self.policy = self.document.policy ## Have to take care where status is stored in a different attribute
+    self.provider_name = provider_name || self.document.get_default_provider
 
     # get reviewers
     self.current_level = document.level

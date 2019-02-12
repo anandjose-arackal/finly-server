@@ -2,7 +2,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
 
   attr_accessor :provider_name
 
-  def initialize(document, violation_present, user)
+  def initialize(document, violation_present, user, provider_name=nil)
     self.document = document
     self.violations_present = violations_present
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
