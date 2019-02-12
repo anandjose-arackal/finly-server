@@ -162,8 +162,8 @@ class Event::ETravelRequest::Base < Event::SetNotifier
         else
           view = "\"personal\""
       end
-      suffix = "/params={\"view\":" + view + ",\"preview\":true}"
-      path = "travel_requests/#{travel_request.id}"
+      suffix = URI.escape("{\"view\":" + view + ",\"preview\":true}")
+      path = "travel_show/#{travel_request.id}/params="
       url = Constants::BASE_URL + path + suffix
     end
 
@@ -184,8 +184,8 @@ class Event::ETravelRequest::Base < Event::SetNotifier
       if travel_request.controlling_user_id == user.id
       # token = params[:email_authorization]
 
-        suffix = "/params={\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}"
-        path = "travel_request/#{travel_request.id}"
+        suffix = URI.escape("{\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}")
+        path = "travel_request/#{travel_request.id}/params="
         url = Constants::BASE_URL_AUTHORIZER + path + suffix
       end
       url
