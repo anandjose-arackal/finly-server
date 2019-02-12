@@ -34,6 +34,7 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     end
 
     event :approve do
+      transitions :from => :processing, :to => :pending, guard: [:reviewers_not_present?, :user_can_review?, :travel_request_present?]
       transitions :from => :processing, :to => :approved, guard: [:reviewers_not_present?, :user_can_review?]
       transitions :from => :processing, :to => :processing, guard: :user_can_review?
     end
@@ -104,5 +105,9 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
         dlrms.update_all(active: false)
       end
     end
+  end
+
+  def travel_request_present?
+    self.document.travel_request.present?
   end
 end
