@@ -74,7 +74,7 @@ class TrailMigrationFromTrack
         current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id) if current_dlrm.pluck(:reviewer_id).include?(action_user&.id)
         next_dlrm = report.document_level_reviewer_mappings.where(level_id: next_level&.id)
         next_dlrm.update_all(viewable: true)
-        report.update(controlling_level_id: next_level&.id)
+        report.update_columns(controlling_level_id: next_level&.id)
 
 
         # now creating the trail
@@ -100,7 +100,7 @@ class TrailMigrationFromTrack
       end
 
       if report.approved? || report.settled? || report.settlement_confirmed?
-        report.update(controlling_level_id: nil)
+        report.update_columns(controlling_level_id: nil)
         report.document_level_reviewer_mappings.update_all(viewable: true)
       end
     end
@@ -172,7 +172,7 @@ class TrailMigrationFromTrack
         current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id) if current_dlrm.pluck(:reviewer_id).include?(action_user&.id)
         next_dlrm = bpr.document_level_reviewer_mappings.where(level_id: next_level&.id)
         next_dlrm.update_all(viewable: true)
-        bpr.update(controlling_level_id: next_level&.id)
+        bpr.update_columns(controlling_level_id: next_level&.id)
 
         # now creating the trail
         bpr.trails.build(
@@ -195,11 +195,11 @@ class TrailMigrationFromTrack
 
       begin
         if bpr.approved? || bpr.credited?
-          bpr.update(controlling_level_id: nil)
+          bpr.update_columns(controlling_level_id: nil)
           bpr.document_level_reviewer_mappings.update_all(viewable: true)
         end
       rescue
-        bpr.update(controlling_level_id: nil)
+        bpr.update_columns(controlling_level_id: nil)
         bpr.document_level_reviewer_mappings.update_all(viewable: true)
       end
 
