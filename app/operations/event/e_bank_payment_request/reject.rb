@@ -64,6 +64,6 @@ class Event::EBankPaymentRequest::Reject < Event::EBankPaymentRequest::Base
   def bank_payment_request_view_role(user)
     # self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
     # return roles.first
-    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+    bank_payment_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 end
