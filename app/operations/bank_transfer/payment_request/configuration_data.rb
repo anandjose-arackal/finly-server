@@ -5,6 +5,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
     params[:categories] = Categories::Index.(current_user, params)
     params[:policies] = Policy::Index.(current_user, params)
     params[:cost_centers] = CostCenters::Index.(current_user, params)
+    params[:tds_slabs] = TdsSlabs::Index.(current_user, params)
 
   end
 
@@ -25,13 +26,15 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
   end
 
   class BankTransfer::PaymentRequest::ConfigurationDataPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :departments, :cost_centers, :categories, :policies
+    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs
     
     def init
       self.departments = params[:departments]
       self.categories = params[:categories]
       self.policies = params[:policies]
       self.cost_centers = params[:cost_centers]
+      self.tds_slabs = params[:tds_slabs]
+
     end
 
   end

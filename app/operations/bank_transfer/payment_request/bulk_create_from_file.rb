@@ -38,8 +38,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
 
-    puts "validate_operation", validate_operation.inspect
-    binding.pry
     if validate_operation.success?
       self.requested_amount = validate_operation.requested_amount
     else

@@ -14,9 +14,14 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def new_pr
+    logger.fatal "params from controller, #{params.inspect}"
     @result = BankTransfer::PaymentRequest::NewPr.(current_user, params)
     if @result.success?
-      respond
+      respond_to do |format|
+        format.json {
+          render 'new_pr'
+        }
+      end
     else
       respond_to do |format|
         format.json {
