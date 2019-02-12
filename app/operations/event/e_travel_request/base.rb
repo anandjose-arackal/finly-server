@@ -185,7 +185,7 @@ class Event::ETravelRequest::Base < Event::SetNotifier
       # token = params[:email_authorization]
 
         suffix = URI.escape("{\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}")
-        path = "travel_request/#{travel_request.id}/params="
+        path = "travel_show/#{travel_request.id}/params="
         url = Constants::BASE_URL_AUTHORIZER + path + suffix
       end
       url
