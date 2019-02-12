@@ -11,6 +11,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  headers            :text(65535)
+#  deleted_at         :datetime
 #
 
 require 'test_helper'

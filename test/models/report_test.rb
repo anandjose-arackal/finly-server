@@ -36,6 +36,8 @@
 #  sub_department_id                  :integer
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
+#  deleted_at                         :datetime
+#  controlling_level_id               :integer
 #
 
 # requires a report with the following states in the db:

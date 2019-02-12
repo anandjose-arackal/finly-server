@@ -10,6 +10,7 @@
 #  is_deleted     :boolean          default(FALSE), not null
 #  ancestry       :string(255)
 #  cost_center_id :integer
+#  deleted_at     :datetime
 #
 
 require 'test_helper'
