@@ -12,8 +12,8 @@
 #  is_deleted          :boolean          default(FALSE)
 #  cancelled           :boolean          default(FALSE)
 #  atm_surcharge       :boolean          default(FALSE)
+#  deleted_at          :datetime
 #
-
 
 require 'test_helper'
 

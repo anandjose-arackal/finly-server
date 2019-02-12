@@ -17,6 +17,7 @@
 #  comment                :string(255)
 #  previously_delivered   :decimal(20, 5)
 #  is_deleted             :boolean          default(FALSE), not null
+#  deleted_at             :datetime
 #
 
 class InwardDocumentItem < ApplicationRecord

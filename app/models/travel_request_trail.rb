@@ -15,6 +15,7 @@
 #  updated_at               :datetime         not null
 #  is_deleted               :boolean          default(FALSE)
 #  delegated_action_user_id :integer
+#  deleted_at               :datetime
 #
 
 class TravelRequestTrail < ApplicationRecord

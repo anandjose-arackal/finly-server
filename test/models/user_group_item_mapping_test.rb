@@ -9,6 +9,7 @@
 #  updated_at         :datetime         not null
 #  is_deleted         :boolean          default(FALSE)
 #  user_group_id      :integer
+#  deleted_at         :datetime
 #
 
 require 'test_helper'

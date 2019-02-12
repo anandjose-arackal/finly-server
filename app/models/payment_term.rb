@@ -11,6 +11,7 @@
 #  company_id  :integer
 #  default     :boolean
 #  is_deleted  :boolean          default(FALSE), not null
+#  deleted_at  :datetime
 #
 
 class PaymentTerm < ApplicationRecord
