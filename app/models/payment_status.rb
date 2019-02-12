@@ -59,4 +59,8 @@ class PaymentStatus < ApplicationRecord
     self.id == PaymentStatus.id_for(:pending_approval)
   end
 
+  def pending_retry?
+    self.id == PaymentStatus.id_for(:pending_retry)
+  end
+
 end

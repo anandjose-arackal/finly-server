@@ -17,6 +17,7 @@
 #  booking_request_id       :integer
 #  is_deleted               :boolean          default(FALSE)
 #  delegated_action_user_id :integer
+#  deleted_at               :datetime
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

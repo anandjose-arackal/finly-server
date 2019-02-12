@@ -79,7 +79,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
         # Payment with pending transaction will rerun through CronJobs
-        if op.transfer_request.bank_error_message.include? TEMPORARY_ERRORS_FROM_BANK
+        if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message)
           payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
         else
           payment.update(payment_status_id: PaymentStatus.id_for(:failed))

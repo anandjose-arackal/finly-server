@@ -15,6 +15,7 @@
 #  expense_type_id           :integer
 #  with_receipt_amount_id    :integer
 #  without_receipt_amount_id :integer
+#  deleted_at                :datetime
 #
 
 require 'test_helper'

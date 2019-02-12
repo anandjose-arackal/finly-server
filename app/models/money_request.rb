@@ -31,6 +31,8 @@
 #  destination_pocket_id              :integer
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
+#  deleted_at                         :datetime
+#  controlling_level_id               :integer
 #
 
 class MoneyRequest < ApplicationRecord

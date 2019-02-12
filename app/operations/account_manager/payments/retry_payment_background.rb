@@ -32,7 +32,7 @@ class AccountManager::Payments::RetryPaymentBackground < AccountManager::Base
   end
 
   def validate
-    unless payment.failed?
+    unless payment.failed? || self.payment.pending_retry?
       add_message :error, "Only failed payments can be retried"
       return
     end

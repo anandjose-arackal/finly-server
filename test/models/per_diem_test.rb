@@ -10,6 +10,7 @@
 #  configurable_id   :integer
 #  configurable_type :string(255)
 #  is_deleted        :boolean          default(FALSE)
+#  deleted_at        :datetime
 #
 
 require 'test_helper'

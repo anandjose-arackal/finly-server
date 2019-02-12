@@ -29,6 +29,9 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #  account                :string(255)
 #  tax_rate_id            :integer
+#  deleted_at             :datetime
+#  submitted_at           :datetime
+#  approved_at            :datetime
 #
 
 require 'test_helper'

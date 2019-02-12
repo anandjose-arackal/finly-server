@@ -8,6 +8,7 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  time_object_id :integer
+#  deleted_at     :datetime
 #
 
 require 'test_helper'

@@ -66,6 +66,9 @@
 #  is_deleted                   :boolean          default(FALSE)
 #  resource_template_id         :integer
 #  invoice_id                   :string(255)
+#  deleted_at                   :datetime
+#  submitted_at                 :datetime
+#  approved_at                  :datetime
 #
 
 #  gst_type_id: 1 - IGST
