@@ -1,4 +1,4 @@
-class Event::ETravelRequest::Reject < Event::ETravelRequest::Base
+class Event::ETravelRequest::RejectSelection < Event::ETravelRequest::Base
 
  attr_accessor :rejecting_user, :roles
 

@@ -27,24 +27,34 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     state :auto_approved
     state :credited
     state :pending
+    state :trip_open
+    state :trip_processing
+    state :trip_retracted
+    state :trip_rejected
+    state :trip_approved
 
     event :submit do
+      transitions from: [:trip_open, :trip_retracted, :trip_rejected], to: :trip_approved, guard: [:reviewers_not_present?, :travel_request_present?]
       transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
+
+      transitions from: [:trip_open, :trip_retracted, :trip_rejected], to: :trip_processing, guard: [:travel_request_present?]
       transitions from: [:open, :retracted, :rejected], to: :processing
     end
 
     event :approve do
-      transitions :from => :processing, :to => :pending, guard: [:reviewers_not_present?, :user_can_review?, :travel_request_present?]
+      transitions :from => :trip_processing, :to => :trip_approved, guard: [:reviewers_not_present?, :user_can_review?, :travel_request_present?]
       transitions :from => :processing, :to => :approved, guard: [:reviewers_not_present?, :user_can_review?]
       transitions :from => :processing, :to => :processing, guard: :user_can_review?
     end
 
     event :confirm_booking do
-      transitions :from => :pending, :to => :approved, guard: [:travel_request_present?, :travel_request_booking_confirmed?]
+      transitions :from => :trip_approved, :to => :approved, guard: [:travel_request_present?, :travel_request_booking_confirmed?]
     end
 
 
     event :unapprove do
+      transitions :from => :trip_processing, :to => :trip_processing, guard: [:travel_request_present?]
+      transitions :from => :trip_approved, :to => :trip_processing, guard: [:travel_request_present?]
       transitions :from => :processing, :to => :processing
       transitions :from => :approved, :to => :processing
     end
@@ -58,29 +68,33 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     end
 
     event :take_control do
+      transitions :from => :trip_processing, :to => :trip_processing, guard: [:travel_request_present?]
       transitions :from => :processing, :to => :processing
     end
 
     event :return_control do
+      transitions :from => :trip_processing, :to => :trip_processing, guard: [:travel_request_present?]
       transitions :from => :processing, :to => :processing
     end
 
     event :reject do
+      transitions :from => :trip_processing, :to => :trip_rejected, guard: [:user_can_review?, :travel_request_present?]
       transitions :from => :processing, :to => :rejected, guard: :user_can_review?
     end
 
     event :retract do
+      transitions :from => :trip_processing, :to => :trip_retracted, guard: [:travel_request_present?]
       transitions :from => :processing, :to => :retracted
     end
 
-    event :credit do ## Confirm the action
+    event :credit do
       transitions :from => :processing, to: :credited
       transitions :from => [:approved, :auto_approved], to: :credited
       transitions :from => [:approved, :auto_approved], to: :pending
     end
 
-    event :mark_as_credited do #todo write the action for moving from pending to credited
-      transitions from: :pending, to: :credited
+    event :mark_as_credited do #todo check if mark as credited should do this
+      transitions from: :approved, to: :credited
     end
 
     after_all_events :change_state

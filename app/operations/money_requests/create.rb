@@ -53,7 +53,13 @@ class MoneyRequests::Create < MoneyRequests::Base
 
   def process
     param = mr_create_params
-    param[:status_id] = MoneyRequestStatus.id_for(:open)
+
+    # if travel request present then should start with trip_open status > check MoneyRuquestProvider for more reference
+    if self.travel_request.present?
+      param[:status_id] = MoneyRequestStatus.id_for(:trip_open)
+    else
+      param[:status_id] = MoneyRequestStatus.id_for(:open)
+    end
     param[:controlling_user] = self.for_user
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
     param[:policy_id] = self.policy_id
