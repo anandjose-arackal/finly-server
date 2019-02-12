@@ -17,27 +17,28 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def mark_as_credited
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
-        return true
-      elsif bank_payment_request.approved?
-        return true
-      end
+      return true if (bank_payment_request.approved? || bank_payment_request.auto_approved?)
+      # if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
+      #   return true
+      # elsif bank_payment_request.approved?
+      #   return true
+      # end
     end
     ############# Admin logic end ####################    
 
     ############# Reviewer logic start ####################
-    if user.vendor_payments_reviewer?
-      if (!bank_payment_request.processing? && !bank_payment_request.open?)
-        if (bank_payment_request.get_reviewers.include?(user))
-          return true
-        end
-      end
-    end
+    # if user.vendor_payments_reviewer?
+    #   if (!bank_payment_request.approved? && !bank_payment_request.auto_approved?)
+    #     if (bank_payment_request.get_reviewers.include?(user))
+    #       return true
+    #     end
+    #   end
+    # end
     ############# Reviewer logic start ####################
 
     ############# Creditor logic start ####################
     if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved?
+      if bank_payment_request.document_role_users(:creditor).include?(user) && (bank_payment_request.approved? || bank_payment_request.auto_approved?)
         return true
       end
     end
@@ -45,13 +46,13 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ############# Initiator logic start ####################
-    if user.vendor_payments_initiator?
-      if (bank_payment_request.open? || bank_payment_request.rejected?) && (bank_payment_request.owner_id == user.id)
-        return user.vendor_payments_admin? ? true : false
-      elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
-        return user.vendor_payments_admin?
-      end
-    end
+    # if user.vendor_payments_initiator?
+    #   if (bank_payment_request.open? || bank_payment_request.rejected?) && (bank_payment_request.owner_id == user.id)
+    #     return user.vendor_payments_admin? ? true : false
+    #   elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
+    #     return user.vendor_payments_admin?
+    #   end
+    # end
     ############# Initiator logic end ####################
   end
 
@@ -257,7 +258,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
       ############# Initiator logic start ####################
     elsif (bank_payment_request.owner_id == user.id)
-      if (bank_payment_request.processing? || bank_payment_request.open? || bank_payment_request.rejected?)
+      if (bank_payment_request.retracted? || bank_payment_request.open? || bank_payment_request.rejected?)
         return true
       end
     end
@@ -272,7 +273,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
       ############# Initiator logic start ####################
     elsif (bank_payment_request.owner_id == user.id)
-      if (bank_payment_request.processing? || bank_payment_request.open? || bank_payment_request.rejected?)
+      if (bank_payment_request.retracted? || bank_payment_request.open? || bank_payment_request.rejected?)
         return true
       end
     end

@@ -127,7 +127,7 @@ class YesBankApi::Base < BaseHandler
 
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
-      self.transfer_status_id = BankTransferStatus.id_for(:failed)
+      self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
       # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
       if self.payment&.reference_resource&.is_a?(BankTransaction)
@@ -135,7 +135,7 @@ class YesBankApi::Base < BaseHandler
         self.bank_transaction = payment.reference_resource
         self.bank_transaction.update(
             bank_reference_number: self.transfer_request.bank_reference_number,
-            transfer_status_id: BankTransferStatus.id_for(:possible_failure),
+            transfer_status_id: self.transfer_status_id,
             bank_response: self.transfer_request.transaction_result
         )
         self.payment.retry_count += 1
