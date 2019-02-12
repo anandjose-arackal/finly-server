@@ -1,5 +1,5 @@
 class MoneyRequests::Create < MoneyRequests::Base
-  attr_accessor :policy_id, :for_user, :default_policy, :mr_create_params
+  attr_accessor :policy_id, :for_user, :default_policy, :mr_create_params, :travel_request
 
   # def authorized_user_types
   #   :employee
@@ -25,6 +25,17 @@ class MoneyRequests::Create < MoneyRequests::Base
     end
   end
 
+  def validate
+    travel_request_id = mr_create_params[:travel_request_id]
+    if travel_request_id.present?
+      self.travel_request = TravelRequests::Show.(user, {id: travel_request_id}).travel_request rescue nil
+
+      unless self.travel_request.present?
+        add_message :error, "Travel Request Not Found"
+      end
+    end
+  end
+
   def pre_process
     if [1, '1'].include?(mr_create_params[:payment_mode_id]) and mr_create_params[:destination_pocket_id].blank?
       mr_create_params[:destination_pocket_id] = self.for_user.user_pockets.cash_pockets_only.first.id
@@ -42,7 +53,13 @@ class MoneyRequests::Create < MoneyRequests::Base
 
   def process
     param = mr_create_params
-    param[:status_id] = MoneyRequestStatus.id_for(:open)
+
+    # if travel request present then should start with trip_open status > check MoneyRuquestProvider for more reference
+    if self.travel_request.present?
+      param[:status_id] = MoneyRequestStatus.id_for(:trip_open)
+    else
+      param[:status_id] = MoneyRequestStatus.id_for(:open)
+    end
     param[:controlling_user] = self.for_user
     param[:controlling_user_role_id] = UserRole.id_for(:employee)
     param[:policy_id] = self.policy_id
@@ -80,24 +97,40 @@ class MoneyRequests::Create < MoneyRequests::Base
       CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request),
           custom_fields: params[:custom_fields], reset_fields: true, save: true)
 
-      # Create Document Level Reviewer Mapping
-      # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.money_request.reload
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
-        return
+      if self.travel_request.present?
+        # Create Document Level Reviewer Mapping & Use Travel Request Provider
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.money_request.reload
+        params[:provider_name] = "TravelRequestProvider"
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
+      else
+        # Create Document Level Reviewer Mapping
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.money_request.reload
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
       end
+
+      
     else
       self.messages[:error] = money_request.errors.full_messages
     end
   end
 
   def post_process
-    if self.money_request.travel_request.present? and TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.money_request.travel_request.status_id)
-      self.money_request.update(status_id: MoneyRequestStatus.id_for(:pending))
-    end
+    #if self.money_request.travel_request.present? and TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.money_request.travel_request.status_id)
+    #  self.money_request.update(status_id: MoneyRequestStatus.id_for(:pending))
+    #end
     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     money_request.comments.create(user: user, comment_action_id: MoneyRequestCommentAction.id_for(:created_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
   end

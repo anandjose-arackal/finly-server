@@ -1,8 +1,6 @@
 class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aasm::BaseProvider
 
-  attr_accessor :provider_name
-
-  def initialize(document, violation_present, user)
+  def initialize(document, violation_present, user, provider_name=nil)
     self.document = document
     self.violations_present = violations_present
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
@@ -17,6 +15,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
     self.previous_level = document.get_level(:prev, provider_name)
     self.current_level_reviewers = document.get_reviewers(:current, provider_name)
     self.reviewers = document.get_reviewers(:next, provider_name)
+    self.document_update_params = {}
   end
 
   aasm :whiny_transitions => false do
@@ -59,6 +58,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
     end
 
     event :confirm_booking do
+      # MoneyRequestProvider depends on this to mark money requests to approved form pending status
       transitions from: :selection_confirmed, to: :booking_confirmed
     end
 

@@ -12,9 +12,9 @@
 class MoneyRequestStatus < ApplicationRecord
   include Seedable
 
-  VALUES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, credited: 6, pending: 7, auto_approved: 8}
+  VALUES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, credited: 6, pending: 7, auto_approved: 8, trip_open: 9, trip_processing: 10, trip_retracted: 11, trip_rejected: 12, trip_approved: 13}
 
-  ORDER = {open: 1, processing: 3, retracted: 2, rejected: 4, approved: 5, credited: 6, pending: 7, auto_approved: 8}
+  ORDER = {open: 1, processing: 3, retracted: 2, rejected: 4, approved: 5, credited: 6, pending: 7, auto_approved: 8, trip_open: 9, trip_processing: 10, trip_retracted: 11, trip_rejected: 12, trip_approved: 13}
 
   scope :with_name, ->(name) { where name: name}
 

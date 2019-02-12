@@ -54,19 +54,27 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
     end
 
     self.workflow_output = op.workflow_output
+
+    self.trave_request.money_requests.each do |money_request|
+      parameters = {
+        document: money_request,
+        aasm_event: 'reject',
+        provider_name: 'TravelRequestProvider'
+      }
+
+      money_request_op = WorkflowManager::Base.(user, parameters)
+    end
   end
 
   def post_process
-    # add comments #todo
     travel_request.comments.create user_id: user.id,
                                          action_id: TravelRequestCommentAction.id_for(:reject),
                                          note: self.rejection_note
 
-    # todo - abi
-    travel_request.money_requests.status_pending.update_all(
-        controlling_user_id: travel_request.controlling_user_id,
-        controlling_user_role_id: travel_request.controlling_user_role_id
-    )
+    #travel_request.money_requests.status_pending.update_all(
+    #    controlling_user_id: travel_request.controlling_user_id,
+    #    controlling_user_role_id: travel_request.controlling_user_role_id
+    #)
 
     # Event::EBankPaymentRequest::Reject.(user, travel_request: travel_request)
     role_id = self.workflow_output[:role_id]

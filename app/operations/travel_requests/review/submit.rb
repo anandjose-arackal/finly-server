@@ -91,6 +91,16 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
       return
     end
 
+    self.travel_request.money_requests.each do |money_request|
+      parameters = {
+        document: money_request,
+        aasm_event: 'submit',
+        provider_name: 'TravelRequestProvider'
+      }
+
+      money_request_op = WorkflowManager::Base.(user, parameters)
+    end
+
     self.workflow_output = op.workflow_output
   end
 
@@ -101,11 +111,6 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
     travel_request.comments.create(user_id: user.id,
                                    action_id: TravelRequestCommentAction.id_for(tr_comment_action), delegated_action_user_id: delegated_action_user_id)
 
-    # todo - abi
-    travel_request.money_requests.status_pending.update_all(
-        controlling_user_id: travel_request.controlling_user_id,
-        controlling_user_role_id: travel_request.controlling_user_role_id
-    )
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
     role_id = self.workflow_output[:role_id]
     Event::ETravelRequest::Submit.(user, travel_request: travel_request, role_id: role_id)

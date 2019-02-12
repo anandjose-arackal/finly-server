@@ -64,6 +64,16 @@ class TravelRequests::Review::ReturnControl < TravelRequests::Review::Base
     end
 
     self.workflow_output = op.workflow_output
+
+    self.travel_request.money_requests.each do |money_request|
+      parameters = {
+        document: money_request,
+        aasm_event: 'return_control',
+        provider_name: 'TravelRequestProvider'
+      }
+
+      money_request_op = WorkflowManager::Base.(user, parameters)
+    end
   end
 
   def post_process
@@ -71,19 +81,11 @@ class TravelRequests::Review::ReturnControl < TravelRequests::Review::Base
                                    action_id: TravelRequestCommentAction.id_for(:return_control),
                                    content: params[:take_control_note]
 
-    # # todo - check how the workflow should be
-    # travel_request.money_requests.status_pending.update_all(
-    #     controlling_user_id: travel_request.controlling_user_id,
-    #     controlling_user_role_id: travel_request.controlling_user_role_id
-    # )
+    
     # # Event::EMoneyRequest::TakeControl.(self.user, travel_request: self.travel_request)
-    # role_id = self.workflow_output[:role_id]
-    # Event::ETravelRequest::TakeControl.(user, travel_request: travel_request, role_id: role_id)
-
-    travel_request.money_requests.status_pending.each do |money_request|
-      params[:money_request_id] = money_request.id
-      op = MoneyRequests::TakeControl.(user, params)
-    end
+    # todo Rais check & test mailers
+    role_id = self.workflow_output[:role_id]
+    Event::ETravelRequest::TakeControl.(user, travel_request: travel_request, role_id: role_id)
 
     add_message :success, "You've returned control of this trip"
   end

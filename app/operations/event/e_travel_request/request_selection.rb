@@ -17,7 +17,7 @@ class Event::ETravelRequest::RequestSelection < Event::ETravelRequest::Base
   end
 
   def mailer_body(user)
-    "#{self.travel_request.travel_request_trails.last.action_user.name} has requested for selection for the trip : #{self.travel_request.trip_id} and is curently awaiting your approval"
+    "#{self.travel_request.trails.last.action_user.name} has requested for selection for the trip : #{self.travel_request.trip_id} and is curently awaiting your approval"
   end
 
   def travel_request_view_role(user)

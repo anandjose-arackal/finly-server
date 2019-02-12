@@ -57,6 +57,10 @@ class Trail < ApplicationRecord
     where(action_user_id: id)
   }
 
+  scope :with_action_user_role_id, -> (role_id) {
+    where action_user_role_id: role_id
+  }
+
   # default_scope { order created_at: :desc }
 
   scope :natural_order, -> {
