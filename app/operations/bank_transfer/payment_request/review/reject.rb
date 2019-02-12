@@ -4,11 +4,20 @@ class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentReques
 
   def init
     id = params[:id] || params[:bank_payment_request_id]
-    self.bank_payment_request = BankPaymentRequest.reviewer_associated_items(user).find_by id: id
+    op = BankTransfer::PaymentRequest::Show.(user, params)
+    if op.success?
+
+      self.bank_payment_request = op.bank_payment_request
+    end
+
     self.rejection_note = params[:note]
   end
 
   def validate
+    if self.bank_payment_request.blank?
+      add_message :error, 'Bank Payment Request Not Found'
+      return
+    end
     unless bank_payment_request.can_reject?
       add_message :error, "Payment Order cannot be rejected at this state"
       return
