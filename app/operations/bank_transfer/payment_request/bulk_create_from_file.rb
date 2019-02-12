@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation
+                :headers, :contents, :validate_operation, :policy_id
 
   def pre_validate
     if user.blank?
@@ -28,6 +28,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
                                                    {skip_empty_lines: true})
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
+    self.policy_id = params[:policy_id]
   end
 
   def validate
@@ -98,7 +99,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   private
 
   def parse_payment_order_data
-    policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
     payment_order_attributes = {
         initiating_user_id: user.id,
         payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
@@ -124,7 +124,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             currency_id: 1
         },
         beneficiary_type_id: 2,
-        policy_id: policy&.id,
+        policy_id: self.policy_id,
         payment_order_attributes: payment_order_attributes,
         api_initiated: false
     }
