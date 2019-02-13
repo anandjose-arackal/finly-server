@@ -91,7 +91,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       #                                                         modified_user_role_id: nil
 
       # NEW CODE
-      params[:document] = self.payment_request
+      params[:document] = self.bank_payment_request
       params[:aasm_event] = 'credit'
       params[:violation_present] = false
       op = WorkflowManager::Base.(user, params)

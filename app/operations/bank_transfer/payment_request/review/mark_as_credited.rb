@@ -39,21 +39,35 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
 
   def process
     self.bank_payment_requests.each do |payment_request|
-      if payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+
+      parameters = {
+        document: payment_request,
+        aasm_event: 'mark_as_credited',
+      }
+
+      op = WorkflowManager::Base.(user, parameters)
+
+      if op.success?
+
+
+      # self.workflow_output = op.workflow_output
+
+
+      # if payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
         # mark the respective payment order and the associated payments as credited
         payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
         payment_request.payment_order.payments.each do |payment|
           payment.update(payment_status_id: PaymentStatus.id_for(:completed))
         end
         # create the trail for the same
-        payment_request.bank_payment_request_trails.create action_user: user,
-                                                          action_user_role_id: self.view_role,
-                                                          action_id: BankPaymentRequestTrailAction.id_for(:mark_as_credited),
-                                                          modified_user_id: nil,
-                                                          modified_user_role_id: nil
-        payment_request.trails.create action_user: user,
-                                      action_user_role_id: self.view_role,
-                                      action_id: TrailAction.id_for(:mark_as_credited)
+        # payment_request.bank_payment_request_trails.create action_user: user,
+        #                                                   action_user_role_id: self.view_role,
+        #                                                   action_id: BankPaymentRequestTrailAction.id_for(:mark_as_credited),
+        #                                                   modified_user_id: nil,
+        #                                                   modified_user_role_id: nil
+        # payment_request.trails.create action_user: user,
+        #                               action_user_role_id: self.view_role,
+        #                               action_id: TrailAction.id_for(:mark_as_credited)
 
         # if the payment has an associated invoice, update the status of the invoice
         payments = payment_request.payment_order.payments
@@ -64,7 +78,7 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
           end
         end
       else
-        add_message :error, bank_payment_request.errors.full_messages
+        add_message :error, op.messages[:error]
       end
     end
   end
