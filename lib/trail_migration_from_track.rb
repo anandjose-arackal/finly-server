@@ -111,8 +111,9 @@ class TrailMigrationFromTrack
     bank_payment_requests = BankPaymentRequest.all
     remaining_bank_payment_ids = bank_payment_requests.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "BankPaymentRequest").pluck(:document_reviewer_mappable_id)
     remaining_bank_payments = BankPaymentRequest.where(id: remaining_bank_payment_ids)
+    remaining_bank_payment_requests = remaining_bank_payments.where.not(api_initiated: true)
     # bank_payment_requests = BankPaymentRequest.where(id: [124557])
-    remaining_bank_payments.each do |bpr|
+    remaining_bank_payment_requests.each do |bpr|
       level_number = 1
       policy = bpr.policy
       levels = policy.levels.where(associated_entity_type: "BankPaymentRequestProvider")
@@ -213,5 +214,3 @@ class TrailMigrationFromTrack
   end
   ############################ MONEY REQUEST END ###############################
 end
-
-
