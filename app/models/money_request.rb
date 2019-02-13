@@ -106,7 +106,7 @@ class MoneyRequest < ApplicationRecord
   scope :without_associated_processor, -> { where money_request_processor_mapping_id: nil }
   scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
   scope :skip_pending, -> { where.not status_id: MoneyRequestStatus.id_for(:pending)}
-  scope :skip_tripped, -> { where.not status_id: MoneyRequest.status_ids(:trip_open, :trip_processing, :trip_retracted, :trip_rejected, :trip_approved)}
+  scope :skip_tripped, -> { where.not status_id: MoneyRequest.status_idsr(:trip_open, :trip_processing, :trip_retracted, :trip_rejected, :trip_approved)}
   scope :without_user, -> (user_id) { where.not user_id: user_id }
   scope :status_pending, -> { where status_id: MoneyRequestStatus.id_for(:pending)}
 

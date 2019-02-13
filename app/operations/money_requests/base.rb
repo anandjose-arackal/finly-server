@@ -38,9 +38,9 @@ class MoneyRequests::Base < BaseOperation
   end
 
   class MoneyRequests::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :money_request, :items, :manager, :finance_manager, :status, :total, #:money_request_currency,
+    attr_accessor :money_request, :items, :manager, :status, :total, #:money_request_currency,
                   :required_by_date, :comments, :actions, :policies, :selected_policy, :violations,
-                  :result, :card, :cash_pockets, :reviewal_chains
+                  :result, :card, :cash_pockets, :reviewal_chains, :awaiting_credit, :finance_managers
 
     def init
       self.money_request = params[:money_request]
@@ -54,6 +54,14 @@ class MoneyRequests::Base < BaseOperation
       self.selected_policy = money_request.policy
       # self.manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :manager)
       # self.finance_manager = User::Team::Approver.(money_request.user, money_request: self.money_request, type: :finance_manager)
+      
+      self.finance_managers = self.money_request.document_role_users(:finance_managers)
+
+      if MoneyRequest.status_ids(:approved, :auto_approved).include?(money_request.status_id)
+        self.awaiting_credit = true
+      else
+        self.awaiting_credit = false
+      end
       self.card = load_card
       self.cash_pockets = money_request.user.user_pockets.cash_pockets_only
 

@@ -23,10 +23,12 @@ class TravelRequests::Show < TravelRequests::Base
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :travel_request, :manager_user, :reviewal_chains, :reviewal_chains_booking, :provider_name, :awaiting_action_from_travel,
-      :travel_action_taken, :tavel_action_taken_by, :awaiting_booking
+      :travel_action_taken, :tavel_action_taken_by, :awaiting_booking, :travel_managers
   
     def init
       self.travel_request = params[:travel_request]
+
+      self.travel_managers = self.travel_request.document_role_users(:travel_managers)
 
       self.reviewal_chains = []
       self.reviewal_chains_booking = []
@@ -106,9 +108,9 @@ class TravelRequests::Show < TravelRequests::Base
     #   self.travel_manager_user
     # end
 
-    def travel_managers
-      self.travel_request.document_role_users(:travel_managers)
-    end
+    #def travel_managers
+    #  self.travel_request.document_role_users(:travel_managers)
+    #end
 
     def actions
       # actions = {editable: editable, destroyable: destroyable}
