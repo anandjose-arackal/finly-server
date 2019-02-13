@@ -61,9 +61,9 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       category_id = item[:category_id]
       cost_center_id = item[:cost_center_id]
       department_id = item[:department_id]
-      invoice_number = item[:invoice_number]
-      invoice_date = item[:invoice_date]
-      due_date = item[:due_date]
+      # invoice_number = item[:invoice_number]
+      # invoice_date = item[:invoice_date]
+      # due_date = item[:due_date]
       note = item[:note]
 
       # generating custom field data
@@ -81,29 +81,39 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       item[:custom_fields] = custom_fields
+      
 
 
       self.error_messages = []
       self.issue_item = {}
+
+      # new requirement
+      # SET key as array to hold mupltiple errors
+      self.issue_item[:ifsc] = []
+      self.issue_item[:tax] = []
+      self.issue_item[:discount] = []
+      self.issue_item[:original_amount] = []
+      self.issue_item[:bank_account_number] = []
+
       # Check if bank account number is present
       if bank_account_no.blank?
         self.valid = false
         self.error_messages << 'Bank account not found'
-        self.issue_item[:bank_account_number] = 'No bank account entered'
+        self.issue_item[:bank_account_number] << 'No bank account entered'
       end
 
       # Check if the amount is present
       unless validate_amount(amount)
         self.valid = false
         self.error_messages << 'Invalid amount'
-        self.issue_item[:original_amount] = 'Invalid amount'
+        self.issue_item[:original_amount] << 'Invalid amount'
       end
 
       # check if the ifsc is present
       if ifsc.blank?
         self.valid = false
         self.error_messages << 'IFSC cannot be blank'
-        self.issue_item[:ifsc] = 'IFSC cannot be blank'
+        self.issue_item[:ifsc] <<  'IFSC cannot be blank'
       end
 
       # check for format of the IFSC
@@ -111,32 +121,36 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       unless ifsc =~ pattern
         self.valid = false
         self.error_messages << "Invalid IFSC"
-        self.issue_item[:ifsc] = 'Invalid IFSC'
+        self.issue_item[:ifsc] << 'Invalid IFSC'
       end
 
+      
       # adding all invoice specific validations here for the payment
-      unless validate_date invoice_date
-        self.valid = false
-        self.error_messages << "Invalid invoice date"
-        self.issue_item[:invoice_date] = 'Invalid invoice date'
-      end
+      # 
+      # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
+      # 
+      # unless validate_date invoice_date
+      #   self.valid = false
+      #   self.error_messages << "Invalid invoice date"
+      #   self.issue_item[:invoice_date] = 'Invalid invoice date'
+      # end
 
-      unless validate_date due_date
-        self.valid = false
-        self.error_messages << "Invalid due date"
-        self.issue_item[:due_date] = 'Invalid due date'
-      end
+      # unless validate_date due_date
+      #   self.valid = false
+      #   self.error_messages << "Invalid due date"
+      #   self.issue_item[:due_date] = 'Invalid due date'
+      # end
 
       unless validate_rate tax, 1, amount
         self.valid = false
         self.error_messages << "Invalid tax entered"
-        self.issue_item[:tax] = 'Invalid tax entered'
+        self.issue_item[:tax] << 'Invalid tax entered'
       end
 
       unless validate_rate discount, 1, amount
         self.valid = false
         self.error_messages << "Invalid discount entered"
-        self.issue_item[:discount] = 'Invalid discount entered'
+        self.issue_item[:discount] << 'Invalid discount entered'
       end
 
       if self.valid
@@ -146,6 +160,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
       self.contents << item.values
+
+      self.issue_item.each {|k, v| self.issue_item.delete(k) if v.blank?} # delete unnecessary keys which have no error
       self.issues << self.issue_item
     end
     puts "self.issues", self.issues.inspect

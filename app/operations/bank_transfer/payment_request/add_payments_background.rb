@@ -1,3 +1,6 @@
+# called when user adds excel sheet or manually adds new payments
+# This would create multiple individual payments for payment ticket/bankpaymentrequest in the background
+
 class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   sidekiq_options queue: :payments_queue
 
@@ -66,12 +69,15 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
           invoice_attributes: {
               category_id: payment[:category_id],
               cost_center_id: payment[:cost_center_id],
-              inclusive_of_taxes: payment[:inclusive_of_taxes],
+              inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
               gst_type_id: payment[:gst_type_id],
               tds_slab_id: payment[:tds_slab_id],
-              invoice_number: payment[:invoice_number],
-              date: payment[:invoice_date],
-              due_date: payment[:due_date],
+              # 
+              # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
+              # 
+              # invoice_number: payment[:invoice_number],
+              # date: payment[:invoice_date],
+              # due_date: payment[:due_date],
               tax: payment[:tax],
               discount: payment[:discount],
               invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),

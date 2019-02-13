@@ -1,10 +1,13 @@
 # This creates a new bankpaymentrequest/payment ticket
+# without using excel sheet
+# Part of new payment concept
+# User can create multiple payments
 # This handles payments to beneficiries, unauthorized/authorized
 
 # TODO
-# create individual payments in the background
-# handle all type of validations
-# reuse existing bulkvalidation
+# create individual payments in the background DONE
+# handle all type of validations DONE
+# reuse existing bulkvalidation DONE
 
 class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	attr_accessor :vendor_id, :vendor, :total_amount, :payment_mode, :bank_payment_request_params, :bank_payment_request,
@@ -71,7 +74,9 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	    # asynchronously add payments to it one by one
 	    self.bank_payment_request_params = parse_payment_order_data
 	    self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
-		op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+
+	    # Delegate payment creation to the background operation
+		BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
 	end
 
