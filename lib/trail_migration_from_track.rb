@@ -1,8 +1,7 @@
 class TrailMigrationFromTrack
 
+  ############################## REPORTS START ##############################
   def self.reports_run
-    ############################## REPORTS START ##############################
-
     start_time = DateTime.now
     puts start_time
     reports = Report.all
@@ -104,13 +103,11 @@ class TrailMigrationFromTrack
         report.document_level_reviewer_mappings.update_all(viewable: true)
       end
     end
-
-
-    ######################### REPORTS END #########################
   end
+  ############################# REPORTS END ################################
 
+  ############################# PAYMENT TICKET START ##########################
   def self.bpr_run
-    ############################# PAYMENT TICKET START ##########################
     bank_payment_requests = BankPaymentRequest.all
     remaining_bank_payment_ids = bank_payment_requests.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "BankPaymentRequest").pluck(:document_reviewer_mappable_id)
     remaining_bank_payments = BankPaymentRequest.where(id: remaining_bank_payment_ids)
@@ -206,8 +203,15 @@ class TrailMigrationFromTrack
     end
     end_time = DateTime.now
     puts end_time
-    ######################### PAYMENT TICKET START #########################
   end
+
+  ############################## PAYMENT TICKET START ###########################
+
+  ############################## MONEY REQUEST START ###########################
+  def self.money_request_run
+
+  end
+  ############################ MONEY REQUEST END ###############################
 end
 
 
