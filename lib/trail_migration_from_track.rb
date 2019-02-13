@@ -116,7 +116,8 @@ class TrailMigrationFromTrack
     remaining_bank_payment_requests.each do |bpr|
       level_number = 1
       policy = bpr.policy
-      levels = policy.levels.where(associated_entity_type: "BankPaymentRequestProvider")
+      next if policy.blank?
+      levels = policy&.levels.where(associated_entity_type: "BankPaymentRequestProvider")
       user = bpr.user
 
       # create DLRM for this particular document
