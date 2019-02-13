@@ -61,7 +61,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 	      self.contents = validate_operation.contents
 	      self.headers = validate_operation.headers
 	      self.issues = validate_operation.issues
-	      add_message :error, "Some of the payments have errors, please verify your vendor data."
+	      add_message :error, self.issues
 	    end
 
 	end
