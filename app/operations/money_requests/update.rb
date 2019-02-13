@@ -100,14 +100,18 @@ class MoneyRequests::Update < MoneyRequests::Base
       if params[:custom_fields].present? or original_policy_id != updated_policy_id
         CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), custom_fields: params[:custom_fields], save: true, reset_fields: true)
       end
-      # Create Document Level Reviewer Mapping
-      # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.money_request.reload
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
-        return
+      # Update money_request DLRMs only when the owner does it
+      if money_request.user_id == user.id && params[:view] == 'personal' && money_request.travel_request.blank?
+        # Create Document Level Reviewer Mapping
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.money_request.reload
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
       end
 
     else

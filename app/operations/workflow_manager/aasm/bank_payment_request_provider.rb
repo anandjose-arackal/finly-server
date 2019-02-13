@@ -8,8 +8,10 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     state :auto_approved
     state :credited
     state :creation_in_progress
-    state :failed
     state :pending
+
+
+    #[:open, :processing, :submitted, :retracted, :rejected, :approved, :unapprove, :credited, :pending, :creation_in_progress, :auto_approved]
     #:open, :processing, :submitted, :retracted, :rejected, :approved,
     # :unapprove, :credited, :pending, :creation_in_progress, :auto_approved
 
@@ -52,29 +54,15 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
       transitions :from => :processing, :to => :retracted
     end
 
-    event :settle do ## Confirm the action
-      transitions :from => [:approved, :auto_approved], to: :settled
-    end
-
-    event :confirm_settlement do ## Confirm the action
-      transitions :from => [:settled], :to => [:settlement_confirmed]
-    end
-
     event :credit do
       transitions from: [:open, :retracted, :rejected, :approved, :auto_approved], to: :credited
     end
 
-    event :fail do
-      transitions from: [:open, :retracted, :rejected, :approved, :auto_approved], to: :failed
-    end
-
-    event :close do ## Confirm action
-      # Check from what all states it can transition
-      #
-      transitions :from => [:approved], to: :closed
+    event :mark_as_credited do
+      # Failed should be also added
+      transitions from: [:approved, :auto_approved], to: :credited
     end
 
     after_all_events :change_state
   end
-
 end
