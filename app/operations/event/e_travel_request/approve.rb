@@ -35,7 +35,7 @@ class Event::ETravelRequest::Approve < Event::ETravelRequest::Base
     # else
     #   [last_tr_trail.action_user, self.travel_request.controlling_user]
     # end
-    self.travel_request.affected_users(:approve)
+   self.travel_request.document_role_users(:travel_manager).present? ? ( self.travel_request.affected_users(:approve) + self.travel_request.document_role_users(:travel_manager) ) :  self.travel_request.affected_users(:approve)
   end
 
   def mailer_subject(user)
@@ -43,14 +43,18 @@ class Event::ETravelRequest::Approve < Event::ETravelRequest::Base
     if approver_id.present? and (user.id == approver_id)
       "Trip Approved : #{self.travel_request.trip_id}"
     else
-      if approved and (user.id == self.travel_request.user.id)
-        if auto_approve
-          message = "Congratulations! Your trip #{travel_request.trip_id} has been auto approved"
+      if approved 
+        if (user.id == self.travel_request.user.id)
+          if auto_approve
+            message = "Congratulations! Your trip #{travel_request.trip_id} has been auto approved"
+          else
+            message = "Congratulations! Your trip #{travel_request.trip_id} has been has been approved"
+          end
+        elsif user.id == self.travel_request.document_role_users(:travel_manager).last.id
+          "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id} and is currently waiting for your approval"
         else
-          message = "Congratulations! Your trip #{travel_request.trip_id} has been has been approved"
+          "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id}"
         end
-      else
-        "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id}"
       end
     end
   end
@@ -60,14 +64,18 @@ class Event::ETravelRequest::Approve < Event::ETravelRequest::Base
     if approver_id.present? and (user.id == approver_id)
       message = "You have successfully approved the trip : #{self.travel_request.trip_id}"
     else
-      if approved and (user.id == travel_request.user.id)
-        if auto_approve
-          message = "Congratulations! Your trip has been auto-approved"
+      if approved
+        if (user.id == travel_request.user.id)
+          if auto_approve
+            message = "Congratulations! Your trip has been auto-approved"
+          else
+            message = "Congratulations! Your trip has been approved"
+          end
+        elsif user.id == self.travel_request.document_role_users(:travel_manager).last.id
+          message = "#{self.approving_user.name&.titleize} has approved the trip '#{self.travel_request.trip_id}' and is currently waiting for your approval"
         else
-          message = "Congratulations! Your trip has been approved"
+          "#{self.approving_user.name&.titleize} has approved the trip: #{travel_request.trip_id}"
         end
-      else
-        message = "#{self.approving_user.name&.titleize} has approved the trip '#{self.travel_request.trip_id}' and is currently waiting for your approval"
       end
     end
     message
@@ -89,6 +97,8 @@ class Event::ETravelRequest::Approve < Event::ETravelRequest::Base
       return UserRole.id_for(:manager)
     elsif user.id == self.travel_request.trails.last.action_user_id
       return UserRole.id_for(:manager)
+    elsif user.id == self.travel_request.document_role_users(:travel_manager).last.id
+      return UserRole.id_for(:travel_manager)
     end
   end
 

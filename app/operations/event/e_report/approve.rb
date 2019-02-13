@@ -45,7 +45,7 @@ class Event::EReport::Approve < Event::EReport::Base
     # else
     #   [self.report.tracks.last.action_user, self.report.controlling_user]
     # end
-    self.report.affected_users(:approve)
+    self.report.document_user_roles(:finance_manager).last.present? ? ( self.report.affected_users(:approve) + self.report.document_user_roles(:finance_manager).last ) : self.report.affected_users(:approve)
   end
 
   def get_token(user)
@@ -150,6 +150,8 @@ class Event::EReport::Approve < Event::EReport::Base
       return UserRole.id_for(:manager)
     elsif user.id == self.report.trails.last.action_user_id
       return UserRole.id_for(:manager)
+    elsif user.id == self.report.document_user_roles(:finance_manager)&.last&.id
+      return UserRole.id_for(:finance_manager)
     end
   end
 
