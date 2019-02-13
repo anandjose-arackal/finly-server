@@ -88,10 +88,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def credit
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
-      if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
-        return !bank_payment_request.credit_card?
-      elsif bank_payment_request.approved?
-          return true
+      if ( (bank_payment_request.approved? || bank_payment_request.auto_approved?)  )
+        return true
+      # elsif bank_payment_request.approved?
+      #     return true
       elsif bank_payment_request.credited?
         return bank_payment_request.payment_order.partially_completed?
       end
@@ -99,16 +99,16 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic end #########################
 
     ############# Reviewer logic start #########################
-    if bank_payment_request.processing?
-      if (bank_payment_request.get_reviewers.include?(user))
-        return !bank_payment_request.credit_card?
-      end
-    end
+    # if bank_payment_request.processing?
+    #   if (bank_payment_request.get_reviewers.include?(user))
+    #     return !bank_payment_request.credit_card?
+    #   end
+    # end
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
     if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved?
+      if bank_payment_request.document_role_users(:creditor).include?(user) && (bank_payment_request.approved? || bank_payment_request.auto_approved?)
         return !bank_payment_request.credit_card?
       elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
         return bank_payment_request.payment_order.partially_completed?
@@ -118,27 +118,27 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ########## Initiator logic start ######################### 
-    if user.vendor_payments_initiator?
-      if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
-        balance = retrieve_balance(:vendor_payment_wallet, user)
-        if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval) && !bank_payment_request.credit_card?
-          return true
-        elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
-          return true
-        end
-      elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
-        balance = retrieve_balance(:vendor_payment_wallet, user)
-        if balance >= bank_payment_request.requested_amount_value
-          return true
-        elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
-          return true
-        end
-      elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
-        if bank_payment_request.payment_order.partially_completed?
-          return true
-        end          
-      end
-    end
+    # if user.vendor_payments_initiator?
+    #   if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
+    #     balance = retrieve_balance(:vendor_payment_wallet, user)
+    #     if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval) && !bank_payment_request.credit_card?
+    #       return true
+    #     elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
+    #       return true
+    #     end
+    #   elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
+    #     balance = retrieve_balance(:vendor_payment_wallet, user)
+    #     if balance >= bank_payment_request.requested_amount_value
+    #       return true
+    #     elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
+    #       return true
+    #     end
+    #   elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
+    #     if bank_payment_request.payment_order.partially_completed?
+    #       return true
+    #     end          
+    #   end
+    # end
     ########### Initiator logic end ##############################
   end
 
