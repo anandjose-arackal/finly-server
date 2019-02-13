@@ -36,24 +36,26 @@ class Event::EInvoice::Approve < Event::EInvoice::Base
   end
 
   def affected_users
-    if approved
-      if auto_approve
-        return [self.invoice.created_by]
-      end
-      [self.invoice.trails.last.action_user, self.invoice.created_by]
-    else
-      users = [self.invoice.trails.last.action_user]
-      if controlling_users.present?
-        controlling_users.each do |user|
-          users.push(user)
-        end
-      end
-      users
-    end
+    # if approved
+    #   if auto_approve
+    #     return [self.invoice.created_by]
+    #   end
+    #   [self.invoice.trails.last.action_user, self.invoice.created_by]
+    # else
+    #   users = [self.invoice.trails.last.action_user]
+    #   if controlling_users.present?
+    #     controlling_users.each do |user|
+    #       users.push(user)
+    #     end
+    #   end
+    #   users
+    # end
+    self.invoice.affected_users(:approve)
   end
 
   def notification_affected_users
-    approved ?  [invoice.created_by] : self.controlling_users
+    # approved ?  [invoice.created_by] : self.controlling_users
+    approved ?  [invoice.created_by] : self.invoice.notification_affected_users(:approve)
   end
 
   def set_notification(user)

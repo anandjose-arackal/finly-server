@@ -9,27 +9,28 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
 
   def affected_users
     # [self.report.user, self.report.reload.controlling_user]
-    users = []
-    users.push self.invoice.created_by
+    # users = []
+    # users.push self.invoice.created_by
 
-    level = ReviewalLevel.find_by id: workflow_output[:modified_level_id]
+    # level = ReviewalLevel.find_by id: workflow_output[:modified_level_id]
 
-    if level.present?
-      user_selected_reviewer = invoice.document_level_reviewer_mappings.with_level_ids(level.id).last
-      if user_selected_reviewer.present?
-        self.controlling_users.push(user_selected_reviewer.reviewer)
-        users.push(user_selected_reviewer.reviewer)
-      else
-        amount = invoice.net_amount.value
-        reviewers_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
-        reviewers = User.with_id(reviewers_ids)
-        reviewers.each do |reviewer|
-          users.push(reviewer)
-          self.controlling_users.push(reviewer)
-        end
-      end
-    end
-    users
+    # if level.present?
+    #   user_selected_reviewer = invoice.document_level_reviewer_mappings.with_level_ids(level.id).last
+    #   if user_selected_reviewer.present?
+    #     self.controlling_users.push(user_selected_reviewer.reviewer)
+    #     users.push(user_selected_reviewer.reviewer)
+    #   else
+    #     amount = invoice.net_amount.value
+    #     reviewers_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
+    #     reviewers = User.with_id(reviewers_ids)
+    #     reviewers.each do |reviewer|
+    #       users.push(reviewer)
+    #       self.controlling_users.push(reviewer)
+    #     end
+    #   end
+    # end
+    # users
+    self.invoice.affected_users(:submit)
   end
 
   # def get_token(user)
@@ -39,7 +40,8 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
 
 
   def notification_affected_users
-    self.controlling_users
+    # self.controlling_users
+    self.notification_affected_users(:submit)
   end
 
   # def send_push_notification(user)

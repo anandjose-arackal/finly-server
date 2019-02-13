@@ -22,7 +22,8 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
   end
 
   def affected_users
-    User::AssociatedUsers::Index.(self.user, document: self.invoice, user_before: self.user, amount: invoice.net_amount.value)
+    # User::AssociatedUsers::Index.(self.user, document: self.invoice, user_before: self.user, amount: invoice.net_amount.value)
+    self.invoice.affected_users(:reject)
   end
 
   # def get_token(user)
@@ -32,7 +33,8 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
 
 
   def notification_affected_users
-    self.controlling_users
+    # self.controlling_users
+    self.invoice.notification_affected_users(:reject)
   end
 
   # def send_push_notification(user)
