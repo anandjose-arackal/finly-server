@@ -92,7 +92,7 @@ class Report::Base < BaseOperation
         # policies << {id: 0, name: 'None'}
         return report.user.policies.with_application(current_app).non_default
       end
-      report.user.policies
+      report.user.policies.with_application(current_app)
     end
 
     def status_name(report)
