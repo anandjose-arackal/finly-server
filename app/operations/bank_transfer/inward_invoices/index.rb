@@ -20,7 +20,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
   attr_accessor :invoices
 
   def init
-    self.invoices = user.company.inward_invoices.created_at_desc
+    self.invoices = user.company.inward_invoices.non_beneficiary.created_at_desc
   end
 
   def success

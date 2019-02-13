@@ -255,6 +255,13 @@ class Invoice < ApplicationRecord
     where invoice_type_id: InwardInvoiceType.id_for(invoice_type)
   }
 
+  scope :non_beneficiary, ->  {
+    where(invoice_type_id: [InwardInvoiceType.id_for(:tax_invoice),
+                            InwardInvoiceType.id_for(:advance),
+                            InwardInvoiceType.id_for(:non_po_invoice),
+                            nil])
+  }
+
   after_create :set_defaults
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy

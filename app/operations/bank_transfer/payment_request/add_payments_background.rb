@@ -30,7 +30,6 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   end
 
   def init
-    puts "self.payments_attributes", self.payments_attributes.inspect
     self.company_id = self.bank_payment_request.owner.company_id
     self.user = self.bank_payment_request.owner
     self.payment_mode = self.bank_payment_request.payment_mode
@@ -76,6 +75,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
               tax: payment[:tax],
               discount: payment[:discount],
               invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
+              invoice_type_id: InwardInvoiceType.id_for(:beneficiary),
               company_id: self.user.company_id,
               original_amount_attributes: {
                   value: payment[:original_amount],
