@@ -1,11 +1,14 @@
 Gatekeeper::Checker.new 'AccountLock' do
 
+  before do
+    skip unless RequestStoreUtil.current_session.platform == 'UserSessionWeb'
+  end
+
   section 'on authorization' do
     premise :after_session_create,:after_session_update do
       # Web specific checks
       rule 'X-Finly-RP has to be set for all web requests' do
         headers = RequestStoreUtil.current_request.headers
-        next unless RequestStoreUtil.current_session.platform == 'UserSessionWeb'
         next if headers['X-Finly-RP'].present?
         response_code 401
         fail
@@ -17,7 +20,6 @@ Gatekeeper::Checker.new 'AccountLock' do
        :os_name, :os_version].each do |property|
         rule "#{property} is required in X-Finly-RP for all web requests" do
           session = RequestStoreUtil.current_session
-          next unless session.platform == 'UserSessionWeb'
           web = session.user_session_web
           if web.send(property).blank?
             response_code 401

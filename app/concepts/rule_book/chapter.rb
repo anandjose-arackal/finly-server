@@ -7,6 +7,7 @@ class RuleBook::Chapter < RuleBook::API
 
   def initialize(chapter_name, &block)
     self.page_tree = RuleBook::PageTree.new(self)
+    self.before_blocks = []
     self.name = chapter_name
     self.block = block
     run

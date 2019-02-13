@@ -1,7 +1,7 @@
 class RuleBook::Verdict < RuleBook::Rule
   include DynamicProperty
 
-  attr_accessor :executed, :failed, :rule, :params
+  attr_accessor :executed, :failed, :skipped, :rule, :params
 
   define_property :instance, :message
 
@@ -12,7 +12,10 @@ class RuleBook::Verdict < RuleBook::Rule
   end
 
   def run
-    instance_eval(&rule.block)
+    self.rule.before_blocks.each do |before_block|
+      instance_eval(&before_block)
+    end
+    instance_eval(&self.rule.block) #unless self.skipped?
     self.executed = true
   end
 
@@ -21,11 +24,20 @@ class RuleBook::Verdict < RuleBook::Rule
   end
 
   def success?
-    self.executed? and not failed?
+    self.skipped? or (self.executed? and not failed?)
   end
 
   def failed?
     self.executed? and !!self.failed
+  end
+
+  def skipped?
+    !!self.skipped
+  end
+
+  # Used for skipping rules
+  def skip
+    self.skipped = true
   end
 
   def fail
