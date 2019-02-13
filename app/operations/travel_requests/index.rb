@@ -71,6 +71,7 @@ class TravelRequests::Index < TravelRequests::Base
     when UserRole.id_for(:admin), UserRole.id_for(:auditor)
       self.travel_requests = TravelRequest.admin_associated_items(user)
     when UserRole.id_for(:manager)
+      # Include both from DLRMs of TravelRequestProvider & TravelRequestBookingProvider
       self.travel_requests = TravelRequest.reviewer_associated_items(user).or(TravelRequest.reviewer_associated_booking_items(user))
     when UserRole.id_for(:finance_manager)
       self.travel_requests = TravelRequest.finance_associated_items(user)

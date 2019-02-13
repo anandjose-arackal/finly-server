@@ -53,7 +53,7 @@ class TravelRequests::Show < TravelRequests::Base
         self.reviewal_chains_booking.push(chain)
       end
       
-      if TravelRequest.status_ids(:booking_pending, :selection_confirmed).include?(travel_request.staus_id)
+      if TravelRequest.status_ids(:booking_pending, :selection_confirmed).include?(travel_request.status_id)
         self.awaiting_booking = true
         self.travel_action_taken = false
       else
