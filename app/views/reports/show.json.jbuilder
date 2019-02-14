@@ -8,7 +8,8 @@ json.controlling_user @result.report.controlling_user
 # json.manager_name manager
 # finance_manager = (@result.finance_manager.name rescue '')
 # json.finance_manager_name finance_manager
-json.finance_managers @result.finance_managers
+json.awaiting_settlement @result.awaiting_settlement
+json.finance_managers @result.finance_managers.map(&:name)
 json.export_csv export_report_path(report_id: @result.report.id, view: params[:view], :format => :csv)
 json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
