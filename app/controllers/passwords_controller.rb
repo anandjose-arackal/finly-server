@@ -10,7 +10,7 @@ class PasswordsController < Devise::PasswordsController
     self.resource = resource_class.send_reset_password_instructions(resource_params)
     yield resource if block_given?
 
-    if successfully_sent?(resource)
+    # if successfully_sent?(resource)
       @result = {
           success: true,
           messages: {
@@ -18,10 +18,10 @@ class PasswordsController < Devise::PasswordsController
           }
       }
       render json: @result.as_json
-    else
-      flash[:error] = resource.errors.full_messages.to_sentence
-      respond_with(resource)
-    end
+    # else
+    #   # flash[:error] = resource.errors.full_messages.to_sentence
+    #   respond_with(resource)
+    # end
   end
 
   def edit
@@ -45,6 +45,10 @@ class PasswordsController < Devise::PasswordsController
         end
       }
     end
+  end
+
+  def authentication_scope
+
   end
 
   private
