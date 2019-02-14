@@ -21,6 +21,8 @@ json.summary do
   reviewer = (@result.manager.name rescue '--')
   json.reviewing_user reviewer
   creditor = (@result.finance_manager.name rescue '--')
+  json.awaiting_credit @result.awaiting_credit
+  json.creditors @result.creditors.map(&:name)
   json.crediting_user creditor
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
   # json.approvers @result.approvers

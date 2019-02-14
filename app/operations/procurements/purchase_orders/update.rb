@@ -44,14 +44,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       purchase_order.save
       purchase_order.save
 
-      # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.purchase_order.reload
-      params[:document_reviewer_mappings] = document_reviewer_mappings_params
+      if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.status_id) && purchase_order.user_id == user.id
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.purchase_order.reload
+        params[:document_reviewer_mappings] = document_reviewer_mappings_params
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
-        return
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
       end
 
       # Save Custom Fields

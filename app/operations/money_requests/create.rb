@@ -87,13 +87,18 @@ class MoneyRequests::Create < MoneyRequests::Base
     end
     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     if money_request.save
-      self.money_request.tracks.create action_user: for_user,
-                                       action_user_role_id: UserRole.id_for(:employee),
-                                       modified_user: for_user,
-                                       modified_user_role_id: param[:controlling_user_role_id],
-                                       money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
-                                       status_id: MoneyRequestStatus.id_for(:open),
-                                       delegated_action_user_id: delegated_action_user_id
+      money_request.trails.create action_user: user,
+                           action_id: TrailAction.id_for(:create),
+                           action_user_role_id: UserRole.id_for(:employee),
+                           delegated_action_user_id: delegated_action_user_id
+
+      #self.money_request.tracks.create action_user: for_user,
+      #                                 action_user_role_id: UserRole.id_for(:employee),
+      #                                 modified_user: for_user,
+      #                                 modified_user_role_id: param[:controlling_user_role_id],
+      #                                 money_request_tracking_action_id: MoneyRequestTrackingAction.create_id,
+      #                                 status_id: MoneyRequestStatus.id_for(:open),
+      #                                 delegated_action_user_id: delegated_action_user_id
       CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request),
           custom_fields: params[:custom_fields], reset_fields: true, save: true)
 

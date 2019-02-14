@@ -4,10 +4,12 @@ json.user_initial @result.report.user.name.split(' ').first[0] + ((@result.repor
 json.status @result.status_name(@result.report)
 json.status_name @result.status_name(@result.report)
 json.controlling_user @result.report.controlling_user
-manager = (@result.manager.name rescue '')
-json.manager_name manager
-finance_manager = (@result.finance_manager.name rescue '')
-json.finance_manager_name finance_manager
+# manager = (@result.manager.name rescue '')
+# json.manager_name manager
+# finance_manager = (@result.finance_manager.name rescue '')
+# json.finance_manager_name finance_manager
+json.awaiting_settlement @result.awaiting_settlement
+json.finance_managers @result.finance_managers.map(&:name)
 json.export_csv export_report_path(report_id: @result.report.id, view: params[:view], :format => :csv)
 json.export_xls export_report_path(report_id: @result.report.id, view: params[:view], :format => :xls)
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
@@ -21,6 +23,8 @@ json.currency_country_code @result.report.base_currency_code
 json.synced_with_quickbooks !!@result.report.synced_with_quickbooks?
 json.show_sync_button (@result.report.processed? && is_admin_view)
 json.controlling_user @result.report.controlling_user&.name
+
+
 
 json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
 
@@ -43,7 +47,7 @@ json.total @result.report.total_amount
 json.base_currency_id @result.report.base_currency_id
 json.date @result.report.created_at.strftime('%d %b %Y')
 
-json.approvers @result.approvers
+# json.approvers @result.approvers
 
 json.comments @result.comments do |comment|
   json.content comment.generate @result.user

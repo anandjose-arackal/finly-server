@@ -70,25 +70,43 @@ class TravelRequests::Update < TravelRequests::Base
     end
 
     if travel_request.save
-      # Create Document Level Reviewer Mapping
-      # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.travel_request.reload
-      params[:provider_name] = 'TravelRequestProvider'
+      # Update money_request DLRMs only when the owner does it
+      if travel_request.user_id == user.id && params[:view] == 'personal'
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
-        return
-      end
+        # Create Document Level Reviewer Mapping
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.travel_request.reload
+        params[:provider_name] = 'TravelRequestProvider'
 
-      # Create Document Level Reviewer Mapping for Travel Request Booking Provider
-      params[:provider_name] = 'TravelRequestBookingProvider'
-      params[:document_reviewer_mappings] = params[:document_reviewer_mappings_booking]
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
-        return
+        # Create Document Level Reviewer Mapping for Travel Request Booking Provider
+        params[:provider_name] = 'TravelRequestBookingProvider'
+        params[:document_reviewer_mappings] = params[:document_reviewer_mappings_booking]
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
+
+        # Update money requests with new policy id & new approval flow
+        policy_id = travel_request.policy_id
+        travel_request.money_requests.each do |money_request|
+          # Manually update money request > MoneyRequest::Update will not work as MoneyRequest::Index won't return these money requests
+          money_request.update(policy_id: policy_id)
+          parameters = {
+            reviewal_document: money_request,
+            provider_name: 'TravelRequestProvider'
+          }
+
+          money_request_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, parameters)
+        end
+
       end
     else
       add_message :error, self.travel_request.errors.full_messages

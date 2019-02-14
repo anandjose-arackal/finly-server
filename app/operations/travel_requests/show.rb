@@ -22,16 +22,18 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :travel_request, :manager_user, :travel_managers, :reviewal_chains, :reviewal_chains_booking, :provider_name
-
+    attr_accessor :travel_request, :manager_user, :reviewal_chains, :reviewal_chains_booking, :provider_name, :awaiting_action_from_travel,
+      :travel_action_taken, :tavel_action_taken_by, :awaiting_booking, :travel_managers
+  
     def init
       self.travel_request = params[:travel_request]
+
+      self.travel_managers = self.travel_request.document_role_users(:travel_managers)
 
       self.reviewal_chains = []
       self.reviewal_chains_booking = []
 
       self.provider_name = travel_request.get_default_provider
-
 
       params[:reviewal_document] = travel_request
       policies.each do |policy|
@@ -52,6 +54,19 @@ class TravelRequests::Show < TravelRequests::Base
         }
         self.reviewal_chains_booking.push(chain)
       end
+      
+      if TravelRequest.status_ids(:booking_pending, :selection_confirmed).include?(travel_request.status_id)
+        self.awaiting_booking = true
+        self.travel_action_taken = false
+      else
+        self.awaiting_action_from_travel = false
+      end
+
+      if TravelRequest.status_ids(:booked, :selection_requested, :selection_processing, :selection_rejected, :booking_confirmed, :completed)
+        self.travel_action_taken = true
+        #self.travel_action_taken_by = 
+      end
+
     end
 
     def get_reviewal_chain
@@ -93,9 +108,9 @@ class TravelRequests::Show < TravelRequests::Base
     #   self.travel_manager_user
     # end
 
-    def travel_managers
-      self.travel_request.document_role_users(:travel_managers)
-    end
+    #def travel_managers
+    #  self.travel_request.document_role_users(:travel_managers)
+    #end
 
     def actions
       # actions = {editable: editable, destroyable: destroyable}

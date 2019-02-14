@@ -23,12 +23,12 @@ class MoneyRequestTrack < ApplicationRecord
   belongs_to :money_request, optional: true
   belongs_to :action_user, optional: true, class_name: 'User'
   belongs_to :modified_user, optional: true, class_name: 'User'
-  belongs_to :money_request_action, optional: true
   belongs_to :status, optional: true, class_name: 'MoneyRequestStatus'
   belongs_to :action_user_role, optional: true, class_name: 'UserRole'
   belongs_to :modified_user_role, optional: true, class_name: 'UserRole'
   belongs_to :payment, optional: true
   belongs_to :delegated_action_user, optional: true, class_name: 'User'
+  belongs_to :money_request_tracking_action, optional: true
 
   default_scope { order('money_request_tracks.created_at ASC') }
 

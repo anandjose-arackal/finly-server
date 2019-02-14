@@ -78,6 +78,12 @@ class TravelRequests::Create < TravelRequests::Base
     travel_request.comments.create(user_id: user.id,
                                    action_id: TravelRequestCommentAction.id_for(:created_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
     add_message :success, 'New trip created'
+
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    travel_request.trails.create(action_user: user,
+      action_id: TrailAction.id_for(:create),
+      action_user_role_id: UserRole.id_for(:employee),
+      delegated_action_user_id: delegated_action_user_id)
   end
 
   def success

@@ -147,6 +147,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # update the requested amount for this payment order
     self.bank_payment_request.payment_order.update_requested_amount
 
+    self.bank_payment_request.trails.create action_user: user, action_id: TrailAction.id_for(:create)
+
     add_message :success, "Payment Request created successfully!"
   end
 
