@@ -35,12 +35,17 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
   end
 
   def process
-    # update the status of all payment orders as pending
+    # update the status of all payment orders that are approvable by current as pending
+    self.bank_payment_requests.where.not(status_id: BankPaymentRequestStatus.id_for(:pending)).or(
+        self.bank_payment_requests.where.not(controlling_user_id: user.id))
     self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
     ids = self.bank_payment_requests.pluck(:id)
-    # BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user: user)
-    BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
-    # BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user_id: user.id)
+
+    if self.bank_payment_requests.present?
+      BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
+    else
+      add_message :notice, 'No Payment tickets are awaiting your approval'
+    end
   end
 
   def post_process
