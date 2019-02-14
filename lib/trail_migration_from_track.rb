@@ -18,15 +18,9 @@ class TrailMigrationFromTrack
       op = ReviewalManager::DocumentReviewalMappings::Set.(report.user, reviewal_document: report)
 
       report.tracks.each do |track|
-        # extract the LURM or LRM for this particular user
-        mappings = user.level_user_reviewer_mappings.where(policy_id: policy.id, level_id: levels)
-        if mappings.empty?
-          mappings = LevelReviewerMapping.where(level_id: levels)
-        end
-
         level = levels.find_by(level_number: level_number)
 
-        reviewer = mappings.where(level_id: level&.id).first&.reviewer
+        reviewer = report.get_reviewers(level&.id).first
 
         # now based on the type of track we can decide the attributes to pass to
         # the DLRM creation operation and trails
@@ -95,6 +89,7 @@ class TrailMigrationFromTrack
           # this will reset the level number because it is going to go through the levels all over again
           level_number = 1
           report.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
+          report.update_columns(controlling_level_id: nil)
         end
       end
 
@@ -124,15 +119,9 @@ class TrailMigrationFromTrack
       op = ReviewalManager::DocumentReviewalMappings::Set.(bpr.user, reviewal_document: bpr)
 
       bpr.bank_payment_request_trails.each do |track|
-        # extract the LURM or LRM for this particular user
-        mappings = user.level_user_reviewer_mappings.where(policy_id: policy.id, level_id: levels)
-        if mappings.empty?
-          mappings = LevelReviewerMapping.where(level_id: levels)
-        end
-
         level = levels.find_by(level_number: level_number)
 
-        reviewer = mappings.where(level_id: level&.id).first&.reviewer
+        reviewer = bpr.get_reviewers(level&.id).first
 
         # now based on the type of track we can decide the attributes to pass to
         # the DLRM creation operation and trails
@@ -189,6 +178,7 @@ class TrailMigrationFromTrack
           # this will reset the level number because it is going to go through the levels all over again
           level_number = 1
           bpr.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
+          bpr.update_columns(controlling_level_id: nil)
         end
       end
 
@@ -228,15 +218,9 @@ class TrailMigrationFromTrack
       op = ReviewalManager::DocumentReviewalMappings::Set.(bpr.user, reviewal_document: bpr)
 
       bpr.bank_payment_request_trails.each do |track|
-        # extract the LURM or LRM for this particular user
-        mappings = user.level_user_reviewer_mappings.where(policy_id: policy.id, level_id: levels)
-        if mappings.empty?
-          mappings = LevelReviewerMapping.where(level_id: levels)
-        end
-
         level = levels.find_by(level_number: level_number)
 
-        reviewer = mappings.where(level_id: level&.id).first&.reviewer
+        reviewer = bpr.get_reviewers(level&.id).first
 
         # now based on the type of track we can decide the attributes to pass to
         # the DLRM creation operation and trails
@@ -293,6 +277,7 @@ class TrailMigrationFromTrack
           # this will reset the level number because it is going to go through the levels all over again
           level_number = 1
           bpr.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
+          bpr.update_columns(controlling_level_id: nil)
         end
       end
 
@@ -320,7 +305,7 @@ class TrailMigrationFromTrack
     money_requests = MoneyRequest.all
     remaining_money_request_ids = money_requests.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "MoneyRequest").pluck(:document_reviewer_mappable_id)
     remaining_money_requests = MoneyRequest.where(id: remaining_money_request_ids)
-    remaining_money_requests = MoneyRequest.where(id: 6711)
+    # remaining_money_requests = MoneyRequest.where(id: 6711)
     remaining_money_requests.each do |money_request|
       level_number = 0
       policy = money_request.policy
@@ -331,15 +316,9 @@ class TrailMigrationFromTrack
       op = ReviewalManager::DocumentReviewalMappings::Set.(money_request.user, reviewal_document: money_request)
 
       money_request.tracks.each do |track|
-        # extract the LURM or LRM for this particular user
-        mappings = user.level_user_reviewer_mappings.where(policy_id: policy.id, level_id: levels)
-        if mappings.empty?
-          mappings = LevelReviewerMapping.where(level_id: levels)
-        end
-
         level = levels.find_by(level_number: level_number)
 
-        reviewer = mappings.where(level_id: level&.id).first&.reviewer
+        reviewer = money_request.get_reviewers(level&.id).first
 
         # now based on the type of track we can decide the attributes to pass to
         # the DLRM creation operation and trails
@@ -399,6 +378,7 @@ class TrailMigrationFromTrack
           # this will reset the level number because it is going to go through the levels all over again
           level_number = 0
           money_request.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
+          money_request.update_columns(controlling_level_id: nil)
         end
       end
 
