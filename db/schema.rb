@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_09_095948) do
+ActiveRecord::Schema.define(version: 2019_02_12_060809) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3449,6 +3449,7 @@ ActiveRecord::Schema.define(version: 2019_02_09_095948) do
     t.string "scopes"
     t.string "previous_refresh_token", default: "", null: false
     t.integer "status_id", default: 1
+    t.text "message"
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
