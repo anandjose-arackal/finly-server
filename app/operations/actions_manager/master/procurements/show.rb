@@ -6,7 +6,7 @@ class ActionsManager::Master::Procurements::Show < ActionsManager::Master::Base
 
   def initialize(user=nil, params={})
     super
-    result = ::Procurements::PurchaseOrders::Show.(user, params)
+    result = ::Procurements::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return

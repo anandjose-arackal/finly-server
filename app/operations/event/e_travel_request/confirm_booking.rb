@@ -1,7 +1,7 @@
 class Event::ETravelRequest::ConfirmBooking < Event::ETravelRequest::Base
 
   def event_id
-    NotifierType.id_for(:travel_request_submit)
+    NotifierType.id_for(:travel_request_confirm_booking)
   end
 
   def action_name
@@ -40,7 +40,7 @@ class Event::ETravelRequest::ConfirmBooking < Event::ETravelRequest::Base
     if self.travel_request.document_role_users(:travel_manager).include?(user)
       return UserRole.id_for(:travel_manager)
     elsif user.id == self.travel_request.user_id
-      return UserRole.id_for(employee)
+      return UserRole.id_for(:employee)
     elsif self.travel_request.get_reviewers('current', 'TravelRequestBookingProvider').include?(user)
       return UserRole.id_for(:travel_manager)
     end

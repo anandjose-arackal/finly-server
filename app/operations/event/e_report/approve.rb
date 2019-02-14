@@ -45,7 +45,7 @@ class Event::EReport::Approve < Event::EReport::Base
     # else
     #   [self.report.tracks.last.action_user, self.report.controlling_user]
     # end
-    self.report.document_user_roles(:finance_manager).last.present? ? ( self.report.affected_users(:approve) + self.report.document_user_roles(:finance_manager).last ) : self.report.affected_users(:approve)
+    self.report.document_user_roles(:finance_manager).present? ? ( self.report.affected_users(:approve) + self.report.document_user_roles(:finance_manager) ) : self.report.affected_users(:approve)
   end
 
   def get_token(user)
@@ -107,15 +107,21 @@ class Event::EReport::Approve < Event::EReport::Base
     if approver_id.present? and user.id == approver_id
       "Report approved : #{self.report.name}"
     else
-      if approved and user.id == self.report.user.id
-        if auto_approve
-          return "Congratulations! Your report #{report.name} has been auto-approved"
+      if approved 
+        if (user.id == self.report.user.id)
+          if auto_approve
+            return "Congratulations! Your report #{report.name} has been auto-approved"
+          else
+            return "Congratulations! Your report #{report.name} has been approved"
+          end
+        elsif self.report.document_user_roles(:finance_manager).include?(user)
+          "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
         else
-          return "Congratulations! Your report #{report.name} has been approved"
+          "#{approving_user.name} has approved the report: #{self.report.name}"
         end
-      else
-        "#{approving_user.name} has approved the report: #{self.report.name}"
-      end
+      elsif self.report.document_user_roles(:finance_manager).include?(user)
+          "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+      end  
     end
   end
 
