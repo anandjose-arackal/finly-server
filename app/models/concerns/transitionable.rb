@@ -4,8 +4,10 @@ module Transitionable
   included do
     belongs_to :policy, optional: true
     belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id, optional: true
+    belongs_to :controlling_level, class_name: "ReviewalLevel", optional: true
 
     has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
+    has_many :dlrms, class_name: "DocumentLevelReviewerMapping", as: :document_reviewer_mappable
     has_many :trails, as: :parent
 
     def document_owner_id
