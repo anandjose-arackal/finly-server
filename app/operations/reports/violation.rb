@@ -314,6 +314,9 @@ class Reports::Violation < Reports::Base
           elsif rule.period_id == Period.id_for(:year)
             start_date = date.beginning_of_year
             end_date = date.end_of_year
+          elsif rule.period_id == Period.id_for(:quarter)
+            start_date = date.beginning_of_quarter
+            end_date = date.end_of_quarter
           elsif rule.period_id == Period.id_for(:day)
             start_date = end_date = date
           end
