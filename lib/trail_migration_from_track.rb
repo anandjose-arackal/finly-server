@@ -320,8 +320,9 @@ class TrailMigrationFromTrack
     money_requests = MoneyRequest.all
     remaining_money_request_ids = money_requests.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "MoneyRequest").pluck(:document_reviewer_mappable_id)
     remaining_money_requests = MoneyRequest.where(id: remaining_money_request_ids)
+    remaining_money_requests = MoneyRequest.where(id: 6711)
     remaining_money_requests.each do |money_request|
-      level_number = 1
+      level_number = 0
       policy = money_request.policy
       levels = policy.levels.where(associated_entity_type: "MoneyRequestProvider")
       user = money_request.user
@@ -392,11 +393,11 @@ class TrailMigrationFromTrack
         ).save
 
         # incrementing the level number so that the next one will be at the level that is next
-        level_number += 1 unless [MoneyRequestTrackingAction.id_for(:create), MoneyRequestTrackingAction.id_for(:submit)].include?(track.money_request_tracking_action_id)
+        level_number += 1 unless [MoneyRequestTrackingAction.id_for(:create)].include?(track.money_request_tracking_action_id)
 
         if [MoneyRequestTrackingAction.id_for(:reject), MoneyRequestTrackingAction.id_for(:retract)].include?(track.money_request_tracking_action_id)
           # this will reset the level number because it is going to go through the levels all over again
-          level_number = 1
+          level_number = 0
           money_request.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
         end
       end

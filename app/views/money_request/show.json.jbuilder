@@ -15,7 +15,7 @@ json.awaiting_credit @result.awaiting_credit
 json.finance_managers @result.finance_managers.map(&:name)
 
 json.cash_money_requests_allowed !!current_company&.configuration&.cash_money_requests_enabled
-json.finance_manager_name finance_manager_name
+# json.finance_manager_name finance_manager_name
 json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
