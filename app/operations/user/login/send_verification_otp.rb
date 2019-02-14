@@ -60,4 +60,8 @@ class User::Login::SendVerificationOtp < BaseOperation
     end
   end
 
+  def failure
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, {})
+  end
+
 end
