@@ -123,6 +123,8 @@ class NotifierType < ApplicationRecord
               configurable_push_notification: false, configurable_mailer: false},
              {key: :travel_request_confirm_selection, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
+             {key: :travel_request_approve_selection, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: false},
              {key: :travel_request_approve, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
              {key: :travel_request_reject, has_push_notification: false, has_mailer: true,
@@ -143,6 +145,8 @@ class NotifierType < ApplicationRecord
              {key: :purchase_order_comment, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
              {key: :purchase_order_credit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :purchase_order_take_control, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
 
              # Inward Invoice

@@ -89,9 +89,9 @@ class TravelRequests::Show < TravelRequests::Base
 
     def policies
       if travel_request.user.enforce_policy_enabled?
-        return travel_request.user.policies.non_default
+        return travel_request.user.policies.with_application(current_app).non_default
       end
-      travel_request.user.policies
+      travel_request.user.policies.with_application(current_app)
     end
 
     def manager

@@ -10,7 +10,7 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::Show < ActionsManage
       add_message :error, result.messages[:error]
       return
     end
-    self.invoice = result.inward_invoice
+    self.invoice = result.invoice
   end
 
   def view_payments
@@ -26,7 +26,7 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::Show < ActionsManage
   end
 
   def delete_invoice
-    invoice.open?
+    (invoice.open? && user.vendor_payments_initiator?)
   end
 
 end
