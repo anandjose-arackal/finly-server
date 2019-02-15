@@ -305,7 +305,7 @@ class TrailMigrationFromTrack
     money_requests = MoneyRequest.all
     remaining_money_request_ids = money_requests.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "MoneyRequest").pluck(:document_reviewer_mappable_id)
     remaining_money_requests = MoneyRequest.where(id: remaining_money_request_ids)
-    # remaining_money_requests = MoneyRequest.where(id: 6711)
+    # remaining_money_requests = MoneyRequest.where(id: 10285)
     remaining_money_requests.each do |money_request|
       level_number = 0
       policy = money_request.policy
@@ -353,7 +353,7 @@ class TrailMigrationFromTrack
 
         # traverse the DLRM and mark the respective ones as viewable if it has touched that user
         current_dlrm = money_request.document_level_reviewer_mappings.where(level_id: level&.id)
-        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id) if current_dlrm.pluck(:reviewer_id).include?(action_user&.id)
+        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id)
         next_dlrm = money_request.document_level_reviewer_mappings.where(level_id: next_level&.id)
         next_dlrm.update_all(viewable: true)
         money_request.update_columns(controlling_level_id: next_level&.id)
@@ -385,6 +385,10 @@ class TrailMigrationFromTrack
       if money_request.approved? || money_request.credited?
         money_request.update_columns(controlling_level_id: nil)
         money_request.document_level_reviewer_mappings.update_all(viewable: true)
+        money_request.dlrms.each do |dlrm|
+          dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
+          dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
+        end
       end
     end
 
