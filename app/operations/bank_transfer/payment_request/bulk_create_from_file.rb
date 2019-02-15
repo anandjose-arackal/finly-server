@@ -17,6 +17,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   end
 
   def init
+    Rails.logger.fatal "FROM BulkCreateFromFile start of init,\n #{params.inspect}"
     self.file = params[:file]
     headers = [:name, :bank_account_number, :ifsc, :original_amount,
                :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
@@ -28,6 +29,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
                                                    {skip_empty_lines: true})
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
+    Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"
   end
 
   def validate

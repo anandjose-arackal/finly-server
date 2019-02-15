@@ -40,6 +40,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     self.requested_amount = 0
 
     self.issues = []
+
+    Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
     
   end
 
