@@ -7,9 +7,9 @@ class TrailMigrationFromTrack
     reports = Report.all
     remaining_report_ids = reports.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "Report").pluck(:document_reviewer_mappable_id)
     remaining_reports = Report.where(id: remaining_report_ids)
-    # reports = Report.where(id: 25849)
+    # remaining_reports = Report.where(id: 23677)
     remaining_reports.each do |report|
-      level_number = 1
+      level_number = 0
       policy = report.policy
       levels = policy.levels.where(associated_entity_type: "ReportProvider")
       user = report.user
@@ -24,7 +24,7 @@ class TrailMigrationFromTrack
 
         # now based on the type of track we can decide the attributes to pass to
         # the DLRM creation operation and trails
-        trail_action_id = TrailAction.id_for(track.report_tracking_action&.name&.to_sym)
+        trail_action_id = TrailAction.id_for(track.report_tracking_action&.name&.underscore&.split(" ")&.join("_")&.to_sym)
         original_track = track
         next_level = levels.find_by(level_number: (level_number + 1))
         modified_level = next_level
@@ -64,7 +64,7 @@ class TrailMigrationFromTrack
 
         # traverse the DLRM and mark the respective ones as viewable if it has touched that user
         current_dlrm = report.document_level_reviewer_mappings.where(level_id: level&.id)
-        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id) if current_dlrm.pluck(:reviewer_id).include?(action_user&.id)
+        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id, action_id: trail_action_id, taken_control: taken_control_by.present?)
         next_dlrm = report.document_level_reviewer_mappings.where(level_id: next_level&.id)
         next_dlrm.update_all(viewable: true)
         report.update_columns(controlling_level_id: next_level&.id)
@@ -83,11 +83,11 @@ class TrailMigrationFromTrack
         ).save
 
         # incrementing the level number so that the next one will be at the level that is next
-        level_number += 1 unless [ReportTrackingAction.id_for(:create), ReportTrackingAction.id_for(:submit)].include?(track.report_tracking_action_id)
+        level_number += 1 unless [ReportTrackingAction.id_for(:create)].include?(track.report_tracking_action_id)
 
         if ReportTrackingAction.ids_for([:reject, :retract]).include?(track.report_tracking_action_id)
           # this will reset the level number because it is going to go through the levels all over again
-          level_number = 1
+          level_number = 0
           report.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
           report.update_columns(controlling_level_id: nil)
         end
@@ -96,6 +96,10 @@ class TrailMigrationFromTrack
       if report.approved? || report.settled? || report.settlement_confirmed?
         report.update_columns(controlling_level_id: nil)
         report.document_level_reviewer_mappings.update_all(viewable: true)
+        report.dlrms.each do |dlrm|
+          dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
+          dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
+        end
       end
     end
   end
@@ -157,7 +161,7 @@ class TrailMigrationFromTrack
 
         # traverse the DLRM and mark the respective ones as viewable if it has touched that user
         current_dlrm = bpr.document_level_reviewer_mappings.where(level_id: level&.id)
-        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id) if current_dlrm.pluck(:reviewer_id).include?(action_user&.id)
+        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id, action_id: trail_action_id, taken_control: taken_control_by.present?)
         next_dlrm = bpr.document_level_reviewer_mappings.where(level_id: next_level&.id)
         next_dlrm.update_all(viewable: true)
         bpr.update_columns(controlling_level_id: next_level&.id)
@@ -256,7 +260,7 @@ class TrailMigrationFromTrack
 
         # traverse the DLRM and mark the respective ones as viewable if it has touched that user
         current_dlrm = bpr.document_level_reviewer_mappings.where(level_id: level&.id)
-        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id) if current_dlrm.pluck(:reviewer_id).include?(action_user&.id)
+        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id, action_id: trail_action_id, taken_control: taken_control_by.present?)
         next_dlrm = bpr.document_level_reviewer_mappings.where(level_id: next_level&.id)
         next_dlrm.update_all(viewable: true)
         bpr.update_columns(controlling_level_id: next_level&.id)
@@ -353,7 +357,7 @@ class TrailMigrationFromTrack
 
         # traverse the DLRM and mark the respective ones as viewable if it has touched that user
         current_dlrm = money_request.document_level_reviewer_mappings.where(level_id: level&.id)
-        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id)
+        current_dlrm.update_all(viewable: true, action_taken_by_id: action_user&.id, taken_control_by_id: taken_control_by&.id, action_id: trail_action_id, taken_control: taken_control_by.present?)
         next_dlrm = money_request.document_level_reviewer_mappings.where(level_id: next_level&.id)
         next_dlrm.update_all(viewable: true)
         money_request.update_columns(controlling_level_id: next_level&.id)
