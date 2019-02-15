@@ -111,9 +111,9 @@ class TrailMigrationFromTrack
     non_api_bank_payment_requests = bank_payment_requests.where.not(api_initiated: true)
     remaining_bank_payment_ids = non_api_bank_payment_requests.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "BankPaymentRequest").pluck(:document_reviewer_mappable_id)
     remaining_bank_payment_requests = BankPaymentRequest.where(id: remaining_bank_payment_ids)
-    # bank_payment_requests = BankPaymentRequest.where(id: [124557])
+    # remaining_bank_payment_requests = BankPaymentRequest.where(id: [63620])
     remaining_bank_payment_requests.each do |bpr|
-      level_number = 1
+      level_number = 0
       policy = bpr.policy
       next if policy.blank?
       levels = policy&.levels.where(associated_entity_type: "BankPaymentRequestProvider")
@@ -143,7 +143,7 @@ class TrailMigrationFromTrack
               BankPaymentRequestTrailAction.id_for(:approve), BankPaymentRequestTrailAction.id_for(:approve_and_forward)
             action_user = track.action_user
             modified_user = track.modified_user
-            modified_level = mappings.where(reviewer_id: modified_user&.id).first&.level
+            modified_level = next_level
           when BankPaymentRequestTrailAction.id_for(:credit), BankPaymentRequestTrailAction.id_for(:mark_as_credited)
             action_user = track.action_user
             modified_user = nil
@@ -176,11 +176,11 @@ class TrailMigrationFromTrack
             original_track: original_track
         ).save
 
-        level_number += 1 unless [BankPaymentRequestTrailAction.id_for(:submit)].include?(track.action_id)
+        level_number += 1
 
         if BankPaymentRequestTrailAction.ids_for([:reject, :retract]).include?(track.action_id)
           # this will reset the level number because it is going to go through the levels all over again
-          level_number = 1
+          level_number = 0
           bpr.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
           bpr.update_columns(controlling_level_id: nil)
         end
@@ -190,11 +190,18 @@ class TrailMigrationFromTrack
         if bpr.approved? || bpr.credited?
           bpr.update_columns(controlling_level_id: nil)
           bpr.document_level_reviewer_mappings.update_all(viewable: true)
+          bpr.dlrms.each do |dlrm|
+            dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
+            dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
+          end
         end
       rescue
         bpr.update_columns(controlling_level_id: nil)
         bpr.document_level_reviewer_mappings.update_all(viewable: true)
-
+        bpr.dlrms.each do |dlrm|
+          dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
+          dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
+        end
       end
 
     end
@@ -212,7 +219,7 @@ class TrailMigrationFromTrack
     remaining_bank_payment_requests = BankPaymentRequest.where(id: remaining_bank_payment_ids)
     # bank_payment_requests = BankPaymentRequest.where(id: [124557])
     remaining_bank_payment_requests.each do |bpr|
-      level_number = 1
+      level_number = 0
       policy = bpr.policy
       next if policy.blank?
       levels = policy&.levels.where(associated_entity_type: "BankPaymentRequestProvider")
@@ -242,7 +249,7 @@ class TrailMigrationFromTrack
               BankPaymentRequestTrailAction.id_for(:approve), BankPaymentRequestTrailAction.id_for(:approve_and_forward)
             action_user = track.action_user
             modified_user = track.modified_user
-            modified_level = mappings.where(reviewer_id: modified_user&.id).first&.level
+            modified_level = next_level
           when BankPaymentRequestTrailAction.id_for(:credit), BankPaymentRequestTrailAction.id_for(:mark_as_credited)
             action_user = track.action_user
             modified_user = nil
@@ -275,11 +282,11 @@ class TrailMigrationFromTrack
             original_track: original_track
         ).save
 
-        level_number += 1 unless [BankPaymentRequestTrailAction.id_for(:submit)].include?(track.action_id)
+        level_number += 1
 
         if BankPaymentRequestTrailAction.ids_for([:reject, :retract]).include?(track.action_id)
           # this will reset the level number because it is going to go through the levels all over again
-          level_number = 1
+          level_number = 0
           bpr.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
           bpr.update_columns(controlling_level_id: nil)
         end
@@ -289,10 +296,18 @@ class TrailMigrationFromTrack
         if bpr.approved? || bpr.credited?
           bpr.update_columns(controlling_level_id: nil)
           bpr.document_level_reviewer_mappings.update_all(viewable: true)
+          bpr.dlrms.each do |dlrm|
+            dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
+            dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
+          end
         end
       rescue
         bpr.update_columns(controlling_level_id: nil)
         bpr.document_level_reviewer_mappings.update_all(viewable: true)
+        bpr.dlrms.each do |dlrm|
+          dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
+          dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
+        end
       end
 
     end
