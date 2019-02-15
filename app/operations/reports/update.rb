@@ -66,14 +66,17 @@ class Reports::Update < Reports::Base
         CustomField::SetFields.(report, FieldParentType.id_for(:report), custom_fields: params[:custom_fields], save: true, reset_fields: true)
       end
 
-      # Create Document Level Reviewer Mapping
-      # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.report.reload
+      # Update report DLRMs only when the owner does it
+      if self.report.user.id == user.id && params[:view] == 'personal'
+        # Create Document Level Reviewer Mapping
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.report.reload
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
-        return
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
       end
     else
       messages[:error] = report.errors.full_messages

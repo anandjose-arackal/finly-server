@@ -4,8 +4,10 @@ module Transitionable
   included do
     belongs_to :policy, optional: true
     belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id, optional: true
+    belongs_to :controlling_level, class_name: "ReviewalLevel", optional: true
 
     has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
+    has_many :dlrms, class_name: "DocumentLevelReviewerMapping", as: :document_reviewer_mappable
     has_many :trails, as: :parent
 
     def document_owner_id
@@ -71,7 +73,7 @@ module Transitionable
         # NEW CODE
         last_retract_trail = self.trails.reload.with_action_id(TrailAction.id_for(:retract)).last
 
-        user_ids += self.get_reviewers(last_retract_trail.action_level_id)&.map(&:id)
+        user_ids += self.get_reviewers(last_retract_trail&.action_level_id)&.map(&:id)
       when :submit, 'submit'
         user_ids.push self.document_owner_id
         user_ids += self.get_reviewers&.map(&:id)
@@ -105,7 +107,7 @@ module Transitionable
       when :submit, 'submit'
         user_ids += self.get_reviewers&.map(&:id)
       when :reject, 'reject'
-        last_action_user_id = self.trails.last.action_user_id
+        last_action_user_id = self.trails.last&.action_user_id
         user_ids += self.document_level_reviewer_mappings.pluck(:action_taken_by_id).reject {|user_id| user_id.nil? || user_id == last_action_user_id }
         user_ids.push self.document_owner_id
       when :take_control, 'take_control'
@@ -129,6 +131,7 @@ module Transitionable
       dlrms = self.document_level_reviewer_mappings.with_provider_name(provider_name).includes(:level, :reviewer, :action_taken_by, :taken_control_by)
       chain = []
 
+
       dlrms.each do |dlrm|
         level_number = dlrm.level_number
 
@@ -141,10 +144,12 @@ module Transitionable
         data[:action_taken] = data[:action_taken] || (dlrm.action_taken_by_id.present?)
         data[:reviewers] = data[:reviewers] || []
         reviewer = {
-            id: dlrm.reviewer.id,
-            name: dlrm.reviewer.name,
+            id: dlrm.reviewer_id,
+            name: dlrm.reviewer&.name,
+            active: dlrm.active,
             threshold: dlrm.threshold,
-            action_taken: (dlrm.reviewer.id == dlrm.action_taken_by_id)
+            action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
+            action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
         }
         data[:reviewers].push(reviewer)
 
@@ -152,7 +157,9 @@ module Transitionable
           data[:taken_control_by] = {
               id: dlrm.taken_control_by_id,
               name: dlrm.taken_control_by.name,
-              action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id)
+              action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id),
+              action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
+
           }
         end
 
@@ -171,14 +178,20 @@ module Transitionable
     end
 
     # Users who can take the current action on the document
-    def action_users(type=nil)
+    def action_users(type=nil, provider_name=nil)
+      provider_name ||= get_default_provider
       user_ids = []
       case type
+      when 'approve', :approve
+        if level.present?
+          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: false).pluck(:reviewer_id)
+          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: true).pluck(:taken_control_by_id)
+        end
       when 'unapprove', :unapprove
-        user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+        user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last&.action_user_id
       when 'return_control', :return_control
         if level.present?
-          user_ids += document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id).compact
+          user_ids += document_level_reviewer_mappings.with_provider_name(provider_name).with_level_id(level.id).pluck(:taken_control_by_id).compact
         end
       else
         # nothing to do

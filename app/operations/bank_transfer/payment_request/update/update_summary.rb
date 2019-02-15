@@ -27,14 +27,16 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
       return
     end
     if payment_request.update(request_params)
-      # Create Document Level Reviewer Mapping
-      # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.payment_request.reload
+      if BankPaymentRequest.status_ids(:open, :retractd, :rejected).include?(payment_request.status_id) && payment_request.owner_id == user.id
+        # Create Document Level Reviewer Mapping
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.payment_request.reload
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
-        return
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
       end
     else
       add_message :error, payment_request.errors.full_messages

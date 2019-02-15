@@ -209,6 +209,9 @@ class User < ApplicationRecord
   has_many :tracker_visits
   has_many :tracker_notifications
 
+  has_many :user_branch_location_mappings
+  has_many :branch_locations, through: :user_branch_location_mappings
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping

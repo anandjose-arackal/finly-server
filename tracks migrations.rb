@@ -1,25 +1,46 @@
 ############# REPORT TRACK MIGRATION ##############
 # first recreating the trails for all approves, settled, settlement confirmed and closed reports
-Report.where(report_status_id: [ReportStatus.id_for(:approved), ReportStatus.id_for(:settled), ReportStatus.id_for(:settlement_confirmed), ReportStatus.id_for(:closed)]).each do |report|
+# Report.where(report_status_id: [ReportStatus.id_for(:approved), ReportStatus.id_for(:settled), ReportStatus.id_for(:settlement_confirmed), ReportStatus.id_for(:closed)]).each do |report|
+Report.where(report_status_id: Report.status_ids(:approved, :settled, :settlement_confirmed, :closed)).each do |report|
 	policy = Policy.unscoped.find_by(id: report.policy_id)
-	report_levels = policy.levels.where(associated_entity_type: "ReportProvider")
-	report_levels.each do |level|
-		level.level_user_reviewer_mappings.each do |lurm|
+  user = report.user
+	report_levels = policy.levels.where(associated_entity_type: "ReportProvider").reorder(level_number: :asc)
+	lurms = user.level_user_reviewer_mappings.where(policy_id: policy.id, level_id: report_levels)
+  if lurms.present?
+		lurms.each do |lurm|
 			reviewer = lurm.reviewer
 			dlrm = report.document_level_reviewer_mappings.build(
-				policy: policy,
-				level: level,
-				level_number: level.level_number,
-				viewable: true,
-				become_viewable_at: DateTime.now,
-				provider_name: report.get_default_provider,
-				reviewer: reviewer,
-				action_taken_by: reviewer,
-				action: TrailAction.id_for(:approve)
-				)
+					policy: policy,
+					level: lurm.level,
+					level_number: lurm.level.level_number,
+					viewable: true,
+					become_viewable_at: DateTime.now,
+					provider_name: report.get_default_provider,
+					reviewer: reviewer,
+					action_taken_by: reviewer,
+					action_id: TrailAction.id_for(:approve)
+			)
 			dlrm.save
-		end
-	end
+    end
+  else
+		report_levels.each do |level|
+			level.level_reviewer_mappings.each do |lurm|
+				reviewer = lurm.reviewer
+				dlrm = report.document_level_reviewer_mappings.build(
+					policy: policy,
+					level: level,
+					level_number: level.level_number,
+					viewable: true,
+					become_viewable_at: DateTime.now,
+					provider_name: report.get_default_provider,
+					reviewer: reviewer,
+					action_taken_by: reviewer,
+					action: TrailAction.id_for(:approve)
+					)
+				dlrm.save
+			end
+    end
+  end
 
 	# now creating the trails in the new system so that the trails will reflect in the new system
 	# not considering modified user in this
@@ -39,7 +60,7 @@ Report.where(report_status_id: [ReportStatus.id_for(:approved), ReportStatus.id_
 		case action_id
 			when ReportTrackingAction.id_for(:approve), ReportTrackingAction.id_for(:submit), ReportTrackingAction.id_for(:create), ReportTrackingAction.id_for(:auto_approve), 
 				ReportTrackingAction.id_for(:reject), ReportTrackingAction.id_for(:unapprove)
-				trail - report.trails.create(
+				trail = report.trails.create(
 					action_user_id: action_user&.id,
 					action_level: reviewal_level,
 					action_user_role: UserRole.id_for(:reviewer),

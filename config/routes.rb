@@ -651,6 +651,8 @@
 #                organization_account_sidebar_menu_config GET    /organization_account/sidebar_menu_config(.:format)                                                                 organization_account#sidebar_menu_config
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                                                       organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                                          organization_account#categories
+#                        organization_account_departments GET    /organization_account/departments(.:format)                                                                         organization_account#departments
+#                  organization_account_all_expense_types GET    /organization_account/all_expense_types(.:format)                                                                   organization_account#all_expense_types
 #                 organization_account_export_preferences GET    /organization_account/export_preferences(.:format)                                                                  organization_account#export_preferences
 #                                             state_codes GET    /state_codes(.:format)                                                                                              organization_account#gst_state_codes
 #                                            add_category POST   /add_category(.:format)                                                                                             organization_account#add_category
@@ -1017,6 +1019,7 @@
 #                                                         PATCH  /departments/:id(.:format)                                                                                          departments#update
 #                                                         PUT    /departments/:id(.:format)                                                                                          departments#update
 #                                                         DELETE /departments/:id(.:format)                                                                                          departments#destroy
+#                                               all_users GET    /all_users(.:format)                                                                                                departments#all_users
 #                            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                                                                             bank_transfer/reimbursement#show
 #                                                         PATCH  /bank_transfer/reimbursements(.:format)                                                                             bank_transfer/reimbursement#update
 #                                                         POST   /bank_transfer/reimbursements(.:format)                                                                             bank_transfer/reimbursement#create
@@ -2625,6 +2628,10 @@ Rails.application.routes.draw do
   get 'organization_account/sidebar_menu_config' => 'organization_account#sidebar_menu_config'
   get 'organization_account/policies_list' => 'organization_account#policies_list'
   get 'organization_account/categories' => 'organization_account#categories'
+  get 'organization_account/departments' => 'organization_account#departments'
+  get 'organization_account/all_expense_types' => 'organization_account#all_expense_types'
+
+
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
   get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
 
@@ -2669,6 +2676,8 @@ Rails.application.routes.draw do
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
     post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
   end
+
+  # get 'test_take_control' => 'reports#test_take_control', as: :test_take_control
   post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
 
 
@@ -2742,6 +2751,9 @@ Rails.application.routes.draw do
   end
 
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
+
+  # get 'expenses/all_expense_types', to: 'expenses#all_expense_types'
+  # get 'expenses/all_expense_types' => 'expenses#all_expense_types'
 
   get 'receipts/export', to: 'receipts#export'
   resources :receipts do
@@ -2977,6 +2989,8 @@ Rails.application.routes.draw do
 
   resources :departments
 
+  get 'all_users' => 'departments#all_users'
+
   namespace :bank_transfer do
     get 'reimbursements' => 'reimbursement#show'
     patch 'reimbursements' => 'reimbursement#update'
@@ -3107,6 +3121,7 @@ Rails.application.routes.draw do
     patch 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
+    # patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
     get 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
     post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
@@ -3121,7 +3136,7 @@ Rails.application.routes.draw do
     resources :bank_payment_requests do
       get 'edit_config', to: 'bank_payment_requests#edit_config', as: :edit_config
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
-      patch 'review', to: 'bank_payment_requests#review', as: :review
+      patch 'review', to: 'bank_payment_requests#review', as: :review      
       patch 'credit', to: 'bank_payment_requests#credit', as: :credit
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
       patch 'add_invoice', to: 'bank_payment_requests#add_invoice', as: :add_invoice
@@ -3134,6 +3149,8 @@ Rails.application.routes.draw do
       get 'payments_count', to: 'bank_payment_requests#payments_count'
       delete 'remove_attachment', to: 'bank_payment_requests#remove_attachment', as: :remove_attachment
     end
+
+
 
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
 

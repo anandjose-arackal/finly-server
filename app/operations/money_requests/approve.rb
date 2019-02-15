@@ -114,6 +114,7 @@ class MoneyRequests::Approve < MoneyRequests::Base
   end
 
   def post_process
+    self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:approve)
     # todo computing settlements
     unless money_request.processing?
       Settlement::MoneyRequests::Approved.(user, money_request: money_request, auto_approve: auto_approve)

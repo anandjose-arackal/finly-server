@@ -51,7 +51,7 @@ class Reports::Approve < Reports::Base
 
   def validate
     # Will be moved to workflow manager
-    # unless report.processing? or auto_approve
+    # unless report.processing?
     #   add_message :error, 'Cannot approve this report as it is not in processing state'
     # end
 

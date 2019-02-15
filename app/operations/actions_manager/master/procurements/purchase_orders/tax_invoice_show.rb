@@ -1,19 +1,20 @@
-class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < ActionsManager::Master::Procurements::PurchaseOrders::Base
+class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < ActionsManager::Master::Base
 
   register_handle :non_po_tax_invoice_show
   #Validate input if required
   register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete, :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_invoice_items]
 
-  def input
+  def initialize(user=nil, params={})
+    super
     result = ::Procurements::Invoices::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
     end
-    result.invoice
+    self.invoice = result.invoice
   end
 
-  alias_method :invoice, :input
+  # alias_method :invoice, :input
 
   def more_details_button
     true

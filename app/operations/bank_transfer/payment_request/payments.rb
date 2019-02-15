@@ -52,7 +52,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
   end
 
   def process
-    self.payments = self.bank_payment_request.payment_order.payments
+    self.payments = self.bank_payment_request.payment_order.payments.include_for_index
   end
 
   def success

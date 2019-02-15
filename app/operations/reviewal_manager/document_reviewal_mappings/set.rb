@@ -1,10 +1,12 @@
 class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::DocumentReviewalMappings::Base
-  attr_accessor :mappings_params, :document, :provider_name
+  attr_accessor :mappings_params, :document, :provider_name, :reviewal_chain_data
 
   def init
     self.document = params[:reviewal_document]
     self.mappings_params = mappings_parameters
     self.provider_name = params[:provider_name] || document.get_default_provider
+
+    self.reviewal_chain_data = []
 
   end
 
@@ -25,28 +27,40 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
           break
         end
 
-        mapping_params[:level] = level
+        # Filter only levels from current provider; In travel request multiple providers are sent & hence has to be filterd
+        filtered_level = ::ReviewalLevel.with_associted_entity_type(provider_name).find_by id: mapping_params[:level_id]
+
+        next if filtered_level.blank?
+
+        data = {
+          level_id: filtered_level.id,
+          level: filtered_level
+        }
+
+        #mapping_params[:level] = level
         # # check if reviewer present in company
-        # todo Scope reviewers from LRM & LURM
         reviewer_ids = level.level_user_reviewer_mappings.with_user_id(user.id).pluck(:reviewer_id) + level.level_reviewer_mappings.pluck(:reviewer_id)
 
         if reviewer_ids.include? mapping_params[:reviewer_id]&.to_i
           reviewer = user.company.users.find_by id: mapping_params[:reviewer_id]
-          mapping_params[:reviewer] = reviewer
+          data[:reviewer] = reviewer
+          data[:reviewer_id] = mapping_params[:reviewer_id]&.to_i
         end
+
+        self.reviewal_chain_data.push(data)
       end
     else
       # When document reviewer mappings are not present
       # Create them with current policy of the document
       if self.document.policy_id.present?
         policy = user.company.policies.find_by id: document.policy_id
-        mappings_params[:document_reviewer_mappings] = []
+        
         policy.levels.with_associted_entity_type(provider_name).non_deleted.with_entity_type(self.provider_name).each do |level|
-          mapping_data = {
-              level_id: level.id,
-              level: level
+          data = {
+            level_id: level.id,
+            level: level
           }
-          mappings_params[:document_reviewer_mappings].push(mapping_data)
+          self.reviewal_chain_data.push(data)
         end
       end
     end
@@ -55,9 +69,11 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
   def process
     # find
     document.document_level_reviewer_mappings.with_provider_name(provider_name).destroy_all
-    if mappings_params[:document_reviewer_mappings].present?
-      mappings_params[:document_reviewer_mappings].each do |mapping_params|
-        reviewer_id = mapping_params[:reviewer_id].to_i
+
+    if self.reviewal_chain_data.present?
+    #if mappings_params[:document_reviewer_mappings].present?
+      self.reviewal_chain_data.each do |mapping_params|
+        #reviewer_id = mapping_params[:reviewer_id].to_i
 
         # reviewer = user.company.users.find_by id: reviewer_id
 

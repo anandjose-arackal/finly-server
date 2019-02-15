@@ -47,11 +47,11 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
   end
 
   def mailer_body(user)
-    if bank_payment_request.owner_id == crediting_user.id
-      return "You have successfully initiated credit for your Payment Order: #{bank_payment_request.name}"
-    else
+    # if bank_payment_request.owner_id == crediting_user.id
+    #   return "You have successfully initiated credit for your Payment Order: #{bank_payment_request.name}"
+    # else
       return "#{crediting_user.name} has successfully initiated the credit of your Payment Order: #{bank_payment_request.name}"
-    end
+    # end
   end
 
   def bank_payment_request_view_role(user)

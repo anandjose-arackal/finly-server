@@ -8,6 +8,10 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
   FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
   SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  TEMPORARY_ERRORS_FROM_BANK = [
+      "Acquiring Bank CBS or node offline",
+      "Rejected/Failed at downstream system"
+  ]
 
   attr_accessor :errors, :company
 
@@ -74,7 +78,12 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        # Payment with pending transaction will rerun through CronJobs
+        if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message)
+          payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
+        else
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        end
         error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error) || "Payment could not be processed at this time"
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
@@ -158,7 +167,11 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   private
 
   def create_bank_transaction(payment, transfer_request)
-    self.company = account.account_owner.company
+    if self.account.account_owner.is_a?(Company)
+      self.company = self.account.account_owner
+    else
+      self.company = account.account_owner.company
+    end
     case payment.payment_status_id
       when PaymentStatus.id_for(:completed)
         transfer_status_id = BankTransferStatus.id_for(:completed)

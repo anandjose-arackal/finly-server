@@ -1,8 +1,6 @@
 class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aasm::BaseProvider
 
-  attr_accessor :provider_name
-
-  def initialize(document, violation_present, user)
+  def initialize(document, violation_present, user, provider_name=nil)
     self.document = document
     self.violations_present = violations_present
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
@@ -17,6 +15,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
     self.previous_level = document.get_level(:prev, provider_name)
     self.current_level_reviewers = document.get_reviewers(:current, provider_name)
     self.reviewers = document.get_reviewers(:next, provider_name)
+    self.document_update_params = {}
   end
 
   aasm :whiny_transitions => false do
@@ -38,8 +37,8 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
     end
 
     event :approve_selection do
-      transitions from: [:selection_processing], to: :selection_confirmed, guard: :reviewers_not_present?
-      transitions from: [:selection_processing], to: :selection_processing
+      transitions from: [:selection_processing], to: :selection_confirmed, guard: [:reviewers_not_present?, :user_can_review?]
+      transitions from: [:selection_processing], to: :selection_processing, guard: :user_can_review?
     end
 
     # event :unapprove_selection do
@@ -59,6 +58,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
     end
 
     event :confirm_booking do
+      # MoneyRequestProvider depends on this to mark money requests to approved form pending status
       transitions from: :selection_confirmed, to: :booking_confirmed
     end
 
@@ -70,6 +70,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
 
   def update_dlrms
     if[:confirm_selection].include?(aasm.current_event)
+      self.document_update_params[:booking_submitted_at] = DateTime.now
       dlrms = document.document_level_reviewer_mappings.with_provider_name(provider_name).with_level_id(next_level&.id).with_policy_id(policy.id)
 
       # Set viewable true for the next level when document is submitted
@@ -96,6 +97,8 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
       if next_level.present?
         next_dlrms = document.document_level_reviewer_mappings.with_provider_name(provider_name).with_level_id(next_level.id).with_policy_id(policy.id)
         next_dlrms.update_all(viewable: true)
+      else
+        self.document_update_params[:booking_approved_at] = DateTime.now
       end
     end
 
@@ -171,25 +174,27 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
 
   def update_status
     status_id = document.status.class.id_for(self.aasm.current_state)
-    update_params = generate_update_params
+    generate_update_params
 
-    update_params[:controlling_level_id] = self.new_level&.id
+    self.document_update_params[:controlling_level_id] = self.new_level&.id
 
-    update_params[document.class.document_status_attribute] = status_id
-    self.document.update(update_params)
+    self.document_update_params[document.class.document_status_attribute] = status_id
+    self.document.update(self.document_update_params)
   end
 
   def generate_update_params
-    update_params = {}
-
     if [:request_selection].include?(aasm.current_event)
-      update_params[:submitted_at] = DateTime.now
+      self.document_update_params[:submitted_at] = DateTime.now
     end
 
     if [:confirm_booking].include?(aasm.current_event)
-      update_params[:booking_confirmed_at] = DateTime.now
+      self.document_update_params[:booking_confirmed_at] = DateTime.now
     end
+  end
 
-    update_params
+  def user_can_review?
+    # todo
+    self.document.action_users(:approve, provider_name)
+
   end
 end

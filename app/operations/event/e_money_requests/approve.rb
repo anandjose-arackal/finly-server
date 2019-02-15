@@ -46,7 +46,7 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
     # else
     #   [self.money_request.tracks.last.action_user, self.money_request.controlling_user]
     # end
-    self.money_request.affected_users(:approve)
+    self.money_request.document_user_roles(:finance_manager).present? ? ( self.money_request.affected_users(:approve) + self.money_request.document_user_roles(:finance_manager) ) : self.money_request.affected_users(:approve)
   end
 
   def notification_affected_users
@@ -109,15 +109,21 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
     if approver_id.present? and user.id == approver_id
       "Money Request approved : #{self.money_request.name}"
     else
-      if approved and user.id == self.money_request.user.id
-        if auto_approve
-          return "Congratulations! Your Money Request #{money_request.name} has been auto-approved"
+      if approved 
+        if (user.id == self.money_request.user.id)
+          if auto_approve
+            return "Congratulations! Your Money Request #{money_request.name} has been auto-approved"
+          else
+            "Congratulations! Your Money Request #{money_request.name} has been approved"
+          end
+        elsif self.money_request.document_user_roles(:finance_manager).include?(user)
+          "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
         else
-          "Congratulations! Your Money Request #{money_request.name} has been approved"
+          "#{approving_user.name} has approved the Money Request: #{self.money_request.name}"
         end
-      else
-        "#{approving_user.name} has approved the Money Request: #{self.money_request.name}"
-      end
+      elsif self.money_request.document_user_roles(:finance_manager).include?(user)
+        "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+      end 
     end
   end
 
@@ -126,14 +132,20 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
     if approver_id.present? and user.id == approver_id
       message = "You have successfully approved the money_request : #{self.money_request.name}"
     else
-      if approved and user.id == money_request.user.id
-        if auto_approve
-          return "Congratulations! Your Money Request #{money_request.name} has been auto-approved"
+      if approved
+        if (user.id == money_request.user.id)
+          if auto_approve
+            return "Congratulations! Your Money Request #{money_request.name} has been auto-approved"
+          else
+            message = "Congratulations! Your Money Request #{money_request.name} has been approved"
+          end
+        elsif self.money_request.document_user_roles(:finance_manager).include?(user)
+        "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
         else
-          message = "Congratulations! Your Money Request #{money_request.name} has been approved"
+          message = "#{approving_user.name} has approved the Money Request '#{self.money_request.name}' and is currently waiting for your approval"
         end
-      else
-        message = "#{approving_user.name} has approved the Money Request '#{self.money_request.name}' and is currently waiting for your approval"
+      elsif self.money_request.document_user_roles(:finance_manager).include?(user)
+        "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
       end
     end
     message

@@ -6,10 +6,10 @@ json.travel_request do
   end
 end
 
-json.manager_name @result.manager&.name
-# json.travel_manager_name @result.travel_managers&.name
-json.travel_manager_name @result.travel_managers.map(&:name)
-json.controlling_user_name @result.travel_request&.controlling_user&.name
+#json.manager_name @result.manager&.name
+json.awaiting_booking @result.awaiting_booking
+json.travel_managers @result.travel_managers.map(&:name)
+#json.controlling_user_name @result.travel_request&.controlling_user&.name
 json.owner do
   owner = @result.travel_request.user
   json.first_name owner.first_name
@@ -49,6 +49,7 @@ json.can_create_money_requests @result.can_create_money_requests?
 json.show_money_requests @result.show_money_requests?
 json.can_create_reports @result.can_create_reports?
 json.show_reports @result.show_reports?
+json.show_add_money_requests @result.show_add_money_requests?
 
 # json.summary @result.travel_request.summary
 

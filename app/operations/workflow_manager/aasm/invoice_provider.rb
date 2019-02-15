@@ -1,16 +1,4 @@
 class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvider
-  # If policy not present auto approve
-  include AASM
-  attr_accessor :invoice_state, :invoice, :user, :violations_present, :policy, :current_level, :next_level
-
-  def initialize(invoice, violations_present, user)
-    self.invoice = invoice
-    self.violations_present = violations_present
-    self.aasm.current_state = self.invoice.invoice_status.name.to_sym
-    self.user = user
-    self.policy = ::Policy.find_by id: self.invoice.policy_id
-    set_levels
-  end
 
   aasm :whiny_transitions => false do
     state :open, initial: true, :before_enter => :set_state
@@ -30,12 +18,12 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
     end
 
     event :approve do
-      transitions :from => :processing, :to => :approved, guard: :approvers_not_present?
-      transitions :from => :processing, :to => :processing
+      transitions :from => :processing, :to => :approved, guard: [:approvers_not_present?, :user_can_review?]
+      transitions :from => :processing, :to => :processing, guard: :user_can_review?
     end
 
     event :reject do
-      transitions :from => :processing, :to => :rejected
+      transitions :from => :processing, :to => :rejected, guard: :user_can_review?
     end
 
     event :retract do
@@ -61,16 +49,16 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
     aasm.current_state = self.invoice_state
   end
 
-  def change_state
-    super
-
-    status_id = ::InwardInvoiceStatus.id_for(self.aasm.current_state)
-    update_params = {
-        invoice_status_id: status_id,
-        controlling_level_id: self.next_level&.id
-    }
-    self.document.update(update_params)
-  end
+  # def change_state
+  #   super
+  #
+  #   status_id = ::InwardInvoiceStatus.id_for(self.aasm.current_state)
+  #   update_params = {
+  #       invoice_status_id: status_id,
+  #       controlling_level_id: self.next_level&.id
+  #   }
+  #   self.document.update(update_params)
+  # end
 
   # def approvers_not_present?
   #   if self.policy.present?

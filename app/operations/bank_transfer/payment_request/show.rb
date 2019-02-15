@@ -13,7 +13,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
   attr_accessor :bank_payment_request
 
   def init
-    id = params[:id] || params[:payment_request_id]
+    id = params[:id] || params[:payment_request_id] || params[:bank_payment_request_id]
     self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
   end
 
@@ -33,7 +33,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     if params[:ref] == '1' and params[:n_id].present?
       Event::EBankPaymentRequest::Unset.(user, params)
     end
-
   end
 
   def success
@@ -48,7 +47,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance,
                   :manager, :finance_manager, :associated_users, :payments_verified, :payments_unverified,
                   :custom_field_config, :approvers, :invoice_categories, :invoice_line_items_categories,
-                  :invoice_custom_fields, :invoice_line_items_custom_fields, :budgets
+                  :invoice_custom_fields, :invoice_line_items_custom_fields, :budgets, :awaiting_credit, :creditors
 
     def init
       self.bank_payment_request = params[:payment_request]
@@ -62,6 +61,14 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         self.finance_manager = associated_users.include?(finance_manager) ? finance_manager : nil
       end
       self.actions = retrieve_actions
+
+      self.creditors = self.bank_payment_request.document_role_users(:creditors)
+
+      if BankPaymentRequest.status_ids(:approved, :auto_approved).include?(self.bank_payment_request.status_id)
+        self.awaiting_credit = true
+      else
+        self.awaiting_credit = false
+      end
 
       self.payments_unverified = []
       self.payments_verified = []

@@ -47,6 +47,16 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
     end
 
     self.workflow_output = op.workflow_output
+
+    self.travel_request.money_requests.each do |money_request|
+      parameters = {
+        document: money_request,
+        aasm_event: 'retract',
+        provider_name: 'TravelRequestProvider'
+      }
+
+      money_request_op = WorkflowManager::Base.(user, parameters)
+    end
   end
 
   def post_process
@@ -56,11 +66,10 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
     self.travel_request.comments.create(user_id: user.id,
                                          action_id: TravelRequestCommentAction.id_for(tr_comment_action), delegated_action_user_id: delegated_action_user_id)
 
-    #todo - abi
-    travel_request.money_requests.status_pending.update_all(
-        controlling_user_id: travel_request.controlling_user_id,
-        controlling_user_role_id: travel_request.controlling_user_role_id
-    )
+    #travel_request.money_requests.status_pending.update_all(
+    #    controlling_user_id: travel_request.controlling_user_id,
+    #    controlling_user_role_id: travel_request.controlling_user_role_id
+    #)
     #
     # Event::EBankPaymentRequest::Retract.(user, travel_request: travel_request)
     role_id = self.workflow_output[:role_id]

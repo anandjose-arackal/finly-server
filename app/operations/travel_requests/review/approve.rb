@@ -69,6 +69,16 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     end
 
     self.workflow_output = op.workflow_output
+
+    self.travel_request.money_requests.each do |money_request|
+      parameters = {
+        document: money_request,
+        aasm_event: 'approve',
+        provider_name: 'TravelRequestProvider'
+      }
+
+      money_request_op = WorkflowManager::Base.(user, parameters)
+    end
     # NEW CODE ENDS
     ####################
   end
@@ -83,12 +93,10 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
                                          action_id: action_id
 
 
-    # todo - abi
-
-    travel_request.money_requests.status_pending.update_all(
-        controlling_user_id: travel_request.controlling_user_id,
-        controlling_user_role_id: travel_request.controlling_user_role_id
-    )
+    #travel_request.money_requests.status_pending.update_all(
+    #    controlling_user_id: travel_request.controlling_user_id,
+    #    controlling_user_role_id: travel_request.controlling_user_role_id
+    #)
     #
     # Event::EBankPaymentRequest::Approve.(user, travel_request: travel_request)
     # Notifications

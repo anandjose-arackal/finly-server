@@ -43,7 +43,7 @@ class BankTransfer::PaymentRequest::EditConfig < BankTransfer::PaymentRequest::B
     end
 
     def get_reviewal_chain
-      op = ::ReviewalManager::ReviewalChain.(user, params)
+      op = ::ReviewalManager::ReviewalChain.(bank_payment_request.owner, params)
       op.chain
     end
   end

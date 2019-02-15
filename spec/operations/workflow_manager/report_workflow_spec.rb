@@ -41,8 +41,8 @@ RSpec.describe "Report Workflow -- " do
     @level_p2_3.level_reviewer_mappings.create({reviewer_id: @em_reviewer_user2.id, threshold: 0, exception: false})
 
     # Createe LURM for overriding reviewer on a default LRM mapping
-    @level1.level_user_reviewer_mappings.create({user_id: @em_employee_user1.id, reviewer_id: @em_reviewer_user4.id, policy_id: @policy.id})
-    @em_reviewer_user1 = @em_reviewer_user4
+    #@level1.level_user_reviewer_mappings.create({user_id: @em_employee_user1.id, reviewer_id: @em_reviewer_user4.id, policy_id: @policy.id, threshold: 0})
+    #@em_reviewer_user1 = @em_reviewer_user4
 
     expense = create(:expense, {user_id: @em_employee_user1.id,
                                 spent_from_id: @em_employee_user1.user_pockets.reimbursement_pocket_only.first.id})
@@ -61,6 +61,7 @@ RSpec.describe "Report Workflow -- " do
     end
 
     xit "has set override user as approver on first level dlrm" do
+      expect(@document.document_level_reviewer_mappings.with_level_id(@level1.id).first&.reviewer_id).to eq(@em_reviewer_user4.id)
     end
   end
 

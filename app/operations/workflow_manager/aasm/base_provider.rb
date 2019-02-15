@@ -3,14 +3,15 @@ class WorkflowManager::Aasm::BaseProvider
 
   attr_accessor :document_state, :document, :user, :violations_present, :policy,
                 :current_level, :next_level, :previous_level,
-                :current_level_reviewers, :reviewers, :new_level
+                :current_level_reviewers, :reviewers, :new_level, :document_update_params, :provider_name
 
-  def initialize(document, violations_present, user)
+  def initialize(document, violations_present, user, provider_name=nil)
     self.document = document
     self.violations_present = violations_present
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
     self.user = user
     self.policy = self.document.policy ## Have to take care where status is stored in a different attribute
+    self.provider_name = provider_name || self.document.get_default_provider
 
     # get reviewers
     self.current_level = document.level
@@ -18,6 +19,7 @@ class WorkflowManager::Aasm::BaseProvider
     self.previous_level = document.get_level(:prev)
     self.current_level_reviewers = document.get_reviewers
     self.reviewers = document.get_reviewers(:next)
+    self.document_update_params = {}
   end
 
   private
@@ -51,7 +53,8 @@ class WorkflowManager::Aasm::BaseProvider
   end
 
   def update_dlrms
-    if[:submit].include?(aasm.current_event)
+    if [:submit].include?(aasm.current_event)
+      self.document_update_params[:submitted_at] = DateTime.now
       dlrms = document.document_level_reviewer_mappings.with_level_id(next_level&.id).with_policy_id(policy.id)
 
       # Set viewable true for the next level when document is submitted
@@ -80,6 +83,8 @@ class WorkflowManager::Aasm::BaseProvider
         next_dlrms = document.document_level_reviewer_mappings.with_level_id(next_level.id).with_policy_id(policy.id)
 
         next_dlrms.update_all(viewable: true)
+      else
+        self.document_update_params[:approved_at] = DateTime.now
       end
     end
 
@@ -100,7 +105,7 @@ class WorkflowManager::Aasm::BaseProvider
           .where(level_id: current_level.id, policy_id: document.policy.id)
 
       if dlrm.present?
-        dlrm.update_all(taken_control_by_id: user.id, taken_control: true)
+        dlrm.update_all(taken_control_by_id: user.id, taken_control: true, active: false)
       end
     end
 
@@ -109,7 +114,7 @@ class WorkflowManager::Aasm::BaseProvider
           .where(level_id: current_level.id, policy_id: document.policy.id)
 
       if dlrm.present?
-        dlrm.update_all(taken_control_by_id: nil, taken_control: false)
+        dlrm.update_all(taken_control_by_id: nil, taken_control: false, active: true)
       end
     end
 
@@ -143,6 +148,11 @@ class WorkflowManager::Aasm::BaseProvider
       self.new_level = self.next_level
     end
 
+    if [:approve].include?(aasm.current_event)
+      unless self.next_level.present?
+      end
+    end
+
     # :take_control and :return_control should remain in the same level
     if [:take_control, :return_control].include?(aasm.current_event)
       self.new_level = self.current_level
@@ -157,11 +167,9 @@ class WorkflowManager::Aasm::BaseProvider
   # Update status of the document
   def update_status
     status_id = document.status.class.id_for(self.aasm.current_state)
-    update_params = {
-        controlling_level_id: self.new_level&.id
-    }
-    update_params[document.class.document_status_attribute] = status_id
-    self.document.update(update_params)
+    self.document_update_params[:controlling_level_id] = self.new_level&.id
+    self.document_update_params[document.class.document_status_attribute] = status_id
+    self.document.update(self.document_update_params)
   end
 
   # def approvers_not_present?
@@ -169,5 +177,9 @@ class WorkflowManager::Aasm::BaseProvider
 
   def reviewers_not_present?
     self.reviewers.blank?
+  end
+
+  def user_can_review?
+    self.current_level_reviewers.include?(user)
   end
 end

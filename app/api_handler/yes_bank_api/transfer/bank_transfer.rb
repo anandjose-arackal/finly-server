@@ -49,8 +49,10 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     super()
     self.account = payment.receiving_account
     # extracting contact email and mobile number
-    self.beneficiary_email = self.account.account_owner.email
-    self.beneficiary_mobile_number = self.account.account_owner.mobile_number
+    unless self.account.account_owner.is_a?(Company)
+      self.beneficiary_email = self.account.account_owner.email
+      self.beneficiary_mobile_number = self.account.account_owner.mobile_number
+    end
     set_xml_params
   end
 
