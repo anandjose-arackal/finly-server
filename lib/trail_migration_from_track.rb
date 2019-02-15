@@ -7,7 +7,7 @@ class TrailMigrationFromTrack
     reports = Report.all
     remaining_report_ids = reports.pluck(:id) - DocumentLevelReviewerMapping.where(document_reviewer_mappable_type: "Report").pluck(:document_reviewer_mappable_id)
     remaining_reports = Report.where(id: remaining_report_ids)
-    # remaining_reports = Report.where(id: 23677)
+    # remaining_reports = Report.where(id: 25425)
     remaining_reports.each do |report|
       level_number = 0
       policy = report.policy
@@ -93,7 +93,7 @@ class TrailMigrationFromTrack
         end
       end
 
-      if report.approved? || report.settled? || report.settlement_confirmed?
+      if report.approved? || report.settled? || report.settlement_confirmed? || report.closed?
         report.update_columns(controlling_level_id: nil)
         report.document_level_reviewer_mappings.update_all(viewable: true)
         report.dlrms.each do |dlrm|
