@@ -64,4 +64,9 @@ class RuleBook::Verdict < RuleBook::Rule
     self.rule.description
   end
 
+  def message
+    path = ''
+    self.page_tree
+  end
+
 end

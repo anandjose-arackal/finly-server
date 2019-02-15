@@ -29,4 +29,8 @@ class RuleBook::API
     end
   end
 
+  def rule(description, &block)
+    RuleBook::Rule.new(self.act, self.chapter, self.page_tree, description, self.before_blocks, &block)
+  end
+
 end

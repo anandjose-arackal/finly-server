@@ -1,13 +1,21 @@
-Gatekeeper::Checker.new 'AccountLock' do
+Gatekeeper::Checker.new 'On Web Authentication' do
 
   before do
     skip unless RequestStoreUtil.current_session.platform == 'UserSessionWeb'
   end
 
-  section 'on authorization' do
-    premise :after_session_create,:after_session_update do
+  premise :asd do
+    premise :efg, :hij do
+      rule 'ad' do
+
+      end
+    end
+  end
+
+  premise :after_session_create do
+    section 'X-Finly-RP' do
       # Web specific checks
-      rule 'X-Finly-RP has to be set for all web requests' do
+      rule 'X-Finly-RP is required for all web requests' do
         headers = RequestStoreUtil.current_request.headers
         next if headers['X-Finly-RP'].present?
         response_code 401
@@ -18,7 +26,7 @@ Gatekeeper::Checker.new 'AccountLock' do
        :language, :browser, :browser_version,
        :browser_engine, :browser_engine_version,
        :os_name, :os_version].each do |property|
-        rule "#{property} is required in X-Finly-RP for all web requests" do
+        rule "#{property} is required for all web requests" do
           session = RequestStoreUtil.current_session
           web = session.user_session_web
           if web.send(property).blank?
@@ -27,7 +35,9 @@ Gatekeeper::Checker.new 'AccountLock' do
           end
         end
       end
+    end
 
+    section 'Active Session' do
       rule 'A user cannot have more than 2 active web sessions' do
         authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
         if authorized_web_sessions.size > 2

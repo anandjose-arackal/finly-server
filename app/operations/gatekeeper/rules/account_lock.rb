@@ -1,4 +1,4 @@
-Gatekeeper::Checker.new 'WebChecks' do
+Gatekeeper::Checker.new 'AccountLock' do
 
   LOCKING_PERIOD ||= 30.minutes
 

@@ -1,13 +1,9 @@
 require 'test_helper'
-
-# Testing requests from web
+require 'ipaddr'
 class Oauth::TokenControllerTest < ActionController::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
 
   def setup
-    @ip = '49.207.52.165'
+    @ip = IPAddr.new(rand(2**32),Socket::AF_INET).to_s
     ActionController::TestRequest.any_instance.stubs(:remote_ip => @ip)
     @email = 'viveka@finly.io'
   end
@@ -136,6 +132,14 @@ class Oauth::TokenControllerTest < ActionController::TestCase
     assert_equal session.access_token_id, token.id
     assert_equal session.ip, @ip
     assert_not_nil session.user_session_web
+
+    body = JSON.parse(response.body)
+    assert_equal body['success'], true
+    assert_not_nil body['data']['access_token']
+    assert_not_nil body['data']['user']['id']
+    assert_nil body['data']['refresh_token']
+    assert_nil body['data']['token_type']
+    assert_nil body['data']['expires_in']
   end
 
   def headers(properties = {})
