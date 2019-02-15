@@ -102,6 +102,9 @@ class TrailMigrationFromTrack
         end
       end
     end
+
+    end_time = DateTime.now
+    puts end_time
   end
   ############################# REPORTS END ################################
 
