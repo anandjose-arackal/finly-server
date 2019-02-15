@@ -57,4 +57,15 @@ class Invoicing::InventoryLineItemsController < ApplicationController
     @result = ActionsManager::Processor.(current_user, params)
     respond
   end
+
+  def upload_attachments
+    # @result = Invoicing::InventoryLineItem::UploadAttachments.(current_user, params)
+    # respond
+  end
+
+  def destroy_attachments
+    # @result = Invoicing::InventoryLineItem::DestroyAttachments.(current_user, params)
+    # respond
+  end
+
 end

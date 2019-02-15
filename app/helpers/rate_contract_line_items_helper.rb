@@ -1,0 +1,2 @@
+module RateContractLineItemsHelper
+end

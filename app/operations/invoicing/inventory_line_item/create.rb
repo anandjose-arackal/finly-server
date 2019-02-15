@@ -34,7 +34,15 @@ class Invoicing::InventoryLineItem::Create < Invoicing::InventoryLineItem::Base
 
   def process
     self.inventory_line_item = user.company.inventory_line_items.build(self.inventory_item_parameters)
-    unless self.inventory_line_item.save
+    if  self.inventory_line_item.save
+      if inventory_item_parameters[:artifacts].present?
+        artifact = inventory_line_item.artifacts.build
+        # artifact.attachment = File.new(file_path)
+        unless artifact.save
+          add_message :error, "Upload failed, some error occurred!"
+        end
+      end
+    else
       add_message :error, self.inventory_line_item.errors.full_messages
       return
     end
