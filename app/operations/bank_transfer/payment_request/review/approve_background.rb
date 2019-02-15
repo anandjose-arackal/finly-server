@@ -30,22 +30,6 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
   end
 
   def validate
-    # this will take all the payment requests that are not approvabe and
-    # exclude them from the list of payment requests
-    self.payment_requests.each do |payment_request|
-      valid = true
-      unless payment_request.pending?
-        valid = false
-      end
-      unless payment_request.controlling_user_id == self.initiating_user.id
-        valid = false
-      end
-
-      unless valid
-        self.payment_requests.reject! { |pr| pr.id == payment_request.id }
-      end
-    end
-
     if self.initiating_user.blank?
       add_message :error, "Initiating user has been returned as blank"
       return
