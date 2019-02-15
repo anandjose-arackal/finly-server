@@ -6,6 +6,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
                 :headers, :contents, :validate_operation
 
   def pre_validate
+    Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"
     if user.blank?
       add_message :error, 'User not found'
       return
