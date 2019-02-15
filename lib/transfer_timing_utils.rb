@@ -23,7 +23,7 @@ class TransferTimingUtils
     end
   end
 
-  # 2018's list. Will have to be updated every year
+  # 2019's list. Will have to be updated every year
   def self.bank_holidays
     %w(
         26-01-2018

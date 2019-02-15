@@ -390,6 +390,7 @@ class Payment < ApplicationRecord
   validate :receiving_account_presence
 
   delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, :pending_approval?, :pending_retry?, to: :payment_status
+  delegate :collect_funds_withdrawal?, to: :payment_purpose
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
