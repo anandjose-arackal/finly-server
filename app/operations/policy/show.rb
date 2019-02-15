@@ -80,7 +80,7 @@ class Policy::Show < Policy::Base
     self.mappings = []
 
     user_ids = self.policy.user_mapping.exclude_deleted.pluck(:user_id)
-    self.policy_users = user.company.users.with_id(user_ids)
+    self.policy_users = user.company.users.with_subscription(current_app).with_id(user_ids)
   end
 
   def authorize

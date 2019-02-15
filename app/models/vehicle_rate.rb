@@ -37,7 +37,7 @@ class VehicleRate < ApplicationRecord
   def as_json(options = {})
     {
         id: id,
-        vehicle_name: vehicle_name,
+        vehicle_name: "#{vehicle_name} - #{policy.name}",
         rate: rate,
         distance_unit: distance_unit,
         policy: policy,
