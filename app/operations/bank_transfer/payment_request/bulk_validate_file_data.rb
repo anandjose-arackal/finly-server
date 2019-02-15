@@ -89,31 +89,31 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       # new requirement
       # SET key as array to hold mupltiple errors
-      self.issue_item[:ifsc] = []
-      self.issue_item[:tax] = []
-      self.issue_item[:discount] = []
-      self.issue_item[:original_amount] = []
-      self.issue_item[:bank_account_number] = []
+      # self.issue_item[:ifsc] = []
+      # self.issue_item[:tax] = []
+      # self.issue_item[:discount] = []
+      # self.issue_item[:original_amount] = []
+      # self.issue_item[:bank_account_number] = []
 
       # Check if bank account number is present
       if bank_account_no.blank?
         self.valid = false
         self.error_messages << 'Bank account not found'
-        self.issue_item[:bank_account_number] << 'No bank account entered'
+        self.issue_item[:bank_account_number] = 'No bank account entered'
       end
 
       # Check if the amount is present
       unless validate_amount(amount)
         self.valid = false
         self.error_messages << 'Invalid amount'
-        self.issue_item[:original_amount] << 'Invalid amount'
+        self.issue_item[:original_amount] = 'Invalid amount'
       end
 
       # check if the ifsc is present
       if ifsc.blank?
         self.valid = false
         self.error_messages << 'IFSC cannot be blank'
-        self.issue_item[:ifsc] <<  'IFSC cannot be blank'
+        self.issue_item[:ifsc] =  'IFSC cannot be blank'
       end
 
       # check for format of the IFSC
@@ -121,7 +121,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       unless ifsc =~ pattern
         self.valid = false
         self.error_messages << "Invalid IFSC"
-        self.issue_item[:ifsc] << 'Invalid IFSC'
+        self.issue_item[:ifsc] = 'Invalid IFSC'
       end
 
       
@@ -144,13 +144,13 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       unless validate_rate tax, 1, amount
         self.valid = false
         self.error_messages << "Invalid tax entered"
-        self.issue_item[:tax] << 'Invalid tax entered'
+        self.issue_item[:tax] = 'Invalid tax entered'
       end
 
       unless validate_rate discount, 1, amount
         self.valid = false
         self.error_messages << "Invalid discount entered"
-        self.issue_item[:discount] << 'Invalid discount entered'
+        self.issue_item[:discount] = 'Invalid discount entered'
       end
 
       if self.valid
@@ -161,7 +161,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       self.contents << item.values
 
-      self.issue_item.each {|k, v| self.issue_item.delete(k) if v.blank?} # delete unnecessary keys which have no error
+      #self.issue_item.each {|k, v| self.issue_item.delete(k) if v.blank?} # delete unnecessary keys which have no error
       self.issues << self.issue_item
     end
     puts "self.issues", self.issues.inspect
