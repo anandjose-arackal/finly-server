@@ -16,4 +16,4 @@ json.results do
     end
   end
 end
-json.rate_contract_count @result.count
+json.count @result.count
