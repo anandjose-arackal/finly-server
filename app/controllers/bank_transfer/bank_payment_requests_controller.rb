@@ -37,6 +37,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def process_file
+    logger.fatal "FROM BankPaymentRequestsController process_file, \n #{params.inspect}"
     @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
     if @result.success?
       respond_to do |format|
