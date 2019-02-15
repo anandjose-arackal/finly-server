@@ -25,8 +25,10 @@ class Admin::Companies::Base < Admin::Base
                                       :invoicing_system,
                                       :em_tax_tracking,
                                       :procurement,
-                                      :travel_request
-                                    ])
+                                      :travel_request,
+                                      :budgeting_system,
+                                      :invoicing_system
+    ])
   end
 
   def success
