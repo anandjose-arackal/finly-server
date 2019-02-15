@@ -4,14 +4,23 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment, :credit_in_credit_options, :policy_editable ]
 
 
+  # def initialize(user=nil, params={})
+  #   super
+  #   result = BankTransfer::PaymentRequest::Show.(user, params)
+  #   unless result.success?
+  #     add_message :error, result.messages[:error]
+  #     return
+  #   end
+  #   self.bank_payment_request = result.bank_payment_request
+  # end
+
   def initialize(user=nil, params={})
     super
-    result = BankTransfer::PaymentRequest::Show.(user, params)
-    unless result.success?
+    self.bank_payment_request = BankPaymentRequest.find_by_id params[:id]
+    unless bank_payment_request.present?
       add_message :error, result.messages[:error]
       return
     end
-    self.bank_payment_request = result.bank_payment_request
   end
 
   def mark_as_credited
