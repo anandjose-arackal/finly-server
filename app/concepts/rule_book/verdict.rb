@@ -5,10 +5,16 @@ class RuleBook::Verdict < RuleBook::Rule
 
   define_property :instance, :message
 
+  def self.success_verdict
+    verdict = self.new(nil, nil)
+    verdict.skipped = true
+    verdict
+  end
+
   def initialize(rule, params)
     self.rule = rule
     self.params = params
-    run
+    run if self.rule.present?
   end
 
   def run
@@ -64,9 +70,8 @@ class RuleBook::Verdict < RuleBook::Rule
     self.rule.description
   end
 
-  def message
-    path = ''
-    self.page_tree
+  def full_description
+    self.rule.full_description
   end
 
 end

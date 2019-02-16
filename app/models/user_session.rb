@@ -47,6 +47,8 @@
 #  status_id              :integer
 #  message                :string(255)
 #  login_username         :string(255)
+#  accuracy_radius        :integer
+#  username               :string(255)
 #
 
 class UserSession < ApplicationRecord

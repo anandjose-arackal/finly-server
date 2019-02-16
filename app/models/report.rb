@@ -37,7 +37,6 @@
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
 #  deleted_at                         :datetime
-#  controlling_level_id               :integer
 #
 
 class Report < ApplicationRecord

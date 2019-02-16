@@ -33,4 +33,8 @@ class RuleBook::API
     RuleBook::Rule.new(self.act, self.chapter, self.page_tree, description, self.before_blocks, &block)
   end
 
+  def to_s(options={})
+    self.page_tree.to_s(options)
+  end
+
 end

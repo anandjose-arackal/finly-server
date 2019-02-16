@@ -19,4 +19,8 @@ class RuleBook::Rule
     self.chapter.verdict.new(self, params)
   end
 
+  def full_description
+    "#{self.page_tree} > #{self.description}"
+  end
+
 end

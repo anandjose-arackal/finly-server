@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_12_060809) do
+ActiveRecord::Schema.define(version: 2019_02_15_104338) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2619,6 +2619,21 @@ ActiveRecord::Schema.define(version: 2019_02_12_060809) do
     t.index ["status_id"], name: "index_finly_transactions_on_status_id"
     t.index ["transaction_reference_id"], name: "index_finly_transactions_on_transaction_reference_id"
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
+  end
+
+  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.text "params"
+    t.text "headers"
+    t.string "act"
+    t.string "premise"
+    t.string "rule"
+    t.string "violation"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_gatekeeper_blocks_on_company_id"
+    t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
 
   create_table "gst_state_codes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

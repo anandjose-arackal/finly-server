@@ -38,8 +38,10 @@
 #  is_session_storage        :boolean
 #  is_cookie                 :boolean
 #  plugins                   :text(65535)
+#  screen_print              :text(65535)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  user_session_id           :integer          not null
 #
 
 class UserSessionWeb < ApplicationRecord

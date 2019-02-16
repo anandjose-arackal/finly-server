@@ -19,6 +19,7 @@ Gatekeeper::Checker.new 'AccountLock' do
           user.locked_at = DateTime.now
           message 'Too many failed password attempts. Locking the account'
           response_code 401
+          fail
         end
         user.save
       end
@@ -28,8 +29,9 @@ Gatekeeper::Checker.new 'AccountLock' do
       rule 'Do not allow locked accounts to login' do
         user = params[:user]
         if user.locked_at.present? && (Time.now - user.locked_at) < LOCKING_PERIOD
-          add_message :error, 'Account has been temporarily locked. Please try after sometime'
+          message 'Account has been temporarily locked. Please try after sometime'
           response_code 401
+          fail
         end
       end
     end

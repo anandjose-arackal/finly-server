@@ -17,8 +17,8 @@ class RuleBook::PageTree
   def to_s(options = {})
     name = ''
     self.tree.each do |item|
-      name += " >" unless name.blank?
-      name += " #{item.name}"
+      name += " > " unless name.blank?
+      name += "#{item.name}"
     end
     name
   end
