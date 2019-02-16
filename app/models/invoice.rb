@@ -412,6 +412,15 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push InwardInvoiceStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
   def self.document_owner_attribute
     'created_by_user_id'
   end
