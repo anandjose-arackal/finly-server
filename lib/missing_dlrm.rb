@@ -20,7 +20,7 @@ class MissingDLRM
     approved_invoice_ids = Invoice.where(company_id: company_ids, invoice_status_id: invoice_approve_status_ids).where.not(procurement_id: nil).pluck(:id)
 
     invoice_processing_status_ids =  Invoice.status_ids(:processing)
-    processing_invoice_ids = Invoice.where(company_id: company_ids, invoice_status_id: invoice_approve_status_ids).where.not(procurement_id: nil).pluck(:id)
+    processing_invoice_ids = Invoice.where(company_id: company_ids, invoice_status_id: invoice_processing_status_ids).where.not(procurement_id: nil).pluck(:id)
 
     invoice_other_status_ids = Invoice.status_ids(:open, :retracted, :rejected) 
     other_invoice_ids = Invoice.where(company_id: company_ids, invoice_status_id: invoice_other_status_ids).where.not(policy_id: nil).where.not(procurement_id: nil).pluck(:id)
