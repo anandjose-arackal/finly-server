@@ -37,9 +37,13 @@ class TrailMigrationFromTrack
           coh_deduction_id = nil
           payment_id = nil
           case track.report_tracking_action_id
-            when ReportTrackingAction.id_for(:submit) , ReportTrackingAction.id_for(:retract), ReportTrackingAction.id_for(:reject), ReportTrackingAction.id_for(:create), ReportTrackingAction.id_for(:unapprove), ReportTrackingAction.id_for(:approve)
+            when ReportTrackingAction.id_for(:submit), ReportTrackingAction.id_for(:retract), ReportTrackingAction.id_for(:reject), ReportTrackingAction.id_for(:create), ReportTrackingAction.id_for(:approve)
               action_user = track.action_user
               modified_user = track.modified_user
+            when ReportTrackingAction.id_for(:unapprove)
+              action_user = track.action_user
+              modified_user = track.modified_user
+              next_level = level # i.e. do not update to the next level and keep it the same
             when ReportTrackingAction.id_for(:settlement_confirmed), ReportTrackingAction.id_for(:closed)
               action_user = track.action_user
               modified_user = nil
@@ -85,7 +89,7 @@ class TrailMigrationFromTrack
           ).save
 
           # incrementing the level number so that the next one will be at the level that is next
-          level_number += 1 unless [ReportTrackingAction.id_for(:create)].include?(track.report_tracking_action_id)
+          level_number += 1 unless [ReportTrackingAction.id_for(:create), ReportTrackingAction.id_for(:unapprove)].include?(track.report_tracking_action_id)
 
           if ReportTrackingAction.ids_for([:reject, :retract]).include?(track.report_tracking_action_id)
             # this will reset the level number because it is going to go through the levels all over again
@@ -102,6 +106,12 @@ class TrailMigrationFromTrack
             dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
             dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
           end
+        end
+
+        # in case it is rejected  / retracted, set the controlling level as nil
+        if report.rejected? || report.retracted?
+          report.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
+          report.update_columns(controlling_level_id: nil)
         end
       rescue => e
         puts "Crashed at report: #{report.id}"
@@ -151,11 +161,15 @@ class TrailMigrationFromTrack
         action_user_role_id = UserRole.id_for(:reviewer)
         case track.action_id
           when BankPaymentRequestTrailAction.id_for(:submit), BankPaymentRequestTrailAction.id_for(:retract),
-              BankPaymentRequestTrailAction.id_for(:reject), BankPaymentRequestTrailAction.id_for(:unapprove),
+              BankPaymentRequestTrailAction.id_for(:reject),
               BankPaymentRequestTrailAction.id_for(:approve), BankPaymentRequestTrailAction.id_for(:approve_and_forward)
             action_user = track.action_user
             modified_user = track.modified_user
             modified_level = next_level
+          when BankPaymentRequestTrailAction.id_for(:unapprove)
+            action_user = track.action_user
+            modified_level = level
+            next_level = level
           when BankPaymentRequestTrailAction.id_for(:credit), BankPaymentRequestTrailAction.id_for(:mark_as_credited)
             action_user = track.action_user
             modified_user = nil
@@ -188,7 +202,7 @@ class TrailMigrationFromTrack
             original_track: original_track
         ).save
 
-        level_number += 1
+        level_number += 1 unless [BankPaymentRequestTrailAction.id_for(:unapprove)].include?(track.action_id)
 
         if BankPaymentRequestTrailAction.ids_for([:reject, :retract]).include?(track.action_id)
           # this will reset the level number because it is going to go through the levels all over again
@@ -214,6 +228,12 @@ class TrailMigrationFromTrack
           dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
           dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
         end
+      end
+
+      # in case it is rejected  / retracted, set the controlling level as nil
+      if bpr.rejected? || bpr.retracted?
+        bpr.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
+        bpr.update_columns(controlling_level_id: nil)
       end
 
     end
@@ -258,11 +278,16 @@ class TrailMigrationFromTrack
         action_user_role_id = UserRole.id_for(:reviewer)
         case track.action_id
           when BankPaymentRequestTrailAction.id_for(:submit), BankPaymentRequestTrailAction.id_for(:retract),
-              BankPaymentRequestTrailAction.id_for(:reject), BankPaymentRequestTrailAction.id_for(:unapprove),
+              BankPaymentRequestTrailAction.id_for(:reject),
               BankPaymentRequestTrailAction.id_for(:approve), BankPaymentRequestTrailAction.id_for(:approve_and_forward)
             action_user = track.action_user
             modified_user = track.modified_user
             modified_level = next_level
+          when BankPaymentRequestTrailAction.id_for(:unapprove)
+            action_user = track.action_user
+            modified_user = track.modified_user
+            modified_level = level
+            next_level = level
           when BankPaymentRequestTrailAction.id_for(:credit), BankPaymentRequestTrailAction.id_for(:mark_as_credited)
             action_user = track.action_user
             modified_user = nil
@@ -321,6 +346,12 @@ class TrailMigrationFromTrack
           dlrm.update(action_taken_by_id: dlrm.reviewer_id) if dlrm.action_taken_by_id.blank?
           dlrm.update(action_id: TrailAction.id_for(:approve)) if dlrm.action_id.blank?
         end
+      end
+
+      # in case it is rejected  / retracted, set the controlling level as nil
+      if bpr.rejected? || bpr.retracted?
+        bpr.document_level_reviewer_mappings.update_all(action_taken_by_id: nil, taken_control_by_id: nil, action_id: nil, taken_control: false)
+        bpr.update_columns(controlling_level_id: nil)
       end
 
     end
