@@ -66,7 +66,7 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
     #   end
     #   users
     # end
-    purchase_order.document_user_roles(:creditor).present? ? ( self.purchase_order.affected_users(:approve) + purchase_order.document_user_roles(:creditor) ) :  self.purchase_order.affected_users(:approve)
+    purchase_order.document_role_users(:creditor).present? ? ( self.purchase_order.affected_users(:approve) + purchase_order.document_role_users(:creditor) ) :  self.purchase_order.affected_users(:approve)
   end
 
   def notification_affected_users
@@ -113,10 +113,10 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
           else
             return "Congratulations! Your purchase order #{purchase_order.po_number} has been approved"
           end
-        elsif self.purchase_order.document_user_roles(:creditor).include?(user)
+        elsif self.purchase_order.document_role_users(:creditor).include?(user)
          "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"   
         end
-      elsif self.purchase_order.document_user_roles(:creditor).include?(user)
+      elsif self.purchase_order.document_role_users(:creditor).include?(user)
          "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"
       else
         "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number}"
@@ -135,10 +135,10 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
           else
             message = "Congratulations! Your purchase order #{purchase_order.po_number} has been approved"
           end
-        elsif self.purchase_order.document_user_roles(:creditor).include?(user)
+        elsif self.purchase_order.document_role_users(:creditor).include?(user)
          "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"
         end
-      elsif self.purchase_order.document_user_roles(:creditor).include?(user)
+      elsif self.purchase_order.document_role_users(:creditor).include?(user)
          "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"
       else
         message = "#{approving_user.name} has approved the purchase order '#{self.purchase_order.po_number}' and is currently waiting for your approval"
