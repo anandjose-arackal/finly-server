@@ -47,6 +47,27 @@ class TravelRequests::Create < TravelRequests::Base
     if travel_request.save
       # add the custom fields associated with this travel request
       CustomField::SetFields.(self.travel_request, FieldParentType.id_for(:travel_request), reset_fields: true, save: true)
+
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.travel_request.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
+      # Create Document Level Reviewer Mapping for Travel Request Booking Provider
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.travel_request.reload
+      params[:provider_name] = 'TravelRequestBookingProvider'
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
     else
       add_message :error, travel_request.errors.full_messages
     end
@@ -57,6 +78,12 @@ class TravelRequests::Create < TravelRequests::Base
     travel_request.comments.create(user_id: user.id,
                                    action_id: TravelRequestCommentAction.id_for(:created_by_delegate), delegated_action_user_id: delegated_action_user_id) if actual_current_user.present?
     add_message :success, 'New trip created'
+
+    delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    travel_request.trails.create(action_user: user,
+      action_id: TrailAction.id_for(:create),
+      action_user_role_id: UserRole.id_for(:employee),
+      delegated_action_user_id: delegated_action_user_id)
   end
 
   def success

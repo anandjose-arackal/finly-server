@@ -25,7 +25,7 @@ module ReportOperationTestHelper
       end
     end
 
-    report = Report::Create.new(user, expense_ids: expense_ids).run
+    report = Reports::Create.new(user, expense_ids: expense_ids).run
     return report
   end
 end

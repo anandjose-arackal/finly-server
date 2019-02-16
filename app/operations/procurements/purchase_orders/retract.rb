@@ -26,7 +26,8 @@ class Procurements::PurchaseOrders::Retract < Procurements::PurchaseOrders::Base
 
   def post_process
     # todo-olx
-    Event::EPurchaseOrder::Retract.(user, purchase_order: purchase_order, workflow_output: workflow_output)
+    role_id = self.workflow_output[:role_id]
+    Event::EPurchaseOrder::Retract.(user, purchase_order: purchase_order, workflow_output: workflow_output, role_id: role_id)
     add_message :success, 'Successfully Retracted Purchase Order'
   end
 end

@@ -75,7 +75,7 @@
 #              2 - CGST + SGST
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable
+  include SoftDeletable, Templatable, Transitionable
 
   include Sequenced::ActsAsSequenced
 
@@ -118,7 +118,7 @@ class Invoice < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
 
-  belongs_to :policy, optional: true
+  # belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
@@ -412,5 +412,25 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push InwardInvoiceStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.document_owner_attribute
+    'created_by_user_id'
+  end
+
+  def self.document_status_attribute
+    'invoice_status_id'
+  end
+
+  def self.finance_associated_status_ids
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+  end
 
 end

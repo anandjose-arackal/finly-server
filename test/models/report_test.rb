@@ -66,7 +66,7 @@ class ReportTest < ActiveSupport::TestCase
     assert @report.name
 
     # creating a new report with no name
-    create_op = Report::Create.new(@employee)
+    create_op = Reports::Create.new(@employee)
     assert_difference 'Report.count', 1 do
       @result = create_op.run
     end

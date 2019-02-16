@@ -69,7 +69,7 @@ class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
     end
     set_company_expenses_summary(summary, user, start_date, end_date, application, options)
     unless summary.blank?
-      Event::ESummary::Report.(user, user: user, summary: summary)
+      Event::ESummary::Reports.(user, user: user, summary: summary)
     end
   end
 
@@ -141,7 +141,7 @@ class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
       }
     end
 
-    report_presenter = Report::Index.(user, view: 'admin')
+    report_presenter = Reports::Index.(user, view: 'admin')
     if report_presenter.success?
       reports = report_presenter.reports.with_status_id(ReportStatus.ids_for([:processing, :approved, :settled, :settlement_confirmed, :closed]))
       expenses = Expense.reported.with_report_id(reports.pluck(:id)).with_date_range(start_date, end_date)

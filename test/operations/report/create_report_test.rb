@@ -11,7 +11,7 @@
 #
 #   test 'creating a report with valid parameters' do
 #     assert_difference '@user.reports.count', 1 do
-#       @report = Report::Create.new(@user, name: "Test name").run
+#       @report = Reports::Create.new(@user, name: "Test name").run
 #       assert_equal 1, @report.tracks.count
 #       assert_equal "Test name", @report.name
 #       assert_equal 0, @report.expenses.count
@@ -19,7 +19,7 @@
 #
 #     # creating a report with expenses
 #     assert_difference '@user.reports.count', 1 do
-#       @report = Report::Create.new(@user, {expense_ids: @expense_ids}).run
+#       @report = Reports::Create.new(@user, {expense_ids: @expense_ids}).run
 #       assert_equal 1, @report.tracks.count
 #       assert @report.name
 #       assert_not @report.expenses.empty?
@@ -27,7 +27,7 @@
 #
 #     # create a report with someone else's expenses
 #     assert_difference '@user.reports.count', 1 do
-#       @report = Report::Create.new(@user, {expense_ids: @other_ids}).run
+#       @report = Reports::Create.new(@user, {expense_ids: @other_ids}).run
 #       # assert that an empty report got created and it has no expenses
 #       assert @report
 #       assert @report.expenses.empty?
