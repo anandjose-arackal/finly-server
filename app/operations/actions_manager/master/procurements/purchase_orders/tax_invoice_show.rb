@@ -21,7 +21,8 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
   
   def send_mail
-    true
+    (invoice.approved? || invoice.auto_approved?) &&
+    (user_in_level?) || (document_owner?)
   end
   
   def export_items
@@ -103,8 +104,9 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def send_btn
-    (invoice.approved? || invoice.auto_approved?) &&
-    (user_in_level?) || (document_owner?)
+    # (invoice.approved? || invoice.auto_approved?) &&
+    # (user_in_level?) || (document_owner?)
+    true
   end
 
   def export_invoice_items

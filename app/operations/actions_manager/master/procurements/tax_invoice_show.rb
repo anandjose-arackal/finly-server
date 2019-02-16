@@ -96,7 +96,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def download
-    true
+    invoice.approved?
   end
 
   def send_btn
