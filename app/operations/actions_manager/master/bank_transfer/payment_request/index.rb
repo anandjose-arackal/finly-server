@@ -76,5 +76,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManag
     true
   end
 
+  def take_control
+    user.vendor_payments_admin?
+  end
+
 
 end
