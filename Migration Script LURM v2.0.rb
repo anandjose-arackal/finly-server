@@ -181,18 +181,6 @@ policies.each do |policy|
 			  end
       end
 
-      # in case there are no mapping levels for this user, his documents will get auto approved,
-      # so create a LURM with reviewer as nil for this guy
-      if mapping_levels.empty?
-				if purpose == 1
-          ["ReportProvider", "MoneyRequestProvider"].each do |provider|
-
-          end
-        else
-
-        end
-      end
-
       # now creating finance managers and creditors for this particular policy - using PURs
       next if finance_manager.blank?
       if purpose == 1
@@ -255,82 +243,82 @@ end
 #
 # THEN:
 # create empty LURMs which will be skipped for that user
-policies.each do |policy|
-	if policy.default
-		purposes = [1, 2]
-	elsif policy.application == "em"
-		purposes = [1]
-	elsif policy.application == "vp"
-		purposes = [2]
-	else
-		purposes = []
-	end
-
-	purposes.each do |purpose|
-		policy.users.each do |user|
-			# this array will contain the list of reviewers (in order) for a paricular user inside a policy
-			mapping_levels = {}
-			mapping_levels[0] = []
-
-			# first setting the managers for this particular user along with their respective approves to
-			# reviewal_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: 1).first
-			reviewal_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: purpose).first
-			non_default_reviewal_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: purpose, default: false).first
-			if reviewal_mapping&.default?
-				manager = reviewal_mapping.manager
-				if reviewal_mapping.present? && manager.present?
-					mapping_levels[0] << manager.id
-				end
-				set_chain(mapping_levels, policy, manager, purpose, 0) if manager.present?
-			end
-			if non_default_reviewal_mapping.present?
-				manager = non_default_reviewal_mapping.manager
-				threshold = non_default_reviewal_mapping.greater_than_amount.value
-				if manager.present?
-					mapping_levels[threshold] = [] unless mapping_levels[threshold].present?
-					mapping_levels[threshold] << manager.id
-				end
-				set_chain(mapping_levels, policy, manager, purpose, threshold) if manager.present?
-			end
-
-			# now finding the finance managers for this user along with their approves finance to
-			finance_manager = reviewal_mapping&.finance_manager
-			if finance_manager.present?
-				# add this user as the finance manager for all levels
-				mapping_levels.each do |thresh, app_levels|
-					app_levels << finance_manager.id unless app_levels.include?(finance_manager.id)
-				end
-			end
-			if reviewal_mapping&.default? && finance_manager.present?
-				set_chain_finance(mapping_levels, policy, finance_manager, purpose, 0)
-			end
-			if non_default_reviewal_mapping.present?
-				finance_manager = non_default_reviewal_mapping.finance_manager
-				threshold = non_default_reviewal_mapping.greater_than_amount.value
-				mapping_levels[threshold] = [] if mapping_levels[threshold].blank?
-
-				if finance_manager.present?
-					mapping_levels[threshold].push(finance_manager.id) unless mapping_levels[threshold].include?(finance_manager.id)
-					set_chain_finance(mapping_levels, policy, finance_manager, purpose, threshold)
-				end
-			end
-
-			finance_manager = reviewal_mapping&.finance_manager
-			puts mapping_levels
-
-      # now if mapping levels is empty (i.e. the UMM for this user was always empty), and the LRM for this policy has multiple levels,
-      # create LURM for every level and make the reviewer_id nil
-
-      mapping_levels.each do |threshold, reviewers|
-				["ReportProvider", "MoneyRequestProvider", "BankPaymentRequestProvider"].each do |provider|
-					levels = policy.levels.where(associated_entity_type: provider)
-					levels.each do |level|
-						lurm = user.level_user_reviewer_mappings.where(level_id: level.id, policy_id: policy.id, threshold: threshold)
-						next if lurm.present?
-						lurm = user.level_user_reviewer_mappings.build(level_id: level.id, reviewer_id: nil, policy_id: policy.id, threshold: threshold).save
-					end
-        end
-			end
-    end
-  end
-end
+# policies.each do |policy|
+# 	if policy.default
+# 		purposes = [1, 2]
+# 	elsif policy.application == "em"
+# 		purposes = [1]
+# 	elsif policy.application == "vp"
+# 		purposes = [2]
+# 	else
+# 		purposes = []
+# 	end
+#
+# 	purposes.each do |purpose|
+# 		policy.users.each do |user|
+# 			# this array will contain the list of reviewers (in order) for a paricular user inside a policy
+# 			mapping_levels = {}
+# 			mapping_levels[0] = []
+#
+# 			# first setting the managers for this particular user along with their respective approves to
+# 			# reviewal_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: 1).first
+# 			reviewal_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: purpose).first
+# 			non_default_reviewal_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: purpose, default: false).first
+# 			if reviewal_mapping&.default?
+# 				manager = reviewal_mapping.manager
+# 				if reviewal_mapping.present? && manager.present?
+# 					mapping_levels[0] << manager.id
+# 				end
+# 				set_chain(mapping_levels, policy, manager, purpose, 0) if manager.present?
+# 			end
+# 			if non_default_reviewal_mapping.present?
+# 				manager = non_default_reviewal_mapping.manager
+# 				threshold = non_default_reviewal_mapping.greater_than_amount.value
+# 				if manager.present?
+# 					mapping_levels[threshold] = [] unless mapping_levels[threshold].present?
+# 					mapping_levels[threshold] << manager.id
+# 				end
+# 				set_chain(mapping_levels, policy, manager, purpose, threshold) if manager.present?
+# 			end
+#
+# 			# now finding the finance managers for this user along with their approves finance to
+# 			finance_manager = reviewal_mapping&.finance_manager
+# 			if finance_manager.present?
+# 				# add this user as the finance manager for all levels
+# 				mapping_levels.each do |thresh, app_levels|
+# 					app_levels << finance_manager.id unless app_levels.include?(finance_manager.id)
+# 				end
+# 			end
+# 			if reviewal_mapping&.default? && finance_manager.present?
+# 				set_chain_finance(mapping_levels, policy, finance_manager, purpose, 0)
+# 			end
+# 			if non_default_reviewal_mapping.present?
+# 				finance_manager = non_default_reviewal_mapping.finance_manager
+# 				threshold = non_default_reviewal_mapping.greater_than_amount.value
+# 				mapping_levels[threshold] = [] if mapping_levels[threshold].blank?
+#
+# 				if finance_manager.present?
+# 					mapping_levels[threshold].push(finance_manager.id) unless mapping_levels[threshold].include?(finance_manager.id)
+# 					set_chain_finance(mapping_levels, policy, finance_manager, purpose, threshold)
+# 				end
+# 			end
+#
+# 			finance_manager = reviewal_mapping&.finance_manager
+# 			puts mapping_levels
+#
+#       # now if mapping levels is empty (i.e. the UMM for this user was always empty), and the LRM for this policy has multiple levels,
+#       # create LURM for every level and make the reviewer_id nil
+#
+#       mapping_levels.each do |threshold, reviewers|
+# 				["ReportProvider", "MoneyRequestProvider", "BankPaymentRequestProvider"].each do |provider|
+# 					levels = policy.levels.where(associated_entity_type: provider)
+# 					levels.each do |level|
+# 						lurm = user.level_user_reviewer_mappings.where(level_id: level.id, policy_id: policy.id, threshold: threshold)
+# 						next if lurm.present?
+# 						lurm = user.level_user_reviewer_mappings.build(level_id: level.id, reviewer_id: nil, policy_id: policy.id, threshold: threshold).save
+# 					end
+#         end
+# 			end
+#     end
+#   end
+# end
