@@ -45,7 +45,7 @@ class Procurements::PurchaseOrders::TakeControl < Procurements::PurchaseOrders::
   end
 
   def post_process
-    role_id = self.workflow_output[:role_id]
+    # role_id = self.workflow_output[:role_id]
     Event::EPurchaseOrder::TakeControl.(user, purchase_order: purchase_order, workflow_output: workflow_output, role_id: role_id)
     add_message :success, 'You have taken control of this purchase order'
   end

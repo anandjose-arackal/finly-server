@@ -96,7 +96,6 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
                                              path_object_id: purchase_order.id,
                                              path_object_type: "Purchase Order",
                                              read: false,
-                                             role_id: role_id,
                                              timestamp: DateUtils,
                                              application: RequestStore.store[:current_app])
     notification.save

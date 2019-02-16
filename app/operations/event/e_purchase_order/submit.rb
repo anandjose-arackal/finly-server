@@ -60,7 +60,6 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
                                              path_object_type: "Purchase Order",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save
