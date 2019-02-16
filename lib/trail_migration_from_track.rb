@@ -40,6 +40,10 @@ class TrailMigrationFromTrack
             when ReportTrackingAction.id_for(:submit) , ReportTrackingAction.id_for(:retract), ReportTrackingAction.id_for(:reject), ReportTrackingAction.id_for(:create), ReportTrackingAction.id_for(:unapprove), ReportTrackingAction.id_for(:approve)
               action_user = track.action_user
               modified_user = track.modified_user
+            when ReportTrackingAction.id_for(:unapprove)
+              action_user = track.action_user
+              modified_user = track.modified_user
+              next_level = level # i.e. do not update to the next level and keep it the same
             when ReportTrackingAction.id_for(:settlement_confirmed), ReportTrackingAction.id_for(:closed)
               action_user = track.action_user
               modified_user = nil
@@ -85,7 +89,7 @@ class TrailMigrationFromTrack
           ).save
 
           # incrementing the level number so that the next one will be at the level that is next
-          level_number += 1 unless [ReportTrackingAction.id_for(:create)].include?(track.report_tracking_action_id)
+          level_number += 1 unless [ReportTrackingAction.id_for(:create), ReportTrackingAction.id_for(:unapprove)].include?(track.report_tracking_action_id)
 
           if ReportTrackingAction.ids_for([:reject, :retract]).include?(track.report_tracking_action_id)
             # this will reset the level number because it is going to go through the levels all over again
