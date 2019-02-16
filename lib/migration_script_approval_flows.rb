@@ -159,7 +159,7 @@ class MigrationScriptApprovalFlows
 
   private
 
-  def set_chain(reviewal_mapping_data, policy, user, purpose, threshold = 0)
+  def self.set_chain(reviewal_mapping_data, policy, user, purpose, threshold = 0)
     default_reviewal_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: purpose, default: true).first
     non_default_reviewer_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: purpose, default: false).where.not(greater_than_amount_id: nil).first
 
@@ -195,7 +195,7 @@ class MigrationScriptApprovalFlows
     end
   end
 
-  def set_chain_finance(reviewal_mapping_data, policy, user, purpose, threshold = 0)
+  def self.set_chain_finance(reviewal_mapping_data, policy, user, purpose, threshold = 0)
     default_reviewal_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: purpose, default: true).first
     non_default_reviewer_mapping = policy.user_team_mapping.with_user(user.id).where(purpose_id: purpose, default: false).where.not(greater_than_amount_id: nil).first
 
