@@ -442,8 +442,9 @@ class Report < ApplicationRecord
   end
 
   def controlling_user?(user)
-    return false if self.controlling_user_id.blank?
-    self.controlling_user.id == user.id
+    self.get_reviewers.first&.id == user&.id
+    # return false if self.controlling_user_id.blank?
+    # self.controlling_user.id == user.id
   end
 
   def versioned_policy
@@ -543,6 +544,10 @@ class Report < ApplicationRecord
 
   def synced_with_quickbooks?
     self.sync_status_id == ReportSyncStatus.id_for(:synced)
+  end
+
+  def controlling_user
+    self.get_reviewers.first
   end
 
 
