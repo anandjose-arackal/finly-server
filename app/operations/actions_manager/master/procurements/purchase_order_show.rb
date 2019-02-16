@@ -14,8 +14,6 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     self.purchase_order = result.purchase_order
   end
 
-  # alias_method :purchase_order, :input
-
   def more_details_button
     true
   end
@@ -59,7 +57,8 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def remind_approver
-    true
+    purchase_order.processing? &&
+    document_owner?
   end
 
   def void
@@ -68,13 +67,15 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def save_btn
-    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ||
+    ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
     (purchase_order.processing? && user_in_level?) ||
     (user.vendor_payment_admin? && purchase_order.voided?)
   end
 
   def save_and_submit
-    true
+    ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
+    (purchase_order.processing? && user_in_level?) ||
+    (user.vendor_payment_admin? && purchase_order.voided?)
   end
 
   def delete
@@ -86,7 +87,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def make_payment
-    true
+    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level?)
   end
 
   def audit_trail
@@ -98,7 +99,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def send_btn
-    true
+    if (purchase_order.approved? || purchase_order.auto_approved?)
+      (user_in_level? || document_owner?)
+    end
   end
 
   def export_po_items

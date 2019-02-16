@@ -14,7 +14,6 @@ class ActionsManager::Master::Procurements::Show < ActionsManager::Master::Base
     self.purchase_order = result.purchase_order
   end
 
-  # alias_method :purchase_order, :input
 
   def add_document
     (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)
