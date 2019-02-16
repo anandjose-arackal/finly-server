@@ -26,8 +26,8 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     end
 
     event :unapprove do
-      transitions :from => :processing, :to => :processing
-      transitions :from => :approved, :to => :processing
+      transitions :from => :processing, :to => :processing, guard: [:user_can_unapprove?]
+      transitions :from => :approved, :to => :processing, guard: [:user_can_unapprove?]
     end
 
     event :hold do

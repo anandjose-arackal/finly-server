@@ -182,4 +182,8 @@ class WorkflowManager::Aasm::BaseProvider
   def user_can_review?
     self.current_level_reviewers.include?(user)
   end
+
+  def user_can_unapprove?
+    self.document.get_reviewers(:prev).include?(user)
+  end
 end
