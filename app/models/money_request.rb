@@ -332,8 +332,9 @@ class MoneyRequest < ApplicationRecord
   end
 
   def controlling_user?(user)
-    return false if self.controlling_user.blank?
-    self.controlling_user.id == user.id
+    self.get_reviewers.first&.id == user&.id
+    # return false if self.controlling_user.blank?
+    # self.controlling_user.id == user.id
   end
 
   def payment_pending?

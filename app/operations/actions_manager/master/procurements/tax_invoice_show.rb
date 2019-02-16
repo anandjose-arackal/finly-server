@@ -2,7 +2,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   register_handle :proc_tax_invoice_show
   validate :input
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
 
   def initialize(user=nil, params={})
     super
@@ -21,7 +21,9 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def send_mail
-    true
+    if (invoice.approved? || invoice.auto_approved?)
+      (user.vendor_payments_admin? || document_owner?)
+    end
   end
 
   def export_items
@@ -62,11 +64,17 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def save_btn
-    true
+    # ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
+    # (invoice.processing? && user_in_level?) ||
+    # (user.vendor_payment_admin?)
+    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def save_and_submit
-    true
+    # ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
+    # (invoice.processing? && user_in_level?) ||
+    # (user.vendor_payment_admin?)
+    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def delete

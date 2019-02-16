@@ -61,7 +61,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def save_btn
-    true
+    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def export_po_items
@@ -81,7 +81,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def save_and_submit
-    true
+    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def more_actions
