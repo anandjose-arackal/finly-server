@@ -64,7 +64,7 @@ class MigrationScriptApprovalFlows
           end
 
           finance_manager = reviewal_mapping&.finance_manager
-          puts mapping_levels
+          puts "#{policy.id} - #{mapping_levels}" 
 
 
           # now mapping_levels will have an array of all the reviewers for a particular user
