@@ -29,7 +29,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
   def init
     id = params[:id] || params[:purchase_order_id] || params[:po_id]
     self.purchase_order = user.company.purchase_orders.find_by(id: id)
-    self.procurement = user.company.procurements.find_by id: params[:procurement_id]
+    self.procurement = user.company.procurements.find_by id: self.purchase_order.procurement_id
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
