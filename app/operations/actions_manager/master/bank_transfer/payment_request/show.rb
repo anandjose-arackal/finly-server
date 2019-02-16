@@ -379,9 +379,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ############# Reviewer logic start #########################
-    if bank_payment_request.processing?
-      if (bank_payment_request.get_reviewers.include?(user))
-        return true
+    if user.vendor_payments_reviewer?
+      if bank_payment_request.processing?
+        if (bank_payment_request.get_reviewers.include?(user))
+          return true
+        end
       end
     end
     ############# Reviewer logic end #########################
