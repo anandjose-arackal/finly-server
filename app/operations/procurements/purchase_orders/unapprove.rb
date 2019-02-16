@@ -45,7 +45,7 @@ class Procurements::PurchaseOrders::Unapprove < Procurements::PurchaseOrders::Ba
   end
 
   def post_process
-    role_id = self.workflow_output[:role_id]
+    # role_id = self.workflow_output[:role_id]
     Event::EPurchaseOrder::Unapprove.(user, purchase_order: purchase_order, workflow_output: self.workflow_output, role_id: role_id)
     add_message :success, 'Successfully Unapproved Purchase Order'
   end
