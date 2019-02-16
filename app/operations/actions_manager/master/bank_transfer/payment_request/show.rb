@@ -347,13 +347,13 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     end
     ############# Reviewer logic end #########################
 
-    ############# Creditor logic start #########################
-    if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved?
-        return true
-      end
-    end
-    ############# Creditor logic end #########################
+    # ############# Creditor logic start #########################
+    # if user.vendor_payments_creditor?
+    #   if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved?
+    #     return true
+    #   end
+    # end
+    # ############# Creditor logic end #########################
   end
 
   def retract
@@ -379,19 +379,21 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ############# Reviewer logic start #########################
-    if bank_payment_request.processing?
-      if (bank_payment_request.get_reviewers.include?(user))
-        return true
+    if user.vendor_payments_reviewer?
+      if bank_payment_request.processing?
+        if (bank_payment_request.get_reviewers.include?(user))
+          return true
+        end
       end
     end
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved?
-        return true
-      end
-    end
+    # if user.vendor_payments_creditor?
+    #   if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.processing?
+    #     return true
+    #   end
+    # end
     ############# Creditor logic end #########################
 
   end
