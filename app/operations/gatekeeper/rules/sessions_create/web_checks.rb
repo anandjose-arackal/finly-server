@@ -1,8 +1,8 @@
 Gatekeeper::Checker.new 'On Web Authentication' do
 
-  # before do
-  #   skip unless RequestStoreUtil.current_session.platform == 'UserSessionWeb'
-  # end
+  before do
+    skip unless RequestStoreUtil.current_session.platform == 'UserSessionWeb'
+  end
 
   premise :after_session_create do
     section 'X-Finly-RP' do
