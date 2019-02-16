@@ -3307,7 +3307,9 @@ Rails.application.routes.draw do
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
+
     end
+    get 'po_advances', to: 'purchase_orders#po_advances', as: :po_advances
 
     resources :inward_documents do
 
