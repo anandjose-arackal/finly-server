@@ -99,11 +99,12 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def download
-    true
+    invoice.approved?
   end
 
   def send_btn
-    true
+    (invoice.approved? || invoice.auto_approved?) &&
+    (user_in_level?) || (document_owner?)
   end
 
   def export_invoice_items
