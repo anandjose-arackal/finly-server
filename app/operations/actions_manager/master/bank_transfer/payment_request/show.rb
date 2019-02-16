@@ -389,11 +389,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.processing?
-        return true
-      end
-    end
+    # if user.vendor_payments_creditor?
+    #   if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.processing?
+    #     return true
+    #   end
+    # end
     ############# Creditor logic end #########################
 
   end
