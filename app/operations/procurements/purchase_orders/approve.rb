@@ -46,7 +46,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
 
   def post_process
     # role_id = self.workflow_output[:role_id]
-    Event::EPurchaseOrder::Approve.(user, purchase_order: purchase_order, workflow_output: workflow_output, role_id: role_id)
+    Event::EPurchaseOrder::Approve.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Approved Purchase Order'
   end
 
