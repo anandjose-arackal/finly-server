@@ -36,9 +36,9 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
     invoice.processing? && user_in_level?
   end
 
-  def close
-    true
-  end
+  # def close
+  #   true
+  # end
 
   def approve
     invoice.processing? && user_in_level?
