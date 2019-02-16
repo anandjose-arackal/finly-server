@@ -1,10 +1,10 @@
 class Gatekeeper::Log < BaseOperation
-  attr_accessor :verdict
+  attr_accessor :verdict, :error_logger, :logger
 
-  GATEKEEPER_ERROR_LOGGER = LogStashLogger.new(type: :file, path: 'log/logstash_gatekeeper_error.log', sync: true)
-  GATEKEEPER_LOGGER = LogStashLogger.new(type: :file, path: 'log/logstash_gatekeeper.log', sync: true)
 
   def initialize(verdict, params)
+    self.error_logger = LogStashLogger.new(type: :file, path: 'log/logstash_gatekeeper_error.log', sync: true)
+    self.logger = LogStashLogger.new(type: :file, path: 'log/logstash_gatekeeper.log', sync: true)
     self.user = RequestStoreUtil.current_user || params&.dig(:user)
     super(self.user, params)
     self.verdict = verdict
@@ -48,13 +48,13 @@ class Gatekeeper::Log < BaseOperation
       puts blocker.errors.full_messages
     end
     blocker.save
-    # GATEKEEPER_LOGGER.info(logstash_params) unless Rails.env.test?
+    logger.info(logstash_params)
   end
 
   def base_params
     {
         params: RequestStoreUtil.request_params,
-        headers: RequestStoreUtil.current_request.headers,
+        headers: RequestStoreUtil.current_request.headers['X-Finly-RP'],
         act: self.verdict.act.to_s,
         premise: self.verdict.premise.to_s,
         rule: self.verdict.rule.to_s,
@@ -65,7 +65,7 @@ class Gatekeeper::Log < BaseOperation
   def add_message(type, message)
     return unless super(type, message)
     if type == :error
-      GATEKEEPER_ERROR_LOGGER.info message unless Rails.env.test?
+      self.error_logger.info message
     end
   end
 
