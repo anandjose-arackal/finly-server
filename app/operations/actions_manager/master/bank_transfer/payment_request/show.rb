@@ -509,7 +509,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def policy_editable
-    bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    if (bank_payment_request.owner_id == user.id)
+      bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    end
   end
 
   def reviewer
