@@ -29,10 +29,10 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     end
 
     # Find over ridden users for a policy level
-    self.levels = self.policy.levels.non_deleted.with_entity_type(provider_name).order(:level_number)
+    self.levels = self.policy.levels.non_deleted.with_entity_type(provider_name).reorder(:level_number)
 
     levels.each do |level|
-      if level.level_user_reviewer_mappings.present?
+      if level.level_user_reviewer_mappings.with_user_id(user.id).present?
         mappings = level.level_user_reviewer_mappings.with_user_id(user.id)
       else
         mappings = level.level_reviewer_mappings.non_deleted
