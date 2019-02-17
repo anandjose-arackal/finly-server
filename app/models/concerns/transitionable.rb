@@ -421,7 +421,7 @@ module Transitionable
           self.where(company_id: user.company.id)
         else
           user_ids = user.company.users.pluck(:id)
-          self.where("#{self.document_owner_attribute} in (?)", user_ids)
+          self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
         end
         # self.where(id: document_ids)
       end
