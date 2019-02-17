@@ -22,7 +22,8 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def affected_users
-    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    # Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
+    report.affected_users(:reject)
   end
 
   def send_push_notification(user)
@@ -32,7 +33,9 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def set_notification(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    #TODO- For Other Roles
+    # role_id = UserRole.id_for(:manager)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:expense),
                                              action_type_id: NotificationActionType.id_for(:notify_reject),
                                              action_user_id: self.user.id,
@@ -42,14 +45,15 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: roles.first,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save
   end
 
   def mailer_subject(user)
-    if user == self.report.controlling_user
+    # if user == self.report.controlling_user
+    if self.report.get_reviewers.include?(user)
       "You rejected the expense : #{rejected_expense.merchant_name}"
     else
       "#{self.report.controlling_user.name} has rejected expense: #{rejected_expense.merchant_name}"
@@ -57,10 +61,12 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def mailer_body(user)
-    if user == self.report.controlling_user
+    # if user == self.report.controlling_user
+    if self.report.get_reviewers.include?(user)
       "You rejected the expense : #{rejected_expense.merchant_name} in report: #{self.report.name}"
     else
-      "#{self.report.controlling_user.name} has rejected the expense at #{self.rejected_expense.merchant_name} in report: '#{self.report.name}'"
+      last_trail = self.report.trails.last
+      "#{last_trail.action_user.name} has rejected the expense at #{self.rejected_expense.merchant_name} in report: '#{self.report.name}'"
     end
     
   end
@@ -71,8 +77,9 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
   end
 
   def report_view_role(user)
-    roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
-    roles.first
+    # roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # roles.first
+    report.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

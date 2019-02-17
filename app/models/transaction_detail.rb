@@ -15,9 +15,9 @@
 #  closing_balance_id       :integer
 #  company_id               :integer
 #  transaction_date         :datetime
-#  sequence_number          :integer
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  sequence_number          :integer
 #
 
 class TransactionDetail < ApplicationRecord

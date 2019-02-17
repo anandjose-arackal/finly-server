@@ -75,7 +75,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
         hash[:selectable] = false
       else
         # check if the payment request can be credited by the selecting user
-        if (payment_request.controlling_user_id == user.id) || (user.vendor_payments_admin? && payment_request.approved?)
+        # if (payment_request.controlling_user_id == user.id) || (user.vendor_payments_admin? && payment_request.approved?)
+        if (payment_request.get_reviewers.include?(user)) || (user.vendor_payments_admin? && payment_request.approved?)
           if hash[:allowed]
             self.processable_amount += payment_request.payment_order.amount_requested&.value
           else

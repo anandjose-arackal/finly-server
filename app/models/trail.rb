@@ -22,7 +22,9 @@ class Trail < ApplicationRecord
   belongs_to :action_user_role, optional: true, class_name: 'UserRole'
   belongs_to :action_level, optional: true, class_name: 'ReviewalLevel'
   belongs_to :modified_level, optional: true, class_name: 'ReviewalLevel'
-
+  belongs_to :payment, optional: true
+  belongs_to :cash_on_hand_deduction, optional: true, class_name: "Payment"
+  belongs_to :original_track, polymorphic: true, optional: true
 
   scope :created_before, -> (time) { where 'created_at < ?', time }
 
@@ -42,14 +44,26 @@ class Trail < ApplicationRecord
     where action_id: TrailAction.id_for(:approve)
   }
 
+  scope :only_retract, -> {
+    where action_id: TrailAction.id_for(:retract)
+  }
+
   scope :with_action_user_id, -> (id) {
     where(action_user_id: id)
   }
 
-  default_scope { order created_at: :desc }
+  scope :with_action_user_role_id, -> (role_id) {
+    where action_user_role_id: role_id
+  }
+
+  # default_scope { order created_at: :desc }
 
   scope :natural_order, -> {
       reorder :created_at
+  }
+
+  scope :desc_order, -> {
+    reorder created_at: :desc
   }
 
   scope :printable_trails, -> {

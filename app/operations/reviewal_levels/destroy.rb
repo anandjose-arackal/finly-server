@@ -4,7 +4,11 @@ class ReviewalLevels::Destroy < ReviewalLevels::Base
 
   def init
     id = params[:id] || params[:level_id]
-    self.level = ReviewalLevel.find_by id: id
+
+    policy_ids = user.company.policies.pluck(:id)
+    reviewal_levels = ReviewalLevel.with_policy_ids(policy_ids)
+
+    self.level = reviewal_levels.find_by id: id
   end
 
   def validate

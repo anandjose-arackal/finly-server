@@ -40,7 +40,7 @@ class BankTransfer::PaymentRequest::ActionUserRole < BankTransfer::PaymentReques
 
     return if load_from_cache
 
-    tracking = self.bank_payment_request.bank_payment_request_trails
+    tracking = self.bank_payment_request.trails
     if self.user_before.present?
       track = tracking.find_by(action_user_id: user_before.id)
       unless track.blank?

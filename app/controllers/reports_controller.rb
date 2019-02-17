@@ -3,57 +3,57 @@ class ReportsController < BaseControllers::WebBase
 
 
   def create
-    @result = Report::Create.(current_user, params)
+    @result = Reports::Create.(current_user, params)
     respond
   end
 
   def index
-    @result = Report::Index.(current_user, params)
+    @result = Reports::Index.(current_user, params)
     respond
   end
 
   def update
-    @result = Report::Update.(current_user, params)
+    @result = Reports::Update.(current_user, params)
     respond render: :show
   end
 
   def show
-    @result = Report::Show.(current_user, params)
+    @result = Reports::Show.(current_user, params)
     respond render: :show
   end
 
   def destroy
-    @result = Report::Destroy.(current_user, params)
+    @result = Reports::Destroy.(current_user, params)
     respond response: :success
   end
 
   def add_expenses
-    @result = Report::Expenses::Add.(current_user, params)
+    @result = Reports::Expenses::Add.(current_user, params)
     respond render: :show
   end
 
   def remove_expenses
-    @result = Report::Expenses::Remove.(current_user, params)
+    @result = Reports::Expenses::Remove.(current_user, params)
     respond render: :show
   end
 
   def submit
-    @result = Report::Submit.(current_user, params)
+    @result = Reports::Submit.(current_user, params)
     respond render: :show
   end
 
   def retract
-    @result = Report::Retract.(current_user, params)
+    @result = Reports::Retract.(current_user, params)
     respond render: :show
   end
 
   def approve
-    @result = Report::Approve.(current_user, params)
+    @result = Reports::Approve.(current_user, params)
     respond render: :show
   end
 
   def bulk_approve
-    @result = Report::BulkApprove.(current_user, params)
+    @result = Reports::BulkApprove.(current_user, params)
     # respond render: :show
     unless @result.success?
       respond_to do |format|
@@ -66,27 +66,27 @@ class ReportsController < BaseControllers::WebBase
   end
 
   def reject
-    @result = Report::Reject.(current_user, params)
+    @result = Reports::Reject.(current_user, params)
     respond render: :show
   end
 
   def reject_expense
-    @result = Report::Expenses::Reject.(current_user, params)
+    @result = Reports::Expenses::Reject.(current_user, params)
     respond render: :show
   end
 
   def unapprove
-    @result = Report::Unapprove.(current_user, params)
+    @result = Reports::Unapprove.(current_user, params)
     respond render: :show
   end
 
   def take_control
-    @result = Report::TakeControl.(current_user, params)
+    @result = Reports::TakeControl.(current_user, params)
     respond render: :show
   end
 
   def toggle_receipt_hardcopy
-    @result = Report::Receipts::ToggleHardCopy.(current_user, params)
+    @result = Reports::Receipts::ToggleHardCopy.(current_user, params)
     if @result.success?
       render 'toggle_receipt_hardcopy'
     end
@@ -105,12 +105,12 @@ class ReportsController < BaseControllers::WebBase
   end
 
   def settlement_confirm
-    @result = Report::SettlementConfirm.(current_user, params)
+    @result = Reports::SettlementConfirm.(current_user, params)
     respond render: :show
   end
 
   def comment
-    @result = Report::Comment::Create.(current_user, params)
+    @result = Reports::Comment::Create.(current_user, params)
     respond render: :show
   end
 

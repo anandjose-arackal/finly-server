@@ -110,6 +110,16 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       add_message :error, bank_payment_request.errors.full_messages
       return
     end
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+    params[:reviewal_document] = self.bank_payment_request.reload
+
+    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+    unless document_reviewer_mappings_op.success?
+      add_message :error, document_reviewer_mappings_op.messages[:error]
+      return
+    end
+
     self.bank_payment_request.payment_order.payments.each_with_index do |payment, index|
       payment_params = request_params[:payment_order_attributes][:payments_attributes][index]
       calculate_tax_and_discounts(payment_params, payment)
@@ -136,6 +146,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
     # update the requested amount for this payment order
     self.bank_payment_request.payment_order.update_requested_amount
+
+    self.bank_payment_request.trails.create action_user: user, action_id: TrailAction.id_for(:create)
 
     add_message :success, "Payment Request created successfully!"
   end

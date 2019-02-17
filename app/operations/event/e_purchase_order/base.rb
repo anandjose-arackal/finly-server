@@ -1,5 +1,5 @@
 class Event::EPurchaseOrder::Base < Event::SetNotifier
-  attr_accessor :purchase_order, :controlling_users, :workflow_output
+  attr_accessor :purchase_order, :controlling_users, :workflow_output, :role_id
 
   def pre_validate
     unless user.present?
@@ -23,6 +23,7 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     self.purchase_order = params[:purchase_order]
     self.workflow_output = params[:workflow_output]
     self.controlling_users = []
+    self.role_id = params[:role_id]
   end
 
   def validate
@@ -137,9 +138,9 @@ class Event::EPurchaseOrder::Base < Event::SetNotifier
     end
 
     def generate_url
-      suffix = "/params={\"show\":\"purchase_order\"}"
+      suffix = URI.escape("{\"show\":\"purchase_order\"}")
       # path = "reports/#{report.id}"
-      path = "procurements/#{purchase_order.procurement.id}"
+      path = "procurements/#{purchase_order.procurement.id}/params="
       url = Constants::BASE_URL_VP + path + suffix
     end
 

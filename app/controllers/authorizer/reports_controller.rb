@@ -1,6 +1,6 @@
 class Authorizer::ReportsController < BaseControllers::PublicBase
   def show
-    @result = Report::ReportAuthorizer::Show.(params)
+    @result = Reports::ReportAuthorizer::Show.(params)
     if @result.failure?
       respond response: :failure
       return
@@ -8,7 +8,7 @@ class Authorizer::ReportsController < BaseControllers::PublicBase
   end
 
   def approve
-    @result = Report::ReportAuthorizer::Approve.(params)
+    @result = Reports::ReportAuthorizer::Approve.(params)
     if @result.failure?
       respond response: :failure
       return
@@ -17,7 +17,7 @@ class Authorizer::ReportsController < BaseControllers::PublicBase
   end
 
   def reject
-    @result = Report::ReportAuthorizer::Reject.(params)
+    @result = Reports::ReportAuthorizer::Reject.(params)
     if @result.failure?
       respond response: :failure
       return

@@ -11,10 +11,9 @@ set :repo_url, 'git@gitlab.com:finlycore/finly-server.git'
 
 set :branch, ENV['BRANCH'] || :master
 
-case fetch(:stage)
-when :itzcash_production
-  raise 'Cannot deploy this to itzcash. Deploy it to AWS instead'
-
+  case fetch(:stage)
+  when :itzcash_production
+    raise 'Cannot deploy this to itzcash. Deploy it to AWS instead'
   # branch = fetch :branch
   # unless ['staging', :staging].include?(branch)
   #   raise 'This branch cannot be deploy to production. Please select the correct branch'
@@ -22,25 +21,37 @@ when :itzcash_production
   # set :deploy_to, '/home/viveka/app'
   # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
-when :aws_production, :background_production
-  branch = fetch :branch
-  unless ['master', :master].include?(branch)
-    raise 'This branch cannot be deploy to production. Please select the correct branch'
-  end
-  set :deploy_to, '/home/centos/app'
-  set :rails_env, 'production'
-when :itzcash
-  set :deploy_to, '/usr/local/app'
-  set :rails_env, 'itzcash_uat'
-when :staging, :development, :combined_development, :insights, :demo_2, :shapoorji, :olx
-  set :deploy_to, '/home/centos/app'
-  set :rails_env, 'staging'
-when :development_2
-  set :deploy_to, '/home/centos/app_2'
-  set :rails_env, 'staging'
-when :development_3
-  set :deploy_to, '/home/centos/app_3'
-  set :rails_env, 'staging'
+  when :aws_production, :background_production
+    branch = fetch :branch
+    unless ['master', :master].include?(branch)
+      raise 'This branch cannot be deploy to production. Please select the correct branch'
+    end
+    set :deploy_to, '/home/centos/app'
+    set :rails_env, 'production'
+  when :itzcash
+    set :deploy_to, '/usr/local/app'
+    set :rails_env, 'itzcash_uat'
+  when :staging, :development, :combined_development, :insights, :demo_2, :shapoorji, :olx, :migrated_test
+    set :deploy_to, '/home/centos/app'
+    set :rails_env, 'staging'
+  when :development_2
+    set :deploy_to, '/home/centos/app_2'
+    set :rails_env, 'staging'
+  when :development_3
+    set :deploy_to, '/home/centos/app_3'
+    set :rails_env, 'staging'
+  when :development_4
+    set :deploy_to, '/home/centos/app_4'
+    set :rails_env, 'staging'
+  when :development_5
+    set :deploy_to, '/home/centos/app_5'
+    set :rails_env, 'staging'
+  when :original_test
+    set :deploy_to, '/home/centos/app_2'
+    set :rails_env, 'staging'
+  when :migrated_script_testing
+    set :deploy_to, '/home/centos/app_3'
+    set :rails_env, 'staging'
 end
 
 set :pty, false

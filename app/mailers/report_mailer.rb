@@ -4,7 +4,7 @@ class ReportMailer < ApplicationMailer
     return unless presenter.validate
     @data = presenter
     #### variables required for the attachment pdf #########
-    @result = Report::Show.(@data.user, {report_id: @data.report.id, role_id: @data.role_id, view: UserRole.name_for(@data.role_id)})
+    @result = Reports::Show.(@data.user, {report_id: @data.report.id, role_id: @data.role_id, view: UserRole.name_for(@data.role_id)})
     if @result.success?
       @report = @data.report
       @curr_user = @data.user
