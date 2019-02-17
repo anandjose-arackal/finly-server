@@ -100,6 +100,8 @@ class Reports::Base < BaseOperation
           }
           self.reviewal_chains.push(chain)
         end
+      else
+        self.policies = Policy.where(id: self.report&.policy&.id)
       end
 
       # budgets_op = BudgetsProcessor::Report.(user, report: self.report)

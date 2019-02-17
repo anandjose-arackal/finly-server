@@ -25,7 +25,7 @@ class Reports::Unapprove < Reports::Base
 
   def authorize
     super
-    if report.user_id == user.id
+    if personal_view? && report.user_id == user.id
       add_message :error, 'You cannot unapprove your own report'
       raise_unauthorized_exception
     end
