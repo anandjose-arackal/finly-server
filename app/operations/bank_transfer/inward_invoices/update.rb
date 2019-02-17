@@ -111,7 +111,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
 
       
-      if Invoice.status_ids(:open, :retracted, :rejected).include?(invoice.invoice_status_id) && invoice.created_by_user_id == user.id
+      if Invoice.status_ids(:open, :retracted, :rejected).include?(inward_invoice.invoice_status_id) && inward_invoice.created_by_user_id == user.id
 
         params[:reviewal_document] = self.inward_invoice.reload
         params[:document_reviewer_mappings] = document_reviewer_mappings_params
