@@ -213,9 +213,10 @@ class MoneyRequests::Base < BaseOperation
           end
         elsif manager_view?
           if self.money_request.processing? && self.money_request.get_reviewers.include?(user)
+            actions[:editable] = true
             if self.money_request.payment_mode_card?
               actions[:approve_and_credit] = true
-              actions[:approve_and_forward_to] = true
+              # actions[:approve_and_forward_to] = true
             else
               actions[:approve] = true
             end
