@@ -45,6 +45,7 @@ class Settlement::SMoneyRequests::Processing::Create < Settlement::SMoneyRequest
                                                                                     scheduled_at: params[:scheduled_at],
                                                                                     payment_type: params[:payment_type],
                                                                                     payment_mode: params[:payment_mode],
+                                                                                    payment_file_generated_at: DateTime.now
                                                                                 })
     if params[:scheduled_at].present? and Date.parse(params[:scheduled_at]) > Date.today
       self.money_request_processor.status_id = MoneyRequestProcessorStatus.id_for(:scheduled)
