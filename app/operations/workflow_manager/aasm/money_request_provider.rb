@@ -53,10 +53,10 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
 
 
     event :unapprove do
-      transitions :from => :trip_processing, :to => :trip_processing, guard: [:travel_request_present?]
-      transitions :from => :trip_approved, :to => :trip_processing, guard: [:travel_request_present?]
-      transitions :from => :processing, :to => :processing
-      transitions :from => :approved, :to => :processing
+      transitions :from => :trip_processing, :to => :trip_processing, guard: [:travel_request_present?, :user_can_unapprove?]
+      transitions :from => :trip_approved, :to => :trip_processing, guard: [:travel_request_present?, :user_can_unapprove?]
+      transitions :from => :processing, :to => :processing, guard: [:user_can_unapprove?]
+      transitions :from => :approved, :to => :processing, guard: [:user_can_unapprove?]
     end
 
     event :hold do

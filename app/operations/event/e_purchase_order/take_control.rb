@@ -35,7 +35,6 @@ class Event::EPurchaseOrder::TakeControl < Event::EPurchaseOrder::Base
                                              path_object_type: "PurchaseOrder",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
                                             )
     notification.save

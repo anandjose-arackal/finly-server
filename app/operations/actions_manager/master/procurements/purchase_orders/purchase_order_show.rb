@@ -55,9 +55,10 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def save_btn
-    (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) || 
-    (purchase_order.processing? && user_in_level?) ||
-    (user.vendor_payment_admin? && !purchase_order.voided?)
+    # (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) || 
+    # (purchase_order.processing? && user_in_level?) ||
+    # (user.vendor_payment_admin? && !purchase_order.voided?)
+    (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
   end
 
   def export_po_items
@@ -73,7 +74,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def save_and_submit
-    true
+    (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
   end
 
   def more_actions

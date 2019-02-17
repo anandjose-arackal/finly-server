@@ -202,7 +202,7 @@ module Transitionable
 
     # Get reviewers from current level
     def get_reviewers(level_details=nil, provider_name=nil)
-      if [:next, :previous, 'next', 'previous', :current, 'current'].include? level_details
+      if [:next, :previous, :prev, 'next', 'previous', :current, 'current'].include? level_details
         level = get_level(level_details, provider_name)
       elsif level_details.is_a?(Integer)
         level = get_level_with_id(level_details, provider_name)
