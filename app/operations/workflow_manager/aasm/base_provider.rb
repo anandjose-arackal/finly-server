@@ -10,7 +10,7 @@ class WorkflowManager::Aasm::BaseProvider
     self.violations_present = violations_present
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
     self.user = user
-    self.policy = self.document.policy ## Have to take care where status is stored in a different attribute
+    self.policy = Policy.find self.document.policy_id ## Have to take care where status is stored in a different attribute
     self.provider_name = provider_name || self.document.get_default_provider
 
     # get reviewers
