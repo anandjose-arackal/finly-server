@@ -18,7 +18,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     super
     self.bank_payment_request = BankPaymentRequest.find_by_id params[:id]
     unless bank_payment_request.present?
-      add_message :error, result.messages[:error]
+      add_message :error, 'Bank payment request not found'
       return
     end
   end
