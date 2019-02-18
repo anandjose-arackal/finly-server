@@ -69,7 +69,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     role_ids = user.role_mapping.vendor_payments.pluck(:user_role_id)
     payment_request_ids = []
     if role_ids.include?(UserRole.id_for(:admin)) || role_ids.include?(UserRole.id_for(:auditor))
-      self.payment_requests = BankPaymentRequest.admin_associated_items(user).or(user.bank_payment_requests)
+      self.payment_requests = BankPaymentRequest.admin_associated_items(user).not_open.or(user.bank_payment_requests)
     elsif role_ids.include?(UserRole.id_for(:reviewer)) || role_ids.include?(UserRole.id_for(:creditor))
       if role_ids.include?(UserRole.id_for(:reviewer))
         self.payment_requests = BankPaymentRequest.reviewer_associated_items(user).or(user.bank_payment_requests)
