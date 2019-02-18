@@ -41,7 +41,7 @@ class Event::EInvoice::Submit < Event::EInvoice::Base
 
   def notification_affected_users
     # self.controlling_users
-    self.notification_affected_users(:submit)
+    self.invoice.notification_affected_users(:submit)
   end
 
   # def send_push_notification(user)
