@@ -4,7 +4,7 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
   def init
     self.document = params[:reviewal_document]
     self.dlrms = self.document.document_level_reviewer_mappings.includes(:level, :reviewer)
-    self.policy = self.document.policy
+    self.policy = Policy.find self.document.policy_id
   end
 
 
