@@ -104,6 +104,14 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:bank_account_number] = 'No bank account entered'
       end
 
+      # check for format of the Bank account number
+      pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
+      unless bank_account_no =~ pattern
+        self.valid = false
+        self.error_messages << "Invalid Bank Account Number entered"
+        self.issue_item[:bank_account_number] = 'Invalid Bank Account Number entered'
+      end
+
       # Check if the amount is present
       unless validate_amount(amount)
         self.valid = false
@@ -225,8 +233,15 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     true
   end
 
+  # def validate_amount(amount)
+  #   if amount.blank? || !amount.to_f&.is_a?(Numeric) || amount.to_f < 0
+  #     return false
+  #   end
+  #   true
+  # end
+
   def validate_amount(amount)
-    if amount.blank? || !amount.to_f&.is_a?(Numeric) || amount.to_f < 0
+    if amount.blank? || !/\A\d+\.\d+\z/.match(amount) || !/\A\d+\z/.match(amount) # check if blank or not a positive float or not a positive integer
       return false
     end
     true

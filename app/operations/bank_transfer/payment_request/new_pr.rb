@@ -122,6 +122,7 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 		        currency_id: 1
 		    },
 		    payment_mode: self.payment_mode,
+		    scheduled_at: params[:scheduled_at],
 		    # payment_mode: params[:payment_mode],
 		    initiating_account_type: YesBankCompanyAccount.name,
 		    receiving_account_type: BankAccount.name,
