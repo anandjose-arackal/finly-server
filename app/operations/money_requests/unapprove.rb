@@ -11,15 +11,13 @@ class MoneyRequests::Unapprove < MoneyRequests::Base
     end
   end
 
-  # Since creator of money request is allowed to the approve it in manager role, hence allowing unapproval of money request too
-  # def authorize
-  #   super
-  #   #OLD CODE
-  #   if money_request.user_id == user.id
-  #     add_message :error, 'You cannot unapprove your own money_request'
-  #     raise_unauthorized_exception
-  #   end
-  # end
+  def authorize
+    super
+    if money_request.user_id == user.id
+      add_message :error, 'You cannot unapprove your own money_request'
+      raise_unauthorized_exception
+    end
+  end
 
   def validate
     # checking if this user can unapprove this money_request at this stage
