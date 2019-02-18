@@ -88,7 +88,7 @@ module Transitionable
           user_ids += self.get_reviewers(:nex)&.map(&:id)
         end
       when :comment, 'comment'
-        user_ids += self.document_owner_id
+        user_ids.push self.document_owner_id
       end
 
       User.with_id(user_ids)
@@ -113,7 +113,7 @@ module Transitionable
       when :take_control, 'take_control'
         user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
       when :comment, 'comment'
-        user_ids += self.document_owner_id
+        user_ids.push self.document_owner_id
       when :unapprove, 'unapprove'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids += self.get_reviewers(:next)&.map(&:id)
@@ -417,12 +417,13 @@ module Transitionable
     def admin_associated_items(user)
       if user.instance_of?(User)
         if self.column_names.include? 'company_id'
-          document_ids = self.where(company_id: user.company.id).pluck(:id)
+          # document_ids = self.where(company_id: user.company.id).pluck(:id)
+          self.where(company_id: user.company.id)
         else
           user_ids = user.company.users.pluck(:id)
-          document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:id)
+          self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
         end
-        self.where(id: document_ids)
+        # self.where(id: document_ids)
       end
     end
 
