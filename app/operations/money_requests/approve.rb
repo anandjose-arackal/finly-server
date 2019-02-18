@@ -44,9 +44,9 @@ class MoneyRequests::Approve < MoneyRequests::Base
   end
 
   def validate_payment_mode
-    unless money_request.payment_mode_id == PaymentMode.id_for(:cash)
-      messages[:error] << 'Error approving money request. Use approve and forward action'
-    end
+    # unless money_request.payment_mode_id == PaymentMode.id_for(:cash)
+    #   messages[:error] << 'Error approving money request. Use approve and forward action'
+    # end
   end
 
   def process

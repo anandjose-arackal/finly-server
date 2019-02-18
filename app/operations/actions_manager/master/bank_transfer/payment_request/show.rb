@@ -16,11 +16,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def initialize(user=nil, params={})
     super
-    self.bank_payment_request = BankPaymentRequest.find_by_id params[:id]
-    unless bank_payment_request.present?
+    result = BankTransfer::PaymentRequest::Show.(user, params)
+    unless result.success?
       add_message :error, result.messages[:error]
       return
     end
+    self.bank_payment_request = result.bank_payment_request
   end
 
   def mark_as_credited
@@ -509,7 +510,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def policy_editable
-    bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    if (bank_payment_request.owner_id == user.id)
+      bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    end
   end
 
   def reviewer
