@@ -113,6 +113,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       # Check if the amount is present
+      binding.pry
       unless validate_amount(amount)
         self.valid = false
         self.error_messages << 'Invalid amount'
@@ -241,7 +242,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   # end
 
   def validate_amount(amount)
-    if amount.blank? || !/\A\d+\.\d+\z/.match(amount) || !/\A\d+\z/.match(amount) # check if blank or not a positive float or not a positive integer
+    if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer
       return false
     end
     true
