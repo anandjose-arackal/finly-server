@@ -29,7 +29,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
       return false
-    elsif bank_transaction&.retriable? || bank_transaction.open?
+    elsif bank_transaction&.retriable? || bank_transaction&.open?
       reference_number = bank_transaction.unique_request_number
     else
       # i.e. it's a whole new payment being initiated for the first time

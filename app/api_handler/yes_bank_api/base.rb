@@ -138,7 +138,7 @@ class YesBankApi::Base < BaseHandler
             transfer_status_id: self.transfer_status_id,
             bank_response: self.transfer_request.transaction_result
         )
-        self.payment.retry_count += 1
+        self.payment.update(retry_count: self.payment.retry_count.to_f + 1)
       else
         # this is an anomaly, so send email and flag it
         Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')

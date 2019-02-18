@@ -120,7 +120,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
       # New Code
       # NEW CODE
-      params[:document] = self.payment_request
+      params[:document] = payment_request
       params[:aasm_event] = 'credit'
       params[:violation_present] = false
       op_2 = WorkflowManager::Base.(user, params)
