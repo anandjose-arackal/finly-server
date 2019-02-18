@@ -93,11 +93,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id # MODIFY TO ADD ANY BANK ACCOUNT
       params[:receiving_account_id] = self.vendor.id
 
-      op = Procurements::Payments::AddAdvance.(user, params)
-      if op.success?
-        add_message :success, 'Successfully added advance payment to this purchase order'
-      else
-        add_message :error, op.messages[:error]
+      # params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { id: 292688, value: 200} }, { amount_attributes: { id: 292689, value: 300} } ]
+      params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { value: 200} }, { amount_attributes: { value: 300} } ]
+
+      unless params[:advance_payments_attributes].blank?
+        op = Procurements::Payments::AddAdvance.(user, params)
+        if op.success?
+          add_message :success, 'Successfully added advance payment to this purchase order'
+        else
+          add_message :error, op.messages[:error]
+        end
       end
 
     else

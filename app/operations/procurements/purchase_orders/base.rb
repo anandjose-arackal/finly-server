@@ -21,7 +21,8 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         document_reviewer_mappings: [
             :level_id, :reviewer_id
         ],
-        advance_payment_attributes: [:advance_amount],
+        # advance_payments_attributes: [:id, :scheduled_at, amount_attributes: [:id, :value, :currency_id]]
+        advance_payments_attributes: [:id, :scheduled_at, amount_attributes: [:id, :value, :currency_id]]
         # tax_amount_attributes: [:value, :currency_id]
     )
   end

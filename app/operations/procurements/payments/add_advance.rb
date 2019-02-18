@@ -33,7 +33,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
-    self.advance_amount = params[:advance_amount] || 999
+    # self.advance_amount = params[:advance_amount] || 999
     # self.receiving_account = user.company.bank_accounts.find_by(id: params[:receiving_account_id])
     puts "ADDADVANCE from init params", params.inspect
 
@@ -64,7 +64,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
   end
 
   def process
-    self.payment_request_params = advance_payment_request_params
+    # self.payment_request_params = advance_payment_request_params
     puts "ADDADVANCE from process",self.payment_request_params.inspect
     # self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     # if self.bank_payment_request.save
@@ -73,10 +73,32 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
     #   add_message :error, self.bank_payment_request.errors.full_messages
     # end
 
-    self.payment = Payment.new(self.payment_request_params)
+    params[:advance_payments_attributes].each do |advance_payment|
+      self.payment = Payment.find_by( id: advance_payment[:amount_attributes][:id],
+                                      purchase_order_id: self.purchase_order.id,
+                                      procurement_id: self.procurement.id, payment_purpose_id: 39 )
+      
+      if self.payment
+        # binding.pry
+        # self.payment.amount_attributes = { value: advance_payment[:amount_attributes][:value] } if advance_payment[:amount_attributes]
+        self.payment.amount.value = advance_payment[:amount_attributes][:value] if advance_payment[:amount_attributes]
+        self.payment.scheduled_at = advance_payment[:scheduled_at] if advance_payment[:scheduled_at]
 
-    unless self.payment.save
-      add_message :error, self.payment.errors.full_messages
+        puts "advance_payment[:amount_attributes]", advance_payment[:amount_attributes].inspect
+        puts "advance_payment[:scheduled_at]", advance_payment[:scheduled_at].inspect
+
+      else
+        # binding.pry
+        self.payment_request_params = advance_payment_request_params(advance_payment)
+        self.payment = Payment.new(self.payment_request_params)
+      end
+
+      # self.payment = Payment.new(self.payment_request_params)
+
+      unless self.payment.save
+        add_message :error, self.payment.errors.full_messages
+      end
+
     end
 
 
@@ -97,7 +119,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
 
   private
 
-  def advance_payment_request_params
+  def advance_payment_request_params(advance_payment)
     payment_params = {
         payment_type_id: PaymentType.id_for(:credit),
         application: "vp",
@@ -121,11 +143,13 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
         payment_purpose_id: PaymentPurpose.id_for(:advance_against_purchase_order),
         payment_mode: self.payment_mode,
         amount_attributes: {
-            value: self.advance_amount,
+            # value: self.advance_amount,
+            value: advance_payment[:amount_attributes][:value],
             currency_id: Currency.first.id
         },
         date: DateUtils.local_date,
         purchase_order_id: self.purchase_order.id,
+        scheduled_at: advance_payment[:scheduled_at],
         procurement_id: self.procurement.id
                       }
     # payment_order_params = {

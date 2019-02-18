@@ -97,6 +97,7 @@ class PurchaseOrder < ApplicationRecord
   accepts_nested_attributes_for :items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
   accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :advance_payments
 
 
   validates :purchase_order_status_id, presence: true
