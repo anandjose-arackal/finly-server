@@ -9,13 +9,16 @@ class Event::EMoneyRequests::Unapprove < Event::EMoneyRequests::Base
   end
 
   def affected_users
-    [self.money_request.controlling_user, self.money_request.tracks.last.modified_user]
+    # [self.money_request.controlling_user, self.money_request.tracks.last.modified_user]
+    self.money_request.affected_users(:unapprove)
   end
 
   def send_push_notification(user)
-    return if user.id == money_request.controlling_user_id
-    message = "#{self.money_request.controlling_user.name} unapproved the Money Request: #{self.money_request.name}"
-    view = UserRole.name_for(self.money_request.tracks.last.modified_user_role_id)
+    # return if user.id == money_request.controlling_user_id
+    return if self.money_request.get_reviewers&.include?(user)
+    message = "#{self.money_request.tails&.last.action_user&.name} unapproved the Money Request: #{self.money_request.name}"
+    # view = UserRole.name_for(self.money_request.tracks.last.modified_user_role_id)
+    view = 'manager'
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
   end
 
