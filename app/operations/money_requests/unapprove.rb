@@ -13,10 +13,10 @@ class MoneyRequests::Unapprove < MoneyRequests::Base
 
   def authorize
     super
-    if money_request.user_id == user.id
-      add_message :error, 'You cannot unapprove your own money_request'
-      raise_unauthorized_exception
-    end
+    # if money_request.user_id == user.id
+    #   add_message :error, 'You cannot unapprove your own money_request'
+    #   # raise_unauthorized_exception
+    # end
   end
 
   def validate
