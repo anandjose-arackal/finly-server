@@ -113,7 +113,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       # Check if the amount is present
-      binding.pry
       unless validate_amount(amount)
         self.valid = false
         self.error_messages << 'Invalid amount'
