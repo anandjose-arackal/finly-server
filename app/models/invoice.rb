@@ -96,6 +96,7 @@ class Invoice < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
   belongs_to :company, optional: true
   belongs_to :invoice_status, optional: true, class_name: "InwardInvoiceStatus"
+  alias_attribute :status, :invoice_status
   belongs_to :receiving_account, optional: true, polymorphic: true
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
   belongs_to :location, optional: true, class_name: 'BranchLocation'
