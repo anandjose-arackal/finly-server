@@ -23,6 +23,7 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         ],
         # advance_payments_attributes: [:id, :scheduled_at, amount_attributes: [:id, :value, :currency_id]]
         advance_payments_attributes: [:id, :scheduled_at, amount_attributes: [:id, :value, :currency_id]]
+        # document_reviewer_mappings: [:level_id, :reviewer_id]
         # tax_amount_attributes: [:value, :currency_id]
     )
   end

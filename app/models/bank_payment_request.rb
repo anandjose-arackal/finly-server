@@ -23,12 +23,16 @@
 #  payment_file_downloaded      :boolean          default(FALSE)
 #  auto_approved                :boolean
 #  api_initiated                :boolean          default(FALSE)
+#  deleted_at                   :datetime
+#  controlling_level_id         :integer
+#  approved_at                  :datetime
 #
 
 class BankPaymentRequest < ApplicationRecord
 
   include SoftDeletable,
-          FindByOrderedIds
+          FindByOrderedIds,
+          Transitionable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, optional: true, dependent: :destroy
@@ -42,6 +46,8 @@ class BankPaymentRequest < ApplicationRecord
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
+
+  has_many :trails, as: :parent
 
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
@@ -157,7 +163,12 @@ class BankPaymentRequest < ApplicationRecord
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
-  scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+  # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+
+  scope :filter_controlling_user, -> (user_id) {
+    ids = self.awaiting_action_items(user_id).map(&:id)
+    with_id(ids)
+  }
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
@@ -239,9 +250,9 @@ class BankPaymentRequest < ApplicationRecord
     processing?
   end
 
-  def can_return_control?
-    processing?
-  end
+  # def can_return_control?
+  #   processing?
+  # end
 
   def credit_pending?
     approved? && !credited?
@@ -254,8 +265,9 @@ class BankPaymentRequest < ApplicationRecord
   def auto_approved?
     # extracting the last tracks and checking if it was a submit action combined
     # with the next action user being blank
-    trail = self.bank_payment_request_trails.last
-    (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
+    self.status_id == BankPaymentRequestStatus.id_for(:auto_approved)
+    # trail = self.bank_payment_request_trails.last
+    # (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
   end
 
   def user
@@ -326,6 +338,27 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   private
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push BankPaymentRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.document_owner_attribute
+    'owner_id'
+  end
+
+  def self.document_status_attribute
+    'status_id'
+  end
+
+  def self.finance_associated_status_ids
+    BankPaymentRequestStatus.ids_for(:approved, :credited, :pending, :creation_in_progress, :auto_approved)
+  end
 
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"

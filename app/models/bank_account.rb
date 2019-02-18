@@ -21,6 +21,8 @@
 #  default_account    :boolean          default(FALSE)
 #  is_deleted         :boolean          default(FALSE)
 #  disabled           :boolean          default(FALSE)
+#  deleted_at         :datetime
+#  on_hold            :boolean          default(FALSE)
 #
 
 class BankAccount < ApplicationRecord

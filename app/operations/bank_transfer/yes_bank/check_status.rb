@@ -39,6 +39,12 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
   end
 
+  def pre_process
+    if self.payment.collect_funds_withdrawal?
+      RequestStore.store[:current_app] = :fc
+    end
+  end
+
   def process
     params = {
         request_reference_number: bank_transaction.unique_request_number,
@@ -49,12 +55,13 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-      # if true
         bank_reference_number = op.bank_reference_number
         bank_transaction.update(bank_reference_number: bank_reference_number) if bank_transaction.bank_reference_number.blank?
+        bank_transaction.update(bank_response: op.request_status.upcase)
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
+        bank_reference_number = op.bank_reference_number
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing), bank_response: op.request_status.upcase, bank_reference_number: bank_reference_number)
         begin
           bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         rescue => error
@@ -79,7 +86,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
           Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
         end
 
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed), bank_response: op.request_status.upcase)
 
         # destroying previous messages first, before adding the failure message
         # self.payment.system_messages.destroy_all # probably not a good idea to destroy previous messages because they contain data about why a particular payment failed
@@ -88,9 +95,13 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         self.payment&.system_messages&.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "Payment failed. The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
-        # the below will be executed only if the company is using Finly's nodal account for processing transactions
-        unless self.company.current_account_connected?
+        # the below will be executed only if the company is using Finly's nodal account for processing transactions or if it's finly collect
+        if [:fc, "fc"].include?(RequestStore.store[:current_app]) # i.e. if it is Finly Collect, process the refund anyway
           create_refund_payment
+        else
+          unless company.current_account_connected?
+            create_refund_payment
+          end
         end
         # nulling reimbursements that might have happened through this
         nullify_reimbursed_reports
@@ -109,7 +120,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
           Event::EAlert::Create.(nil, title: 'Bank Transaction without a payment', description: "We found an orphaned bank transaction - Details: #{bank_transaction.as_json}", subject: 'Bank Transaction without a Payment')
         end
 
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed), bank_response: op.request_status.upcase)
 
         # destroying previous messages first, before adding the failure message
         # self.payment.system_messages.destroy_all # probably not a good idea to destroy previous messages because they contain data about why a particular payment failed
@@ -119,8 +130,12 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
                                              content: "Payment failed. The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         # the below will be executed only if the company is using Finly's nodal account for processing transactions
-        unless self.company.current_account_connected?
+        if [:fc, "fc"].include?(RequestStore.store[:current_app]) # i.e. if it is Finly Collect, process the refund anyway
           create_refund_payment
+        else
+          unless company.current_account_connected?
+            create_refund_payment
+          end
         end
         # nulling reimbursements that might have happened through this
         nullify_reimbursed_reports
@@ -129,6 +144,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   end
 
   def post_process
+    # setting the request store current app as nil again
+    RequestStore.store[:current_app] = nil
+
     # here check if the payment order has associated bank payment requests and accordingly send notification
     if payment_order&.bank_payment_request.present?
       # now check if all the payments in this order are either successes or failures.

@@ -23,7 +23,7 @@ class ReportStatus < ApplicationRecord
   scope :with_name, -> (name) { where(name: name) }
 
   # STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, settled: 6, settlement_confirmed: 7, closed: 8}
-  STATES = [:open, :processing, :retracted, :rejected, :approved, :settled, :settlement_confirmed, :closed]
+  STATES = [:open, :processing, :retracted, :rejected, :approved, :settled, :settlement_confirmed, :closed, :auto_approved]
 
   def self.values
     STATES

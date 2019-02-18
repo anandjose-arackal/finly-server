@@ -21,12 +21,29 @@ class TrailAction < ApplicationRecord
         :reject,
         :unapprove,
         :take_control,
+        :return_control,
         :credited,
         :settled,
         :settlement_confirmed,
         :reimbursed,
         :reimbursement_confirmed,
-        :closed
+        :closed,
+        :hold,
+        :release,
+        # Bank Payment Request
+        :mark_as_credited,
+        :credit,
+
+        # TravelRequestBookingActions
+        :confirm_selection,
+        :approve_selection,
+        :reject_selection,
+        :unapprove_selection,
+        :confirm_booking,
+        :reject_booking_request,
+        :request_selection,
+        :retract_booking
+
     ]
   end
 end

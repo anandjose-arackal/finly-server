@@ -1,4 +1,4 @@
-class Event::ESummary::Report < Event::SetNotifier
+class Event::ESummary::Reports < Event::SetNotifier
   attr_accessor :users
 
   def pre_validate
@@ -35,7 +35,7 @@ class Event::ESummary::Report < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    SummaryMailer.delay.send_admin_mail(Event::ESummary::Report::MailerPresenter.new(user, params))
+    SummaryMailer.delay.send_admin_mail(Event::ESummary::Reports::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
@@ -52,7 +52,7 @@ class Event::ESummary::Report < Event::SetNotifier
     params[:action_name] = action_name
   end
 
-  class Event::ESummary::Report::MailerPresenter < Event::SetNotifier::MailerPresenter
+  class Event::ESummary::Reports::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :summary, :user, :body_val, :subject_val, :button_val, :action_name, :company
 
     def init

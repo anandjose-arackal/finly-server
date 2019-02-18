@@ -8,6 +8,7 @@
 #  finly_database_balance_id :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  calculated_balance_id     :integer
 #
 
 require 'test_helper'

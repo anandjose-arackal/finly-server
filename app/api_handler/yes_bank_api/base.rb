@@ -4,7 +4,7 @@ class YesBankApi::Base < BaseHandler
                 :auth_password, :template, :config_path, :application_id,
                 :customer_id, :resource_not_found, :transfer_status_id,
                 :configuration, :company_id, :account_number,
-                :start_time, :end_time, :file_logger
+                :start_time, :end_time, :file_logger, :payment
 
   ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&', '.']
 
@@ -19,6 +19,7 @@ class YesBankApi::Base < BaseHandler
     #   add_message :error, "Server error, try again later"
     # end
 
+
     if Rails.env.production?
       values = Finly::SecureStorage::Connector.read('core/yes_bank')
     else
@@ -26,13 +27,20 @@ class YesBankApi::Base < BaseHandler
       values = YAML.load_file(path)
     end
 
+
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
     company = self.company_id.present? ? Company.find_by_id(self.company_id) : nil
-    if company.present? and company&.feature_subscription&.current_account_connected #and (values[self.company_id.to_s]).present?
-      type = self.company_id.to_s # i.e. if the configuration associated with this particular company's id doesn't exist, use default
+    if company&.feature_subscription&.current_account_connected and !["fc", :fc].include?(RequestStore.store[:current_app])
+      if Rails.env.production?
+        type = self.company_id.to_s # i.e. if the configuration associated with this particular company's id doesn't exist, use default
+      else
+        type = self.company_id.to_i
+      end
     else
       type = 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
     end
+
+
     self.configuration = values[type] || {}
     self.client_id = self.configuration['client_id']
     self.client_secret = self.configuration['client_secret']
@@ -89,7 +97,6 @@ class YesBankApi::Base < BaseHandler
         req.body = template
       end
 
-
       self.end_time = DateUtils.local_date_time
 
       if Rails.env.production?
@@ -118,34 +125,23 @@ class YesBankApi::Base < BaseHandler
         file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, yes_bank_action: yes_bank_action, request_time: (self.end_time - self.start_time), failure_reason: 'Timeout'}))
       end
 
-
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
-      self.transfer_status_id = BankTransferStatus.id_for(:failed)
-      # create a failed bank transacton so that the record is preserved
+      self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
+      # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
       if self.payment&.reference_resource&.is_a?(BankTransaction)
         # just update the bank transaction with the latest details
         self.bank_transaction = payment.reference_resource
         self.bank_transaction.update(
             bank_reference_number: self.transfer_request.bank_reference_number,
-            transfer_status_id: BankTransferStatus.id_for(:possible_failure),
+            transfer_status_id: self.transfer_status_id,
             bank_response: self.transfer_request.transaction_result
         )
-        self.payment.retry_count += 1
-        # otherwise create a new bank transaction
+        self.payment.update(retry_count: self.payment.retry_count.to_f + 1)
       else
-        self.bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
-                                                                 transfer_type: transfer_request.transfer_type,
-                                                                 bank_reference_number: transfer_request.bank_reference_number,
-                                                                 beneficiary_bank_account: self.account,
-                                                                 transfer_status_id: BankTransferStatus.id_for(:possible_failure),
-                                                                 bank_response: transfer_request.transaction_result,
-                                                                 amount_attributes: {
-                                                                     value: self.payment.amount_value,
-                                                                     currency_id: Currency.first.id
-                                                                 })
-        self.payment.update(reference_resource: self.bank_transaction)
+        # this is an anomaly, so send email and flag it
+        Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
       end
         # temporary - rescue SSL error to simulate various cases
         # rescue Faraday::SSLError

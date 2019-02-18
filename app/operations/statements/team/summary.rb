@@ -48,9 +48,9 @@ class Statements::Team::Summary < Statements::Team::Base
       self.values.each do |item|
         user_data = []
         item.each do |key, value|
-          if [Hash.name, ActionController::Parameters.name].include? value.class.name
+          if [ActiveSupport::HashWithIndifferentAccess.name, ActionController::Parameters.name].include? value.class.name
             value.each do |sub_key, sub_value|
-              if [Hash.name, ActionController::Parameters.name].include? sub_value.class.name
+              if [ActiveSupport::HashWithIndifferentAccess.name, ActionController::Parameters.name].include? sub_value.class.name
                 self.categories.each do |category|
                   user_data << format_amount((sub_value[category.id] || 0))
                 end

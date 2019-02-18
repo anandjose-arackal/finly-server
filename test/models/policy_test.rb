@@ -14,9 +14,8 @@
 #  base_currency_id       :integer          default(1)
 #  application            :string(255)
 #  settlement_currency_id :integer          default(1), not null
+#  deleted_at             :datetime
 #
-
-
 
 require 'test_helper'
 

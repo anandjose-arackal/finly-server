@@ -19,10 +19,10 @@ class TakeControlReportTest < ActiveSupport::TestCase
     # stubbing the face that the report can be taken control of at the moment
     Report.any_instance.stubs(:can_take_control?).returns(true)
 
-    # stubbing the report returned by Report::Index
-    reports_presenter = Report::Index::Presenter.new(@admin, {reports: Report.where(id: @report.id)}, nil)
-    Report::Index.stubs(:call).returns(reports_presenter)
-    take_control_op = Report::TakeControl.new(@admin, {report_id: @report.id, view: 'admin'})
+    # stubbing the report returned by Reports::Index
+    reports_presenter = Reports::Index::Presenter.new(@admin, {reports: Report.where(id: @report.id)}, nil)
+    Reports::Index.stubs(:call).returns(reports_presenter)
+    take_control_op = Reports::TakeControl.new(@admin, {report_id: @report.id, view: 'admin'})
     original_status_id = @report.status_id
 
     assert_difference 'ReportTrack.count', 1 do
@@ -45,13 +45,13 @@ class TakeControlReportTest < ActiveSupport::TestCase
     Report.any_instance.stubs(:policy).returns(true)
     # stubbing the face that the report can be taken control of at the moment
     Report.any_instance.stubs(:can_take_control?).returns(true)
-    # stubbing the Report::Violation method to return junk
-    Report::Violation.stubs(:call).returns({})
+    # stubbing the Reports::Violation method to return junk
+    Reports::Violation.stubs(:call).returns({})
 
-    # stubbing the report returned by Report::Index
-    reports_presenter = Report::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
-    Report::Index.stubs(:call).returns(reports_presenter)
-    take_control_op = Report::TakeControl.new(@employee, {report_id: @report.id, view: 'admin'})
+    # stubbing the report returned by Reports::Index
+    reports_presenter = Reports::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
+    Reports::Index.stubs(:call).returns(reports_presenter)
+    take_control_op = Reports::TakeControl.new(@employee, {report_id: @report.id, view: 'admin'})
     original_status_id = @report.status_id
 
     assert_difference 'ReportTrack.count', 1 do
@@ -70,10 +70,10 @@ class TakeControlReportTest < ActiveSupport::TestCase
     # stubbing the face that the report can be taken control of at the moment
     Report.any_instance.stubs(:can_take_control?).returns(false)
 
-    # stubbing the report returned by Report::Index
-    reports_presenter = Report::Index::Presenter.new(@admin, {reports: Report.where(id: @report.id)}, nil)
-    Report::Index.stubs(:call).returns(reports_presenter)
-    take_control_op = Report::TakeControl.new(@admin, {report_id: @report.id, view: 'admin'})
+    # stubbing the report returned by Reports::Index
+    reports_presenter = Reports::Index::Presenter.new(@admin, {reports: Report.where(id: @report.id)}, nil)
+    Reports::Index.stubs(:call).returns(reports_presenter)
+    take_control_op = Reports::TakeControl.new(@admin, {report_id: @report.id, view: 'admin'})
 
     assert_no_difference 'ReportTrack.count' do
       assert_no_difference '@report.controlling_user_id' do
@@ -92,7 +92,7 @@ class TakeControlReportTest < ActiveSupport::TestCase
 
     # storing the original status_id
     original_status_id = @report.status_id
-    take_control_op = Report::TakeControl.new(@admin, {report_id: @report.id, view: 'admin'})
+    take_control_op = Reports::TakeControl.new(@admin, {report_id: @report.id, view: 'admin'})
 
     assert_no_difference 'ReportTrack.count' do
       assert_no_difference '@report.controlling_user_id' do
@@ -122,7 +122,7 @@ class TakeControlReportTest < ActiveSupport::TestCase
   #   assert @report
   #   assert_equal 5, @report.expenses.count
   #   assert_equal ReportStatus.open_id, @report.status_id
-  #   submit_op = Report::Submit.new(@user, report_id: @report.id)
+  #   submit_op = Reports::Submit.new(@user, report_id: @report.id)
   #   assert_difference '@user.reports.processing.count', 1 do
   #     @report = submit_op.run
   #     assert @report
@@ -131,7 +131,7 @@ class TakeControlReportTest < ActiveSupport::TestCase
   #   end
   #
   #   # now admin tries to take control of the report.
-  #   take_control_op = Report::TakeControl.new(@admin, {report_id: @report.id, role_id: UserRole.admin_id})
+  #   take_control_op = Reports::TakeControl.new(@admin, {report_id: @report.id, role_id: UserRole.admin_id})
   #   assert_difference 'ReportTrack.count', 1 do
   #     @report = take_control_op.run
   #   end
@@ -148,7 +148,7 @@ class TakeControlReportTest < ActiveSupport::TestCase
   #   assert @report
   #   assert_equal 5, @report.expenses.count
   #   assert_equal ReportStatus.open_id, @report.status_id
-  #   submit_op = Report::Submit.new(@user, report_id: @report.id)
+  #   submit_op = Reports::Submit.new(@user, report_id: @report.id)
   #   assert_difference '@user.reports.processing.count', 1 do
   #     @report = submit_op.run
   #     assert @report
@@ -157,7 +157,7 @@ class TakeControlReportTest < ActiveSupport::TestCase
   #   end
   #
   #   # manager and finance manager try to take control of the report in vain
-  #   take_control_op = Report::TakeControl.new(@manager, {report_id: @report.id, role_id: UserRole.admin_id})
+  #   take_control_op = Reports::TakeControl.new(@manager, {report_id: @report.id, role_id: UserRole.admin_id})
   #   assert_no_difference 'ReportTrack.count' do
   #     begin
   #       @report = take_control_op.run
@@ -170,7 +170,7 @@ class TakeControlReportTest < ActiveSupport::TestCase
   #   assert_equal ReportStatus.processing_id, @report.status_id
   #
   #   # finance manager
-  #   take_control_op = Report::TakeControl.new(@finance_manager, {report_id: @report.id, role_id: UserRole.admin_id})
+  #   take_control_op = Reports::TakeControl.new(@finance_manager, {report_id: @report.id, role_id: UserRole.admin_id})
   #   assert_no_difference 'ReportTrack.count' do
   #     begin
   #       @report = take_control_op.run

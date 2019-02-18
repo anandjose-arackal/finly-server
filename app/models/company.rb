@@ -306,6 +306,10 @@ class Company < ApplicationRecord
     self.feature_subscription.yes_bank_account
   end
 
+  def yes_bank_account_enabled?
+    self.feature_subscription.yes_bank_account || self.feature_subscription.bank_account_reimbursement
+  end
+
   def current_account_connected?
     self.feature_subscription.current_account_connected
   end
@@ -320,6 +324,10 @@ class Company < ApplicationRecord
 
   def procurement_enabled?
     self.feature_subscription.procurement
+  end
+
+  def budgeting_system_enabled?
+    self.feature_subscription.budgeting_system
   end
 
   def more_than_one_subscription?

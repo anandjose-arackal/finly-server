@@ -1,7 +1,7 @@
 class Event::ETravelRequest::ConfirmBooking < Event::ETravelRequest::Base
 
   def event_id
-    NotifierType.id_for(:travel_request_submit)
+    NotifierType.id_for(:travel_request_confirm_booking)
   end
 
   def action_name
@@ -9,7 +9,8 @@ class Event::ETravelRequest::ConfirmBooking < Event::ETravelRequest::Base
   end
 
   def affected_users
-    [self.travel_request.user, self.travel_request.controlling_user]
+    # [self.travel_request.user, self.travel_request.controlling_user]
+    [self.travel_request.user, self.travel_request.trails.last.action_user]
   end
 
   def mailer_subject(user)
@@ -29,12 +30,19 @@ class Event::ETravelRequest::ConfirmBooking < Event::ETravelRequest::Base
   end
 
   def travel_request_view_role(user)
-    if user.id == travel_request.user_id
+    # if user.id == travel_request.user_id
+    #   return UserRole.id_for(:employee)
+    # elsif user.id == travel_request.controlling_user_id
+    #   return travel_request.controlling_user_role_id
+    # elsif user.id == self.travel_request.trails.last.action_user_id
+    #   return self.travel_request.trails.last.action_user_role_id
+    # end
+    if self.travel_request.document_role_users(:travel_manager).include?(user)
+      return UserRole.id_for(:travel_manager)
+    elsif user.id == self.travel_request.user_id
       return UserRole.id_for(:employee)
-    elsif user.id == travel_request.controlling_user_id
-      return travel_request.controlling_user_role_id
-    elsif user.id == self.travel_request.travel_request_trails.last.action_user_id
-      return self.travel_request.travel_request_trails.last.action_user_role_id
+    elsif self.travel_request.get_reviewers('current', 'TravelRequestBookingProvider').include?(user)
+      return UserRole.id_for(:travel_manager)
     end
   end
 end

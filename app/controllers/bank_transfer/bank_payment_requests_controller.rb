@@ -36,6 +36,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def actions_configuration
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
   def process_file
     logger.fatal "FROM BankPaymentRequestsController process_file, \n #{params.inspect}"
     @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
@@ -52,6 +57,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
         }
       end
     end
+  end
+
+  def edit_config
+    @result = BankTransfer::PaymentRequest::EditConfig.(current_user, params)
+    respond
   end
 
   def update

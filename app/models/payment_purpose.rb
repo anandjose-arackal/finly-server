@@ -54,4 +54,8 @@ class PaymentPurpose < ApplicationRecord
         :advance_against_purchase_order
     ]
   end
+
+  def collect_funds_withdrawal?
+    self.id == PaymentPurpose.id_for(:collect_funds_withdrawal)
+  end
 end

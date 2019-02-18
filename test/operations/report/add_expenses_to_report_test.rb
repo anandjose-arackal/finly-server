@@ -22,10 +22,10 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     # mocking report's open state
     Report.any_instance.stubs(:open?).returns(true)
     # stubbing Report Index so that the given report is returned for submission
-    reports_presenter = Report::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
-    Report::Index.stubs(:call).returns(reports_presenter)
+    reports_presenter = Reports::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
+    Reports::Index.stubs(:call).returns(reports_presenter)
 
-    add_expenses_op = Report::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
+    add_expenses_op = Reports::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
     assert_difference '@report.expenses.count', 2 do
       @result = add_expenses_op.run
     end
@@ -38,8 +38,8 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     # mocking report's open state
     Report.any_instance.stubs(:open?).returns(true)
     # stubbing Report Index so that the given report is returned for submission
-    reports_presenter = Report::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
-    Report::Index.stubs(:call).returns(reports_presenter)
+    reports_presenter = Reports::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
+    Reports::Index.stubs(:call).returns(reports_presenter)
 
     create_expense_op = Expense::Manual::Create.new(@employee, @expense_params)
     assert_difference '@report.expenses.count', 1 do
@@ -54,8 +54,8 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     # mocking report's open state
     Report.any_instance.stubs(:rejected?).returns(true)
     # stubbing Report Index so that the given report is returned for submission
-    reports_presenter = Report::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
-    Report::Index.stubs(:call).returns(reports_presenter)
+    reports_presenter = Reports::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
+    Reports::Index.stubs(:call).returns(reports_presenter)
 
     # adding a new expense
     create_expense_op = Expense::Manual::Create.new(@employee, @expense_params)
@@ -66,7 +66,7 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     assert_equal ExpenseStatus.unsubmitted_id, @result.expense.expense_status_id
 
     # adding existing expenses
-    add_expenses_op = Report::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
+    add_expenses_op = Reports::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
     assert_difference '@report.expenses.count', 2 do
       @result = add_expenses_op.run
     end
@@ -80,8 +80,8 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     # mocking report's open state
     Report.any_instance.stubs(:retracted?).returns(true)
     # stubbing Report Index so that the given report is returned for submission
-    reports_presenter = Report::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
-    Report::Index.stubs(:call).returns(reports_presenter)
+    reports_presenter = Reports::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
+    Reports::Index.stubs(:call).returns(reports_presenter)
 
     # adding a new expense
     create_expense_op = Expense::Manual::Create.new(@employee, @expense_params)
@@ -92,7 +92,7 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     assert_equal ExpenseStatus.unsubmitted_id, @result.expense.expense_status_id
 
     # add an existing expense
-    add_expenses_op = Report::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
+    add_expenses_op = Reports::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
     assert_difference '@report.expenses.count', 2 do
       @result = add_expenses_op.run
     end
@@ -108,8 +108,8 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     Report.any_instance.stubs(:rejected?).returns(false)
     Report.any_instance.stubs(:retracted?).returns(false)
     # stubbing Report Index so that the given report is returned for submission
-    reports_presenter = Report::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
-    Report::Index.stubs(:call).returns(reports_presenter)
+    reports_presenter = Reports::Index::Presenter.new(@employee, {reports: Report.where(id: @report.id)}, nil)
+    Reports::Index.stubs(:call).returns(reports_presenter)
 
     # failed attempt at adding a new expense
     create_expense_op = Expense::Manual::Create.new(@employee, @expense_params)
@@ -120,7 +120,7 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     assert_not @result.messages[:error].empty?
 
     # failed attempt at adding existing expenses
-    add_expenses_op = Report::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
+    add_expenses_op = Reports::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
     assert_no_difference '@report.expenses.count' do
       @result = add_expenses_op.run
     end
@@ -133,7 +133,7 @@ class AddExpensesToReportTest < ActiveSupport::TestCase
     # mocking ownership of the report as some other user
     Report.any_instance.stubs(:user_id).returns(User.second.id)
 
-    add_expenses_op = Report::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
+    add_expenses_op = Reports::Expenses::Add.new(@employee, {report_id: @report.id, expense_ids: @expense_ids})
     assert_no_difference '@report.expenses.count' do
       @result = add_expenses_op.run
     end

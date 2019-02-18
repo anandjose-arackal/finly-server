@@ -15,7 +15,7 @@ class BankTransfer::PaymentRequest::Review::AssociatedUsers < BankTransfer::Paym
     self.bank_payment_request = params[:bank_payment_request]
     super if self.bank_payment_request.blank?
     if self.bank_payment_request.present?
-      self.bank_payment_trails = bank_payment_request.bank_payment_request_trails
+      self.bank_payment_trails = bank_payment_request.trails
     end
     self.user_before = params[:user_before]
   end

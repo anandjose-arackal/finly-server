@@ -16,7 +16,7 @@
 #   end
 #
 #   test "should receipt to one's own report" do
-#     receipt_op = Report::Receipts::Add.new(@user, { report_id: @report.id,
+#     receipt_op = Reports::Receipts::Add.new(@user, { report_id: @report.id,
 #                                                 receipt: {image: @image} })
 #     assert_difference '@report.receipts.count', 1 do
 #       @receipt = receipt_op.run
@@ -25,7 +25,7 @@
 #   end
 #
 #   test "cannot receipt to someone else's report" do
-#     receipt_op = Report::Receipts::Add.new(@user, { report_id: @other_report.id,
+#     receipt_op = Reports::Receipts::Add.new(@user, { report_id: @other_report.id,
 #                                                     receipt: {image: @image} })
 #     assert_no_difference '@user.receipts.count' do
 #       begin
@@ -42,7 +42,7 @@
 #     # adding receipt to a processing report fails
 #     @employee = User.find_by(email: 'user0@finlytest.io')
 #     @report = @employee.reports.processing.first
-#     receipt_op = Report::Receipts::Add.new(@employee, { report_id: @report.id,
+#     receipt_op = Reports::Receipts::Add.new(@employee, { report_id: @report.id,
 #                                                     receipt: {image: @image} })
 #     assert_no_difference '@report.receipts.count' do
 #       @receipt = receipt_op.run
@@ -52,7 +52,7 @@
 #
 #     # adding receipt to an approved report should also fail
 #     @report = @employee.reports.approved.first
-#     receipt_op = Report::Receipts::Add.new(@employee, { report_id: @report.id,
+#     receipt_op = Reports::Receipts::Add.new(@employee, { report_id: @report.id,
 #                                                     receipt: {image: @image} })
 #     assert_no_difference '@report.receipts.count' do
 #       @receipt = receipt_op.run

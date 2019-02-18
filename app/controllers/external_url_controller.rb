@@ -9,21 +9,21 @@ class ExternalUrlController < ApplicationController
     # todo use report controlling user to figure out user role for report
     if report.blank? && current_user.manager?
         params[:view] = 'manager'
-        result = Report::Show.(current_user, params) rescue nil
+        result = Reports::Show.(current_user, params) rescue nil
         if result&.success?
           report = result.report
         end
     end
     if report.blank? and current_user.finance_manager?
       params[:view] = 'finance_manager'
-      result = Report::Show.(current_user, params) rescue nil
+      result = Reports::Show.(current_user, params) rescue nil
       if result&.success?
         report = result.report
       end
     end
     if report.blank? and current_user.admin?
       params[:view] = 'admin'
-      result = Report::Show.(current_user, params)
+      result = Reports::Show.(current_user, params)
       if result.success?
         report = result.report
       end
@@ -43,21 +43,21 @@ class ExternalUrlController < ApplicationController
     # todo use money_request controlling user to figure out user role for money_request
     if money_request.blank? and current_user.manager?
       params[:view] = 'manager'
-      result = MoneyRequest::Show.(current_user, params) rescue nil
+      result = MoneyRequests::Show.(current_user, params) rescue nil
       if result&.success?
         money_request = result.money_request
       end
     end
     if money_request.blank? and current_user.finance_manager?
       params[:view] = 'finance_manager'
-      result = MoneyRequest::Show.(current_user, params) rescue nil
+      result = MoneyRequests::Show.(current_user, params) rescue nil
       if result&.success?
         money_request = result.money_request
       end
     end
     if money_request.blank? and current_user.admin?
       params[:view] = 'admin'
-      result = MoneyRequest::Show.(current_user, params)
+      result = MoneyRequests::Show.(current_user, params)
       if result.success?
         money_request = result.money_request
       end

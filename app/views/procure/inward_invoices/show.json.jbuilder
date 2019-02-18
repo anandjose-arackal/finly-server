@@ -215,8 +215,16 @@ json.reviewal_chains do
     json.reviewal_chain do
       json.array! chain[:reviewal_chain] do |item|
         json.level_number item[:level_number]
+        json.level_name item[:level_name]
         json.level_id item[:level_id]
-        json.selected_reviewer item[:selected_reviewer]&.as_json
+        if item[:selected_reviewer].present?
+          json.selected_reviewer do
+            json.reviewer_details item[:selected_reviewer].as_json
+            json.threshold item[:selected_reviewer_threshold]
+          end
+        end
+        # json.selected_reviewer item[:selected_reviewer]&.as_json
+        # json.selected_reviewer_threshold item[:selected_reviewer_threshold]
         json.reviewers do
           json.array! item[:reviewers] do |reviewer|
             json.extract! reviewer, :id, :exception, :threshold
@@ -227,6 +235,8 @@ json.reviewal_chains do
     end
   end
 end
+
+json.reviewal_chain @result.invoice.get_reviewal_chain
 
 json.comments do
   json.array! invoice.comments do |comment|

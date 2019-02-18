@@ -8,13 +8,13 @@
 #
 #   test 'Creating new request' do
 #     assert_difference 'MoneyRequest.count', 1 do
-#       @result = MoneyRequest::Create.(@user, nil)
+#       @result = MoneyRequests::Create.(@user, nil)
 #     end
 #     assert @result.success?
 #
 #     name = 'Test Dummy Name'
 #     assert_difference 'MoneyRequest.count', 1 do
-#       @result = MoneyRequest::Create.(@user, money_request: {name: name})
+#       @result = MoneyRequests::Create.(@user, money_request: {name: name})
 #     end
 #     assert @result.success?
 #     assert_equal @result.money_request.name, name
@@ -23,7 +23,7 @@
 #     name = 'Test Dummy Name'
 #     policy_id = @user.policies.last.id
 #     assert_difference 'MoneyRequest.count', 1 do
-#       @result = MoneyRequest::Create.(@user,
+#       @result = MoneyRequests::Create.(@user,
 #           money_request: {name: name, policy_id: policy_id,
 #                           items_attributes: [{category_id: Category.first.id,
 #                                               amount_attributes: {value: 50, currency_id: Currency.first.id}}]})

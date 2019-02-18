@@ -21,9 +21,11 @@ json.summary do
   reviewer = (@result.manager.name rescue '--')
   json.reviewing_user reviewer
   creditor = (@result.finance_manager.name rescue '--')
+  json.awaiting_credit @result.awaiting_credit
+  json.creditors @result.creditors.map(&:name)
   json.crediting_user creditor
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
-  json.approvers @result.approvers
+  # json.approvers @result.approvers
   json.name @result.bank_payment_request.name
   json.show_payment_file_download (current_company.payment_file_configuration.present? && (current_user.company_admin? || current_user.vendor_payments_creditor?))
 
@@ -108,3 +110,5 @@ json.budgets do
     json.budget_amount budget[:budget].budget_amount.as_json
   end
 end
+
+json.reviewal_chain @result.bank_payment_request.get_reviewal_chain

@@ -1,5 +1,5 @@
 class Event::EReport::Base < Event::SetNotifier
-  attr_accessor :report, :rejected_expenses
+  attr_accessor :report, :rejected_expenses, :role_id
 
   def pre_validate
     unless user.present?
@@ -21,6 +21,7 @@ class Event::EReport::Base < Event::SetNotifier
 
   def init
     self.report = params[:report]
+    self.role_id = params[:role_id]
   end
 
   def validate
@@ -47,8 +48,13 @@ class Event::EReport::Base < Event::SetNotifier
   end
 
   def mailer_button_name(user)
-    if report.controlling_user_id.present? and
-      user.id == report.controlling_user_id and not user.id == report.user.id
+    # if report.controlling_user_id.present? and
+    #   user.id == report.controlling_user_id and not user.id == report.user.id
+    #   'Review Report'
+    # else
+    #   'View Report'
+    # end
+    if report.get_reviewers.include?(user) and not user.id == report.user.id
       'Review Report'
     else
       'View Report'
@@ -163,8 +169,8 @@ class Event::EReport::Base < Event::SetNotifier
         else
           view = "\"personal\""
       end
-      suffix = "/params={\"view\":" + view + ",\"preview\":true}"
-      path = "reports/#{report.id}"
+      suffix = URI.escape("{\"view\":" + view + ",\"preview\":true}")
+      path = "reports/#{report.id}/params="
       url = Constants::BASE_URL + path + suffix
     end
 
@@ -182,11 +188,12 @@ class Event::EReport::Base < Event::SetNotifier
       end
 
       url = nil
-      if report.controlling_user_id == user.id
+      # if report.controlling_user_id == user.id
+      if report.get_reviewers.include?(user)
       # token = params[:email_authorization]
-
-        suffix = "/params={\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}"
-        path = "report/#{report.id}"
+        suffix = URI.escape("{\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}")
+        # path = "report/#{report.id}"
+        path = "report/#{report.id}/params="
         url = Constants::BASE_URL_AUTHORIZER + path + suffix
       end
       url

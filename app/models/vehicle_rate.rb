@@ -10,6 +10,7 @@
 #  is_deleted       :boolean          default(FALSE)
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  deleted_at       :datetime
 #
 
 class VehicleRate < ApplicationRecord
@@ -36,7 +37,7 @@ class VehicleRate < ApplicationRecord
   def as_json(options = {})
     {
         id: id,
-        vehicle_name: vehicle_name,
+        vehicle_name: "#{vehicle_name} - #{policy.name}",
         rate: rate,
         distance_unit: distance_unit,
         policy: policy,
