@@ -29,11 +29,11 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
   def init
     id = params[:id] || params[:purchase_order_id] || params[:po_id]
     self.purchase_order = user.company.purchase_orders.find_by(id: id)
-    self.procurement = user.company.procurements.find_by id: params[:procurement_id]
+    self.procurement = user.company.procurements.find_by id: self.purchase_order.procurement.id
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
-    self.advance_amount = params[:advance_amount] || 999
+    self.advance_amount = params[:advance_amount]
     # self.receiving_account = user.company.bank_accounts.find_by(id: params[:receiving_account_id])
     puts "ADDADVANCE from init params", params.inspect
 
@@ -73,7 +73,15 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
     #   add_message :error, self.bank_payment_request.errors.full_messages
     # end
 
-    self.payment = Payment.new(self.payment_request_params)
+    self.payment = Payment.find_by(purchase_order_id: self.purchase_order.id, procurement_id: self.procurement.id)
+
+    if self.payment
+
+      self.payment.assign_attributes()
+
+    else
+      self.payment = Payment.new(self.payment_request_params)
+    end
 
     unless self.payment.save
       add_message :error, self.payment.errors.full_messages
