@@ -33,7 +33,7 @@ class MoneyRequests::Unapprove < MoneyRequests::Base
   end
 
   def process
-    # self.prev_status = money_request.status
+    self.prev_status = money_request.status
     # prev_controlling_user = (money_request.controlling_for_user or money_request.controlling_user)
     # prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.money_request)
     # role_id = nil
