@@ -434,6 +434,13 @@ module Transitionable
           where(action_taken_by_id: nil).
           with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
 
+      other_taken_control_ids = DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
+          with_taken_control.
+          where.not(taken_control_by_id: user.id).
+          with_document_type(self.name).
+          where(action_taken_by_id: nil).
+          with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
+
 
       ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
           with_reviewer_id(user.id).
@@ -447,7 +454,7 @@ module Transitionable
           with_document_type(self.name).
           with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
 
-      final_document_ids = ids - other_reviewer_ids
+      final_document_ids = ids - other_reviewer_ids - other_taken_control_ids
 
       self.where(id: final_document_ids)
     end
