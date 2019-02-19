@@ -123,6 +123,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        scheduled_at: params[:scheduled_at],
         initiating_account_type: YesBankCompanyAccount.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
