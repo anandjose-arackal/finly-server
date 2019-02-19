@@ -438,7 +438,7 @@ module Transitionable
 
       if admin
         # Find all taken control documents from DLRM with controlling level ids
-        ids = DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
+        ids += DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
             with_taken_control.
             with_taken_control_by_id(user.id).
             with_document_type(self.name).
