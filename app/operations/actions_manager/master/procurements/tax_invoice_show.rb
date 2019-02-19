@@ -48,7 +48,8 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def remind
-    true
+    invoice.processing? &&
+    document_owner?
   end
 
   def retract
@@ -56,7 +57,8 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def remind_approver
-    true
+    invoice.processing? &&
+    document_owner?
   end
 
   def void

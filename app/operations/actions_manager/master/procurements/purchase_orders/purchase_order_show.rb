@@ -46,7 +46,8 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def remind_approver
-    true
+    purchase_order.processing? &&
+    document_owner?
   end
 
   def void

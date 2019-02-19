@@ -70,7 +70,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     # ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
     # (purchase_order.processing? && user_in_level?) ||
     # (user.vendor_payment_admin? && purchase_order.voided?)
-    ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )
+    ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) || user.vendor_payment_admin?
   end
 
   def save_and_submit
