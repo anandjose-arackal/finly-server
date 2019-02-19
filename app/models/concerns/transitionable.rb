@@ -409,8 +409,6 @@ module Transitionable
       # # Find all documents where controlling level are from the above list of level ids
       # document_ids = self.with_controlling_level_id(all_level_ids).pluck(:id)
 
-      taken_control_document_ids = self.
-
       if self.column_names.include? 'company_id'
         document_ids = self.where(company_id: user.company.id).with_controlling_level_id(all_level_ids)
 
