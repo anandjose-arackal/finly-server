@@ -427,10 +427,29 @@ module Transitionable
 
 
       # New Logic
-      ids = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids, taken_control: true, taken_control_by_id: user.id, document_reviewer_mappable_type: self.name, action_taken_by_id: nil, document_reviewer_mappable_id: document_ids).pluck(:document_reviewer_mappable_id)
-      ids += DocumentLevelReviewerMapping.where(level_id: controlling_level_ids, reviewer_id: user.id, taken_control: false, action_taken_by_id: nil, document_reviewer_mappable_type: self.name, document_reviewer_mappable_id: document_ids).pluck(:document_reviewer_mappable_id)
+      ids = DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
+          with_taken_control.
+          with_taken_control_by(user.id).
+          with_document_type(self.name).
+          where(action_taken_by_id: nil).
+          with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
 
-      self.where(id: ids)
+
+      ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
+          with_reviewer_id(user.id).
+          where(taken_control: false, action_taken_by_id: nil).
+          with_document_type(self.name).
+          with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
+
+      other_reviewer_ids = DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
+          where.not(reviewer_id: user.id).
+          where(taken_control: false, action_taken_by_id: nil).
+          with_document_type(self.name).
+          with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
+
+      final_document_ids = ids - other_reviewer_ids
+
+      self.where(id: final_document_ids)
     end
 
 
