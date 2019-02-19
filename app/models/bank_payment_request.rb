@@ -352,6 +352,10 @@ class BankPaymentRequest < ApplicationRecord
     'owner_id'
   end
 
+  def self.document_status_class_name
+    'BankPaymentRequestStatus'
+  end
+
   def self.document_status_attribute
     'status_id'
   end
