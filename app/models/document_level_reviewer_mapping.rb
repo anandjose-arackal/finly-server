@@ -43,6 +43,7 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   scope :with_policy_id, -> (ids) {where policy_id: ids}
   scope :with_document_type, -> (document_type) {where document_reviewer_mappable_type: document_type}
   scope :with_taken_control, -> { where taken_control: true }
+  scope :with_taken_control_by_id, -> {where taken_control_by_id: id}
   scope :with_level_number, -> (number) {where level_number: number}
   scope :with_provider_name, -> (name) {where provider_name: name}
   scope :with_action_id, -> (action_id) {where action_id: action_id}

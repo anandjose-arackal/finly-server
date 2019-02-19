@@ -429,7 +429,7 @@ module Transitionable
       # New Logic
       ids = DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
           with_taken_control.
-          with_taken_control_by(user.id).
+          with_taken_control_by_id(user.id).
           with_document_type(self.name).
           where(action_taken_by_id: nil).
           with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
