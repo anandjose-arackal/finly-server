@@ -45,7 +45,11 @@ class Event::EReport::Approve < Event::EReport::Base
     # else
     #   [self.report.tracks.last.action_user, self.report.controlling_user]
     # end
-    self.report.document_role_users(:finance_manager).present? ? ( self.report.affected_users(:approve) + self.report.document_role_users(:finance_manager) ) : self.report.affected_users(:approve)
+    if self.report.document_role_users(:finance_manager).present? && (self.report.approved? || self.report.auto_approved?)
+      self.report.affected_users(:approve) + self.report.document_role_users(:finance_manager)
+    else
+      self.report.affected_users(:approve)
+    end
   end
 
   def get_token(user)
@@ -105,7 +109,7 @@ class Event::EReport::Approve < Event::EReport::Base
   def mailer_subject(user)
     approver_id = self.report.trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
-      "Report approved : #{self.report.name}"
+      message = "Report approved : #{self.report.name}"
     else
       if approved 
         if (user.id == self.report.user.id)
@@ -115,12 +119,12 @@ class Event::EReport::Approve < Event::EReport::Base
             return "Congratulations! Your report #{report.name} has been approved"
           end
         elsif self.report.document_role_users(:finance_manager).include?(user)
-          "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+          message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
         else
-          "#{approving_user.name} has approved the report: #{self.report.name}"
+          message = "#{approving_user.name} has approved the report: #{self.report.name}"
         end
-      elsif self.report.document_role_users(:finance_manager).include?(user)
-          "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
+      else
+        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
       end  
     end
   end
@@ -141,6 +145,8 @@ class Event::EReport::Approve < Event::EReport::Base
         else
           message = "#{message} and has been closed"
         end
+      elsif self.report.document_role_users(:finance_manager).include?(user)
+        message = "#{approving_user.name} has approved the report: #{self.report.name} and is currently waiting for your approval"
       else
         message = "#{approving_user.name} has approved the report '#{self.report.name}' and is currently waiting for your approval"
       end
@@ -152,12 +158,10 @@ class Event::EReport::Approve < Event::EReport::Base
     if user.id == report.user_id
       return UserRole.id_for(:employee)
     # elsif user.id == report.controlling_user_id
-    elsif report.get_reviewers.include?(user)
-      return UserRole.id_for(:manager)
-    elsif user.id == self.report.trails.last.action_user_id
-      return UserRole.id_for(:manager)
     elsif user.id == self.report.document_role_users(:finance_manager)&.last&.id
       return UserRole.id_for(:finance_manager)
+    else report.get_reviewers.include?(user)
+      return UserRole.id_for(:manager)
     end
   end
 
