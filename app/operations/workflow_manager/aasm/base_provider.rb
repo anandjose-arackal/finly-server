@@ -166,7 +166,7 @@ class WorkflowManager::Aasm::BaseProvider
 
   # Update status of the document
   def update_status
-    status_id = document.status.class.id_for(self.aasm.current_state)
+    status_id = document.class.document_status_class_name.constantize.id_for(self.aasm.current_state)
     self.document_update_params[:controlling_level_id] = self.new_level&.id
     self.document_update_params[document.class.document_status_attribute] = status_id
     self.document.update(self.document_update_params)

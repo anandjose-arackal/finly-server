@@ -9,8 +9,7 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     state :credited
     state :creation_in_progress
     state :pending
-
-
+    
     #[:open, :processing, :submitted, :retracted, :rejected, :approved, :unapprove, :credited, :pending, :creation_in_progress, :auto_approved]
     #:open, :processing, :submitted, :retracted, :rejected, :approved,
     # :unapprove, :credited, :pending, :creation_in_progress, :auto_approved

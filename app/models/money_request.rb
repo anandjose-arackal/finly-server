@@ -391,6 +391,10 @@ class MoneyRequest < ApplicationRecord
     'status_id'
   end
 
+  def self.document_status_class_name
+    'MoneyRequestStatus'
+  end
+
   def self.finance_associated_status_ids
     MoneyRequestStatus.ids_for(:approved, :credited, :pending, :auto_approved)
   end

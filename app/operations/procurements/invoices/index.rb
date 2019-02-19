@@ -12,7 +12,7 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
       level_ids = []
       policy_ids = user.company.policies.with_application(:vp).pluck(:id)
 
-      policy_level_ids = ReviewalLevel.with_entity_type('Invoice').with_policy_ids(policy_ids).pluck(:id)
+      policy_level_ids = ReviewalLevel.with_entity_type('InvoiceProvider').with_policy_ids(policy_ids).pluck(:id)
 
       reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
 
