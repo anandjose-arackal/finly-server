@@ -389,14 +389,14 @@ module Transitionable
     # Displays all document. Need to remove draft state
     # # Only gives result for admins and reviewers
     def awaiting_action_items(user)
-      # if user.instance_of?(User)
-      #   # Do nothing
-      # elsif user.is_a?(Integer)
-      #   user = User.find_by id: user
-      #   return [] unless user.present?
-      # else
-      #   return []
-      # end
+      if user.instance_of?(User)
+        # Do nothing
+      elsif user.is_a?(Integer)
+        user = User.find_by id: user
+        return [] unless user.present?
+      else
+        return []
+      end
 
       # if self.column_names.include? 'company_id'
       #   all_documents = self.where(company_id: user.company.id).where.not(controlling_level_id: nil)
@@ -426,7 +426,8 @@ module Transitionable
 
 
       # New Logic
-      ids = DocumentLevelReviewerMapping.where(reviewer_id: user.id, action_taken_by_id: nil, document_reviewer_mappable_type: self.name).pluck(:document_reviewer_mappable_id)
+      ids = DocumentLevelReviewerMapping.where(taken_control: true, taken_control_by_id: user.id, document_reviewer_mappable_type: self.name, action_taken_by_id: nil).pluck(:document_reviewer_mappable_id)
+      ids += DocumentLevelReviewerMapping.where(reviewer_id: user.id, taken_control: false, action_taken_by_id: nil, document_reviewer_mappable_type: self.name).pluck(:document_reviewer_mappable_id)
 
       self.where(id: ids)
     end
