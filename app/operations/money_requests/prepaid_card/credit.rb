@@ -132,25 +132,15 @@ class MoneyRequests::PrepaidCard::Credit < MoneyRequests::Base
       self.workflow_output = op.workflow_output
       # NEW CODE ENDS
       ####################     
+
+      action_id = "credited_from_#{initiating_account_type}_to_#{receiving_account_type}"
+      money_request.comments.create money_request_id: money_request.id,
+                                      user: user, comment_action_id: MoneyRequestCommentAction.id_for(action_id.to_sym), payment: result.payment
     end
   end
 
   def post_process
-    initiating_account_type = params[:initiating_account_type].to_sym
-    initiating_account_id = nil
-    if initiating_account_type == :card
-      initiating_account_id = user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
-    end
-
-    receiving_account_type = :card
-    receiving_account_id = nil
-    receiving_account_type = params[:receiving_account_type].to_sym if params[:receiving_account_type].present?
-    if receiving_account_type == :card
-      receiving_account_id = to_user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
-    end
-    action_id = "credited_from_#{initiating_account_type}_to_#{receiving_account_type}"
-    money_request.comments.create money_request_id: money_request.id,
-                                    user: user, comment_action_id: MoneyRequestCommentAction.id_for(action_id.to_sym), payment: result.payment
+    
     add_message :success, 'Funds transferred successfully'
   end
 
