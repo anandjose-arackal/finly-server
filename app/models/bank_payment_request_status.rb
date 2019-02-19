@@ -42,5 +42,4 @@ class BankPaymentRequestStatus < ApplicationRecord
   def credited?
     self.id == BankPaymentRequestStatus.id_for(:credited)
   end
-
 end
