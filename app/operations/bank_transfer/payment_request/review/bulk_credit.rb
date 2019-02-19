@@ -38,18 +38,11 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     op = BankTransfer::PaymentRequest::Index.(user, params)
 
     if op.success?
-      payment_request_ids = BankPaymentRequest.awaiting_action_items(user).pluck(:id)
-
-      if user.vendor_payments_admin?
-        payment_request_ids += op.payment_requests.creditable.with_id(ids).pluck(:id)
-      end
-
-      self.payment_requests = op.payment_requests.with_id(payment_request_ids)
+      self.payment_requests = op.payment_requests.creditable.with_id(ids)
       self.payment_orders = PaymentOrder.with_id(self.payment_requests.pluck(:payment_order_id))
     else
       add_message :error, op.messages[:error]
     end
-
 
     self.initiating_account = retrieve_initiating_account
     self.view_role = UserRole.id_for(params[:view].to_sym)

@@ -47,7 +47,7 @@ class Event::EMoneyRequests::Unapprove < Event::EMoneyRequests::Base
     if money_request.get_reviewers.include? user
       "Money Request unapproved : #{self.money_request.name}"
     else
-      "#{self.money_request.controlling_user.name} has unapproved the Money Request: #{self.money_request.name}"
+      "#{self.money_request.trails&.last&.action_user&.name} has unapproved the Money Request: #{self.money_request.name}"
     end
   end
 
@@ -55,7 +55,7 @@ class Event::EMoneyRequests::Unapprove < Event::EMoneyRequests::Base
     if money_request.get_reviewers.include? user
       "You have successfully unapproved the Money Request : #{self.money_request.name}"
     else
-      "#{self.money_request.trails.action_user.name} has unapproved the Money Request: #{self.money_request.name}"
+      "#{self.money_request.trails&.last&.action_user&.name} has unapproved the Money Request: #{self.money_request.name}"
     end
   end
 
