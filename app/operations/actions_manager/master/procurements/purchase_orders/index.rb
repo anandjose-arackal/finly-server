@@ -1,4 +1,4 @@
-class ActionsManager::Master::Procurements::PurchaseOrders::Index < ActionsManager::Master::Procurements::PurchaseOrders::Base
+class ActionsManager::Master::Procurements::PurchaseOrders::Index < ActionsManager::Master::Base
 
   register_handle :non_po_index
   register_actions [:new_non_po_invoice, :bulk_actions, :approve_invoices, :export_all, :bulk_import]
