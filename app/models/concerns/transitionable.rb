@@ -430,19 +430,19 @@ module Transitionable
 
 
       # Find all taken control documents from DLRM with controlling level ids
-      ids = DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids)
-          .with_taken_control
-          .with_taken_control_by_id(user.id)
-          .with_document_type(self.name)
-          .where(action_taken_by_id: nil)
-          .with_document_id(taken_control_level_ids).pluck(:document_reviewer_mappable_id)
+      ids = DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
+          with_taken_control.
+          with_taken_control_by_id(user.id).
+          with_document_type(self.name).
+          where(action_taken_by_id: nil).
+          with_document_id(taken_control_controlling_level_ids).pluck(:document_reviewer_mappable_id)
 
       # Find all awaiting action documents from DLRMs with controlling level id
-      ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids)
-          .with_reviewer_id(user.id)
-          .where(taken_control: false, action_taken_by_id: nil)
-          .with_document_type(self.name)
-          .with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
+      ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
+          with_reviewer_id(user.id).
+          where(taken_control: false, action_taken_by_id: nil).
+          with_document_type(self.name).
+          with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
 
       self.where(id: ids)
 
