@@ -9,31 +9,32 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
   def process
     # Only used for getting pending approval
     if user.vendor_payments_reviewer?
-      level_ids = []
-      policy_ids = user.company.policies.with_application(:vp).pluck(:id)
+      # level_ids = []
+      # policy_ids = user.company.policies.with_application(:vp).pluck(:id)
 
-      policy_level_ids = ReviewalLevel.with_entity_type('InvoiceProvider').with_policy_ids(policy_ids).pluck(:id)
+      # policy_level_ids = ReviewalLevel.with_entity_type('InvoiceProvider').with_policy_ids(policy_ids).pluck(:id)
 
-      reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+      # reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
 
-      level_ids = policy_level_ids & reviewer_level_ids
+      # level_ids = policy_level_ids & reviewer_level_ids
 
-      # Find all the invoices with controlling level from above
-      invoice_ids = user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:id)
+      # # Find all the invoices with controlling level from above
+      # invoice_ids = user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:id)
 
-      # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
-      invoice_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
+      # # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
+      # invoice_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
 
-      # Find all document level reviewer mappings with above list of level + NOT reviewer and their invoices
-      other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
+      # # Find all document level reviewer mappings with above list of level + NOT reviewer and their invoices
+      # other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
 
-      invoice_ids -= other_reviewer_invoice_ids
+      # invoice_ids -= other_reviewer_invoice_ids
 
-      self.invoices = user.company.inward_invoices.with_id(invoice_ids).with_status_id(InwardInvoiceStatus.id_for(:processing))
+      # self.invoices = user.company.inward_invoices.with_id(invoice_ids).with_status_id(InwardInvoiceStatus.id_for(:processing))
 
-      all_level_ids = self.invoices.pluck(:controlling_level_id)
+      # all_level_ids = self.invoices.pluck(:controlling_level_id)
 
-      self.invoices = self.invoices.with_controlling_level_ids(level_ids & all_level_ids)
+      # self.invoices = self.invoices.with_controlling_level_ids(level_ids & all_level_ids)
+      self.invoices = Invoice.awaiting_action_items(user)
     end
   end
 
