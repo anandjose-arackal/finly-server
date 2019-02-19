@@ -219,7 +219,8 @@ class MoneyRequests::Base < BaseOperation
               # actions[:approve_and_forward_to] = true
             end
           end
-          if self.money_request.can_unapprove? && money_request.action_users(:unapprove).include?(user)
+          provider_name = money_request.travel_request.present? ? 'TravelRequestProvider' : 'MoneyRequestProvider'
+          if self.money_request.can_unapprove? && money_request.get_reviewers(:prev, provider_name).include?(user)
             actions[:unapprove] = true
           end
         end
