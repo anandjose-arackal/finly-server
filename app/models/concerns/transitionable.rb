@@ -400,62 +400,91 @@ module Transitionable
         return []
       end
 
-      admin = user.admin?
+      # admin = user.admin?
 
-      # Find all level ids where user is a reviewer
-      all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).pluck(:level_id)
+      # # Find all level ids where user is a reviewer
+      # all_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).with_reviewer_id(user.id).pluck(:level_id)
 
-      # if admin
-      #   taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:level_id)
+      # # if admin
+      # #   taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:level_id)
+      # # end
+      # taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:level_id)
+
+      # # # Find all documents where controlling level are from the above list of level ids
+      # # document_ids = self.with_controlling_level_id(all_level_ids).pluck(:id)
+
+      # if self.column_names.include? 'company_id'
+      #   document_ids = self.where(company_id: user.company.id).with_controlling_level_id(all_level_ids)
+      #   # Find controlling level of all those documents
+      #   controlling_level_ids = self.where(company_id: user.company.id).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
+
+      #   # if admin
+      #   #   taken_control_document_ids = self.where(company_id: user.company.id).with_controlling_level_id(taken_control_level_ids)
+      #   #   taken_control_controlling_level_ids = self.where(company_id: user.company.id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
+      #   # end
+      #   taken_control_document_ids = self.where(company_id: user.company.id).with_controlling_level_id(taken_control_level_ids)
+      #   taken_control_controlling_level_ids = self.where(company_id: user.company.id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
+      # else
+      #   user_ids = user.company.users.pluck(:id)
+      #   document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids)
+      #   # Find controlling level of all those documents
+      #   controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
+
+      #   # if admin
+      #   #   taken_control_document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
+      #   #   taken_control_controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
+      #   # end
+      #   taken_control_document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
+      #   taken_control_controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
       # end
-      taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(taken_control_by_id: user.id).pluck(:level_id)
 
-      # # Find all documents where controlling level are from the above list of level ids
-      # document_ids = self.with_controlling_level_id(all_level_ids).pluck(:id)
+      # # final list of document ids
+      # ids = []
 
-      if self.column_names.include? 'company_id'
-        document_ids = self.where(company_id: user.company.id).with_controlling_level_id(all_level_ids)
-        # Find controlling level of all those documents
-        controlling_level_ids = self.where(company_id: user.company.id).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
-
-        # if admin
-        #   taken_control_document_ids = self.where(company_id: user.company.id).with_controlling_level_id(taken_control_level_ids)
-        #   taken_control_controlling_level_ids = self.where(company_id: user.company.id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
-        # end
-        taken_control_document_ids = self.where(company_id: user.company.id).with_controlling_level_id(taken_control_level_ids)
-        taken_control_controlling_level_ids = self.where(company_id: user.company.id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
-      else
-        user_ids = user.company.users.pluck(:id)
-        document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids)
-        # Find controlling level of all those documents
-        controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
-
-        # if admin
-        #   taken_control_document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
-        #   taken_control_controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
-        # end
-        taken_control_document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
-        taken_control_controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
-      end
-
-      # final list of document ids
-      ids = []
-
-      # if admin
-      #   # Find all taken control documents from DLRM with controlling level ids
-      #   ids += DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
+      # # if admin
+      # #   # Find all taken control documents from DLRM with controlling level ids
+      # #   ids += DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
+      # #       with_taken_control.
+      # #       with_taken_control_by_id(user.id).
+      # #       with_document_type(self.name).
+      # #       where(action_taken_by_id: nil).
+      # #       with_document_id(taken_control_controlling_level_ids).pluck(:document_reviewer_mappable_id)
+      # # end
+      # ids += DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
       #       with_taken_control.
       #       with_taken_control_by_id(user.id).
       #       with_document_type(self.name).
       #       where(action_taken_by_id: nil).
       #       with_document_id(taken_control_controlling_level_ids).pluck(:document_reviewer_mappable_id)
-      # end
+
+      # # Find all awaiting action documents from DLRMs with controlling level id
+      # ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
+      #     with_reviewer_id(user.id).
+      #     where(taken_control: false, action_taken_by_id: nil).
+      #     with_document_type(self.name).
+      #     with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
+
+      # self.where(id: ids)
+
+
+      # user = User.find 156
+      user_ids = user.company.users.pluck(:id)
+
+      all_level_ids = DocumentLevelReviewerMapping.with_document_type('BankPaymentRequest').with_reviewer_id(user.id).pluck(:level_id)
+      taken_control_level_ids = DocumentLevelReviewerMapping.with_document_type('BankPaymentRequest').where(taken_control_by_id: user.id).pluck(:level_id)
+
+      controlling_level_ids = self.where("owner_id in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
+      document_ids = self.where("owner_id in (?)", user_ids).with_controlling_level_id(all_level_ids)
+
+      taken_control_document_ids = self.where("owner_id in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
+      taken_control_controlling_level_ids = self.where("owner_id in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
+      ids = []
       ids += DocumentLevelReviewerMapping.with_level_id(taken_control_controlling_level_ids).
-            with_taken_control.
-            with_taken_control_by_id(user.id).
-            with_document_type(self.name).
-            where(action_taken_by_id: nil).
-            with_document_id(taken_control_controlling_level_ids).pluck(:document_reviewer_mappable_id)
+                with_taken_control.
+                with_taken_control_by_id(user.id).
+                with_document_type(self.name).
+                where(action_taken_by_id: nil).
+                with_document_id(taken_control_document_ids).pluck(:document_reviewer_mappable_id)
 
       # Find all awaiting action documents from DLRMs with controlling level id
       ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
