@@ -398,15 +398,15 @@ module Transitionable
         return []
       end
 
-      # if self.column_names.include? 'company_id'
-      #   all_documents = self.where(company_id: user.company.id).where.not(controlling_level_id: nil)
-      # else
-      #   user_ids = user.company.users.pluck(:id)
-      #   all_documents = self.where("#{self.document_owner_attribute} in (?)", user_ids).where.not(controlling_level_id: nil)
-      # end
+      if self.column_names.include? 'company_id'
+        all_documents = self.where(company_id: user.company.id).where.not(controlling_level_id: nil)
+      else
+        user_ids = user.company.users.pluck(:id)
+        all_documents = self.where("#{self.document_owner_attribute} in (?)", user_ids).where.not(controlling_level_id: nil)
+      end
 
       # # controlling_level_ids = self.where(id: document_ids).pluck(:controlling_level_id)
-      # controlling_level_ids = all_documents.pluck(:controlling_level_id)
+      controlling_level_ids = all_documents.pluck(:controlling_level_id)
 
       # # new_document_ids = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id).pluck(:document_reviewer_mappable_id)
       # # new_document_ids += DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id).pluck(:document_reviewer_mappable_id)
@@ -426,8 +426,8 @@ module Transitionable
 
 
       # New Logic
-      ids = DocumentLevelReviewerMapping.where(taken_control: true, taken_control_by_id: user.id, document_reviewer_mappable_type: self.name, action_taken_by_id: nil).pluck(:document_reviewer_mappable_id)
-      ids += DocumentLevelReviewerMapping.where(reviewer_id: user.id, taken_control: false, action_taken_by_id: nil, document_reviewer_mappable_type: self.name).pluck(:document_reviewer_mappable_id)
+      ids = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids, taken_control: true, taken_control_by_id: user.id, document_reviewer_mappable_type: self.name, action_taken_by_id: nil).pluck(:document_reviewer_mappable_id)
+      ids += DocumentLevelReviewerMapping.where(level_id: controlling_level_ids, reviewer_id: user.id, taken_control: false, action_taken_by_id: nil, document_reviewer_mappable_type: self.name).pluck(:document_reviewer_mappable_id)
 
       self.where(id: ids)
     end
