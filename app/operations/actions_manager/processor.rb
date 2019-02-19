@@ -40,6 +40,14 @@ class ActionsManager::Processor < BaseOperation
       add_message :error, m.messages[:error]
       return
     end
+
+
+    # Validate for error
+    obj = self.master.new(user, params) rescue nil
+    if obj.messages.present? && !obj.messages[:error].blank?
+      add_message :error, obj.messages[:error]
+      return
+    end
   end
 
   def process

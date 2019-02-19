@@ -30,12 +30,8 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
       transitions :from => :processing, :to => :retracted
     end
 
-    event :send_to_vendor do
-      transitions from: :approved, to: :sent_to_vendor
-    end
-
     event :close do
-      transitions :from => [:approved, :sent_to_vendor], :to => [:closed]
+      transitions :from => [:approved, :auto_approved], :to => [:closed]
     end
 
     after_all_events :change_state
