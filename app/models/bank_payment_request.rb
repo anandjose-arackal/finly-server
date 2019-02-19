@@ -166,7 +166,9 @@ class BankPaymentRequest < ApplicationRecord
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
 
   scope :filter_controlling_user, -> (user_id) {
-    ids = self.awaiting_action_items(user_id).map(&:id)
+    # ids = self.class.awaiting_action_items(user_id).map(&:id)
+    # with_id(ids)
+    ids = self.awaiting_action_items(user_id)&.pluck(:id)
     with_id(ids)
   }
 

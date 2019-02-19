@@ -389,40 +389,46 @@ module Transitionable
     # Displays all document. Need to remove draft state
     # # Only gives result for admins and reviewers
     def awaiting_action_items(user)
-      if user.instance_of?(User)
-        # Do nothing
-      elsif user.is_a?(Integer)
-        user = User.find_by id: user
-        return [] unless user.present?
-      else
-        return []
-      end
+      # if user.instance_of?(User)
+      #   # Do nothing
+      # elsif user.is_a?(Integer)
+      #   user = User.find_by id: user
+      #   return [] unless user.present?
+      # else
+      #   return []
+      # end
 
-      if self.column_names.include? 'company_id'
-        all_documents = self.where(company_id: user.company.id).where.not(controlling_level_id: nil)
-      else
-        user_ids = user.company.users.pluck(:id)
-        all_documents = self.where("#{self.document_owner_attribute} in (?)", user_ids).where.not(controlling_level_id: nil)
-      end
+      # if self.column_names.include? 'company_id'
+      #   all_documents = self.where(company_id: user.company.id).where.not(controlling_level_id: nil)
+      # else
+      #   user_ids = user.company.users.pluck(:id)
+      #   all_documents = self.where("#{self.document_owner_attribute} in (?)", user_ids).where.not(controlling_level_id: nil)
+      # end
 
-      # controlling_level_ids = self.where(id: document_ids).pluck(:controlling_level_id)
-      controlling_level_ids = all_documents.pluck(:controlling_level_id)
+      # # controlling_level_ids = self.where(id: document_ids).pluck(:controlling_level_id)
+      # controlling_level_ids = all_documents.pluck(:controlling_level_id)
 
-      # new_document_ids = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id).pluck(:document_reviewer_mappable_id)
-      # new_document_ids += DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id).pluck(:document_reviewer_mappable_id)
+      # # new_document_ids = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id).pluck(:document_reviewer_mappable_id)
+      # # new_document_ids += DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id).pluck(:document_reviewer_mappable_id)
 
-      # self.where(id: new_document_ids)
-      dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id, action_taken_by_id: nil)
-      if dlrms.present?
-        dlrms.or(DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id, action_taken_by_id: nil))
-      else
-        dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id, action_taken_by_id: nil)
-      end
+      # # self.where(id: new_document_ids)
+      # dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id, action_taken_by_id: nil)
+      # if dlrms.present?
+      #   dlrms.or(DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id, action_taken_by_id: nil))
+      # else
+      #   dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id, action_taken_by_id: nil)
+      # end
 
-      # other_reviewer_dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).not_with_reviewer_ids(user.id)
+      # # other_reviewer_dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).not_with_reviewer_ids(user.id)
       
-      # document_ids = dlrms.pluck(:document_reviewer_mappable_id) - other_reviewer_dlrms.pluck(:document_reviewer_mappable_id)
-      self.where(id: dlrms.pluck(:document_reviewer_mappable_id))
+      # # document_ids = dlrms.pluck(:document_reviewer_mappable_id) - other_reviewer_dlrms.pluck(:document_reviewer_mappable_id)
+      # self.where(id: dlrms.pluck(:document_reviewer_mappable_id))
+
+
+      # New Logic
+      ids = DocumentLevelReviewerMapping.where(reviewer_id: user.id, action_taken_by_id: nil, document_reviewer_mappable_type: self.name).pluck(:document_reviewer_mappable_id)
+
+      self.where(id: ids)
     end
 
 
