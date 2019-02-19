@@ -17,7 +17,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
       policy_ids = user.company.policies.with_application(:vp).pluck(:id)
 
       # Get all level ids of type purchase order and with policy ids from above
-      policy_level_ids = ReviewalLevel.with_entity_type('PurchaseOrder').with_policy_ids(policy_ids).pluck(:id)
+      policy_level_ids = ReviewalLevel.with_entity_type('PurchaseOrderProvider').with_policy_ids(policy_ids).pluck(:id)
 
       # Get all level ids from level reviewer mapping with current user id
       reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)

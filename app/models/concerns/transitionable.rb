@@ -88,7 +88,7 @@ module Transitionable
           user_ids += self.get_reviewers(:nex)&.map(&:id)
         end
       when :comment, 'comment'
-        user_ids += self.document_owner_id
+        user_ids.push self.document_owner_id
       end
 
       User.with_id(user_ids)
@@ -113,7 +113,7 @@ module Transitionable
       when :take_control, 'take_control'
         user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
       when :comment, 'comment'
-        user_ids += self.document_owner_id
+        user_ids.push self.document_owner_id
       when :unapprove, 'unapprove'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids += self.get_reviewers(:next)&.map(&:id)
@@ -202,7 +202,7 @@ module Transitionable
 
     # Get reviewers from current level
     def get_reviewers(level_details=nil, provider_name=nil)
-      if [:next, :previous, 'next', 'previous', :current, 'current'].include? level_details
+      if [:next, :previous, :prev, 'next', 'previous', :current, 'current'].include? level_details
         level = get_level(level_details, provider_name)
       elsif level_details.is_a?(Integer)
         level = get_level_with_id(level_details, provider_name)
@@ -399,30 +399,43 @@ module Transitionable
       end
 
       if self.column_names.include? 'company_id'
-        document_ids = self.where(company_id: user.company.id).pluck(:id)
+        all_documents = self.where(company_id: user.company.id).where.not(controlling_level_id: nil)
       else
         user_ids = user.company.users.pluck(:id)
-        document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:id)
+        all_documents = self.where("#{self.document_owner_attribute} in (?)", user_ids).where.not(controlling_level_id: nil)
       end
 
-      controlling_level_ids = self.where(id: document_ids).pluck(:controlling_level_id)
+      # controlling_level_ids = self.where(id: document_ids).pluck(:controlling_level_id)
+      controlling_level_ids = all_documents.pluck(:controlling_level_id)
 
-      new_document_ids = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id).pluck(:document_reviewer_mappable_id)
-      new_document_ids += DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id).pluck(:document_reviewer_mappable_id)
+      # new_document_ids = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id).pluck(:document_reviewer_mappable_id)
+      # new_document_ids += DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id).pluck(:document_reviewer_mappable_id)
 
-      self.where(id: new_document_ids)
+      # self.where(id: new_document_ids)
+      dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(taken_control_by_id: user.id, action_taken_by_id: nil)
+      if dlrms.present?
+        dlrms.or(DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id, action_taken_by_id: nil))
+      else
+        dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).where(reviewer_id: user.id, action_taken_by_id: nil)
+      end
+
+      # other_reviewer_dlrms = DocumentLevelReviewerMapping.where(level_id: controlling_level_ids).not_with_reviewer_ids(user.id)
+      
+      # document_ids = dlrms.pluck(:document_reviewer_mappable_id) - other_reviewer_dlrms.pluck(:document_reviewer_mappable_id)
+      self.where(id: dlrms.pluck(:document_reviewer_mappable_id))
     end
 
 
     def admin_associated_items(user)
       if user.instance_of?(User)
         if self.column_names.include? 'company_id'
-          document_ids = self.where(company_id: user.company.id).pluck(:id)
+          # document_ids = self.where(company_id: user.company.id).pluck(:id)
+          self.where(company_id: user.company.id)
         else
           user_ids = user.company.users.pluck(:id)
-          document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:id)
+          self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
         end
-        self.where(id: document_ids)
+        # self.where(id: document_ids)
       end
     end
 

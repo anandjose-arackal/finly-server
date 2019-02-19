@@ -367,6 +367,10 @@ class PurchaseOrder < ApplicationRecord
     'purchase_order_status_id'
   end
 
+  def self.document_status_class_name
+    'PurchaseOrderStatus'
+  end
+
   def self.status_ids(*statuses)
     status_ids = []
     statuses.each do |status|

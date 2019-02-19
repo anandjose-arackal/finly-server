@@ -10,7 +10,7 @@ class WorkflowManager::Aasm::BaseProvider
     self.violations_present = violations_present
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
     self.user = user
-    self.policy = self.document.policy ## Have to take care where status is stored in a different attribute
+    self.policy = Policy.find self.document.policy_id ## Have to take care where status is stored in a different attribute
     self.provider_name = provider_name || self.document.get_default_provider
 
     # get reviewers
@@ -166,7 +166,7 @@ class WorkflowManager::Aasm::BaseProvider
 
   # Update status of the document
   def update_status
-    status_id = document.status.class.id_for(self.aasm.current_state)
+    status_id = document.class.document_status_class_name.constantize.id_for(self.aasm.current_state)
     self.document_update_params[:controlling_level_id] = self.new_level&.id
     self.document_update_params[document.class.document_status_attribute] = status_id
     self.document.update(self.document_update_params)
@@ -181,5 +181,9 @@ class WorkflowManager::Aasm::BaseProvider
 
   def user_can_review?
     self.current_level_reviewers.include?(user)
+  end
+
+  def user_can_unapprove?
+    self.document.get_reviewers(:prev).include?(user)
   end
 end

@@ -2,7 +2,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
 
   register_handle :non_po_tax_invoice_show
   #Validate input if required
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete, :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_invoice_items]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete, :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_invoice_items]
 
   def initialize(user=nil, params={})
     super
@@ -21,7 +21,8 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
   
   def send_mail
-    true
+    (invoice.approved? || invoice.auto_approved?) &&
+    (user_in_level?) || (document_owner?)
   end
   
   def export_items
@@ -36,9 +37,9 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
     invoice.processing? && user_in_level?
   end
 
-  def close
-    true
-  end
+  # def close
+  #   true
+  # end
 
   def approve
     invoice.processing? && user_in_level?
@@ -61,7 +62,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def save_btn
-    true
+    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def export_po_items
@@ -81,7 +82,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def save_and_submit
-    true
+    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def more_actions
@@ -99,10 +100,12 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def download
-    true
+    invoice.approved?
   end
 
   def send_btn
+    # (invoice.approved? || invoice.auto_approved?) &&
+    # (user_in_level?) || (document_owner?)
     true
   end
 

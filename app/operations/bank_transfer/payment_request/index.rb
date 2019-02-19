@@ -51,22 +51,41 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     #   self.payment_requests = user.bank_payment_requests
     # end
 
+    # role_ids = user.role_mapping.vendor_payments.pluck(:user_role_id)
+    # payment_request_ids = []
+    # if role_ids.include?(UserRole.id_for(:admin))
+    #   payment_request_ids += BankPaymentRequest.admin_associated_items(user).map(&:id)
+    # end
+    # if role_ids.include?(UserRole.id_for(:reviewer))
+    #   payment_request_ids += BankPaymentRequest.reviewer_associated_items(user).map(&:id)
+    # end
+    # if role_ids.include?(UserRole.id_for(:creditor))
+    #   payment_request_ids += BankPaymentRequest.creditor_associated_items(user).map(&:id)
+    # end
+    # if role_ids.include?(UserRole.id_for(:initiator))
+    #   payment_request_ids += user.bank_payment_requests.map(&:id)
+    # end
+
     role_ids = user.role_mapping.vendor_payments.pluck(:user_role_id)
     payment_request_ids = []
-    if role_ids.include?(UserRole.id_for(:admin))
-      payment_request_ids += BankPaymentRequest.admin_associated_items(user).map(&:id)
-    end
-    if role_ids.include?(UserRole.id_for(:reviewer))
-      payment_request_ids += BankPaymentRequest.reviewer_associated_items(user).map(&:id)
-    end
-    if role_ids.include?(UserRole.id_for(:creditor))
-      payment_request_ids += BankPaymentRequest.creditor_associated_items(user).map(&:id)
-    end
-    if role_ids.include?(UserRole.id_for(:initiator))
-      payment_request_ids += user.bank_payment_requests.map(&:id)
+    if role_ids.include?(UserRole.id_for(:admin)) || role_ids.include?(UserRole.id_for(:auditor))
+      self.payment_requests = BankPaymentRequest.admin_associated_items(user).not_open.or(user.bank_payment_requests)
+    elsif role_ids.include?(UserRole.id_for(:reviewer)) || role_ids.include?(UserRole.id_for(:creditor))
+      if role_ids.include?(UserRole.id_for(:reviewer))
+        self.payment_requests = BankPaymentRequest.reviewer_associated_items(user).or(user.bank_payment_requests)
+      end
+      if role_ids.include?(UserRole.id_for(:creditor))
+        if self.payment_requests.present?
+          self.payment_request.or(BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests))
+        else
+          self.payment_requests = BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests)
+        end
+      end
+    else
+      self.payment_requests = user.bank_payment_requests
     end
 
-    self.payment_requests = BankPaymentRequest.with_id(payment_request_ids)
+    # self.payment_requests = BankPaymentRequest.with_id(payment_request_ids)
 
     # case self.role_id
     # when UserRole.id_for(:admin), UserRole.id_for(:auditor)

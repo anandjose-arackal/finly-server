@@ -9,7 +9,7 @@ json.results do
     end
     json.name payment_request.name
     json.scheduled_at scheduled_at
-    json.controlling_user payment_request.controlling_user&.name
+    json.controlling_user payment_request.get_reviewers.first&.name
     processed_date = item.processed_at
     if processed_date.present?
       processed_date = processed_date.strftime('%d %b %Y')

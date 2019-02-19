@@ -46,7 +46,7 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
     # else
     #   [self.money_request.tracks.last.action_user, self.money_request.controlling_user]
     # end
-    self.money_request.document_user_roles(:finance_manager).present? ? ( self.money_request.affected_users(:approve) + self.money_request.document_user_roles(:finance_manager) ) : self.money_request.affected_users(:approve)
+    self.money_request.document_role_users(:finance_manager).present? ? ( self.money_request.affected_users(:approve) + self.money_request.document_role_users(:finance_manager) ) : self.money_request.affected_users(:approve)
   end
 
   def notification_affected_users
@@ -116,12 +116,12 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
           else
             "Congratulations! Your Money Request #{money_request.name} has been approved"
           end
-        elsif self.money_request.document_user_roles(:finance_manager).include?(user)
+        elsif self.money_request.document_role_users(:finance_manager).include?(user)
           "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
         else
           "#{approving_user.name} has approved the Money Request: #{self.money_request.name}"
         end
-      elsif self.money_request.document_user_roles(:finance_manager).include?(user)
+      elsif self.money_request.document_role_users(:finance_manager).include?(user)
         "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
       end 
     end
@@ -139,12 +139,12 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
           else
             message = "Congratulations! Your Money Request #{money_request.name} has been approved"
           end
-        elsif self.money_request.document_user_roles(:finance_manager).include?(user)
+        elsif self.money_request.document_role_users(:finance_manager).include?(user)
         "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
         else
           message = "#{approving_user.name} has approved the Money Request '#{self.money_request.name}' and is currently waiting for your approval"
         end
-      elsif self.money_request.document_user_roles(:finance_manager).include?(user)
+      elsif self.money_request.document_role_users(:finance_manager).include?(user)
         "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
       end
     end

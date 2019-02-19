@@ -202,7 +202,7 @@ class BankPaymentRequest < ApplicationRecord
   }
 
   scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
-  scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved)}
+  scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved, :processing, :auto_approved)}
 
   scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
@@ -350,6 +350,10 @@ class BankPaymentRequest < ApplicationRecord
 
   def self.document_owner_attribute
     'owner_id'
+  end
+
+  def self.document_status_class_name
+    'BankPaymentRequestStatus'
   end
 
   def self.document_status_attribute

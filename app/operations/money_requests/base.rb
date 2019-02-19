@@ -203,25 +203,24 @@ class MoneyRequests::Base < BaseOperation
             actions[:take_control] = true
           elsif self.money_request.processing? and self.money_request.get_reviewers.include?(user)
             actions[:editable] = true
+            actions[:approve] = true
+            actions[:reject] = true
             if self.money_request.payment_mode_card?
               actions[:approve_and_credit] = true
-              actions[:approve_and_forward_to] = true
-            else
-              actions[:approve] = true
             end
-            actions[:reject] = true
           end
         elsif manager_view?
           if self.money_request.processing? && self.money_request.get_reviewers.include?(user)
+            actions[:editable] = true
+            actions[:reject] = true
+            actions[:approve] = true
             if self.money_request.payment_mode_card?
               actions[:approve_and_credit] = true
-              actions[:approve_and_forward_to] = true
-            else
-              actions[:approve] = true
+              # actions[:approve_and_forward_to] = true
             end
-            actions[:reject] = true
           end
-          if self.money_request.can_unapprove? && money_request.action_users(:unapprove).include?(user)
+          provider_name = money_request.travel_request.present? ? 'TravelRequestProvider' : 'MoneyRequestProvider'
+          if self.money_request.can_unapprove? && money_request.get_reviewers(:prev, provider_name).include?(user)
             actions[:unapprove] = true
           end
         end

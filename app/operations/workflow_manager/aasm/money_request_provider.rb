@@ -51,12 +51,11 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
       transitions :from => :trip_approved, :to => :approved, guard: [:travel_request_present?, :travel_request_booking_confirmed?]
     end
 
-
     event :unapprove do
-      transitions :from => :trip_processing, :to => :trip_processing, guard: [:travel_request_present?]
-      transitions :from => :trip_approved, :to => :trip_processing, guard: [:travel_request_present?]
-      transitions :from => :processing, :to => :processing
-      transitions :from => :approved, :to => :processing
+      transitions :from => :trip_processing, :to => :trip_processing, guard: [:travel_request_present?, :user_can_unapprove?]
+      transitions :from => :trip_approved, :to => :trip_processing, guard: [:travel_request_present?, :user_can_unapprove?]
+      transitions :from => :processing, :to => :processing, guard: [:user_can_unapprove?]
+      transitions :from => :approved, :to => :processing, guard: [:user_can_unapprove?]
     end
 
     event :hold do
@@ -88,13 +87,13 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     end
 
     event :credit do
-      transitions :from => :processing, to: :credited
+      transitions :from => :processing, to: :credited, guard: [:user_can_review?]
       transitions :from => [:approved, :auto_approved], to: :credited
-      transitions :from => [:approved, :auto_approved], to: :pending
+      # transitions :from => [:approved, :auto_approved], to: :pending # Pending was used in travel request.
     end
 
     event :mark_as_credited do #todo check if mark as credited should do this
-      transitions from: :approved, to: :credited
+      transitions :from => [:approved, :auto_approved], to: :credited
     end
 
     after_all_events :change_state

@@ -22,9 +22,9 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
     end
 
     event :unapprove do
-      transitions :from => :processing, :to => :processing
-      transitions :from => :approved, :to => :processing
-      transitions :from => :closed, :to => :processing
+      transitions :from => :processing, :to => :processing, guard: [:user_can_unapprove?]
+      transitions :from => :approved, :to => :processing, guard: [:user_can_unapprove?]
+      transitions :from => :closed, :to => :processing, guard: [:user_can_unapprove?]
     end
 
     event :hold do

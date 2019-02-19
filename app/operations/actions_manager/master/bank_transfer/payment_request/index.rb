@@ -1,7 +1,7 @@
 class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManager::Master::Base
 
   register_handle :payment_ticket_index
-  register_actions [ :new_orders, :bulk_actions,:export_sap, :mark_as_credited, :credit_payment_order, :approve_selected, :approve_pending, :upload_utr, :bulk_downloads, :download_payment_files, :download_pending, :download_selected, :download_all, :export, :tally, :quickbooks, :sap, :oracle_ns]
+  register_actions [ :new_orders, :bulk_actions,:export_sap, :mark_as_credited, :credit_payment_order, :approve_selected, :approve_pending, :upload_utr, :bulk_downloads, :download_payment_files, :download_pending, :download_selected, :download_all, :export, :tally, :quickbooks, :sap, :oracle_ns, :take_control]
 
 
   def new_orders
@@ -74,6 +74,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManag
 
   def oracle_ns
     true
+  end
+
+  def take_control
+    user.vendor_payments_admin?
   end
 
 

@@ -235,7 +235,7 @@ class Procurement < ApplicationRecord
 
       policy_ids = user.company.policies.with_application(:vp).pluck(:id)
 
-      policy_level_ids = ReviewalLevel.with_entity_type(['PurchaseOrder', 'Invoice']).with_policy_ids(policy_ids).pluck(:id)
+      policy_level_ids = ReviewalLevel.with_entity_type(['PurchaseOrderProvider', 'InvoiceProvider']).with_policy_ids(policy_ids).pluck(:id)
 
       reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
 
@@ -273,6 +273,9 @@ class Procurement < ApplicationRecord
       procurement_ids = purchase_orders.pluck(:procurement_id) + invoices.pluck(:procurement_id)
 
       where(id: procurement_ids.uniq)
+      # procurement_ids = PurchaseOrder.awaiting_action_items(user).pluck(:procurement_id).compact
+      # procurement_ids += Invoice.awaiting_action_items(user).pluck(:procurement_id).compact
+      # where(id: procurement_ids.uniq)
     end
   }
 

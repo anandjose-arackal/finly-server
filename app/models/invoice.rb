@@ -98,6 +98,7 @@ class Invoice < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
   belongs_to :company, optional: true
   belongs_to :invoice_status, optional: true, class_name: "InwardInvoiceStatus"
+  alias_attribute :status, :invoice_status
   belongs_to :receiving_account, optional: true, polymorphic: true
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
   belongs_to :location, optional: true, class_name: 'BranchLocation'
@@ -412,12 +413,25 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push InwardInvoiceStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
   def self.document_owner_attribute
     'created_by_user_id'
   end
 
   def self.document_status_attribute
     'invoice_status_id'
+  end
+
+  def self.document_status_class_name
+    'InwardInvoiceStatus'
   end
 
   def self.finance_associated_status_ids

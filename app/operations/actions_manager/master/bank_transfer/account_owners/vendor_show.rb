@@ -7,7 +7,7 @@ class ActionsManager::Master::BankTransfer::AccountOwners::VendorShow < ActionsM
   def initialize(user=nil, params={})
     super
     result = BankTransfer::AccountOwners::Show.(user, params)
-    if result.success?
+    unless result.success?
       add_message :error, result.messages[:error]
       return
     end
@@ -39,7 +39,7 @@ class ActionsManager::Master::BankTransfer::AccountOwners::VendorShow < ActionsM
   end
 
   def create_beneficiaries
-    account_owner.is_a?(YesBankVendor) && user.permission.create_beneficiaries
+    account_owner.is_a?(YesBankVendor) && (user.permission.create_beneficiaries || user.vendor_payments_admin?)
   end
 
 

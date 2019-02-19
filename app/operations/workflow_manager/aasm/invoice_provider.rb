@@ -13,12 +13,12 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
     state :paid
 
     event :submit do
-      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :approvers_not_present?
+      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
       transitions from: [:open, :retracted, :rejected], to: :processing
     end
 
     event :approve do
-      transitions :from => :processing, :to => :approved, guard: [:approvers_not_present?, :user_can_review?]
+      transitions :from => :processing, :to => :approved, guard: [:reviewers_not_present?, :user_can_review?]
       transitions :from => :processing, :to => :processing, guard: :user_can_review?
     end
 
@@ -30,12 +30,8 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
       transitions :from => :processing, :to => :retracted
     end
 
-    event :send_to_vendor do
-      transitions from: :approved, to: :sent_to_vendor
-    end
-
     event :close do
-      transitions :from => [:approved, :sent_to_vendor], :to => [:closed]
+      transitions :from => [:approved, :auto_approved], :to => [:closed]
     end
 
     after_all_events :change_state
