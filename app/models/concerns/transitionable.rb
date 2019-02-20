@@ -420,13 +420,13 @@ module Transitionable
         end
       else
         user_ids = user.company.users.pluck(:id)
-        document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids)
+        document_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids)
         # Find controlling level of all those documents
-        controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
+        controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
 
         if admin
-          taken_control_document_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
-          taken_control_controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
+          taken_control_document_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids)
+          taken_control_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
         end
       end
 

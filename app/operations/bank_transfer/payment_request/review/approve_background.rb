@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperation
 
-  attr_accessor :payment_requests, :options, :initiating_user
+  attr_accessor :payment_requests, :options, :initiating_user, :processing_payment_requests
 
   def self.call(payment_request_ids, options = {})
     self.new.perform(payment_request_ids, options)
@@ -19,6 +19,9 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
   def initialize
     # self.payment_order = payment_order
     # self.options = options
+
+
+    self.processing_payment_requests = []
   end
 
   def pre_validate
@@ -33,17 +36,12 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
     # this will take all the payment requests that are not approvabe and
     # exclude them from the list of payment requests
     self.payment_requests.each do |payment_request|
-      valid = true
-      unless payment_request.pending?
-        valid = false
-      end
-      unless payment_request.get_reviewers.include? initiating_user
-        valid = false
+
+      if payment_request.pending? && payment_request.get_reviewers.include?(initiating_user)
+        self.processing_payment_requests.push(payment_request)
       end
 
-      unless valid
-        self.payment_requests.reject! { |pr| pr.id == payment_request.id }
-      end
+      # todo - Change status of other payment requests from pending to processing
     end
 
     if self.initiating_user.blank?
@@ -53,10 +51,10 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
   end
 
   def process
-    self.payment_requests.each do |payment_request|
+    self.processing_payment_requests.each do |payment_request|
       # presenter = User::Team::Review::NextReviewer.(payment_request)
       # next_reviewer = presenter.user
-      next_reviewer_role_id = presenter.role_id
+      # next_reviewer_role_id = presenter.role_id
       # this returns the role under which this particular user is viewing the payment request
       # current_user_role = User::Team::Review::UserRole.(initiating_user, payment_request)
       # if next_reviewer.nil?
@@ -85,10 +83,14 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       # end
 
       # New Code
-      params[:document] = payment_request
-      params[:aasm_event] = 'approve'
-      params[:violation_present] = false
-      op = WorkflowManager::Base.(user, params)
+      parameters = {
+          document: payment_request,
+          aasm_event: 'approve'
+      }
+      # params[:document] = payment_request
+      # params[:aasm_event] = 'approve'
+      # params[:violation_present] = false
+      op = WorkflowManager::Base.(user, parameters)
 
       # unless op.success?
       #   add_message :error, op.messages[:error]
