@@ -76,7 +76,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       end
       if role_ids.include?(UserRole.id_for(:creditor))
         if self.payment_requests.present?
-          self.payment_request.or(BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests))
+          self.payment_requests.or(BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests))
         else
           self.payment_requests = BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests)
         end
