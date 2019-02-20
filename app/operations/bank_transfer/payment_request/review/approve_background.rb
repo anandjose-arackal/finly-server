@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
     self.payment_requests.each do |payment_request|
 
       if payment_request.pending? && payment_request.get_reviewers.include?(initiating_user)
-        self.processing_payment_requests.push(payment_requests)
+        self.processing_payment_requests.push(payment_request)
       end
 
       # todo - Change status of other payment requests from pending to processing
