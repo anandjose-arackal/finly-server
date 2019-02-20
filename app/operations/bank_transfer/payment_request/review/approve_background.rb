@@ -17,10 +17,6 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
   end
 
   def initialize
-    # self.payment_order = payment_order
-    # self.options = options
-
-
     self.processing_payment_requests = []
   end
 
@@ -81,27 +77,27 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       #                                                           modified_user_id: next_reviewer&.id,
       #                                                           modified_user_role_id: next_reviewer_role_id
       # end
-
       # New Code
+
       parameters = {
           document: payment_request,
           aasm_event: 'approve'
       }
-      # params[:document] = payment_request
-      # params[:aasm_event] = 'approve'
-      # params[:violation_present] = false
-      op = WorkflowManager::Base.(user, parameters)
-      if op.success?
-        # generate comments for this particular action
-        payment_request.comments.create user_id: initiating_user.id,
-                                        action_id: BankPaymentRequestCommentAction.id_for(:approve)
-      end
+
+      op = WorkflowManager::Base.(initiating_user, parameters)
+
       # unless op.success?
       #   add_message :error, op.messages[:error]
       #   return
       # end
 
       # self.workflow_output = op.workflow_output
+
+      # generate comments for this particular action
+      if op.success?
+        payment_request.comments.create user_id: initiating_user.id,
+                                       action_id: BankPaymentRequestCommentAction.id_for(:approve)
+      end
     end
   end
 end

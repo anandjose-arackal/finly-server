@@ -1,5 +1,4 @@
 class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::PaymentRequest::Review::Base
-
   attr_accessor :bank_payment_requests, :processing_status_id,
                 :errors_found, :validate_result
 
@@ -22,10 +21,8 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
       self.bank_payment_requests = op.payment_requests
       # now extract all payment requests for which this particular user is the controlling user
       # self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
-
-
       # self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
-      self.bank_payment_requests = BankPaymentRequest.awaiting_action_items(user).includes_details
+      self.bank_payment_requests = self.bank_payment_requests.with_id(BankPaymentRequest.awaiting_action_items(user).pluck(:id)).includes_details
       self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
     else
       add_message :error, op.messages[:error]
@@ -41,12 +38,11 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
   def process
     # update the status of all payment orders that are approvable by current as pending
     self.bank_payment_requests = self.bank_payment_requests.where.not(status_id: BankPaymentRequestStatus.id_for(:pending))
-    
-    self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
-    
-    ids = self.bank_payment_requests.pluck(:id)
 
     if self.bank_payment_requests.present?
+      self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
+      ids = self.bank_payment_requests.pluck(:id)
+
       BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
     else
       add_message :notice, 'No Payment tickets are awaiting your approval'
