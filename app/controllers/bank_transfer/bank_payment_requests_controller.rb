@@ -117,7 +117,9 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def count
     @result = BankTransfer::PaymentRequest::Count.(current_user, params)
-    render json: @result.as_json
+    # render json: @result.as_json
+    render json: { count: @result.count.as_json, status_count: @result.status_count.as_json }
+
   end
 
   def add_beneficiary
