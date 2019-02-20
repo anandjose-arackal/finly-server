@@ -31,7 +31,14 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
     else
       unless self.payment_order.scheduled? || self.payment_order.pending?
         add_message :error, "Cannot be processed yet"
+        return
       end
+    end
+
+    if self.payment_order.bank_payment_request.blank?
+      add_message :error, "Invalid payment order, cannot be processed"
+      add_system_message :error, self.payment_order, "Invalid payment order, cannot be processed"
+      return
     end
   end
 
@@ -42,11 +49,8 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
   end
 
   def post_process
-    # add condition here that if the payment order has been successfully executed,
-    # mark the respective bank payment request also as credited
-    if payment_order.completed?
-      payment_order.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
-    end
+    # mark the respective bank payment request as credited because it has been officially executed
+    payment_order.bank_payment_request&.update(status_id: BankPaymentRequestStatus.id_for(:credited))
   end
 
   def success

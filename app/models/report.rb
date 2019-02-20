@@ -165,7 +165,7 @@ class Report < ApplicationRecord
   scope :filter_status, ->(status_id, user_id) do
     case status_id
     when 99, '99'
-      where(controlling_user_id: user_id).where.not(report_status_id: ReportStatus.ids_for(:retracted, :open, :rejected))
+      awaiting_action_items(user_id)
     else
       where report_status_id: status_id
     end
@@ -616,6 +616,10 @@ class Report < ApplicationRecord
 
   def self.document_status_attribute
     'report_status_id'
+  end
+
+  def self.document_status_class_name
+    'ReportStatus'
   end
 
   def self.document_owner_attribute

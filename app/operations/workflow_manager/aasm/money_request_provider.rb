@@ -51,7 +51,6 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
       transitions :from => :trip_approved, :to => :approved, guard: [:travel_request_present?, :travel_request_booking_confirmed?]
     end
 
-
     event :unapprove do
       transitions :from => :trip_processing, :to => :trip_processing, guard: [:travel_request_present?, :user_can_unapprove?]
       transitions :from => :trip_approved, :to => :trip_processing, guard: [:travel_request_present?, :user_can_unapprove?]
@@ -88,13 +87,13 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     end
 
     event :credit do
-      transitions :from => :processing, to: :credited
+      transitions :from => :processing, to: :credited, guard: [:user_can_review?]
       transitions :from => [:approved, :auto_approved], to: :credited
-      transitions :from => [:approved, :auto_approved], to: :pending
+      # transitions :from => [:approved, :auto_approved], to: :pending # Pending was used in travel request.
     end
 
     event :mark_as_credited do #todo check if mark as credited should do this
-      transitions from: :approved, to: :credited
+      transitions :from => [:approved, :auto_approved], to: :credited
     end
 
     after_all_events :change_state
@@ -110,18 +109,20 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     super
 
     if [:credit].include?(aasm.current_event)
-      dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(policy.id)
-                .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
+      if current_level.present?
+        dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(policy.id)
+                  .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
 
-      if dlrm.present?
-        dlrm.update(
-                action_id: TrailAction.id_for(aasm.current_event),
-                action_taken_by_id: user.id
-        )
+        if dlrm.present?
+          dlrm.update(
+                  action_id: TrailAction.id_for(aasm.current_event),
+                  action_taken_by_id: user.id
+          )
 
-        dlrms = document.document_level_reviewer_mappings.where('level_number > ?', dlrm.level_number)
+          dlrms = document.document_level_reviewer_mappings.where('level_number > ?', dlrm.level_number)
 
-        dlrms.update_all(active: false)
+          dlrms.update_all(active: false)         
+        end
       end
     end
   end

@@ -15,7 +15,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
 
   def send_push_notification(user)
     return if self.report.get_reviewers&.include? user
-    message = "#{self.report.trails.last.action_user_id.name} unapproved the report: #{self.report.name}"
+    message = "#{self.report.trails.last.action_user.name} unapproved the report: #{self.report.name}"
     # view = UserRole.name_for(self.report.tracks.last.modified_user_role_id)
     view = 'manager'
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
@@ -47,7 +47,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
     if report.get_reviewers.include? user
       "Report unapproved : #{self.report.name}"
     else
-      "#{self.report.trails.last.action_user.name} has unapproved the report: #{self.report.name}"
+      "#{self.report.trails&.last&.action_user&.name} has unapproved the report: #{self.report.name}"
     end
   end
 
@@ -55,7 +55,7 @@ class Event::EReport::Unapprove < Event::EReport::Base
     if report.get_reviewers.include? user
       "You have successfully unapproved the report : #{self.report.name}"
     else
-      "#{self.report.trails.last.action_user.name} has unapproved the report: #{self.report.name}"
+      "#{self.report.trails&.last&.action_user&.name} has unapproved the report: #{self.report.name}"
     end
   end
 

@@ -27,7 +27,6 @@ class WorkflowManager::Aasm::TravelRequestProvider < WorkflowManager::Aasm::Base
     state :rejected
     state :booked
     state :cancelled
-    state :approved
     state :booking_pending
     state :auto_approved
 

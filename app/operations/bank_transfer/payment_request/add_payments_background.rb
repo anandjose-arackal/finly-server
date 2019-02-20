@@ -109,6 +109,10 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     # now once the payment request has been created and the payments saved, we can mark it as open
     self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
     self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, {reviewal_document: self.bank_payment_request.reload})
     # puts 'SUCCESSFUL!'
   end
 
