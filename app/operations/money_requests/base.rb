@@ -223,6 +223,10 @@ class MoneyRequests::Base < BaseOperation
           if self.money_request.can_unapprove? && money_request.get_reviewers(:prev, provider_name).include?(user)
             actions[:unapprove] = true
           end
+        elsif finance_view?
+          if self.money_request.approved? and self.money_request.document_role_users(:finance_manager).include?(user)
+            actions[:approve_and_credit] = true
+          end
         end
       else
         # Personal View
