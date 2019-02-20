@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
     self.payment_requests.each do |payment_request|
 
       if payment_request.pending? && payment_request.get_reviewers.include?(initiating_user)
-        self.processing_payment_requests.push(payment_requests)
+        self.processing_payment_requests.push(payment_request)
       end
 
       # todo - Change status of other payment requests from pending to processing
@@ -83,10 +83,14 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       # end
 
       # New Code
-      params[:document] = payment_request
-      params[:aasm_event] = 'approve'
-      params[:violation_present] = false
-      op = WorkflowManager::Base.(user, params)
+      parameters = {
+          document: payment_request,
+          aasm_event: 'approve'
+      }
+      # params[:document] = payment_request
+      # params[:aasm_event] = 'approve'
+      # params[:violation_present] = false
+      op = WorkflowManager::Base.(user, parameters)
 
       # unless op.success?
       #   add_message :error, op.messages[:error]
