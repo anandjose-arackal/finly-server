@@ -83,10 +83,14 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       # end
 
       # New Code
-      params[:document] = payment_request
-      params[:aasm_event] = 'approve'
-      params[:violation_present] = false
-      op = WorkflowManager::Base.(user, params)
+      parameters = {
+          document: payment_request,
+          aasm_event: 'approve'
+      }
+      # params[:document] = payment_request
+      # params[:aasm_event] = 'approve'
+      # params[:violation_present] = false
+      op = WorkflowManager::Base.(user, parameters)
 
       # unless op.success?
       #   add_message :error, op.messages[:error]
