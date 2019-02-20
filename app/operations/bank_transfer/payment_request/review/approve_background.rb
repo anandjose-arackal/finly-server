@@ -37,7 +37,7 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
     # exclude them from the list of payment requests
     self.payment_requests.each do |payment_request|
 
-      if payment_request.pending? && payment_request.get_reviewers.include? initiating_user
+      if payment_request.pending? && payment_request.get_reviewers.include?(initiating_user)
         self.processing_payment_requests.push(payment_requests)
       end
       # valid = true
