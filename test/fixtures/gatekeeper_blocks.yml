@@ -9,8 +9,7 @@
 #  headers    :text(65535)
 #  act        :string(255)
 #  premise    :string(255)
-#  rule       :string(255)
-#  violation  :string(255)
+#  verdict    :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

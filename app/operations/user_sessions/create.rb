@@ -55,7 +55,8 @@ class UserSessions::Create < BaseOperation
     enrich_request args
     enrich_access args
     enrich_geo_location args
-    enrich_platform args
+    enrich_device args
+    # enrich_platform args
     set_event args
     return if has_errors?
     self.session = UserSession.new args
@@ -121,33 +122,11 @@ class UserSessions::Create < BaseOperation
     args[:accuracy_radius] = data&.dig('location', 'accuracy_radius')
   end
 
-  PLATFORMS = [
-      UserSessionWeb
-  ]
+  def enrich_device(args)
+    result = UserDevices::FindOrCreate.(user, params)
+    return unless result.success?
 
-  def enrich_platform(args)
-    request = RequestStoreUtil.current_request
-    headers = request.headers
-    request_properties = headers['X-Finly-RP']
-    # if request_properties.nil?
-    #   add_message :error, 'Error in request'
-    #   return
-    # end
-    if request_properties.present?
-      request_properties = Base64.decode64(request_properties)
-      request_properties = JSON.parse(request_properties) if request_properties.is_a?(String)
-    else
-      # todo fallback to user-agent instead of not creating the properties
-      request_properties = {}
-    end
-    request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
-    PLATFORMS.each do |platform|
-      if params[:scope].include?(platform.authentication_scope.to_s) and platform.accept_request?
-        args[:platform] = platform.name
-        args[platform.create_attributes_key] = reformat_platform_properties platform.platform_map, request_properties[platform.platform_key.to_s]
-        break
-      end
-    end
+    args[:user_device_id] = result.device.id
   end
 
   def set_event(args)
@@ -159,21 +138,6 @@ class UserSessions::Create < BaseOperation
     args[:events_attributes][0][:action] = params[:action]
     args[:events_attributes][0][:view] = current_view
     args[:events_attributes][0][:status_id] = UserSessionStatus.id_for(self.status)
-  end
-
-  private
-
-  def reformat_platform_properties(platform_map, headers)
-    headers={} if headers.nil?
-    reformatted_map = {}
-    platform_map.each do |attribute, id|
-      reformatted_map[attribute] = headers[id]
-    end
-    # Convert timestamp to datetime
-    if reformatted_map[:timestamp]
-      reformatted_map[:timestamp] = DateTime.strptime(reformatted_map[:timestamp], '%s')
-    end
-    reformatted_map
   end
 
 end
