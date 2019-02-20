@@ -91,17 +91,17 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       # params[:aasm_event] = 'approve'
       # params[:violation_present] = false
       op = WorkflowManager::Base.(user, parameters)
-
+      if op.success?
+        # generate comments for this particular action
+        payment_request.comments.create user_id: initiating_user.id,
+                                        action_id: BankPaymentRequestCommentAction.id_for(:approve)
+      end
       # unless op.success?
       #   add_message :error, op.messages[:error]
       #   return
       # end
 
       # self.workflow_output = op.workflow_output
-
-      # generate comments for this particular action
-      payment_request.comments.create user_id: initiating_user.id,
-                                       action_id: BankPaymentRequestCommentAction.id_for(:approve)
     end
   end
 end
