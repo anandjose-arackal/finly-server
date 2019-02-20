@@ -40,13 +40,8 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       if payment_request.pending? && payment_request.get_reviewers.include?(initiating_user)
         self.processing_payment_requests.push(payment_requests)
       end
-      # valid = true
-      # unless payment_request.pending?
-      #   valid = false
-      # end
-      # unless payment_request.get_reviewers.include? initiating_user
-      #   valid = false
-      # end
+
+      # todo - Change status of other payment requests from pending to processing
     end
 
     if self.initiating_user.blank?
