@@ -208,6 +208,10 @@ class MoneyRequests::Base < BaseOperation
             if self.money_request.payment_mode_card?
               actions[:approve_and_credit] = true
             end
+          elsif self.money_request.approved?
+            if self.money_request.payment_mode_card?
+              actions[:approve_and_credit] = true
+            end
           end
         elsif manager_view?
           if self.money_request.processing? && self.money_request.get_reviewers.include?(user)
