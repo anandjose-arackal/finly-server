@@ -46,7 +46,12 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
     # else
     #   [self.money_request.tracks.last.action_user, self.money_request.controlling_user]
     # end
-    self.money_request.document_role_users(:finance_manager).present? ? ( self.money_request.affected_users(:approve) + self.money_request.document_role_users(:finance_manager) ) : self.money_request.affected_users(:approve)
+    if self.money_request.document_role_users(:finance_manager).present? && (money_request.approved? || money_request.auto_approved?)
+     aff_users = self.money_request.affected_users(:approve) + self.money_request.document_role_users(:finance_manager)
+    else 
+      aff_users = self.money_request.affected_users(:approve)
+    end
+    return aff_users
   end
 
   def notification_affected_users
@@ -107,24 +112,25 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
   def mailer_subject(user)
     approver_id = self.money_request.trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
-      "Money Request approved : #{self.money_request.name}"
+      message = "Money Request approved : #{self.money_request.name}"
     else
       if approved 
         if (user.id == self.money_request.user.id)
           if auto_approve
             return "Congratulations! Your Money Request #{money_request.name} has been auto-approved"
           else
-            "Congratulations! Your Money Request #{money_request.name} has been approved"
+            message = "Congratulations! Your Money Request #{money_request.name} has been approved"
           end
         elsif self.money_request.document_role_users(:finance_manager).include?(user)
-          "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+          message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
         else
-          "#{approving_user.name} has approved the Money Request: #{self.money_request.name}"
+          message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name}"
         end
-      elsif self.money_request.document_role_users(:finance_manager).include?(user)
-        "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+      else
+        message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
       end 
     end
+    message
   end
 
   def mailer_body(user)
@@ -140,12 +146,12 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
             message = "Congratulations! Your Money Request #{money_request.name} has been approved"
           end
         elsif self.money_request.document_role_users(:finance_manager).include?(user)
-        "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+          message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
         else
           message = "#{approving_user.name} has approved the Money Request '#{self.money_request.name}' and is currently waiting for your approval"
         end
-      elsif self.money_request.document_role_users(:finance_manager).include?(user)
-        "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
+      else
+        message = "#{approving_user.name} has approved the Money Request: #{self.money_request.name} and is currently waiting for your approval"
       end
     end
     message
@@ -159,7 +165,14 @@ class Event::EMoneyRequests::Approve < Event::EMoneyRequests::Base
     # elsif user.id == self.money_request.tracks.last.action_user_id
     #   return self.money_request.tracks.last.action_user_role_id
     # end
-    money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+    # money_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+    if user.id == money_request.user_id
+      return UserRole.id_for(:employee)
+    elsif user.id == self.money_request.document_role_users(:finance_manager)&.last&.id
+      return UserRole.id_for(:finance_manager)
+    else money_request.get_reviewers.include?(user)
+      return UserRole.id_for(:manager)
+    end
   end
 
 end

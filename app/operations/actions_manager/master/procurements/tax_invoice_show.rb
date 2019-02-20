@@ -48,7 +48,8 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def remind
-    true
+    invoice.processing? &&
+    document_owner?
   end
 
   def retract
@@ -56,7 +57,8 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def remind_approver
-    true
+    invoice.processing? &&
+    document_owner?
   end
 
   def void
@@ -64,10 +66,10 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def save_btn
-    # ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
-    # (invoice.processing? && user_in_level?) ||
-    # (user.vendor_payment_admin?)
-    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
+    # (user.vendor_payment_admin?) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
+    # (invoice.processing? && user_in_level?)
+    # 
+    user.vendor_payments_admin? || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def save_and_submit

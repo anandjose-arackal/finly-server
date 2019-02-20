@@ -86,7 +86,6 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
 
       op = WorkflowManager::Base.(initiating_user, parameters)
 
-
       # unless op.success?
       #   add_message :error, op.messages[:error]
       #   return
