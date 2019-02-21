@@ -110,15 +110,21 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     end
 
     def retrieve_actions
-      actions = {}
-      if admin_view? && user.vendor_payments_admin?
+      # actions = {}
+      # if admin_view? && user.vendor_payments_admin?
+      #   actions = retrieve_admin_actions
+      # elsif (manager_view?) && bank_payment_request.processing?
+      #   actions = retrieve_reviewer_actions
+      # elsif finance_view?
+      #   actions = retrieve_creditor_actions
+      # elsif initiator_view?
+      #   actions = retrieve_initiator_actions
+      # end
+
+      if user.vendor_payments_admin?
         actions = retrieve_admin_actions
-      elsif (manager_view?) && bank_payment_request.processing?
-        actions = retrieve_reviewer_actions
-      elsif finance_view?
+      elsif user.vendor_payments_creditor?
         actions = retrieve_creditor_actions
-      elsif initiator_view?
-        actions = retrieve_initiator_actions
       end
       actions
     end
