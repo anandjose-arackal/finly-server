@@ -58,9 +58,9 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
               has_success = true
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
                              marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
-              mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
-                                         controlling_for_user_id: nil, controlling_for_user_role_id: nil,
-                                         report_status_id: report_status, reimbursement_id: mapping.payment&.id)
+              # mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
+              #                            controlling_for_user_id: nil, controlling_for_user_role_id: nil,
+              #                            report_status_id: report_status, reimbursement_id: mapping.payment&.id)
 
 
               # todo workflow-v2
