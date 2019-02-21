@@ -37,7 +37,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Creditor logic start ####################
     if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && !bank_payment_request.credited?
+      if bank_payment_request.document_role_users(:creditor).include?(user)
         return true
       end
     end
