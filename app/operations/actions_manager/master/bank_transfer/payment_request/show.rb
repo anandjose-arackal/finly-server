@@ -456,7 +456,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def retry_payment
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if bank_payment_request.credited? && (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
+      if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
         return true
       end
     end
@@ -464,7 +464,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Creditor logic start ####################
     if user.vendor_payments_creditor?
-      if bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
+      if bank_payment_request.payment_order.initiating_user_id == user.id
         if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
           return true
         end
@@ -475,11 +475,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ############# Initiator logic start ####################
-    if user.vendor_payments_initiator?
-      if bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
-        return true if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
-      end
-    end
+    # if user.vendor_payments_initiator?
+    #   if bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
+    #     return true if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
+    #   end
+    # end
     ############# Initiator logic end ####################
   end
 
