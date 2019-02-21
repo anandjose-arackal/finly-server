@@ -94,7 +94,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                   #                    payment: mapping.payment
 
                   # Update the trail with payment info
-                  op.workflow_output.trail&.update(
+                  op.workflow_output[:trail]&.update(
                     payment_id: mapping.payment&.id,
 
                   )
@@ -103,10 +103,11 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                   #                    action_user_role_id: self.report_processor_group.created_by_user_role_id,
                   #                    action_id: trail_action_id,
                   #                    payment: mapping.payment
+                  generate_comment(report, mapping, report_comment_action, marked_as_closed)
+
                 end
                 
 
-                generate_comment(report, mapping, report_comment_action, marked_as_closed)
               end
             elsif mapping.payment.failed?
               has_failure = true
