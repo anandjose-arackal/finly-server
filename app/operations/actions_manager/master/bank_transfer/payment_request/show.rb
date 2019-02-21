@@ -25,6 +25,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def mark_as_credited
+    return true if (user.vendor_payments_creditor? || user.vendor_payments_admin?) 
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       return true if (bank_payment_request.approved? || bank_payment_request.auto_approved?)
@@ -96,6 +97,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def credit
+    return true if (user.vendor_payments_creditor? || user.vendor_payments_admin?)
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
       if ( (bank_payment_request.approved? || bank_payment_request.auto_approved?)  )
