@@ -126,7 +126,18 @@ class MoneyRequests::Update < MoneyRequests::Base
 
   protected
   def generate_comments(model)
+  unless  user.id == money_request.user_id
     self.changes = model.changes
+      model.items.each do |item|
+        if item.amount.changed?
+          if self.changes['items_attributes'].present?
+            self.changes['items_attributes'] << {category_id: item.category_id, value: item.amount.changes['value']}
+          else
+            self.changes['items_attributes'] = [{category_id: item.category_id, value: item.amount.changes['value']}]
+          end
+        end
+      end
+  end
   end
 
   def save_comments
@@ -134,18 +145,25 @@ class MoneyRequests::Update < MoneyRequests::Base
     changes.each do |key, value|
       next unless value.present? and key.present?
       case key
-      when :name
-        self.money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:update),
+      when 'name', :name
+        self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:update),
           updated_field: 'name', updated_from: money_request.name_was,
           updated_to: money_request.name
-      when :policy_id
-        self.money_request.comments.create user: user, money_request_comment_action_id: MoneyRequestCommentAction.id_for(:update),
-          updated_field: 'policy', updated_from: money_request.policy_id_was,
-          updated_to: money_request.policy_id
-      when :items_attributes
-        # value.each do |updating_mapping|
-        #   # todo test it out and add comments
-        # end
+      when 'policy_id', :policy_id
+        old_policy_name = Policy.find_by(id: value.first)&.name
+        new_policy_name = Policy.find_by(id: value.second)&.name
+        self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:update),
+          updated_field: 'policy', updated_from: old_policy_name,
+          updated_to: new_policy_name
+      when 'items_attributes', :items_attributes
+        value.each do |item_change|
+          old_value = item_change[:value].first.to_f
+          new_value = item_change[:value].second.to_f
+          category_name = MoneyRequestItemCategory.find_by(id: item_change[:category_id])&.name
+          self.money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:update),
+                                             updated_field: category_name, updated_from: old_value,
+                                             updated_to: new_value
+        end
       else
       end
     end

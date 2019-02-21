@@ -14,7 +14,7 @@ class Reports::Expenses::UpdateComment < BaseOperation
       add_message :error, 'Expense not found'
       return
     end
-    if params[:updated_attributes].blank? or not params[:updated_attributes].kind_of?(Hash)
+    if params[:updated_attributes].blank? or not params[:updated_attributes].kind_of?(ActionController::Parameters)
       add_message :error, 'Nothing to update'
     end
   end
@@ -34,7 +34,7 @@ class Reports::Expenses::UpdateComment < BaseOperation
       add_message :error, 'Expense not found'
       return
     end
-    if updated_attributes.blank? or not updated_attributes.kind_of?(Hash)
+    if updated_attributes.blank? or not updated_attributes.kind_of?(ActionController::Parameters)
       add_message :error, 'Nothing to update'
       return
     end
