@@ -440,7 +440,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     def retrieve_creditor_actions
       actions = {}
       # if bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
-      if bank_payment_request.document_role_users(:creditor).include? user && bank_payment_request.approved? # todo check logic
+      if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved? # todo check logic
         # actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:summary_editable] = true
         actions[:payments_editable] = true
