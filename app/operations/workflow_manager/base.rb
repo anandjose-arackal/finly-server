@@ -1,6 +1,6 @@
 class WorkflowManager::Base < BaseOperation
   attr_accessor :document, :aasm_document, :violations_present,
-                :aasm_event, :document_types, :note, :role_id, :provider_name
+                :aasm_event, :document_types, :note, :role_id, :provider_name, :trail
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
@@ -65,7 +65,7 @@ class WorkflowManager::Base < BaseOperation
     # If user delegation is allowed
     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     # Create Trail
-    trail = document.trails.new action_user: user,
+    self.trail = document.trails.new action_user: user,
                            action_id: TrailAction.id_for(aasm_event),
                            action_user_role_id: role_id,
                            action_level_id: aasm_document.current_level&.id,
@@ -73,10 +73,10 @@ class WorkflowManager::Base < BaseOperation
                            delegated_action_user_id: delegated_action_user_id
 
     if self.note.present?
-      trail.note = self.note
+      self.trail.note = self.note
     end
 
-    trail.save
+    self.trail.save
     # Return Data to referrer
   end
 
@@ -86,7 +86,8 @@ class WorkflowManager::Base < BaseOperation
         action_id: TrailAction.id_for(aasm_event),
         action_level_id: aasm_document.current_level&.id,
         modified_level_id: aasm_document.next_level&.id,
-        role_id: self.role_id
+        role_id: self.role_id,
+        trail: self.trail
     }
 
    WorkflowManager::Base::BasePresenter.new(user, params, messages)

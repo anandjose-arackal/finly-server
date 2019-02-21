@@ -59,29 +59,52 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
                              marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
               # mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
-              #                            controlling_for_user_id: nil, controlling_for_user_role_id: nil,
-              #                            report_status_id: report_status, reimbursement_id: mapping.payment&.id_for)
+                                         controlling_for_user_id: nil, controlling_for_user_role_id: nil,
+                                         report_status_id: report_status, reimbursement_id: mapping.payment&.id)
 
 
               # todo workflow-v2
               # Updating report status to closed
               # For now not being done through workflow manager as reimbursable_id cannot be updated through it
               # Also version two should handle with multiple items in workflow manager
-              mapping.reports.update_all(controlling_level_id: nil, report_status_id: report_status,
-                                         reimbursement_id: mapping.payment&.id_for)
+              # mapping.reports.update_all(controlling_level_id: nil, report_status_id: report_status,
+              #                            reimbursement_id: mapping.payment&.id_for)
 
+              if marked_as_closed
+                event = 'close'
+              else
+                event = 'settle'
+              end
 
               mapping.reports.each do |report|
-                report.tracks.create action_user_id: self.report_processor_group.created_by_user_id,
-                                     action_user_role_id: self.report_processor_group.created_by_user_role_id,
-                                     report_tracking_action_id: report_tracking_status,
-                                     report_status_id: report_status,
-                                     payment: mapping.payment
 
-                report.trails.create action_user_id: self.report_processor_group.created_by_user_id,
-                                     action_user_role_id: self.report_processor_group.created_by_user_role_id,
-                                     action_id: trail_action_id,
-                                     payment: mapping.payment
+                parameters = {
+                  document: report,
+                  aasm_event: event
+                }
+
+                created_by_user = User.find_by id: self.report_processor_group.created_by_user_id
+                op = WorkflowManager::Base.(created_by_user, parameters)
+
+                if op.success?
+                  # report.tracks.create action_user_id: self.report_processor_group.created_by_user_id,
+                  #                    action_user_role_id: self.report_processor_group.created_by_user_role_id,
+                  #                    report_tracking_action_id: report_tracking_status,
+                  #                    report_status_id: report_status,
+                  #                    payment: mapping.payment
+
+                  # Update the trail with payment info
+                  op.workflow_output.trail&.update(
+                    payment_id: mapping.payment&.id,
+
+                  )
+
+                  # report.trails.create action_user_id: self.report_processor_group.created_by_user_id,
+                  #                    action_user_role_id: self.report_processor_group.created_by_user_role_id,
+                  #                    action_id: trail_action_id,
+                  #                    payment: mapping.payment
+                end
+                
 
                 generate_comment(report, mapping, report_comment_action, marked_as_closed)
               end
