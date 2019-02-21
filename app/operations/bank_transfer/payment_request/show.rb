@@ -349,7 +349,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
     def retrieve_reviewer_actions
       actions = {}
-      if bank_payment_request.get_reviewers.include? user
+      if bank_payment_request.get_reviewers.include?(user)
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:summary_editable] = true
