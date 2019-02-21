@@ -12,14 +12,6 @@ GIT
       tilt (~> 2.0)
 
 GIT
-  remote: git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git
-  revision: 278af4329cbd4f7687177831725e51756ddbc101
-  specs:
-    finly-secure_storage-sdk (0.1.31)
-      aws-sdk-ec2 (>= 1.24.0)
-      rails (>= 4.2)
-
-GIT
   remote: https://github.com/ruckus/quickbooks-ruby.git
   revision: 22c8df58bbed441207f3d0d8ac5a786cdb4821a5
   ref: 22c8df58bbed441207f3d0d8ac5a786cdb4821a5
@@ -99,9 +91,6 @@ GEM
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
-    aws-sdk-ec2 (1.67.0)
-      aws-sdk-core (~> 3, >= 3.39.0)
-      aws-sigv4 (~> 1.0)
     aws-sdk-kms (1.13.0)
       aws-sdk-core (~> 3, >= 3.39.0)
       aws-sigv4 (~> 1.0)
@@ -563,7 +552,6 @@ DEPENDENCIES
   faraday (~> 0.15.4)
   faraday_middleware (~> 0.12.2)
   figaro (~> 1.1.1)
-  finly-secure_storage-sdk!
   font-awesome-rails (~> 4.7.0.4)
   foreman (~> 0.85.0)
   gcm (~> 0.1.1)

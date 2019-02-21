@@ -13,8 +13,7 @@ class RateContracts::Create < RateContracts::Base
   # end
 
   def process
-    binding.pry
-    rate_contract = RateContract.new(create_params)
+    rate_contract = RateContract.new(strong_params)
     unless  rate_contract.save!
       add_message :error, rate_contract.errors.full_messages
       return
@@ -41,11 +40,5 @@ class RateContracts::Create < RateContracts::Base
       self.rate_contract = rate_contract
     end
   end
-
-  protected
-  # Params whitelisting
-  def create_params
-    params.require(:rate_contract).permit(:name, :vendor_id, :renewal_alert, :creator_id, rate_contract_line_items_attributes: [:location_id, :item_id, :start_date, :end_date, :amount])
-  end 
   
 end

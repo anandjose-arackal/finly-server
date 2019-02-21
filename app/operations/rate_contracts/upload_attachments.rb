@@ -1,13 +1,5 @@
 class RateContracts::UploadAttachments < RateContracts::Base
 
-  attr_accessor :artifact_params, :artifact
-
-  def init
-    id = params[:id] || params[:rate_contract_id]
-    self.rate_contract = RateContract.find_by_id(id)
-    self.artifact_params = artifact_params
-  end
-
   def validate
     if rate_contract.blank?
       add_message :error, 'Rate contract not found!'
@@ -16,6 +8,7 @@ class RateContracts::UploadAttachments < RateContracts::Base
   end
 
   def process
+    params[:company_id] = company.id
     self.artifact = rate_contract.artifacts.build(artifact_params)
   end
 
@@ -28,9 +21,9 @@ class RateContracts::UploadAttachments < RateContracts::Base
     end
   end
 
+  protected
   def artifact_params
-    params.require(:artifact).permit(:attachment_file_name, :attachment_file_size, :attachment_content_type, :attachment_updated_at, :description, :company_id)
+    params.permit(:attachment, :description)
   end
-
 
 end

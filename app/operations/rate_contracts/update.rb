@@ -23,18 +23,11 @@ class RateContracts::Update < RateContracts::Base
   def process
     # Update RateContract
     if self.rate_contract.present?
-      add_message :error, rate_contract.errors.full_messages unless rate_contract.update_attributes(update_params)
+      add_message :error, rate_contract.errors.full_messages unless rate_contract.update_attributes(strong_params)
     end
   end
 
   def post_process
     add_message :success, 'Rate Contracts successfully updated'
   end
-
-  protected
-  
-  def update_params
-    params.require(:rate_contract).permit(:id, :name, :vendor_id, :renewal_alert, :creator_id, rate_contract_line_items_attributes: [:id, :location_id, :item_id, :start_date, :end_date, :amount])
-  end
-
 end

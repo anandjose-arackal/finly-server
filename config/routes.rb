@@ -3412,14 +3412,16 @@ Rails.application.routes.draw do
   ######## Reviewal Workflow End ##########
 
   ######### Rate Contract API start #############
-    resources :rate_contracts do
-      put 'upload_attachments', to: 'rate_contracts#upload_attachments'
-      put 'destroy_attachments', to: 'rate_contracts#destroy_attachments'
-    end
+  resources :rate_contracts do
+    put 'upload_attachments', to: 'rate_contracts#upload_attachments'
+    put 'destroy_attachments', to: 'rate_contracts#destroy_attachments'
+  end
   ######### Rate Contract API end ################
 
   ########### Rate Contract Line Item API start #############
-    post 'invoice_line_items/parse_import_excel', to: 'invoice_line_items#parse_import_excel'   
+  resources :rate_contract_line_items do
+    put 'import', to: 'rate_contract_line_items#import'
+  end
   ########### Rate Contract Line Item API end ###############
 
   # The priority is based upon order of creation: first created -> highest priority.

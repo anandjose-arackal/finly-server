@@ -7,6 +7,7 @@ class RateContract < ApplicationRecord
   has_many :rate_contract_line_items
 
   accepts_nested_attributes_for :rate_contract_line_items
+  # accepts_nested_attributes_for :artifacts
 
 
   # Renewal alert options in weeks

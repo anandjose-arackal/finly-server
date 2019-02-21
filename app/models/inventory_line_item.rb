@@ -39,6 +39,9 @@ class InventoryLineItem < ApplicationRecord
   validates :rate, presence: true
   validates :description, presence: true
 
+
+  accepts_nested_attributes_for :artifacts
+
   scope :with_category_id, -> (id){
     where category_id: id
   }

@@ -16,7 +16,7 @@ class RateContractLineItemsController < ApplicationController
   end
 
   def import
-    # @result = RateContracts::RateContractLineItems::Import.(current_user, params)
-    # respond
+    @result = RateContracts::RateContractLineItems::Import.(current_user, params)
+    respond
   end
 end

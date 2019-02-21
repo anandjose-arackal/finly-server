@@ -1,8 +1,9 @@
 class Artifact < ApplicationRecord
   include Attachable
 
-  belongs_to :resource, polymorphic: true
-  belongs_to :company
+  belongs_to :resource, optional: true, polymorphic: true
+  belongs_to :company, optional: true
+  belongs_to :creator,  optional: true, class_name: 'User'
 
   CONTENT_TYPES = {content_type: []}
   has_attached_file :attachment, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
