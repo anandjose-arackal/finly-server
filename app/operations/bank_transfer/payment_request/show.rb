@@ -125,6 +125,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         actions = retrieve_admin_actions
       elsif user.vendor_payments_creditor?
         actions = retrieve_creditor_actions
+      else
+        actions = {}
       end
       actions
     end
