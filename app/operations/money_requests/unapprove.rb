@@ -1,6 +1,14 @@
 class MoneyRequests::Unapprove < MoneyRequests::Base
   attr_accessor :prev_status
 
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:money_request, :unapprove], :pre_process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:manager, :finance_manager, :admin]
   end

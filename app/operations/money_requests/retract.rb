@@ -1,5 +1,13 @@
 class MoneyRequests::Retract < MoneyRequests::Base
 
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:money_request, :retract], :pre_process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     :employee
   end
