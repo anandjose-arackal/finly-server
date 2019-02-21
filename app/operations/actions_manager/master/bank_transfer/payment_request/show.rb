@@ -112,7 +112,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor?
+    if user.vendor_payments_creditor? && !bank_payment_request.open?
       if bank_payment_request.document_role_users(:creditor).include?(user)
         return !bank_payment_request.credit_card?
       elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
@@ -173,7 +173,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor?
+    if user.vendor_payments_creditor? && !bank_payment_request.open?
 
       #Policy User Role is not generalized
       policy_user_role = user.policy_user_roles.where(user_role_id: UserRole.id_for(:creditor), policy_id: bank_payment_request.policy_id).last rescue nil
@@ -184,7 +184,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
         if min_amount.present?
           allow_credit = (bank_payment_request.requested_amount_value >= min_amount)
         end
-        if max_amount.present?
+        if max_amount.present? && allow_credit
           allow_credit = (max_amount > 0) && (bank_payment_request.requested_amount_value <= max_amount)
         end
       end
