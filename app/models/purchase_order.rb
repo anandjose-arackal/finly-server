@@ -244,6 +244,12 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
+  # Public Method
+
+  def process_line_item_calculation
+    calculate_line_items
+  end
+
   private
 
   def calculate_line_items
