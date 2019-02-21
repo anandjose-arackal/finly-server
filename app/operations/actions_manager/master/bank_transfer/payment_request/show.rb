@@ -464,7 +464,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Creditor logic start ####################
     if user.vendor_payments_creditor?
-      if bank_payment_request.payment_order.initiating_user_id == user.id
+      if bank_payment_request.document_role_users(:creditor).include?(user)
         if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
           return true
         end
