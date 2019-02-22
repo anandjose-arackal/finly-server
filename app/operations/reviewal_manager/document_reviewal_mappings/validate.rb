@@ -22,12 +22,12 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
     dlrms.each do |dlrm|
       level = dlrm.level
 
-      valid_reviewers = []
+      valid_reviewer_ids = []
 
       if level.lurms.with_user_id(user.id).present?
         valid_reviewer_ids += level.lurms.with_user_id(user.id).with_threshold(amount).pluck(:reviewer_id)
       else
-        valid_reviewer_ids = level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id)
+        valid_reviewer_ids += level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id)
       end
 
       unless valid_reviewer_ids.include? dlrm.reviewer_id
