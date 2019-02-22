@@ -48,6 +48,8 @@
 #  template_name                :string(255)
 #  resource_template_id         :integer
 #  deleted_at                   :datetime
+#  submitted_at                 :datetime
+#  approved_at                  :datetime
 #
 
 require 'test_helper'
