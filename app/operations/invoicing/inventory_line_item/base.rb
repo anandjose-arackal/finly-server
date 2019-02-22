@@ -15,16 +15,16 @@ class Invoicing::InventoryLineItem::Base < BaseOperation
     end
   end
 
-  def inventory_line_item_params
-    params.require(:inventory_line_item).permit(:rate, :tax_rate_id, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note, :item_code, :account, :supply_item_type_id, artifacts_attributes: [:id, :attachment, :description, :inventory_line_item_id, :_destroy])
+  def inventory_item_params
+    params.require(:inventory_item).permit(:rate, :tax_rate_id, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note, :item_code, :account, :supply_item_type_id, artifacts_attributes: [:id, :attachment, :description, :inventory_line_item_id, :_destroy])
   end
 
   class Invoicing::InventoryLineItem::Base::ItemPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :inventory_line_item
+    attr_accessor :inventory_item
 
     def init
-      self.inventory_line_item = params[:inventory_line_item]
+      self.inventory_item = params[:inventory_line_item]
     end
 
   end
