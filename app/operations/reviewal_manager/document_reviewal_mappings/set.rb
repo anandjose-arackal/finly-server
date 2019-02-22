@@ -113,10 +113,10 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
             # document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
 
             # If reviewer overrides are present for level
+            lurms = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount)
             all_lurms = level.level_user_reviewer_mappings.with_user_id(user.id)
-            # all_lurms = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount)
             if all_lurms.present?
-              valid_lurms = all_lurms.with_threshold(amount)
+              valid_lurms = all_lurms.with_reviewer.with_threshold(amount)
               valid_lurms.each do |lurm|
                 document.document_level_reviewer_mappings.create(
                     {

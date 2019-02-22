@@ -25,28 +25,16 @@ class LevelUserReviewerMapping < ActiveRecord::Base
   validates :policy_id, presence: true
   validates :user_id, presence: true
 
-  scope :with_reviewer_id, -> (reviewer_id) {
-    where reviewer_id: reviewer_id
-  }
+  scope :with_reviewer, -> { where.not reveiwer_id: nil }
+  scope :with_reviewer_id, -> (reviewer_id) { where reviewer_id: reviewer_id }
+  scope :with_level_id, -> (ids) { where level_id: ids }
+  scope :with_user_id, -> (ids) { where user_id: ids }
+  scope :with_policy_id, -> (ids) { where(policy_id: ids) }
+  scope :with_reviewer_id, -> (ids){ where reviewer_id: ids }
 
   # Finds all the MAX amounts which are less than the amount passed
   # Find thes the mappings with max threshold which are lteq amount
   scope :with_threshold, -> (amount) {
     where('threshold = ?', where('threshold <= ?', amount).maximum("threshold"))
-  }
-  scope :with_level_id, -> (ids) {
-    where level_id: ids
-  }
-
-  scope :with_user_id, -> (ids) {
-    where user_id: ids
-  }
-
-  scope :with_policy_id, -> (ids) {
-    where(policy_id: ids)
-  }
-
-  scope :with_reviewer_id, -> (ids){
-    where reviewer_id: ids
   }
 end
