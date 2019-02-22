@@ -18,6 +18,7 @@
 #  contact_name          :string(255)
 #  contact_mobile_number :string(255)
 #  is_deleted            :boolean          default(FALSE), not null
+#  deleted_at            :datetime
 #
 
 class BranchLocation < ApplicationRecord
@@ -28,6 +29,12 @@ class BranchLocation < ApplicationRecord
   has_many :company_departments, through: :company_location_departments
 
   has_many :budget_trails, as: :location
+
+  has_many :user_branch_location_mappings
+  has_many :users, through: :user_branch_location_mappings
+
+  has_many :budget_rule_branch_location_mappings
+  has_many :budget_rules, through: :budget_rule_branch_location_mappings
 
   def address
     address = ""

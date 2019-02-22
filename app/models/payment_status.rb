@@ -10,7 +10,7 @@
 
 class PaymentStatus < ApplicationRecord
 
-  VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5, cancelled: 6, processing: 7, pending_approval: 8, possible_failure: 9, pending_credit: 10}
+  VALUES = {completed: 1, failed: 2, pending: 3, in_progress: 4, scheduled: 5, cancelled: 6, processing: 7, pending_approval: 8, possible_failure: 9, pending_credit: 10, pending_retry: 11}
 
   scope :with_name, ->(name) { where name: name }
 
@@ -57,6 +57,10 @@ class PaymentStatus < ApplicationRecord
 
   def pending_approval?
     self.id == PaymentStatus.id_for(:pending_approval)
+  end
+
+  def pending_retry?
+    self.id == PaymentStatus.id_for(:pending_retry)
   end
 
 end

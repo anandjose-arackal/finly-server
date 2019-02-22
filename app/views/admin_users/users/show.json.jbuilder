@@ -81,6 +81,7 @@ json.subscriptions do
   json.disburse @result.user_panel_subscription.disburse
   json.yes_bank_account_transfer @result.user_panel_subscription.yes_bank_account_transfer
   json.invoicing_system @result.user_panel_subscription.invoicing_system
+  json.travel_request @result.user_panel_subscription.travel_request
 end
 
 json.individual_kyc @result.individual_kyc_data
@@ -90,6 +91,7 @@ json.roles do
   json.finance_manager @result.selected_user.finance_manager?
   json.manager @result.selected_user.manager?
   json.auditor @result.selected_user.auditor?
+  json.travel_manager @result.selected_user.travel_manager?
 end
 
 json.roles_em do
@@ -97,6 +99,7 @@ json.roles_em do
   json.finance_manager @result.selected_user.finance_manager?
   json.manager @result.selected_user.manager?
   json.auditor @result.selected_user.auditor?
+  json.travel_manager @result.selected_user.travel_manager?
 end
 
 json.roles_vp do

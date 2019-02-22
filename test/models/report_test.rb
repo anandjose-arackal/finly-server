@@ -36,6 +36,8 @@
 #  sub_department_id                  :integer
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
+#  deleted_at                         :datetime
+#  controlling_level_id               :integer
 #
 
 # requires a report with the following states in the db:
@@ -64,7 +66,7 @@ class ReportTest < ActiveSupport::TestCase
     assert @report.name
 
     # creating a new report with no name
-    create_op = Report::Create.new(@employee)
+    create_op = Reports::Create.new(@employee)
     assert_difference 'Report.count', 1 do
       @result = create_op.run
     end

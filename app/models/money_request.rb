@@ -31,6 +31,8 @@
 #  destination_pocket_id              :integer
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
+#  deleted_at                         :datetime
+#  controlling_level_id               :integer
 #
 
 class MoneyRequest < ApplicationRecord
@@ -38,7 +40,8 @@ class MoneyRequest < ApplicationRecord
           MathUtil,
           SoftDeletable,
           FieldCustomizer::CustomizableValidation,
-          FindByOrderedIds
+          FindByOrderedIds,
+          Transitionable
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :status, optional: true, class_name: 'MoneyRequestStatus'
@@ -63,6 +66,8 @@ class MoneyRequest < ApplicationRecord
   has_many :tracks, class_name: 'MoneyRequestTrack', foreign_key: :money_request_id, dependent: :destroy
   has_many :comments, class_name: 'MoneyRequestComment', foreign_key: :money_request_id, dependent: :destroy
   has_many :items, class_name: 'MoneyRequestItem', foreign_key: :money_request_id, dependent: :destroy
+  has_many :trails, as: :parent
+
 
   belongs_to :travel_request, optional: true
 
@@ -101,6 +106,7 @@ class MoneyRequest < ApplicationRecord
   scope :without_associated_processor, -> { where money_request_processor_mapping_id: nil }
   scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
   scope :skip_pending, -> { where.not status_id: MoneyRequestStatus.id_for(:pending)}
+  scope :skip_tripped, -> { where.not status_id: MoneyRequest.status_ids(:trip_open, :trip_processing, :trip_retracted, :trip_rejected, :trip_approved)}
   scope :without_user, -> (user_id) { where.not user_id: user_id }
   scope :status_pending, -> { where status_id: MoneyRequestStatus.id_for(:pending)}
 
@@ -119,7 +125,7 @@ class MoneyRequest < ApplicationRecord
   scope :filter_status, ->(status_id, user_id) do
     case status_id
     when 99, '99'
-      where(controlling_user_id: user_id).where.not(status_id: MoneyRequestStatus.ids_for(:retracted, :open, :rejected))
+      awaiting_action_items(user_id)
     else
       where status_id: status_id
     end
@@ -264,6 +270,10 @@ class MoneyRequest < ApplicationRecord
     status_id == MoneyRequestStatus.id_for(:credited)
   end
 
+  def auto_approved?
+    status_id == MoneyRequestStatus.id_for(:auto_approved)
+  end
+
   def editable?
     self.status_id == MoneyRequestStatus.id_for(:open) ||
         self.status_id == MoneyRequestStatus.id_for(:rejected) ||
@@ -277,7 +287,7 @@ class MoneyRequest < ApplicationRecord
   end
 
   def can_retract?
-    processing? or (approved? and auto_approve)
+    processing? or (approved? and auto_approved?)
   end
 
   def can_destroy?
@@ -322,8 +332,9 @@ class MoneyRequest < ApplicationRecord
   end
 
   def controlling_user?(user)
-    return false if self.controlling_user.blank?
-    self.controlling_user.id == user.id
+    self.get_reviewers.first&.id == user&.id
+    # return false if self.controlling_user.blank?
+    # self.controlling_user.id == user.id
   end
 
   def payment_pending?
@@ -361,6 +372,33 @@ class MoneyRequest < ApplicationRecord
   end
 
   private
+
+  # doesn't make it private
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push MoneyRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.document_owner_attribute
+    'user_id'
+  end
+
+  def self.document_status_attribute
+    'status_id'
+  end
+
+  def self.document_status_class_name
+    'MoneyRequestStatus'
+  end
+
+  def self.finance_associated_status_ids
+    MoneyRequestStatus.ids_for(:approved, :credited, :pending, :auto_approved)
+  end
+
   def handle_name
     if self.name.blank?
       self.name = MoneyRequest.get_default_name(self.user)

@@ -8,7 +8,7 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
 
   def init
     super
-    self.approving_user = self.purchase_order.trails.natural_order.last.action_user
+    self.approving_user = self.purchase_order.trails.last.action_user
     self.approved = (purchase_order.approved? || purchase_order.closed? || purchase_order.auto_approved?) if purchase_order.present?
     self.auto_approve = params[:auto_approve]
 
@@ -52,28 +52,30 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
   end
 
   def affected_users
-    if approved
-      if auto_approve
-        return [self.purchase_order.user]
-      end
-      [self.purchase_order.trails.last.action_user, self.purchase_order.user]
-    else
-      users = [self.purchase_order.trails.last.action_user]
-      if controlling_users.present?
-        controlling_users.each do |user|
-          users.push(user)
-        end
-      end
-      users
-    end
+    # if approved
+    #   if auto_approve
+    #     return [self.purchase_order.user]
+    #   end
+    #   [self.purchase_order.trails.last.action_user, self.purchase_order.user]
+    # else
+    #   users = [self.purchase_order.trails.last.action_user]
+    #   if controlling_users.present?
+    #     controlling_users.each do |user|
+    #       users.push(user)
+    #     end
+    #   end
+    #   users
+    # end
+    purchase_order.document_role_users(:creditor).present? ? ( self.purchase_order.affected_users(:approve) + purchase_order.document_role_users(:creditor) ) :  self.purchase_order.affected_users(:approve)
   end
 
   def notification_affected_users
-    if approved
-      [purchase_order.user]
-    else
-      self.controlling_users
-    end
+    # if approved
+    #   [purchase_order.user]
+    # else
+    #   self.controlling_users
+    # end
+    self.purchase_order.notification_affected_users(:approve)
   end
 
   def set_notification(user)
@@ -88,13 +90,13 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
     end
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:purchase_order),
                                              action_type_id: notify_type,
-                                             action_user_id: (purchase_order.trails.last.action_user.id rescue nil),
+                                             action_user_id: (purchase_order.trails.last.action_user_id rescue nil),
                                              object_id: purchase_order.id,
                                              object_type: "Purchase Order",
                                              path_object_id: purchase_order.id,
                                              path_object_type: "Purchase Order",
                                              read: false,
-                                             timestamp: DateUtils.local_date_time,
+                                             timestamp: DateUtils,
                                              application: RequestStore.store[:current_app])
     notification.save
   end
@@ -103,12 +105,18 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
     if self.approving_user.present? and user.id == self.approving_user.id
       "Purchase Order approved : #{self.purchase_order.po_number}"
     else
-      if approved and user.id == self.purchase_order.user.id
-        if auto_approve
-          return "Congratulations! Your purchase order #{purchase_order.po_number} has been auto-approved"
-        else
-          return "Congratulations! Your purchase order #{purchase_order.po_number} has been approved"
+      if approved 
+        if user.id == self.purchase_order.user.id
+          if auto_approve
+            return "Congratulations! Your purchase order #{purchase_order.po_number} has been auto-approved"
+          else
+            return "Congratulations! Your purchase order #{purchase_order.po_number} has been approved"
+          end
+        elsif self.purchase_order.document_role_users(:creditor).include?(user)
+         "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"   
         end
+      elsif self.purchase_order.document_role_users(:creditor).include?(user)
+         "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"
       else
         "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number}"
       end
@@ -119,12 +127,18 @@ class Event::EPurchaseOrder::Approve < Event::EPurchaseOrder::Base
     if self.approving_user.present? and user.id == self.approving_user.id
       message = "You have successfully approved the purchase order : #{self.purchase_order.po_number}"
     else
-      if approved and user.id == purchase_order.user.id
-        if auto_approve
-          message = "Congratulations! Your purchase order #{purchase_order.po_number} has been auto-approved"
-        else
-          message = "Congratulations! Your purchase order #{purchase_order.po_number} has been approved"
+      if approved 
+        if user.id == purchase_order.user.id
+          if auto_approve
+            message = "Congratulations! Your purchase order #{purchase_order.po_number} has been auto-approved"
+          else
+            message = "Congratulations! Your purchase order #{purchase_order.po_number} has been approved"
+          end
+        elsif self.purchase_order.document_role_users(:creditor).include?(user)
+         "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"
         end
+      elsif self.purchase_order.document_role_users(:creditor).include?(user)
+         "#{approving_user.name} has approved the purchase order: #{self.purchase_order.po_number} and is waiting for your approval"
       else
         message = "#{approving_user.name} has approved the purchase order '#{self.purchase_order.po_number}' and is currently waiting for your approval"
       end

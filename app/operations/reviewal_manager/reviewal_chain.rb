@@ -1,26 +1,26 @@
 class ReviewalManager::ReviewalChain < ReviewalManager::Base
-  attr_accessor :document, :document_types, :document_class_name, :chain, :policy, :levels
+  attr_accessor :document, :provider_names,
+                :chain, :policy,
+                :levels, :provider_name
 
   # In params
   # policy_id needs to be present
   def init
     self.document = params[:reviewal_document]
+    self.provider_name = params[:provider_name] || self.document&.get_default_provider
     self.chain = []
-    self.document_types = ['PurchaseOrder', 'Invoice']
+    self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider )
     policy_id = params[:policy_id]
 
-    self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
-    self.policy = user.company.policies.with_application(:vp).with_id(policy_id).first rescue nil
+    # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
+    self.policy = user.company.policies.with_id(policy_id).first rescue nil
   end
 
   def validate
-    self.document_class_name = document.class.name
-
-    unless document_types.include? document_class_name
+    unless provider_names.include? provider_name
       add_message :error, 'Invalid Document Provided'
       return
     end
-
   end
 
   def process
@@ -28,24 +28,29 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       return
     end
 
-    self.levels = self.policy.levels.with_entity_type(document_class_name).order(:level_number)
+    # Find over ridden users for a policy level
+    self.levels = self.policy.levels.non_deleted.with_entity_type(provider_name).reorder(:level_number)
 
     levels.each do |level|
-      mappings = level.level_reviewer_mappings.non_deleted
-
-      selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
+      if level.level_user_reviewer_mappings.with_user_id(user.id).present?
+        mappings = level.level_user_reviewer_mappings.with_user_id(user.id)
+      else
+        mappings = level.level_reviewer_mappings.non_deleted
+      end
+      selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
+      selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
       level_data = {
           level_number: level.level_number,
           level_id: level.id,
+          level_name: level.name,
           reviewers: mappings
       }
       if selected_reviewer.present?
-
         level_data[:selected_reviewer] = selected_reviewer.reviewer
+        level_data[:selected_reviewer_threshold] = selected_reviewer.threshold
       end
 
-
-      chain.push(level_data)
+      self.chain.push(level_data)
     end
   end
 

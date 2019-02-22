@@ -94,7 +94,9 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     self.payment_params.each do |params|
       custom_fields = params[:custom_fields]
       params.delete(:custom_fields)
-      payment = self.bank_payment_request.payment_order.payments.build(params)
+      params[:payment_order_id] = self.bank_payment_request.payment_order.id
+      payment = ::Payment.new(params)
+      # payment = self.bank_payment_request.payment_order.payments.build(params)
       if payment.save
         # perform the required calculations
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
@@ -107,6 +109,10 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     # now once the payment request has been created and the payments saved, we can mark it as open
     self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
     self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, {reviewal_document: self.bank_payment_request.reload})
     # puts 'SUCCESSFUL!'
   end
 

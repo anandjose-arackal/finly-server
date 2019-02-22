@@ -44,6 +44,7 @@
 #  procurement_id                 :integer
 #  department_id                  :integer
 #  location_id                    :integer
+#  deleted_at                     :datetime
 #
 
 class Payment < ApplicationRecord
@@ -400,6 +401,10 @@ class Payment < ApplicationRecord
                   payment_order: [bank_payment_request: [:status]])
   }
 
+  scope :include_minimal_for_index, -> {
+        includes( :payment_status, :amount, :receiving_user, receiving_account: [:account_owner])
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   validates :external_reference_id, uniqueness: {allow_nil: true, scope: :company_id}
@@ -410,7 +415,8 @@ class Payment < ApplicationRecord
   validate :initiating_account_presence
   validate :receiving_account_presence
 
-  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, :pending_approval?, to: :payment_status
+  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, :pending_approval?, :pending_retry?, to: :payment_status
+  delegate :collect_funds_withdrawal?, to: :payment_purpose
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)

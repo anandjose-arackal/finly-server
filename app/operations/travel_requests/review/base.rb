@@ -1,5 +1,5 @@
 class TravelRequests::Review::Base < TravelRequests::Base
-  attr_accessor :travel_request
+  attr_accessor :travel_request, :workflow_output
 
   def pre_validate
     if user.blank? || params.blank?

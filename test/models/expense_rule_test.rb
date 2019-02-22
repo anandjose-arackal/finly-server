@@ -12,8 +12,8 @@
 #  expense_rule_type_id   :integer
 #  policy_id              :integer
 #  is_deleted             :boolean          default(FALSE)
+#  deleted_at             :datetime
 #
-
 
 require 'test_helper'
 

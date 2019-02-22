@@ -1,4 +1,4 @@
-class Procurements::AssociatedUsers < Report::Base
+class Procurements::AssociatedUsers < BaseOperation
   attr_accessor :associated_users, :tracks, :user_before
 
   def pre_validate

@@ -16,17 +16,21 @@ class Event::EBankPaymentRequest::EComment::Create < Event::EBankPaymentRequest:
   end
 
   def affected_users
-    users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.controlling_user)
-    users.reject { |r| r == self.user}
+    # users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.controlling_user)
+    # users.reject { |r| r == self.user}
+    self.bank_payment_request.affected_users(:comment)
   end
 
   def notification_affected_users
-    users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.controlling_user)
-    users.reject { |r| r == self.user}
+    # users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.controlling_user)
+    # users.reject { |r| r == self.user}
+    self.bank_payment_request.notification_affected_users(:comment)
   end
 
   def set_notification(user)
-    self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
+    # self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
+    #ToDO - Check for other roles
+    role_id = (user.id == bank_payment_request.owner_id) ? UserRole.id_for(:initiator) : UserRole.id_for(:manager)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:bank_payment_request),
                                              action_type_id: NotificationActionType.id_for(:notify_comment),
                                              action_user_id: bank_payment_request.owner_id,
@@ -36,7 +40,7 @@ class Event::EBankPaymentRequest::EComment::Create < Event::EBankPaymentRequest:
                                              path_object_type: "PaymentOrder",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: roles.first,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app])
     notification.save
   end
@@ -60,7 +64,8 @@ class Event::EBankPaymentRequest::EComment::Create < Event::EBankPaymentRequest:
   end
 
   def bank_payment_request_view_role(user)
-    self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
-    return roles.first
+    # self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
+    # return roles.first
+    bank_payment_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 end

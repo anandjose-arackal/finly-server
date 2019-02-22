@@ -11,27 +11,35 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def affected_users
-    users = Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
-    users.reject { |r| r == self.user}
+    # users = Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    # users.reject { |r| r == self.user}
+    self.report.affected_users(:retract)
   end
 
   def notification_affected_users
-    users = Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
-    users.reject { |r| r == self.user}
+    # users = Reports::AssociatedUsers.(self.user, report: self.report, user_before: self.report.tracks.last.modified_user)
+    # users.reject { |r| r == self.user}
+    self.report.notification_affected_users(:retract)
   end
 
   def send_push_notification(user)
-    last_track = self.report.tracks.last
-    return unless user.id == last_track&.modified_user&.id
-    message = "#{self.report.user.name} retracted the report: #{self.report.name}"
-    view = UserRole.name_for(last_track.modified_user_role_id)
+    # last_track = self.report.tracks.last
+    last_trail = self.report.trails.last
+    # return unless user.id == last_trail&.modified_user&.id # todo get modified user
+    # return unless user.id == last_trail.action_user.id
+    # On retract, eveyone who has viewed the document should get notified
+    return unless self.report.affected_users(:retract).include?(user.id)
+    message = "#{last_trail.action_user.name} retracted the report: #{self.report.name}"
+    # view = UserRole.name_for(last_track.modified_user_role_id)
+    #TODO- For Other Roles
+    view = "manager"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id, view: view
   end
 
   def set_notification(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:report),
-                                             action_type_id: NotificationActionType.id_for(:notify_retract),
+                                               action_type_id: NotificationActionType.id_for(:notify_retract),
                                              action_user_id: report.user_id,
                                              object_id: report.id,
                                              object_type: "Report",
@@ -39,7 +47,7 @@ class Event::EReport::Retract < Event::EReport::Base
                                              path_object_type: "Report",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: roles.first,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app])
     notification.save
   end
@@ -61,8 +69,9 @@ class Event::EReport::Retract < Event::EReport::Base
   end
 
   def report_view_role(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
-    return roles.first
+    # self.roles = Reports::ActionUserRole.(user, {report: report, user_id: user.id})
+    # return roles.first
+    (report.affected_users(:retract).include? user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

@@ -18,9 +18,7 @@ class Procurements::PurchaseOrders::Base < BaseOperation
             :inventory_line_item_id
         ],
         attachments: [],
-        document_reviewer_mappings: [
-            :level_id, :reviewer_id
-        ]
+        # document_reviewer_mappings: [:level_id, :reviewer_id]
         # tax_amount_attributes: [:value, :currency_id]
     )
   end

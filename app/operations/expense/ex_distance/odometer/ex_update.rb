@@ -122,7 +122,7 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
 
   def post_process
     # add comment in report if expense is added within report
-    Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+    Reports::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     # if the expense has an associated amount, update the amount
     if expense.report.present?
