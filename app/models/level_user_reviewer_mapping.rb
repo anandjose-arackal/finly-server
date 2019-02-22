@@ -20,7 +20,8 @@ class LevelUserReviewerMapping < ActiveRecord::Base
   belongs_to :policy
 
   validates :level_id, presence: true
-  validates :reviewer_id, presence: true
+  # Validation for reviewer id is removed, & nil is now allowed
+  # validates :reviewer_id, presence: true
   validates :policy_id, presence: true
   validates :user_id, presence: true
 
