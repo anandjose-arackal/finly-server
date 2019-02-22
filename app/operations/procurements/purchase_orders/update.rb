@@ -49,12 +49,23 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     puts "PURCHASEORDER UPDATE FROM Process", params.inspect
     # binding.pry
+    # binding.pry
     # self.purchase_order = procurement.build_purchse_order(purchase_order_params)
+    # advance_amount_attributes: [:value, :currency_id]
+    purchase_order_params[:advance_amount_attributes] = {value: 300, currency_id: 1}
+    purchase_order_params[:due_date] = "2019-02-22"
+    purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+    puts "PURCHASEORDER AFTER ADVANCE UPDATE FROM Process", params.inspect
+    puts "purchase_order_params", purchase_order_params.inspect
+    puts "purchase_order before", purchase_order.inspect
     purchase_order.assign_attributes(purchase_order_params)
+    puts "purchase_order after", purchase_order.inspect
+    # binding.pry
     if purchase_order.valid?
 
       purchase_order.save
-      # purchase_order.save
+      # binding.pry
+      purchase_order.save
 
       if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
         # For setting level specific reviewers from reviewal chain for a document
@@ -90,22 +101,25 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         end
       end
 
-      params[:purchase_order_id] = self.purchase_order.id
-      params[:receiving_user_type] = self.vendor.class&.name
-      params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id # MODIFY TO ADD ANY BANK ACCOUNT
-      params[:receiving_account_id] = self.vendor.id
+      # AS OF NOW MULTIPLE ADVANCE PAYMENT CREATION CANCELLED
+      # TO BE TAKEN UP LATER
+
+      # params[:purchase_order_id] = self.purchase_order.id
+      # params[:receiving_user_type] = self.vendor.class&.name
+      # params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id # MODIFY TO ADD ANY BANK ACCOUNT
+      # params[:receiving_account_id] = self.vendor.id
 
       # params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { id: 292688, value: 200} }, { amount_attributes: { id: 292689, value: 300} } ]
-      params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { value: 200} }, { amount_attributes: { value: 300} } ]
+      # params[:advance_payments_attributes] = [ { scheduled_at: "2019-02-06", amount_attributes: { value: 200} }, { amount_attributes: { value: 300} } ]
 
-      unless params[:advance_payments_attributes].blank?
-        op = Procurements::Payments::AddAdvance.(user, params)
-        if op.success?
-          add_message :success, 'Successfully added advance payment to this purchase order'
-        else
-          add_message :error, op.messages[:error]
-        end
-      end
+      # unless params[:advance_payments_attributes].blank?
+      #   op = Procurements::Payments::AddAdvance.(user, params)
+      #   if op.success?
+      #     add_message :success, 'Successfully added advance payment to this purchase order'
+      #   else
+      #     add_message :error, op.messages[:error]
+      #   end
+      # end
 
     else
       add_message :error, purchase_order.errors.full_messages

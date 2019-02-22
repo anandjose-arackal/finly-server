@@ -61,6 +61,7 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :payment_term, optional: true
   belongs_to :procurement_term, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
+  belongs_to :advance_amount_status, optional: true
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center, optional: true
@@ -76,6 +77,8 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :total_after_tax, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount", autosave: true
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
+  # IF PO HAS ANY ADVANCE AMOUNT, WE ADD IT HERE
+  belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
@@ -96,9 +99,9 @@ class PurchaseOrder < ApplicationRecord
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, allow_destroy: true
-  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
+  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount
   accepts_nested_attributes_for :custom_fields
-  accepts_nested_attributes_for :advance_payments
+  # accepts_nested_attributes_for :advance_payments
 
 
   validates :purchase_order_status_id, presence: true
@@ -304,11 +307,13 @@ class PurchaseOrder < ApplicationRecord
       end
     end
 
+
     if self.total_before_tax.present?
       self.total_before_tax.value = total_before_tax_amount
     else
       self.total_before_tax = Amount.new(value: total_before_tax_amount, currency_id: 1)
     end
+
 
     if self.total_after_tax.present?
       self.total_after_tax.value = total_after_tax_amount
@@ -337,6 +342,12 @@ class PurchaseOrder < ApplicationRecord
     else
       self.build_balance_amount(value: total_amount, currency_id: 1)
     end
+
+    if self.advance_amount.present? # && self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+      self.balance_amount.value = total_amount - self.advance_amount.value
+    end
+
+    # binding.pry
 
     # self.save
   end

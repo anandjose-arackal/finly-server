@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_16_175251) do
+ActiveRecord::Schema.define(version: 2019_02_21_120331) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -130,6 +130,12 @@ ActiveRecord::Schema.define(version: 2019_02_16_175251) do
     t.string "encrypted_master_password"
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "agreement_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -2646,17 +2652,6 @@ ActiveRecord::Schema.define(version: 2019_02_16_175251) do
     t.index ["name"], name: "index_gst_types_on_name"
   end
 
-  create_table "index_tree_index_nodes", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.string "root_element_type", null: false
-    t.bigint "root_element_id", null: false
-    t.string "node_element_type", null: false
-    t.bigint "node_element_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["node_element_type", "node_element_id"], name: "node"
-    t.index ["root_element_type", "root_element_id"], name: "root"
-  end
-
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -4152,8 +4147,6 @@ ActiveRecord::Schema.define(version: 2019_02_16_175251) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
-    t.datetime "submitted_at"
-    t.datetime "approved_at"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"
@@ -4214,6 +4207,13 @@ ActiveRecord::Schema.define(version: 2019_02_16_175251) do
     t.string "template_name"
     t.integer "resource_template_id"
     t.datetime "deleted_at"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
+    t.integer "advance_amount_id"
+    t.date "due_date"
+    t.integer "advance_amount_status_id"
+    t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
+    t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
     t.index ["company_id"], name: "index_purchase_orders_on_company_id"
     t.index ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id"
@@ -5762,8 +5762,6 @@ ActiveRecord::Schema.define(version: 2019_02_16_175251) do
     t.string "vendor_id"
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
-    t.boolean "active", default: true
-    t.index ["active"], name: "index_yes_bank_vendors_on_active"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"
