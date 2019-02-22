@@ -250,6 +250,30 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
+  def advance_to_be_processed?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:to_be_processed)
+  end
+
+  def advance_pending?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:pending)
+  end
+
+  def advance_initiated?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:initiated)
+  end
+
+  def advance_failed?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:failed)
+  end
+
+  def advance_paid?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:paid)
+  end
+
+  def advance_can_be_paid?
+    advance_to_be_processed? || advance_failed?
+  end
+
   private
 
   def calculate_line_items

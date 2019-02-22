@@ -31,26 +31,26 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
 
   def validate
 
-    reject_po = []
-    self.purchase_orders.each do |purchase_order|
-      valid = true
-      if purchase_order.advance_payments.present?
-        valid = false
-        if purchase_order.advance_amount_status_id == AdvanceAmountStatus.id_for(:failed)
-          valid = true
-        end
-      end
+    # reject_po = []
+    # self.purchase_orders.each do |purchase_order|
+    #   valid = true
+    #   if purchase_order.advance_payments.present?
+    #     valid = false
+    #     if purchase_order.advance_amount_status_id == AdvanceAmountStatus.id_for(:failed)
+    #       valid = true
+    #     end
+    #   end
 
-      unless valid
-        reject_po << purchase_order
-      end
-    end
+    #   unless valid
+    #     reject_po << purchase_order
+    #   end
+    # end
 
-    self.purchase_orders = self.purchase_orders.reject do |all_po|
-        reject_po.any? do |po|
-            all_po.id == po.id
-        end
-    end
+    # self.purchase_orders = self.purchase_orders.reject do |all_po|
+    #     reject_po.any? do |po|
+    #         all_po.id == po.id
+    #     end
+    # end
 
     if self.purchase_orders.blank?
       add_message :error, "Purchase order with advance amount still to be processed or failed, were not found."

@@ -98,6 +98,13 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         next
       end
 
+      unless purchase_order.advance_can_be_paid?
+        row_details << "Purchase Order id #{purchase_order.id} is already linked to a payment ticket."
+        self.contents << row_details
+        errors_found = true
+        next
+      end
+
       # checking to make sure the PO is approved
       unless purchase_order.approved? || purchase_order.auto_approved?
         row_details << "Purchase Order is not approved"
@@ -176,7 +183,9 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     self.bank_payment_request_params = parse_payment_order_data
     payment_params = parse_payment_params
     self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
+
     if self.bank_payment_request
+      self.purchase_order.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:pending))
       # now pass this particular bank payment request and the payments data to the
       # background operation where it will continue creating payments till the data is exhausted
       op = BankTransfer::PaymentRequest::NewAddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})

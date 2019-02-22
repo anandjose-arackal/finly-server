@@ -5,7 +5,7 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
   sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute, :payment_params
+                :company_id, :execute, :payment_params, :purchase_orders
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -72,6 +72,7 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
           parent_id: payment[:parent_id]
       }
     end
+    self.purchase_orders = PurchaseOrder.where(id: self.payment_params.pluck(:purchase_order_id))
   end
 
   def validate
@@ -86,6 +87,8 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
       payment = ::Payment.new(params)
       # payment = self.bank_payment_request.payment_order.payments.build(params)
       if payment.save
+        purchase_order = self.purchase_orders.find(params[:purchase_order_id])
+        purchase_order.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:initiated))
         # perform the required calculations
         # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
         payment.save
@@ -97,6 +100,7 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
     # now once the payment request has been created and the payments saved, we can mark it as open
     self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
     self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+
     # puts 'SUCCESSFUL!'
   end
 
