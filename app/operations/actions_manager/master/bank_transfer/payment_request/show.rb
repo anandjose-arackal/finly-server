@@ -257,6 +257,8 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       return true if bank_payment_request.action_users(:return_control).include?(user)
+      return true if (bank_payment_request.approved? || bank_payment_request.auto_approved?)
+      return true if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) 
     end
     ############# Admin logic end ####################
   end
@@ -530,12 +532,21 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def policy_editable
-    ############# Creditor logic start ####################
-    if user.vendor_payments_creditor?
-      if !bank_payment_request.open? && !bank_payment_request.credited?
+    ############# Admin logic start ######################
+    if vendor_payments_admin?
+      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
     end
+    ############# Admin logic end ######################
+
+
+    ############# Creditor logic start ####################
+    # if user.vendor_payments_creditor?
+    #   if !bank_payment_request.open? && !bank_payment_request.credited?
+    #     return true
+    #   end
+    # end
     ############# Creditor logic end ######################
     
     ############# Initiator logic start ######################
@@ -640,6 +651,15 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def reviewal_flow
+    ############# Admin logic start ######################
+    if user.vendor_payments_admin?
+      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        return true
+      end
+    end
+    ############# Admin logic start ######################
+
+
     # Only Initiator is allowed to edit it
     ############# Initiator logic start ######################
     if user.vendor_payments_initiator?
