@@ -8,7 +8,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy_id, :policy, :payments, :contents,
                 :description, :bank_payment_request, :total_advance_amount,
                 :payment_request_params, :receiving_account, :bank_payment_request_params,
-                :requested_amount
+                :requested_amount, :all_purchase_orders
 
   class Procurements::Payments::CreatePoAdvanceTicket::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -142,6 +142,9 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       add_message :error, self.contents #"Your advance payment has a few errors, please check the same and retry"
       return
     end
+
+    po_ids = params[:po_advance_attributes].pluck(:purchase_order_id)
+    self.all_purchase_orders = user.company.purchase_orders.where(id: po_ids)
   end
 
   # def process
@@ -185,7 +188,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
 
     if self.bank_payment_request
-      self.purchase_order.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:pending))
+      self.all_purchase_orders.update_all(advance_amount_status_id: AdvanceAmountStatus.id_for(:pending))
       # now pass this particular bank payment request and the payments data to the
       # background operation where it will continue creating payments till the data is exhausted
       op = BankTransfer::PaymentRequest::NewAddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})
