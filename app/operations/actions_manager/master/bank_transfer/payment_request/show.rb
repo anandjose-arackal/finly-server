@@ -639,6 +639,14 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def description_field
+    ############# Admin logic start ######################
+    if user.vendor_payments_admin?
+      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        return true
+      end
+    end
+    ############# Admin logic start ######################
+    
     ############# Initiator logic start ######################
     if user.vendor_payments_initiator?
       if bank_payment_request.owner_id == user.id
