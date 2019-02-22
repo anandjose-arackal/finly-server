@@ -25,6 +25,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def validate
+    if purchase_order.approved? || purchase_order.auto_approved?
+      add_message :error, "Cant update Purchase Orders which are already approved"
+    end
+
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
     end

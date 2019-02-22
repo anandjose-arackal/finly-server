@@ -5,7 +5,7 @@
 
 class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders::Base
 
-  attr_accessor :purchase_order
+  attr_accessor :purchase_orders
 
   class Procurements::PurchaseOrders::PoWithAdvance::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -19,7 +19,7 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
   end
 
   def init
-    self.purchase_order = user.company.purchase_orders.where( purchase_order_status_id: [
+    self.purchase_orders = user.company.purchase_orders.where( purchase_order_status_id: [
                                                                                           PurchaseOrderStatus.id_for(:approved),
                                                                                           PurchaseOrderStatus.id_for(:auto_approved)
                                                                                         ], 
@@ -30,13 +30,35 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
   end
 
   def validate
-    if self.purchase_order.blank?
+
+    reject_po = []
+    self.purchase_orders.each do |purchase_order|
+      valid = true
+      if purchase_order.advance_payments.present?
+        valid = false
+        if purchase_order.advance_amount_status_id == AdvanceAmountStatus.id_for(:failed)
+          valid = true
+        end
+      end
+
+      unless valid
+        reject_po << purchase_order
+      end
+    end
+
+    self.purchase_orders = self.purchase_orders.reject do |all_po|
+        reject_po.any? do |po|
+            all_po.id == po.id
+        end
+    end
+
+    if self.purchase_orders.blank?
       add_message :error, "Purchase order with advance amount still to be processed or failed, were not found."
     end
   end
 
   def process
-    params[:purchase_order] = self.purchase_order
+    params[:purchase_order] = self.purchase_orders
   end
 
   def success    

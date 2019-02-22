@@ -94,6 +94,8 @@ class PurchaseOrder < ApplicationRecord
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :advance_payments, class_name: "Payment"
 
+  has_many :payments, as: :parent
+
   has_many :trails, as: :parent
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
