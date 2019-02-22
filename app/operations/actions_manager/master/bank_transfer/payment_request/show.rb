@@ -533,7 +533,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def policy_editable
     ############# Admin logic start ######################
-    if vendor_payments_admin?
+    if user.vendor_payments_admin?
       if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
