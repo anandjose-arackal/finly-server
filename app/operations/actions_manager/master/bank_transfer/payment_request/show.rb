@@ -3,17 +3,6 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   register_handle :payment_ticket_show
   register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment, :credit_in_credit_options, :policy_editable ]
 
-
-  # def initialize(user=nil, params={})
-  #   super
-  #   result = BankTransfer::PaymentRequest::Show.(user, params)
-  #   unless result.success?
-  #     add_message :error, result.messages[:error]
-  #     return
-  #   end
-  #   self.bank_payment_request = result.bank_payment_request
-  # end
-
   def initialize(user=nil, params={})
     super
     result = BankTransfer::PaymentRequest::Show.(user, params)
@@ -27,7 +16,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def mark_as_credited
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      return true if (bank_payment_request.approved? || bank_payment_request.auto_approved?)
+      return true
       # if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
       #   return true
       # elsif bank_payment_request.approved?
@@ -48,7 +37,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Creditor logic start ####################
     if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && (bank_payment_request.approved? || bank_payment_request.auto_approved?)
+      if bank_payment_request.document_role_users(:creditor).include?(user)
         return true
       end
     end
@@ -97,13 +86,19 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def credit
     ############# Admin logic start #######################
+    # if user.vendor_payments_admin?
+    #   if ( (bank_payment_request.approved? || bank_payment_request.auto_approved?)  )
+    #     return true
+    #   # elsif bank_payment_request.approved?
+    #   #     return true
+    #   elsif bank_payment_request.credited?
+    #     return bank_payment_request.payment_order.partially_completed?
+    #   end
+    # end
+
     if user.vendor_payments_admin?
-      if ( (bank_payment_request.approved? || bank_payment_request.auto_approved?)  )
+      if !bank_payment_request.credited?
         return true
-      # elsif bank_payment_request.approved?
-      #     return true
-      elsif bank_payment_request.credited?
-        return bank_payment_request.payment_order.partially_completed?
       end
     end
     ############# Admin logic end #########################
@@ -117,8 +112,8 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && (bank_payment_request.approved? || bank_payment_request.auto_approved?)
+    if user.vendor_payments_creditor? && !bank_payment_request.open?
+      if bank_payment_request.document_role_users(:creditor).include?(user)
         return !bank_payment_request.credit_card?
       elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
         return bank_payment_request.payment_order.partially_completed?
@@ -155,62 +150,77 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def credit_options
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
-      if bank_payment_request.approved?
-        !bank_payment_request.credit_card?
-      elsif bank_payment_request.credited?
-        return bank_payment_request.payment_order.partially_completed?
+      if !bank_payment_request.credited?
+        return true
       end
     end
     ############# Admin logic end #######################
 
     ############# Reviewer logic start #########################
-    if bank_payment_request.processing?
-      if (bank_payment_request.get_reviewers.include?(user))
-        balance = retrieve_balance(:vendor_payment_wallet, user)
-        if (balance >= bank_payment_request.requested_amount_value) && !bank_payment_request.require_approval
-          return true
-        else
-          if user.vendor_payments_admin?
-            balance = retrieve_balance(:company_credits, user)
-            return true if (balance >= bank_payment_request.requested_amount_value)
-          end
-        end
-      end
-    end
+    # if bank_payment_request.processing?
+    #   if (bank_payment_request.get_reviewers.include?(user))
+    #     balance = retrieve_balance(:vendor_payment_wallet, user)
+    #     if (balance >= bank_payment_request.requested_amount_value) && !bank_payment_request.require_approval
+    #       return true
+    #     else
+    #       if user.vendor_payments_admin?
+    #         balance = retrieve_balance(:company_credits, user)
+    #         return true if (balance >= bank_payment_request.requested_amount_value)
+    #       end
+    #     end
+    #   end
+    # end
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.approved?
-        balance = retrieve_balance(:vendor_payment_wallet, user)
-        if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval)
-          return !bank_payment_request.credit_card?
-        else
-          if user.vendor_payments_admin?
-            balance = retrieve_balance(:company_credits, user)
-            if balance >= bank_payment_request.requested_amount_value
-              return !bank_payment_request.credit_card?
+    if user.vendor_payments_creditor? && !bank_payment_request.open?
+
+      #Policy User Role is not generalized
+      policy_user_role = user.policy_user_roles.where(user_role_id: UserRole.id_for(:creditor), policy_id: bank_payment_request.policy_id).last rescue nil
+      allow_credit = true
+     if !policy_user_role.blank?
+        min_amount = policy_user_role.min_amount
+        max_amount = policy_user_role.max_amount
+        if min_amount.present?
+          allow_credit = (bank_payment_request.requested_amount_value >= min_amount)
+        end
+        if max_amount.present? && allow_credit
+          allow_credit = (max_amount > 0) && (bank_payment_request.requested_amount_value <= max_amount)
+        end
+      end
+      if allow_credit
+        if bank_payment_request.document_role_users(:creditor).include?(user)
+          # check if amount lies within threshold limit of creditor
+          balance = retrieve_balance(:vendor_payment_wallet, user)
+          if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval)
+            return !bank_payment_request.credit_card?
+          else
+            if user.vendor_payments_admin?
+              balance = retrieve_balance(:company_credits, user)
+              if balance >= bank_payment_request.requested_amount_value
+                return !bank_payment_request.credit_card?
+              end
             end
           end
+        elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
+          return bank_payment_request.payment_order.partially_completed?
         end
-      elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
-        return bank_payment_request.payment_order.partially_completed?
       end
     end
     ############# Creditor logic end ###########################
 
     ############# Initiator logic start ####################
-    if user.vendor_payments_initiator?
-      if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
-        return (credit && !bank_payment_request.credit_card?)
-      elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
-        return !bank_payment_request.credit_card?    
-      elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
-        if bank_payment_request.payment_order.partially_completed?
-          return true
-        end
-      end
-    end
+    # if user.vendor_payments_initiator?
+    #   if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
+    #     return (credit && !bank_payment_request.credit_card?)
+    #   elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
+    #     return !bank_payment_request.credit_card?    
+    #   elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
+    #     if bank_payment_request.payment_order.partially_completed?
+    #       return true
+    #     end
+    #   end
+    # end
     ############# Initiator logic end ####################
   end
 
@@ -446,7 +456,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def retry_payment
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if bank_payment_request.credited? && (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
+      if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
         return true
       end
     end
@@ -454,7 +464,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Creditor logic start ####################
     if user.vendor_payments_creditor?
-      if bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
+      if bank_payment_request.document_role_users(:creditor).include?(user)
         if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
           return true
         end
@@ -465,11 +475,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ############# Initiator logic start ####################
-    if user.vendor_payments_initiator?
-      if bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
-        return true if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
-      end
-    end
+    # if user.vendor_payments_initiator?
+    #   if bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id
+    #     return true if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
+    #   end
+    # end
     ############# Initiator logic end ####################
   end
 

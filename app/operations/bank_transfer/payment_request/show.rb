@@ -110,15 +110,23 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     end
 
     def retrieve_actions
-      actions = {}
-      if admin_view? && user.vendor_payments_admin?
+      # actions = {}
+      # if admin_view? && user.vendor_payments_admin?
+      #   actions = retrieve_admin_actions
+      # elsif (manager_view?) && bank_payment_request.processing?
+      #   actions = retrieve_reviewer_actions
+      # elsif finance_view?
+      #   actions = retrieve_creditor_actions
+      # elsif initiator_view?
+      #   actions = retrieve_initiator_actions
+      # end
+
+      if user.vendor_payments_admin?
         actions = retrieve_admin_actions
-      elsif (manager_view?) && bank_payment_request.processing?
-        actions = retrieve_reviewer_actions
-      elsif finance_view?
+      elsif user.vendor_payments_creditor?
         actions = retrieve_creditor_actions
-      elsif initiator_view?
-        actions = retrieve_initiator_actions
+      else
+        actions = {}
       end
       actions
     end
@@ -341,7 +349,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
     def retrieve_reviewer_actions
       actions = {}
-      if bank_payment_request.get_reviewers.include? user
+      if bank_payment_request.get_reviewers.include?(user)
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:summary_editable] = true
@@ -432,7 +440,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     def retrieve_creditor_actions
       actions = {}
       # if bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
-      if bank_payment_request.document_role_users(:creditor).include? user && bank_payment_request.approved? # todo check logic
+      if bank_payment_request.document_role_users(:creditor).include?(user) && (bank_payment_request.approved? || bank_payment_request.auto_approved?) # todo check logic
         # actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:summary_editable] = true
         actions[:payments_editable] = true

@@ -41,6 +41,10 @@ class LevelUserReviewerMapping < ActiveRecord::Base
     where user_id: ids
   }
 
+  scope :with_policy_id, -> (ids) {
+    where(policy_id: ids)
+  }
+
   scope :with_reviewer_id, -> (ids){
     where reviewer_id: ids
   }
