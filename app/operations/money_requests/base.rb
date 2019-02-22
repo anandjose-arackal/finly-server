@@ -208,6 +208,10 @@ class MoneyRequests::Base < BaseOperation
             if self.money_request.payment_mode_card?
               actions[:approve_and_credit] = true
             end
+          elsif self.money_request.approved?
+            if self.money_request.payment_mode_card?
+              actions[:approve_and_credit] = true
+            end
           end
         elsif manager_view?
           if self.money_request.processing? && self.money_request.get_reviewers.include?(user)
@@ -222,6 +226,10 @@ class MoneyRequests::Base < BaseOperation
           provider_name = money_request.travel_request.present? ? 'TravelRequestProvider' : 'MoneyRequestProvider'
           if self.money_request.can_unapprove? && money_request.get_reviewers(:prev, provider_name).include?(user)
             actions[:unapprove] = true
+          end
+        elsif finance_view?
+          if self.money_request.approved? and self.money_request.document_role_users(:finance_manager).include?(user)
+            actions[:approve_and_credit] = true
           end
         end
       else

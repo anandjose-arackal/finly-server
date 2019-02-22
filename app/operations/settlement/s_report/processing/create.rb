@@ -54,6 +54,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
                                                                                   scheduled_at: params[:scheduled_at],
                                                                                   payment_type: params[:payment_type],
                                                                                   payment_mode: params[:payment_mode],
+                                                                                  payment_file_generated_at: DateTime.now # todo - temporary because it is throwing an error
                                                                               })
     if params[:scheduled_at].present? and Date.parse(params[:scheduled_at]) > Date.today
       self.report_processor_group.status_id = ReportProcessorGroupStatus.id_for(:scheduled)

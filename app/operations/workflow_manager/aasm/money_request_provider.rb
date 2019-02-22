@@ -109,18 +109,20 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
     super
 
     if [:credit].include?(aasm.current_event)
-      dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(policy.id)
-                .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
+      if current_level.present?
+        dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(policy.id)
+                  .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
 
-      if dlrm.present?
-        dlrm.update(
-                action_id: TrailAction.id_for(aasm.current_event),
-                action_taken_by_id: user.id
-        )
+        if dlrm.present?
+          dlrm.update(
+                  action_id: TrailAction.id_for(aasm.current_event),
+                  action_taken_by_id: user.id
+          )
 
-        dlrms = document.document_level_reviewer_mappings.where('level_number > ?', dlrm.level_number)
+          dlrms = document.document_level_reviewer_mappings.where('level_number > ?', dlrm.level_number)
 
-        dlrms.update_all(active: false)
+          dlrms.update_all(active: false)         
+        end
       end
     end
   end

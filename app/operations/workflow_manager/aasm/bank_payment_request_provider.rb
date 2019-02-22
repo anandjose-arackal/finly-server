@@ -20,8 +20,8 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     end
 
     event :approve do
-      transitions :from => :processing, :to => :approved, guard: [:reviewers_not_present?, :user_can_review?]
-      transitions :from => :processing, :to => :processing, guard: :user_can_review?
+      transitions :from => [:processing, :pending], :to => :approved, guard: [:reviewers_not_present?, :user_can_review?]
+      transitions :from => [:processing, :pending], :to => :processing, guard: :user_can_review?
     end
 
     event :unapprove do

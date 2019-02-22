@@ -59,6 +59,10 @@ class WorkflowManager::Aasm::ReportProvider < WorkflowManager::Aasm::BaseProvide
       transitions :from => [:settled], :to => [:settlement_confirmed]
     end
 
+    event :close do
+      transitions :from => [:approved, :auto_approved], to: :closed
+    end
+
     event :mark_as_settled do ## Confirm action
       transitions from: :approved, to: :settled
     end
