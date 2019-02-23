@@ -186,7 +186,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && (!bank_payment_request.credited? || bank_payment_request.partially_completed?)
+    if user.vendor_payments_creditor? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?)
 
       #Policy User Role is not generalized
       policy_user_role = user.policy_user_roles.where(user_role_id: UserRole.id_for(:creditor), policy_id: bank_payment_request.policy_id).last rescue nil
