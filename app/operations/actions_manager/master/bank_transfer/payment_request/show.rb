@@ -118,7 +118,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor? && !bank_payment_request.open?
+    if user.vendor_payments_creditor? && !bank_payment_request.open? && !bank_payment_request.retracted? && !bank_payment_request.rejected?
       if bank_payment_request.document_role_users(:creditor).include?(user) && !bank_payment_request.credited?
         return !bank_payment_request.credit_card?
       end
@@ -163,7 +163,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     end
 
     if user.vendor_payments_admin? && bank_payment_request.credited?
-      if !bank_payment_request.credit_card
+      if !bank_payment_request.credit_card?
         return bank_payment_request.payment_order.partially_completed?
       end
     end
