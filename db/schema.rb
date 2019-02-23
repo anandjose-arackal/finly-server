@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_22_182920) do
+ActiveRecord::Schema.define(version: 2019_02_23_072521) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -4218,6 +4218,7 @@ ActiveRecord::Schema.define(version: 2019_02_22_182920) do
     t.index ["company_id"], name: "index_purchase_orders_on_company_id"
     t.index ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id"
     t.index ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id"
+    t.index ["due_date", "created_at"], name: "index_purchase_orders_on_due_date_and_created_at"
     t.index ["gst_type_id"], name: "fk_rails_a50fbe2826"
     t.index ["location_id"], name: "index_purchase_orders_on_location_id"
     t.index ["payment_term_id"], name: "index_purchase_orders_on_payment_term_id"

@@ -11,22 +11,22 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
 
     attr_accessor :purchase_order, :paginated_purchase_order
 
+    has_scope :filter_by_due_date
+    has_scope :filter_po_number
+    has_scope :filter_vendor_id
+    has_scope :filter_by_created_at
+
+
     def init
       self.purchase_order = params[:purchase_order]
+      self.purchase_order = apply_scopes(self.purchase_order, params)
       self.paginated_purchase_order = self.purchase_order.paginate(page: params[:page], per_page: (params[:per_page] || 30))
     end
 
   end
 
   def init
-    self.purchase_orders = user.company.purchase_orders.where( purchase_order_status_id: [
-                                                                                          PurchaseOrderStatus.id_for(:approved),
-                                                                                          PurchaseOrderStatus.id_for(:auto_approved)
-                                                                                        ], 
-                                                              advance_amount_status_id: [
-                                                                                          AdvanceAmountStatus.id_for(:to_be_processed),
-                                                                                          AdvanceAmountStatus.id_for(:failed)
-                                                                                        ])
+    self.purchase_orders = user.company.purchase_orders.filter_payable_advances
   end
 
   def validate
