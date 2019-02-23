@@ -64,13 +64,14 @@ class UserSessions::Create < BaseOperation
       add_message :error, session.errors.full_messages
       return
     end
-    self.session.save(validate: false)
+    self.session.save
   end
 
   def post_process
     RequestStoreUtil.set_current_user self.user
     RequestStoreUtil.set_current_session self.session
     RequestStoreUtil.set_current_event self.session.events.last
+    RequestStoreUtil.set_current_device self.session.user_device
   end
 
   def success
@@ -123,10 +124,19 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_device(args)
-    result = UserDevices::FindOrCreate.(user, params)
-    return unless result.success?
+    result = UserDevices::FindOrCreate.(params)
+    unless result.success?
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.messages[:error].to_sentence
+      return
+    end
 
     args[:user_device_id] = result.device.id
+    args[:device_type_id] = result.device.type_id
+    unless result.device.valid?
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.messages[:error].to_sentence
+    end
   end
 
   def set_event(args)

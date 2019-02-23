@@ -2,7 +2,7 @@ require 'test_helper'
 Dir.glob("#{Rails.root}/test/helpers/**/*.rb").each { |r| require r }
 
 class Authentication::SuccessfulAuthTest < ActionDispatch::IntegrationTest
-  include AuthenticationHelper, IPHelper, UserHelper
+  include RequestHelper, RequestHelper, UserHelper
 
   def setup
     @ip = random_ip
@@ -22,7 +22,7 @@ class Authentication::SuccessfulAuthTest < ActionDispatch::IntegrationTest
                 password: 'demo1234',
                 client_id: 'ba7eafbefaf117882a2abbc9037054cf',
                 client_secret: '1976de370091732175b5661346a68bf7'
-            }, headers: headers
+            }, headers: authentication_headers_for(:web)
           end
         end
       end
@@ -33,7 +33,7 @@ class Authentication::SuccessfulAuthTest < ActionDispatch::IntegrationTest
     token = Doorkeeper::AccessToken.last
     assert_equal session.access_token_id, token.id
     assert_equal session.ip, @ip
-    assert_not_nil session.user_session_web
+    assert_not_nil session.user_device.user_device_browser
 
     body = JSON.parse(response.body)
     assert_equal body['success'], true

@@ -39,6 +39,25 @@
 #
 
 class UserDeviceBrowser < ApplicationRecord
+  attr_accessor :timestamp_s
+
+  # validates :timestamp, presence: true
+  # validates :user_agent, presence: true
+  # validates :timezone, presence: true
+  # validates :fingerprint, presence: true
+  # validates :language, presence: true
+  # validates :browser, presence: true
+  # validates :browser_version, presence: true
+  # validates :browser_engine, presence: true
+  # validates :browser_engine_version, presence: true
+  # validates :os_name, presence: true
+  # validates :os_version, presence: true
+  # validates :screen_width, presence: true
+  # validates :screen_height, presence: true
+  # validates :color_depth, presence: true
+  # validates :is_mobile, presence: true
+
+  before_save :set_timestamp
 
   # {
   #     '11': '1549636286',
@@ -74,9 +93,24 @@ class UserDeviceBrowser < ApplicationRecord
   #     '31': true
   # }
 
+  def incomplete?
+    set_timestamp
+    [
+        :timestamp, :user_agent, :timezone, :fingerprint, :language,
+        :browser, :browser_version, :browser_engine, :browser_engine_version,
+        :os_name, :os_version,
+        :screen_width, :screen_height, :color_depth, :is_mobile
+    ].each do |attr|
+      if self.send(attr).blank?
+        return true
+      end
+    end
+    false
+  end
+
   def self.obfuscation_map
     {
-        timestamp: '11',
+        timestamp_s: '11',
         user_agent: '16',
         timezone: '19',
         fingerprint: '7',
@@ -110,24 +144,9 @@ class UserDeviceBrowser < ApplicationRecord
     }
   end
 
-  def self.matching_attributes
-    [:fingerprint]
+  def set_timestamp
+    self.timestamp = DateTime.strptime(self.timestamp_s, '%s') if timestamp_s.present? and self.timestamp.blank?
   end
 
-  def self.find_or_create(x_finly_rp)
-    attributes = {}
-    obfuscation_map.each do |attribute, id|
-      value = x_finly_rp[id]
-      case attribute
-      when :timestamp
-        value = DateTime.strptime(value, '%s') if value.present?
-      end
-      attributes[value] = value
-    end
-    device = where(attributes.only(:matching_attributes))&.first
-    return device if device.present?
-
-    self.create(attributes)
-  end
 
 end

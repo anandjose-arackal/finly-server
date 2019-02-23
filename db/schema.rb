@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_19_092604) do
+ActiveRecord::Schema.define(version: 2019_02_22_150622) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2642,6 +2642,7 @@ ActiveRecord::Schema.define(version: 2019_02_19_092604) do
     t.string "verdict"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "rule"
     t.index ["company_id"], name: "index_gatekeeper_blocks_on_company_id"
     t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
@@ -3978,6 +3979,8 @@ ActiveRecord::Schema.define(version: 2019_02_19_092604) do
     t.integer "user_role_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "min_amount", precision: 20, scale: 5, default: "0.0"
+    t.decimal "max_amount", precision: 20, scale: 5
     t.index ["policy_id"], name: "index_policy_user_roles_on_policy_id"
     t.index ["user_id"], name: "index_policy_user_roles_on_user_id"
     t.index ["user_role_id"], name: "index_policy_user_roles_on_user_role_id"
@@ -5132,21 +5135,7 @@ ActiveRecord::Schema.define(version: 2019_02_19_092604) do
     t.index ["user_id"], name: "index_user_department_mappings_on_user_id"
   end
 
-  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_user_device_statuses_on_name"
-  end
-
-  create_table "user_device_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_user_device_types_on_name"
-  end
-
-  create_table "user_device_webs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.datetime "timestamp"
     t.string "user_agent"
     t.string "timezone"
@@ -5179,7 +5168,21 @@ ActiveRecord::Schema.define(version: 2019_02_19_092604) do
     t.text "plugins"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_device_id", null: false
+    t.boolean "is_mobile"
+  end
+
+  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_device_statuses_on_name"
+  end
+
+  create_table "user_device_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_device_types_on_name"
   end
 
   create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5196,6 +5199,7 @@ ActiveRecord::Schema.define(version: 2019_02_19_092604) do
     t.integer "verification_failed_attempts"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_device_browser_id", null: false
     t.index ["company_id"], name: "index_user_devices_on_company_id"
     t.index ["fingerprint"], name: "index_user_devices_on_fingerprint"
     t.index ["status_id"], name: "index_user_devices_on_status_id"
@@ -5455,6 +5459,7 @@ ActiveRecord::Schema.define(version: 2019_02_19_092604) do
     t.integer "accuracy_radius"
     t.string "username"
     t.integer "user_device_id", null: false
+    t.integer "device_type_id"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"

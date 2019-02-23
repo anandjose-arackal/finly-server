@@ -21,13 +21,43 @@
 
 class UserDevice < ApplicationRecord
 
-  belongs_to :user_device_browser
+  DEVICES = {
+      browser: {
+          klass: UserDeviceBrowser,
+          user_device_type: UserDeviceType.id_for(:browser),
+          device_key: 13,
+          authentication_scope: :web,
+          create_attributes_key: :user_device_browser
+      }
+  }
+
+  belongs_to :user_device_browser, optional: true, dependent: :destroy
   has_many :user_sessions
   belongs_to :status, class_name: 'UserDeviceStatus'
   belongs_to :type, class_name: 'UserDeviceType'
 
-  scope :find_by_property, ->(user, device_property) do
-    find_by type_id: device_property.type_id, user_device_browser_id: device_property.id, user_id: user.id
+  validates :status_id, presence: true
+
+  scope :not_incomplete, -> {where.not(status_id: UserDeviceStatus.id_for(:incomplete))}
+  scope :find_by_property, ->(user, device_property) {find_by type_id: device_property.type_id, user_device_browser_id: device_property.id, user_id: user.id}
+
+  def incomplete?
+    device_property&.incomplete?
   end
-  
+
+  def device_property
+    case type_id
+    when UserDeviceType.id_for(:browser)
+      return user_device_browser
+    when UserDeviceType.id_for(:android_app)
+
+    when UserDeviceType.id_for(:ios_app)
+
+    when UserDeviceType.id_for(:api)
+
+    else
+      nil
+    end
+  end
+
 end

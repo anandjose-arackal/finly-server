@@ -2,7 +2,7 @@ require 'test_helper'
 Dir.glob("#{Rails.root}/test/helpers/**/*.rb").each { |r| require r }
 
 class Authentication::HeaderTest < ActionDispatch::IntegrationTest
-  include AuthenticationHelper, IPHelper, UserHelper
+  include RequestHelper, RequestHelper, UserHelper
 
   def setup
     @ip = random_ip
@@ -36,7 +36,7 @@ class Authentication::HeaderTest < ActionDispatch::IntegrationTest
     assert_equal UserSessionEvent.last.status_id, UserSessionStatus.id_for(:failed)
   end
 
-  [:timestamp, :user_agent, :timezone, :fingerprint,
+  [:timestamp_s, :user_agent, :timezone, :fingerprint,
    :language, :browser, :browser_version,
    :browser_engine, :browser_engine_version,
    :os_name, :os_version].each do |property|
@@ -53,7 +53,7 @@ class Authentication::HeaderTest < ActionDispatch::IntegrationTest
                   password: 'demo1234',
                   client_id: 'ba7eafbefaf117882a2abbc9037054cf',
                   client_secret: '1976de370091732175b5661346a68bf7'
-              }, headers: headers(p)
+              }, headers: authentication_headers_for(:web, p)
             end
           end
         end

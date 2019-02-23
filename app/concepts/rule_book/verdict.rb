@@ -21,7 +21,7 @@ class RuleBook::Verdict < RuleBook::Rule
     self.rule.before_blocks.each do |before_block|
       instance_eval(&before_block)
     end
-    instance_eval(&self.rule.block) #unless self.skipped?
+    instance_eval(&self.rule.block) unless self.skipped?
     self.executed = true
   end
 

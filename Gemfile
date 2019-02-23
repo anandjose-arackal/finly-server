@@ -17,7 +17,6 @@ gem 'daemons', '~> 1.3.1'
 # gem 'activemessaging'
 
 # grm for mocking and stubbing in test cases
-gem 'mocha', '~> 1.7.0'
 
 # gem for crash reports
 gem 'rollbar', '~> 2.18.2'
@@ -244,6 +243,9 @@ group :test do
   gem 'rails-perftest', '~> 0.0.7'
   gem 'ruby-prof', '~> 0.17.0'
   gem 'test-unit', '~> 3.2.9'
+  gem 'mocha', '~> 1.8.0'
+  gem 'minitest-around', '~> 0.5.0'
+  gem 'minitest-spec-rails', '~> 5.5.0'
 end
 
 group :production do

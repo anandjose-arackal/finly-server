@@ -48,7 +48,8 @@ class UserSession < ApplicationRecord
   belongs_to :status, class_name: 'UserSessionStatus'
 
   has_many :events, class_name: 'UserSessionEvent', dependent: :destroy
-  belongs_to :user_device
+  belongs_to :user_device, optional: true
+  belongs_to :device_type, optional: true, class_name: 'UserDeviceType'
 
   accepts_nested_attributes_for :events
 
@@ -56,7 +57,7 @@ class UserSession < ApplicationRecord
   scope :with_device, ->(device) {where device: device}
   scope :with_ip, ->(ip) {where ip: ip}
   scope :started_after, ->(datetime) {where 'started_at >= ?', datetime}
-  scope :web, -> {where platform: 'UserSessionWeb'}
+  scope :web, -> {where device_type_id: UserDeviceType.id_for(:browser)}
   scope :authorized, -> {where status_id: UserSessionStatus.id_for(:authorized)}
 
   delegate :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status

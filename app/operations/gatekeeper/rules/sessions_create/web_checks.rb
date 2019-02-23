@@ -1,7 +1,7 @@
 Gatekeeper::Checker.new 'On Web Authentication' do
 
   before do
-    skip unless RequestStoreUtil.current_session.platform == 'UserSessionWeb'
+    skip unless RequestStoreUtil.current_device == 'UserDeviceBrowser'
   end
 
   premise :after_session_create do
@@ -14,16 +14,28 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         fail
       end
 
-      [:timestamp, :user_agent, :timezone, :fingerprint,
-       :language, :browser, :browser_version,
-       :browser_engine, :browser_engine_version,
-       :os_name, :os_version].each do |property|
-        rule "#{property} is required for all web requests" do
-          session = RequestStoreUtil.current_session
-          web = session.user_session_web
-          next unless web.send(property).blank?
+      rule 'Associated device is required for all requests' do
+        if RequestStoreUtil.current_device.blank?
           response_code 401
           fail
+        end
+      end
+
+      section 'If device is available' do
+        before do
+          skip if RequestStoreUtil.current_device.nil?
+        end
+
+        [:timestamp, :user_agent, :timezone, :fingerprint,
+         :language, :browser, :browser_version,
+         :browser_engine, :browser_engine_version,
+         :os_name, :os_version].each do |property|
+          rule "#{property} is required for all web requests" do
+            web = RequestStoreUtil.current_device.user_device_browser
+            next unless web.send(property).blank?
+            response_code 401
+            fail
+          end
         end
       end
     end

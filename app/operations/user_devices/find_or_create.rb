@@ -1,34 +1,30 @@
 class UserDevices::FindOrCreate < BaseOperation
 
   class UserDevices::FindOrCreate::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :device, :device_property
+    attr_accessor :device
 
     def init
       self.device = params[:device]
-      self.device_property = params[:device_property]
     end
 
   end
 
-  DEVICES = [
-      {
-          klass: UserDeviceBrowser,
-          user_device_type: UserDeviceType.id_for(:web),
-          device_key: 13,
-          authentication_scope: :web,
-          create_attributes_key: :user_device_web
-      }
-  ]
-
   attr_accessor :device, :device_property
 
+  def self.call(params)
+    self.new(params).run
+  end
+
+  def initialize(params)
+    super(nil, params)
+  end
+
   def process
-    self.device_property = device_property_from_request
-    self.device = user.user_devices.find_by_property(self.device_property)
+    self.device = device_property_from_request
   end
 
   def success
-    UserDevices::FindOrCreate::SuccessPresenter.new(user, {device: self.device, device_property: self.device_property}, messages)
+    UserDevices::FindOrCreate::SuccessPresenter.new(user, {device: self.device}, messages)
   end
 
   protected
@@ -45,12 +41,41 @@ class UserDevices::FindOrCreate < BaseOperation
       request_properties = {}
     end
     request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
-    DEVICES.each do |device|
+    UserDevice::DEVICES.each do |type, device|
       if params[:scope].include?(device[:authentication_scope].to_s)
-        return device.find_or_create request_properties[device[:device_key].to_s]
+        fingerprint_key = device[:klass].obfuscation_map[:fingerprint]
+        fingerprint = request_properties&.dig(device[:device_key].to_s, fingerprint_key)
+        user_device = nil
+        # Find
+        if fingerprint.present?
+          user_device = UserDevice.not_incomplete.find_by_fingerprint(fingerprint)
+        end
+
+        # Create
+        if user_device.nil?
+          user_device = UserDevice.new(fingerprint: fingerprint)
+          user_device.send "#{device[:create_attributes_key]}=", device_property_for(device[:klass], request_properties[device[:device_key].to_s])
+          user_device.type_id = device[:user_device_type]
+
+          if user_device.incomplete?
+            user_device.status_id = UserDeviceStatus.id_for(:incomplete)
+          else
+            user_device.status_id = UserDeviceStatus.id_for(:unverified)
+          end
+
+          user_device.save
+        end
+
+        return user_device
       end
     end
     nil
+  end
+
+  def device_property_for(device_klass, x_finly_rp)
+    attributes = {}
+    device_klass.obfuscation_map.each {|attribute, id| attributes[attribute] = x_finly_rp[id]}
+    device_klass.new(attributes)
   end
 
 end
