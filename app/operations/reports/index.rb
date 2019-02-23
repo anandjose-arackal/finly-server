@@ -186,6 +186,8 @@ class Reports::Index < Reports::Base
       return nil if report.blank?
       if report.processing? and report.controlling_user?(self.user)
         'Awaiting Approval'
+      elsif report.auto_approved?
+        'Auto Approved'
       else
         report.status_name
       end
