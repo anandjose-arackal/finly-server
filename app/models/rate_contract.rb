@@ -5,9 +5,10 @@ class RateContract < ApplicationRecord
   belongs_to :item, optional: true, class_name: 'InventoryLineItem'
   
   has_many :rate_contract_line_items
+  has_many :artifacts, as: :resource, dependent: :destroy
 
   accepts_nested_attributes_for :rate_contract_line_items
-  # accepts_nested_attributes_for :artifacts
+  accepts_nested_attributes_for :artifacts
 
 
   # Renewal alert options in weeks

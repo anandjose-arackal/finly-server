@@ -6,12 +6,6 @@ class RateContracts::Create < RateContracts::Base
     self.params[:rate_contract][:creator_id] = user.id
   end
 
-  # def validate
-  # end
-
-  # def pre_process
-  # end
-
   def process
     rate_contract = RateContract.new(strong_params)
     unless  rate_contract.save!

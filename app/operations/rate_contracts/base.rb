@@ -21,6 +21,6 @@ class RateContracts::Base < BaseOperation
   protected
   # Params whitelisting
   def strong_params
-    params.require(:rate_contract).permit(:name, :vendor_id, :renewal_alert, :creator_id, rate_contract_line_items_attributes: [:id, :location_id, :item_id, :start_date, :end_date, :amount, :_destroy], artifacts_attributes: [:id, :attachment, :description, :_destroy])
+    params.require(:rate_contract).permit(:name, :vendor_id, :renewal_alert, :item_id, :renewable, :creator_id, rate_contract_line_items_attributes: [:id, :location_id, :item_id, :start_date, :end_date, :amount, :_destroy], artifacts_attributes: [:id, :attachment])
   end 
 end
