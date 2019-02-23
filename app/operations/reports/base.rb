@@ -130,15 +130,17 @@ class Reports::Base < BaseOperation
       # policies = []
       if report.user.enforce_policy_enabled?
         # policies << {id: 0, name: 'None'}
-        return report.user.policies.with_application(current_app).non_default
+        return report.user.policies.with_application(current_app).non_default.non_deleted
       end
-      report.user.policies.with_application(current_app)
+      report.user.policies.with_application(current_app).non_deleted
     end
 
     def status_name(report)
       return nil if report.blank?
       if report.processing? and report.controlling_user?(self.user)
         'Awaiting Approval'
+      elsif report.auto_approved?
+        'Auto Approved'
       else
         report.status_name
       end

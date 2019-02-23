@@ -1,7 +1,7 @@
 class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManager::Master::Base
 
   register_handle :payment_ticket_show
-  register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment, :credit_in_credit_options, :policy_editable ]
+  register_actions [ :mark_as_credited, :delete, :submit, :credit, :credit_options, :add_payments, :edit_order_summary, :download_payments_file, :payments_history, :edit_payment_history, :delete_payment_history, :attachments_editable, :reject, :retract, :approve, :take_control, :return_control, :unapprove, :cancel_scheduled_payment, :retry_payment, :credit_in_credit_options, :policy_editable, :order_name, :transfer_type, :scheduled_date, :description_field, :reviewal_flow ]
 
   def initialize(user=nil, params={})
     super
@@ -186,7 +186,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor? && !bank_payment_request.open? && (!bank_payment_request.credited? || bank_payment_request.partially_completed?)
+    if user.vendor_payments_creditor? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && (!bank_payment_request.credited? || bank_payment_request.partially_completed?)
 
       #Policy User Role is not generalized
       policy_user_role = user.policy_user_roles.where(user_role_id: UserRole.id_for(:creditor), policy_id: bank_payment_request.policy_id).last rescue nil
@@ -256,10 +256,22 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     end
     ############# Reviewer logic end ####################
 
+    ############# Creditor logic start ##################
+    if user.vendor_payments_creditor?
+      if bank_payment_request.document_role_users(:creditor).include?(user)
+        if !bank_payment_request.open? && !bank_payment_request.credited?
+          return true
+        end
+      end
+    end
+    ############# Creditor logic end ####################
+
 
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       return true if bank_payment_request.action_users(:return_control).include?(user)
+      return true if (bank_payment_request.approved? || bank_payment_request.auto_approved?)
+      return true if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) 
     end
     ############# Admin logic end ####################
   end
@@ -533,9 +545,152 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def policy_editable
-    if (bank_payment_request.owner_id == user.id)
-      bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+    ############# Admin logic start ######################
+    if user.vendor_payments_admin?
+      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        return true
+      end
     end
+    ############# Admin logic end ######################
+
+
+    ############# Creditor logic start ####################
+    # if user.vendor_payments_creditor?
+    #   if !bank_payment_request.open? && !bank_payment_request.credited?
+    #     return true
+    #   end
+    # end
+    ############# Creditor logic end ######################
+    
+    ############# Initiator logic start ######################
+    if user.vendor_payments_initiator?
+      if (bank_payment_request.owner_id == user.id)
+        bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        return true
+      end
+    end
+  end
+
+  def order_name
+    ############# Admin logic start ######################
+    if user.vendor_payments_admin?
+      if !bank_payment_request.credited?
+        return true
+      end
+    end
+  ############# Admin logic end ######################
+
+  ############# Initiator logic start ######################
+    if user.vendor_payments_initiator?
+      if bank_payment_request.owner_id == user.id
+        if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+          return true
+        end
+      end
+    end
+    ############# Initiator logic end ######################
+  end
+  
+  def transfer_type
+    ############# Admin logic start ######################
+    if user.vendor_payments_admin?
+      if !bank_payment_request.credited?
+        return true
+      end
+    end
+    ############# Admin logic end ######################
+
+    ############# Creditor logic start ######################
+    if user.vendor_payments_creditor?
+      if !bank_payment_request.open? && !bank_payment_request.credited?
+        if bank_payment_request.document_role_users(:creditor).include?(user)
+          return true
+        end
+      end
+    end
+    ############# Creditor logic end ######################
+
+    ############# Initiator logic start ######################
+    if user.vendor_payments_initiator?
+      if bank_payment_request.owner_id == user.id
+        if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+          return true
+        end
+      end
+    end
+    ############# Initiator logic end ######################
+  end
+
+  def scheduled_date
+    ############# Admin logic start ######################
+    if user.vendor_payments_admin?
+      if !bank_payment_request.credited?
+        return true
+      end
+    end
+    ############# Admin logic end ######################
+
+    ############# Creditor logic start ######################
+    if user.vendor_payments_creditor?
+      if !bank_payment_request.open? && !bank_payment_request.credited?
+        if bank_payment_request.document_role_users(:creditor).include?(user)
+          return true
+        end
+      end
+    end
+    ############# Creditor logic end ######################
+
+    ############# Initiator logic start ######################
+    if user.vendor_payments_initiator?
+      if bank_payment_request.owner_id == user.id
+        if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+          return true
+        end
+      end
+    end
+    ############# Initiator logic end ######################
+  end
+
+  def description_field
+    ############# Admin logic start ######################
+    if user.vendor_payments_admin?
+      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        return true
+      end
+    end
+    ############# Admin logic start ######################
+    
+    ############# Initiator logic start ######################
+    if user.vendor_payments_initiator?
+      if bank_payment_request.owner_id == user.id
+        if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+          return true
+        end
+      end
+    end
+    ############# Initiator logic end ######################
+  end
+
+  def reviewal_flow
+    ############# Admin logic start ######################
+    if user.vendor_payments_admin?
+      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        return true
+      end
+    end
+    ############# Admin logic start ######################
+
+
+    # Only Initiator is allowed to edit it
+    ############# Initiator logic start ######################
+    if user.vendor_payments_initiator?
+      if bank_payment_request.owner_id == user.id
+        if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+          return true
+        end
+      end
+    end
+    ############# Initiator logic end ######################
   end
 
   def reviewer
