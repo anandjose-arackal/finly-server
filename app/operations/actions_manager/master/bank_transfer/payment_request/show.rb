@@ -16,7 +16,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def mark_as_credited
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      return true
+      if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) 
+        return true
+      end
       # if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
       #   return true
       # elsif bank_payment_request.approved?
@@ -36,9 +38,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic start ####################
 
     ############# Creditor logic start ####################
-    if user.vendor_payments_creditor?
+    if user.vendor_payments_creditor? && !bank_payment_request.open?
       if bank_payment_request.document_role_users(:creditor).include?(user)
-        return true
+        return true if !bank_payment_request.credited?
       end
     end
     ############# Creditor logic end ######################
@@ -58,7 +60,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def delete
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
-      bank_payment_request.open? && (bank_payment_request.owner_id == user.id)
+      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        return true
+      end
     end
     ############# Admin logic end #######################
 
@@ -73,7 +77,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def submit
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
-      bank_payment_request.open? && (bank_payment_request.owner_id == user.id)
+      if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        return true
+      end
     end
     ############# Admin logic end #######################
 
@@ -97,7 +103,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     # end
 
     if user.vendor_payments_admin?
-      if !bank_payment_request.credited?
+      if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?)
         return true
       end
     end
@@ -113,9 +119,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Creditor logic start #########################
     if user.vendor_payments_creditor? && !bank_payment_request.open?
-      if bank_payment_request.document_role_users(:creditor).include?(user)
+      if bank_payment_request.document_role_users(:creditor).include?(user) && !bank_payment_request.credited?
         return !bank_payment_request.credit_card?
-      elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
+      end
+      if bank_payment_request.credited? && bank_payment_request.document_role_users(:creditor).include?(user) && !bank_payment_request.credit_card?
         return bank_payment_request.payment_order.partially_completed?
       end
     end
@@ -154,6 +161,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
         return true
       end
     end
+
+    if user.vendor_payments_admin? && bank_payment_request.credited?
+      if !bank_payment_request.credit_card
+        return bank_payment_request.payment_order.partially_completed?
+      end
+    end
     ############# Admin logic end #######################
 
     ############# Reviewer logic start #########################
@@ -173,7 +186,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic end #########################
 
     ############# Creditor logic start #########################
-    if user.vendor_payments_creditor? && !bank_payment_request.open?
+    if user.vendor_payments_creditor? && !bank_payment_request.open? && (!bank_payment_request.credited? || bank_payment_request.partially_completed?)
 
       #Policy User Role is not generalized
       policy_user_role = user.policy_user_roles.where(user_role_id: UserRole.id_for(:creditor), policy_id: bank_payment_request.policy_id).last rescue nil
