@@ -343,7 +343,7 @@ class Report < ApplicationRecord
   end
 
   def auto_approved?
-    self.status_id == ReportStatus.id_for(:auto_approved)
+    self.status_id == ReportStatus.auto_approved_id
   end
 
   def settled?
