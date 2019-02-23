@@ -147,7 +147,8 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
               inclusive_of_taxes: order_details[:inclusive_of_taxes],
               category_id: order_details[:category_id],
               cost_center_id: order_details[:cost_center_id],
-              tds_slab_id: order_details[:tds_slab_id]
+              tds_slab_id: order_details[:tds_slab_id],
+              receiving_account: bank_account
           }
       }
     end
