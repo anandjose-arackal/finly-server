@@ -102,4 +102,8 @@ class ReportStatus < ApplicationRecord
     8
   end
 
+  def self.auto_approved_id
+    10
+  end
+
 end
