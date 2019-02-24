@@ -5,7 +5,10 @@ json.result do
   if @result.inventory_item.artifacts.present?
     json.attachments do
       json.array!(@result.inventory_item.artifacts) do |artifact|
-        json.attachment = artifact&.attachment&.url 
+        json.uid artifact.id
+        json.name artifact&.attachment_file_name
+        json.url artifact&.attachment&.url
+        json.status 'done'
       end
     end
   end
