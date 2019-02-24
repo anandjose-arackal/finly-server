@@ -14,10 +14,10 @@ class Artifact < ApplicationRecord
   scope :with_id, -> (ids) { where id: ids }
 
   def add_creator
-    self.creator_id = self.resource.creator_id if self.resource.creator_id.present?
+    self.creator_id = self.resource.creator_id if self.resource.has_attribute?(:creator_id) && self.resource.creator_id.present?
   end
 
   def add_company
-    self.company_id = self.resource.creator.company_id if self.resource.creator_id.present?
+    self.company_id = self.resource.creator.company_id if self.resource.has_attribute?(:creator_id) && self.resource.creator_id.present?
   end
 end
