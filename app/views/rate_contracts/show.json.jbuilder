@@ -20,7 +20,10 @@ json.result do
       json.attachments do
         if @result.rate_contract.artifacts.present?
           json.array!(@result.rate_contract.artifacts) do |artifact|
-            json.attachment = artifact&.attachment&.url
+          json.uid artifact.id
+          json.name artifact&.attachment_file_name
+          json.url artifact&.attachment&.url
+          json.status 'done'
           end
         end
       end
