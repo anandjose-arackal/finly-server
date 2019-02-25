@@ -71,17 +71,6 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   end
 
   def validate
-    if self.inward_invoice.blank?
-      add_message :error, "Invoice not found"
-    end
-
-    if self.payable_amount.blank?
-      add_message :error, "You need to enter a payable amount to create an order"
-      return
-    end
-  end
-
-  def validate
     if self.inward_invoices.empty?
       add_message :error, "Nothing to add"
       return
