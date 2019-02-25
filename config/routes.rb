@@ -3395,6 +3395,7 @@ Rails.application.routes.draw do
   ## Procurement APIs end   ##########################################
 
   ######## Reviewal Workflow ##########
+  get 'reviewal_levels/index_user_level', to: "reviewal_levels#index_user_level"
   resources :reviewal_levels do
     resources :reviewers
   end

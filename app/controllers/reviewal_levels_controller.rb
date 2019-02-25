@@ -11,6 +11,13 @@ class ReviewalLevelsController < ApplicationController
     respond
   end
 
+  # Ideally rest of the operations should be present under Policy namespace
+  def index_user_level
+    @result = Policy::ReviewalLevels::IndexUserLevel.(current_user, params)
+    respond
+  end
+
+
   def update
     @result = ReviewalLevels::Update.(current_user, params)
     respond
@@ -20,4 +27,5 @@ class ReviewalLevelsController < ApplicationController
     @result = ReviewalLevels::Destroy.(current_user, params)
     respond
   end
+
 end
