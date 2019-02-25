@@ -5,7 +5,7 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
   sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute, :payment_params, :purchase_orders
+                :company_id, :execute, :payment_params, :purchase_orders, :ticket_type
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -18,6 +18,7 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
     end
     self.bank_payment_request = BankPaymentRequest.find_by(id: options[:bank_payment_request_id])
     self.payments_attributes = options[:payments_attributes]
+    self.ticket_type = options[:ticket_type]
     self.options = options
     self.run
   end
@@ -55,6 +56,7 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
           # payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
           payment_purpose_id: payment[:payment_purpose_id],
           purchase_order_id: payment[:purchase_order_id],
+          invoice_id: payment[:invoice_id],
           payment_mode: self.payment_mode,
           amount_attributes: {
               value: payment[:requested_amount],
@@ -72,7 +74,9 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
           parent_id: payment[:parent_id]
       }
     end
-    self.purchase_orders = PurchaseOrder.where(id: self.payment_params.pluck(:purchase_order_id))
+    if self.ticket_type == 'po_advance'
+      self.purchase_orders = PurchaseOrder.where(id: self.payment_params.pluck(:purchase_order_id))
+    end
   end
 
   def validate
@@ -85,15 +89,28 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
       params.delete(:custom_fields)
       params[:payment_order_id] = self.bank_payment_request.payment_order.id
       payment = ::Payment.new(params)
-      # payment = self.bank_payment_request.payment_order.payments.build(params)
+      payment = self.bank_payment_request.payment_order.payments.build(params)
+      # binding.pry
       if payment.save
-        purchase_order = self.purchase_orders.find(params[:purchase_order_id])
-        purchase_order.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:initiated))
-        # perform the required calculations
-        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+        case self.ticket_type
+        when "invoice"
+          puts "invoice SUCCESSFULS", payment.id
+          # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+          payment.invoice.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+        when "po_advance"
+          purchase_order = self.purchase_orders.find(params[:purchase_order_id])
+          purchase_order.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:initiated))
+        # when 'beneficiary'
+        #   # perform the required calculations
+        #   InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+        # when 'bulk_beneficiary'
+        #   InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)                                
+        end
         payment.save
         # now save the custom fields to the invoice
         # set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
+      else
+        puts "ERROR", payment.errors.full_messages
       end
     end
 
@@ -101,7 +118,7 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
     self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
     self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
 
-    # puts 'SUCCESSFUL!'
+    puts 'SUCCESSFUL!'
   end
 
   private

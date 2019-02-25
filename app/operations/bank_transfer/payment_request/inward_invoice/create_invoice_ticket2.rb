@@ -46,7 +46,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # # params[:purchase_order_id] = 1733
     # params[:scheduled_at] = "2019-02-28"
     # params[:payment_mode] = 'neft'
-    # params[:invoices] = [{invoice_id: 40343, payable_amount: '1' }]
+    # params[:invoices_attributes] = [{invoice_id: 40343, payable_amount: '1' }]
     self.payable_amounts = {}
     self.requested_amount = 0
     ids = []
@@ -67,6 +67,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # self.payment_mode = params[:payment_mode]
     # self.policy_id = params[:policy_id]
     # self.payable_amount = params[:payable_amount]
+
+    # binding.pry
 
   end
 
@@ -96,18 +98,21 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     if self.bank_payment_request.save
       # any changes to be made here? #todo
-      initialize_payment_objects
-      payment_order = self.bank_payment_request.payment_order
-      self.payments.each do |payment|
-        payment.update(payment_order_id: payment_order.id)
-      end
+      # initialize_payment_objects
+      # payment_order = self.bank_payment_request.payment_order
+      # self.payments.each do |payment|
+      #   payment.update(payment_order_id: payment_order.id)
+      # end
+      # self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
+      payment_params = initialize_payment_objects
+      op = BankTransfer::PaymentRequest::NewAddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, ticket_type: 'invoice'})
     else
       add_message :error, self.bank_payment_request.errors.full_messages
     end
   end
 
   def post_process
-    add_message :success, "Payment order created"
+    add_message :success, "Payment Ticket for invoice created"
 
     # Set status to unpaid if done via a procurement
     # if inward_invoice.procurement_id.present?
@@ -126,7 +131,13 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   def initialize_payment_objects
     payment_params = []
     self.inward_invoices.each do |invoice|
+      bank_account = invoice.vendor&.bank_accounts&.where(default_account: true).first
       payment_params << {
+          name: invoice.vendor&.name,
+          bank_account_number: bank_account&.account_number,
+          ifsc: bank_account&.ifsc,
+          account_id: bank_account&.id,
+          requested_amount: self.payable_amounts[invoice.id],
           payment_type_id: PaymentType.id_for(:credit),
           application: RequestStore.store[:current_app],
           receiving_user_type: invoice.bank_account&.account_owner&.class&.name,
@@ -150,7 +161,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           invoice_id: invoice.id
       }
     end
-    self.payments = self.bank_payment_request.payment_order.payments.build(payment_params)
+    # self.payments = self.bank_payment_request.payment_order.payments.build(payment_params)
+    payment_params
   end
 
   def bank_payment_request_params
