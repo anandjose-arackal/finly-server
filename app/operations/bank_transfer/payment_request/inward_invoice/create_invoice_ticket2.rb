@@ -25,16 +25,32 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
   end
 
+
+  def pre_validate
+      if user.blank?
+        add_message :error, 'User not found'
+        return
+      end
+      if params.blank?
+        add_message :error, 'No params sent at all.'
+        return
+      end
+      if params[:invoices_attributes].blank?
+        add_message :error, 'No Invoices sent for processing.'
+        return
+      end
+  end
+
   def init
-    params[:policy_id] = 4
-    # params[:purchase_order_id] = 1733
-    params[:scheduled_at] = "2019-02-28"
-    params[:payment_mode] = 'neft'
-    params[:invoices] = [{invoice_id: 40343, payable_amount: '1' }]
+    # params[:policy_id] = 4
+    # # params[:purchase_order_id] = 1733
+    # params[:scheduled_at] = "2019-02-28"
+    # params[:payment_mode] = 'neft'
+    # params[:invoices] = [{invoice_id: 40343, payable_amount: '1' }]
     self.payable_amounts = {}
     self.requested_amount = 0
     ids = []
-    self.invoices_params = params[:invoices]
+    self.invoices_params = params[:invoices_attributes]
     self.invoices_params.each do |param|
       ids << param[:invoice_id]
       self.payable_amounts[param[:invoice_id]&.to_i] = param[:payable_amount].to_f
