@@ -301,6 +301,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               cost_center_id: order_details[:cost_center_id],
               tds_slab_id: order_details[:tds_slab_id],
               invoice_type_id: order_details[:invoice_type_id],
+              receiving_account_type: "BankAccount",
+              receiving_account_id: bank_account.id,
               original_amount_attributes: {
                   value: order_details[:original_amount],
                   currency_id: 1
