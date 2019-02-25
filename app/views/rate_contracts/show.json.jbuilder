@@ -17,7 +17,10 @@ json.result do
           json.rate_contract_id line_item&.rate_contract_id
           if line_item.artifacts.present?
             json.array!(line_item.artifacts) do |artifact|
-              json.attachment = artifact&.attachment&.url
+              json.uid artifact.id
+              json.name artifact&.attachment_file_name
+              json.url artifact&.attachment&.url
+              json.status 'done'
             end
           end
         end
