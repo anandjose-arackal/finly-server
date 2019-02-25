@@ -239,6 +239,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond_success_failure
   end
 
+  def create_invoice_ticket
+    @result = BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2.(current_user, params)
+    respond
+  end
+
   def remove_attachment
     @result = BankTransfer::PaymentRequest::RemoveAttachment.(current_user, params)
     respond response: (@result&.success? ? :success : :failure)

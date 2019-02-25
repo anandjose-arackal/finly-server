@@ -3126,6 +3126,8 @@ Rails.application.routes.draw do
 
     post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
 
+    post 'create_invoice_ticket', to: 'bank_payment_requests#create_invoice_ticket', as: :create_invoice_ticket
+
     get 'configuration_data', to: 'bank_payment_requests#configuration_data', as: :configuration_data
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
     get 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
