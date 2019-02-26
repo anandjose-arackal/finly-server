@@ -3125,6 +3125,7 @@ Rails.application.routes.draw do
     patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
 
     post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
+    post 'unified_payment_ticket' => 'bank_payment_requests#unified_payment_ticket', as: :unified_payment_ticket
 
     post 'create_invoice_ticket', to: 'bank_payment_requests#create_invoice_ticket', as: :create_invoice_ticket
 

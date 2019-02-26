@@ -13,7 +13,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
                 :description, :bank_payment_request, :payable_amount,
                 :payment_request_params, :policy, :bank_payment_request_params, :payable_amounts, :requested_amount, :inward_invoices,
-                :payments, :invoices_params
+                :payments, :invoices_params, :invoices_status
 
   class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -50,26 +50,24 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.payable_amounts = {}
     self.requested_amount = 0
     ids = []
+    self.invoices_status = {}
     self.invoices_params = params[:invoices_attributes]
     self.invoices_params.each do |param|
       ids << param[:invoice_id]
       self.payable_amounts[param[:invoice_id]&.to_i] = param[:payable_amount].to_f
     end
     self.inward_invoices = user.company.inward_invoices.with_id(ids)
+
+    # we will use this later in background operation
+    # to update the status of invoice from pending to its previous state,
+    # which can be unpaid or partially paid
+    # since previous state can be more than one type, this is a clean way to handle this
+    self.inward_invoices.pluck(:id,:invoice_status_id).map { |id, st| self.invoices_status[id.to_i] = st }
+
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
-
-    id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
-    # self.inward_invoice = user.company.inward_invoices.find_by(id: id)
-    # self.scheduled_at = params[:scheduled_at]
-    # self.payment_mode = params[:payment_mode]
-    # self.policy_id = params[:policy_id]
-    # self.payable_amount = params[:payable_amount]
-
-    # binding.pry
-
   end
 
   def validate
@@ -78,9 +76,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
-    # todo - add conditions to select how much of the invoice will be paid in this payment
     self.payable_amounts.each do |invoice_id, payable_amount|
-      # binding.pry
       invoice = self.inward_invoices.find_by(id: invoice_id)
       remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
       if remaining_amount.blank?
@@ -97,15 +93,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.payment_request_params = bank_payment_request_params
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     if self.bank_payment_request.save
-      # any changes to be made here? #todo
-      # initialize_payment_objects
-      # payment_order = self.bank_payment_request.payment_order
-      # self.payments.each do |payment|
-      #   payment.update(payment_order_id: payment_order.id)
-      # end
-      # self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
+      self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
       payment_params = initialize_payment_objects
-      op = BankTransfer::PaymentRequest::NewAddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, ticket_type: 'invoice'})
+      op = BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, invoices_status: invoices_status})
     else
       add_message :error, self.bank_payment_request.errors.full_messages
     end

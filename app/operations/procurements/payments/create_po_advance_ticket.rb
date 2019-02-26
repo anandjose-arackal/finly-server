@@ -1,7 +1,5 @@
 # This will create a payment ticket for advance payment for an already existing puchase order which is DEFINITELY LINKED to a procurement
 # This will generate a new payment order and a new payment ticket
-# this will not create a new individual payment
-# this updates attributes of an existing individual payment which already has a purchase order and procurement id to include a new payment order id
 
 class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Base
 
@@ -191,7 +189,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       self.all_purchase_orders.update_all(advance_amount_status_id: AdvanceAmountStatus.id_for(:pending))
       # now pass this particular bank payment request and the payments data to the
       # background operation where it will continue creating payments till the data is exhausted
-      op = BankTransfer::PaymentRequest::NewAddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})
+      op = Procurements::Payments::PoAdvancePaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})
       # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})
     else
       add_message :error, self.bank_payment_request.errors.full_message
