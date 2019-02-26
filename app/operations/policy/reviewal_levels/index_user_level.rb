@@ -1,17 +1,17 @@
 class Policy::ReviewalLevels::IndexUserLevel < Policy::ReviewalLevels::Base
-  attr_accessor :reviewal_levels, :users, :policy
+  attr_accessor :reviewal_levels, :policy_users, :policy
 
   class Policy::ReviewalLevels::IndexUserLevel::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :reviewal_levels, :users, :paginated_users, :levels_data
+    attr_accessor :reviewal_levels, :policy_users, :paginated_users, :levels_data
 
     has_scope :filter_policy
     has_scope :filter_associated_entity_type
     # has_scope :reviewal_level_id
 
     def init
-      self.users = params[:users]
+      self.policy_users = params[:policy_users]
       self.reviewal_levels = params[:reviewal_levels]
-      
+
       if self.reviewal_levels.present?
         self.reviewal_levels = apply_scopes(self.reviewal_levels, params)
         self.reviewal_levels = self.reviewal_levels.non_deleted
@@ -32,7 +32,7 @@ class Policy::ReviewalLevels::IndexUserLevel < Policy::ReviewalLevels::Base
 
       page = (params[:page] || 1)
       per_page = (params[:per_page] || 30)
-      self.paginated_users = self.users.paginate(page: page, per_page: per_page)
+      self.paginated_users = self.policy_users.paginate(page: page, per_page: per_page)
     end
   end
 
@@ -50,7 +50,7 @@ class Policy::ReviewalLevels::IndexUserLevel < Policy::ReviewalLevels::Base
 
     self.reviewal_levels = ReviewalLevel.with_policy_ids(self.policy.id)
 
-    self.users = User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id))
+    self.policy_users = User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id))
   end
 
   def validate
@@ -58,7 +58,7 @@ class Policy::ReviewalLevels::IndexUserLevel < Policy::ReviewalLevels::Base
   end
 
   def success
-    params[:users] = self.users
+    params[:policy_users] = self.policy_users
     params[:reviewal_levels] = self.reviewal_levels
     Policy::ReviewalLevels::IndexUserLevel::IndexPresenter.new(user, params, messages)
   end
