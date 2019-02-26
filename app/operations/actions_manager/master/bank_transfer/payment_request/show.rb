@@ -415,6 +415,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
         if last_trail.action_id == TrailAction.id_for(:approve)
           return true
         end
+        if last_trail.action_id == TrailAction.id_for(:take_control)
+          return true
+        end
       end
     end 
     ############# Admin logic end ####################
@@ -433,6 +436,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
               return true
             end
             if last_trail.action_id == TrailAction.id_for(:return_control)
+              return true
+            end
+            if last_trail.action_id == TrailAction.id_for(:submit)
               return true
             end
           end
