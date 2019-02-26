@@ -327,7 +327,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def edit_payment_history
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if !bank_payment_request.credited?
+      if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user)
         return true
       end
     end
@@ -351,7 +351,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def delete_payment_history
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if !bank_payment_request.credited?
+      if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user)
         return true
       end
     end
