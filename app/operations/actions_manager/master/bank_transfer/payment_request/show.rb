@@ -408,9 +408,13 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       last_trail = bank_payment_request.trails.last rescue nil
-      if bank_payment_request.processing? &&
-      (last_trail.action_id != TrailAction.id_for(:approve))
-        return true
+      if bank_payment_request.processing? && !bank_payment_request.open? && bank_payment_request.action_users(:approve).include?(user)
+        if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
+          return true
+        end
+        if last_trail.action_id == TrailAction.id_for(:approve)
+          return true
+        end
       end
     end 
     ############# Admin logic end ####################
@@ -421,8 +425,16 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       if bank_payment_request.processing?
         last_trail = bank_payment_request.trails.last rescue nil
         if (bank_payment_request.get_reviewers.include?(user))
-          if bank_payment_request.action_users(:approve).include?(user) && (last_trail.action_id != TrailAction.id_for(:approve))
-            return true
+          if bank_payment_request.action_users(:approve).include?(user)
+            if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
+              return true
+            end
+            if last_trail.action_id == TrailAction.id_for(:approve)
+              return true
+            end
+            if last_trail.action_id == TrailAction.id_for(:return_control)
+              return true
+            end
           end
         end
       end
@@ -461,20 +473,23 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       last_trail = bank_payment_request.trails.last rescue nil
-      if bank_payment_request.processing? &&
-      (last_trail.action_id != TrailAction.id_for(:unapprove))
+      if bank_payment_request.processing? && !bank_payment_request.open? && (last_trail.action_id == TrailAction.id_for(:approve)) &&
+          (last_trail.action_user_id == user.id)
         return true
       end
     end 
     ############# Admin logic end ####################
 
+
+    ############# Reviewer logic start ######################
     if bank_payment_request.action_users(:unapprove).include?(user)
       last_trail = bank_payment_request.trails.last rescue nil
-      if (last_trail.action_id == TrailAction.id_for(:approve)) &&
+      if bank_payment_request.processing? && (last_trail.action_id == TrailAction.id_for(:approve)) &&
           (last_trail.action_user_id == user.id)
         return true
       end
     end
+    ############# Reviewer logic end #########################
   end
 
   def cancel_scheduled_payment
