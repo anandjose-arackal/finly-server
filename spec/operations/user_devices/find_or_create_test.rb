@@ -34,6 +34,10 @@ RSpec.describe 'UserDevices::FindOrCreate' do
             expect(@device.valid?).to eq(true)
           end
 
+          it 'should not be incomplete' do
+            expect(@device.incomplete?).to eq(false)
+          end
+
           it 'should associated UserDevice with the user and company' do
             expect(@user1).to_not be_nil
             expect(@user1.company).to_not be_nil
