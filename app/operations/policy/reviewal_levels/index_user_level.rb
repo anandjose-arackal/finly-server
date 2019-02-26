@@ -33,6 +33,7 @@ class Policy::ReviewalLevels::IndexUserLevel < Policy::ReviewalLevels::Base
       page = params[:page] || 1
       per_page = params[:per_page] || 30
       self.paginated_users = self.users.paginate(page: page, per_page: per_page)
+      debugger
     end
   end
 

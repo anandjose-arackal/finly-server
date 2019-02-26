@@ -5,6 +5,7 @@ json.table_headers do
   end
 end
 
+debugger
 json.result do
   json.array! @result.paginated_users do |user|
     json.user_details do
