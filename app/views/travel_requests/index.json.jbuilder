@@ -5,6 +5,9 @@ json.result do
     request_json.each do |key, value|
       json.set! key, value
     end
+    if travel_request.get_reviewers.present?
+      json.controlling_user travel_request.get_reviewers.first
+    end
   end
 end
 

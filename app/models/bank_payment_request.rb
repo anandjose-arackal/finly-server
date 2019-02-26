@@ -29,7 +29,8 @@
 class BankPaymentRequest < ApplicationRecord
 
   include SoftDeletable,
-          FindByOrderedIds
+          FindByOrderedIds,
+          Transitionable
 
   belongs_to :status, optional: true, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, optional: true, dependent: :destroy
@@ -43,6 +44,8 @@ class BankPaymentRequest < ApplicationRecord
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
+
+  has_many :trails, as: :parent
 
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
@@ -91,12 +94,17 @@ class BankPaymentRequest < ApplicationRecord
     when 9, '9' # i.e. pending
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
     when '10', 10 # i.e awaiting approval from current user
-      case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
-      when UserRole.id_for(:admin)
-        where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
-      else
-        where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
       end
+      # case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
+      # when UserRole.id_for(:admin)
+      #   where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
+      # else
+      #   where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
+      # end
     else
       # do nothing?
     end
@@ -158,7 +166,14 @@ class BankPaymentRequest < ApplicationRecord
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
-  scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+  # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+
+  # scope :filter_controlling_user, -> (user_id) {
+  #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
+  #   # with_id(ids)
+  #   ids = self.awaiting_action_items(user_id)&.pluck(:id)
+  #   with_id(ids)
+  # }
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
@@ -192,7 +207,7 @@ class BankPaymentRequest < ApplicationRecord
   }
 
   scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
-  scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved)}
+  scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved, :processing, :auto_approved)}
 
   scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
@@ -240,9 +255,9 @@ class BankPaymentRequest < ApplicationRecord
     processing?
   end
 
-  def can_return_control?
-    processing?
-  end
+  # def can_return_control?
+  #   processing?
+  # end
 
   def credit_pending?
     approved? && !credited?
@@ -255,8 +270,9 @@ class BankPaymentRequest < ApplicationRecord
   def auto_approved?
     # extracting the last tracks and checking if it was a submit action combined
     # with the next action user being blank
-    trail = self.bank_payment_request_trails.last
-    (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
+    self.status_id == BankPaymentRequestStatus.id_for(:auto_approved)
+    # trail = self.bank_payment_request_trails.last
+    # (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
   end
 
   def user
@@ -327,6 +343,31 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   private
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push BankPaymentRequestStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.document_owner_attribute
+    'owner_id'
+  end
+
+  def self.document_status_class_name
+    'BankPaymentRequestStatus'
+  end
+
+  def self.document_status_attribute
+    'status_id'
+  end
+
+  def self.finance_associated_status_ids
+    BankPaymentRequestStatus.ids_for(:approved, :credited, :pending, :creation_in_progress, :auto_approved)
+  end
 
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"

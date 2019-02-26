@@ -4,11 +4,16 @@ json.travel_request do
   request_json.each do |key, value|
     json.set! key, value
   end
+
+  if @result.travel_request.get_reviewers.present?
+    json.controlling_user @result.travel_request.get_reviewers.first
+  end
 end
 
-json.manager_name @result.manager&.name
-json.travel_manager_name @result.travel_manager&.name
-json.controlling_user_name @result.travel_request&.controlling_user&.name
+#json.manager_name @result.manager&.name
+json.awaiting_booking @result.awaiting_booking
+json.travel_managers @result.travel_managers.map(&:name)
+#json.controlling_user_name @result.travel_request&.controlling_user&.name
 json.owner do
   owner = @result.travel_request.user
   json.first_name owner.first_name
@@ -58,7 +63,12 @@ json.money_requests do
   json.data do
     json.array! @result.money_requests.each do |money_request|
       json.extract! money_request, :id, :name, :memo, :required_by_date
-      json.status money_request.status
+      if MoneyRequest.status_ids(:trip_open, :trip_processing, :trip_retracted, :trip_rejected, :trip_approved).include?(money_request.status.id)
+        status_object = {id: nil, name: 'Pending'}
+        json.status status_object
+      else
+        json.status money_request.status
+      end
       json.user do
         json.extract! money_request.user, :name
       end
@@ -161,3 +171,49 @@ end
 # json.custom_fields do
 #   json.array! @result.travel_request.custom_fields
 # end
+#
+json.reviewal_chains do
+  json.array! @result.reviewal_chains do |chain|
+    json.policy_id chain[:policy_id]
+    json.reviewal_chain do
+      json.array! chain[:reviewal_chain] do |item|
+        json.level_number item[:level_number]
+        json.level_name item[:level_name]
+        json.level_id item[:level_id]
+        if item[:selected_reviewer].present?
+          json.selected_reviewer do
+            json.reviewer_details item[:selected_reviewer].as_json
+            json.threshold item[:selected_reviewer_threshold]
+          end
+        end
+        json.reviewers do
+          json.array! item[:reviewers] do |reviewer|
+            json.extract! reviewer, :id, :exception, :threshold
+            json.reviewer_details reviewer.reviewer.as_json
+          end
+        end
+      end
+    end
+  end
+end
+json.reviewal_chains_booking do
+  json.array! @result.reviewal_chains_booking do |chain|
+    json.policy_id chain[:policy_id]
+    json.reviewal_chain do
+      json.array! chain[:reviewal_chain] do |item|
+        json.level_number item[:level_number]
+        json.level_name item[:level_name]
+        json.level_id item[:level_id]
+        json.selected_reviewer item[:selected_reviewer]&.as_json
+        json.reviewers do
+          json.array! item[:reviewers] do |reviewer|
+            json.extract! reviewer, :id, :exception, :threshold
+            json.reviewer_details reviewer.reviewer.as_json
+          end
+        end
+      end
+    end
+  end
+end
+json.reviewal_chain @result.travel_request.get_reviewal_chain('TravelRequestProvider')
+json.reviewal_chain_booking @result.travel_request.get_reviewal_chain('TravelRequestBookingProvider')

@@ -17,7 +17,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
   end
 
   def process
-    reports_presenter = Report::Index.(user, params)
+    reports_presenter = Reports::Index.(user, params)
     unless reports_presenter&.success?
       add_message :error, reports_presenter.messages[:error]
       return

@@ -41,4 +41,9 @@ class BankTransfer::InwardInvoicesController < BaseControllers::WebBase
     render json: @result.as_json
   end
 
+  def actions_configuration
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
 end

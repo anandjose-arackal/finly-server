@@ -54,6 +54,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
                                                                                   scheduled_at: params[:scheduled_at],
                                                                                   payment_type: params[:payment_type],
                                                                                   payment_mode: params[:payment_mode],
+                                                                                  payment_file_generated_at: DateTime.now # todo - temporary because it is throwing an error
                                                                               })
     if params[:scheduled_at].present? and Date.parse(params[:scheduled_at]) > Date.today
       self.report_processor_group.status_id = ReportProcessorGroupStatus.id_for(:scheduled)
@@ -158,6 +159,12 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       return
     end
 
+    # ###################
+    # # todo remove it
+    # policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: UserRole.id_for(:finance_manager)).pluck(:policy_id)
+    # users = User.where(id: PolicyUserMapping.where(policy_id: policy_ids, user_id: user_ids).pluck(:user_id))
+
+
     users = users_presenter.team.include_reimbursable_accounts.with_id(user_ids)
     unless users.count == user_ids.size
       add_message :error, 'Error loading configuration'
@@ -169,7 +176,6 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
 
     users&.each do |user|
       config = params&.dig(:mappings, user.id.to_s)
-
       processor_accountable_id = config[:processor_accountable_id]
       processor_accountable_type = config[:processor_accountable_type]
       processor_accountable = nil

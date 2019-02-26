@@ -110,6 +110,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       add_message :error, bank_payment_request.errors.full_messages
       return
     end
+
     self.bank_payment_request.payment_order.payments.each_with_index do |payment, index|
       payment_params = request_params[:payment_order_attributes][:payments_attributes][index]
       calculate_tax_and_discounts(payment_params, payment)
@@ -118,9 +119,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
         inv_attachment.update(invoice_id: payment.invoice.id)
       end
     end
-  end
 
-  def post_process
     # if there are unauthorized vendors, mandate an approval flow
     authorized = []
     self.bank_payment_request.payment_order.payments.each do |payment|
@@ -136,6 +135,20 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
     # update the requested amount for this payment order
     self.bank_payment_request.payment_order.update_requested_amount
+
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+    params[:reviewal_document] = self.bank_payment_request.reload
+
+    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+    unless document_reviewer_mappings_op.success?
+      add_message :error, document_reviewer_mappings_op.messages[:error]
+      return
+    end
+  end
+
+  def post_process
+    self.bank_payment_request.trails.create action_user: user, action_id: TrailAction.id_for(:create)
 
     add_message :success, "Payment Request created successfully!"
   end
@@ -288,6 +301,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               cost_center_id: order_details[:cost_center_id],
               tds_slab_id: order_details[:tds_slab_id],
               invoice_type_id: order_details[:invoice_type_id],
+              receiving_account_type: "BankAccount",
+              receiving_account_id: bank_account.id,
               original_amount_attributes: {
                   value: order_details[:original_amount],
                   currency_id: 1

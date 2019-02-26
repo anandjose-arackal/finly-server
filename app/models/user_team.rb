@@ -22,5 +22,4 @@ class UserTeam < ApplicationRecord
   accepts_nested_attributes_for :user_team_group_item_mappings
 
   scope :with_application, -> (application) { where application: application }
-
 end

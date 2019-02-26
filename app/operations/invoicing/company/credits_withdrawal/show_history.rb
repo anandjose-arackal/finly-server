@@ -17,7 +17,7 @@ class Invoicing::Company::CreditsWithdrawal::ShowHistory < Invoicing::Company::B
   end
 
   def process
-    self.credit_payments = Payment.with_receiving_account(self.collect_credit_account).with_payment_purpose(PaymentPurpose.id_for(:collect_funds_withdrawal)).processed
+    self.credit_payments = Payment.with_receiving_account(self.collect_credit_account).with_payment_purpose(PaymentPurpose.id_for(:collect_funds_withdrawal)).include_for_index
   end
 
   def success

@@ -23,7 +23,7 @@ module Constants
   MIGRATING_COMPANIES = [10, 67, 112]
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
-  PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io', 'kashyap.bj@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']

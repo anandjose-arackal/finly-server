@@ -10,6 +10,15 @@
 #  document_reviewer_mappable_type :string(255)      not null
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
+#  level_number                    :integer
+#  taken_control                   :boolean          default(FALSE)
+#  taken_control_by_id             :integer
+#  viewable                        :boolean          default(FALSE)
+#  action_taken_by_id              :integer
+#  action_id                       :integer
+#  provider_name                   :string(255)
+#  threshold                       :decimal(20, 5)
+#  active                          :boolean          default(TRUE)
 #
 
 class DocumentLevelReviewerMapping < ApplicationRecord
@@ -18,15 +27,27 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   # a new mapping is created. If nothing is selected it falls back to reviewer(s) in the
   # level
   belongs_to :policy, optional: true
-  belongs_to :level, optional: true, class_name: 'ReviewalLevel'
-  belongs_to :reviewer, optional: true, class_name: 'User'
-  belongs_to :document_reviewer_mappable, optional: true, polymorphic: true
+  belongs_to :level, class_name: 'ReviewalLevel', optional: true
+  belongs_to :reviewer, class_name: 'User', optional: true
+  belongs_to :document_reviewer_mappable, polymorphic: true, optional: true
+  belongs_to :taken_control_by, class_name: 'User', optional: true
+  belongs_to :action_taken_by, class_name: 'User', optional: true
+  belongs_to :action, class_name: 'TrailAction', optional: true
 
   scope :with_level_ids, -> (ids) {where level_id: ids}
+  scope :with_level_id, -> (ids) {where level_id: ids}
   scope :with_reviewer_ids, -> (ids) {where reviewer_id: ids}
+  scope :with_reviewer_id, -> (ids) {where reviewer_id: ids}
   scope :not_with_reviewer_ids, ->(id) { where.not reviewer_id: id }
   scope :with_policy_ids, -> (ids) {where policy_id: ids}
+  scope :with_policy_id, -> (ids) {where policy_id: ids}
   scope :with_document_type, -> (document_type) {where document_reviewer_mappable_type: document_type}
+  scope :with_taken_control, -> { where taken_control: true }
+  scope :with_taken_control_by_id, -> (ids) {where taken_control_by_id: ids}
+  scope :with_level_number, -> (number) {where level_number: number}
+  scope :with_provider_name, -> (name) {where provider_name: name}
+  scope :with_action_id, -> (action_id) {where action_id: action_id}
+  scope :with_viewable, -> {where viewable: true}
 
   scope :with_document_id, -> (document_ids) {where document_reviewer_mappable_id: document_ids}
 

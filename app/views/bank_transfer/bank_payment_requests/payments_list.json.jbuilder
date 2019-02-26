@@ -2,8 +2,8 @@ json.payments do
   json.array!(@result.paginated_payments.include_for_index) do |payment|
     json.owner_name payment.receiving_account&.account_owner&.name
     json.name payment.receiving_account&.name
-    json.account_number payment.receiving_account.account_number
-    json.ifsc payment.receiving_account.ifsc
+    json.account_number payment.receiving_account&.account_number
+    json.ifsc payment.receiving_account&.ifsc
     json.amount precision_value payment.amount_value
     json.payment_amount payment.amount_value
     json.net_amount precision_value payment.amount_value
@@ -11,9 +11,9 @@ json.payments do
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
-    json.account_id payment.receiving_account.id
-    json.beneficiary_id payment.receiving_account.account_owner&.id
-    json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
+    json.account_id payment.receiving_account&.id
+    json.beneficiary_id payment.receiving_account&.account_owner&.id
+    json.beneficiary_type (payment.receiving_account&.account_owner_type == "User" ? 1 : 2)
     if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
       json.beneficiary_type "authorized"
     else

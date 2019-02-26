@@ -127,7 +127,7 @@ class YesBankApi::Base < BaseHandler
 
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
-      self.transfer_status_id = BankTransferStatus.id_for(:failed)
+      self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
       # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
       if self.payment&.reference_resource&.is_a?(BankTransaction)
@@ -135,10 +135,10 @@ class YesBankApi::Base < BaseHandler
         self.bank_transaction = payment.reference_resource
         self.bank_transaction.update(
             bank_reference_number: self.transfer_request.bank_reference_number,
-            transfer_status_id: BankTransferStatus.id_for(:possible_failure),
+            transfer_status_id: self.transfer_status_id,
             bank_response: self.transfer_request.transaction_result
         )
-        self.payment.retry_count += 1
+        self.payment.update(retry_count: self.payment.retry_count.to_f + 1)
       else
         # this is an anomaly, so send email and flag it
         Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')

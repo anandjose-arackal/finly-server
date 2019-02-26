@@ -94,6 +94,7 @@ class User < ApplicationRecord
   has_many :manager_reports, -> { distinct }, source: :report, through: :manager_report_tracks
   has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
+  has_many :policy_user_roles
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
@@ -198,6 +199,7 @@ class User < ApplicationRecord
 
   has_many :procurements
   has_many :level_reviewer_mappings
+  has_many :level_user_reviewer_mappings
   has_many :procurement_attachments
 
   has_one :individual_kyc, dependent: :destroy
@@ -235,7 +237,6 @@ class User < ApplicationRecord
   scope :with_id_or_email_or_mobile_number, -> (string) {
     ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
     where id: ids
-
   }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
@@ -252,6 +253,10 @@ class User < ApplicationRecord
   scope :filter_vendor_payments_reviewers, -> (flag) {
     # passed argument is only for has scope, no effect here
     with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
+  }
+
+  scope :filter_em_reviewers, -> (flag) {
+    with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))
   }
   scope :only_finance_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   scope :only_vendor_payment_creditors, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
@@ -496,6 +501,45 @@ class User < ApplicationRecord
     includes(:cards, :company)
   }
 
+  # Gives list of user who are not part of a policy as finance manager
+  scope :filter_unassigned_finance_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:finance_manager)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_travel_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:travel_manager)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_members_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+
+    if policy.present?
+      user_ids = policy.user_mapping.non_deleted.pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_creditor_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy.id).with_role_id(UserRole.id_for(:creditor)).pluck(:user_id)
+      without_id(user_ids)
+    end
+
+  }
+
 
   before_save :strip_whitespace
 
@@ -626,13 +670,17 @@ class User < ApplicationRecord
     self.role_mapping.vendor_payments.manager.present?
   end
 
+  def vendor_payments_auditor?
+    self.role_mapping.vendor_payments.auditor.present?
+  end
+
   alias_method :vendor_payments_manager?, :vendor_payment_manager?
 
   alias_method :vendor_payment_reviewer?, :vendor_payment_manager?
   alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
 
   def vendor_payment_finance?
-    self.role_mapping.vendor_payments.finance_manager.present?
+    self.role_mapping.vendor_payments.creditor.present?
   end
 
   alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?

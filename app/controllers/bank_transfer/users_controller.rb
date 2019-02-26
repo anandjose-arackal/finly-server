@@ -30,4 +30,9 @@ class BankTransfer::UsersController < BaseControllers::WebBase
     respond
   end
 
+  def actions_configuration
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
 end

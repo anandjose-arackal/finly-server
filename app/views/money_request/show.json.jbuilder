@@ -10,10 +10,12 @@ json.status_name @result.status_name(@result.money_request)
 manager_name = @result.manager.name rescue ''
 json.manager_name manager_name
 json.controlling_user @result.money_request.controlling_user&.name
-finance_manager_name = @result.finance_manager.name rescue ''
+#finance_manager_name = @result.finance_manager.name rescue ''
+json.awaiting_credit @result.awaiting_credit
+json.finance_managers @result.finance_managers.map(&:name)
 
 json.cash_money_requests_allowed !!current_company&.configuration&.cash_money_requests_enabled
-json.finance_manager_name finance_manager_name
+# json.finance_manager_name finance_manager_name
 json.export_csv ''
 json.export_xls ''
 json.export_pdf ''
@@ -63,26 +65,26 @@ if travel_desk_enabled
   json.associated_trip @result.money_request.travel_request
 end
 
-json.forwardable_users do
-  forwardable_users = @result.forwardable_users
-  if forwardable_users.present?
-    json.array! forwardable_users.each do |item|
-      json.user do
-        user = item[:approver]
-        json.id user.id
-        json.name user.name
-        expenses = []
-        json.email user.email
-      end
-      json.user_role do
-        json.id item[:role_id]
-        json.name UserRole.name_for(item[:role_id])&.to_s&.humanize
-      end
-      json.position item[:pos]
-      json.is_reviewer item[:reviewer]
-    end
-  end
-end
+# json.forwardable_users do
+#   forwardable_users = @result.forwardable_users
+#   if forwardable_users.present?
+#     json.array! forwardable_users.each do |item|
+#       json.user do
+#         user = item[:approver]
+#         json.id user.id
+#         json.name user.name
+#         expenses = []
+#         json.email user.email
+#       end
+#       json.user_role do
+#         json.id item[:role_id]
+#         json.name UserRole.name_for(item[:role_id])&.to_s&.humanize
+#       end
+#       json.position item[:pos]
+#       json.is_reviewer item[:reviewer]
+#     end
+#   end
+# end
 # if @result.money_request.policy
 policy_name = ''
 policy_id = ''
@@ -146,3 +148,30 @@ json.account_details do
   end
   json.finly_money_balance finly_money_adapter.balance
 end
+
+json.reviewal_chains do
+  json.array! @result.reviewal_chains do |chain|
+    json.policy_id chain[:policy_id]
+    json.reviewal_chain do
+      json.array! chain[:reviewal_chain] do |item|
+        json.level_number item[:level_number]
+        json.level_name item[:level_name]
+        json.level_id item[:level_id]
+        if item[:selected_reviewer].present?
+          json.selected_reviewer do
+            json.reviewer_details item[:selected_reviewer].as_json
+            json.threshold item[:selected_reviewer_threshold]
+          end
+        end
+        json.reviewers do
+          json.array! item[:reviewers] do |reviewer|
+            json.extract! reviewer, :id, :exception, :threshold
+            json.reviewer_details reviewer.reviewer.as_json
+          end
+        end
+      end
+    end
+  end
+end
+
+json.reviewal_chain @result.money_request.get_reviewal_chain

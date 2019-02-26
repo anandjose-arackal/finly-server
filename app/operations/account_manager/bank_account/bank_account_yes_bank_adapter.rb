@@ -8,6 +8,10 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
   FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
   SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  TEMPORARY_ERRORS_FROM_BANK = [
+      "Acquiring Bank CBS or node offline",
+      "Rejected/Failed at downstream system"
+  ]
 
   attr_accessor :errors, :company
 
@@ -25,7 +29,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
       return false
-    elsif bank_transaction&.retriable?
+    elsif bank_transaction&.retriable? || bank_transaction&.open?
       reference_number = bank_transaction.unique_request_number
     else
       # i.e. it's a whole new payment being initiated for the first time
@@ -74,7 +78,12 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        # Payment with pending transaction will rerun through CronJobs
+        if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message)
+          payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
+        else
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        end
         error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error) || "Payment could not be processed at this time"
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message

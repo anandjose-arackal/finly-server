@@ -46,6 +46,11 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
     respond
   end
 
+  def unapprove
+    @result = Procurements::PurchaseOrders::Unapprove.(current_user, params)
+    respond
+  end
+
   def bulk_approve
     @result = Procurements::PurchaseOrders::BulkApprove.(current_user, params)
     respond
@@ -143,6 +148,11 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
   def template_destroy
     @result = Procurements::PurchaseOrders::Templates::Destroy.(current_user, params)
     respond response: @result.success? ? :success : :failure
+  end
+
+  def actions_configuration
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
   end
 
 end

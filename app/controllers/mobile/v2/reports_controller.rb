@@ -8,7 +8,7 @@ class Mobile::V2::ReportsController < BaseControllers::MobileBase
   respond_to :json
 
   def create
-    @result = Report::Create.(current_user, params)
+    @result = Reports::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
       respond render: 'mobile/v2/reports/show'
@@ -22,25 +22,25 @@ class Mobile::V2::ReportsController < BaseControllers::MobileBase
     @result = nil
     case action.to_sym
       when :submit
-        @result = Report::Submit.(current_user, params)
+        @result = Reports::Submit.(current_user, params)
       when :retract
-        @result = Report::Retract.(current_user, params)
+        @result = Reports::Retract.(current_user, params)
       when :approve
-        @result = Report::Approve.(current_user, params)
+        @result = Reports::Approve.(current_user, params)
       when :reject
-        @result = Report::Reject.(current_user, params)
+        @result = Reports::Reject.(current_user, params)
       when :unapprove
-        @result = Report::Unapprove.(current_user, params)
+        @result = Reports::Unapprove.(current_user, params)
       when :add_expenses
-        @result = Report::Expenses::Add.(current_user, params)
+        @result = Reports::Expenses::Add.(current_user, params)
       when :remove_expenses
-        @result = Report::Expenses::Remove.(current_user, params)
+        @result = Reports::Expenses::Remove.(current_user, params)
       when :reimbursement_confirm
-        @result = Report::SettlementConfirm.(current_user, params)
+        @result = Reports::SettlementConfirm.(current_user, params)
       when :reject_expense
-        @result = Report::Expenses::Reject.(current_user, params)
+        @result = Reports::Expenses::Reject.(current_user, params)
       else
-        @result = Report::Update.(current_user, params)
+        @result = Reports::Update.(current_user, params)
     end
     if @result.present?
       @result.config[:mobile_api] = true
@@ -53,13 +53,13 @@ class Mobile::V2::ReportsController < BaseControllers::MobileBase
   end
 
   def show
-    @result = Report::Show.(current_user, params)
+    @result = Reports::Show.(current_user, params)
     @result.config[:mobile_api] = true
     respond
   end
 
   def destroy
-    @result = Report::Destroy.(current_user, params)
+    @result = Reports::Destroy.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
       respond response: :success
@@ -72,7 +72,7 @@ class Mobile::V2::ReportsController < BaseControllers::MobileBase
     if params[:content].present? and (params[:content] == "" or params[:content] == 'nil')
       params[:content] = nil
     end
-    @result = Report::Comment::Create.(current_user, params)
+    @result = Reports::Comment::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
       respond render: 'mobile/v2/reports/show'

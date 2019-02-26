@@ -2,17 +2,17 @@ class MoneyRequestController < BaseControllers::WebBase
 
 
   def create
-    @result = MoneyRequest::Create.(current_user, params)
+    @result = MoneyRequests::Create.(current_user, params)
     respond render: :show
   end
 
   def index
-    @result = MoneyRequest::Index.(current_user, params)
+    @result = MoneyRequests::Index.(current_user, params)
     respond
   end
 
   def show
-    @result = MoneyRequest::Show.(current_user, params)
+    @result = MoneyRequests::Show.(current_user, params)
     respond render: :show
   end
 
@@ -25,45 +25,45 @@ class MoneyRequestController < BaseControllers::WebBase
     end
     case params[:action_type].to_sym
       when :update
-        @result = MoneyRequest::Update.(current_user, params)
+        @result = MoneyRequests::Update.(current_user, params)
       when :submit
-        @result = MoneyRequest::Submit.(current_user, params)
+        @result = MoneyRequests::Submit.(current_user, params)
       when :retract
-        @result = MoneyRequest::Retract.(current_user, params)
+        @result = MoneyRequests::Retract.(current_user, params)
       when :approve
-        @result = MoneyRequest::Approve.(current_user, params)
+        @result = MoneyRequests::Approve.(current_user, params)
       when :reject
-        @result = MoneyRequest::Reject.(current_user, params)
+        @result = MoneyRequests::Reject.(current_user, params)
       when :unapprove
-        @result = MoneyRequest::Unapprove.(current_user, params)
+        @result = MoneyRequests::Unapprove.(current_user, params)
       when :credit
         # from_account: wallet / virtual_account
-        @result = MoneyRequest::PrepaidCard::Credit.(current_user, params)
+        @result = MoneyRequests::PrepaidCard::Credit.(current_user, params)
       when :approve_and_forward_to
-        @result = MoneyRequest::ApproveAndForward.(current_user, params)
+        @result = MoneyRequests::ApproveAndForward.(current_user, params)
       when :take_control
-        @result = MoneyRequest::TakeControl.(current_user, params)
+        @result = MoneyRequests::TakeControl.(current_user, params)
     end
     respond render: :show
   end
 
   def credit_cash
-    @result = MoneyRequest::Cash::Credit.(current_user, params)
+    @result = MoneyRequests::Cash::Credit.(current_user, params)
     respond
   end
 
   def destroy
-    @result = MoneyRequest::Destroy.(current_user, params)
+    @result = MoneyRequests::Destroy.(current_user, params)
     respond response: :success
   end
 
   def comment
-    @result = MoneyRequest::Comment::Create.(current_user, params)
+    @result = MoneyRequests::Comment::Create.(current_user, params)
     respond render: :show
   end
 
   def config_details
-    @result = MoneyRequest::Config.(current_user, params)
+    @result = MoneyRequests::Config.(current_user, params)
     respond
   end
 

@@ -31,18 +31,18 @@ class VehicleRate < ApplicationRecord
 
   def rate
     return nil if super.nil?
-    Amount.new(value: super.value, currency_id: policy.base_currency_id)
+    Amount.new(value: super.value, currency_id: policy&.base_currency_id)
   end
 
   def as_json(options = {})
     {
         id: id,
-        vehicle_name: vehicle_name,
+        vehicle_name: "#{vehicle_name} - #{policy.present? ? policy&.name : ''}",
         rate: rate,
         distance_unit: distance_unit,
         policy: policy,
-        default_category: policy.distance_expense_config.default_category,
-        enforce_category: policy.distance_expense_config.enforce_category
+        default_category: policy&.distance_expense_config&.default_category,
+        enforce_category: policy&.distance_expense_config&.enforce_category
     }
   end
 

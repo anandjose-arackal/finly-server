@@ -14,7 +14,7 @@ class Event::EPurchaseOrder::Credit < Event::EPurchaseOrder::Base
 
   def init
     self.payment = params[:payment]
-    self.crediting_user = payment.payment_order.bank_payment_request.bank_payment_request_trails.last.action_user
+    self.crediting_user = payment.payment_order.bank_payment_request.trails.last.action_user
 
     self.purchase_order = payment.purchase_order
     unless self.purchase_order.present?

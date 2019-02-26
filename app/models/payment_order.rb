@@ -68,6 +68,7 @@ class PaymentOrder < ApplicationRecord
   has_one :bank_payment_request
   has_many :payments, dependent: :destroy
   has_many :payment_order_attachments, dependent: :destroy
+  has_many :system_messages, as: :messagable, dependent: :destroy
 
   has_attached_file :payment_file, default_url: '/images/:style/missing.png'
   validates_attachment_content_type :payment_file,

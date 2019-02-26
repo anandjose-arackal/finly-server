@@ -24,6 +24,10 @@ class LevelReviewerMapping < ApplicationRecord
 
   default_scope { unscope(:where) }
 
+  scope :with_reviewer_id, -> (reviewer_id) {
+    where reviewer_id: reviewer_id
+  }
+
   # Finds all the MAX amounts which are less than the amount passed
   # Find thes the mappings with max threshold which are lteq amount
   scope :with_threshold, -> (amount) {
@@ -37,6 +41,10 @@ class LevelReviewerMapping < ApplicationRecord
   scope :with_reviewer_id, -> (ids){
     where reviewer_id: ids
   }
+
+  # scope :with_provider_name, -> (provider_name){
+  #   where provider_name: provider_name
+  # }
 
 
 
