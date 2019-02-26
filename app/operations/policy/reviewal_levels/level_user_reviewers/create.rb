@@ -17,8 +17,8 @@ class Policy::ReviewalLevels::LevelUserReviewers::Create < Policy::ReviewalLevel
       add_message :error, "Invalid User Details"
     end
 
-    unless self.reviewer.present?
-      add_message :error, "Invalid User Details"
+    if level_user_reviewer_params[:reviewer_id].present? && self.reviewer.blank?
+      add_message :error, "Invalid Reviewer Details"
     end
   end
 
