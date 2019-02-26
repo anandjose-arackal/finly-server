@@ -143,6 +143,22 @@ RSpec.describe 'UserDevices::FindOrCreate' do
         end
       end
     end
+
+    describe '> Incomplete Params' do
+      describe '> New UserDeviceBrowser' do
+        describe '> New UserDevice' do
+
+        end
+      end
+      describe '> Existing UserDeviceBrowser' do
+        describe '> New UserDevice' do
+
+        end
+        describe '> Existing UserDevice' do
+
+        end
+      end
+    end
   end
 
 end

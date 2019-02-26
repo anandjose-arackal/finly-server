@@ -56,7 +56,7 @@ class UserDevices::FindOrCreate < BaseOperation
           if device_property.nil?
             device_property = device_property_for(device[:klass], request_properties[device[:device_key].to_s])
           end
-          user_device.send "#{device[:create_attributes_key]}=", device_property
+          user_device.send "#{device[:user_device_key]}=", device_property
 
           if user_device.incomplete?
             user_device.status_id = UserDeviceStatus.id_for(:incomplete)

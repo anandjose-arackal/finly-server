@@ -27,7 +27,7 @@ class UserDevice < ApplicationRecord
           user_device_type: UserDeviceType.id_for(:browser),
           device_key: 13,
           authentication_scope: :web,
-          create_attributes_key: :user_device_browser
+          user_device_key: :user_device_browser
       }
   }
 
