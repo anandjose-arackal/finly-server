@@ -3399,6 +3399,8 @@ Rails.application.routes.draw do
   resources :reviewal_levels do
     resources :reviewers
   end
+
+  resources :level_user_reviewers
   ######## Reviewal Workflow End ##########
 
   ### Audit Trails ##
