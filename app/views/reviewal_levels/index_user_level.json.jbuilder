@@ -1,4 +1,11 @@
-json.result do 
+json.table_headers do
+  json.array! @result.levels_data do |data|
+    json.level_number data[:level_numer]
+    json.name data[:level]&.name
+  end
+end
+
+json.result do
   json.array! @result.paginated_users do |user|
     json.user_details do
       json.merge! user.as_json

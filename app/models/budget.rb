@@ -209,7 +209,9 @@ class Budget < ApplicationRecord
   private
 
   def recalculate_parent_budget
-
+    if self.parent.present?
+      self.parent.children
+    end
   end
 
 end
