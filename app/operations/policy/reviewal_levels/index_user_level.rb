@@ -1,4 +1,4 @@
-class Policy::ReviewalLevels::IndexUserLevel < ReviewalLevels::Base
+class Policy::ReviewalLevels::IndexUserLevel < Policy::ReviewalLevels::Base
   attr_accessor :reviewal_levels, :users, :policy
 
   class Policy::ReviewalLevels::IndexUserLevel::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter

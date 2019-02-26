@@ -23,6 +23,7 @@ json.result do
         json.reviewers do 
           if lurms.present?
             json.array! lurms do |lurm|
+              json.level_user_reviewer_mapping_id lurm.id
               json.name lurm.reviewer&.name
               json.threshold lurm.threshold
               json.exception lurm.exception

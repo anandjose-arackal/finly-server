@@ -17,6 +17,11 @@ class ReviewalLevelsController < ApplicationController
     respond
   end
 
+  def show_user_level
+    @result = Policy::ReviewalLevels::ShowUserLevel.(current_user, params)
+    respond
+  end
+
 
   def update
     @result = ReviewalLevels::Update.(current_user, params)

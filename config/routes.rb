@@ -3396,6 +3396,7 @@ Rails.application.routes.draw do
 
   ######## Reviewal Workflow ##########
   get 'reviewal_levels/index_user_level', to: "reviewal_levels#index_user_level"
+  get 'reviewal_levels/show_user_level', to: "reviewal_levels#show_user_level"
   resources :reviewal_levels do
     resources :reviewers
   end

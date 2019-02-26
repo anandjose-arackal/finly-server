@@ -6,8 +6,8 @@ class Policy::ReviewalLevels::LevelUserReviewers::Create < Policy::ReviewalLevel
  
     policy_ids = user.company.policies.non_deleted.pluck(:id)
     self.level = ReviewalLevel.with_policy_id(policy_ids).non_deleted.with_id(level_user_reviewer_params[:level_id]).first rescue nil
-    self.target_user = User::Index.(user, params).teams.find_by(id: level_user_reviewer_params[:user_id]).first rescue nil
-    self.reviewer = User::Index.(user, params).teams.find_by(id: level_user_reviewer_params[:reviewer_id]).first rescue nil
+    self.target_user = user.company.users.find_by id: level_user_reviewer_params[:user_id]
+    self.reviewer = user.company.users.find_by id: level_user_reviewer_params[:reviewer_id]
   end
 
   def validate
@@ -27,14 +27,14 @@ class Policy::ReviewalLevels::LevelUserReviewers::Create < Policy::ReviewalLevel
   def process
     lurm = LevelUserReviewerMapping.new level_user_reviewer_params
 
-    lurm.policy_id self.level.policy_id
+    lurm.policy_id = self.level.policy_id
 
     unless lurm.save
       add_message :error, lurm.errors.full_messages
     end
   end
 
-  def success
+  def post_process
     add_message :success, "Added Override"
   end
 end
