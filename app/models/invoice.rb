@@ -266,6 +266,16 @@ class Invoice < ApplicationRecord
                             nil])
   }
 
+  scope :filter_by_created_at, -> (created_at) {
+    created_at = Date.parse(created_at).strftime('%Y-%m-%d')
+    # where created_at: created_at
+    where("DATE(created_at) >= ?", created_at)
+  }
+
+  scope :filter_vendor_id, -> (ids){
+    where vendor_id: ids
+  }
+
   after_create :set_defaults
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
