@@ -313,11 +313,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Reviewer logic start ####################
     if user.vendor_payments_reviewer?
       return true if (bank_payment_request.action_users(:approve).include?(user) && bank_payment_request.processing? || bank_payment_request.credited?)
+    end
       ############# Reviewer logic end ####################
 
       ############# Initiator logic start ####################
-    elsif (bank_payment_request.owner_id == user.id)
-      if (bank_payment_request.processing? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.credited?)
+    if (bank_payment_request.owner_id == user.id)
+      if (bank_payment_request.processing? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted? || bank_payment_request.credited?)
         return true
       end
     end
