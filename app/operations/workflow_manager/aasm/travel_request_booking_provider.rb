@@ -59,7 +59,7 @@ class WorkflowManager::Aasm::TravelRequestBookingProvider < WorkflowManager::Aas
 
     event :confirm_booking do
       # MoneyRequestProvider depends on this to mark money requests to approved form pending status
-      transitions from: :selection_confirmed, to: :booking_confirmed
+      transitions from: [:selection_confirmed, :booking_pending], to: :booking_confirmed
     end
 
     # event :request
