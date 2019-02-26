@@ -55,7 +55,7 @@ class TravelRequests::Review::Reject < TravelRequests::Review::Base
 
     self.workflow_output = op.workflow_output
 
-    self.trave_request.money_requests.each do |money_request|
+    self.travel_request.money_requests.each do |money_request|
       parameters = {
         document: money_request,
         aasm_event: 'reject',

@@ -4,6 +4,10 @@ json.travel_request do
   request_json.each do |key, value|
     json.set! key, value
   end
+
+  if @result.travel_request.get_reviewers.present?
+    json.controlling_user @result.travel_request.get_reviewers.first
+  end
 end
 
 #json.manager_name @result.manager&.name
@@ -59,7 +63,12 @@ json.money_requests do
   json.data do
     json.array! @result.money_requests.each do |money_request|
       json.extract! money_request, :id, :name, :memo, :required_by_date
-      json.status money_request.status
+      if MoneyRequest.status_ids(:trip_open, :trip_processing, :trip_retracted, :trip_rejected, :trip_approved).include?(money_request.status.id)
+        status_object = {id: nil, name: 'Pending'}
+        json.status status_object
+      else
+        json.status money_request.status
+      end
       json.user do
         json.extract! money_request.user, :name
       end
