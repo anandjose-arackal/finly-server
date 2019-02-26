@@ -6,8 +6,8 @@ class Policy::ReviewalLevels::LevelUserReviewers::Create < Policy::ReviewalLevel
  
     policy_ids = user.company.policies.non_deleted.pluck(:id)
     self.level = ReviewalLevel.with_policy_id(policy_ids).non_deleted.with_id(level_user_reviewer_params[:level_id]).first rescue nil
-    self.target_user = User::Team::Index.(user, params).users.find_by(id: level_user_reviewer_params[:user_id]).first rescue nil
-    self.reviewer = User::Team::Index.(user, params).users.find_by(id: level_user_reviewer_params[:reviewer_id]).first rescue nil
+    self.target_user = User::Index.(user, params).teams.find_by(id: level_user_reviewer_params[:user_id]).first rescue nil
+    self.reviewer = User::Index.(user, params).teams.find_by(id: level_user_reviewer_params[:reviewer_id]).first rescue nil
   end
 
   def validate
