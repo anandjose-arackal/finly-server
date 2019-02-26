@@ -12,6 +12,8 @@
 
 
 class Currency < ApplicationRecord
+  include Seedable
+
   has_many :amounts
 
   # since default currency is INR
@@ -19,13 +21,13 @@ class Currency < ApplicationRecord
     1
   end
 
-  def as_json(options={})
-      {
-          id: self.id,
-          country: self.country,
-          country_code: self.country_code,
-          symbol: self.symbol
-      }
+  def as_json(options = {})
+    {
+        id: self.id,
+        country: self.country,
+        country_code: self.country_code,
+        symbol: self.symbol
+    }
   end
 
   CURRENCIES = [
@@ -75,8 +77,8 @@ class Currency < ApplicationRecord
           symbol: "₽"
       },
       {
-          :country=>"United Arab Emirates Dirham",
-          :country_code=>"AED",
+          :country => "United Arab Emirates Dirham",
+          :country_code => "AED",
           symbol: ""
       },
       {
@@ -836,11 +838,11 @@ class Currency < ApplicationRecord
   ]
 
   def self.id_for(country_code)
-      Currency.find_by(country_code: country_code)&.id
+    Currency.find_by(country_code: country_code)&.id
   end
 
   def self.currency_for(country_code)
-      Currency.find_by(country_code: country_code)
+    Currency.find_by(country_code: country_code)
   end
 
   def self.seed_data

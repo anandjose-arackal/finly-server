@@ -58,6 +58,9 @@ class UserDeviceBrowser < ApplicationRecord
   # validates :is_mobile, presence: true
 
   before_save :set_timestamp
+  before_save :set_incomplete
+
+  scope :not_incomplete, -> { where incomplete: false }
 
   # {
   #     '11': '1549636286',
@@ -92,21 +95,6 @@ class UserDeviceBrowser < ApplicationRecord
   #     '28': 'Chrome PDF Plugin, Chrome PDF Viewer, Native Client',
   #     '31': true
   # }
-
-  def incomplete?
-    set_timestamp
-    [
-        :timestamp, :user_agent, :timezone, :fingerprint, :language,
-        :browser, :browser_version, :browser_engine, :browser_engine_version,
-        :os_name, :os_version,
-        :screen_width, :screen_height, :color_depth, :is_mobile
-    ].each do |attr|
-      if self.send(attr).blank?
-        return true
-      end
-    end
-    false
-  end
 
   def self.obfuscation_map
     {
@@ -146,6 +134,21 @@ class UserDeviceBrowser < ApplicationRecord
 
   def set_timestamp
     self.timestamp = DateTime.strptime(self.timestamp_s, '%s') if timestamp_s.present? and self.timestamp.blank?
+  end
+
+  def set_incomplete
+    [
+        :timestamp, :user_agent, :timezone, :fingerprint, :language,
+        :browser, :browser_version, :browser_engine, :browser_engine_version,
+        :os_name, :os_version,
+        :screen_width, :screen_height, :color_depth, :is_mobile
+    ].each do |attr|
+      if self.send(attr).blank?
+        self.incomplete = true
+        break
+      end
+    end
+    self.incomplete = false
   end
 
 

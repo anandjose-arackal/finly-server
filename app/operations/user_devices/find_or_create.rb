@@ -11,14 +11,6 @@ class UserDevices::FindOrCreate < BaseOperation
 
   attr_accessor :device, :device_property
 
-  def self.call(params)
-    self.new(params).run
-  end
-
-  def initialize(params)
-    super(nil, params)
-  end
-
   def process
     self.device = device_property_from_request
   end
@@ -48,14 +40,23 @@ class UserDevices::FindOrCreate < BaseOperation
         user_device = nil
         # Find
         if fingerprint.present?
-          user_device = UserDevice.not_incomplete.find_by_fingerprint(fingerprint)
+          user_device = user.user_devices.not_incomplete.find_by_fingerprint(fingerprint)
         end
 
         # Create
         if user_device.nil?
           user_device = UserDevice.new(fingerprint: fingerprint)
-          user_device.send "#{device[:create_attributes_key]}=", device_property_for(device[:klass], request_properties[device[:device_key].to_s])
           user_device.type_id = device[:user_device_type]
+          user_device.user = user
+          user_device.company = user.company
+
+          # Find Device Property
+          device_property = device[:klass].not_incomplete.find_by_fingerprint(fingerprint)
+
+          if device_property.nil?
+            device_property = device_property_for(device[:klass], request_properties[device[:device_key].to_s])
+          end
+          user_device.send "#{device[:create_attributes_key]}=", device_property
 
           if user_device.incomplete?
             user_device.status_id = UserDeviceStatus.id_for(:incomplete)

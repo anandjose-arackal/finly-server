@@ -3,8 +3,8 @@ require File.expand_path('../../config/environment', __FILE__)
 require 'test_helper'
 require 'rails/test_help'
 require 'sidekiq/testing'
-require 'minitest/autorun'
-require 'minitest/around/spec'
+# require 'minitest/autorun'
+# require 'minitest/around/spec'
 require 'database_cleaner'
 
 DatabaseCleaner.strategy = :transaction

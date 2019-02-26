@@ -35,6 +35,8 @@ class UserDevice < ApplicationRecord
   has_many :user_sessions
   belongs_to :status, class_name: 'UserDeviceStatus'
   belongs_to :type, class_name: 'UserDeviceType'
+  belongs_to :user
+  belongs_to :company
 
   validates :status_id, presence: true
 
@@ -42,7 +44,7 @@ class UserDevice < ApplicationRecord
   scope :find_by_property, ->(user, device_property) {find_by type_id: device_property.type_id, user_device_browser_id: device_property.id, user_id: user.id}
 
   def incomplete?
-    device_property&.incomplete?
+    device_property.nil? or device_property&.incomplete?
   end
 
   def device_property

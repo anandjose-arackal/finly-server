@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_22_150622) do
+ActiveRecord::Schema.define(version: 2019_02_26_044922) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -62,7 +62,7 @@ ActiveRecord::Schema.define(version: 2019_02_22_150622) do
     t.datetime "updated_at", null: false
     t.boolean "trigger_email", default: false, null: false
     t.boolean "reviewer", default: false, null: false
-    t.integer "admin_user_id", null: false
+    t.integer "admin_user_id"
     t.datetime "email_triggered_at"
     t.index ["admin_review_workflow_id"], name: "index_admin_review_workflow_levels_on_admin_review_workflow_id"
     t.index ["position"], name: "index_admin_review_workflow_levels_on_position"
@@ -5169,6 +5169,7 @@ ActiveRecord::Schema.define(version: 2019_02_22_150622) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_mobile"
+    t.boolean "incomplete"
   end
 
   create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

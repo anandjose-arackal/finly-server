@@ -124,7 +124,7 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_device(args)
-    result = UserDevices::FindOrCreate.(params)
+    result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.messages[:error].to_sentence
