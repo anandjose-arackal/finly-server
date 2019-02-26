@@ -54,6 +54,8 @@ class Budget < ApplicationRecord
   validates :start_date, presence: true
   validates :end_date, presence: true
 
+  after_update :recalculate_parent_budget
+
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
     id = id.split(",")
@@ -203,5 +205,11 @@ class Budget < ApplicationRecord
                  ]
              ])
   }
+
+  private
+
+  def recalculate_parent_budget
+
+  end
 
 end
