@@ -1,6 +1,6 @@
 json.table_headers do
   json.array! @result.levels_data do |data|
-    json.level_number data[:level_numer]
+    json.level_number data[:level_number]
     json.name data[:level]&.name
   end
 end
