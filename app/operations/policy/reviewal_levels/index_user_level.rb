@@ -2,7 +2,7 @@ class Policy::ReviewalLevels::IndexUserLevel < ReviewalLevels::Base
   attr_accessor :reviewal_levels, :users, :policy
 
   class Policy::ReviewalLevels::IndexUserLevel::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :reviewal_levels, :users, :paginated_users
+    attr_accessor :reviewal_levels, :users, :paginated_users, :levels_data
 
     has_scope :filter_policy
     has_scope :filter_associated_entity_type
@@ -18,6 +18,17 @@ class Policy::ReviewalLevels::IndexUserLevel < ReviewalLevels::Base
         self.reviewal_levels = self.reviewal_levels.order(:level_number)
       end
 
+      self.levels_data = []
+      self.reviewal_levels.each do |level|
+        data = {
+          level_number: level.level_number,
+          id: level.id,
+          level: level,
+          lrms: level.level_reviewer_mappings.non_deleted.includes(:reviewer)
+        }
+        self.levels_data.push(data)
+      end
+
 
       page = params[:page] || 1
       per_page = params[:per_page] || 30
@@ -25,6 +36,9 @@ class Policy::ReviewalLevels::IndexUserLevel < ReviewalLevels::Base
     end
   end
 
+  def authorized_user_types
+    [:admin]
+  end
 
   def init
     policy_id = params[:policy_id]

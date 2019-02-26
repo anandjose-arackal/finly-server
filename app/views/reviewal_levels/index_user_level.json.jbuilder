@@ -5,10 +5,11 @@ json.result do
     end
 
     json.levels do
-      json.array! @result.reviewal_levels do |level|
-        json.level_number level.level_number
-        json.id level.id
-        lurms = level.lurms.with_user_id(user.id)
+      json.array! @result.levels_data do |data|
+        json.level_number data[:level_number]
+        json.id data[:id]
+
+        lurms = data[:level].lurms.with_user_id(user.id)
 
         json.overridden lurms.present?
 
@@ -20,7 +21,7 @@ json.result do
               json.exception lurm.exception
             end
           else
-            json.array! level.level_reviewer_mappings.non_deleted do |lrm|
+            json.array! data[:lrms] do |lrm|
               json.name lrm.reviewer&.name
               json.threshold lrm.threshold
               json.exception lrm.exception
