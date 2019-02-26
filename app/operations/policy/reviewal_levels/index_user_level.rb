@@ -11,7 +11,7 @@ class Policy::ReviewalLevels::IndexUserLevel < Policy::ReviewalLevels::Base
     def init
       self.users = params[:users]
       self.reviewal_levels = params[:reviewal_levels]
-
+      
       if self.reviewal_levels.present?
         self.reviewal_levels = apply_scopes(self.reviewal_levels, params)
         self.reviewal_levels = self.reviewal_levels.non_deleted
@@ -20,20 +20,19 @@ class Policy::ReviewalLevels::IndexUserLevel < Policy::ReviewalLevels::Base
 
       self.levels_data = []
       self.reviewal_levels.each do |level|
+        lrms = level.level_reviewer_mappings.non_deleted
         data = {
           level_number: level.level_number,
           id: level.id,
           level: level,
-          lrms: level.level_reviewer_mappings.non_deleted.includes(:reviewer)
+          lrms: lrms
         }
         self.levels_data.push(data)
       end
 
-
-      page = params[:page] || 1
-      per_page = params[:per_page] || 30
+      page = (params[:page] || 1)
+      per_page = (params[:per_page] || 30)
       self.paginated_users = self.users.paginate(page: page, per_page: per_page)
-      debugger
     end
   end
 
