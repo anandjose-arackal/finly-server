@@ -2,6 +2,8 @@ class Policy::ReviewalLevels::LevelUserReviewers::Create < Policy::ReviewalLevel
   attr_accessor :level_user_reviewer, :level, :target_user, :reviewer
 
   def init
+    super
+ 
     policy_ids = user.company.policies.non_deleted.pluck(:id)
     self.level = ReviewalLevel.with_policy_id(policy_ids).non_deleted.with_id(level_user_reviewer_params[:level_id]).first rescue nil
     self.target_user = User::Team::Index.(user, params).users.find_by(id: level_user_reviewer_params[:user_id]).first rescue nil
