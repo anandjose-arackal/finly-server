@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_22_101448) do
+ActiveRecord::Schema.define(version: 2019_02_27_064833) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -4347,21 +4347,22 @@ ActiveRecord::Schema.define(version: 2019_02_22_101448) do
     t.integer "item_id"
     t.datetime "start_date"
     t.datetime "end_date"
-    t.decimal "amount", precision: 10
     t.integer "rate_contract_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "amount_id"
   end
 
   create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.integer "vendor_id"
-    t.string "renewal_alert"
     t.boolean "renewable"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "item_id"
     t.integer "creator_id"
+    t.integer "renewal_alert_number"
+    t.integer "renewal_alert_period_id"
   end
 
   create_table "rate_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

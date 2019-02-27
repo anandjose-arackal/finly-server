@@ -3413,8 +3413,9 @@ Rails.application.routes.draw do
 
   ######### Rate Contract API start #############
   resources :rate_contracts do
-    put 'upload_attachments', to: 'rate_contracts#upload_attachments'
-    put 'destroy_attachments', to: 'rate_contracts#destroy_attachments'
+    collection do
+      get 'configuration', to: 'rate_contracts#configuration'
+    end
   end
   ######### Rate Contract API end ################
 
