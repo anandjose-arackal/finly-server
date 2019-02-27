@@ -42,6 +42,10 @@ class LevelReviewerMapping < ApplicationRecord
     where reviewer_id: ids
   }
 
+  scope :with_exception, -> (bool) {
+    where exception: bool
+  }
+
   # scope :with_provider_name, -> (provider_name){
   #   where provider_name: provider_name
   # }

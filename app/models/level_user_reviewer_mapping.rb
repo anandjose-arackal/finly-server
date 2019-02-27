@@ -49,4 +49,8 @@ class LevelUserReviewerMapping < ActiveRecord::Base
     where reviewer_id: ids
   }
 
+  scope :with_exception, -> (bool) {
+    where exception: bool
+  }
+
 end

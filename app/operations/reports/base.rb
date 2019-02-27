@@ -68,6 +68,8 @@ class Reports::Base < BaseOperation
       self.violations_present = has_warning? || has_blocking?
       self.finance_managers = report.document_role_users(:finance_managers)
 
+      debugger
+
       if Report.status_ids(:approved, :auto_approved).include?(report.status_id)
         self.awaiting_settlement = true
       else
@@ -94,6 +96,7 @@ class Reports::Base < BaseOperation
 
         policies.each do |policy|
           params[:policy_id] = policy.id
+          params[:violations_present] = has_blocking?
           chain = {
               policy_id: policy.id,
               reviewal_chain: get_reviewal_chain
