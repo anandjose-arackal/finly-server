@@ -39,7 +39,7 @@ class Reports::Expenses::Reject < Reports::Base
       raise_unauthorized_exception
     end
 
-    unless report.controlling_user_id == user.id
+    unless report.get_reviewers.include?(user)
       messages[:error] << 'You cannot reject the expenses in this report'
     end
   end

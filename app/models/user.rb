@@ -524,7 +524,7 @@ class User < ApplicationRecord
     policy = Policy.find_by id: policy_id
 
     if policy.present?
-      user_ids = policy.users.pluck(:id)
+      user_ids = policy.user_mapping.non_deleted.pluck(:user_id)
       without_id(user_ids)
     end
   }

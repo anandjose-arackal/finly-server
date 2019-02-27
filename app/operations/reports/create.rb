@@ -22,7 +22,7 @@ class Reports::Create < Reports::Base
     return if for_user.blank?
     self.policy_id = params[:policy_id]
     if policy_id.blank? and for_user.enforce_policy_enabled?
-      self.policy_id = for_user.policies.non_default&.first&.id
+      self.policy_id = for_user.policies.non_deleted.non_default&.first&.id
     end
     if policy_id.blank?
       self.policy_id = user.company.default_policy.id
@@ -31,7 +31,7 @@ class Reports::Create < Reports::Base
   end
 
   def authorize
-    if policy_id.present? and for_user.policies.with_id(policy_id).blank?
+    if policy_id.present? and for_user.policies.non_deleted.with_id(policy_id).blank?
       add_message :error, 'User does not belong to the selected policy'
       raise_unauthorized_exception
     end
