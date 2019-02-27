@@ -10,10 +10,12 @@ json.levels do
       json.level_number data[:level_number]
       json.id data[:id]
       json.overridden lurms.present?
+      json.name data[:level]&.name
 
       json.reviewers do
         json.array! data[:lrms] do |lrm|
           json.name lrm.reviewer&.name
+          json.email lrm.reviewer&.email
           json.threshold lrm.threshold
           json.exception lrm.exception
         end
@@ -22,6 +24,7 @@ json.levels do
     if lurms.present?
       json.overridden do
         json.level_number data[:level_number]
+        json.name data[:level]&.name
         json.id data[:id]
 
         json.reviewers do 
@@ -29,6 +32,7 @@ json.levels do
           json.array! lurms do |lurm|
             json.level_user_reviewer_mapping_id lurm.id
             json.name lurm.reviewer&.name
+            json.email lurm.reviewer&.email
             json.threshold lurm.threshold
             json.exception lurm.exception
           end

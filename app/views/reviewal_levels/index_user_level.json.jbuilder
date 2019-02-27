@@ -25,12 +25,14 @@ json.result do
             json.array! lurms do |lurm|
               json.level_user_reviewer_mapping_id lurm.id
               json.name lurm.reviewer&.name
+              json.email lurm.reviewer&.email
               json.threshold lurm.threshold
               json.exception lurm.exception
             end
           else
             json.array! data[:lrms] do |lrm|
               json.name lrm.reviewer&.name
+              json.email lrm.reviewer&.email
               json.threshold lrm.threshold
               json.exception lrm.exception
             end
