@@ -36,31 +36,21 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  is_mobile              :boolean
+#  message                :string(255)
+#  status_id              :integer          not null
 #
 
 class UserDeviceBrowser < ApplicationRecord
   attr_accessor :timestamp_s
 
-  # validates :timestamp, presence: true
-  # validates :user_agent, presence: true
-  # validates :timezone, presence: true
-  # validates :fingerprint, presence: true
-  # validates :language, presence: true
-  # validates :browser, presence: true
-  # validates :browser_version, presence: true
-  # validates :browser_engine, presence: true
-  # validates :browser_engine_version, presence: true
-  # validates :os_name, presence: true
-  # validates :os_version, presence: true
-  # validates :screen_width, presence: true
-  # validates :screen_height, presence: true
-  # validates :color_depth, presence: true
-  # validates :is_mobile, presence: true
+  before_validation :set_timestamp
+  before_validation :set_incomplete
 
-  before_save :set_timestamp
-  before_save :set_incomplete
+  belongs_to :status, class_name: 'UserDeviceStatus'
 
-  scope :not_incomplete, -> { where incomplete: false }
+  scope :completed, -> {where status_id: UserDeviceStatus.id_for(:complete)}
+
+  delegate :incomplete?, :attribute_mismatch?, :complete?, to: :status
 
   # {
   #     '11': '1549636286',
@@ -95,6 +85,24 @@ class UserDeviceBrowser < ApplicationRecord
   #     '28': 'Chrome PDF Plugin, Chrome PDF Viewer, Native Client',
   #     '31': true
   # }
+
+  # Compares all attributes of current model with the hash provided in arguments. Returns the differences
+  def differences(attrs)
+    differences = []
+    [:user_agent, :timezone, :fingerprint, :language, :system_language,
+     :browser, :browser_version, :browser_engine, :browser_engine_version,
+     :os_name, :os_version,
+     :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
+     :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
+     :silver_light_version,
+     :is_mime_types, :mime_types_list,
+     :fonts_list,
+     :is_local_storage, :is_session_storage, :is_cookie,
+     :plugins, :is_mobile].each do |attr|
+      differences << attr unless self.send(attr)&.to_s == attrs[attr]&.to_s
+    end
+    differences
+  end
 
   def self.obfuscation_map
     {
@@ -133,10 +141,12 @@ class UserDeviceBrowser < ApplicationRecord
   end
 
   def set_timestamp
-    self.timestamp = DateTime.strptime(self.timestamp_s, '%s') if timestamp_s.present? and self.timestamp.blank?
+    self.timestamp = DateTime.strptime(self.timestamp_s, '%Q') if timestamp_s.present? and self.timestamp.blank?
   end
 
   def set_incomplete
+    return unless status_id.nil?
+    incomplete_list = []
     [
         :timestamp, :user_agent, :timezone, :fingerprint, :language,
         :browser, :browser_version, :browser_engine, :browser_engine_version,
@@ -144,11 +154,15 @@ class UserDeviceBrowser < ApplicationRecord
         :screen_width, :screen_height, :color_depth, :is_mobile
     ].each do |attr|
       if self.send(attr).blank?
-        self.incomplete = true
-        break
+        incomplete_list << attr
       end
     end
-    self.incomplete = false
+    if incomplete_list.blank?
+      self.status_id = UserDeviceStatus.id_for(:complete)
+    else
+      self.status_id = UserDeviceStatus.id_for(:incomplete)
+      self.message = "Missing attributes #{incomplete_list}"
+    end
   end
 
 

@@ -7,7 +7,6 @@
 #  company_id                   :integer
 #  fingerprint                  :string(255)
 #  status_id                    :integer          not null
-#  type_id                      :integer          not null
 #  verification_mode            :string(255)
 #  verification_key             :string(255)
 #  verification_code_sent_at    :datetime
@@ -16,7 +15,8 @@
 #  verification_failed_attempts :integer
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
-#  user_device_browser_id       :integer          not null
+#  client_id                    :integer
+#  client_type                  :string(255)
 #
 
 FactoryBot.define do

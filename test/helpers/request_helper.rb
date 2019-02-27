@@ -5,6 +5,7 @@ module RequestHelper
   end
 
   def authentication_headers_for(type, properties = {})
+    properties = properties.with_indifferent_access
     headers = {}
     case type
     when :web

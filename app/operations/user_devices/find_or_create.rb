@@ -9,10 +9,14 @@ class UserDevices::FindOrCreate < BaseOperation
 
   end
 
-  attr_accessor :device, :device_property
+  attr_accessor :device, :client
+
+  def pre_validate
+    user_present?
+  end
 
   def process
-    self.device = device_property_from_request
+    self.device = client_from_request
   end
 
   def success
@@ -21,7 +25,7 @@ class UserDevices::FindOrCreate < BaseOperation
 
   protected
 
-  def device_property_from_request
+  def client_from_request
     request = RequestStoreUtil.current_request
     headers = request.headers
     request_properties = headers['X-Finly-RP']
@@ -35,48 +39,51 @@ class UserDevices::FindOrCreate < BaseOperation
     request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
     UserDevice::DEVICES.each do |type, device|
       if params[:scope].include?(device[:authentication_scope].to_s)
-        fingerprint_key = device[:klass].obfuscation_map[:fingerprint]
-        fingerprint = request_properties&.dig(device[:device_key].to_s, fingerprint_key)
-        user_device = nil
-        # Find
-        if fingerprint.present?
-          user_device = user.user_devices.not_incomplete.find_by_fingerprint(fingerprint)
-        end
-
-        # Create
-        if user_device.nil?
-          user_device = UserDevice.new(fingerprint: fingerprint)
-          user_device.type_id = device[:user_device_type]
-          user_device.user = user
-          user_device.company = user.company
-
-          # Find Device Property
-          device_property = device[:klass].not_incomplete.find_by_fingerprint(fingerprint)
-
-          if device_property.nil?
-            device_property = device_property_for(device[:klass], request_properties[device[:device_key].to_s])
-          end
-          user_device.send "#{device[:user_device_key]}=", device_property
-
-          if user_device.incomplete?
-            user_device.status_id = UserDeviceStatus.id_for(:incomplete)
-          else
-            user_device.status_id = UserDeviceStatus.id_for(:unverified)
-          end
-
-          user_device.save
-        end
-
+        client = client_for(device[:klass], request_properties[device[:device_key].to_s])
+        user_device = user_device_for(client)
         return user_device
       end
     end
     nil
   end
 
-  def device_property_for(device_klass, x_finly_rp)
+  def user_device_for(client)
+    user_device = user.user_devices.valid.find_by(client: client)
+    return user_device if user_device.present?
+    # If not found
+    user_device = user.user_devices.build company: user.company, client: client, status_id: UserDeviceStatus.id_for(:unverified)
+    unless client.complete?
+      user_device.status_id = client.status_id
+      user_device.message = client.message
+    end
+    user_device.save
+    user_device
+  end
+
+  def client_for(config_class, x_finly_rp)
+    attributes = client_attributes_for config_class, x_finly_rp
+    client = config_class.completed.find_by(fingerprint: attributes[:fingerprint])
+    # If the device with the same fingerprint is found, then check if attributes are matching
+    if client
+      # Verify client matches with the request properties
+      differences = client.differences(attributes)
+      # If there is a mismatch, flag it as attribute mismatch
+      if differences.present?
+        # Mark client status as config mismatch
+        attributes[:status_id] = UserDeviceStatus.id_for(:attribute_mismatch)
+        attributes[:message] = "Attribute mismatch for #{differences.to_sentence}"
+        client = config_class.create(attributes)
+      end
+    else
+      client = config_class.create(attributes)
+    end
+    client
+  end
+
+  def client_attributes_for(config_class, x_finly_rp)
     attributes = {}
-    device_klass.obfuscation_map.each {|attribute, id| attributes[attribute] = x_finly_rp[id]}
-    device_klass.new(attributes)
+    config_class.obfuscation_map.each {|attribute, id| attributes[attribute] = x_finly_rp[id]}
+    attributes
   end
 
 end

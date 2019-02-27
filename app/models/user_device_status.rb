@@ -12,7 +12,27 @@ class UserDeviceStatus < ApplicationRecord
   include Seedable
 
   def self.values
-    [:unverified, :verified, :incomplete]
+    [:unverified, :verified, :incomplete, :attribute_mismatch, :complete]
+  end
+
+  def unverified?
+    self.id == UserDeviceStatus.id_for(:unverified)
+  end
+
+  def verified?
+    self.id == UserDeviceStatus.id_for(:verified)
+  end
+
+  def incomplete?
+    self.id == UserDeviceStatus.id_for(:incomplete)
+  end
+
+  def attribute_mismatch?
+    self.id == UserDeviceStatus.id_for(:attribute_mismatch)
+  end
+
+  def complete?
+    self.id == UserDeviceStatus.id_for(:complete)
   end
 
 end

@@ -17,10 +17,10 @@ module RequestHelper
     args = {}
     id = params[:id] || '13'
     args[id] = {}
-    args[id]['11'] = params.has_key?(:timestamp_s) ? params[:timestamp_s] : '1549636286'
+    args[id]['11'] = params.has_key?(:timestamp_s) ? params[:timestamp_s] : DateTime.now.strftime('%Q')
     args[id]['16'] = params.has_key?(:user_agent) ? params[:user_agent] : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.96 Safari/537.36'
     args[id]['19'] = params.has_key?(:timezone) ? params[:timezone] : 'India Standard Time'
-    args[id]['7'] = params.has_key?(:fingerprint) ? params[:fingerprint] : '3202771635'
+    args[id]['7'] = params.has_key?(:fingerprint) ? params[:fingerprint] : rand(10 ** 10).to_s.rjust(10,'0')
     args[id]['5'] = params.has_key?(:language) ? params[:language] : 'en-IN'
     args[id]['20'] = params.has_key?(:system_language) ? params[:system_language] : nil
     args[id]['27'] = params.has_key?(:browser) ? params[:browser] : 'Chrome'
