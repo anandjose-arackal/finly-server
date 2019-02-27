@@ -17,6 +17,7 @@
 #  updated_at                   :datetime         not null
 #  client_id                    :integer
 #  client_type                  :string(255)
+#  message                      :text(65535)
 #
 
 require 'rails_helper'

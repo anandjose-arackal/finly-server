@@ -36,8 +36,8 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  is_mobile              :boolean
-#  message                :string(255)
 #  status_id              :integer          not null
+#  message                :text(65535)
 #
 
 class UserDeviceBrowser < ApplicationRecord
@@ -102,6 +102,14 @@ class UserDeviceBrowser < ApplicationRecord
       differences << attr unless self.send(attr)&.to_s == attrs[attr]&.to_s
     end
     differences
+  end
+
+  def self.client_id
+    '13'
+  end
+
+  def self.authentication_scope
+    :web
   end
 
   def self.obfuscation_map

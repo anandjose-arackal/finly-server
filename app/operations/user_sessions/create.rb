@@ -56,7 +56,6 @@ class UserSessions::Create < BaseOperation
     enrich_access args
     enrich_geo_location args
     enrich_device args
-    # enrich_platform args
     set_event args
     return if has_errors?
     self.session = UserSession.new args
@@ -128,14 +127,17 @@ class UserSessions::Create < BaseOperation
     unless result.success?
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.messages[:error].to_sentence
+      add_message :error, result.messages[:error].to_sentence
       return
     end
 
     args[:user_device_id] = result.device.id
     args[:device_type_id] = result.device.type_id
-    unless result.device.valid?
+    unless result.device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(result.device.status_id)
       args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.messages[:error].to_sentence
+      args[:message] = result.device.message
+      add_message :error, result.device.message
+      return
     end
   end
 

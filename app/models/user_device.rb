@@ -17,17 +17,12 @@
 #  updated_at                   :datetime         not null
 #  client_id                    :integer
 #  client_type                  :string(255)
+#  message                      :text(65535)
 #
 
 class UserDevice < ApplicationRecord
 
-  DEVICES = {
-      browser: {
-          klass: UserDeviceBrowser,
-          device_key: 13,
-          authentication_scope: :web
-      }
-  }
+  DEVICES = [UserDeviceBrowser]
 
   belongs_to :client, polymorphic: true, optional: true, dependent: :destroy
   has_many :user_sessions
