@@ -1,6 +1,6 @@
 json.result do
   json.rate_contract do
-    json.extract! @result.rate_contract, :id, :name, :vendor_id, :renewal_alert, :creator_id, :renewable
+    json.extract! @result.rate_contract, :id, :name, :vendor_id, :renewal_alert_number, :renewal_alert_period_id, :creator_id, :renewable
     if @result.rate_contract.rate_contract_line_items.present?
       json.line_items do
         json.array!(@result.rate_contract.rate_contract_line_items) do |line_item|
@@ -13,7 +13,9 @@ json.result do
           json.location_code line_item&.location&.location_code
           json.line_item_start_date line_item&.start_date&.to_date
           json.line_item_end_date line_item&.end_date&.to_date
-          json.amount line_item&.amount
+          json.amount_id line_item&.amount&.id
+          json.amount_value line_item&.amount&.value
+          json.amount_currency line_item&.amount&.currency
           json.rate_contract_id line_item&.rate_contract_id
           if line_item.artifacts.present?
             json.array!(line_item.artifacts) do |artifact|
