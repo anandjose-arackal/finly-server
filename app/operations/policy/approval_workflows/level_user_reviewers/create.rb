@@ -1,4 +1,4 @@
-class Policy::ReviewalLevels::LevelUserReviewers::Create < Policy::ReviewalLevels::LevelUserReviewers::Base
+class Policy::ApprovalWorkflows::LevelUserReviewers::Create < Policy::ApprovalWorkflows::LevelUserReviewers::Base
   attr_accessor :level_user_reviewer, :level, :target_user, :reviewer
 
   def init

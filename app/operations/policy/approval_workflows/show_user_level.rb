@@ -1,7 +1,7 @@
-class Policy::ReviewalLevels::ShowUserLevel < Policy::ReviewalLevels::Base
+class Policy::ApprovalWorkflows::ShowUserLevel < Policy::ApprovalWorkflows::Base
   attr_accessor :reviewal_levels, :target_user, :policy
 
-  class Policy::ReviewalLevels::IndexUserLevel::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Policy::ApprovalWorkflows::ShowUserLevel::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reviewal_levels, :target_user, :paginated_users, :levels_data
 
     has_scope :filter_policy
@@ -57,6 +57,6 @@ class Policy::ReviewalLevels::ShowUserLevel < Policy::ReviewalLevels::Base
   def success
     params[:target_user] = self.target_user
     params[:reviewal_levels] = self.reviewal_levels
-    Policy::ReviewalLevels::IndexUserLevel::IndexPresenter.new(user, params, messages)
+    Policy::ApprovalWorkflows::ShowUserLevel::ShowPresenter.new(user, params, messages)
   end
 end

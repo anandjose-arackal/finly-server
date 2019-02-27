@@ -13,12 +13,12 @@ class ReviewalLevelsController < ApplicationController
 
   # Ideally rest of the operations should be present under Policy namespace
   def index_user_level
-    @result = Policy::ReviewalLevels::IndexUserLevel.(current_user, params)
+    @result = Policy::ApprovalWorkflows::IndexUserLevel.(current_user, params)
     respond
   end
 
   def show_user_level
-    @result = Policy::ReviewalLevels::ShowUserLevel.(current_user, params)
+    @result = Policy::ApprovalWorkflows::ShowUserLevel.(current_user, params)
     respond
   end
 

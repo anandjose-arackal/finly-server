@@ -1,4 +1,4 @@
-class Policy::ReviewalLevels::LevelUserReviewers::Destroy < Policy::ReviewalLevels::LevelUserReviewers::Base
+class Policy::ApprovalWorkflows::LevelUserReviewers::Destroy < Policy::ApprovalWorkflows::LevelUserReviewers::Base
   attr_accessor :level_user_reviewer
 
   def init

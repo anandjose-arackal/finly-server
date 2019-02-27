@@ -1,4 +1,4 @@
-class Policy::ReviewalLevels::LevelUserReviewers::Base < BaseOperation
+class Policy::ApprovalWorkflows::LevelUserReviewers::Base < BaseOperation
   attr_accessor :level_user_reviewer_params
 
   def authorized_user_types
