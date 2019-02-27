@@ -13,7 +13,7 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Destroy < Policy::ApprovalW
   end
 
   def process
-    unless level_user_reviewer.destroy
+    unless lurm.destroy
       add_message :error, "Couldn't remove override"
     end
   end

@@ -6,7 +6,7 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Index < Policy::ApprovalWor
   end
 
   def init
-    self.level_user_reviewer_params = generate_params
+    # self.level_user_reviewer_params = generate_params
     policy_ids = user.company.policies.non_deleted.pluck(:id)
 
     reviewal_level_ids = ReviewalLevel.with_policy_id(policy_ids)
