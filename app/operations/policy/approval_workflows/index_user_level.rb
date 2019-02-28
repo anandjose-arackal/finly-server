@@ -2,7 +2,7 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
   attr_accessor :reviewal_levels, :policy_users, :policy
 
   class Policy::ApprovalWorkflows::IndexUserLevel::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :reviewal_levels, :policy_users, :paginated_users, :levels_data
+    attr_accessor :reviewal_levels, :policy_users, :paginated_users, :levels_data, :count
 
     has_scope :filter_policy
     has_scope :filter_associated_entity_type
@@ -30,6 +30,7 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
         self.levels_data.push(data)
       end
 
+      self.count = self.policy_users.count
       page = (params[:page] || 1)
       per_page = (params[:per_page] || 30)
       self.paginated_users = self.policy_users.paginate(page: page, per_page: per_page)
