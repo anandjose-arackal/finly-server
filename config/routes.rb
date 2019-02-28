@@ -499,6 +499,7 @@
 #                                                         GET    /invoices/customers/:id(.:format)                                                                                   api/fc/invoices/customers#show
 #                   api_vp_bank_transfer_initiate_payment POST   /api/vp/bank_transfer/initiate_payment(.:format)                                                                    api/vp/bank_transfer/bank_payment_requests#initiate_payment
 #                     api_vp_bank_transfer_payment_status GET    /api/vp/bank_transfer/payment_status/:id(.:format)                                                                  api/vp/bank_transfer/bank_payment_requests#payment_status
+#        api_vp_bank_transfer_payment_status_external_ref GET    /api/vp/bank_transfer/payment_status_by_external_id/:id(.:format)                                                   api/vp/bank_transfer/bank_payment_requests#payment_status_by_external_ref
 #              api_vp_bank_transfer_bulk_initiate_payment POST   /api/vp/bank_transfer/bulk_initiate_payment(.:format)                                                               api/vp/bank_transfer/bank_payment_requests#bulk_initiate_payment
 #        api_vp_bank_transfer_bank_payment_request_credit PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)                               api/vp/bank_transfer/bank_payment_requests#credit
 #        api_vp_bank_transfer_bank_payment_request_review PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)                               api/vp/bank_transfer/bank_payment_requests#review
@@ -1164,6 +1165,13 @@
 #                                                         DELETE /payments/companies/:id(.:format)                                                                                   companies#destroy
 #                                   request_index_configs GET    /payment_request_configs(.:format)                                                                                  bank_transfer/bank_payment_requests#index_configurations
 #                                         request_filters GET    /payment_request_filters(.:format)                                                                                  bank_transfer/bank_payment_requests#index_configurations
+#                            payment_ticket_action_config GET    /payment_ticket_action_config(.:format)                                                                             bank_transfer/bank_payment_requests#actions_configuration
+#                               beneficiary_action_config GET    /beneficiary_action_config(.:format)                                                                                bank_transfer/account_owners#actions_configuration
+#                            inward_invoice_action_config GET    /inward_invoice_action_config(.:format)                                                                             bank_transfer/inward_invoices#actions_configuration
+#                       inventory_line_item_action_config GET    /inventory_line_item_action_config(.:format)                                                                        invoicing/inventory_line_items#actions_configuration
+#                                    non_po_action_config GET    /non_po_action_config(.:format)                                                                                     procure/purchase_orders#actions_configuration
+#                               procurement_action_config GET    /procurement_action_config(.:format)                                                                                procure/procurements#actions_configuration
+#                                   vp_user_action_config GET    /vp_user_action_config(.:format)                                                                                    bank_transfer/users#actions_configuration
 #                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                                                       bank_transfer/payment_orders#count
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                                                     bank_transfer/payment_orders#balance
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                                                             bank_transfer/payment_orders#index
@@ -2553,6 +2561,7 @@ Rails.application.routes.draw do
       namespace :bank_transfer do
         post 'initiate_payment', to: 'bank_payment_requests#initiate_payment', as: :initiate_payment
         get 'payment_status/:id', to: 'bank_payment_requests#payment_status', as: :payment_status
+        get 'payment_status_by_external_id/:id', to: 'bank_payment_requests#payment_status_by_external_ref', as: :payment_status_external_ref
         post 'bulk_initiate_payment', to: 'bank_payment_requests#bulk_initiate_payment', as: :bulk_initiate_payment
         resources :bank_payment_requests do
           patch 'credit', to: 'bank_payment_requests#credit', as: :credit
