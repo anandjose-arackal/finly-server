@@ -1,3 +1,5 @@
+#NOT BEING USED. REMOVE THIS WHEN YOU START USING IT
+
 class Users::Index < Users::Base
   attr_accessor :users
 
