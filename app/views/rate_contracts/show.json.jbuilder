@@ -20,7 +20,7 @@ json.result do
             json.value line_item&.amount&.value
           end
           if line_item.artifacts.present?
-            json.attachments do
+            json.artifacts_attributes do
               json.array!(line_item.artifacts) do |artifact|
                 json.uid artifact.id
                 json.name artifact&.attachment_file_name
@@ -33,12 +33,12 @@ json.result do
       end
       
       if @result.rate_contract.artifacts.present?
-        json.attachments do
+        json.artifacts_attributes do
           json.array!(@result.rate_contract.artifacts) do |artifact|
-          json.uid artifact.id
-          json.name artifact&.attachment_file_name
-          json.url artifact&.attachment&.url
-          json.status 'done'
+            json.uid artifact.id
+            json.name artifact&.attachment_file_name
+            json.url artifact&.attachment&.url
+            json.status 'done'
           end
         end
       end
