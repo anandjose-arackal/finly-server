@@ -6,7 +6,7 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
-                :vendor
+                :vendor, :bank_account
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -14,6 +14,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order_id = params[:id] || params[:purchase_order_id]
     # self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
+    # params[:bank_account_id] = '80'
+    if params[:bank_account_id]
+      self.bank_account = self.purchase_order.vendor.bank_accounts.find_by(id: params[:bank_account_id])
+    end
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
     purchase_order_params.delete(:document_reviewer_mappings)
 
@@ -38,6 +42,28 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         add_message :error, 'Policy cannot be blank'
       end
     end
+
+    if self.purchase_order_params[:advance_amount_attributes].present? # && self.purchase_order_params[:advance_amount_attributes][:value].blank?
+      valid = true
+      if self.purchase_order_params[:advance_amount_attributes][:value].blank? || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
+        add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
+        valid = false
+
+      elsif self.purchase_order_params[:due_date].blank?
+        add_message :error, 'Bro add the due date for the advance bro.'
+        valid = false
+
+      elsif self.bank_account.blank?
+        add_message :error, 'Please select the bank account of the vendor.'
+        valid = false
+
+      end
+
+      if valid && purchase_order.advance_amount_status_empty
+        purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+      end
+    end
+
   end
 
   def pre_process
@@ -56,9 +82,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # binding.pry
     # self.purchase_order = procurement.build_purchse_order(purchase_order_params)
     # advance_amount_attributes: [:value, :currency_id]
-    purchase_order_params[:advance_amount_attributes] = {value: 300, currency_id: 1}
-    purchase_order_params[:due_date] = "2019-02-22"
-    purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+    # purchase_order_params[:advance_amount_attributes] = {value: 300, currency_id: 1}
+    # purchase_order_params[:due_date] = "2019-02-22"
+    # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+    
     puts "PURCHASEORDER AFTER ADVANCE UPDATE FROM Process", params.inspect
     puts "purchase_order_params", purchase_order_params.inspect
     puts "purchase_order before", purchase_order.inspect
@@ -70,6 +97,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       purchase_order.save
       # binding.pry
       purchase_order.save
+
+      # Directly update the columns because we have callbacks,
+      # and those callbacks are validating data which were not previously formatted, like ifsc, (we have some gibberrish ifsc values which  were allowed to be saved before)
+      # so at this moment it is better to simply call the database,
+      # later when we have proper formatted data, we will call update
+      if params[:bank_account_id]
+        self.bank_account.update_columns(purchase_order_id: purchase_order.id)
+      end
 
       if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
         # For setting level specific reviewers from reviewal chain for a document

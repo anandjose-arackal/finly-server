@@ -51,7 +51,7 @@
 #
 
 class PurchaseOrder < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable
+  include SoftDeletable, Templatable, Transitionable, MathUtil
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :procurement, optional: true
@@ -97,6 +97,8 @@ class PurchaseOrder < ApplicationRecord
   has_many :payments, as: :parent
 
   has_many :trails, as: :parent
+
+  has_one :bank_account
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
@@ -295,6 +297,24 @@ class PurchaseOrder < ApplicationRecord
 
   def advance_can_be_paid?
     advance_to_be_processed? || advance_failed?
+  end
+
+  def advance_amount_status_empty
+    self.advance_amount_status.blank?
+  end
+
+  # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
+  def as_json2
+    {
+      original_amount: precision_value(self.total_after_tax&.value),
+      advance_amount: precision_value(self.advance_amount&.value),
+      balance_due: precision_value(self.balance_amount&.value)
+      # balance_due: {
+      #   value: precision_value(self.balance_amount&.value),
+      #   id: self.balance_amount&.id,
+      #   currency_id: self.balance_amount&.currency&.id
+      # }
+    }
   end
 
   private

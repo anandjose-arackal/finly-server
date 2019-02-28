@@ -253,7 +253,8 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       # purchase_order = current_company.purchase_orders.find_by(po_number: po_number)
       purchase_order = user.company.purchase_orders.find_by(id: po_id)
       vendor = purchase_order.vendor
-      bank_account = vendor.bank_accounts.where(default_account: true).first
+      # bank_account = vendor.bank_accounts.where(default_account: true).first
+      bank_account = purchase_order.bank_account
       payment_params << {
           name: vendor.name,
           bank_account_number: bank_account.account_number,

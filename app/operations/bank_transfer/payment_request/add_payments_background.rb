@@ -22,9 +22,9 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     self.run
   end
 
-  def initialize
+  # def initialize
 
-  end
+  # end
 
   def pre_validate
     if self.bank_payment_request.blank?
@@ -40,6 +40,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     self.payment_params = []
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
+      # binding.pry
       self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
           application: "vp",
@@ -97,13 +98,34 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
 
   end
 
+  # def process
+  #   self.payment_params.each do |params|
+  #     custom_fields = params[:custom_fields]
+  #     params.delete(:custom_fields)
+  #     params[:payment_order_id] = self.bank_payment_request.payment_order.id
+  #     # payment = ::Payment.new(params)
+  #     payment = self.bank_payment_request.payment_order.payments.build(params)
+  #     if payment.save
+  #       # perform the required calculations
+  #       InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+  #       payment.save
+  #       # now save the custom fields to the invoice
+  #       set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
+  #     end
+  #   end
+
+  #   # now once the payment request has been created and the payments saved, we can mark it as open
+  #   self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
+  #   self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+  #   # puts 'SUCCESSFUL!'
+  # end
+
   def process
     self.payment_params.each do |params|
       custom_fields = params[:custom_fields]
       params.delete(:custom_fields)
-      params[:payment_order_id] = self.bank_payment_request.payment_order.id
-      payment = ::Payment.new(params)
-      # payment = self.bank_payment_request.payment_order.payments.build(params)
+      payment = self.bank_payment_request.payment_order.payments.build(params)
+      # binding.pry
       if payment.save
         # perform the required calculations
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
@@ -116,7 +138,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     # now once the payment request has been created and the payments saved, we can mark it as open
     self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
     self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
-    # puts 'SUCCESSFUL!'
+    puts 'SUCCESSFUL!'
   end
 
   private
@@ -130,6 +152,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   end
 
   def retrieve_bank_account(order_details)
+    # binding.pry
     if order_details[:account_id].present?
       id = order_details[:account_id]
       ba = BankAccount.find_by(id: id)

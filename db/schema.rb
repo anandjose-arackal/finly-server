@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_25_074444) do
+ActiveRecord::Schema.define(version: 2019_02_28_170551) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -477,6 +477,8 @@ ActiveRecord::Schema.define(version: 2019_02_25_074444) do
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
+    t.integer "purchase_order_id"
+    t.index ["purchase_order_id"], name: "index_bank_accounts_on_purchase_order_id"
     t.index ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id"
   end
 
@@ -597,6 +599,51 @@ ActiveRecord::Schema.define(version: 2019_02_25_074444) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "name"
+    t.integer "vendor_id"
+    t.integer "bank_account_id"
+    t.integer "category_id"
+    t.integer "department_id"
+    t.integer "original_amount_id"
+    t.integer "tax_amount_id"
+    t.integer "payable_amount_id"
+    t.boolean "inclusive_of_taxes"
+    t.integer "gst_type_id"
+    t.decimal "tax", precision: 10
+    t.integer "tds_slab_id"
+    t.integer "company_id"
+    t.integer "sub_department_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status_id"
+    t.integer "tds_amount_id"
+    t.integer "balance_due_id"
+    t.integer "net_amount_id"
+    t.integer "gross_amount_id"
+    t.decimal "roundoff_amount", precision: 10
+    t.integer "cost_center_id"
+    t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
+    t.index ["category_id"], name: "index_beneficiary_payments_on_category_id"
+    t.index ["company_id"], name: "index_beneficiary_payments_on_company_id"
+    t.index ["cost_center_id"], name: "index_beneficiary_payments_on_cost_center_id"
+    t.index ["department_id"], name: "index_beneficiary_payments_on_department_id"
+    t.index ["gst_type_id"], name: "index_beneficiary_payments_on_gst_type_id"
+    t.index ["original_amount_id"], name: "index_beneficiary_payments_on_original_amount_id"
+    t.index ["payable_amount_id"], name: "index_beneficiary_payments_on_payable_amount_id"
+    t.index ["status_id"], name: "index_beneficiary_payments_on_status_id"
+    t.index ["sub_department_id"], name: "index_beneficiary_payments_on_sub_department_id"
+    t.index ["tax_amount_id"], name: "index_beneficiary_payments_on_tax_amount_id"
+    t.index ["tds_slab_id"], name: "index_beneficiary_payments_on_tds_slab_id"
+    t.index ["vendor_id"], name: "index_beneficiary_payments_on_vendor_id"
   end
 
   create_table "bill_of_supplies", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -3847,7 +3894,9 @@ ActiveRecord::Schema.define(version: 2019_02_25_074444) do
     t.integer "department_id"
     t.integer "location_id"
     t.datetime "deleted_at"
+    t.integer "beneficiary_payment_id"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
+    t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
     t.index ["initiating_user_id"], name: "index_payments_on_initiating_user_id"
     t.index ["payment_type_id"], name: "index_payments_on_payment_type_id"
@@ -5791,6 +5840,10 @@ ActiveRecord::Schema.define(version: 2019_02_25_074444) do
   add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
   add_foreign_key "bank_transactions", "amounts"
   add_foreign_key "bank_transactions", "companies"
+  add_foreign_key "beneficiary_payments", "bank_accounts"
+  add_foreign_key "beneficiary_payments", "categories"
+  add_foreign_key "beneficiary_payments", "departments"
+  add_foreign_key "beneficiary_payments", "yes_bank_vendors", column: "vendor_id"
   add_foreign_key "bill_of_supplies", "companies"
   add_foreign_key "bill_of_supplies", "document_statuses"
   add_foreign_key "bill_of_supplies", "payment_terms"

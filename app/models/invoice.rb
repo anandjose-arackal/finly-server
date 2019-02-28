@@ -75,7 +75,7 @@
 #              2 - CGST + SGST
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable
+  include SoftDeletable, Templatable, Transitionable, MathUtil
 
   include Sequenced::ActsAsSequenced
 
@@ -400,6 +400,63 @@ class Invoice < ApplicationRecord
 
   def generate_sequential_id?
     self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+  end
+
+  def as_json
+    {
+      id: self.id,
+      advance: self.advance,
+      advance_amount: self.advance_amount&.value,
+      tax_amount: precision_value(self.tax_amount&.value),
+      tds_amount: precision_value(self.tds_amount&.value),
+      tax: precision_value(self.tax),
+      tds: precision_value(self.tds),      
+      gst_type_id: self.gst_type_id,
+      tax_type_id: self.tax_type_id,
+      tds_type_id: self.tds_type_id,
+      discount_amount: precision_value(self.discount_amount&.value),
+      discount: precision_value(self.discount),
+      date: self.date,
+      discount_type_id: self.discount_type_id,
+      due_date: self.due_date,
+      invoice_number: self.invoice_number,
+      inclusive_of_taxes: self.inclusive_of_taxes,
+      freight_amount: self.freight_amount&.value,
+      roundoff_amount: self.roundoff_amount,
+      net_payable_amount: self.balance_due&.value,
+      balance_due: self.balance_due&.value,
+      taxable_amount: precision_value(self.gross_amount&.value),
+      editable: self.unpaid?,
+      tax_rate: precision_value(self.tax_rate),
+      tds_rate: precision_value(self.tds_rate),
+      discount_rate: precision_value(self.discount_rate),
+      advance_rate: precision_value(self.advance_rate),
+      invoice_attachment: {
+        url: self.invoice_attachments.first&.attached_file&.url,
+        thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+        content_type: self.invoice_attachments.first&.attached_file&.content_type,
+        file_name: self.invoice_attachments.first&.attached_file&.original_filename
+      },
+      net_amount: precision_value(self.net_amount&.value),
+      gross_amount: precision_value(self.gross_amount&.value),
+      custom_fields: [],
+      category_id: self.category_id,
+      category_name: self.category&.name,
+
+      cost_center_id: self.cost_center_id,
+      cost_center_name: self.cost_center&.name,
+
+      tds_slab_id: self.tds_slab_id,
+      tds_slab_name: self.tds_slab&.name,
+      tds_rate: self.tds,
+
+      # invoice amounts total
+      item_amounts_total: self.item_amounts_total,
+
+      # paid amount for this invoice
+      paid_amount: self.payments.successful.joins(:amount).sum(:value),
+      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+    }
   end
 
   private

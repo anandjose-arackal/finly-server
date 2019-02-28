@@ -130,8 +130,15 @@ json.payments do
         json.balance_due payment.amount&.value
       end
     end
+
+    json.parent_type payment.parent_type
+    json.parent_id payment.parent_id
+    # json.invoice_details payment.invoice.invoice_amount_details
+    json.parent_details payment.parent_details
+
   end
 end
+
 
 
 # json.payments_count @result.ordered_payments.count
