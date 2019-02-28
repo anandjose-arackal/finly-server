@@ -26,12 +26,11 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
   end
 
   def init
-
     # extracting the user to whom the money request belongs
     id = (params[:id] or params[:to_user_id])
     team = User::Team::Index.(user, params)
     self.to_user = team.with_id(id).first rescue nil if team.present?
-    if params.class.name == ActionController::Parameters.name || params.class.name == HashWithIndifferentAccess.name
+    if params.class.name == HashWithIndifferentAccess.name
       self.params = ActionController::Parameters.new(params)
     end
     self.payment_param = payment_params
@@ -117,7 +116,7 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
   def init_payment_request(payment_type, payment_purpose, options = {})
     initiating_account = options[:initiating_account]
     amount = options[:amount]
-    receiving_account = options[:receiving_account] || to_user.cash_on_hand
+    receiving_account = options[:receiving_account] || to_user.user_pockets.cash_pockets_only.find_by(id: params[:destination_pocket_id])
     self.payment_request = PaymentRequest.(user, initiating_account, (receiving_account&.class&.name), payment_type, payment_purpose)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, amount, note: self.note))
   end
