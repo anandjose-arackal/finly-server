@@ -13,7 +13,7 @@ class DestroyReportTest < ActiveSupport::TestCase
     Report.any_instance.stubs(:open?).returns(true)
 
     assert_difference '@user.reports.exclude_deleted.count', -1 do
-      @result = Report::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
+      @result = Reports::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
     end
     assert @result.success?
   end
@@ -23,7 +23,7 @@ class DestroyReportTest < ActiveSupport::TestCase
     Report.any_instance.stubs(:retracted?).returns(true)
 
     assert_difference '@user.reports.exclude_deleted.count', -1 do
-      @result = Report::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
+      @result = Reports::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
     end
     assert @result.success?
   end
@@ -35,7 +35,7 @@ class DestroyReportTest < ActiveSupport::TestCase
     Report.any_instance.stubs(:retracted?).returns(false)
 
     assert_no_difference '@user.reports.exclude_deleted.count' do
-      @result = Report::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
+      @result = Reports::Destroy.new(@user, {report_id: @report.id, role_id: 4}).run
     end
     assert_not @result.success?
     assert_not @report.is_deleted
@@ -47,7 +47,7 @@ class DestroyReportTest < ActiveSupport::TestCase
 
     assert_no_difference '@user.reports.exclude_deleted.count' do
       begin
-        @result = Report::Destroy.new(@user, {report_id: @report.id, role_id: 1}).run
+        @result = Reports::Destroy.new(@user, {report_id: @report.id, role_id: 1}).run
       rescue NotAuthorizedException
         @rescued = true
       end

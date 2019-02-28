@@ -13,7 +13,7 @@
 #   end
 #
 #   test "successful marking of a report as reimbursed after they're approved" do
-#     reimburse_op = Report::MarkAsReimbursed.new(@finance, report: @approved_report)
+#     reimburse_op = Reports::MarkAsReimbursed.new(@finance, report: @approved_report)
 #     assert_difference '@employee.reports.approved.count', -1 do
 #       @report = reimburse_op.run
 #     end

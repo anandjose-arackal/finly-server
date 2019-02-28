@@ -1,7 +1,7 @@
 class Kyc::UserController < ApplicationController
 
 
-  before_action -> { finly_authorize! :web}
+  before_action -> {finly_authorize! :web}
 
   def show
     @result = KycProcess::User::Show.(current_user, params)

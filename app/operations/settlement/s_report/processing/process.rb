@@ -79,7 +79,7 @@ class Settlement::SReport::Processing::Process < BackgroundOperation
       mapping.reports.update_all(report_status_id: report_status_settled, reimbursement: payment)
       mapping.update(status_id: status_completed, payment: payment, completed_at: DateTime.now)
       mapping.reports.each do |report|
-        Report::MarkAsSettled.(user, {payment: payment, report: report, role_id: role, view: params[:view]})
+        Reports::MarkAsSettled.(user, {payment: payment, report: report, role_id: role, view: params[:view]})
       end
 
     end

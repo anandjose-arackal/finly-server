@@ -36,18 +36,21 @@
 #  sub_department_id                  :integer
 #  created_by_id                      :integer
 #  modified_by_id                     :integer
+#  deleted_at                         :datetime
+#  controlling_level_id               :integer
 #
 
 class Report < ApplicationRecord
   include MathUtil
   include SoftDeletable,
           FieldCustomizer::CustomizableValidation,
-          FindByOrderedIds
+          FindByOrderedIds, Transitionable
+
+
 
   has_many :email_authorizations, as: :authorizable
   belongs_to :user, optional: true, inverse_of: :reports
   belongs_to :status, optional: true, class_name: 'ReportStatus', foreign_key: :report_status_id
-  belongs_to :policy, optional: true
   belongs_to :controlling_user, optional: true, class_name: 'User'
   belongs_to :controlling_user_role, optional: true, class_name: 'UserRole'
   belongs_to :controlling_for_user, optional: true, class_name: 'User'
@@ -56,6 +59,7 @@ class Report < ApplicationRecord
   has_many :expenses
   has_many :comments, class_name: 'ReportComment', dependent: :destroy
   has_many :receipts, as: :parent
+  has_many :trails, as: :parent
   # Payment made as reimbursement
   belongs_to :report_status, optional: true
   belongs_to :reimbursement, optional: true, class_name: 'Payment'
@@ -161,7 +165,7 @@ class Report < ApplicationRecord
   scope :filter_status, ->(status_id, user_id) do
     case status_id
     when 99, '99'
-      where(controlling_user_id: user_id).where.not(report_status_id: ReportStatus.ids_for(:retracted, :open, :rejected))
+      awaiting_action_items(user_id)
     else
       where report_status_id: status_id
     end
@@ -338,6 +342,10 @@ class Report < ApplicationRecord
     self.status_id == ReportStatus.approved_id
   end
 
+  def auto_approved?
+    self.status_id == ReportStatus.auto_approved_id
+  end
+
   def settled?
     self.status_id == ReportStatus.settled_id
   end
@@ -369,7 +377,7 @@ class Report < ApplicationRecord
   end
 
   def can_retract?
-    processing? or (approved? and auto_approve) or (closed? and auto_approve)
+    processing? or (approved? and auto_approved?) or (closed? and auto_approved?)
   end
 
   def can_destroy?
@@ -434,8 +442,9 @@ class Report < ApplicationRecord
   end
 
   def controlling_user?(user)
-    return false if self.controlling_user_id.blank?
-    self.controlling_user.id == user.id
+    self.get_reviewers.include?(user)
+    # return false if self.controlling_user_id.blank?
+    # self.controlling_user.id == user.id
   end
 
   def versioned_policy
@@ -537,6 +546,10 @@ class Report < ApplicationRecord
     self.sync_status_id == ReportSyncStatus.id_for(:synced)
   end
 
+  def controlling_user
+    self.get_reviewers.first
+  end
+
 
   private
 
@@ -599,6 +612,31 @@ class Report < ApplicationRecord
     self.expenses.each do |expense|
       BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(expense)
     end
+  end
+
+  def self.document_status_attribute
+    'report_status_id'
+  end
+
+  def self.document_status_class_name
+    'ReportStatus'
+  end
+
+  def self.document_owner_attribute
+    'user_id'
+  end
+
+  def self.finance_associated_status_ids
+    ReportStatus.ids_for(:approved, :settled, :settlement_confirmed , :closed, :auto_approved)
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push ReportStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
   end
 
 end

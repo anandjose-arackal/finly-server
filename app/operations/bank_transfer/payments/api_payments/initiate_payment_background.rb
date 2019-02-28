@@ -90,7 +90,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePaymentBackground < Backgroun
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
                                   controlling_for_user_id: nil, controlling_for_user_role_id: nil)
       # create a trail to show that the BPR was credited
-      bank_payment_request.bank_payment_request_trails.create action_user: user,
+      bank_payment_request.trails.create action_user: user,
                                                               action_user_role_id: UserRole.id_for(:initiator),
                                                               action_id: BankPaymentRequestTrailAction.id_for(:credit),
                                                               modified_user_id: nil,

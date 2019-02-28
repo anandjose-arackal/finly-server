@@ -177,6 +177,7 @@
 #  ZWL         :decimal(20, 5)
 #  is_deleted  :boolean          default(FALSE)
 #  MYR         :decimal(20, 5)
+#  deleted_at  :datetime
 #
 
 class Amount < ApplicationRecord
@@ -308,10 +309,10 @@ class Amount < ApplicationRecord
   def as_json(options={})
     {value: self.value,
      currency: {
-         id: self.currency.id,
-         country: self.currency.country,
-         country_code: self.currency.country_code,
-         symbol: self.currency.symbol}}
+         id: self.currency&.id,
+         country: self.currency&.country,
+         country_code: self.currency&.country_code,
+         symbol: self.currency&.symbol}}
   end
 
   def update_currencies(date)

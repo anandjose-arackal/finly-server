@@ -13,7 +13,7 @@
 #
 #   test "Should be able to retract in processing state" do
 #     @report = @employee.reports.processing.first
-#     retract_op = Report::Retract.new(@employee, report_id: @report.id)
+#     retract_op = Reports::Retract.new(@employee, report_id: @report.id)
 #     assert_difference '@report.comments.count', 1 do
 #       assert_difference 'ReportTrack.count', 1 do
 #         @report = retract_op.run
@@ -24,7 +24,7 @@
 #
 #   test "Cannot retract a report that's already approved or reimbursed" do
 #     @report = @employee.reports.approved.first
-#     retract_op = Report::Retract.new(@employee, report_id: @report.id)
+#     retract_op = Reports::Retract.new(@employee, report_id: @report.id)
 #     assert_no_difference '@report.comments.count' do
 #       @result = retract_op.run
 #     end
@@ -33,7 +33,7 @@
 #
 #     # cannot retract reimbursed reports as well
 #     @report.update_attributes(report_status_id: ReportStatus.reimbursed_id) # temporarily updating report to reimbursed state
-#     retract_op = Report::Retract.new(@employee, report_id: @report.id)
+#     retract_op = Reports::Retract.new(@employee, report_id: @report.id)
 #     assert_no_difference '@report.comments.count' do
 #       @result = retract_op.run
 #     end

@@ -18,6 +18,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def actions_configuration
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
   def process_file
     @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
     if @result.success?
@@ -33,6 +38,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
         }
       end
     end
+  end
+
+  def edit_config
+    @result = BankTransfer::PaymentRequest::EditConfig.(current_user, params)
+    respond
   end
 
   def update

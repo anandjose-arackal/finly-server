@@ -57,6 +57,16 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       add_message :error, "You need to choose at least once payment to process this order"
       return
     end
+
+    if self.user.vendor_payments_creditor? && !self.user.vendor_payments_admin?
+      minimum = self.bank_payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.min_amount
+      maximum = self.bank_payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.max_amount || 999999999999999999999999
+      if self.bank_payment_request.payments.joins(:amount).sum(:value) > maximum
+        add_message :error, "You are not eligible to credit the payment order, you are eligible to credit only upto #{maximum}"
+      elsif self.bank_payment_request.payments.joins(:amount).sum(:value) < minimum
+        add_message :error, "You are not eligible to credit the payment order, you are eligible to credit only greater than #{minimum}"
+      end
+    end
   end
 
   def pre_process
@@ -81,14 +91,28 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
                                                             background: true, payment_order: self.payment_order})
     if op.success?
       # update the bank_payment_request to credited
-      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
-                                  controlling_for_user_id: nil, controlling_for_user_role_id: nil)
-      # create a trail to show that the BPR was credited
-      bank_payment_request.bank_payment_request_trails.create action_user: user,
-                                                              action_user_role_id: self.view_role,
-                                                              action_id: BankPaymentRequestTrailAction.id_for(:credit),
-                                                              modified_user_id: nil,
-                                                              modified_user_role_id: nil
+      # bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
+      #                             controlling_for_user_id: nil, controlling_for_user_role_id: nil)
+      # # create a trail to show that the BPR was credited
+      # bank_payment_request.bank_payment_request_trails.create action_user: user,
+      #                                                         action_user_role_id: self.view_role,
+      #                                                         action_id: BankPaymentRequestTrailAction.id_for(:credit),
+      #                                                         modified_user_id: nil,
+      #                                                         modified_user_role_id: nil
+
+      # NEW CODE
+      params[:document] = self.bank_payment_request
+      params[:aasm_event] = 'credit'
+      params[:violation_present] = false
+      op = WorkflowManager::Base.(user, params)
+
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
+
+      self.workflow_output = op.workflow_output
+
     else
       add_message :error, op.messages[:error]
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:failed))
@@ -100,7 +124,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:credit)
 
-    Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request)
+    role_id = self.workflow_output[:role_id]                                     
+    Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request, role_id: role_id)
 
 
     add_message :success, "Payment Order credit initiated!"

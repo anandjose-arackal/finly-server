@@ -4,7 +4,7 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
 
   def init
     super
-    self.crediting_user = self.bank_payment_request.bank_payment_request_trails.last.action_user
+    self.crediting_user = self.bank_payment_request.trails.last.action_user
   end
 
   def action_name
@@ -27,7 +27,7 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
   end
 
   def set_notification(user)
-    view_role_id = UserRole.id_for(:initiator)
+    # view_role_id = UserRole.id_for(:initiator)
     notification = user.notifications.create(notification_type_id: NotificationType.id_for(:bank_payment_request),
                                              action_type_id: NotificationActionType.id_for(:notify_credit),
                                              action_user_id: crediting_user.id,
@@ -37,7 +37,7 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
                                              path_object_type: "PaymentOrder",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app])
       notification.save
   end
@@ -47,15 +47,16 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
   end
 
   def mailer_body(user)
-    if bank_payment_request.owner_id == crediting_user.id
-      return "You have successfully initiated credit for your Payment Order: #{bank_payment_request.name}"
-    else
+    # if bank_payment_request.owner_id == crediting_user.id
+    #   return "You have successfully initiated credit for your Payment Order: #{bank_payment_request.name}"
+    # else
       return "#{crediting_user.name} has successfully initiated the credit of your Payment Order: #{bank_payment_request.name}"
-    end
+    # end
   end
 
   def bank_payment_request_view_role(user)
-    return UserRole.id_for(:initiator)
+    # return UserRole.id_for(:initiator)
+    bank_payment_request.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
   end
 
 end

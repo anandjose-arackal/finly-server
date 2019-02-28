@@ -14,7 +14,7 @@ json.result do
     if report.policy
       json.policy report.policy.name
     end
-    json.controlling_user report.controlling_user
+    json.controlling_user report.get_reviewers.first
     json.status @result.status_name(report)
     json.total(('%.2f' % report.total_amount))
     json.currency_id report.base_currency_id

@@ -17,16 +17,23 @@ class Event::ETravelRequest::RequestSelection < Event::ETravelRequest::Base
   end
 
   def mailer_body(user)
-    "#{self.travel_request.travel_request_trails.last.action_user.name} has requested for selection for the trip : #{self.travel_request.trip_id} and is curently awaiting your approval"
+    "#{self.travel_request.trails.last.action_user.name} has requested for selection for the trip : #{self.travel_request.trip_id} and is curently awaiting your approval"
   end
 
   def travel_request_view_role(user)
+    # if user.id == travel_request.user_id
+    #   return UserRole.id_for(:employee)
+    # elsif user.id == travel_request.controlling_user_id
+    #   return travel_request.controlling_user_role_id
+    # elsif user.id == self.travel_request.travel_request_trails.last.action_user_id
+    #   return self.travel_request.travel_request_trails.last.action_user_role_id
+    # end
     if user.id == travel_request.user_id
       return UserRole.id_for(:employee)
-    elsif user.id == travel_request.controlling_user_id
-      return travel_request.controlling_user_role_id
-    elsif user.id == self.travel_request.travel_request_trails.last.action_user_id
-      return self.travel_request.travel_request_trails.last.action_user_role_id
+    elsif travel_request.document_role_users(:travel_manager).include?(user)
+      return UserRole.id_for(:travel_manager)
+    else
+      return UserRole.id_for(:manager)
     end
   end
 

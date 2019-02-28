@@ -3,7 +3,7 @@ class Event::EPurchaseOrder::Reject < Event::EPurchaseOrder::Base
 
   def init
     super
-    self.rejecting_user = self.purchase_order.trails.natural_order.last.action_user rescue nil
+    self.rejecting_user = self.purchase_order.trails.last.action_user rescue nil
   end
 
   def validate
@@ -22,7 +22,8 @@ class Event::EPurchaseOrder::Reject < Event::EPurchaseOrder::Base
   end
 
   def affected_users
-    User::AssociatedUsers::Index.(self.user, document: self.purchase_order, user_before: self.user, amount: purchase_order.balance_amount.value)
+    # User::AssociatedUsers::Index.(self.user, document: self.purchase_order, user_before: self.user, amount: purchase_order.balance_amount.value)
+    self.purchase_order.affected_users(:reject)
   end
 
   # def get_token(user)
@@ -32,7 +33,8 @@ class Event::EPurchaseOrder::Reject < Event::EPurchaseOrder::Base
 
 
   def notification_affected_users
-    self.controlling_users
+    # self.controlling_users
+    self.purchase_order.notification_affected_users(:reject)
   end
 
   # def send_push_notification(user)
@@ -52,7 +54,6 @@ class Event::EPurchaseOrder::Reject < Event::EPurchaseOrder::Base
                                              path_object_type: "Purchase Order",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             # view_role_id: report.controlling_user_role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save

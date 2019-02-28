@@ -20,6 +20,7 @@
 #  arrival_date   :date
 #  arrival_time   :time
 #  booking_id     :integer
+#  deleted_at     :datetime
 #
 
 require 'test_helper'

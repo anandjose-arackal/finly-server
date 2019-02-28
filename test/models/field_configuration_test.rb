@@ -23,6 +23,7 @@
 #  root_field              :boolean          default(TRUE)
 #  field_key               :string(255)
 #  sequence_number         :integer
+#  deleted_at              :datetime
 #
 
 require 'test_helper'

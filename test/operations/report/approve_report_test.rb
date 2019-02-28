@@ -20,12 +20,12 @@
 #     Report.any_instance.stubs(:controlling_user_id).returns(@admin.id)
 #     Report.any_instance.stubs(:controlling_user?).returns(true)
 #     # stubbing the attr_accessor within the approve operation
-#     Report::Approve.any_instance.stubs(:report).returns(@report)
+#     Reports::Approve.any_instance.stubs(:report).returns(@report)
 #     # stubbing next reviewer
 #     next_reviewer_presenter = User::Team::Review::NextReviewer::Presenter.new(nil, role_id: nil)
 #     User::Team::Review::NextReviewer.stubs(:call).returns(next_reviewer_presenter)
 #
-#     approve_op = Report::Approve.new(@admin, {id: @report.id, view: "admin"})
+#     approve_op = Reports::Approve.new(@admin, {id: @report.id, view: "admin"})
 #     assert_difference 'Report.approved.count', 1 do
 #       @result = approve_op.run
 #       @report.reload
@@ -45,11 +45,11 @@
 #     Report.any_instance.stubs(:controlling_user_id).returns(@admin.id)
 #     Report.any_instance.stubs(:controlling_user?).returns(true)
 #     # stubbing the attr_accessor within the report and the next reviewer
-#     Report::Approve.any_instance.stubs(:report).returns(@report)
+#     Reports::Approve.any_instance.stubs(:report).returns(@report)
 #     next_reviewer_presenter = User::Team::Review::NextReviewer::Presenter.new(@manager, role_id: UserRole.id_for(:manager))
 #     User::Team::Review::NextReviewer.stubs(:call).returns(next_reviewer_presenter)
 #
-#     approve_op = Report::Approve.new(@admin, {id: @report.id, view: "admin"})
+#     approve_op = Reports::Approve.new(@admin, {id: @report.id, view: "admin"})
 #     assert_difference 'Report.processing.count', 1 do
 #       @result = approve_op.run
 #     end
@@ -66,11 +66,11 @@
 #     Report.any_instance.stubs(:controlling_user?).returns(true)
 #     Report.any_instance.stubs(:require_reimbursement?).returns(false)
 #     # stubbing the attr_accessor within the report and the next reviewer
-#     Report::Approve.any_instance.stubs(:report).returns(@report)
+#     Reports::Approve.any_instance.stubs(:report).returns(@report)
 #     next_reviewer_presenter = User::Team::Review::NextReviewer::Presenter.new(nil, role_id: nil)
 #     User::Team::Review::NextReviewer.stubs(:call).returns(next_reviewer_presenter)
 #
-#     approve_op = Report::Approve.new(@admin, {id: @report.id, view: "admin"})
+#     approve_op = Reports::Approve.new(@admin, {id: @report.id, view: "admin"})
 #     assert_difference 'Report.closed.count', 1 do
 #       @result = approve_op.run
 #     end
@@ -90,11 +90,11 @@
 #     Report.any_instance.stubs(:controlling_user?).returns(true)
 #
 #     # stubbing the attr_accessor within the report and the next reviewer
-#     Report::Approve.any_instance.stubs(:report).returns(@report)
+#     Reports::Approve.any_instance.stubs(:report).returns(@report)
 #     next_reviewer_presenter = User::Team::Review::NextReviewer::Presenter.new(nil, role_id: nil)
 #     User::Team::Review::NextReviewer.stubs(:call).returns(next_reviewer_presenter)
 #
-#     approve_op = Report::Approve.new(@admin, {id: @report.id, view: "admin"})
+#     approve_op = Reports::Approve.new(@admin, {id: @report.id, view: "admin"})
 #     assert_no_difference 'Report.open.count' do
 #       @result = approve_op.run
 #     end
@@ -111,9 +111,9 @@
 #     Report.any_instance.stubs(:controlling_user?).returns(true)
 #
 #     # stubbing the attr_accessor within the report
-#     Report::Approve.any_instance.stubs(:report).returns(@report)
+#     Reports::Approve.any_instance.stubs(:report).returns(@report)
 #
-#     approve_op = Report::Approve.new(@admin, {id: @report.id, view: "admin"})
+#     approve_op = Reports::Approve.new(@admin, {id: @report.id, view: "admin"})
 #     assert_no_difference 'Report.open.count' do
 #       begin
 #         @result = approve_op.run

@@ -44,17 +44,21 @@ class Settlement::Summary < Settlement::Base
       add_message :error, users_presenter.messages[:error]
       return
     end
-    users = users_presenter.team
-    user_ids = users.pluck(:id)
-    load_users_summary(users)
-    load_cash_on_hand_summary(user_ids)
 
-    if cards_enabled or bank_transfer_enabled
-      load_finly_money_summary(user_ids)
-    end
-    if cards_enabled
-      load_expense_cards_summary(user_ids)
-      load_reimbursement_cards_summary(user_ids)
+    users = users_presenter.team
+    user_ids = users&.pluck(:id)
+
+    unless users.blank?
+      load_users_summary(users)
+      load_cash_on_hand_summary(user_ids)
+
+      if cards_enabled or bank_transfer_enabled
+        load_finly_money_summary(user_ids)
+      end
+      if cards_enabled
+        load_expense_cards_summary(user_ids)
+        load_reimbursement_cards_summary(user_ids)
+      end
     end
   end
 
@@ -72,7 +76,7 @@ class Settlement::Summary < Settlement::Base
   protected
 
   def load_reports_summary
-    reports_presenter = Report::Index.(user, params)
+    reports_presenter = Reports::Index.(user, params)
     unless reports_presenter.success?
       add_message :error, reports_presenter.messages[:error]
       return
@@ -87,7 +91,7 @@ class Settlement::Summary < Settlement::Base
   end
 
   def load_money_requests_summary
-    money_requests_presenter = Object.const_get('MoneyRequest::Index').(user, params)
+    money_requests_presenter = Object.const_get('MoneyRequests::Index').(user, params)
     unless money_requests_presenter.success?
       add_message :error, money_requests_presenter.messages[:error]
       return

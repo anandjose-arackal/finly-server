@@ -1,6 +1,6 @@
 json.partial! 'money_request', money_request: @result.money_request
 json.manager_name @result.manager.present? ? @result.manager.name : ''
-json.finance_manager_name @result.finance_manager.present? ? @result.finance_manager.name : ''
+json.finance_manager_name @result.finance_managers.first.present? ? @result.finance_managers.first.name : ''
 json.cash_money_requests_allowed !!current_company&.configuration&.cash_money_requests_enabled
 json.actions @result.actions
 json.categories @result.items.each do |item|
