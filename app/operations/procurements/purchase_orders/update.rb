@@ -45,6 +45,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     if self.purchase_order_params[:advance_amount_attributes].present? # && self.purchase_order_params[:advance_amount_attributes][:value].blank?
       valid = true
+      Rails.logger.fatal purchase_order_params.inspect
+      Rails.logger.fatal params.inspect
       if self.purchase_order_params[:advance_amount_attributes][:value].blank? || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
         add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
         valid = false
