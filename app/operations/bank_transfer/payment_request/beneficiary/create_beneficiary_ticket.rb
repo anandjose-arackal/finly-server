@@ -75,8 +75,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    self.bank_payment_request_params = parse_payment_order_data
 	    self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
 
-	    Rails.logger.fatal "self.bank_payment_request.id", self.bank_payment_request.id
-	    Rails.logger.fatal "self.validate_operation.order_details", self.validate_operation.order_details.inspect
+	    Rails.logger.fatal "self.bank_payment_request.id,\n #{self.bank_payment_request.id}"
+	    Rails.logger.fatal "self.validate_operation.order_details,\n #{self.validate_operation.order_details.inspect}"
 
 	    # Delegate payment creation to the background operation
 		BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
