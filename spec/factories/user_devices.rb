@@ -22,14 +22,12 @@
 
 FactoryBot.define do
   factory :user_device do
-    user_id { 1 }
-    company_id { 1 }
-    fingerprint { "MyString" }
+    fingerprint { SecureRandom.hex(32) }
     otp_verified { false }
-    otp { "MyString" }
-    otp_sent_at { "2019-02-18 08:56:28" }
-    otp_verified_at { "2019-02-18 08:56:28" }
-    otp_count { 1 }
-    otp_failed_attempts { 1 }
+    otp { nil }
+    otp_sent_at { nil }
+    otp_verified_at { nil }
+    otp_count { 0 }
+    otp_failed_attempts { 0 }
   end
 end

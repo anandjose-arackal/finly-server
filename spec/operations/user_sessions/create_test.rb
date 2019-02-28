@@ -14,6 +14,9 @@ RSpec.describe 'UserSessions::Create' do
 
     describe '> Failed' do
       describe '> With user' do
+        before(:all) do
+
+        end
         it 'should succeed' do
 
         end
