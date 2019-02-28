@@ -96,7 +96,7 @@ class Reports::Base < BaseOperation
 
         policies.each do |policy|
           params[:policy_id] = policy.id
-          params[:violations_present] = has_blocking?
+          params[:violations_present] = has_warning?
           chain = {
               policy_id: policy.id,
               reviewal_chain: get_reviewal_chain
