@@ -31,7 +31,9 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
     id = (params[:id] or params[:to_user_id])
     team = User::Team::Index.(user, params)
     self.to_user = team.with_id(id).first rescue nil if team.present?
-
+    if params.class.name == ActionController::Parameters.name || params.class.name == HashWithIndifferentAccess.name
+      self.params = ActionController::Parameters.new(params)
+    end
     self.payment_param = payment_params
     if user.admin? and admin_view?
       self.role = UserRole.id_for(:admin)
