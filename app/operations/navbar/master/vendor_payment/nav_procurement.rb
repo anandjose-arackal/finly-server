@@ -5,8 +5,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {procure: [:po, :po_vendors, :po_catalogue]},
-          :shipments,
+          {procure: [:po_initiator, :po_awaiting_approval, :team_po, :policy_po, :company_po]},
+          {shipments: [:pending_shipments, :shipment_history]},
           {payables: [:unbilled_items, :po_advances, :invoices, :payment_tickets]},
           {manage: [:manage_vendors, :manage_catalogue, :manage_rate_contracts]},
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket]}
@@ -33,12 +33,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'Procure', id: 'procure', url: 'procure'}
   end
 
-  def po
-    {name: 'Purchase Orders', id: 'purchase_orders', url: 'purchase_orders'}
+  def po_initiator
+    {name: 'Your POs', id: 'purchase_orders', url: 'purchase_orders'}
   end
 
-  def po_vendors
-    {name: 'Vendors', id: 'po_vendors', url: 'purchase_orders/vendors'}
+  def po_awaiting_approval
+    {name: "Awaiting Approval", id: 'purchase_orders', url: 'purchase_orders/vendors'}
   end
 
   def po_catalogue
