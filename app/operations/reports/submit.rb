@@ -50,7 +50,7 @@ class Reports::Submit < Reports::Base
       end
     end
     # checking for blocking violations
-    violations = Reports::Violation.(user, report: report)
+    self.violations = Reports::Violation.(user, report: report)
     blocking_violations_present = false
     violations.each do |key, value|
       blocking_violations_present ||= (value['expense_blocking'].present? or value['budget_blocking'].present?)
