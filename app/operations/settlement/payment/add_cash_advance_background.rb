@@ -21,7 +21,7 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
   def perform(user_id, params, request_store_hash=nil)
     load_request_store request_store_hash
     self.user = User.find_by id: user_id
-    self.params = params
+    self.params = ActionController::Parameters.new(params)
     self.run
   end
 
