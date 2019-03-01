@@ -439,7 +439,7 @@ class Invoice < ApplicationRecord
       },
       net_amount: precision_value(self.net_amount&.value),
       gross_amount: precision_value(self.gross_amount&.value),
-      custom_fields: [],
+      custom_fields: self.custom_fields,
       category_id: self.category_id,
       category_name: self.category&.name,
 

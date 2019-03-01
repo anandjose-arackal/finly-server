@@ -58,6 +58,7 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :location, optional: true, class_name: 'BranchLocation'
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
+  belongs_to :bank_account, optional: true
   belongs_to :payment_term, optional: true
   belongs_to :procurement_term, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
@@ -98,7 +99,7 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :trails, as: :parent
 
-  has_one :bank_account
+  belongs_to :bank_account, optional: true
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 

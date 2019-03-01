@@ -118,6 +118,13 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         next
       end
 
+      if purchase_order.bank_account.blank?
+        row_details << "This PO advance(# #{purchase_order.id}) needs a bank account associated with it. Please update those details by going to the purchase order show page."
+        self.contents << row_details
+        errors_found = true
+        next
+      end
+
       # if advance_amount >= purchase_order.balance_amount&.value
       #   row_details << "Advance cannot be greater than the balance amount in the PO"
       #   self.contents << row_details
@@ -257,7 +264,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
       bank_account = purchase_order.bank_account
       payment_params << {
           name: vendor.name,
-          bank_account_number: bank_account.account_number,
+          bank_account_number: bank_account&.account_number,
           ifsc: bank_account.ifsc,
           requested_amount:advance_amount,
           account_id: bank_account.id,

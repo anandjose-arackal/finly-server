@@ -91,7 +91,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
           puts "invoice SUCCESSFULS", payment.id
           inv_id = payment.invoice.id
           payment.invoice.update(invoice_status_id: invoices_status[inv_id])
-        payment.save
+          InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+          payment.save
         # now save the custom fields to the invoice
         # set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
       else
@@ -100,13 +101,13 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
       end
     end
 
-    if flag
+    # if flag
       # now once the payment request has been created and the payments saved, we can mark it as open
       self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
       self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
 
       puts 'SUCCESSFUL!'
-    end
+    # end
   end
 
   private

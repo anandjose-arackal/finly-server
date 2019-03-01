@@ -148,7 +148,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
           note: invoice.note,
           category_id: invoice.category_id,
           date: DateUtils.local_date,
-          invoice_id: invoice.id
+          invoice_id: invoice.id,
+          parent_type: invoice&.class.name,
+          parent_id: invoice&.id
       }
     end
     # self.payments = self.bank_payment_request.payment_order.payments.build(payment_params)

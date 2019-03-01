@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_28_170551) do
+ActiveRecord::Schema.define(version: 2019_03_01_002308) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -477,8 +477,6 @@ ActiveRecord::Schema.define(version: 2019_02_28_170551) do
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
-    t.integer "purchase_order_id"
-    t.index ["purchase_order_id"], name: "index_bank_accounts_on_purchase_order_id"
     t.index ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id"
   end
 
@@ -4261,9 +4259,11 @@ ActiveRecord::Schema.define(version: 2019_02_28_170551) do
     t.integer "advance_amount_id"
     t.date "due_date"
     t.integer "advance_amount_status_id"
+    t.integer "bank_account_id"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
+    t.index ["bank_account_id"], name: "index_purchase_orders_on_bank_account_id"
     t.index ["company_id"], name: "index_purchase_orders_on_company_id"
     t.index ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id"
     t.index ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id"
