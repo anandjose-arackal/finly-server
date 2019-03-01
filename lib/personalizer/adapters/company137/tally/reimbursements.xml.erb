@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+   <HEADER>
+      <TALLYREQUEST>Import Data</TALLYREQUEST>
+   </HEADER>
+   <BODY>
+      <IMPORTDATA>
+         <REQUESTDESC>
+            <REPORTNAME>Vouchers</REPORTNAME>
+            <STATICVARIABLES>
+               <SVCURRENTCOMPANY><%= html_escape configuration.company_name %></SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+         </REQUESTDESC>
+         <REQUESTDATA>
+            <TALLYMESSAGE xmlns:UDF="TallyUDF">
+            <% report_processor_groups.each do |group| %>
+              <VOUCHER VCHTYPE="Payment" ACTION="Create">
+                <VOUCHERTYPENAME>Payment</VOUCHERTYPENAME>
+                <DATE><%= group.created_at.strftime('%Y%m%d') %></DATE>
+                <NARRATION></NARRATION>
+                <EFFECTIVEDATE><%= group.created_at.strftime('%Y%m%d') %></EFFECTIVEDATE>
+                  <% group.mappings.each do |mapping| %>
+                    <% if mapping.user.gl_config&.dig(:name).blank? %>
+                      <% raise "GL Config is not configured for the user" %>
+                    <% end %>
+                <ALLLEDGERENTRIES.LIST>
+                   <LEDGERNAME><%= html_escape mapping.user.gl_config[:name] %></LEDGERNAME>
+                   <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                   <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                   <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                   <AMOUNT>-<%= mapping.amount.value %></AMOUNT>
+                </ALLLEDGERENTRIES.LIST>
+                  <% end %>
+                <ALLLEDGERENTRIES.LIST>
+                   <LEDGERNAME>HDFC BANK LTD (CC A/C. 02272790000303)</LEDGERNAME>
+                   <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                   <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+                   <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                   <AMOUNT><%= group.processed_amount.value %></AMOUNT>
+                </ALLLEDGERENTRIES.LIST>
+              </VOUCHER>
+            <% end %>
+            </TALLYMESSAGE>
+         </REQUESTDATA>
+      </IMPORTDATA>
+   </BODY>
+</ENVELOPE>
