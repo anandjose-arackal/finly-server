@@ -21,8 +21,18 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
   def perform(user_id, params, request_store_hash=nil)
     load_request_store request_store_hash
     self.user = User.find_by id: user_id
-    super(user, params)
+    self.params = params
     self.run
+  end
+
+  def self.perform_async(user_id, options)
+    # in case the object is passed directly instead of an id
+    user_id = user_id
+    if user_id.present? && user_id.is_a?(User)
+      user_id = user_id.id
+    end
+    # calls the Sidekiq::Worker method
+    super(user_id, options)
   end
 
   def init
