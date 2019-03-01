@@ -64,6 +64,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     # since previous state can be more than one type, this is a clean way to handle this
     self.inward_invoices.pluck(:id,:invoice_status_id).map { |id, st| self.invoices_status[id.to_i] = st }
 
+    Rails.logger.fatal "invoices_status,\n #{invoices_status.inspect}"
+
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
     policy_id = params[:policy_id]
@@ -93,7 +95,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.payment_request_params = bank_payment_request_params
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     if self.bank_payment_request.save
+      Rails.logger.fatal "BEFORE inward_invoices,\n #{inward_invoices.inspect}"
       self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
+      Rails.logger.fatal "AFTER inward_invoices,\n #{inward_invoices.inspect}"
       payment_params = initialize_payment_objects
       op = BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, invoices_status: invoices_status})
     else

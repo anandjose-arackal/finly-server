@@ -5,7 +5,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
   sidekiq_options queue: :payments_queue
 
   attr_accessor :bank_payment_request, :payments_attributes, :payment_mode, :options,
-                :company_id, :execute, :payment_params, :invoices_status
+                :company_id, :execute, :payment_params, :invoices_status, :invoices
 
   def self.call(user, options = {})
     self.new.perform(user, options)
@@ -73,6 +73,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
           parent_id: payment[:parent_id]
       }
     end
+    self.invoices = Invoice.where(id: self.payment_params.pluck(:invoice_id))
   end
 
   def validate
@@ -90,7 +91,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
       if payment.save
           puts "invoice SUCCESSFULS", payment.id
           inv_id = payment.invoice.id
-          payment.invoice.update(invoice_status_id: invoices_status[inv_id])
+          # payment.invoice.update(invoice_status_id: invoices_status[inv_id])
+          invoice = self.invoices.find(params[:invoice_id])
+          invoice.update(invoice_status_id: invoices_status[inv_id])
           InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
           payment.save
         # now save the custom fields to the invoice
