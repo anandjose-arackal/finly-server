@@ -54,7 +54,7 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     end
 
     event :credit do
-      transitions from: [:open, :retracted, :rejected, :approved, :auto_approved], to: :credited
+      transitions from: [:open, :retracted, :rejected, :processing, :approved, :auto_approved], to: :credited
     end
 
     event :mark_as_credited do

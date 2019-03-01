@@ -309,10 +309,10 @@ class Amount < ApplicationRecord
   def as_json(options={})
     {value: self.value,
      currency: {
-         id: self.currency.id,
-         country: self.currency.country,
-         country_code: self.currency.country_code,
-         symbol: self.currency.symbol}}
+         id: self.currency&.id,
+         country: self.currency&.country,
+         country_code: self.currency&.country_code,
+         symbol: self.currency&.symbol}}
   end
 
   def update_currencies(date)

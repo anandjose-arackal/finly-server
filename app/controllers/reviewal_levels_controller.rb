@@ -10,6 +10,18 @@ class ReviewalLevelsController < BaseControllers::WebBase
     respond
   end
 
+  # Ideally rest of the operations should be present under Policy namespace
+  def index_user_level
+    @result = Policy::ApprovalWorkflows::IndexUserLevel.(current_user, params)
+    respond
+  end
+
+  def show_user_level
+    @result = Policy::ApprovalWorkflows::ShowUserLevel.(current_user, params)
+    respond
+  end
+
+
   def update
     @result = ReviewalLevels::Update.(current_user, params)
     respond
@@ -19,4 +31,5 @@ class ReviewalLevelsController < BaseControllers::WebBase
     @result = ReviewalLevels::Destroy.(current_user, params)
     respond
   end
+
 end

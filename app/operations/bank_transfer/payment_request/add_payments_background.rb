@@ -76,6 +76,8 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
               discount: payment[:discount],
               invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
               company_id: self.user.company_id,
+              receiving_account_type: "BankAccount",
+              receiving_account_id: bank_account.id,
               original_amount_attributes: {
                   value: payment[:original_amount],
                   currency_id: 1

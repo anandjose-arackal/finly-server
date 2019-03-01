@@ -279,7 +279,12 @@ class MoneyRequest < ApplicationRecord
         self.status_id == MoneyRequestStatus.id_for(:rejected) ||
         self.status_id == MoneyRequestStatus.id_for(:retracted) ||
         self.status_id == MoneyRequestStatus.id_for(:pending) ||
-        self.status_id == MoneyRequestStatus.id_for(:processing)
+        self.status_id == MoneyRequestStatus.id_for(:processing) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_processing) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_open) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_retracted) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_rejected) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_approved)
   end
 
   def can_submit?

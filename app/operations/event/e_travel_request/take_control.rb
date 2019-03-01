@@ -10,7 +10,7 @@ class Event::ETravelRequest::TakeControl < Event::ETravelRequest::Base
 
   def affected_users
     # [self.travel_request.user, self.travel_request.controlling_user, self.travel_request.controlling_for_user]
-    self.take_control.affected_users(:take_control)
+    self.travel_request.affected_users(:take_control)
   end
 
   def mailer_subject(user)
