@@ -60,7 +60,6 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
     payment_order = self.bank_payment_request.payment_order
     self.payments.each do |payment|
       payment.update(payment_order_id: payment_order.id)
-      debugger
     end
   end
 
