@@ -68,8 +68,6 @@ class Reports::Base < BaseOperation
       self.violations_present = has_warning? || has_blocking?
       self.finance_managers = report.document_role_users(:finance_managers)
 
-      debugger
-
       if Report.status_ids(:approved, :auto_approved).include?(report.status_id)
         self.awaiting_settlement = true
       else

@@ -1,13 +1,12 @@
 class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::DocumentReviewalMappings::Base
-  attr_accessor :mappings_params, :document, :provider_name, :reviewal_chain_data
+  attr_accessor :mappings_params, :document, :provider_name, :reviewal_chain_data, :violations_present
 
   def init
     self.document = params[:reviewal_document]
     self.mappings_params = mappings_parameters
     self.provider_name = params[:provider_name] || document.get_default_provider
-
+    self.violations_present = !!params[:violations_present]
     self.reviewal_chain_data = []
-
   end
 
   def validate
@@ -84,7 +83,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
         amount = get_document_amount
 
-        valid_reviewers = level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id) + level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).pluck(:reviewer_id)
+        valid_reviewers = level.level_reviewer_mappings.non_deleted.with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id) + level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
 
         # If valid reviewers is empty; document level reviewr mapping will not be created for current level and will be auto approved for the current level
         next if valid_reviewers.empty?
@@ -113,7 +112,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
             # document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
 
             # If reviewer overrides are present for level
-            lurms = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount)
+            lurms = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).with_threshold(amount)
             if lurms.present?
               lurms.each do |lurm|
                 document.document_level_reviewer_mappings.create(
@@ -129,7 +128,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
             else
               # Overrides for users not present
               # level.reviewers.each do |level_reviewer|
-              level.level_reviewer_mappings.non_deleted.with_threshold(amount).each do |lrm|
+              level.level_reviewer_mappings.non_deleted.with_threshold(amount).with_exception(violations_present).each do |lrm|
                 if valid_reviewers.include?(lrm.reviewer_id)
                   document.document_level_reviewer_mappings.create(
                       {

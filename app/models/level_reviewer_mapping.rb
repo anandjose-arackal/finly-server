@@ -43,7 +43,13 @@ class LevelReviewerMapping < ApplicationRecord
   }
 
   scope :with_exception, -> (bool) {
-    where exception: bool
+    exception_present = !!bool
+
+    if exception_present
+      where(exception: true)
+    else
+      where(wo_exception: true)
+    end
   }
 
   # scope :with_provider_name, -> (provider_name){

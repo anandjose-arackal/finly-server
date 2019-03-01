@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_21_115929) do
+ActiveRecord::Schema.define(version: 2019_02_28_115016) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2118,6 +2118,7 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.string "provider_name"
     t.decimal "threshold", precision: 20, scale: 5
     t.boolean "active", default: true
+    t.boolean "wo_exception", default: true
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
@@ -3095,11 +3096,12 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_reviewer_mappings_on_level_id"
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
 
-  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "level_id"
     t.integer "user_id"
     t.integer "reviewer_id"
@@ -3108,6 +3110,7 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.datetime "updated_at", null: false
     t.decimal "threshold", precision: 20, scale: 5
     t.boolean "exception", default: false
+    t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_level_user_reviewer_mappings_on_policy_id"
     t.index ["reviewer_id"], name: "index_level_user_reviewer_mappings_on_reviewer_id"
