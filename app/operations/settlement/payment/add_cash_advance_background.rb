@@ -21,17 +21,28 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
   def perform(user_id, params, request_store_hash=nil)
     load_request_store request_store_hash
     self.user = User.find_by id: user_id
-    super(user, params)
+    self.params = ActionController::Parameters.new(params)
     self.run
   end
 
-  def init
+  def self.perform_async(user_id, options)
+    # in case the object is passed directly instead of an id
+    user_id = user_id
+    if user_id.present? && user_id.is_a?(User)
+      user_id = user_id.id
+    end
+    # calls the Sidekiq::Worker method
+    super(user_id, options)
+  end
 
+  def init
     # extracting the user to whom the money request belongs
     id = (params[:id] or params[:to_user_id])
     team = User::Team::Index.(user, params)
     self.to_user = team.with_id(id).first rescue nil if team.present?
-
+    if params.class.name == HashWithIndifferentAccess.name
+      self.params = ActionController::Parameters.new(params)
+    end
     self.payment_param = payment_params
     if user.admin? and admin_view?
       self.role = UserRole.id_for(:admin)
@@ -115,7 +126,7 @@ class Settlement::Payment::AddCashAdvanceBackground < BackgroundOperation
   def init_payment_request(payment_type, payment_purpose, options = {})
     initiating_account = options[:initiating_account]
     amount = options[:amount]
-    receiving_account = options[:receiving_account] || to_user.cash_on_hand
+    receiving_account = options[:receiving_account] || to_user.user_pockets.cash_pockets_only.find_by(id: params[:destination_pocket_id])
     self.payment_request = PaymentRequest.(user, initiating_account, (receiving_account&.class&.name), payment_type, payment_purpose)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, amount, note: self.note))
   end
