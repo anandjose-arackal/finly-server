@@ -2,14 +2,13 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   register_app :vp
   register_structure(
-      [
+      :tabs, [
           :dashboard,
           :invoices,
           :payment_tickets,
-          :manage_vendors,
-          :manage_catalogue,
-          :create,
-          :create_payment_ticket
+          :vendors,
+          :item_master,
+          {create: [:create_invoice, :create_payment_ticket]},
       ]
   )
 
@@ -32,12 +31,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'Payment Tickets', id: 'payables_payment_tickets', url: 'payables/payment_tickets'}
   end
 
-  def manage_vendors
+  def vendors
     {name: 'Vendors', id: 'manage_vendors', url: 'manage/vendors'}
   end
 
-  def manage_catalogue
-    {name: 'Catalogue', id: 'manage_catalogue', url: 'manage/catalogue'}
+  def item_master
+    {name: 'Item Master', id: 'item_master', url: 'manage/item_master'}
   end
 
   def create

@@ -5,18 +5,16 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {procure: [:po_initiator, :po_awaiting_approval, :team_po, :policy_po, :company_po]},
-          {shipments: [:pending_shipments, :shipment_history]},
+          {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_policy, :po_company]},
+          {shipments: [:shipments_pending, :shipment_history]},
           {payables: [:unbilled_items, :po_advances, :invoices, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_catalogue, :manage_rate_contracts]},
-          {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket]}
+          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
+          {create: [:create_purchase_order, :create_invoice, :create_payment_ticket]}
       ]
   )
   register_structure(
       :cog,
-      [
-        :attachments
-      ]
+      [:attachments]
   )
 
   def self.accept?
@@ -34,19 +32,35 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_initiator
-    {name: 'Your POs', id: 'purchase_orders', url: 'purchase_orders'}
+    {name: 'Your Purchase Orders', id: 'purchase_orders', url: 'purchase_orders'}
   end
 
   def po_awaiting_approval
-    {name: "Awaiting Approval", id: 'purchase_orders', url: 'purchase_orders/vendors'}
+    {name: 'PO Awaiting Approval', id: 'purchase_orders', url: 'purchase_orders/vendors'}
   end
 
-  def po_catalogue
-    {name: 'Catalogue', id: 'po_catalogue', url: 'purchase_orders/catalogue'}
+  def po_team
+    {name: 'PO Awaiting Approval', id: 'purchase_orders', url: 'purchase_orders/vendors'}
+  end
+
+  def po_policy
+    {name: 'PO Awaiting Approval', id: 'purchase_orders', url: 'purchase_orders/vendors'}
+  end
+
+  def po_company
+    {name: 'PO Awaiting Approval', id: 'purchase_orders', url: 'purchase_orders/vendors'}
   end
 
   def shipments
     {name: 'Shipments', id: 'po_shipments', url: 'purchase_orders/shipments'}
+  end
+
+  def shipments_pending
+    {name: 'Pending Shipments', id: 'pending_po_shipments', url: 'purchase_orders/shipments'}
+  end
+
+  def shipments_history
+    {name: 'Pending Shipments', id: 'pending_po_shipments', url: 'purchase_orders/shipments'}
   end
 
   def payables
