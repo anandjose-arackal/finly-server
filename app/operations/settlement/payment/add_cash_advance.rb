@@ -11,7 +11,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   include MathUtil
   attr_accessor :money_requests, :payment_param, :role, :money_request_amounts,
                 :payment, :payment_purpose, :initiating_account, :receiving_account,
-                :destination_pocket
+                :destination_pocket, :cash_advance_param
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -40,6 +40,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     self.to_user = team.with_id(id).first rescue nil if team.present?
 
     self.payment_param = payment_params
+    self.cash_advance_param = cash_advance_params
     if user.admin? and admin_view?
       self.role = UserRole.id_for(:admin)
     else
@@ -98,7 +99,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         add_message :error, op.messages[:error]
       end
     else
-      op = Settlement::Payment::AddCashAdvanceBackground.call_async(user.id, params)
+      op = Settlement::Payment::AddCashAdvanceBackground.call_async(user.id, self.cash_advance_param.to_h)
       # op = Settlement::Payment::AddCashAdvanceBackground.call(user.id, params)
       add_message :success, "Cash on hand credit has been initiated. Please check back in some time for the money to reflect"
       return
