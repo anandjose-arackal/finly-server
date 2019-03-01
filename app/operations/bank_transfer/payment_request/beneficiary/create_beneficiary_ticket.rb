@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 					:payments_attributes, :options, :company_id, :execute, :payment_params,
 					:name, :bank_account_number, :ifsc, :original_amount, :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id,
 					:category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note,
-					:contents, :headers, :issues, :validate_operation
+					:contents, :headers, :issues, :validate_operation, :policy, :description, :scheduled_at
 
 	def pre_validate
 	    if user.blank?
@@ -34,6 +34,10 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	def init
 		
 		self.payment_mode = params[:payment_mode]
+		self.scheduled_at = params[:scheduled_at]
+	    self.description = params[:description]
+	    policy_id = params[:policy_id]
+	    self.policy = current_company.policies.find_by(id: policy_id)
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
@@ -132,6 +136,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
 		    application: "vp",
 		    currency_id: Currency.first.id,
+		    scheduled_at: self.scheduled_at,
 		    api_initiated: false
 		}
 		bpr_attributes = {
@@ -143,7 +148,9 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		        currency_id: 1
 		    },
 		    beneficiary_type_id: 2,
-		    policy_id: policy&.id,
+		    # policy_id: policy&.id,
+		    policy_id: self.policy&.id,
+		    description: self.description,
 		    payment_order_attributes: payment_order_attributes,
 		    api_initiated: false
 		}

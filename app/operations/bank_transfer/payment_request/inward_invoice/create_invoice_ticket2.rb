@@ -21,6 +21,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
 
     def init
       self.bank_payment_request = params[:bank_payment_request]
+  
     end
 
   end
@@ -70,6 +71,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.payment_mode = params[:payment_mode]
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
+    self.description = params[:description]
   end
 
   def validate
@@ -212,7 +214,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         },
         description: self.description,
         beneficiary_type_id: 2, # this is because an invoice will always come from a vendor
-        policy_id: self.policy_id,
+        policy_id: self.policy&.id,
         payment_order_attributes: payment_order_params
     }
     return bank_payment_request_params

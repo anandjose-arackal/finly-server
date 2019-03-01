@@ -42,6 +42,7 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
     id = params[:id] || params[:purchase_order_id] || params[:po_id]
     self.purchase_order = user.company.purchase_orders.find_by(id: id)
     self.scheduled_at = params[:scheduled_at]
+    self.description = params[:description]
     self.payment_mode = params[:payment_mode]
     policy_id = params[:policy_id]
     self.policy = current_company.policies.find_by(id: policy_id)
@@ -245,9 +246,10 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         },
         beneficiary_type_id: 2,
         # policy_id: policy&.id,
-        policy_id: self.policy_id,
+        policy_id: self.policy&.id,
         payment_order_attributes: payment_order_attributes,
-        api_initiated: false
+        api_initiated: false,
+        description: self.description
     }
     bpr_attributes
   end
