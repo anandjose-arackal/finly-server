@@ -95,7 +95,8 @@ class Reports::Submit < Reports::Base
 
     # Set validation of DLRMs
     dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
-        reviewal_document: self.report
+        reviewal_document: self.report,
+        violations_present: has_warning?
     })
 
     unless dlrm_validation_op.success?

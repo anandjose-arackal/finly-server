@@ -1,17 +1,16 @@
 class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::DocumentReviewalMappings::Base
-  attr_accessor :document, :dlrms, :policy
+  attr_accessor :document, :dlrms, :policy, :violations_present
 
   def init
     self.document = params[:reviewal_document]
     self.dlrms = self.document.document_level_reviewer_mappings.includes(:level, :reviewer)
     self.policy = Policy.find self.document.policy_id
+    self.violations_present = !!params[:violations_present]
   end
 
 
   def process
     amount = get_document_amount
-
-
 
     dlrms.each do |dlrm|
       level = dlrm.level
