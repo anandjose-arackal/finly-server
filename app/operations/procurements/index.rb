@@ -28,6 +28,7 @@ class Procurements::Index < Procurements::Base
 
     # If reviewer or awaiting reviewal
     if user.vendor_payments_reviewer?
+      #todo lrm
       level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
 
       # policies = user.company.policies.with_application(:vp)
