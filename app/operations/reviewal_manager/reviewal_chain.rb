@@ -54,8 +54,9 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
         level_data[:selected_reviewer] = selected_reviewer.reviewer
         level_data[:selected_reviewer_threshold] = selected_reviewer.threshold
       end
-
-      self.chain.push(level_data)
+      if mappings.present?
+        self.chain.push(level_data)
+      end
     end
   end
 

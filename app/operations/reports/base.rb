@@ -150,7 +150,6 @@ class Reports::Base < BaseOperation
       else
         return nil
       end
-
     end
 
     def retrieve_policies
