@@ -20,10 +20,10 @@ class LevelUserReviewerMapping < ActiveRecord::Base
   belongs_to :policy
 
   validates :level_id, presence: true
-  validates :reviewer_id, presence: true
   validates :policy_id, presence: true
   validates :user_id, presence: true
 
+  scope :with_id, -> (ids) {where id: ids}
   scope :with_reviewer_id, -> (reviewer_id) {
     where reviewer_id: reviewer_id
   }

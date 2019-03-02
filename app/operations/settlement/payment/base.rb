@@ -32,6 +32,11 @@ class Settlement::Payment::Base < Settlement::Base
                                     from_reimbursement_card: [:id, :amount], reimbursement_bank_account: [:amount])
   end
 
+  def cash_advance_params
+    params.delete :password
+    params.permit!
+  end
+
   def success
     Settlement::Payment::Base::Presenter.new(user, {payment: self.payment}, messages)
   end
