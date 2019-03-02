@@ -504,6 +504,10 @@ class Invoice < ApplicationRecord
     'invoice_status_id'
   end
 
+  def self.document_status_class_name
+    'InwardInvoiceStatus'
+  end
+
   def self.finance_associated_status_ids
     InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
   end

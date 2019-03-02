@@ -9,8 +9,7 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     state :credited
     state :creation_in_progress
     state :pending
-
-
+    
     #[:open, :processing, :submitted, :retracted, :rejected, :approved, :unapprove, :credited, :pending, :creation_in_progress, :auto_approved]
     #:open, :processing, :submitted, :retracted, :rejected, :approved,
     # :unapprove, :credited, :pending, :creation_in_progress, :auto_approved
@@ -21,8 +20,8 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     end
 
     event :approve do
-      transitions :from => :processing, :to => :approved, guard: [:reviewers_not_present?, :user_can_review?]
-      transitions :from => :processing, :to => :processing, guard: :user_can_review?
+      transitions :from => [:processing, :pending], :to => :approved, guard: [:reviewers_not_present?, :user_can_review?]
+      transitions :from => [:processing, :pending], :to => :processing, guard: :user_can_review?
     end
 
     event :unapprove do
@@ -55,7 +54,7 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     end
 
     event :credit do
-      transitions from: [:open, :retracted, :rejected, :approved, :auto_approved], to: :credited
+      transitions from: [:open, :retracted, :rejected, :processing, :approved, :auto_approved], to: :credited
     end
 
     event :mark_as_credited do

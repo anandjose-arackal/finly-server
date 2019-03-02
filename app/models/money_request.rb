@@ -125,7 +125,7 @@ class MoneyRequest < ApplicationRecord
   scope :filter_status, ->(status_id, user_id) do
     case status_id
     when 99, '99'
-      where(controlling_user_id: user_id).where.not(status_id: MoneyRequestStatus.ids_for(:retracted, :open, :rejected))
+      awaiting_action_items(user_id)
     else
       where status_id: status_id
     end
@@ -279,7 +279,12 @@ class MoneyRequest < ApplicationRecord
         self.status_id == MoneyRequestStatus.id_for(:rejected) ||
         self.status_id == MoneyRequestStatus.id_for(:retracted) ||
         self.status_id == MoneyRequestStatus.id_for(:pending) ||
-        self.status_id == MoneyRequestStatus.id_for(:processing)
+        self.status_id == MoneyRequestStatus.id_for(:processing) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_processing) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_open) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_retracted) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_rejected) ||
+        self.status_id == MoneyRequestStatus.id_for(:trip_approved)
   end
 
   def can_submit?
@@ -389,6 +394,10 @@ class MoneyRequest < ApplicationRecord
 
   def self.document_status_attribute
     'status_id'
+  end
+
+  def self.document_status_class_name
+    'MoneyRequestStatus'
   end
 
   def self.finance_associated_status_ids

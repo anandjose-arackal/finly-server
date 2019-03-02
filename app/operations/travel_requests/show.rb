@@ -310,7 +310,8 @@ class TravelRequests::Show < TravelRequests::Base
     def can_edit_money_request?(money_request)
       # return false unless personal_view?
       return false unless (money_request.user == user || money_request.get_reviewers.include?(user))
-      TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.travel_request.status_id)
+      return false unless TravelRequestStatus.ids_for(:open, :processing, :retracted, :rejected).include?(self.travel_request.status_id)
+      true
     end
 
     def can_cancel_booking?

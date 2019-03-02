@@ -264,10 +264,8 @@ class Reports::Violation < Reports::Base
       end
     end
 
-    # if total_expenses > rule.amount.value
-    #   return true
-    # end
-    # false
+    # the expenses that will be considered for the receipt rule are only those that fit the criteria for this particular rule
+    expenses = expenses.without_usage_date_type.with_date_range(start_date, end_date).filter_category_id(categories&.pluck(:id))
 
     if rule.amount.present?
       # Rule is independent of receipt

@@ -67,15 +67,15 @@ class MoneyRequests::Index < MoneyRequests::Base
     case self.role_id
     when UserRole.id_for(:admin), UserRole.id_for(:auditor)
       if self.user.company_admin? || self.user.auditor?
-        self.money_requests = MoneyRequest.admin_associated_items(user)
+        self.money_requests = MoneyRequest.admin_associated_items(user).not_open
       elsif user.policy_admin?
         # todo Take care of policy admins
-        self.money_requests = MoneyRequest.admin_associated_items(user)
+        self.money_requests = MoneyRequest.admin_associated_items(user).not_open
       end
     when UserRole.id_for(:manager)
-      self.money_requests = MoneyRequest.reviewer_associated_items(user)
+      self.money_requests = MoneyRequest.reviewer_associated_items(user).not_open
     when UserRole.id_for(:finance_manager)
-      self.money_requests = MoneyRequest.finance_associated_items(user)
+      self.money_requests = MoneyRequest.finance_associated_items(user).not_open
     else
       self.money_requests = user.money_requests.sort_for_personal
     end

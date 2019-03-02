@@ -84,7 +84,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
         amount = get_document_amount
 
-        valid_reviewers = level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id)
+        valid_reviewers = level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id) + level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).pluck(:reviewer_id)
 
         # If valid reviewers is empty; document level reviewr mapping will not be created for current level and will be auto approved for the current level
         next if valid_reviewers.empty?
@@ -92,7 +92,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         if level.present?
           if reviewer.present?
             if valid_reviewers.include?(reviewer.id)
-              threshold = level.level_reviewer_mappings.non_deleted.with_reviewer_id(reviewer.id).first&.threshold
+              threshold = level.level_user_reviewer_mappings.with_user_id(user.id).with_reviewer_id(reviewer.id).first&.threshold || level.level_reviewer_mappings.non_deleted.with_reviewer_id(reviewer.id).first&.threshold
               # document.document_level_reviewer_mappings.with_level_id(level.id).destroy_all
               dlrm = document.document_level_reviewer_mappings.new(
                   {

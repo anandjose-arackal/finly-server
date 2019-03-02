@@ -19,13 +19,14 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
   end
 
   attr_accessor :bank_payment_requests, :processing_status_id,
-                :errors_found, :validate_result
+                :errors_found, :validate_result, :processing_status_ids
 
   def init
     ids = params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
     self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
     self.bank_payment_requests = self.bank_payment_requests.includes_details
     self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
+    self.processing_status_ids = [BankPaymentRequestStatus.id_for(:processing), BankPaymentRequestStatus.id_for(:pending)]
     self.errors_found = false
     self.validate_result = []
   end
@@ -40,7 +41,7 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
     self.processable_amount = self.unprocessable_amount = 0
     self.bank_payment_requests.each do |payment_request|
       errors = []
-      if payment_request.status_id != self.processing_status_id
+      unless self.processing_status_ids.include?(payment_request.status_id)
         errors << "Payment order cannot be approved in this state"
         self.errors_found = true
       end

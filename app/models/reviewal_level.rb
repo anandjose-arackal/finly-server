@@ -22,7 +22,8 @@ class ReviewalLevel < ApplicationRecord
   has_many :level_reviewer_mappings, foreign_key: :level_id, dependent: :destroy
   has_many :reviewers, class_name: 'User', through: :level_reviewer_mappings
 
-  has_many :level_user_reviewer_mappings,foreign_key: :level_id
+  has_many :level_user_reviewer_mappings, foreign_key: :level_id
+  alias_method :lurms, :level_user_reviewer_mappings
 
   validates :policy_id, presence: true
   validates :level_number, presence: true
@@ -34,6 +35,7 @@ class ReviewalLevel < ApplicationRecord
   scope :with_entity_type, -> (type) { where associated_entity_type: type }
   scope :with_level_number, -> (number) { where level_number: number }
   scope :with_policy_ids, -> (ids) {where policy_id: ids}
+  scope :with_policy_id, -> (ids) {where policy_id: ids}
   scope :with_associted_entity_type, -> (associated_entity_type) { where associated_entity_type: associated_entity_type}
 
   # alias_method :filter_associated_entity_type, :with_entity_type

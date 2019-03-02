@@ -58,7 +58,7 @@ class Reports::BulkApprove < BaseOperation
         raise_unauthorized_exception
       end
 
-      unless value[:report].controlling_user_id == user.id
+      unless value[:report].get_reviewers.include?(user)
         value[:errors] << "You are not the controlling user."
         # Do something else todo
         # raise_unauthorized_exception
@@ -138,54 +138,70 @@ class Reports::BulkApprove < BaseOperation
         for key, value in multiple_reports
           report = value[:report]
           has_violations = (value[:violations][:warning].present? or value[:violations][:blocking].present?)
-          presenter = User::Team::Review::NextReviewer.(report, has_violations: has_violations)
-          manager = presenter.user
-          to_user_role_id = presenter.role_id
-          status = ReportStatus.processing_id
-          if manager.blank?
-            status = ReportStatus.approved_id
-            # if the report has no reimbursable expenses, mark it as closed because there are no reimbursements
-            if report.expenses.only_reimbursable_expenses.count == 0 && report.only_card_expenses?
-              status = ReportStatus.closed_id
-            end
-          end
+          # presenter = User::Team::Review::NextReviewer.(report, has_violations: has_violations)
+          # manager = presenter.user
+          # to_user_role_id = presenter.role_id
+          # status = ReportStatus.processing_id
+          # if manager.blank?
+          #   status = ReportStatus.approved_id
+          #   # if the report has no reimbursable expenses, mark it as closed because there are no reimbursements
+          #   if report.expenses.only_reimbursable_expenses.count == 0 && report.only_card_expenses?
+          #     status = ReportStatus.closed_id
+          #   end
+          # end
 
-          if status == ReportStatus.approved_id || status == ReportStatus.closed_id
-            approved_at = DateUtils.local_date_time
-          else
-            approved_at = nil
-          end
+          # if status == ReportStatus.approved_id || status == ReportStatus.closed_id
+          #   approved_at = DateUtils.local_date_time
+          # else
+          #   approved_at = nil
+          # end
 
-          curr_user_role = User::Team::Review::UserRole.(user, report)
-          update_attributes = {report_status_id: status,
-                               controlling_user: manager,
-                               controlling_for_user_id: nil,
-                               controlling_user_role_id: to_user_role_id,
-                               controlling_for_user_role_id: nil,
-                               # auto_approve: auto_approve,
-                               approved_at: approved_at}
+          # curr_user_role = User::Team::Review::UserRole.(user, report)
+          # update_attributes = {report_status_id: status,
+          #                      controlling_user: manager,
+          #                      controlling_for_user_id: nil,
+          #                      controlling_user_role_id: to_user_role_id,
+          #                      controlling_for_user_role_id: nil,
+          #                      # auto_approve: auto_approve,
+          #                      approved_at: approved_at}
           # update_attributes[:submitted_at] = DateTime.now if auto_approve
-          if report.update_attributes update_attributes
+          # if report.update_attributes update_attributes
             
-            track = report.tracks.build action_user: user,
-                                        modified_user_id: report.controlling_user_id,
-                                        modified_user_role_id: to_user_role_id,
-                                        report_tracking_action_id: ReportTrackingAction.id_for(:approve),
-                                        report_status_id: status,
-                                        action_user_role_id: curr_user_role
-            track.save
+          #   track = report.tracks.build action_user: user,
+          #                               modified_user_id: report.controlling_user_id,
+          #                               modified_user_role_id: to_user_role_id,
+          #                               report_tracking_action_id: ReportTrackingAction.id_for(:approve),
+          #                               report_status_id: status,
+          #                               action_user_role_id: curr_user_role
+          #   track.save
 
-            if report.closed?
-              track = report.tracks.build action_user: nil,
-                                          modified_user: nil,
-                                          report_tracking_action_id: ReportTrackingAction.id_for(:closed),
-                                          report_status_id: ReportStatus.closed_id
-              track.save
-            end
-          else
+          #   if report.closed?
+          #     track = report.tracks.build action_user: nil,
+          #                                 modified_user: nil,
+          #                                 report_tracking_action_id: ReportTrackingAction.id_for(:closed),
+          #                                 report_status_id: ReportStatus.closed_id
+          #     track.save
+          #   end
+
+          # NEW CODE
+          #  Workflow Manager
+          params[:document] = report
+          params[:aasm_event] = 'approve'
+          op = WorkflowManager::Base.(user, params)
+
+          unless op.success?
+            add_message :error, op.messages[:error]
             self.approved_all = false
-            value[:errors] += report.errors.full_messages
+            value[:error] += op.messages[:error]
           end
+
+          # self.workflow_output = op.workflow_output
+          # # NEW CODE ENDS
+
+            # else
+            #   self.approved_all = false
+            #   value[:errors] += report.errors.full_messages
+            # end
 
           # value[:errors] += report.errors.full_messages
           # add_message :error, report.errors.full_messages

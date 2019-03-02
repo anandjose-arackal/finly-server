@@ -76,7 +76,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       end
       if role_ids.include?(UserRole.id_for(:creditor))
         if self.payment_requests.present?
-          self.payment_request.or(BankPaymentRequest.reviewer_associated_items(user).or(user.bank_payment_requests))
+          self.payment_requests = self.payment_requests.or(BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests))
         else
           self.payment_requests = BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests)
         end
@@ -133,7 +133,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_policy_id
     has_scope :filter_user_id
     has_scope :filter_scheduled_date, using: [:from, :to], type: :hash
-    has_scope :filter_controlling_user
+    # has_scope :filter_controlling_user
     has_scope :filter_payment_ids
     has_scope :filter_vendor_id
 

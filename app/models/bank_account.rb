@@ -39,6 +39,7 @@ class BankAccount < ApplicationRecord
   validates :account_number, presence: true, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
+  validate :valid_bank_account
 
   accepts_nested_attributes_for :account_owner
 
@@ -122,6 +123,17 @@ class BankAccount < ApplicationRecord
         name: name,
         default_account: default_account
     }
+  end
+
+  private
+
+  def valid_bank_account
+    pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
+    return if self.persisted?
+    unless self.account_number =~ pattern && !self.persisted?
+      errors.add(:account_number, "is not valid")
+      return false
+    end
   end
 
 end

@@ -46,7 +46,8 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def remind_approver
-    true
+    purchase_order.processing? &&
+    document_owner?
   end
 
   def void
@@ -55,10 +56,9 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def save_btn
-    # (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) || 
-    # (purchase_order.processing? && user_in_level?) ||
-    # (user.vendor_payment_admin? && !purchase_order.voided?)
-    (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
+    (user.vendor_payment_admin? && !purchase_order.voided?) || (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) || 
+    (purchase_order.processing? && user_in_level?)
+    # (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
   end
 
   def export_po_items
