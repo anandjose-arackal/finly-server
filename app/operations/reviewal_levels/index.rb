@@ -26,7 +26,7 @@ class ReviewalLevels::Index < ReviewalLevels::Base
     # policy = user.company.policies.find_by(id: policy_id)
     # self.reviewal_levels = policy.levels.non_deleted
 
-    policy_ids = user.company.policies.pluck(:id)
+    policy_ids = user.company.policies.non_deleted.pluck(:id)
     self.reviewal_levels = ReviewalLevel.with_policy_ids(policy_ids)
 
   end
