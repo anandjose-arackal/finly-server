@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_28_115016) do
+ActiveRecord::Schema.define(version: 2019_03_02_092609) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3091,7 +3091,7 @@ ActiveRecord::Schema.define(version: 2019_02_28_115016) do
     t.integer "level_id"
     t.integer "reviewer_id"
     t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
-    t.boolean "exception", default: false
+    t.boolean "exception", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
@@ -3101,7 +3101,7 @@ ActiveRecord::Schema.define(version: 2019_02_28_115016) do
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
 
-  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "level_id"
     t.integer "user_id"
     t.integer "reviewer_id"
@@ -3109,7 +3109,7 @@ ActiveRecord::Schema.define(version: 2019_02_28_115016) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "threshold", precision: 20, scale: 5
-    t.boolean "exception", default: false
+    t.boolean "exception", default: true
     t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_level_user_reviewer_mappings_on_policy_id"
@@ -3932,6 +3932,13 @@ ActiveRecord::Schema.define(version: 2019_02_28_115016) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "booking_type_flight", default: true
+    t.boolean "booking_type_car_rental", default: true
+    t.boolean "booking_type_bus", default: true
+    t.boolean "booking_type_train", default: true
+    t.boolean "booking_type_hotel", default: true
+    t.boolean "booking_type_restaurant", default: true
+    t.boolean "booking_type_other", default: true
     t.index ["default_tag_id"], name: "index_policy_configurations_on_default_tag_id"
     t.index ["policy_id"], name: "index_policy_configurations_on_policy_id"
     t.index ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id"

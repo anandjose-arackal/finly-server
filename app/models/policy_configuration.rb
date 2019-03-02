@@ -31,5 +31,4 @@ class PolicyConfiguration < ApplicationRecord
     self.mandate_expense_tagging = false if self.mandate_expense_tagging.nil?
     self.active = false if self.active.nil?
   end
-
 end
