@@ -197,7 +197,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         return false
       end
       unless payment.update(reference_resource: bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
       end
     end
     bank_transaction
