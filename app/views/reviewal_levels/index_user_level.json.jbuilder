@@ -30,6 +30,7 @@ json.result do
               json.email lurm.reviewer&.email
               json.threshold lurm.threshold
               json.exception lurm.exception
+              json.wo_exception lurm.wo_exception
             end
           else
             json.array! data[:lrms] do |lrm|
@@ -37,6 +38,7 @@ json.result do
               json.email lrm.reviewer&.email
               json.threshold lrm.threshold
               json.exception lrm.exception
+              json.wo_exception lrm.wo_exception
             end
           end
         end
