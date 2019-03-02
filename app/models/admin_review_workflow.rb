@@ -38,10 +38,10 @@ class AdminReviewWorkflow < ApplicationRecord
           reviewer = !!user_config[:reviewer]
 
           admin_user = AdminUser.with_email(user)&.first
-          if admin_user.blank?
-            raise "AdminUser with Email ID #{user} not found"
-            return
-          end
+          # if admin_user.blank?
+          #   raise "AdminUser with Email ID #{user} not found"
+          #   return
+          # end
           workflow.levels.create position: pos.to_s.to_i, admin_user: admin_user, trigger_email: trigger_email, reviewer: reviewer
         end
       end

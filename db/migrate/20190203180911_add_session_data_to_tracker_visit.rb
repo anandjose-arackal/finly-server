@@ -12,12 +12,6 @@ class AddSessionDataToTrackerVisit < ActiveRecord::Migration[5.2]
     add_column :user_sessions, :status_id, :integer, references: 'user_session_statuses', index: true, foreign_key: true
     add_column :user_sessions, :message, :string
     add_column :user_sessions, :login_username, :string
-    add_column :user_sessions, :screen_width, :integer
-    add_column :user_sessions, :screen_height, :integer
-    add_column :user_sessions, :mouse_pos_x, :decimal, precision: 20, scale: 10
-    add_column :user_sessions, :mouse_pos_y, :decimal, precision: 20, scale: 10
-    add_column :user_sessions, :scroll_x, :decimal, precision: 20, scale: 10
-    add_column :user_sessions, :scroll_y, :decimal, precision: 20, scale: 10
     add_column :user_session_events, :status_id, :integer, references: 'user_session_statuses', index: true, foreign_key: true
     add_column :user_session_events, :message, :string
     add_column :user_session_events, :response_code, :integer

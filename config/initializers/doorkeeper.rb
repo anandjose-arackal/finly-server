@@ -18,10 +18,14 @@ Doorkeeper.configure do
       u = nil
       if params[:username].blank?
         Gatekeeper::Event.(:user_login_blank_username)
-        UserSessions::Create.(:failed, message: 'Blank username', user: u, request_params: params)
+        params[:user] = u
+        params[:message] = 'Blank Password'
+        UserSessions::Create.(:failed, params)
       elsif params[:password].blank?
         Gatekeeper::Event.(:user_login_blank_password)
-        UserSessions::Create.(:failed, message: 'Blank password', user: u, request_params: params)
+        params[:user] = u
+        params[:message] = 'Blank Password'
+        UserSessions::Create.(:failed, params)
       end
     else
       if scopes.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes.first)

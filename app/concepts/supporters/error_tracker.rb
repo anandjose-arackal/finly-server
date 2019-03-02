@@ -11,13 +11,14 @@ module Supporters::ErrorTracker
   end
 
   def add_message(type, message)
-    return if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
+    return false if type.blank? or message.blank? or (type != :error and type != :failure and type != :success and type != :message and type != :notice)
     clear_messages if self.messages.blank?
     if message.is_a?(Array)
       messages[type].concat message
     elsif message.is_a?(String)
       messages[type] << message
     end
+    true
   end
 
   def add_system_message(type, model, message)

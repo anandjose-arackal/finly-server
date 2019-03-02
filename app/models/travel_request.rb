@@ -30,6 +30,9 @@
 #  created_by_id                :integer
 #  modified_by_id               :integer
 #  deleted_at                   :datetime
+#  controlling_level_id         :integer
+#  booking_submitted_at         :datetime
+#  booking_approved_at          :datetime
 #
 
 class TravelRequest < ApplicationRecord

@@ -306,16 +306,21 @@ class ApplicationController < ActionController::Base
     head(403)
   end
 
+  def skip_finly_authorize?
+    scopes = *authentication_scope
+    scopes.delete(:public)
+    scopes.blank? or self.class.get_skip_authentication_actions.include?(action_name&.to_sym)
+  end
+
   def finly_authorize!
     scopes = *authentication_scope
     scopes.delete(:public)
-    return if scopes.blank?
-    return if self.class.get_skip_authentication_actions.include?(action_name&.to_sym)
+    return if skip_finly_authorize?
 
     set_tokens_in_header
     doorkeeper_authorize! *scopes
 
-    unless doorkeeper_token.status_id == UserSessionStatus.id_for(:authorized)
+    unless doorkeeper_token&.status_id == UserSessionStatus.id_for(:authorized)
       head 401
       return
     end
@@ -352,7 +357,8 @@ class ApplicationController < ActionController::Base
   @skip_authentication_actions = []
 
   def self.skip_authentication_actions(*actions)
-    @skip_authentication_actions = actions
+    @skip_authentication_actions = [] if @skip_authentication_actions.nil?
+    @skip_authentication_actions += actions
   end
 
   def self.get_skip_authentication_actions
@@ -443,6 +449,7 @@ class ApplicationController < ActionController::Base
   end
 
   def after_finly_authorize
+    return if skip_finly_authorize?
     result = Gatekeeper::Event.(:after_finly_authorize, params)
     unless result.success?
       invalidate_session UserSessionStatus.id_for(:revoked), result.message

@@ -3,22 +3,27 @@ class Gatekeeper::Event
 
   attr_accessor :event, :params
 
-  def self.call(event, params)
+  def self.call(event, params = {})
     self.new(event, params).run
   end
 
-  def initialize(event, params)
+  def initialize(event, params = {})
     self.event = event
     self.params = params
   end
 
   def run
-    result = nil
     Gatekeeper::Registry.subscribers(event)&.each do |rule|
-      result = rule.verify(self.params)
-      return result unless result.success?
+      result = rule.verdict(self.params)
+      unless result.success?
+        gr = Gatekeeper::Log.(result, params)
+        unless gr.success?
+          puts gr.messages[:error]
+        end
+        return result
+      end
     end
-    result
+    Gatekeeper::Checker::Verdict.success_verdict
   end
 
 end

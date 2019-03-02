@@ -5,7 +5,7 @@
 #     current_ip = RequestStoreUtil.current_request.remote_ip
 #     session_ip = RequestStoreUtil.current_session.ip
 #     if current_ip != session_ip
-#       add_message :error, 'IP mismatch with session IP'
+#       message 'IP mismatch with session IP'
 #       response_code 401
 #     end
 #   end

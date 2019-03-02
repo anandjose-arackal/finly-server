@@ -35,13 +35,11 @@ FactoryBot.define do
     else
       number = "987654320#{n}"
     end
-    p "******", number
     number
   end
 
 
   factory :user do
-    company_id {nil}
     first_name {"User"}
     last_name {"Doe"}
     email {generate(:user_email)}

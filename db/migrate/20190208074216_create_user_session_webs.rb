@@ -1,7 +1,7 @@
 class CreateUserSessionWebs < ActiveRecord::Migration[5.2]
   def change
     create_table :user_session_webs do |t|
-      t.references :user_session, index: true, foreign_key: true, null: false
+      t.integer :user_session_id, index: true, foreign_key: true, null: false, references: 'user_sessions'
       t.datetime :timestamp
       t.string :user_agent
       t.string :timezone
