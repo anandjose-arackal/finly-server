@@ -141,7 +141,7 @@ class YesBankApi::Base < BaseHandler
         self.payment.update(retry_count: self.payment.retry_count.to_f + 1)
       else
         # this is an anomaly, so send email and flag it
-        Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+        Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
       end
         # temporary - rescue SSL error to simulate various cases
         # rescue Faraday::SSLError
