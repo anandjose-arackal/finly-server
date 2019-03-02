@@ -1,6 +1,7 @@
 json.result do
   json.rate_contract do
-    json.extract! @result.rate_contract, :id, :name, :vendor_id, :renewal_alert_number, :renewal_alert_period_id, :creator_id, :renewable
+    # json.extract! @result.rate_contract, :id, :name, :vendor_id, :renewal_alert_number, :renewal_alert_period_id, :creator_id, :renewable
+    json.merge! @result.rate_contract.as_json
     if @result.rate_contract.rate_contract_line_items.present?
       json.line_items do
         json.array!(@result.rate_contract.rate_contract_line_items) do |line_item|
@@ -28,20 +29,25 @@ json.result do
                 json.status 'done'
               end
             end
+          else
+            json.artifacts_attributes []
           end
         end
       end
+    else json.line_items []
+    end
       
-      if @result.rate_contract.artifacts.present?
-        json.artifacts_attributes do
-          json.array!(@result.rate_contract.artifacts) do |artifact|
-            json.uid artifact.id
-            json.name artifact&.attachment_file_name
-            json.url artifact&.attachment&.url
-            json.status 'done'
-          end
+    if @result.rate_contract.artifacts.present?
+      json.artifacts_attributes do
+        json.array!(@result.rate_contract.artifacts) do |artifact|
+          json.uid artifact.id
+          json.name artifact&.attachment_file_name
+          json.url artifact&.attachment&.url
+          json.status 'done'
         end
       end
+    else
+      json.artifacts_attributes []
     end
   end
 end

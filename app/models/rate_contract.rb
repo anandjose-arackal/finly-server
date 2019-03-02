@@ -10,4 +10,17 @@ class RateContract < ApplicationRecord
 
   accepts_nested_attributes_for :rate_contract_line_items
   accepts_nested_attributes_for :artifacts   
+
+  def as_json
+    {
+      id: id, 
+      name: name, 
+      vendor_id: vendor_id,
+      vendor_name: vendor&.name,
+      renewal_alert_number: renewal_alert_number,
+      renewal_alert_period_id: renewal_alert_period_id,
+      creator_id: creator_id,
+      renewable: renewable
+    }
+  end
 end
