@@ -70,7 +70,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     # end
 
     if user.vendor_payments_creditor? && !bank_payment_request.open? && !bank_payment_request.retracted? && !bank_payment_request.rejected?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && (!bank_payment_request.credited? || bank_payment_request.partially_completed?) && bank_payment_request.approved?
+      if bank_payment_request.document_role_users(:creditor).include?(user) && (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
         if !bank_payment_request.credit_card?
           return true
         end
@@ -80,7 +80,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       # end
       last_trail = bank_payment_request.trails.last rescue nil
       if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.action_users(:approve).include?(user)
-        if (!bank_payment_request.credited? || bank_payment_request.partially_completed?) && !bank_payment_request.credit_card? && !bank_payment_request.approved?
+        if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.credit_card? && !bank_payment_request.approved?
           unless (last_trail.action_user_id == user.id) && (last_trail.action_id == TrailAction.id_for(:approve)) && (bpr.controlling_level_id == last_trail.modified_level_id)
             return true
           end
@@ -172,7 +172,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Creditor logic start #########################
     if user.vendor_payments_creditor? && !bank_payment_request.open? && !bank_payment_request.retracted? && !bank_payment_request.rejected?
-      if bank_payment_request.document_role_users(:creditor).include?(user) && (!bank_payment_request.credited? || bank_payment_request.partially_completed?) && bank_payment_request.approved?
+      if bank_payment_request.document_role_users(:creditor).include?(user) && (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
         if !bank_payment_request.credit_card?
           return true
         end
@@ -182,7 +182,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       # end
       last_trail = bank_payment_request.trails.last rescue nil
       if bank_payment_request.document_role_users(:creditor).include?(user) && bank_payment_request.action_users(:approve).include?(user)
-        if (!bank_payment_request.credited? || bank_payment_request.partially_completed?) && !bank_payment_request.credit_card? && !bank_payment_request.approved?
+        if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.credit_card? && !bank_payment_request.approved?
           unless (last_trail.action_user_id == user.id) && (last_trail.action_id == TrailAction.id_for(:approve)) && (bpr.controlling_level_id == last_trail.modified_level_id)
             return true
           end
