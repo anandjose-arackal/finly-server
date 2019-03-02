@@ -23,11 +23,19 @@
 FactoryBot.define do
   factory :user_device do
     fingerprint { SecureRandom.hex(32) }
-    otp_verified { false }
-    otp { nil }
-    otp_sent_at { nil }
-    otp_verified_at { nil }
-    otp_count { 0 }
-    otp_failed_attempts { 0 }
+    status_id {UserDeviceStatus.id_for(:unverified)}
+    verification_mode {'otp'}
+    verification_key {rand(10 ** 6)}
+    verification_code_sent_at {DateTime.now}
+    verified_at {nil}
+    verification_code_count {1}
+    verification_failed_attempts {0}
+    message {nil}
+
+    UserDeviceStatus.all.each do |status|
+      factory :"user_device_#{status.name}" do
+        status_id {status.id}
+      end
+    end
   end
 end

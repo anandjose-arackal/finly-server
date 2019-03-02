@@ -1,6 +1,7 @@
 class SeedHelper
 
   def self.seed_test_data
+    ActiveRecord::Migration.change_column_null :admin_review_workflow_levels, :admin_user_id, true
     seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
     if seedable_classes.blank?
       Dir.glob("#{Rails.root}/app/models/**/*.rb") {|f| require f}

@@ -75,17 +75,17 @@ module Seedable
 
   # Load all values of all variables in SimpleConfig
   def self.init_global_variables
-    unless Rails.env.production?
-      Rails.application.eager_load!
-    end
-    seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
-    values = {}
-    seedable_classes.each do |seedable_class|
-      values[seedable_class.name] = seedable_class.as_hash rescue nil
-    end
-    SimpleConfig.for :application do
-      set :seedable, values.with_indifferent_access
-    end
+    # unless Rails.env.production?
+    #   Rails.application.eager_load!
+    # end
+    # seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
+    # values = {}
+    # seedable_classes.each do |seedable_class|
+    #   values[seedable_class.name] = seedable_class.as_hash rescue nil
+    # end
+    # SimpleConfig.for :application do
+    #   set :seedable, values.with_indifferent_access
+    # end
   end
 
 end

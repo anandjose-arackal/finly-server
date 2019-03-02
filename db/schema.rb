@@ -62,7 +62,7 @@ ActiveRecord::Schema.define(version: 2019_02_26_044922) do
     t.datetime "updated_at", null: false
     t.boolean "trigger_email", default: false, null: false
     t.boolean "reviewer", default: false, null: false
-    t.integer "admin_user_id"
+    t.integer "admin_user_id", null: false
     t.datetime "email_triggered_at"
     t.index ["admin_review_workflow_id"], name: "index_admin_review_workflow_levels_on_admin_review_workflow_id"
     t.index ["position"], name: "index_admin_review_workflow_levels_on_position"
@@ -2632,7 +2632,7 @@ ActiveRecord::Schema.define(version: 2019_02_26_044922) do
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
   end
 
-  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id"
     t.integer "company_id"
     t.text "params"
@@ -4778,7 +4778,6 @@ ActiveRecord::Schema.define(version: 2019_02_26_044922) do
     t.datetime "updated_at", null: false
     t.string "voucher_expense_date"
     t.boolean "custom_voucher", default: false
-    t.string "voucher_extension"
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
 
@@ -5135,7 +5134,7 @@ ActiveRecord::Schema.define(version: 2019_02_26_044922) do
     t.index ["user_id"], name: "index_user_department_mappings_on_user_id"
   end
 
-  create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.datetime "timestamp"
     t.string "user_agent"
     t.string "timezone"
@@ -5169,29 +5168,22 @@ ActiveRecord::Schema.define(version: 2019_02_26_044922) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_mobile"
-    t.boolean "incomplete"
+    t.integer "status_id", null: false
+    t.text "message"
   end
 
-  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_user_device_statuses_on_name"
   end
 
-  create_table "user_device_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_user_device_types_on_name"
-  end
-
-  create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id"
     t.integer "company_id"
     t.string "fingerprint"
     t.integer "status_id", null: false
-    t.integer "type_id", null: false
     t.string "verification_mode"
     t.string "verification_key"
     t.datetime "verification_code_sent_at"
@@ -5200,11 +5192,12 @@ ActiveRecord::Schema.define(version: 2019_02_26_044922) do
     t.integer "verification_failed_attempts"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_device_browser_id", null: false
+    t.integer "client_id"
+    t.string "client_type"
+    t.text "message"
     t.index ["company_id"], name: "index_user_devices_on_company_id"
     t.index ["fingerprint"], name: "index_user_devices_on_fingerprint"
     t.index ["status_id"], name: "index_user_devices_on_status_id"
-    t.index ["type_id"], name: "index_user_devices_on_type_id"
     t.index ["user_id"], name: "index_user_devices_on_user_id"
     t.index ["verification_mode"], name: "index_user_devices_on_verification_mode"
   end
@@ -5417,7 +5410,7 @@ ActiveRecord::Schema.define(version: 2019_02_26_044922) do
     t.index ["view"], name: "index_user_session_notifications_on_view"
   end
 
-  create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -5459,8 +5452,8 @@ ActiveRecord::Schema.define(version: 2019_02_26_044922) do
     t.string "login_username"
     t.integer "accuracy_radius"
     t.string "username"
-    t.integer "user_device_id", null: false
-    t.integer "device_type_id"
+    t.integer "user_device_id"
+    t.string "client_type"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"

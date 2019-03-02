@@ -24,4 +24,7 @@
 class UserSessionEvent < ApplicationRecord
   belongs_to :user_session
   belongs_to :status, class_name: 'UserSessionStatus'
+
+  validates :controller, presence: true
+  validates :action, presence: true
 end

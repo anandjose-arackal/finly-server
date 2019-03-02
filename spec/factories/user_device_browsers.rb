@@ -23,7 +23,7 @@
 FactoryBot.define do
   factory :user_device_browser do
     user_agent = Faker::Internet.user_agent
-    ua_client = DeviceDetector.new(self.user_agent)
+    ua_client = DeviceDetector.new(user_agent)
 
     timestamp {DateTime.now.strftime('%Q')}
     user_agent {user_agent}

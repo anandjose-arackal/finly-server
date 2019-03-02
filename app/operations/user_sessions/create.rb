@@ -51,6 +51,7 @@ class UserSessions::Create < BaseOperation
   def process
     args = {}
     args[:status_id] = UserSessionStatus.id_for(self.status)
+    args[:message] = params[:message]
     enrich_user args
     enrich_request args
     enrich_access args
@@ -132,7 +133,7 @@ class UserSessions::Create < BaseOperation
     end
 
     args[:user_device_id] = result.device.id
-    args[:device_type_id] = result.device.type_id
+    args[:client_type] = result.device.client_type
     unless result.device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(result.device.status_id)
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.device.message
@@ -150,6 +151,7 @@ class UserSessions::Create < BaseOperation
     args[:events_attributes][0][:action] = params[:action]
     args[:events_attributes][0][:view] = current_view
     args[:events_attributes][0][:status_id] = UserSessionStatus.id_for(self.status)
+    args[:events_attributes][0][:message] = params[:message]
   end
 
 end
