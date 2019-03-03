@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
 
   before_action :finly_authorize!
 
-  before_action :load_global_variables
+  # before_action :load_global_variables
   before_action :after_finly_authorize
   # before_action :set_raven_context
 
@@ -318,6 +318,7 @@ class ApplicationController < ActionController::Base
     return if skip_finly_authorize?
 
     set_tokens_in_header
+
     doorkeeper_authorize! *scopes
 
     unless doorkeeper_token&.status_id == UserSessionStatus.id_for(:authorized)
@@ -332,12 +333,18 @@ class ApplicationController < ActionController::Base
     user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
     if user_session.nil?
       # todo better handle how existing logins are associated i.e mobile, API etc
+      params[:user] = current_user
+      params[:message] = 'User Session not found'
+      UserSessions::Create.(:blocked, params)
       head 401
       return
     end
 
     RequestStoreUtil.set_current_session user_session
-    UserSessions::Events::Create.(user, params)
+    load_global_variables
+
+    result = UserSessions::Events::Create.(current_user, params)
+    RequestStoreUtil.set_current_event result.event
 
     unless user_session.authorized?
       invalidate_session UserSessionStatus.id_for(:revoked), "User session is #{user_session.status.name}"
@@ -345,11 +352,15 @@ class ApplicationController < ActionController::Base
       return
     end
 
+    result = Gatekeeper::Event.(:on_authenticated_request, user: current_user)
+    unless result.success?
+      invalidate_session UserSessionStatus.id_for(:blocked), result.message
+    end
   end
 
   def invalidate_session(status_id, reason)
     RequestStoreUtil.current_session&.update(status_id: status_id, message: reason)
-    RequestStoreUtil.current_event&.update(status_id: status_id, message: reason)
+    RequestStoreUtil.current_session_event&.update(status_id: status_id, message: reason)
     doorkeeper_token&.update(status_id: status_id, message: reason)
     head 401
   end

@@ -112,7 +112,7 @@ class RequestStoreUtil
   end
 
   def self.current_token
-    RequestStore.store[:current_session_event]
+    RequestStore.store[:current_token]
   end
 
 end

@@ -51,10 +51,6 @@ Gatekeeper::Checker.new 'On Web Authentication' do
           end
         end
       end
-
-      rule 'Cannot create 2 sessions with the exact same timestamp' do
-        # todo
-      end
     end
   end
 

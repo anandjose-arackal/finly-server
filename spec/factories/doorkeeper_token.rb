@@ -3,10 +3,10 @@ FactoryBot.define do
     application_id {1}
     token {SecureRandom.hex(32)}
     refresh_token {SecureRandom.hex(32)}
-    expires_in {39000}
+    expires_in {3900000}
     revoked_at {nil}
     created_at {DateTime.now}
-    scopes {['web']}
+    scopes {'web'}
     status_id {UserSessionStatus.id_for(:authorized)}
   end
 end
