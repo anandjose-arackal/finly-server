@@ -37,6 +37,7 @@ RSpec.describe 'UserSession' do
         session = @user1.user_sessions.last
         sessions << session
         expect(session.status_id).to eq(UserSessionStatus.id_for(:authorized))
+        expect(session.access_token.status_id).to eq(UserSessionStatus.id_for(:authorized))
       end
 
       expect do
@@ -55,8 +56,11 @@ RSpec.describe 'UserSession' do
       expect(response.status).to eq(200)
       session = @user1.user_sessions.last
       expect(session.status_id).to eq(UserSessionStatus.id_for(:authorized))
+      expect(session.access_token.status_id).to eq(UserSessionStatus.id_for(:authorized))
       expect(sessions.first.reload.status_id).to eq(UserSessionStatus.id_for(:revoked))
+      expect(sessions.first.access_token.status_id).to eq(UserSessionStatus.id_for(:revoked))
       expect(sessions.second.reload.status_id).to eq(UserSessionStatus.id_for(:authorized))
+      expect(sessions.second.access_token.reload.status_id).to eq(UserSessionStatus.id_for(:authorized))
     end
 
   end
