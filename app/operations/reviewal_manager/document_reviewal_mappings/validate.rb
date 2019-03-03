@@ -9,7 +9,7 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
 
     provider_name = self.document.get_default_provider
     if self.policy.present?
-      self.reviewal_levels = self.policy.levels.with_associted_entity_type(provider_name).non_deleted
+      self.reviewal_levels = self.policy.levels.with_associted_entity_type(provider_name).non_deleted.reorder(:level_number)
     end
   end
 
@@ -25,7 +25,7 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
     amount = get_document_amount
     self.reviewal_levels.each do |level|
       if level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).present?
-        valid_reviewer_ids = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).pluck(:reviewr_id)
+        valid_reviewer_ids = level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
       else
         valid_reviewer_ids = level.level_reviewer_mappings.non_deleted.with_threshold(amount).with_exception(violations_present).pluck(:reviewer_id)
       end
@@ -43,6 +43,13 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
             end
           end
         else
+          add_message :error, "Changes found in document. Reviewal Flow needs to be updated"
+        end
+      else
+        # If Valid reviewers are not present, should check if DLRM is created for it
+        level_specific_dlrms = dlrms.with_level_id(level.id)
+
+        if level_specific_dlrms.present?
           add_message :error, "Changes found in document. Reviewal Flow needs to be updated"
         end
       end
