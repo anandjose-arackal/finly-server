@@ -8,6 +8,7 @@ class RateContract < ApplicationRecord
   has_many :rate_contract_line_items
   has_many :artifacts, as: :resource, dependent: :destroy
 
+  validates :renewal_alert_period, :renewal_alert_number, :vendor, presence: true
   accepts_nested_attributes_for :rate_contract_line_items
   accepts_nested_attributes_for :artifacts
 

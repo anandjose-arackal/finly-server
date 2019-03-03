@@ -11,11 +11,6 @@ class RateContracts::Create < RateContracts::Base
       add_message :error, "Contract name can't be blank"
       return
     end
-    if params[:rate_contract][:renewal_alert_number].blank?
-      add_message :error, "Renewal alert period count can't be blank"
-      return
-    end
-
   end
 
   def process
