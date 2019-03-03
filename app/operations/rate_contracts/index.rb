@@ -16,9 +16,15 @@ class RateContracts::Index < RateContracts::Base
   class RateContracts::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :rate_contracts, :count, :paginated_rate_contracts
+
+    has_scope :filter_rate_contract_id
+    has_scope :filter_vendor_id
+    has_scope :filter_rate_contract_name
+
     def init  
       self.rate_contracts = params[:rate_contracts]
       self.count = rate_contracts.count
+      self.rate_contracts = apply_scopes(rate_contracts)
       self.paginated_rate_contracts = rate_contracts.paginate(page: params[:page], per_page: 30) rescue nil
     end
   end

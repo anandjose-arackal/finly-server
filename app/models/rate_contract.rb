@@ -11,6 +11,17 @@ class RateContract < ApplicationRecord
   accepts_nested_attributes_for :rate_contract_line_items
   accepts_nested_attributes_for :artifacts
 
+  scope :filter_rate_contract_id, -> (contract_id) {
+    where id: contract_id
+  }
+  scope :filter_vendor_id, -> (vendor_id) {
+    where vendor_id: vendor_id
+  }
+
+  scope :filter_rate_contract_name, -> (contract_name) {
+    where name: contract_name
+  }
+
   def as_json
     {
       id: id, 
