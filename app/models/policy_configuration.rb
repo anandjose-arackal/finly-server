@@ -13,6 +13,13 @@
 #  active                  :boolean          default(TRUE), not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  booking_type_flight     :boolean          default(TRUE)
+#  booking_type_car_rental :boolean          default(TRUE)
+#  booking_type_bus        :boolean          default(TRUE)
+#  booking_type_train      :boolean          default(TRUE)
+#  booking_type_hotel      :boolean          default(TRUE)
+#  booking_type_restaurant :boolean          default(TRUE)
+#  booking_type_other      :boolean          default(TRUE)
 #
 
 class PolicyConfiguration < ApplicationRecord
@@ -31,5 +38,4 @@ class PolicyConfiguration < ApplicationRecord
     self.mandate_expense_tagging = false if self.mandate_expense_tagging.nil?
     self.active = false if self.active.nil?
   end
-
 end
