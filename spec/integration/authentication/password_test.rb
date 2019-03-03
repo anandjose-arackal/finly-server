@@ -1,5 +1,5 @@
 require 'rails_helper'
-RSpec.describe 'AccountLock' do
+RSpec.describe 'UserAuthentication' do
 
   before :all do
     @company = create :company
@@ -58,6 +58,9 @@ RSpec.describe 'AccountLock' do
 
   describe '> Valid Password' do
     it 'should return 200 with tokens when correct username and password is entered' do
+      @ip = random_ip
+      allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@ip)
+
       expect do
         post '/oauth/token.json', params: {
             email: @user2.email,
@@ -70,11 +73,25 @@ RSpec.describe 'AccountLock' do
         change {Doorkeeper::AccessToken.count}.by(1).and \
         change {UserSession.count}.by(1).and \
         change {UserSessionEvent.count}.by(1)
-
       expect(response.status).to eq(200)
       body = JSON.parse(response.body)
       expect(body&.dig('data', 'access_token')).to_not be_nil
       expect(body&.dig('data', 'refresh_token')).to be_nil
+
+      session = UserSession.last
+      token = Doorkeeper::AccessToken.last
+      expect(session.access_token_id).to eq(token.id)
+      expect(session.ip).to eq(@ip)
+      expect(session.user_device).to_not be_nil
+      expect(session.user_device.client.class).to be(UserDeviceBrowser)
+
+      body = JSON.parse(response.body)
+      expect(body&.dig('success')).to eq(true)
+      expect(body&.dig('data', 'access_token')).to_not be_nil
+      expect(body&.dig('data', 'refresh_token')).to be_nil
+      expect(body&.dig('data', 'token_type')).to be_nil
+      expect(body&.dig('data', 'expires_in')).to be_nil
+      expect(body&.dig('data', 'user', 'id')).to_not be_nil
     end
   end
 

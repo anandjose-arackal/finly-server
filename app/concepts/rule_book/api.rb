@@ -23,14 +23,24 @@ class RuleBook::API
     RuleBook::Section.new(self.act, self.chapter, self.page_tree, context_name, self.before_blocks, &block)
   end
 
+  # Skip Section
+  def xsection(context_name, &block)
+  end
+
   def premise(*premise_names, &block)
     premise_names.each do |premise_name|
       RuleBook::Premise.new(self.act, self.chapter, self.page_tree, premise_name, self.before_blocks, &block)
     end
   end
 
+  def xpremise(*premise_names, &block)
+  end
+
   def rule(description, &block)
     RuleBook::Rule.new(self.act, self.chapter, self.page_tree, description, self.before_blocks, &block)
+  end
+
+  def xrule(description, &block)
   end
 
   def to_s(options={})

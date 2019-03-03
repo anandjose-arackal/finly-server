@@ -1,11 +1,12 @@
 Gatekeeper::Checker.new 'On Web Authentication' do
 
   before do
-    skip unless RequestStoreUtil.current_device == 'UserDeviceBrowser'
+    skip unless RequestStoreUtil.current_device&.client_type == 'UserDeviceBrowser'
   end
 
   premise :after_session_create do
-    section 'X-Finly-RP' do
+    # todo un-skip once frontend is implemented
+    xsection 'X-Finly-RP' do
       # Web specific checks
       rule 'X-Finly-RP is required for all web requests' do
         headers = RequestStoreUtil.current_request.headers
@@ -31,7 +32,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
          :browser_engine, :browser_engine_version,
          :os_name, :os_version].each do |property|
           rule "#{property} is required for all web requests" do
-            web = RequestStoreUtil.current_device.user_device_browser
+            web = RequestStoreUtil.current_device.client
             next unless web.send(property).blank?
             response_code 401
             fail
