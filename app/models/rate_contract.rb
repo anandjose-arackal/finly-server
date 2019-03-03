@@ -9,7 +9,7 @@ class RateContract < ApplicationRecord
   has_many :artifacts, as: :resource, dependent: :destroy
 
   accepts_nested_attributes_for :rate_contract_line_items
-  accepts_nested_attributes_for :artifacts   
+  accepts_nested_attributes_for :artifacts
 
   def as_json
     {
@@ -20,7 +20,11 @@ class RateContract < ApplicationRecord
       renewal_alert_number: renewal_alert_number,
       renewal_alert_period_id: renewal_alert_period_id,
       creator_id: creator_id,
-      renewable: renewable
+      renewable: renewable,
+      note: note,
+      default_location_name: (rate_contract_line_items.where.not(location_id: nil).first.location.name rescue nil),
+      locations_count: (rate_contract_line_items.pluck(:location_id).count rescue 0),
     }
   end
+
 end

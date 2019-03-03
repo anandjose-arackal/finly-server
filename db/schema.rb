@@ -4158,8 +4158,6 @@ ActiveRecord::Schema.define(version: 2019_02_27_064833) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
-    t.datetime "submitted_at"
-    t.datetime "approved_at"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"
@@ -4363,6 +4361,7 @@ ActiveRecord::Schema.define(version: 2019_02_27_064833) do
     t.integer "creator_id"
     t.integer "renewal_alert_number"
     t.integer "renewal_alert_period_id"
+    t.string "note"
   end
 
   create_table "rate_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

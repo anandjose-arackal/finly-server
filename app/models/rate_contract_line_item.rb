@@ -11,4 +11,6 @@ class RateContractLineItem < ApplicationRecord
   accepts_nested_attributes_for :artifacts
   accepts_nested_attributes_for :amount
 
+  validates :start_date, :end_date, presence: true
+
 end

@@ -6,9 +6,21 @@ class RateContracts::Create < RateContracts::Base
     self.params[:rate_contract][:creator_id] = user.id
   end
 
+  def validate
+    if params[:rate_contract][:name].blank?
+      add_message :error, "Contract name can't be blank"
+      return
+    end
+    if params[:rate_contract][:renewal_alert_number].blank?
+      add_message :error, "Renewal alert period count can't be blank"
+      return
+    end
+
+  end
+
   def process
     rate_contract = RateContract.new(strong_params)
-    unless  rate_contract.save!
+    unless  rate_contract.save
       add_message :error, rate_contract.errors.full_messages
       return
     end
