@@ -166,7 +166,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
     # trigger event for sending mailer to the receiver of the payment
     if self.payment&.completed?
-      op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
+      op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment) rescue nil
       execute_callback(self.payment)
     elsif payment&.failed?
       execute_callback(self.payment)
