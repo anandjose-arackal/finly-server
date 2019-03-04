@@ -152,7 +152,15 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     self.expense = user.expenses.build(expense_params)
 
     if self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.enforce_category
-      self.expense.category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
+      enforced_category = self.expense.distance_expense&.vehicle_rate&.policy&.distance_expense_config&.default_category
+      sent_category_id = expense_params[:category_id].to_i
+      sent_category = user.company.categories.find_by(id: sent_category_id)
+      # i.e. checking of the selected category is a sub category of the one enforced inside the policy
+      if enforced_category.children.pluck(:id).include?(sent_category_id)
+        self.expense.category = sent_category
+      else
+        self.expense.category = enforced_category
+      end
     end
 
     # Create custom fields only for validations. Fields will be saved later
