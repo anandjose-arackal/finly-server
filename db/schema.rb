@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_02_092609) do
+ActiveRecord::Schema.define(version: 2019_03_04_124115) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3108,7 +3108,7 @@ ActiveRecord::Schema.define(version: 2019_03_02_092609) do
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "threshold", precision: 20, scale: 5
+    t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
     t.boolean "exception", default: true
     t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id"
