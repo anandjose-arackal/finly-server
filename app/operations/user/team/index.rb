@@ -110,7 +110,7 @@ class User::Team::Index < User::Team::Base
         # approves_to_association = :has_approves_to
         # NEW CODE
         level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
-        policy_ids = ReviewalLevel.with_id(:level_ids).pluck(:policy_id)
+        policy_ids = ReviewalLevel.with_id(level_ids).pluck(:policy_id)
       when UserRole.id_for(:travel_manager)
         # manager_association = :has_travel_manager
         #approves_to_association = :has_approves_travel_to

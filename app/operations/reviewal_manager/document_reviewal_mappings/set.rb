@@ -1,3 +1,6 @@
+# Creates DLRMs for documents
+# Usually called while creating/updating document
+
 class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::DocumentReviewalMappings::Base
   attr_accessor :mappings_params, :document, :provider_name, :reviewal_chain_data, :violations_present
 
@@ -38,7 +41,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
         #mapping_params[:level] = level
         # # check if reviewer present in company
-        reviewer_ids = level.level_user_reviewer_mappings.with_user_id(user.id).pluck(:reviewer_id) + level.level_reviewer_mappings.pluck(:reviewer_id)
+        reviewer_ids = level.lurms.with_user_id(user.id).with_reviewer.pluck(:reviewer_id) + level.level_reviewer_mappings.pluck(:reviewer_id)
 
         if reviewer_ids.include? mapping_params[:reviewer_id]&.to_i
           reviewer = user.company.users.find_by id: mapping_params[:reviewer_id]
@@ -113,8 +116,10 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
 
             # If reviewer overrides are present for level
             lurms = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).with_threshold(amount)
-            if lurms.present?
-              lurms.each do |lurm|
+            all_lurms = level.level_user_reviewer_mappings.with_user_id(user.id)
+            if all_lurms.present?
+              valid_lurms = all_lurms.with_reviewer.with_threshold(amount)
+              valid_lurms.each do |lurm|
                 document.document_level_reviewer_mappings.create(
                     {
                         level_id: level.id,
