@@ -200,6 +200,7 @@ class User < ApplicationRecord
   has_many :procurements
   has_many :level_reviewer_mappings
   has_many :level_user_reviewer_mappings
+  alias_method :lurms, :level_user_reviewer_mappings
   has_many :procurement_attachments
 
   has_one :individual_kyc, dependent: :destroy
@@ -524,7 +525,7 @@ class User < ApplicationRecord
     policy = Policy.find_by id: policy_id
 
     if policy.present?
-      user_ids = policy.users.pluck(:id)
+      user_ids = policy.user_mapping.non_deleted.pluck(:user_id)
       without_id(user_ids)
     end
   }

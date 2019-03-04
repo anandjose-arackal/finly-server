@@ -96,12 +96,17 @@ class BankPaymentRequest < ApplicationRecord
     when 9, '9' # i.e. pending
       joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
     when '10', 10 # i.e awaiting approval from current user
-      case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
-      when UserRole.id_for(:admin)
-        where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
-      else
-        where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
       end
+      # case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
+      # when UserRole.id_for(:admin)
+      #   where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
+      # else
+      #   where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
+      # end
     else
       # do nothing?
     end
@@ -165,10 +170,12 @@ class BankPaymentRequest < ApplicationRecord
 
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
 
-  scope :filter_controlling_user, -> (user_id) {
-    ids = self.awaiting_action_items(user_id).map(&:id)
-    with_id(ids)
-  }
+  # scope :filter_controlling_user, -> (user_id) {
+  #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
+  #   # with_id(ids)
+  #   ids = self.awaiting_action_items(user_id)&.pluck(:id)
+  #   with_id(ids)
+  # }
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
@@ -202,7 +209,7 @@ class BankPaymentRequest < ApplicationRecord
   }
 
   scope :non_approved, -> {where.not(status_id: BankPaymentRequestStatus.id_for(:approved))}
-  scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved)}
+  scope :creditable, -> {where status_id: BankPaymentRequestStatus.ids_for(:approved, :processing, :auto_approved)}
 
   scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
@@ -350,6 +357,10 @@ class BankPaymentRequest < ApplicationRecord
 
   def self.document_owner_attribute
     'owner_id'
+  end
+
+  def self.document_status_class_name
+    'BankPaymentRequestStatus'
   end
 
   def self.document_status_attribute

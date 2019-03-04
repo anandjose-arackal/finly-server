@@ -84,6 +84,8 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
               invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
               invoice_type_id: InwardInvoiceType.id_for(:beneficiary),
               company_id: self.user.company_id,
+              receiving_account_type: "BankAccount",
+              receiving_account_id: bank_account.id,
               original_amount_attributes: {
                   value: payment[:original_amount],
                   currency_id: 1
@@ -138,7 +140,11 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     # now once the payment request has been created and the payments saved, we can mark it as open
     self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
     self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
-    puts 'SUCCESSFUL!'
+
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, {reviewal_document: self.bank_payment_request.reload})
+    # puts 'SUCCESSFUL!'
   end
 
   private

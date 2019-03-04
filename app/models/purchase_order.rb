@@ -48,6 +48,8 @@
 #  template_name                :string(255)
 #  resource_template_id         :integer
 #  deleted_at                   :datetime
+#  submitted_at                 :datetime
+#  approved_at                  :datetime
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -316,6 +318,10 @@ class PurchaseOrder < ApplicationRecord
       #   currency_id: self.balance_amount&.currency&.id
       # }
     }
+  # Public Method
+
+  def process_line_item_calculation
+    calculate_line_items
   end
 
   private
@@ -447,6 +453,10 @@ class PurchaseOrder < ApplicationRecord
 
   def self.document_status_attribute
     'purchase_order_status_id'
+  end
+
+  def self.document_status_class_name
+    'PurchaseOrderStatus'
   end
 
   def self.status_ids(*statuses)

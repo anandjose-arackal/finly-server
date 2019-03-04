@@ -331,6 +331,10 @@ class TravelRequest < ApplicationRecord
     'status_id'
   end
 
+  def self.document_status_class_name
+    'TravelRequestStatus'
+  end
+
   def self.document_owner_attribute
     'user_id'
   end

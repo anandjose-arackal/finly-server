@@ -101,6 +101,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       purchase_order.save
       # binding.pry
       purchase_order.save
+      purchase_order.process_line_item_calculation
 
       # Directly update the columns because we have callbacks,
       # and those callbacks are validating data which were not previously formatted, like ifsc, (we have some gibberrish ifsc values which  were allowed to be saved before)
@@ -112,7 +113,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
       if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
         # For setting level specific reviewers from reviewal chain for a document
-        params[:reviewal_document] = self.purchase_order.reload
+        params[:reviewal_document] = self.purchase_order
         params[:document_reviewer_mappings] = document_reviewer_mappings_params
 
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
@@ -121,6 +122,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
           return
         end
       end
+
+      purchase_order.save
+      purchase_order.save
 
       # Save Custom Fields
       if params[:custom_fields].present?

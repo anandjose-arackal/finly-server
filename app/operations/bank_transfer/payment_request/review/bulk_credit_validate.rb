@@ -76,7 +76,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
       else
         # check if the payment request can be credited by the selecting user
         # if (payment_request.controlling_user_id == user.id) || (user.vendor_payments_admin? && payment_request.approved?)
-        if (payment_request.get_reviewers.include?(user)) || (user.vendor_payments_admin? && payment_request.approved?)
+        if (payment_request.get_reviewers.include?(user)) || (user.vendor_payments_admin? && payment_request.approved?) || (user.vendor_payments_creditor? && payment_request.document_role_users(:creditor).include?(user) && payment_request.approved?)
           if hash[:allowed]
             self.processable_amount += payment_request.payment_order.amount_requested&.value
           else
@@ -88,6 +88,20 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           errors << "You can only credit payment orders which are awaiting your approval or have already been approved"
           hash[:selectable] = false
           self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
+        end
+
+        if self.user.vendor_payments_creditor? && !self.user.vendor_payments_admin?
+          minimum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.min_amount
+          maximum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.max_amount || 999999999999999999999999
+          if payment_request.payments.joins(:amount).sum(:value) > maximum
+            hash[:selectable] = false
+            self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
+            errors << "You are not eligible to credit the payment order, you are eligible to credit only upto #{maximum}"
+          elsif payment_request.payments.joins(:amount).sum(:value) < minimum
+            hash[:selectable] = false
+            self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
+            errors << "You are not eligible to credit the payment order, you are eligible to credit only greater than #{minimum}"
+          end
         end
       end
 

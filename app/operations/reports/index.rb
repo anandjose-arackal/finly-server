@@ -104,15 +104,15 @@ class Reports::Index < Reports::Base
     case self.role_id
     when UserRole.id_for(:admin), UserRole.id_for(:auditor)
       if self.user.company_admin? || self.user.auditor?
-        self.reports = Report.admin_associated_items(user)
+        self.reports = Report.admin_associated_items(user).not_open
       elsif user.policy_admin?
         # todo Take care of policy admins
-        self.reports = Report.admin_associated_items(user)
+        self.reports = Report.admin_associated_items(user).not_open
       end
     when UserRole.id_for(:manager)
-      self.reports = Report.reviewer_associated_items(user)
+      self.reports = Report.reviewer_associated_items(user).not_open
     when UserRole.id_for(:finance_manager)
-      self.reports = Report.finance_associated_items(user)
+      self.reports = Report.finance_associated_items(user).not_open
     else
       self.reports = user.reports.sort_for_personal
     end
@@ -186,6 +186,8 @@ class Reports::Index < Reports::Base
       return nil if report.blank?
       if report.processing? and report.controlling_user?(self.user)
         'Awaiting Approval'
+      elsif report.auto_approved?
+        'Auto Approved'
       else
         report.status_name
       end

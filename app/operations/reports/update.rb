@@ -70,7 +70,10 @@ class Reports::Update < Reports::Base
       if self.report.user.id == user.id && params[:view] == 'personal'
         # Create Document Level Reviewer Mapping
         # For setting level specific reviewers from reviewal chain for a document
+        check_for_violations
         params[:reviewal_document] = self.report.reload
+        params[:violations_present] = has_warning?
+
 
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
         unless document_reviewer_mappings_op.success?

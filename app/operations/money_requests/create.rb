@@ -9,7 +9,7 @@ class MoneyRequests::Create < MoneyRequests::Base
     self.for_user = (params[:for_user] or user)
     self.policy_id = params&.dig(:money_request, :policy_id)
     if policy_id.blank? and for_user.enforce_policy_enabled?
-      self.policy_id = for_user.policies.non_default.first.id rescue nil
+      self.policy_id = for_user.policies.non_default.non_deleted.first.id rescue nil
     end
     if policy_id.blank?
       self.policy_id = user.company.default_policy.id

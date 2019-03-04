@@ -93,37 +93,54 @@ class MoneyRequests::PrepaidCard::Credit < MoneyRequests::Base
         return
       end
 
-      role_id = money_request.controlling_user_role_id
+      # role_id = money_request.controlling_user_role_id
 
-      update_attributes = {}
-      update_attributes[:status_id] = MoneyRequestStatus.id_for(:credited)
-      update_attributes[:controlling_user_id] = nil
-      update_attributes[:controlling_for_user_id] = nil
-      update_attributes[:controlling_user_role_id] = nil
-      update_attributes[:controlling_for_user_role_id] = nil
-      update_attributes[:payment] = result.payment
-      update_attributes[:processed_amount_attributes] = {
-          value: self.amount,
-          currency_id: Currency.first.id
-      }
+      # update_attributes = {}
+      # update_attributes[:status_id] = MoneyRequestStatus.id_for(:credited)
+      # update_attributes[:controlling_user_id] = nil
+      # update_attributes[:controlling_for_user_id] = nil
+      # update_attributes[:controlling_user_role_id] = nil
+      # update_attributes[:controlling_for_user_role_id] = nil
+      # update_attributes[:payment] = result.payment
+      # update_attributes[:processed_amount_attributes] = {
+      #     value: self.amount,
+      #     currency_id: Currency.first.id
+      # }
 
-      money_request.update_attributes update_attributes
+      # money_request.update_attributes update_attributes
 
-      track_attributes = {}
-      track_attributes[:action_user] = user
-      track_attributes[:action_user_role_id] = role_id
-      track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:credited)
-      track_attributes[:status_id] = MoneyRequestStatus.id_for(:credited)
-      track_attributes[:payment] = result.payment
-      money_request.tracks.create track_attributes
+      # track_attributes = {}
+      # track_attributes[:action_user] = user
+      # track_attributes[:action_user_role_id] = role_id
+      # track_attributes[:money_request_tracking_action_id] = MoneyRequestTrackingAction.id_for(:credited)
+      # track_attributes[:status_id] = MoneyRequestStatus.id_for(:credited)
+      # track_attributes[:payment] = result.payment
+      # money_request.tracks.create track_attributes
+
+      ###################
+      # NEW CODE
+      #  Workflow Manager
+      params[:document] = self.money_request
+      params[:aasm_event] = 'credit'
+      op = WorkflowManager::Base.(user, params)
+
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
+
+      self.workflow_output = op.workflow_output
+      # NEW CODE ENDS
+      ####################     
 
       action_id = "credited_from_#{initiating_account_type}_to_#{receiving_account_type}"
       money_request.comments.create money_request_id: money_request.id,
-                                    user: user, comment_action_id: MoneyRequestCommentAction.id_for(action_id.to_sym), payment: result.payment
+                                      user: user, comment_action_id: MoneyRequestCommentAction.id_for(action_id.to_sym), payment: result.payment
     end
   end
 
   def post_process
+    
     add_message :success, 'Funds transferred successfully'
   end
 

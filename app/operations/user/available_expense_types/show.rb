@@ -138,9 +138,9 @@ class User::AvailableExpenseTypes::Show < User::Base
 
   def retrieve_policies
     if user.enforce_policy_enabled?
-      return user.policies.with_application(current_app).non_default
+      return user.policies.with_application(current_app).non_default.non_deleted
     end
-    user.policies.with_application(current_app)
+    user.policies.with_application(current_app).non_deleted
   end
 
   def success

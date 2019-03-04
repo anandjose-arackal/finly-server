@@ -3,7 +3,7 @@
 
 require "#{Rails.root}/lib/formatter.rb"
 class Reports::Base < BaseOperation
-  attr_accessor :report, :report_id, :workflow_output
+  attr_accessor :report, :report_id, :workflow_output, :violations
 
   def pre_validate
     if user.blank?
@@ -41,6 +41,32 @@ class Reports::Base < BaseOperation
 
   def receipt_params
     params.require(:receipt).permit(:image)
+  end
+
+  def check_for_violations
+    self.violations = Reports::Violation.(user, report: self.report)
+  end
+
+  def has_blocking?
+    return false unless self.violations.present?
+    self.violations.each do |key, violation|
+      if violation[:expense_blocking].present? or violation[:budget_blocking].present? or
+          violation['expense_blocking'].present? or violation['budget_blocking'].present?
+        return true
+      end
+    end
+    false
+  end
+
+  def has_warning?
+    return false unless self.violations.present?
+    self.violations.each do |key, violation|
+      if violation[:expense_warning].present? or violation[:budget_warning].present? or
+          violation['expense_warning'].present? or violation['budget_warning'].present?
+        return true
+      end
+    end
+    false
   end
 
   def present_report
@@ -94,6 +120,7 @@ class Reports::Base < BaseOperation
 
         policies.each do |policy|
           params[:policy_id] = policy.id
+          params[:violations_present] = has_warning?
           chain = {
               policy_id: policy.id,
               reviewal_chain: get_reviewal_chain
@@ -123,22 +150,23 @@ class Reports::Base < BaseOperation
       else
         return nil
       end
-
     end
 
     def retrieve_policies
       # policies = []
       if report.user.enforce_policy_enabled?
         # policies << {id: 0, name: 'None'}
-        return report.user.policies.with_application(current_app).non_default
+        return report.user.policies.with_application(current_app).non_default.non_deleted
       end
-      report.user.policies.with_application(current_app)
+      report.user.policies.with_application(current_app).non_deleted
     end
 
     def status_name(report)
       return nil if report.blank?
       if report.processing? and report.controlling_user?(self.user)
         'Awaiting Approval'
+      elsif report.auto_approved?
+        'Auto Approved'
       else
         report.status_name
       end
