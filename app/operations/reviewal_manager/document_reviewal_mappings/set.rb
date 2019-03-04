@@ -122,7 +122,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
               valid_lurms.each do |lurm|
                 document.document_level_reviewer_mappings.create(
                     {
-                        level_id: level.id,ß
+                        level_id: level.id,
                         level_number: level.level_number,
                         provider_name: level.associated_entity_type,
                         reviewer_id: lurm.reviewer_id,
