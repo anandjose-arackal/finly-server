@@ -487,8 +487,10 @@
 #              admin_users_bank_transfers_get_bulk_status POST   /admin_users/bank_transfers/get_bulk_status(.:format)                                                               admin_users/bank_transfers#get_bulk_status
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                                           admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                                              admin_users/users#admin_menus
-#                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                                                  api/callbacks#successful_vendor_payment
-#                            api_invoice_payment_received POST   /api/callbacks/invoice_payment_received(.:format)                                                                   api/callbacks#invoice_payment_received
+#                               successful_vendor_payment POST   /callbacks/successful_vendor_payment(.:format)                                                                      callbacks/callbacks#successful_vendor_payment
+#                                invoice_payment_received POST   /callbacks/invoice_payment_received(.:format)                                                                       callbacks/callbacks#invoice_payment_received
+#                                     icici_registrations POST   /callbacks/icici_callbacks/registrations(.:format)                                                                  callbacks/icici_callbacks#registrations
+#                                      icici_transactions POST   /callbacks/icici_callbacks/transactions(.:format)                                                                   callbacks/icici_callbacks#transactions
 #                                                         GET    /virtual_accounts/:account_number(.:format)                                                                         api/fc/invoices/virtual_bank_accounts#show
 #                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                                         api/fc/invoices/virtual_bank_accounts#create
 #                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                                         api/fc/invoices/virtual_bank_accounts#update
@@ -1585,6 +1587,8 @@
 #                                                         PUT    /procure/configs/doc_number_configs/:id(.:format)                                                                   procure/configs/doc_number_configs#update
 #                               procure_configs_send_mail POST   /procure/configs/send_mail(.:format)                                                                                procure/configs/mailer#send_mail
 #                                        procure_comments POST   /procure/comments(.:format)                                                                                         procure/comments#create
+#                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
+#                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
 #                                reviewal_level_reviewers GET    /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#index
 #                                                         POST   /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#create
 #                             new_reviewal_level_reviewer GET    /reviewal_levels/:reviewal_level_id/reviewers/new(.:format)                                                         reviewers#new
@@ -1601,6 +1605,14 @@
 #                                                         PATCH  /reviewal_levels/:id(.:format)                                                                                      reviewal_levels#update
 #                                                         PUT    /reviewal_levels/:id(.:format)                                                                                      reviewal_levels#update
 #                                                         DELETE /reviewal_levels/:id(.:format)                                                                                      reviewal_levels#destroy
+#                                    level_user_reviewers GET    /level_user_reviewers(.:format)                                                                                     level_user_reviewers#index
+#                                                         POST   /level_user_reviewers(.:format)                                                                                     level_user_reviewers#create
+#                                 new_level_user_reviewer GET    /level_user_reviewers/new(.:format)                                                                                 level_user_reviewers#new
+#                                edit_level_user_reviewer GET    /level_user_reviewers/:id/edit(.:format)                                                                            level_user_reviewers#edit
+#                                     level_user_reviewer GET    /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#show
+#                                                         PATCH  /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#update
+#                                                         PUT    /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#update
+#                                                         DELETE /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#destroy
 #                                            audit_trails GET    /audit_trails(.:format)                                                                                             audit_trails#index
 #                               policy_user_role_mappings GET    /policy_user_role_mappings(.:format)                                                                                policy_user_role_mappings#index
 #                                                         POST   /policy_user_role_mappings(.:format)                                                                                policy_user_role_mappings#create
@@ -2534,12 +2546,14 @@ Rails.application.routes.draw do
 
   ######### ADMIN PANEL END ###########
 
-  ################### API Callbacks tester ######################
+  ################### API Callbacks ######################
 
-  namespace :api do
-    post 'callbacks/successful_vendor_payment', to: 'callbacks#successful_vendor_payment', as: :successful_vendor_payment
-    post 'callbacks/invoice_payment_received', to: 'callbacks#invoice_payment_received', as: :invoice_payment_received
-  end
+  post 'callbacks/successful_vendor_payment', to: 'callbacks/callbacks#successful_vendor_payment', as: :successful_vendor_payment
+  post 'callbacks/invoice_payment_received', to: 'callbacks/callbacks#invoice_payment_received', as: :invoice_payment_received
+  post 'callbacks/icici_callbacks/registrations', to: 'callbacks/icici_callbacks#registrations', as: :icici_registrations
+  post 'callbacks/icici_callbacks/transactions', to: 'callbacks/icici_callbacks#transactions', as: :icici_transactions
+
+  ################### API Callbacks ######################
 
   ############# Virtual Bank Accounts and Collect API Start ######################
 
