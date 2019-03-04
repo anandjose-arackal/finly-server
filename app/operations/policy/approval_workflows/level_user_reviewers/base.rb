@@ -12,7 +12,7 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Base < BaseOperation
   private
 
   def generate_params
-    params.require(:level_user_reviewer).permit(:id, :user_id, :reviewer_id, :level_id, :threshold, :exception)
+    params.require(:level_user_reviewer).permit(:id, :user_id, :reviewer_id, :level_id, :threshold, :exception, :wo_exception)
   end
 
 end
