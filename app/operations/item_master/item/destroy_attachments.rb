@@ -1,4 +1,4 @@
-class Invoicing::InventoryLineItem::DeleteAttachments < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::DeleteAttachments < ItemMaster::Item::Base
   attr_accessor :company_id, :artifact
 
   def init

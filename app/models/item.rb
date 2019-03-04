@@ -22,7 +22,7 @@
 #  deleted_at          :datetime
 #
 
-class InventoryLineItem < ApplicationRecord
+class Item < ApplicationRecord
   include SoftDeletable
   belongs_to :company, optional: true
   belongs_to :category, optional: true

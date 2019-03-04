@@ -1,6 +1,6 @@
 # now that the import should include custom fields that belong to a particular company,
 # it will need to be dynamically generated
-class Invoicing::InventoryLineItem::ImportTemplate < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::ImportTemplate < ItemMaster::Item::Base
 
   attr_accessor :company, :inventory_item_custom_fields, :sample_type,
                 :headers, :content, :sheets, :import_data

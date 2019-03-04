@@ -1,10 +1,10 @@
-class Invoicing::InventoryLineItem::Destroy < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::Destroy < ItemMaster::Item::Base
 
   attr_accessor :inventory_item
 
   def init
     id = params[:id] || params[:inventory_item_id]
-    self.inventory_item = user.company.inventory_line_items.find_by(id: id)
+    self.inventory_item = user.company.items.find_by(id: id)
   end
 
   def process

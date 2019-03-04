@@ -1,8 +1,8 @@
-class Invoicing::InventoryLineItem::Index < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::Index < ItemMaster::Item::Base
 
   attr_accessor :inventory_line_items
 
-  class Invoicing::InventoryLineItem::Index::InventoryLineItemsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class ItemMaster::Item::Index::InventoryLineItemsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :inventory_line_items, :paginated_line_items
 
@@ -18,7 +18,7 @@ class Invoicing::InventoryLineItem::Index < Invoicing::InventoryLineItem::Base
   end
 
   def init
-    self.inventory_line_items = user.company.inventory_line_items
+    self.inventory_line_items = user.company.items
   end
 
   def validate
@@ -27,7 +27,7 @@ class Invoicing::InventoryLineItem::Index < Invoicing::InventoryLineItem::Base
 
   def success
     params[:inventory_line_items] = self.inventory_line_items
-    Invoicing::InventoryLineItem::Index::InventoryLineItemsPresenter.new(user, params, messages)
+    ItemMaster::Item::Index::InventoryLineItemsPresenter.new(user, params, messages)
   end
 
 end

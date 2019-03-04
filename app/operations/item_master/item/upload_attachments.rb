@@ -1,4 +1,4 @@
-class Invoicing::InventoryLineItem::UploadAttachments < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::UploadAttachments < ItemMaster::Item::Base
 
   def validate
     if item.blank?

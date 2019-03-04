@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_27_064833) do
+ActiveRecord::Schema.define(version: 2019_03_04_013855) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3005,6 +3005,30 @@ ActiveRecord::Schema.define(version: 2019_02_27_064833) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.decimal "tax", precision: 20, scale: 10
+    t.decimal "discount", precision: 20, scale: 10
+    t.string "hsn_sac"
+    t.integer "company_id"
+    t.string "sku"
+    t.decimal "rate", precision: 20, scale: 10
+    t.text "description"
+    t.integer "category_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "note"
+    t.integer "tax_rate_id"
+    t.boolean "is_deleted", default: false, null: false
+    t.string "item_code"
+    t.string "account"
+    t.integer "supply_item_type_id"
+    t.datetime "deleted_at"
+    t.index ["category_id"], name: "index_items_on_category_id"
+    t.index ["company_id"], name: "index_items_on_company_id"
+    t.index ["supply_item_type_id"], name: "index_items_on_supply_item_type_id"
+    t.index ["tax_rate_id"], name: "index_items_on_tax_rate_id"
+  end
+
   create_table "itz_cash_card_programs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "product_code"
     t.string "charge_code"
@@ -5915,7 +5939,7 @@ ActiveRecord::Schema.define(version: 2019_02_27_064833) do
   add_foreign_key "departments", "cost_centers"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
-  add_foreign_key "document_items", "inventory_line_items"
+  add_foreign_key "document_items", "items", column: "inventory_line_item_id"
   add_foreign_key "document_items", "purchase_order_items"
   add_foreign_key "document_level_reviewer_mappings", "policies"
   add_foreign_key "document_number_configs", "companies"
@@ -5975,10 +5999,15 @@ ActiveRecord::Schema.define(version: 2019_02_27_064833) do
   add_foreign_key "invoices", "payment_terms"
   add_foreign_key "inward_document_items", "inventory_line_items"
   add_foreign_key "inward_document_items", "inward_documents"
+  add_foreign_key "inward_document_items", "items", column: "inventory_line_item_id"
   add_foreign_key "inward_document_items", "purchase_order_items"
   add_foreign_key "inward_documents", "companies"
   add_foreign_key "inward_documents", "procurements"
   add_foreign_key "inward_documents", "users"
+  add_foreign_key "items", "categories"
+  add_foreign_key "items", "companies"
+  add_foreign_key "items", "supply_item_types"
+  add_foreign_key "items", "tax_rates"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"
@@ -6065,7 +6094,7 @@ ActiveRecord::Schema.define(version: 2019_02_27_064833) do
   add_foreign_key "procurements", "procurement_statuses"
   add_foreign_key "procurements", "procurement_tracks"
   add_foreign_key "procurements", "users"
-  add_foreign_key "purchase_order_items", "inventory_line_items"
+  add_foreign_key "purchase_order_items", "items", column: "inventory_line_item_id"
   add_foreign_key "purchase_order_items", "purchase_orders"
   add_foreign_key "purchase_orders", "companies"
   add_foreign_key "purchase_orders", "gst_types"

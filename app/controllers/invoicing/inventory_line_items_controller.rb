@@ -1,17 +1,17 @@
 class Invoicing::InventoryLineItemsController < ApplicationController
 
   def index
-    @result = Invoicing::InventoryLineItem::Index.(current_user, params)
+    @result = ItemMaster::Item::Index.(current_user, params)
     respond
   end
 
   def show
-    @result = Invoicing::InventoryLineItem::Show.(current_user, params)
+    @result = ItemMaster::Item::Show.(current_user, params)
     respond
   end
 
   def update
-    @result = Invoicing::InventoryLineItem::Update.(current_user, params)
+    @result = ItemMaster::Item::Update.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -20,12 +20,12 @@ class Invoicing::InventoryLineItemsController < ApplicationController
   end
 
   def create
-    @result = Invoicing::InventoryLineItem::Create.(current_user, params)
+    @result = ItemMaster::Item::Create.(current_user, params)
     respond
   end
 
   def destroy
-    @result = Invoicing::InventoryLineItem::Destroy.(current_user, params)
+    @result = ItemMaster::Item::Destroy.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -34,22 +34,22 @@ class Invoicing::InventoryLineItemsController < ApplicationController
   end
 
   def count
-    @result = Invoicing::InventoryLineItem::Count.(current_user, params)
+    @result = ItemMaster::Item::Count.(current_user, params)
     render json: @result.count.as_json
   end
 
   def inventory_item_config
-    @result = Invoicing::InventoryLineItem::InventoryItemConfig.(current_user, params)
+    @result = ItemMaster::Item::ItemConfig.(current_user, params)
     respond
   end
 
   def import
-    @result = Invoicing::InventoryLineItem::Import.(current_user, params)
+    @result = ItemMaster::Item::Import.(current_user, params)
     respond
   end
 
   def import_template
-    @result = Invoicing::InventoryLineItem::ImportTemplate.(current_user, params)
+    @result = ItemMaster::Item::ImportTemplate.(current_user, params)
     respond
   end
 
@@ -59,12 +59,12 @@ class Invoicing::InventoryLineItemsController < ApplicationController
   end
 
   def upload_attachments
-    # @result = Invoicing::InventoryLineItem::UploadAttachments.(current_user, params)
+    # @result = ItemMaster::Item::UploadAttachments.(current_user, params)
     # respond
   end
 
   def destroy_attachments
-    # @result = Invoicing::InventoryLineItem::DestroyAttachments.(current_user, params)
+    # @result = ItemMaster::Item::DestroyAttachments.(current_user, params)
     # respond
   end
 

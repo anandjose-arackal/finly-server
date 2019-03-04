@@ -1,10 +1,10 @@
-class Invoicing::InventoryLineItem::Show < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::Show < ItemMaster::Item::Base
 
   attr_accessor :inventory_line_item
 
   def init
     id = params[:id] || params[:inventory_line_item_id]
-    self.inventory_line_item = user.company.inventory_line_items.find_by(id: id)
+    self.inventory_line_item = user.company.items.find_by(id: id)
   end
 
   def validate
@@ -16,6 +16,6 @@ class Invoicing::InventoryLineItem::Show < Invoicing::InventoryLineItem::Base
 
   def success
     params[:inventory_line_item] = self.inventory_line_item
-    Invoicing::InventoryLineItem::Base::ItemPresenter.new(user, params, messages)
+    ItemMaster::Item::Base::ItemPresenter.new(user, params, messages)
   end
 end

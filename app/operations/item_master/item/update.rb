@@ -1,6 +1,6 @@
-class Invoicing::InventoryLineItem::Create < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::Update < ItemMaster::Item::Base
 
-  attr_accessor :inventory_line_item, :inventory_item_parameters
+  attr_accessor :inventory_item, :inventory_item_parameters
 
   def personalizer
     {
@@ -11,10 +11,17 @@ class Invoicing::InventoryLineItem::Create < Invoicing::InventoryLineItem::Base
   end
 
   def init
+    id = params[:id] || params[:inventory_item_id]
+    self.inventory_item = user.company.items.find_by(id: id)
     self.inventory_item_parameters = inventory_item_params
   end
 
   def validate
+    if self.inventory_item.blank?
+      add_message :error, "Inventory item not found"
+      return
+    end
+
     supply_item_type_id = inventory_item_params[:supply_item_type_id]
 
     if supply_item_type_id.present?
@@ -33,27 +40,13 @@ class Invoicing::InventoryLineItem::Create < Invoicing::InventoryLineItem::Base
   end
 
   def process
-    self.inventory_line_item = user.company.inventory_line_items.build(self.inventory_item_parameters)
-    if  self.inventory_line_item.save
-      # if inventory_item_parameters[:artifacts].present?
-      #   artifact = inventory_line_item.artifacts.build
-      #   # artifact.attachment = File.new(file_path)
-      #   unless artifact.save
-      #     add_message :error, "Upload failed, some error occurred!"
-      #   end
-      # end
-    else
-      add_message :error, self.inventory_line_item.errors.full_messages
+    unless self.inventory_item.update(self.inventory_item_parameters)
+      add_message :error, self.inventory_item.errors.full_messages
       return
     end
   end
 
   def post_process
-    add_message :success, "Inventory item created"
-  end
-
-  def success
-    params[:inventory_line_item] = self.inventory_line_item
-    Invoicing::InventoryLineItem::Base::ItemPresenter.new(user, params, messages)
+    add_message :success, "Inventory item updated!"
   end
 end
