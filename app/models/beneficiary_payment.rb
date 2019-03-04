@@ -105,7 +105,7 @@ class BeneficiaryPayment < ApplicationRecord
   # this method should take the invoice, payment object and the params object and
   # assign the respective calculated amounts to the invoice object that is passed
   def calculate_tax_and_amount
-  	gross_amount = self.original_amount.value
+  	original_amount = self.original_amount.value
   	net_amount = 0
   	tds_amount = 0
   	tax_amount = 0
@@ -116,25 +116,26 @@ class BeneficiaryPayment < ApplicationRecord
       # first calculate the gross amount by deducting the discount from
       # the original amount entered
       # calculate_inclusive_taxes
-      gross_amount = TaxCalculationUtils.inclusive_tax_amount(gross_amount, (self.tax))
-      tax_amount = self.original_amount.value - gross_amount
+      gross_amount = TaxCalculationUtils.inclusive_tax_amount(original_amount, (self.tax))
+      tax_amount = original_amount - gross_amount
       # calculate_tds
       tds = self.tds_slab&.tds
       new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
       tds_amount = gross_amount - new_gross_amount
 
-      net_amount = gross_amount - tds_amount
+      # net_amount = gross_amount - tds_amount
+      net_amount = self.original_amount.value - tds_amount
     else # calculate proactively
       
       # calculate_exclusive_taxes
-      net_amount = TaxCalculationUtils.exclusive_tax_amount(gross_amount, (self.tax))
-      tax_amount = net_amount - gross_amount
+      net_amount = TaxCalculationUtils.exclusive_tax_amount(original_amount, (self.tax))
+      tax_amount = net_amount - original_amount
       # calculate_tds
       tds = self.tds_slab&.tds
-      new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
-      tds_amount = gross_amount - new_gross_amount
+      new_gross_amount = TaxCalculationUtils.tds_amount(original_amount, tds)
+      tds_amount = original_amount - new_gross_amount
 
-      net_amount = gross_amount + tax_amount - tds_amount
+      net_amount = original_amount + tax_amount - tds_amount
     end
 
 

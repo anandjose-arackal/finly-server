@@ -191,7 +191,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       gst_type_id: payment[:gst_type_id],
       tds_slab_id: payment[:tds_slab_id],
       status_id: BeneficiaryPaymentStatus.id_for(:pending),
-      inclusive_of_taxes: payment[:inclusive_of_taxes],
+      inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
       tax: payment[:tax],
       original_amount_attributes: {
               value: payment[:original_amount],
