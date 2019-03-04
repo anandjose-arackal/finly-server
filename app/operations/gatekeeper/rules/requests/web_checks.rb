@@ -8,11 +8,22 @@ Gatekeeper::Checker.new 'On New Request' do
     rule 'Request IP has to match Session IP' do
       request = RequestStoreUtil.current_request
       session = RequestStoreUtil.current_session
+
       unless request.ip == session.ip
-        update_attr = {status_id: UserSessionStatus.id_for(:blocked), message: 'Browser IP mismatch'}
-        session.update(update_attr)
-        session.access_token.update(update_attr)
-        RequestStoreUtil.current_session_event.update(update_attr)
+        message 'Browser IP mismatch'
+        session_status_id UserSessionStatus.id_for(:blocked)
+
+        response_code 401
+        fail
+      end
+    end
+
+    rule 'Session should timeout after 30 minute of inactivity' do
+      session = RequestStoreUtil.current_session
+
+      if Time.now - Time.parse(session.last_request_at.to_s) > 30.minutes
+        message 'Session timeout'
+        session_status_id UserSessionStatus.id_for(:revoked)
         response_code 401
         fail
       end

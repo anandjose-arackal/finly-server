@@ -1,6 +1,6 @@
 require 'resolv'
 class UserSessions::Create < BaseOperation
-  attr_accessor :oauth_response, :user, :status, :session
+  attr_accessor :user, :status, :session, :token
 
   class UserSessions::Create::Success < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :session, :event
@@ -19,7 +19,7 @@ class UserSessions::Create < BaseOperation
   def initialize(status, params)
     super(params[:user], params)
     self.status = status
-    self.oauth_response = params[:response]
+    self.token = params[:response]&.token || RequestStoreUtil.current_token
   end
 
   def pre_validate
@@ -36,16 +36,16 @@ class UserSessions::Create < BaseOperation
         add_message :error, 'User not found'
         return
       end
-      if self.oauth_response.blank?
+      if self.token.blank?
         add_message :error, 'Token not found'
         return
       end
     end
 
-    if self.params[:username].blank?
-      add_message :error, 'Username not found'
-      return
-    end
+    # if self.params[:username].blank?
+    #   add_message :error, 'Username not found'
+    #   return
+    # end
   end
 
   def process
@@ -72,6 +72,8 @@ class UserSessions::Create < BaseOperation
     RequestStoreUtil.set_current_session self.session
     RequestStoreUtil.set_current_event self.session.events.last
     RequestStoreUtil.set_current_device self.session.user_device
+
+    self.token&.update(status_id: self.session.status_id, message: self.session.message)
   end
 
   def success
@@ -83,7 +85,7 @@ class UserSessions::Create < BaseOperation
   def enrich_user(args)
     args[:company_id] = user&.company_id
     args[:user_id] = user&.id
-    args[:access_token] = self.oauth_response&.token
+    args[:access_token] = self.token
     args[:username] = params[:username]
   end
 
@@ -124,7 +126,7 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_device(args)
-    return if user.nil?
+    return if true
     result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
       args[:status_id] = UserSessionStatus.id_for(:failed)

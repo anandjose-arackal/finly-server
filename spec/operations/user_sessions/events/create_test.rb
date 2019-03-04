@@ -23,7 +23,8 @@ RSpec.describe 'UserSessions::Events::Create' do
     describe '> Active Session' do
       before :all do
         RSpec::Mocks.with_temporary_scope do
-          @session1 = create :user_session, user: @user1, user_device: @device1, access_token: @token1, status_id: UserSessionStatus.id_for(:authorized)
+          @session1 = create :user_session, user: @user1, user_device: @device1, access_token: @token1,
+                             status_id: UserSessionStatus.id_for(:authorized)
           allow(RequestStoreUtil).to receive(:current_request).and_return(double({method_symbol: @method, path: @path}))
           allow(RequestStoreUtil).to receive(:current_app).and_return(:em)
           allow(RequestStoreUtil).to receive(:current_session).and_return(@session1)
@@ -53,7 +54,8 @@ RSpec.describe 'UserSessions::Events::Create' do
     describe '> Inactive Session' do
       before :all do
         RSpec::Mocks.with_temporary_scope do
-          @session1 = create :user_session, user: @user1, user_device: @device1, access_token: @token1, status_id: UserSessionStatus.id_for(:revoked)
+          @message = 'Revoked message'
+          @session1 = create :user_session, user: @user1, user_device: @device1, access_token: @token1, status_id: UserSessionStatus.id_for(:revoked), message: @message
           allow(RequestStoreUtil).to receive(:current_request).and_return(double({method_symbol: @method, path: @path}))
           allow(RequestStoreUtil).to receive(:current_app).and_return(:em)
           allow(RequestStoreUtil).to receive(:current_session).and_return(@session1)
@@ -70,6 +72,7 @@ RSpec.describe 'UserSessions::Events::Create' do
       it 'should a new UserSessionEvent with status as revoked' do
         expect(@before_session_events_count + 1).to eq(UserSessionEvent.count)
         expect(@result.event.status_id).to eq(UserSessionStatus.id_for(:revoked))
+        expect(@result.event.message).to eq(@message)
       end
 
       [:user_session_id, :http_method, :app, :path,

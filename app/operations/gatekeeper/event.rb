@@ -16,10 +16,7 @@ class Gatekeeper::Event
     Gatekeeper::Registry.subscribers(event)&.each do |rule|
       result = rule.verdict(self.params)
       unless result.success?
-        gr = Gatekeeper::Log.(result, params)
-        unless gr.success?
-          puts gr.messages[:error]
-        end
+        Gatekeeper::Log.(result, params)
         return result
       end
     end

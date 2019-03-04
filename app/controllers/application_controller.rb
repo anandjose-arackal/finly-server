@@ -270,6 +270,7 @@ class ApplicationController < ActionController::Base
     RequestStoreUtil.set_request_params params
     RequestStoreUtil.set_current_app current_app
     RequestStoreUtil.set_current_device current_device
+    RequestStoreUtil.set_current_token doorkeeper_token
   end
 
   def respond_failure(message = nil)
@@ -326,6 +327,8 @@ class ApplicationController < ActionController::Base
       return
     end
 
+    load_global_variables
+
     if current_user.present?
       RequestStoreUtil.set_authorized_scopes scopes
     end
@@ -341,21 +344,22 @@ class ApplicationController < ActionController::Base
     end
 
     RequestStoreUtil.set_current_session user_session
-    load_global_variables
 
     result = UserSessions::Events::Create.(current_user, params)
     RequestStoreUtil.set_current_event result.event
 
     unless user_session.authorized?
-      invalidate_session UserSessionStatus.id_for(:revoked), "User session is #{user_session.status.name}"
       head 401
       return
     end
 
     result = Gatekeeper::Event.(:on_authenticated_request, user: current_user)
     unless result.success?
-      invalidate_session UserSessionStatus.id_for(:blocked), result.message
+      session_status = result.session_status_id || UserSessionStatus.id_for(:blocked)
+      invalidate_session session_status, result.message
     end
+
+    user_session.update(last_request_at: DateTime.now)
   end
 
   def invalidate_session(status_id, reason)
