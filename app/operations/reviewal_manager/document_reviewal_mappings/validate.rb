@@ -1,3 +1,6 @@
+# File used to validate the current set of dlrms.
+# Usually called before submitting, and prevents user from submitting if errors are found
+
 class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::DocumentReviewalMappings::Base
   attr_accessor :document, :dlrms, :policy, :violations_present, :reviewal_levels
 
@@ -14,14 +17,14 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
   end
 
   def validate
-    unless self.policy.present?
-      add_message :error, "Please Select a Policy"
+    unless self.document.present?
+      add_message :error, 'Document not found'
     end
   end
 
 
   def process
-    # Check 
+    # Check
     amount = get_document_amount
     self.reviewal_levels.each do |level|
       if level.level_user_reviewer_mappings.with_user_id(user.id).with_threshold(amount).with_exception(violations_present).present?
