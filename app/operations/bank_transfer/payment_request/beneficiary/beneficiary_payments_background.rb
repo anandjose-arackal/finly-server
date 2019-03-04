@@ -65,6 +65,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
           external_reference_id: payment[:external_reference_id],
           department_id: payment[:department_id],
           category_id: payment[:category_id],
+          cost_center_id: payment[:cost_center_id],
           company_id: user.company_id,
           api_initiated: true,
           beneficiary_payment_id: beneficiary_payment.id,
