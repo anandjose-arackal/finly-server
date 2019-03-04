@@ -1,5 +1,5 @@
 json.results do
-  json.array!(@result.paginated_invoices) do |invoice|
+  json.array!(@result.paginated_invoices.include_for_index) do |invoice|
     json.id invoice.id
     json.invoice do
       json.id invoice.id
@@ -75,6 +75,7 @@ json.results do
       end
 
       # invoice items
+      json.invoice_items_count invoice.invoice_items.count
       json.invoice_items do
         json.array!(invoice.invoice_items) do |item|
           json.rate item.rate

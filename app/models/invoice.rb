@@ -259,6 +259,31 @@ class Invoice < ApplicationRecord
     where invoice_type_id: InwardInvoiceType.id_for(invoice_type)
   }
 
+  scope :filter_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
+  }
+
+  scope :filter_non_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+  }
+
+  scope :filter_invoice_type, -> (type) {
+    case type
+    when 'po_invoice'
+      where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
+    when 'non_po_invoice'        
+      where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+    else
+      return nil
+    end      
+  }
+
+  scope :filter_status, -> (status_name) {
+    if status_name.present?
+      where invoice_status_id: InwardInvoiceStatus.id_for(status_name)
+    end
+  }
+
   scope :non_beneficiary, ->  {
     where(invoice_type_id: [InwardInvoiceType.id_for(:tax_invoice),
                             InwardInvoiceType.id_for(:advance),
@@ -274,6 +299,12 @@ class Invoice < ApplicationRecord
 
   scope :filter_vendor_id, -> (ids){
     where vendor_id: ids
+  }
+
+  scope :include_for_index, -> {
+        includes( :amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
+           :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due,
+           :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount], vendor: [:bank_accounts])
   }
 
   after_create :set_defaults
