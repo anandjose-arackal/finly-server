@@ -10,8 +10,8 @@ class RateContract < ApplicationRecord
 
   validates :renewal_alert_period, :renewal_alert_number, :vendor, presence: true
 
-  accepts_nested_attributes_for :rate_contract_line_items
-  accepts_nested_attributes_for :artifacts
+  accepts_nested_attributes_for :rate_contract_line_items, allow_destroy: true
+  accepts_nested_attributes_for :artifacts, allow_destroy: true
 
   scope :filter_rate_contract_id, -> (contract_id) {
     where id: contract_id

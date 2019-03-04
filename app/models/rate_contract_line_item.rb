@@ -10,7 +10,7 @@ class RateContractLineItem < ApplicationRecord
   validates :location, :item, :start_date, :end_date, :amount, presence: true
 
 
-  accepts_nested_attributes_for :artifacts
-  accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :artifacts, allow_destroy: true
+  accepts_nested_attributes_for :amount, allow_destroy: true
 
 end
