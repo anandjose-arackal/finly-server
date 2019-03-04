@@ -3954,6 +3954,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.boolean "booking_type_hotel", default: true
     t.boolean "booking_type_restaurant", default: true
     t.boolean "booking_type_other", default: true
+    t.boolean "trips_money_request", default: true
     t.index ["default_tag_id"], name: "index_policy_configurations_on_default_tag_id"
     t.index ["policy_id"], name: "index_policy_configurations_on_policy_id"
     t.index ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id"
