@@ -1,6 +1,6 @@
 json.results do
   json.array!(@result.paginated_rate_contracts) do |rate_contract|
-    json.extract! rate_contract, :id, :name, :vendor_id, :renewal_alert_number, :renewal_alert_period_id, :creator_id
+    json.merge! rate_contract.as_json
     json.vendor_name rate_contract&.vendor&.name
     if rate_contract.rate_contract_line_items.present?
       json.line_items do
