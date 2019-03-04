@@ -7,7 +7,7 @@ json.result do
         json.array!(@result.rate_contract.rate_contract_line_items) do |line_item|
           json.id  line_item.id
           json.item_id line_item&.item_id
-          json.item_name line_item&.item&.hsn_sac
+          json.item_name line_item&.item&.description
           json.item_code line_item&.item&.item_code
           json.location_id line_item&.location_id
           json.location_name line_item&.location&.name

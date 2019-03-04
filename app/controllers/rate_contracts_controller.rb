@@ -26,7 +26,11 @@ class RateContractsController < ApplicationController
 
   def destroy
     @result = RateContracts::Destroy.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def configuration

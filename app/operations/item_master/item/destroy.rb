@@ -15,7 +15,7 @@ class ItemMaster::Item::Destroy < ItemMaster::Item::Base
   end
 
   def post_process
-    add_message :success, "Inventory item created"
+    add_message :success, "Inventory item deleted"
   end
 
 end

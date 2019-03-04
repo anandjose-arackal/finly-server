@@ -4,7 +4,7 @@ class RateContracts::Index < RateContracts::Base
 
 
   def process
-    self.rate_contracts = RateContract.includes(:rate_contract_line_items)
+    self.rate_contracts = user.rate_contracts
   end
 
   def success
