@@ -21,23 +21,31 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     #   end
 
     # if admin is not creditor
-    if user.vendor_payments_admin? && !bank_payment_request.document_role_users(:creditor).include?(user)
-      if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.approved?
+    # if user.vendor_payments_admin? && !bank_payment_request.document_role_users(:creditor).include?(user)
+    #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.approved?
+    #     return true
+    #   end
+    # end
+
+    # If admin is creditor too
+    if user.vendor_payments_admin?
+      if bank_payment_request.payment_order.partially_completed? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
-    end
-    # If admin is creditor too
-    if user.vendor_payments_admin? && bank_payment_request.document_role_users(:creditor).include?(user)
-      if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?)
+      if  bank_payment_request.processing? && bank_payment_request.action_users(:return_control).include?(user)
+        return true
+      end
+
+      if (bank_payment_request.approved? || bank_payment_request.auto_approved?) && !bank_payment_request.credited?
         return true
       end
     end
 
-    if user.vendor_payments_admin?
-      if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
-        return true
-      end
-    end
+    # if user.vendor_payments_admin?
+    #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
+    #     return true
+    #   end
+    # end
 
       # if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
       #   return true
@@ -142,20 +150,33 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     #   end
     # end
     # if admin is not creditor
-    if user.vendor_payments_admin? && !bank_payment_request.document_role_users(:creditor).include?(user)
-      if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.approved?
-        return true
-      end
-    end
-    # If admin is creditor too
-    if user.vendor_payments_admin? && bank_payment_request.document_role_users(:creditor).include?(user)
-      if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?)
-        return true
-      end
-    end
+    # if user.vendor_payments_admin? && !bank_payment_request.document_role_users(:creditor).include?(user)
+    #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.approved?
+    #     return true
+    #   end
+    # end
+    # # If admin is creditor too
+    # if user.vendor_payments_admin? && bank_payment_request.document_role_users(:creditor).include?(user)
+    #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?)
+    #     return true
+    #   end
+    # end
+
+    # if user.vendor_payments_admin?
+    #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
+    #     return true
+    #   end
+    # end
 
     if user.vendor_payments_admin?
-      if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
+      if bank_payment_request.payment_order.partially_completed? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted? 
+        return true
+      end
+      if  bank_payment_request.processing? && bank_payment_request.action_users(:return_control).include?(user)
+        return true
+      end
+
+      if (bank_payment_request.approved? || bank_payment_request.auto_approved?) && !bank_payment_request.credited?
         return true
       end
     end
@@ -297,7 +318,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def add_payments
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
-      !bank_payment_request.credited?
+      if !bank_payment_request.credited?
+        return true
+      end
     end
     ############# Admin logic end #######################
 
