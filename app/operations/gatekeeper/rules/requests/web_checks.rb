@@ -8,11 +8,9 @@ Gatekeeper::Checker.new 'On New Request' do
     rule 'Request IP has to match Session IP' do
       request = RequestStoreUtil.current_request
       session = RequestStoreUtil.current_session
-
-      unless request.ip == session.ip
+      unless request.remote_ip == session.ip
         message 'Browser IP mismatch'
         session_status_id UserSessionStatus.id_for(:blocked)
-
         response_code 401
         fail
       end

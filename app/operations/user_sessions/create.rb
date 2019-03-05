@@ -108,8 +108,8 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_geo_location(args)
-    # geo_ip = Geocoder.search(RequestStoreUtil.current_request.remote_ip)
-    geo_ip = Geocoder.search('106.51.71.232')
+    geo_ip = Geocoder.search(RequestStoreUtil.current_request.remote_ip)
+    # geo_ip = Geocoder.search('106.51.71.232')
     geo_ip = geo_ip.first if geo_ip.respond_to?(:each)
     data = geo_ip.data
     args[:continent_name] = data&.dig('continent', 'names', 'en')
@@ -126,6 +126,7 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_device(args)
+    args[:client_type] = params[:temporary_client_type]
     return if true
     result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
