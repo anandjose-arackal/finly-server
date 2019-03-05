@@ -37,14 +37,4 @@ class RateContractsController < ApplicationController
     @result = RateContracts::Configuration::Show.(current_user, params)
     respond
   end
-
-  # def upload_attachments
-  #   # @result = RateContracts::UploadAttachments.(current_user, params)
-  #   # respond
-  # end
-
-  # def destroy_attachments
-  #   # @result = RateContracts.UploadAttachments.(current_user, params)
-  #   # respond
-  # end
 end
