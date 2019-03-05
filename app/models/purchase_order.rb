@@ -318,6 +318,7 @@ class PurchaseOrder < ApplicationRecord
       #   currency_id: self.balance_amount&.currency&.id
       # }
     }
+  end
   # Public Method
 
   def process_line_item_calculation

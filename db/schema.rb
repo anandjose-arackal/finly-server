@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_04_053710) do
+ActiveRecord::Schema.define(version: 2019_03_04_124115) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2698,20 +2698,6 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.index ["name"], name: "index_gst_types_on_name"
   end
 
-  create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "AGGRNAME"
-    t.string "AGGRID"
-    t.string "URN"
-    t.string "UNIQUEID"
-    t.string "REQUESTID"
-    t.string "TXNSTATUS"
-    t.string "UTRNUMBER"
-    t.string "CORPID"
-    t.string "USERID"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -2997,6 +2983,8 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.datetime "approved_at"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
+    t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
+    t.index ["invoice_type_id"], name: "index_invoices_on_invoice_type_id"
     t.index ["payment_term_id"], name: "index_invoices_on_payment_term_id"
     t.index ["tax_type_id"], name: "index_invoices_on_tax_type_id"
   end
@@ -3173,7 +3161,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "threshold", precision: 20, scale: 5
+    t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
     t.boolean "exception", default: true
     t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id"
@@ -3559,7 +3547,6 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.string "scopes", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "confidential", default: true, null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
