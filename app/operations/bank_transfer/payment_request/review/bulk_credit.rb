@@ -122,8 +122,6 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
       if op_2.success?
         payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:credit)
-      else
-        binding.pry
       end
       #
       # self.workflow_output = op.workflow_output
@@ -139,8 +137,8 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
     # updating all the individual payments to pending state
     payments = ::Payment.with_payment_order_id(self.creditable_payment_orders.pluck(:id))
     payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
-    # BankTransfer::PaymentRequest::Review::CreditBackground.call_async(ids, initiating_user_id: user.id)
-    BankTransfer::PaymentRequest::Review::CreditBackground.call(ids, initiating_user_id: user.id) #todo make it async
+    BankTransfer::PaymentRequest::Review::CreditBackground.call_async(ids, initiating_user_id: user.id)
+    # BankTransfer::PaymentRequest::Review::CreditBackground.call(ids, initiating_user_id: user.id) #todo make it async
   end
 
   def post_process

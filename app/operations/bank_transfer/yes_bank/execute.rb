@@ -49,9 +49,38 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
   end
 
   def post_process
-    binding.pry
     # mark the respective bank payment request as credited because it has been officially executed
-    payment_order.bank_payment_request&.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+    unless payment_order.bank_payment_request&.status_id == BankPaymentRequestStatus.id_for(:credited)
+      payment_order.bank_payment_request&.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+      # Missing user payment initiating user information hence doing workflow manager's task manually
+      current_level = payment_order.bank_payment_request.level
+      if current_level.present?
+        # Update current dlrm with action
+        current_dlrms_taken_control = document.document_level_reviewer_mappings.with_level_id(current_level.id).where(taken_control: true).first rescue nil
+
+        if current_dlrms_taken_control.present?
+          taken_control_user = current_dlrms_taken_control.taken_control_by
+          current_dlrms_taken_control.update(action_id: TrailAction.id_for(:credit), action_taken_by_id: taken_control_user&.id)
+        else
+          current_dlrms = document.document_level_reviewer_mappings.with_level_id(current_level.id)
+
+          if current_dlrms.present?
+            current_dlrms.update_all(
+              action_id: TrailAction.id_for(:credit),
+              action_taken_by_id: current_dlrms.first&.reviewer_id
+            ) 
+          end
+        end
+
+        # Update next dlrms as active false
+        current_level_number = current_level.level_number
+        dlrms = document.document_level_reviewer_mappings.with_level_number_gt(current_level_number)
+
+        if dlrms.present?
+          dlrms.update_all(active: false)
+        end
+      end
+    end
   end
 
   def success

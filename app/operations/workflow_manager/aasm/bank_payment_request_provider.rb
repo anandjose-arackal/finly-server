@@ -70,15 +70,17 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     super
 
     # If Credit then mark all next level active:false & set controlling level to nil
-    if [:credit].include?(aasm.current_event)
+    if [:credit, :mark_as_credited].include?(aasm.current_event)
       if current_level.present?
         # Update current dlrm with action
         dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id)
                    .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
-        dlrm.update(
-          action_id: TrailAction.id_for(aasm.current_event),
-          action_taken_by_id: user.id
-        )
+        if dlrm.present?
+          dlrm.update(
+            action_id: TrailAction.id_for(aasm.current_event),
+            action_taken_by_id: user.id
+          )
+        end
 
         # Update next dlrms as active false
         current_level_number = current_level.level_number
