@@ -242,9 +242,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
       if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.credit_card?
-        company_credits = retrieve_balance(:company_credits, user)
-        finly_money = retrieve_balance(:vendor_payment_wallet, user)
-        if (company_credits > 0) || (finly_money > 0)
+        company_credits = retrieve_balance(:company_credits, user) rescue nil
+        finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
+        # Allow credit even if the balance retreival fails
+        if (company_credits > 0) || (finly_money > 0) || company_credits.blank? || finly_money.blank?
           return true
         end
       end
@@ -301,9 +302,10 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       #     return bank_payment_request.payment_order.partially_completed?
       #   end
       # end
-      finly_money = retrieve_balance(:vendor_payment_wallet, user)
+      finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
       if allow_credit && bank_payment_request.document_role_users(:creditor).include?(user)
-        if (finly_money > 0)
+        # Allow credit even if the balance retrieval fails
+        if (finly_money > 0) || finly_money.blank?
           return true
         end
       end
@@ -418,9 +420,14 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def edit_payment_history
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user)
+      # if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user) && bank_payment_request.processing?
+      #   return true
+      # end
+
+      if !bank_payment_request.credited?
         return true
       end
+
     end
     ############# Admin logic end ####################
 
@@ -441,8 +448,13 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def delete_payment_history
     ############# Admin logic start ####################
+    # if user.vendor_payments_admin?
+    #   if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user)
+    #     return true
+    #   end
+    # end
     if user.vendor_payments_admin?
-      if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user)
+      if !bank_payment_request.credited?
         return true
       end
     end
@@ -595,6 +607,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       if (bank_payment_request.processing? && bank_payment_request.get_reviewers.exclude?(user))
         return true
       end
+      if bank_payment_request.processing? && !bank_payment_request.action_users(:return_control).include?(user) && bank_payment_request.action_users(:approve).include?(user)
+        return true
+      end
     end
     ############# Admin logic end ####################    
   end
@@ -735,8 +750,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Initiator logic start ######################
     if user.vendor_payments_initiator?
       if (bank_payment_request.owner_id == user.id)
-        bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
-        return true
+        if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+          return true
+        end
       end
     end
   end
@@ -802,7 +818,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Creditor logic start ######################
     if user.vendor_payments_creditor?
-      if !bank_payment_request.open? && !bank_payment_request.credited?
+      if !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && !bank_payment_request.credited?
         if bank_payment_request.document_role_users(:creditor).include?(user)
           return true
         end
