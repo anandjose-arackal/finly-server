@@ -5,7 +5,7 @@ class BankTransfer::InwardInvoices::Count < BankTransfer::InwardInvoices::Base
   def init
     op = BankTransfer::InwardInvoices::Index.(user, params)
     if op.success?
-      case params[:type]
+      case params[:filter_invoice_type]
       when 'po_invoice'        
         self.status_count = op.po_invoice_status_count
       when 'non_po_invoice'
