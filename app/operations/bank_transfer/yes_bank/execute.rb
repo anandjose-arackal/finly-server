@@ -49,6 +49,7 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
   end
 
   def post_process
+    binding.pry
     # mark the respective bank payment request as credited because it has been officially executed
     payment_order.bank_payment_request&.update(status_id: BankPaymentRequestStatus.id_for(:credited))
   end
