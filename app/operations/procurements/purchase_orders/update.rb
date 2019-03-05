@@ -98,10 +98,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # binding.pry
     if purchase_order.valid?
 
-      # purchase_order.save
+      purchase_order.save
       # # binding.pry
-      # purchase_order.save
-      purchase_order.process_line_item_calculation
+      purchase_order.save
+      # purchase_order.process_line_item_calculation
 
       # Directly update the columns because we have callbacks,
       # and those callbacks are validating data which were not previously formatted, like ifsc, (we have some gibberrish ifsc values which  were allowed to be saved before)
@@ -123,8 +123,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         end
       end
 
-      purchase_order.save
-      purchase_order.save
+      # purchase_order.save
+      # purchase_order.save
 
       # Save Custom Fields
       if params[:custom_fields].present?
