@@ -6,16 +6,18 @@ class BankTransfer::InwardInvoices::Count < BankTransfer::InwardInvoices::Base
     params[:type] = params[:filter_invoice_type]
     params.delete(:filter_invoice_type)
     op = BankTransfer::InwardInvoices::Index.(user, params)
-    if op.success?
+    if op.success?      
+      self.count = op.invoices.count
+      self.po_invoice_count = op.invoices.filter_invoice_type('po_invoice').count      
+      self.non_po_invoice_count = op.invoices.filter_invoice_type('non_po_invoice').count
       case params[:type]
       when 'po_invoice'        
         self.status_count = op.po_invoice_status_count
+        self.status_count["all"] = sprintf '%02d', self.po_invoice_count
       when 'non_po_invoice'
         self.status_count = op.non_po_invoice_status_count
+        self.status_count["all"] = sprintf '%02d', self.non_po_invoice_count
       end
-      self.count = op.invoices.count
-      self.po_invoice_count = op.invoices.filter_invoice_type('po_invoice').count      
-      self.non_po_invoice_count = op.invoices.filter_invoice_type('non_po_invoice').count      
     else
       self.count = 0
     end
