@@ -3,9 +3,11 @@ class BankTransfer::InwardInvoices::Count < BankTransfer::InwardInvoices::Base
   attr_accessor :count, :status_count, :po_invoice_count, :non_po_invoice_count
 
   def init
+    params[:type] = params[:filter_invoice_type]
+    params.delete(:filter_invoice_type)
     op = BankTransfer::InwardInvoices::Index.(user, params)
     if op.success?
-      case params[:filter_invoice_type]
+      case params[:type]
       when 'po_invoice'        
         self.status_count = op.po_invoice_status_count
       when 'non_po_invoice'
@@ -26,8 +28,8 @@ class BankTransfer::InwardInvoices::Count < BankTransfer::InwardInvoices::Base
   def success
     params[:count] = self.count
     params[:status_count] = self.status_count
-    params[:po_invoice_count] = self.po_invoice_count
-    params[:non_po_invoice_count] = self.non_po_invoice_count
+    params[:po_invoice_count] = sprintf '%02d', self.po_invoice_count
+    params[:non_po_invoice_count] = sprintf '%02d', self.non_po_invoice_count
     BankTransfer::InwardInvoices::Count::CountPresenter.new(user, params, messages)
   end
 

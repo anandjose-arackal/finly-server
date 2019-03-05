@@ -35,7 +35,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     def get_count(id)
       raw_count = self.invoices.where(invoice_type_id: id).group( :invoice_status_id).count
       h = {}
-      InwardInvoiceStatus.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = raw_count[ps.id] else h[ps.name] = 0 end}
+      InwardInvoiceStatus.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = sprintf '%02d', raw_count[ps.id] else h[ps.name] = sprintf '%02d', 0 end}
       return h
     end
 
