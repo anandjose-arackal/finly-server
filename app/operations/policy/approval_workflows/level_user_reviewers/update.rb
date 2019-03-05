@@ -28,6 +28,6 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Update < Policy::ApprovalWo
 
   # Only allow updation of threshold & exception
   def generate_params
-    params.require(:level_user_reviewer).permit(:threshold, :exception)
+    params.require(:level_user_reviewer).permit(:threshold, :exception, :wo_exception)
   end
 end
