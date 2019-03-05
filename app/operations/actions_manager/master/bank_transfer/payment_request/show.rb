@@ -242,7 +242,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic start #######################
     if user.vendor_payments_admin?
       if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.credit_card?
-        return true
+        company_credits = retrieve_balance(:company_credits, user)
+        finly_money = retrieve_balance(:vendor_payment_wallet, user)
+        if (company_credits > 0) || (finly_money > 0)
+          return true
+        end
       end
     end
     ############# Admin logic end #######################
@@ -279,22 +283,28 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
           allow_credit = (max_amount > 0) && (bank_payment_request.requested_amount_value <= max_amount)
         end
       end
-      if allow_credit
-        if bank_payment_request.document_role_users(:creditor).include?(user)
-          # check if amount lies within threshold limit of creditor
-          balance = retrieve_balance(:vendor_payment_wallet, user)
-          if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval)
-            return !bank_payment_request.credit_card?
-          else
-            if user.vendor_payments_admin?
-              balance = retrieve_balance(:company_credits, user)
-              if balance >= bank_payment_request.requested_amount_value
-                return !bank_payment_request.credit_card?
-              end
-            end
-          end
-        elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
-          return bank_payment_request.payment_order.partially_completed?
+      # if allow_credit
+      #   if bank_payment_request.document_role_users(:creditor).include?(user)
+      #     # check if amount lies within threshold limit of creditor
+      #     balance = retrieve_balance(:vendor_payment_wallet, user)
+      #     if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval)
+      #       return !bank_payment_request.credit_card?
+      #     else
+      #       if user.vendor_payments_admin?
+      #         balance = retrieve_balance(:company_credits, user)
+      #         if balance >= bank_payment_request.requested_amount_value
+      #           return !bank_payment_request.credit_card?
+      #         end
+      #       end
+      #     end
+      #   elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
+      #     return bank_payment_request.payment_order.partially_completed?
+      #   end
+      # end
+      finly_money = retrieve_balance(:vendor_payment_wallet, user)
+      if allow_credit && bank_payment_request.document_role_users(:creditor).include?(user)
+        if (finly_money > 0)
+          return true
         end
       end
     end
