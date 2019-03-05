@@ -302,6 +302,17 @@ class Invoice < ApplicationRecord
     where vendor_id: ids
   }
 
+  scope :filter_po_number, -> (po_number) {
+    # ipid = where(invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)).pluck(:procurement_id)
+    # poid = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
+
+    # procs = ipid & poid
+    poid = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
+
+    where(procurement_id: poid)
+
+  }
+
   scope :include_for_index, -> {
         includes( :amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab,
            :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
