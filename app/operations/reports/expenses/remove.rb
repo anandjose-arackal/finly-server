@@ -5,7 +5,7 @@
 
 class Reports::Expenses::Remove < Reports::Base
 
-  attr_accessor :expenses, :retracted
+  attr_accessor :expenses, :retracted, :report_violations
 
   def authorized_user_types
     [:employee]
@@ -62,6 +62,19 @@ class Reports::Expenses::Remove < Reports::Base
       unless expense.update_attributes(report_id: nil, expense_status_id: ExpenseStatus.unreported_id, manager_memo: nil, rejecting_manager: nil)
         messages[:error] = expense.errors.full_messages
       end
+    end
+
+    check_for_violations
+    violations_present = has_warning?
+
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+    params[:reviewal_document] = self.report
+    params[:violations_present] = violations_present
+
+    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+    if document_reviewer_mappings_op.success?
+      add_message :success, "Reviewal Flow Updated to Reflect New Changes"
     end
   end
 

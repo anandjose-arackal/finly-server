@@ -19,6 +19,7 @@
 #  provider_name                   :string(255)
 #  threshold                       :decimal(20, 5)
 #  active                          :boolean          default(TRUE)
+#  wo_exception                    :boolean          default(TRUE)
 #
 
 class DocumentLevelReviewerMapping < ApplicationRecord
@@ -50,6 +51,16 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   scope :with_viewable, -> {where viewable: true}
 
   scope :with_document_id, -> (document_ids) {where document_reviewer_mappable_id: document_ids}
+  scope :with_level_number_gt, -> (number) {
+    if number.present?
+      where("level_number > ?", number.to_i)
+    end
+  }
+  scope :with_level_number_gteq, -> (number) {
+    if number.present?
+      where("level_number >= ?", number.to_i)
+    end
+  }
 
   validates :policy_id, presence: true
   validates :level_id, presence: true

@@ -1,13 +1,14 @@
 class ReviewalManager::ReviewalChain < ReviewalManager::Base
   attr_accessor :document, :provider_names,
                 :chain, :policy,
-                :levels, :provider_name
+                :levels, :provider_name, :violations_present
 
   # In params
   # policy_id needs to be present
   def init
     self.document = params[:reviewal_document]
     self.provider_name = params[:provider_name] || self.document&.get_default_provider
+    self.violations_present = !!params[:violations_present]
     self.chain = []
     self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider )
     policy_id = params[:policy_id]
@@ -31,11 +32,15 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     # Find over ridden users for a policy level
     self.levels = self.policy.levels.non_deleted.with_entity_type(provider_name).reorder(:level_number)
 
+    params[:filter_associated_entity_type] = provider_name
+    params[:filter_policy_id] = self.policy.id
+    self.levels = ReviewalLevels::Index.(user, params).reviewal_levels
+
     levels.each do |level|
-      if level.level_user_reviewer_mappings.with_user_id(user.id).present?
-        mappings = level.level_user_reviewer_mappings.with_user_id(user.id)
+      if level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).present?
+        mappings = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present)
       else
-        mappings = level.level_reviewer_mappings.non_deleted
+        mappings = level.level_reviewer_mappings.with_exception(violations_present).non_deleted
       end
       selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
       selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
@@ -49,8 +54,9 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
         level_data[:selected_reviewer] = selected_reviewer.reviewer
         level_data[:selected_reviewer_threshold] = selected_reviewer.threshold
       end
-
-      self.chain.push(level_data)
+      if mappings.present?
+        self.chain.push(level_data)
+      end
     end
   end
 

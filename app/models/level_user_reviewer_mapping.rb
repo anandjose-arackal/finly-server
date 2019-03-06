@@ -2,15 +2,16 @@
 #
 # Table name: level_user_reviewer_mappings
 #
-#  id          :integer          not null, primary key
-#  level_id    :integer
-#  user_id     :integer
-#  reviewer_id :integer
-#  policy_id   :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  threshold   :decimal(20, 5)
-#  exception   :boolean          default(FALSE)
+#  id           :integer          not null, primary key
+#  level_id     :integer
+#  user_id      :integer
+#  reviewer_id  :integer
+#  policy_id    :integer
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  threshold    :decimal(20, 5)
+#  exception    :boolean          default(TRUE)
+#  wo_exception :boolean          default(TRUE)
 #
 
 class LevelUserReviewerMapping < ActiveRecord::Base
@@ -20,13 +21,18 @@ class LevelUserReviewerMapping < ActiveRecord::Base
   belongs_to :policy
 
   validates :level_id, presence: true
+  # Validation for reviewer id is removed, & nil is now allowed
+  # validates :reviewer_id, presence: true
   validates :policy_id, presence: true
   validates :user_id, presence: true
 
   scope :with_id, -> (ids) {where id: ids}
-  scope :with_reviewer_id, -> (reviewer_id) {
-    where reviewer_id: reviewer_id
-  }
+  scope :with_reviewer, -> { where.not reviewer_id: nil }
+  scope :with_reviewer_id, -> (reviewer_id) { where reviewer_id: reviewer_id }
+  scope :with_level_id, -> (ids) { where level_id: ids }
+  scope :with_user_id, -> (ids) { where user_id: ids }
+  scope :with_policy_id, -> (ids) { where(policy_id: ids) }
+  scope :with_reviewer_id, -> (ids){ where reviewer_id: ids }
 
   # Finds all the MAX amounts which are less than the amount passed
   # Find thes the mappings with max threshold which are lteq amount
@@ -49,4 +55,13 @@ class LevelUserReviewerMapping < ActiveRecord::Base
     where reviewer_id: ids
   }
 
+  scope :with_exception, -> (bool) {
+    exception_present = !!bool
+
+    if exception_present
+      where(exception: true)
+    else
+      where(wo_exception: true)
+    end
+  }
 end
