@@ -79,8 +79,7 @@ json.results do
 
       # invoice items
       json.po_number invoice.procurement&.purchase_order&.po_number || ""
-      json.invoice_items_count invoice.invoice_items.count
-      json.invoice_items_quantity_total invoice.item_quantity_total
+      
       json.invoice_items do
         json.array!(invoice.invoice_items) do |item|
           json.rate item.rate
@@ -99,6 +98,8 @@ json.results do
           json.taxable_amount precision_value item.taxable_amount&.value
         end
       end
+
+      json.invoice_items_count invoice.invoice_items.size
 
       if invoice.vendor.present?
         json.vendor do

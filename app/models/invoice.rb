@@ -387,7 +387,8 @@ class Invoice < ApplicationRecord
 
   def item_amounts_total
     if self.invoice_items.present?
-      return self.invoice_items.joins(:amount).sum(:value)
+      # return self.invoice_items.joins(:amount).sum(:value)
+      return self.invoice_items.map {|p| p.amount.value}.sum
     else
       return 0
     end
@@ -404,7 +405,8 @@ class Invoice < ApplicationRecord
 
   def item_quantity_total
     if self.invoice_items.present?
-      return self.invoice_items.sum(:quantity)
+      # return self.invoice_items.sum(:quantity)
+      return self.invoice_items.map {|p| p.quantity}.sum
     else
       return 0
     end
