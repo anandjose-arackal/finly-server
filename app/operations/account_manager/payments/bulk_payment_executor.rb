@@ -110,7 +110,7 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
         payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       else
         # here check if all the payments have been processed, if they are, mark as completed, otherwise mark as partially credited
-        if self.crediting_payments.count == self.payment_order.payments.count
+        if self.crediting_payments.completed.count == self.payment_order.payments.count
           payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
         else
           payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))

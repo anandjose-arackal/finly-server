@@ -85,7 +85,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       return
     end
     # also set the payment order's status id as either scheduled or as pending
-    if self.crediting_payments.present?
+    if self.crediting_payments.present? && self.crediting_payments.pluck(:scheduled_at).uniq&.compact.blank?
       self.payment_order&.with_lock do
         self.payment_order.reload # kinda redundant since with_lock already reloads the data
         if self.payment_order.pending? || self.payment_order.in_progress?
@@ -99,7 +99,11 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     else
       if payment_order.scheduled_at.present? && payment_order.scheduled_at > DateUtils.local_date
         payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
-        payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
+        if self.crediting_payments.present?
+          self.crediting_payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
+        else
+          self.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
+        end
       else
         self.payment_order.with_lock do
           self.payment_order.reload # kinda redundant since with_lock already reloads the data
@@ -119,11 +123,11 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # now the actual execution of the payment order, based on whether it's
     # synchronous or a background operation
     if self.crediting_payments.present?
-      if self.background
+      if self.background && self.crediting_payments.pluck(:scheduled_at).uniq&.compact.blank?
         options[:crediting_payment_ids] = self.crediting_payments.pluck(:id)
         # op = AccountManager::Payments::BulkPaymentExecutor.(self.payment_order, options)
         op = AccountManager::Payments::BulkPaymentExecutor.call_async(self.payment_order, options)
-        add_message :success, 'Payments have been scheduled, you can check their status from the order screen'
+        add_message :success, 'Payments have initiated, you can check their status from the order screen'
       end
     else
       # if payment order has been scheduled for execution right away, process it right now
