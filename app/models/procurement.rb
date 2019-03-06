@@ -415,7 +415,7 @@ class Procurement < ApplicationRecord
 
     data.sort_by!{ |doc| doc.created_at}.reverse!
   end
-
+  
   def attached_documents
     attachments = []
     if self.purchase_order.present?
