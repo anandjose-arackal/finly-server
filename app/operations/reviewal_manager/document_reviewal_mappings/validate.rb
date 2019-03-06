@@ -46,14 +46,14 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
             end
           end
         else
-          add_message :error, "Changes found in document. Reviewal Flow needs to be updated"
+          add_message :error, "Reviewal flow has changed. Please update the document & resubmit"
         end
       else
         # If Valid reviewers are not present, should check if DLRM is created for it
         level_specific_dlrms = dlrms.with_level_id(level.id)
 
         if level_specific_dlrms.present?
-          add_message :error, "Changes found in document. Reviewal Flow needs to be updated"
+          add_message :error, "Reviewal flow has changed. Please update the document & resubmit"
         end
       end
     end
