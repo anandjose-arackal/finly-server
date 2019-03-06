@@ -3,6 +3,7 @@ json.results do
     json.id invoice.id
     json.invoice do
       json.id invoice.id
+      json.procurement_id invoice.procurement_id || ""
       json.created_at invoice.created_at
       json.status_id invoice.invoice_status_id
       json.status_name invoice.invoice_status&.name&.humanize
