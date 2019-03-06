@@ -1,12 +1,13 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
-  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments
+  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:invoice, :custom_fields)
+    self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
   end
 
   def validate
@@ -105,6 +106,20 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     validate_custom_fields_invoice
     return if has_errors?
+
+    if inward_invoice.valid?
+      if Invoice.status_ids(:open, :retracted, :rejected).include?(inward_invoice.invoice_status_id) && inward_invoice.created_by_user_id == user.id
+
+        params[:reviewal_document] = self.inward_invoice
+        params[:document_reviewer_mappings] = document_reviewer_mappings_params
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
+      end
+    end
 
     if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)

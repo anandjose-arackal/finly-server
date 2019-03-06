@@ -66,13 +66,16 @@
 #  is_deleted                   :boolean          default(FALSE)
 #  resource_template_id         :integer
 #  invoice_id                   :string(255)
+#  deleted_at                   :datetime
+#  submitted_at                 :datetime
+#  approved_at                  :datetime
 #
 
 #  gst_type_id: 1 - IGST
 #              2 - CGST + SGST
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable
+  include SoftDeletable, Templatable, Transitionable
 
   include Sequenced::ActsAsSequenced
 
@@ -95,6 +98,7 @@ class Invoice < ApplicationRecord
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
   belongs_to :company, optional: true
   belongs_to :invoice_status, optional: true, class_name: "InwardInvoiceStatus"
+  alias_attribute :status, :invoice_status
   belongs_to :receiving_account, optional: true, polymorphic: true
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
   belongs_to :location, optional: true, class_name: 'BranchLocation'
@@ -115,7 +119,7 @@ class Invoice < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
 
-  belongs_to :policy, optional: true
+  # belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
@@ -416,5 +420,29 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push InwardInvoiceStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.document_owner_attribute
+    'created_by_user_id'
+  end
+
+  def self.document_status_attribute
+    'invoice_status_id'
+  end
+
+  def self.document_status_class_name
+    'InwardInvoiceStatus'
+  end
+
+  def self.finance_associated_status_ids
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+  end
 
 end

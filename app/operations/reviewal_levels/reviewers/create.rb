@@ -5,13 +5,16 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
 
   def init
     self.reviewer_params = reviewer_parameters
-    self.reviewal_level = ReviewalLevel.find_by(id: params[:reviewal_level_id])
-    self.reviewer = User.find_by id: reviewer_params[:reviewer_id]
+    reviewal_levels = ReviewalLevels::Index.(user, params).reviewal_levels
+    self.reviewal_level = reviewal_levels.find_by id: params[:reviewal_level_id]
+
+    # self.reviewer = User.find_by id: reviewer_params[:reviewer_id]
+    self.reviewer = user.company.users.find_by id: reviewer_params[:reviewer_id]
   end
 
   def validate
     unless reviewal_level.present?
-      add_message :error, 'Please provide level number'
+      add_message :error, 'Level not found'
       return
     end
 
@@ -23,7 +26,7 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
       add_message :error, 'Reviewer not found'
     end
 
-    unless reviewer.company.id == user.company.id
+    unless reviewer.present?
       add_message :error, 'Unknown Reviewer'
     end
   end
@@ -43,7 +46,7 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
   private
 
   def reviewer_parameters
-    params.require(:level_reviewer_mapping).permit(:level_id, :reviewer_id, :threshold, :exception)
+    params.require(:level_reviewer_mapping).permit(:level_id, :reviewer_id, :threshold, :exception, :wo_exception)
   end
 
 end

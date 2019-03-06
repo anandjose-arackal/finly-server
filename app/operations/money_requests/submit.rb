@@ -1,0 +1,141 @@
+class MoneyRequests::Submit < MoneyRequests::Base
+
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:money_request, :submit], :pre_process, self)
+        },
+        post_process: {
+            before: Personalizer::Process.new([:money_request, :submit], :post_process, self)
+        }
+    }
+  end
+
+  def authorized_user_types
+    [:employee]
+  end
+
+  def init
+    id = (params[:money_request_id] or params[:id])
+    self.money_request = user.money_requests.find_by(id: id)
+  end
+
+  def validate
+    unless money_request.valid?
+      add_message :error, money_request.errors.full_messages
+      return
+    end
+    # checking money_request status
+    unless money_request.can_submit?
+      messages[:error] << 'Cannot submit this money_request'
+      return false
+    end
+    # checking if policy is added if enforce policy is enabled
+    if user.enforce_policy_enabled?
+      if money_request.policy.nil?
+        add_message :error, "You have to select a policy for the money request before submission"
+        return false
+      end
+    end
+    # checking if the money_request has expenses
+    unless money_request.total_amount> 0
+      add_message :error, 'Cannot submit an empty money request'
+      return
+    end
+
+    custom_field_validations = CustomField::Validate.(money_request)
+    unless custom_field_validations.success?
+      add_message :error, custom_field_validations.messages[:error]
+    end
+
+
+    # Set validation of DLRMs
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+        reviewal_document: self.money_request
+    })
+
+    unless dlrm_validation_op.success?
+      add_message :error, dlrm_validation_op.messages[:error]
+    end
+  end
+
+  def authorize
+    unless money_request
+      raise_unauthorized_exception
+      return false
+    end
+
+    # Only request owners can submit request
+    unless money_request.user_id == user.id
+      raise_unauthorized_exception
+    end
+  end
+
+  def process
+    # presenter = User::Team::Review::NextReviewer.(money_request)
+    # manager = presenter.user
+    # manager_role_id = presenter.role_id
+    # # If no manager assigned, auto approve the money_request
+    # if manager.blank? and not money_request.payment_mode_card?
+    #   # call the approve class with the right parameters
+    #   approve_op = MoneyRequests::Approve.(user, {money_request_id: money_request.id, auto_approve: true})
+    #   unless approve_op.success?
+    #     self.messages[:error] = messages[:error].merge approve_op.messages[:error]
+    #     # self.messages[:error] << "Error auto-approving money_request. Please try again."
+    #     return
+    #   end
+    #   # update submitted amount here
+    #   submitted_amount_attributes = {value: money_request.total_amount, currency_id: 1}
+    #   if money_request.submitted_amount
+    #     submitted_amount_attributes[:id] = money_request.submitted_amount_id
+    #   end
+    #   money_request.update(submitted_amount_attributes: submitted_amount_attributes)
+    #   money_request.reload
+    #   return
+    # end
+    # submitted_amount_attributes = {value: money_request.total_amount, currency_id: 1}
+    # if money_request.submitted_amount
+    #   submitted_amount_attributes[:id] = money_request.submitted_amount_id
+    # end
+    # submitted_at = DateTime.now
+    # manager_id = manager.id rescue nil
+    # if money_request.update_attributes status_id: MoneyRequestStatus.id_for(:processing),
+    #                                    controlling_user_id: manager_id,
+    #                                    controlling_for_user_id: nil,
+    #                                    controlling_user_role_id: manager_role_id,
+    #                                    controlling_for_user_role_id: nil,
+    #                                    submitted_at: submitted_at,
+    #                                    submitted_amount_attributes: submitted_amount_attributes
+    #   money_request.tracks.create action_user: user,
+    #                               action_user_role_id: UserRole.id_for(:employee),
+    #                               modified_user_id: money_request.controlling_user_id,
+    #                               modified_user_role_id: manager_role_id,
+    #                               money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:submit),
+    #                               status_id: MoneyRequestStatus.id_for(:processing)
+    #   return true
+    # end
+    # messages[:error] = money_request.errors.full_messages
+
+    params[:document] = self.money_request
+    params[:aasm_event] = 'submit'
+    params[:violation_present] = false
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
+    end
+
+    self.workflow_output = op.workflow_output
+  end
+
+  def post_process
+    # adding comment regarding the change in status of this money request
+    money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:submit)
+
+    add_message :success, 'Money Request Submitted'
+    role_id = self.workflow_output[:role_id]
+    Event::EMoneyRequests::Submit.(user, money_request: money_request, role_id: role_id)
+  end
+
+end

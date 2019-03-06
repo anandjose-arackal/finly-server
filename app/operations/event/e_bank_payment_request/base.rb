@@ -1,6 +1,6 @@
 class Event::EBankPaymentRequest::Base < Event::SetNotifier
 
-  attr_accessor :bank_payment_request
+  attr_accessor :bank_payment_request, :role_id
 
   def pre_validate
     unless user.present?
@@ -18,6 +18,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
 
   def init
     self.bank_payment_request = params[:bank_payment_request]
+    self.role_id = params[:role_id]
   end
 
   def validate
@@ -118,7 +119,8 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
         else
           view = "initiator"
       end
-      url = "#{Constants::BASE_URL_VP}orders/#{bank_payment_request.id}/params={\"view\":\"#{view}\"}"
+      suffix = URI.escape("{}")
+      url = "#{Constants::BASE_URL_VP}orders/#{bank_payment_request.id}/params=" + suffix
     end
 
   end

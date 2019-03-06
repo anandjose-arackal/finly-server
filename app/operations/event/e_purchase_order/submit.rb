@@ -9,27 +9,28 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
 
   def affected_users
     # [self.report.user, self.report.reload.controlling_user]
-    users = []
-    users.push self.purchase_order.user
+    # users = []
+    # users.push self.purchase_order.user
 
-    level = ReviewalLevel.find_by id: workflow_output[:modified_level_id]
+    # level = ReviewalLevel.find_by id: workflow_output[:modified_level_id]
 
-    if level.present?
-      user_selected_reviewer = purchase_order.document_level_reviewer_mappings.with_level_ids(level.id).last
-      if user_selected_reviewer.present?
-        self.controlling_users.push(user_selected_reviewer.reviewer)
-        users.push(user_selected_reviewer.reviewer)
-      else
-        amount = purchase_order.balance_amount.value
-        reviewers_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
-        reviewers = User.with_id(reviewers_ids)
-        reviewers.each do |reviewer|
-          users.push(reviewer)
-          self.controlling_users.push(reviewer)
-        end
-      end
-    end
-    users
+    # if level.present?
+    #   user_selected_reviewer = purchase_order.document_level_reviewer_mappings.with_level_ids(level.id).last
+    #   if user_selected_reviewer.present?
+    #     self.controlling_users.push(user_selected_reviewer.reviewer)
+    #     users.push(user_selected_reviewer.reviewer)
+    #   else
+    #     amount = purchase_order.balance_amount.value
+    #     reviewers_ids = level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id)
+    #     reviewers = User.with_id(reviewers_ids)
+    #     reviewers.each do |reviewer|
+    #       users.push(reviewer)
+    #       self.controlling_users.push(reviewer)
+    #     end
+    #   end
+    # end
+    # users
+    self.purchase_order.affected_users(:submit)
   end
 
   # def get_token(user)
@@ -39,7 +40,7 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
 
 
   def notification_affected_users
-    self.controlling_users
+    self.purchase_order.notification_affected_users(:submit)
   end
 
   # def send_push_notification(user)
@@ -59,7 +60,6 @@ class Event::EPurchaseOrder::Submit < Event::EPurchaseOrder::Base
                                              path_object_type: "Purchase Order",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             # view_role_id: report.controlling_user_role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save

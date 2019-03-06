@@ -26,7 +26,19 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
       add_message :error, payment_order.errors.full_messages
       return
     end
-    unless payment_request.update(request_params)
+    if payment_request.update(request_params)
+      if BankPaymentRequest.status_ids(:open, :retracted, :rejected).include?(payment_request.status_id) && payment_request.owner_id == user.id
+        # Create Document Level Reviewer Mapping
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.payment_request.reload
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
+      end
+    else
       add_message :error, payment_request.errors.full_messages
     end
   end

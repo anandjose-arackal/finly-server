@@ -53,7 +53,7 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
       # todo - temporary, will be updated to all policies later - as of now only the default company policy
       self.policy = selected_user.company.policies.default.first
       policy_ids = selected_user.policy_user_mappings.non_deleted.pluck(:policy_id)
-      self.policies = self.selected_user.company.policies.with_id(policy_ids)
+      self.policies = self.selected_user.company.policies.with_application(current_app).with_id(policy_ids)
       self.mapping = retrieve_mappings
       self.roles = {
           admin: selected_user.vendor_payment_admin?,

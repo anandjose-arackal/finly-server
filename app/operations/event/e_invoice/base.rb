@@ -1,5 +1,5 @@
 class Event::EInvoice::Base < Event::SetNotifier
-  attr_accessor :invoice, :controlling_users, :workflow_output
+  attr_accessor :invoice, :controlling_users, :workflow_output, :role_id
 
   def pre_validate
     unless user.present?
@@ -23,6 +23,7 @@ class Event::EInvoice::Base < Event::SetNotifier
     self.invoice = params[:invoice]
     self.workflow_output = params[:workflow_output]
     self.controlling_users = []
+    self.role_id = params[:role_id]
   end
 
   def validate
@@ -146,9 +147,9 @@ class Event::EInvoice::Base < Event::SetNotifier
         view = 'reviewer'
       end
 
-      suffix = "/params={\"view\":\"#{view}\",\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}"
+      suffix = URI.escape("{\"document_type\":\"invoice\",\"document_id\":#{invoice.id}}")
       # path = "reports/#{report.id}"
-      path = "procurements/#{invoice.procurement.id}"
+      path = "procurements/#{invoice.procurement.id}/params="
       url = Constants::BASE_URL_VP + path + suffix
     end
 

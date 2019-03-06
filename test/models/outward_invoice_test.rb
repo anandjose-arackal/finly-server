@@ -46,6 +46,7 @@
 #  tds_slab_id             :integer
 #  tds                     :decimal(10, 5)
 #  tds_amount_id           :integer
+#  deleted_at              :datetime
 #
 
 require 'test_helper'

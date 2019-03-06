@@ -8,8 +8,8 @@ class EmailProcessor
   def process
 
     user = User.find_by_email(@email.from[:email])
-    to_email = @email.to[:email]
-    if to_email == Constants::SPECIAL_RESPONSE_EMAIL # && user.id == 651
+    special_response_email = @email.to.select {|e| e[:email] == Constants::SPECIAL_RESPONSE_EMAIL}
+    if special_response_email.present? # && user.id == 651
         # pass the special response file to the respective operation
       if @email.attachments.any?
         attachment = @email.attachments.first

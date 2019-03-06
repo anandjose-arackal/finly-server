@@ -16,6 +16,14 @@
 class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
   attr_accessor :receipt_start, :receipt_end, :start_reading, :end_reading
 
+  def personalizer
+    {
+        validate: {
+            before: Personalizer::Process.new([:expense, :ex_distance, :odometer, :ex_create], :validate, self)
+        }
+    }
+  end
+
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, 'Invalid parameters passed'

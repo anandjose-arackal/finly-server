@@ -4,7 +4,7 @@ class GcmMessenger
   # todo critical to remove this before deploy
   require 'openssl'
   unless Rails.env.production?
-    OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+    OpenSSL::SSL::VERIFY_PEER ||= OpenSSL::SSL::VERIFY_NONE
   end
 
   def self.push(users, params)

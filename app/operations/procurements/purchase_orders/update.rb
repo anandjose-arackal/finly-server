@@ -14,7 +14,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order_id = params[:id] || params[:purchase_order_id]
     # self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
-    self.document_reviewer_mappings_params = purchase_order_params[:document_reviewer_mappings]
+    self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
     purchase_order_params.delete(:document_reviewer_mappings)
 
     self.document_number = purchase_order_params[:po_number]
@@ -53,14 +53,18 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
 
-      # For setting level specific reviewers from reviewal chain for a document
-      params[:reviewal_document] = self.purchase_order
-      params[:document_reviewer_mappings] = document_reviewer_mappings_params
+      purchase_order.process_line_item_calculation
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Create.(user, params)
-      unless document_reviewer_mappings_op.success?
-        add_message :error, document_reviewer_mappings_op.messages[:error]
-        return
+      if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.purchase_order
+        params[:document_reviewer_mappings] = document_reviewer_mappings_params
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+          return
+        end
       end
 
       purchase_order.save

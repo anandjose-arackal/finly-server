@@ -23,6 +23,11 @@ class User::Team::Index < User::Team::Base
   has_scope :filter_vendor_payments
   has_scope :yes_bank_account_transfer
   has_scope :filter_vendor_payments_reviewers
+  has_scope :filter_em_reviewers
+  has_scope :filter_unassigned_travel_for_policy
+  has_scope :filter_unassigned_finance_for_policy
+  has_scope :filter_unassigned_creditor_for_policy
+  has_scope :filter_unassigned_members_for_policy
 
   def pre_validate
     unless user.present?
@@ -95,22 +100,37 @@ class User::Team::Index < User::Team::Base
         self.response = admin_team
         return
       when UserRole.finance_manager_id
-        manager_association = :has_finance_manager
-        approves_to_association = :has_approves_finance_to
+        # manager_association = :has_finance_manager
+        # approves_to_association = :has_approves_finance_to
+        #
+        # NEW CODE
+        policy_ids = PolicyUserRole.with_user_id(user.id).with_role_id(role_id).pluck(:policy_id)
       when UserRole.manager_id
-        manager_association = :has_manager
-        approves_to_association = :has_approves_to
+        # manager_association = :has_manager
+        # approves_to_association = :has_approves_to
+        # NEW CODE
+        level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+        policy_ids = ReviewalLevel.with_id(level_ids).pluck(:policy_id)
       when UserRole.id_for(:travel_manager)
-        manager_association = :has_travel_manager
+        # manager_association = :has_travel_manager
         #approves_to_association = :has_approves_travel_to
+        # NEW CODE
+        policy_ids = PolicyUserRole.with_user_id(user.id).with_role_id(role_id).pluck(:policy_id)
+    else
+      return
     end
-    return if manager_association.blank? #or approves_to_association.blank?
-    user_ids += UserManagerMapping.send(manager_association, user.id).send('with_purpose', purpose_id).pluck(:user_id)
-    if approves_to_association.present?
-      # the below are the managers for which our current user is the 'approves_to'
-      manager_ids = UserManagerMapping.send(approves_to_association, user.id).send('with_purpose', purpose_id).pluck(:user_id)
-      user_ids += UserManagerMapping.send(manager_association, manager_ids).send('with_purpose', purpose_id).pluck(:user_id)
-    end
+    # return if manager_association.blank? #or approves_to_association.blank?
+    # user_ids += UserManagerMapping.send(manager_association, user.id).send('with_purpose', purpose_id).pluck(:user_id)
+    # if approves_to_association.present?
+    #   # the below are the managers for which our current user is the 'approves_to'
+    #   manager_ids = UserManagerMapping.send(approves_to_association, user.id).send('with_purpose', purpose_id).pluck(:user_id)
+    #   user_ids += UserManagerMapping.send(manager_association, manager_ids).send('with_purpose', purpose_id).pluck(:user_id)
+    # end
+    # user_ids.uniq! if user_ids.present?
+    # self.response = user.company.users.with_id(user_ids)
+    #
+    # NEW CODE
+    user_ids = PolicyUserMapping.where(policy_id: policy_ids).pluck(:user_id)
     user_ids.uniq! if user_ids.present?
     self.response = user.company.users.with_id(user_ids)
   end

@@ -49,8 +49,10 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     super()
     self.account = payment.receiving_account
     # extracting contact email and mobile number
-    self.beneficiary_email = self.account.account_owner.email
-    self.beneficiary_mobile_number = self.account.account_owner.mobile_number
+    unless self.account.account_owner.is_a?(Company)
+      self.beneficiary_email = self.account.account_owner.email
+      self.beneficiary_mobile_number = self.account.account_owner.mobile_number
+    end
     set_xml_params
   end
 
@@ -61,13 +63,13 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   def post_process
     # handle the various error cases here
-    # case 200
+    # case 500
     case self.response.status
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 401
-        add_message :error, "Unauthorized. Please check the credentials being used for the API"
+        add_message :error, "Unauthorized."
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 500
         self.parsed_response = Hash.from_xml(response.body)
@@ -117,22 +119,10 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
                           transfer_status_id: self.transfer_status_id,
                           bank_response: self.transfer_request.transaction_result
       )
-      self.payment.retry_count += 1
-    # otherwise create a new bank transaction
+      self.payment.update(retry_count: self.payment.retry_count.to_f + 1)
     else
-      self.bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
-                                                               transfer_type: transfer_request.transfer_type,
-                                                               bank_reference_number: transfer_request.bank_reference_number,
-                                                               beneficiary_bank_account: self.account,
-                                                               transfer_status_id: self.transfer_status_id,
-                                                               bank_response: transfer_request.transaction_result,
-                                                               amount_attributes: {
-                                                                   value: self.payment.amount_value,
-                                                                   currency_id: Currency.first.id
-                                                               })
-      unless self.payment.update(reference_resource: self.bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
-      end
+      # this is an anomaly, so send email and flag it
+      Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
     end
   end
 
@@ -147,20 +137,21 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   def success
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
-    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params)
+    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params, messages)
   end
 
   def failure
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
-    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(params)
+    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(params, messages)
   end
 
   class YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :transfer_request, :bank_transaction
 
-    def initialize(params)
+    def initialize(params, messages)
+      self.messages = messages
       self.transfer_request = params[:transfer_request]
       self.bank_transaction = params[:bank_transaction]
     end
@@ -170,7 +161,8 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
     attr_accessor :transfer_request, :bank_transaction
 
-    def initialize(params)
+    def initialize(params, messages)
+      self.messages = messages
       self.transfer_request = params[:transfer_request]
       self.bank_transaction = params[:bank_transaction]
     end
@@ -190,7 +182,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
     beneficiary_ifsc = transfer_request.ifsc&.match(Constants::VALID_IFSC).to_s rescue ""
     self.template = liquid_template.render(
-        'UNIQUE_REFERENCE_NUMBER' => transfer_request.generate_unique_reference,
+        'UNIQUE_REFERENCE_NUMBER' => transfer_request.unique_reference_number,
         'APP_ID' => application_id,
         'CUSTOMER_ID' => customer_id,
         'ACCOUNT_NUMBER' => account_number,

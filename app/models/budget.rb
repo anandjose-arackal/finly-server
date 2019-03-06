@@ -20,6 +20,7 @@
 #  payment          :boolean
 #  expense          :boolean
 #  ancestry         :string(255)
+#  deleted_at       :datetime
 #
 
 class Budget < ApplicationRecord
@@ -52,6 +53,8 @@ class Budget < ApplicationRecord
   validates :name, presence: true
   validates :start_date, presence: true
   validates :end_date, presence: true
+
+  after_update :recalculate_parent_budget
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
@@ -202,5 +205,14 @@ class Budget < ApplicationRecord
                  ]
              ])
   }
+
+  private
+
+  def recalculate_parent_budget
+    if self.parent.present?
+      sum_children = self.parent.children.joins(:budget_amount).sum(:value)
+      self.parent.budget_amount.update(value: sum_children)
+    end
+  end
 
 end

@@ -9,13 +9,15 @@ class Event::EPurchaseOrder::Retract < Event::EPurchaseOrder::Base
   end
 
   def affected_users
-    users = User::AssociatedUsers::Index.(self.user, document: self.purchase_order, amount: purchase_order.balance_amount.value)
-    users.reject { |r| r == self.user}
+    # users = User::AssociatedUsers::Index.(self.user, document: self.purchase_order, amount: purchase_order.balance_amount.value)
+    # users.reject { |r| r == self.user}
+    self.purchase_order.affected_users(:retract)
   end
 
   def notification_affected_users
-    users = User::AssociatedUsers::Index.(self.user, document: self.purchase_order, amount: purchase_order.balance_amount.value)
-    users.reject { |r| r == self.user}
+    # users = User::AssociatedUsers::Index.(self.user, document: self.purchase_order, amount: purchase_order.balance_amount.value)
+    # users.reject { |r| r == self.user}
+    self.purchase_order.notification_affected_users(:retract)
   end
 
   def set_notification(user)

@@ -10,6 +10,16 @@
 #  document_reviewer_mappable_type :string(255)      not null
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
+#  level_number                    :integer
+#  taken_control                   :boolean          default(FALSE)
+#  taken_control_by_id             :integer
+#  viewable                        :boolean          default(FALSE)
+#  action_taken_by_id              :integer
+#  action_id                       :integer
+#  provider_name                   :string(255)
+#  threshold                       :decimal(20, 5)
+#  active                          :boolean          default(TRUE)
+#  wo_exception                    :boolean          default(TRUE)
 #
 
 require 'test_helper'

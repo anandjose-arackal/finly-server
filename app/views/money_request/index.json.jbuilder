@@ -8,7 +8,7 @@ json.result do
     json.policy money_request.policy.name if money_request.policy
     json.total(Amount.new(value: ('%.2f' % money_request.total_amount), currency: money_request.base_currency))
     json.date money_request.created_at.strftime("%d %b")
-    json.controlling_user money_request.controlling_user
+    json.controlling_user money_request.get_reviewers.first
   end
 end
 json.count @result.count
