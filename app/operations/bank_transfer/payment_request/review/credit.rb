@@ -75,11 +75,9 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     self.crediting_payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
 
     # check if the payment order can be executed at this moment, otherwise schedule it for the next working day
-    # unless TransferTimingUtils.within_timeframe?(payment_order&.payment_mode, payment_order&.scheduled_at)
-    unless false
+    unless TransferTimingUtils.within_timeframe?(payment_order&.payment_mode, payment_order&.scheduled_at)
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
-      # next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
-      next_date = Date.tomorrow
+      next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
       self.crediting_payments.update_all(scheduled_at: next_date)
       self.payment_order.update(scheduled_at: next_date)
     end
