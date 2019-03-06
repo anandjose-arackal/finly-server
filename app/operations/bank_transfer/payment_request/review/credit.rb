@@ -79,6 +79,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
       self.crediting_payments.update_all(scheduled_at: next_date)
+      self.payment_order.update(scheduled_at: next_date)
     end
 
   end
@@ -90,15 +91,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     op = AccountManager::Payments::PaymentProcessor.(user, {crediting_payments: self.crediting_payments, bank_transfer_type: self.bank_transfer_type,
                                                             background: true, payment_order: self.payment_order})
     if op.success?
-      # update the bank_payment_request to credited
-      # bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
-      #                             controlling_for_user_id: nil, controlling_for_user_role_id: nil)
-      # # create a trail to show that the BPR was credited
-      # bank_payment_request.bank_payment_request_trails.create action_user: user,
-      #                                                         action_user_role_id: self.view_role,
-      #                                                         action_id: BankPaymentRequestTrailAction.id_for(:credit),
-      #                                                         modified_user_id: nil,
-      #                                                         modified_user_role_id: nil
 
       # NEW CODE
       params[:document] = self.bank_payment_request
