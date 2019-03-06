@@ -14,9 +14,11 @@ class RateContractLineItem < ApplicationRecord
   accepts_nested_attributes_for :amount, allow_destroy: true
 
   def end_date_is_after_start_date
-    if end_date < start_date
-      add_message :error, 'End date cannot be before start date'
-      return
+    if !start_date.blank? && !end_date.blank?
+      if end_date < start_date
+        errors.add(:end_date, 'cannot be before start date')
+        return
+      end
     end
   end
 
