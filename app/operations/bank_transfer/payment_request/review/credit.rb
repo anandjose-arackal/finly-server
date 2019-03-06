@@ -82,6 +82,12 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       self.payment_order.update(scheduled_at: next_date)
     end
 
+    # if the payment order has been scheduled for tomorrow, update the payments' scheduled_at to reflect the same
+    if self.payment_order&.scheduled_at.present? && self.payment_order&.scheduled_at > DateUtils.local_date
+      # in this case also the payments need to be scheduled for the next day:
+      self.crediting_payments.update_all(scheduled_at: self.payment_order&.scheduled_at)
+    end
+
   end
 
 
