@@ -41,6 +41,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       end
     end
 
+
     # if user.vendor_payments_admin?
     #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
     #     return true
@@ -552,7 +553,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
       last_trail = bank_payment_request.trails.last rescue nil
-      if bank_payment_request.processing? && !bank_payment_request.open? && bank_payment_request.action_users(:approve).include?(user)
+      if bank_payment_request.processing? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && bank_payment_request.action_users(:approve).include?(user)
         if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
           return true
         end
