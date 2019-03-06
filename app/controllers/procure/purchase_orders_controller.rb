@@ -82,6 +82,10 @@ class Procure::PurchaseOrdersController < ApplicationController
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     @purchase_order = @result.purchase_order
     @company = @purchase_order.company
+    @purchase_order.trails.create action_user: current_user,
+                                     action_id: TrailAction.id_for(:downloaded),
+                                     action_level: @purchase_order.trails.last.action_level,
+                                     note: 'po downloaded'
     respond_to do |format|
       format.pdf {
           render pdf: "PO-#{@result.purchase_order.po_number}",

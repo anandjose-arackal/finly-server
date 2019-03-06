@@ -26,7 +26,8 @@ class TrailAction < ApplicationRecord
         :settlement_confirmed,
         :reimbursed,
         :reimbursement_confirmed,
-        :closed
+        :closed,
+        :downloaded
     ]
   end
 end

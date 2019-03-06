@@ -31,6 +31,7 @@ class Procurement < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
   has_one :purchase_order, dependent: :destroy
+  has_many :revised_po, class_name: 'PurchaseOrder', dependent: :destroy
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy
   has_many :bill_of_supplies, dependent: :destroy
