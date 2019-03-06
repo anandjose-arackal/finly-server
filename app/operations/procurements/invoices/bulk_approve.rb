@@ -9,7 +9,9 @@ class Procurements::Invoices::BulkApprove < Procurements::Invoices::Base
       return
     end
 
-    self.invoices = user.company.inward_invoices.with_id(invoice_ids)
+    # self.invoices = user.company.inward_invoices.with_id(invoice_ids)
+    # self.invoices = Invoice.awaiting_action_items(user).with_id(invoice_ids)
+    self.invoices = Procurements::Invoices::Index.(user, params).invoices.with_id(invoice_ids)
   end
 
   def validate
