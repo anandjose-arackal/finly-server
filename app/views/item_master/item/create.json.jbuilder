@@ -1,1 +1,0 @@
-json.id @result.inventory_item.id
