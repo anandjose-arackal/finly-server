@@ -374,4 +374,28 @@ class BankPaymentRequest < ApplicationRecord
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
+
+
+  
+  def self.role_based_associated_status_ids(user)
+    self.status_ids(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:bank_payment_request_initiator) == role_id.to_i)
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :credited, :pending]
+        elsif (UserRole.id_for(:bank_payment_request_reviewer) == role_id.to_i)
+          statuses += [:processing, :approved, :pending, :auto_approved, :credited]
+        elsif UserRole.id_for(:bank_payment_request_creditor) == role_id.to_i
+          statuses += [:approved, :pending, :creation_in_progress, :auto_approved, :credited]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:retracted, :processing, :approved, :rejected, :auto_approved, :creation_in_progress, :pending, :credited]
+        end
+      end
+    end
+    return statuses.uniq
+  end
 end
