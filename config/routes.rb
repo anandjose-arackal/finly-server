@@ -3273,7 +3273,10 @@ Rails.application.routes.draw do
     get 'inventory_item_config', to: 'inventory_line_items#inventory_item_config', as: :inventory_item_config
     put 'inventory_line_items/import', to: 'inventory_line_items#import', as: :inventory_line_items_import
     get 'inventory_line_items/import_template', to: 'inventory_line_items#import_template', as: :inventory_line_items_import_template
-    resources :inventory_line_items
+    resources :inventory_line_items do 
+      put 'upload_attachments', to: 'inventory_line_items#upload_attachments'
+      put 'destroy_attachments', to: 'inventory_line_items#destroy_attachments'
+    end
     resources :payment_terms
     resources :reminders
     patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds
@@ -3424,9 +3427,19 @@ Rails.application.routes.draw do
   resources :policy_user_role_mappings
   ######## Reviewal Workflow End ##########
 
+  ######### Rate Contract API start #############
+  resources :rate_contracts do
+    collection do
+      get 'configuration', to: 'rate_contracts#configuration'
+    end
+  end
+  ######### Rate Contract API end ################
 
-
-
+  ########### Rate Contract Line Item API start #############
+  resources :rate_contract_line_items do
+    put 'import', to: 'rate_contract_line_items#import'
+  end
+  ########### Rate Contract Line Item API end ###############
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

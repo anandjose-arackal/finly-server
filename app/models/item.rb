@@ -22,17 +22,25 @@
 #  deleted_at          :datetime
 #
 
-class InventoryLineItem < ApplicationRecord
+class Item < ApplicationRecord
   include SoftDeletable
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
-
   belongs_to :supply_item_type, optional: true
+
+  has_many :rate_contracts, foreign_key: :item_id
+  # LineItem and Branch Location Mapping
+  has_many :branch_locations
+  has_many :inventory_line_item_location_mappings, through: :branch_locations
+  has_many :artifacts, as: :resource, dependent: :destroy
 
 
   validates :rate, presence: true
   validates :description, presence: true
+
+
+  accepts_nested_attributes_for :artifacts
 
   scope :with_category_id, -> (id){
     where category_id: id

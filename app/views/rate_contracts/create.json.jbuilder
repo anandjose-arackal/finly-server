@@ -1,0 +1,1 @@
+json.extract! @result.rate_contract, :id, :name

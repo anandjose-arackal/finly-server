@@ -1,4 +1,4 @@
-class Invoicing::InventoryLineItem::Update < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::Update < ItemMaster::Item::Base
 
   attr_accessor :inventory_item, :inventory_item_parameters
 
@@ -12,7 +12,7 @@ class Invoicing::InventoryLineItem::Update < Invoicing::InventoryLineItem::Base
 
   def init
     id = params[:id] || params[:inventory_item_id]
-    self.inventory_item = user.company.inventory_line_items.find_by(id: id)
+    self.inventory_item = user.company.items.find_by(id: id)
     self.inventory_item_parameters = inventory_item_params
   end
 

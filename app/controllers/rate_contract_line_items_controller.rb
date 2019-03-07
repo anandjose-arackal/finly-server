@@ -1,0 +1,2 @@
+class RateContractLineItemsController < ApplicationController
+end
