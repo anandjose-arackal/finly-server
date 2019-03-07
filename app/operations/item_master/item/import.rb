@@ -1,4 +1,4 @@
-class Invoicing::InventoryLineItem::Import < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::Import < ItemMaster::Item::Base
 
   attr_accessor :company, :inventory_data, :file, :headers, :data, :contents,
                 :has_errors, :inventory_line_items, :validation_data, :attr_mapping
@@ -85,7 +85,7 @@ class Invoicing::InventoryLineItem::Import < Invoicing::InventoryLineItem::Base
       end
 
       # Initialize inventory_line_item
-      inventory_line_item = user.company.inventory_line_items.build(inventory_item_params)
+      inventory_line_item = user.company.items.build(inventory_item_params)
 
       # Push the global array, so it can be saved in process
       self.inventory_line_items.push(inventory_line_item)
@@ -129,7 +129,7 @@ class Invoicing::InventoryLineItem::Import < Invoicing::InventoryLineItem::Base
         contents: self.contents
     }
     # self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.contents}}, messages)
-    Invoicing::InventoryLineItem::ImportTemplate.(user, params)
+    ItemMaster::Item::ImportTemplate.(user, params)
   end
 
   def validate_item_params(item_params)

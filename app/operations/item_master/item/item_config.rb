@@ -1,4 +1,4 @@
-class Invoicing::InventoryLineItem::InventoryItemConfig < Invoicing::InventoryLineItem::Base
+class ItemMaster::Item::ItemConfig < ItemMaster::Item::Base
 
   attr_accessor :categories, :tax_rates, :supply_item_types
 
@@ -12,10 +12,10 @@ class Invoicing::InventoryLineItem::InventoryItemConfig < Invoicing::InventoryLi
     params[:categories] = self.categories
     params[:tax_rates] = self.tax_rates
     params[:supply_item_types] = self.supply_item_types
-    Invoicing::InventoryLineItem::InventoryItemConfig::ConfigPresenter.new(user, params, messages)
+    ItemMaster::Item::ItemConfig::ConfigPresenter.new(user, params, messages)
   end
 
-  class Invoicing::InventoryLineItem::InventoryItemConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class ItemMaster::Item::ItemConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :categories, :tax_rates, :supply_item_types
 
     def init

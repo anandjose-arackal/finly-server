@@ -38,7 +38,7 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :net_amount, optional: true, class_name: "Amount"
   belongs_to :parent, optional: true, polymorphic: true
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
-  belongs_to :inventory_line_item, optional: true
+  belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :gst_type, optional: true
   belongs_to :tax_rate, optional: true
 
