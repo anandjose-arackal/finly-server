@@ -6,6 +6,8 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.procurement = user.company.procurements.find_by id: params[:procurement_id]
     vendor_id = purchase_order_params[:vendor_id]
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
+    # binding.pry
+    puts "PURCHASEORDER CREATE from init params", params.inspect
   end
 
   def validate
@@ -52,6 +54,11 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
       self.procurement.status_tags << status_tag
 
       CustomField::SetFields.(purchase_order, FieldParentType.id_for(:purchase_order), reset_fields: true, save: true)
+
+      # params[:purchase_order_id] = self.purchase_order.id
+      # params[:receiving_user_type] = self.vendor.class&.name
+      # params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id
+      # params[:receiving_account_id] = self.vendor.id
 
     else
       add_message :error, purchase_order.errors.full_messages

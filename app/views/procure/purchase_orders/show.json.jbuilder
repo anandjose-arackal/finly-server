@@ -19,6 +19,12 @@ json.total_before_tax do
   json.value @result.purchase_order.total_before_tax&.value
   json.currency_id @result.purchase_order.total_before_tax&.currency&.id
 end
+json.advance_amount do
+  json.id @result.purchase_order.advance_amount&.id
+  json.value @result.purchase_order.advance_amount&.value
+  json.currency_id @result.purchase_order.advance_amount&.currency&.id
+  json.due_date @result.purchase_order.due_date
+end
 json.tax do
   json.value @result.purchase_order.tax_amount&.value
   json.id @result.purchase_order.tax_amount&.id

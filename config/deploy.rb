@@ -61,6 +61,8 @@ when :itzcash_production, :aws_production, :background_production
   linked_files << "config/sidekiq.yml"
   linked_files << "config/elastic_apm.yml"
   # linked_files << "config/sentry.yml"
+when :development_3
+  linked_files << "config/sidekiq.yml"
 end
 set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}

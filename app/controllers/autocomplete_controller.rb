@@ -30,7 +30,7 @@ class AutocompleteController < ApplicationController
   end
 
   def inventory_items
-    @result = Invoicing::InventoryLineItem::Search.(current_user, params)
+    @result = ItemMaster::Item::Search.(current_user, params)
     respond
   end
 end

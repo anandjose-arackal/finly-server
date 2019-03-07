@@ -13,6 +13,24 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def new_pr
+    logger.fatal "params from controller, #{params.inspect}"
+    @result = BankTransfer::PaymentRequest::NewPr.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'new_pr'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'new_pr_failure'
+        }
+      end
+    end
+  end
+
   def index
     @result = BankTransfer::PaymentRequest::Index.(current_user, params)
     respond
@@ -24,6 +42,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def process_file
+    logger.fatal "FROM BankPaymentRequestsController process_file, \n #{params.inspect}"
     @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
     if @result.success?
       respond_to do |format|
@@ -201,6 +220,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def payments_list
+    puts "ROUTES PARAMS FROM BankTransfer PAUYMENT LIST", params.inspect, current_user.inspect
     @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
     respond
   end
@@ -219,10 +239,52 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond_success_failure
   end
 
+  def create_invoice_ticket
+    @result = BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2.(current_user, params)
+    respond
+  end
+
   def remove_attachment
     @result = BankTransfer::PaymentRequest::RemoveAttachment.(current_user, params)
     respond response: (@result&.success? ? :success : :failure)
   end
+
+
+  def bulk_take_control
+    @result = BankTransfer::PaymentRequest::Review::BulkTakeControl.(current_user, params)
+    respond
+  end
+
+  def configuration_data
+    @result = BankTransfer::PaymentRequest::ConfigurationData.(current_user, params)
+    respond
+  end
+
+  def validate_beneficiary
+    @result = BankTransfer::PaymentRequest::ValidateBeneficiary.(current_user, params)
+    respond
+  end
+
+  def unified_payment_ticket
+    operation = nil
+    case params[:ticket_type].downcase
+    when 'invoice'
+      create_invoice_ticket(current_user, params)
+    when 'po_advance'
+      # operation = Procurements::Payments::CreatePoAdvanceTicket.(current_user, params)
+      create_po_advance_ticket(current_user, params)
+    when 'beneficiary'
+      # operation = BankTransfer::PaymentRequest::CreateBeneficiaryTicket.(current_user, params)
+      create_beneficiary_ticket(current_user, params)
+    when 'bulk_beneficiary'
+      # operation = BankTransfer::PaymentRequest::CreateBulkBeneficiaryTicket.(current_user, params)
+      create_bulk_beneficiary_ticket(current_user, params)
+    else
+      respond response: :failure, message: "WTF, tell me what type of ticket you want to create?"
+    end
+  end
+
+
 
   private
 
@@ -303,5 +365,76 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
       respond response: :failure, message: @result.messages[:error] || 'Error while updating details'
     end
   end
+
+  def create_invoice_ticket(current_user, params)
+    @result = BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2.(current_user, params)
+    if @result.success?
+      @response = {
+          success: true,
+          bank_payment_request_id: @result.bank_payment_request.id,
+          messages: {
+              error: [],
+              failure: [],
+              success: @result.messages[:success],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json { render json: @response.as_json }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def create_po_advance_ticket(current_user, params)
+    @result = Procurements::Payments::CreatePoAdvanceTicket.(current_user, params)
+    if @result.success?
+      @response = {
+          success: true,
+          bank_payment_request_id: @result.bank_payment_request.id,
+          messages: {
+              error: [],
+              failure: [],
+              success: @result.messages[:success],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json { render json: @response.as_json }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def create_beneficiary_ticket(current_user, params)
+    @result = BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json { render 'new_pr' }
+      end
+    else
+      respond_to do |format|
+        format.json { render 'new_pr_failure' }
+      end
+    end
+  end
+
+  def create_bulk_beneficiary_ticket(current_user, params)
+    @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json { render 'bulk_create_from_file_success' }
+      end
+    else
+      respond_to do |format|
+        format.json { render 'bulk_create_from_file_failure' }
+      end
+    end
+  end
+
 end
 

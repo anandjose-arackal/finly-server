@@ -24,7 +24,8 @@ end
 json.bank_reference_number payment.reference_resource&.bank_reference_number
 json.retriable do
   json.retriable payment.retriable?
-  json.change_mode payment.payment_order.failed?
+  # binding.pry
+  json.change_mode payment.payment_order.failed? rescue nil
 end
 
 invoice = payment.invoice

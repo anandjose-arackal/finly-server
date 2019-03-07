@@ -12,7 +12,7 @@ class InwardInvoiceStatus < ApplicationRecord
   include Seedable
 
   def self.values
-    [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed]
+    [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
   end
 
   def unpaid?
@@ -53,6 +53,10 @@ class InwardInvoiceStatus < ApplicationRecord
 
   def retracted?
     self.id == InwardInvoiceStatus.id_for(:retracted)
+  end
+
+  def pending?
+    self.id == InwardInvoiceStatus.id_for(:pending)
   end
 
 end

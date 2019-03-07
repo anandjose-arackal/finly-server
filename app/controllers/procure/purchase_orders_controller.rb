@@ -120,6 +120,21 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def po_advances
+    @result = Procurements::PurchaseOrders::PoAdvances.(current_user, params)
+    respond
+  end
+
+  def po_advance_ticket
+    @result = Procurements::Payments::CreatePoAdvanceTicket.(current_user, params)
+    respond
+  end
+
+  def po_with_advance
+    @result = Procurements::PurchaseOrders::PoWithAdvance.(current_user, params)
+    respond
+  end
+
   # Templates
   def template_create
     @result = Procurements::PurchaseOrders::Templates::Create.(current_user, params)
