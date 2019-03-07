@@ -126,7 +126,7 @@ class Reports::Violation < Reports::Base
     message = ''
     if rule.greater_than_amount_value && rule.greater_than_amount_value != 0
       expense_amount = expense.amount.send(base_currency_code.to_sym)
-      if expense_amount and expense_amount >= rule.greater_than_amount_value
+      if expense_amount and expense_amount > rule.greater_than_amount_value
         message += ' above ' + rule.greater_than_amount_value.to_s
       else
         return false
@@ -264,10 +264,8 @@ class Reports::Violation < Reports::Base
       end
     end
 
-    # if total_expenses > rule.amount.value
-    #   return true
-    # end
-    # false
+    # the expenses that will be considered for the receipt rule are only those that fit the criteria for this particular rule
+    expenses = expenses.without_usage_date_type.with_date_range(start_date, end_date).filter_category_id(categories&.pluck(:id))
 
     if rule.amount.present?
       # Rule is independent of receipt

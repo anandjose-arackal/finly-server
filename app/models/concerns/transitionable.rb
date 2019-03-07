@@ -168,15 +168,17 @@ module Transitionable
         chain[level_number - 1] = data
       end
 
-      # chain.reject {|item| item.blank? }
-      # chain
-      chain.map do |item|
-        if item.blank?
-          {skipped: true}
-        else
-          item
-        end
-      end
+      # Send Skipped Level Data
+      # chain.map do |item|
+      #   if item.blank?
+      #     {skipped: true}
+      #   else
+      #     item
+      #   end
+      # end
+
+      # Do NOT Send Skipped Level Data
+      chain.reject {|item| item.blank?}
     end
 
     # Users who can take the current action on the document

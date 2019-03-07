@@ -19,6 +19,7 @@
 #  provider_name                   :string(255)
 #  threshold                       :decimal(20, 5)
 #  active                          :boolean          default(TRUE)
+#  wo_exception                    :boolean          default(TRUE)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

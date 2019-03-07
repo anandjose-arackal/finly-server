@@ -4,7 +4,7 @@ class Event::EBankPaymentRequest::CreditConfirm < Event::EBankPaymentRequest::Ba
 
   def init
     super
-    self.crediting_user = self.bank_payment_request.trails.last.action_user
+    self.crediting_user = self.bank_payment_request.trails.last&.action_user
   end
 
   def action_name
