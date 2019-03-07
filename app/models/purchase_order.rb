@@ -91,7 +91,7 @@ class PurchaseOrder < ApplicationRecord
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
   # has_many :custom_fields, as: :parent
   has_many :custom_fields, as: :parent, dependent: :destroy
-  has_many :advance_payments, class_name: "Payment"
+  # has_many :advance_payments, class_name: "Payment"
 
   has_many :trails, as: :parent
 
