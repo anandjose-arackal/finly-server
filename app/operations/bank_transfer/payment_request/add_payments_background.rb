@@ -145,6 +145,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     # For setting level specific reviewers from reviewal chain for a document
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, {reviewal_document: self.bank_payment_request.reload})
     # puts 'SUCCESSFUL!'
+
   end
 
   private

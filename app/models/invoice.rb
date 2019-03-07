@@ -259,6 +259,32 @@ class Invoice < ApplicationRecord
     where invoice_type_id: InwardInvoiceType.id_for(invoice_type)
   }
 
+  scope :filter_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
+  }
+
+  scope :filter_non_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+  }
+
+  scope :filter_invoice_type, -> (type) {
+    case type
+    when 'po_invoice'
+      where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
+    when 'non_po_invoice'        
+      where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+    else
+      return nil
+    end      
+  }
+
+  scope :filter_status, -> (status_name) {
+    all_statuses = InwardInvoiceStatus.all.pluck(:name)
+    if status_name.present? && all_statuses.include?(status_name)
+      where invoice_status_id: InwardInvoiceStatus.id_for(status_name)
+    end
+  }
+
   scope :non_beneficiary, ->  {
     where(invoice_type_id: [InwardInvoiceType.id_for(:tax_invoice),
                             InwardInvoiceType.id_for(:advance),
@@ -274,6 +300,23 @@ class Invoice < ApplicationRecord
 
   scope :filter_vendor_id, -> (ids){
     where vendor_id: ids
+  }
+
+  scope :filter_po_number, -> (po_number) {
+    # ipid = where(invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)).pluck(:procurement_id)
+    # poid = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
+
+    # procs = ipid & poid
+    poid = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
+
+    where(procurement_id: poid)
+
+  }
+
+  scope :include_for_index, -> {
+        includes( :amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab,
+           :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
+           :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount])#.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
   }
 
   after_create :set_defaults
@@ -344,7 +387,26 @@ class Invoice < ApplicationRecord
 
   def item_amounts_total
     if self.invoice_items.present?
-      return self.invoice_items.joins(:amount).sum(:value)
+      # return self.invoice_items.joins(:amount).sum(:value)
+      return self.invoice_items.map {|p| p.amount.value}.sum
+    else
+      return 0
+    end
+  end
+
+  def payment_amounts_total
+    if self.payments.present?
+      # return self.payments.successful.joins(:amount).sum(:value)
+      return self.payments.successful.map {|p| p.amount.value}.sum
+    else
+      return 0
+    end
+  end
+
+  def item_quantity_total
+    if self.invoice_items.present?
+      # return self.invoice_items.sum(:quantity)
+      return self.invoice_items.map {|p| p.quantity}.sum
     else
       return 0
     end
@@ -454,8 +516,10 @@ class Invoice < ApplicationRecord
       item_amounts_total: self.item_amounts_total,
 
       # paid amount for this invoice
-      paid_amount: self.payments.successful.joins(:amount).sum(:value),
-      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+      # paid_amount: self.payments.successful.joins(:amount).sum(:value),
+      # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+      paid_amount: payment_amounts_total, 
+      remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total)
     }
   end
 
