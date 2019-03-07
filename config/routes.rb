@@ -3408,9 +3408,14 @@ Rails.application.routes.draw do
   resources :audit_trails, only: [:index]
   ### Audit Trails End ##
 
-  ######## Reviewal Workflow ##########
-  resources :policy_user_role_mappings
-  ######## Reviewal Workflow End ##########
+
+  ######## Dashboards ##################
+  namespace :dashboards do
+    namespace :vp do
+    end
+  end
+  ######## Dashbaord Ends ##############
+
 
 
 
