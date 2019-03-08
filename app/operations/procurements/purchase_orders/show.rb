@@ -113,6 +113,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       if purchase_order.sent_to_vendor?
         if user_in_level? || document_owner?
           action[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions, method: "GET"}
+        end
       end
 
       if PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id
