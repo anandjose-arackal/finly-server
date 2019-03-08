@@ -53,6 +53,22 @@ json.trail do
         json.due_date item.due_date&.strftime("%b %d, %Y")
       end
 
+    elsif item.is_a?(PurchaseOrder) && item.revision_number > 0
+      json.purchase_order_details do
+        json.status do
+          json.id item.status&.id
+          json.name item.status&.name
+        end
+
+        json.po_number item.po_number
+        json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
+        json.amount item&.balance_amount&.value
+        json.items_count item.items.count
+        json.revision_for item.revised_po_id
+        json.revision_of item.revision_of_id
+        json.revision_number item.revision_number
+      end
+
     elsif item.is_a?(PurchaseOrder)
       json.purchase_order_details do
         json.status do
@@ -65,6 +81,7 @@ json.trail do
         json.amount item&.balance_amount&.value
         json.items_count item.items.count
       end
+
     elsif item.is_a?(InwardDocument)
       json.inward_document_details do
         json.items_count item.items.count
