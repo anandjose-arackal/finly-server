@@ -64,6 +64,7 @@ json.trail do
         json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
         json.amount item&.balance_amount&.value
         json.items_count item.items.count
+        json.revision true
         json.revision_for item.revised_po_id
         json.revision_of item.revision_of_id
         json.revision_number item.revision_number
