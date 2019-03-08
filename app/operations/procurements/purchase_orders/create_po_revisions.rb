@@ -77,6 +77,10 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
 
   end
 
+  def post_process
+    add_message :success, 'Successfully generated a revised purchase order.'
+  end
+
   def success
     params[:duplicate_po] = self.duplicate_po
     Procurements::PurchaseOrders::CreatePoRevisions::PaymentsPresenter.new(user, params, messages)
