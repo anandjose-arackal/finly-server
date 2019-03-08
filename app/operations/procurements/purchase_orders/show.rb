@@ -90,7 +90,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       if purchase_order.approved? || purchase_order.auto_approved?
         if user_in_level? || document_owner?
           actions[:send_mail] = {url: Rails.application.routes.url_helpers.procure_configs_send_mail_path, method: "POST"}
-          actions[:mark_send_to_vendor] = {url: Rails.application.routes.url_helpers.procure_purchase_order_mark_send_to_vendor, method: "POST"}
+          actions[:mark_send_to_vendor] = {url: Rails.application.routes.url_helpers.procure_purchase_order_mark_send_to_vendor_path(purchase_order_id: purchase_order.id), method: "PUT"}
 
           # todo
           if purchase_order.can_unapprove?(user)
@@ -112,7 +112,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       if purchase_order.sent_to_vendor?
         if user_in_level? || document_owner?
-          action[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions, method: "GET"}
+          action[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions_path(purchase_order_id: purchase_order.id), method: "GET"}
         end
       end
 
