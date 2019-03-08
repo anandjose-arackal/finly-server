@@ -15,12 +15,12 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def mark_send_to_vendor
-    (purchase_order.approved? || purchase_order.auto_approved?) &&
-    (user_in_level?) || (document_owner?)
+    # binding.pry
+    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)
   end
 
   def po_revision
-    (purchase_order.sent_to_vendor?) && (user_in_level?) || (document_owner?)
+    (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner?)
   end
 
   def more_details_button
@@ -28,8 +28,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def send_mail
-    (purchase_order.approved? || purchase_order.auto_approved?) &&
-    (user_in_level?) || (document_owner?)
+    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)
 
   end
 
