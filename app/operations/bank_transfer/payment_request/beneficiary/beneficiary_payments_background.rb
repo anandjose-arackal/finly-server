@@ -41,7 +41,6 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
       beneficiary_payment = retrieve_beneficiary_payment(payment, bank_account)
-      # binding.pry
       self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
           application: "vp",
@@ -133,7 +132,6 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
   private
 
   def retrieve_bank_account(order_details)
-    # binding.pry
     if order_details[:account_id].present?
       id = order_details[:account_id]
       ba = BankAccount.find_by(id: id)
@@ -166,7 +164,6 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     #   bp = BeneficiaryPayment.new(bp_params)
     #   bp.calculate_tax_and_amount
     #   bp.save
-    #   # binding.pry
     #   return bp
     # end
     
@@ -174,7 +171,6 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     bp = BeneficiaryPayment.new(bp_params)
     bp.calculate_tax_and_amount
     bp.save
-    # binding.pry
     return bp
   end
 

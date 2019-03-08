@@ -31,7 +31,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
   def init
     self.order_details = params[:order_details]
-    # binding.pry
     self.contents = []
     self.headers = retrieve_header_names
     # setting the valid as true here, so that even if one line item failed in the
@@ -174,8 +173,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       #self.issue_item.each {|k, v| self.issue_item.delete(k) if v.blank?} # delete unnecessary keys which have no error
       self.issues << self.issue_item
     end
-    puts "self.issues", self.issues.inspect
-    # binding.pry
   end
 
   def success?

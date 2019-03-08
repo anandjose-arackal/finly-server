@@ -48,7 +48,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       valid = true
       Rails.logger.fatal purchase_order_params.inspect
       Rails.logger.fatal params.inspect
-      # binding.pry
       if self.purchase_order_params[:advance_amount_attributes][:value].blank? || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
         add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
         valid = false
@@ -81,25 +80,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def process
 
-    puts "PURCHASEORDER UPDATE FROM Process", params.inspect
-    # binding.pry
-    # binding.pry
     # self.purchase_order = procurement.build_purchse_order(purchase_order_params)
     # advance_amount_attributes: [:value, :currency_id]
     # purchase_order_params[:advance_amount_attributes] = {value: 300, currency_id: 1}
     # purchase_order_params[:due_date] = "2019-02-22"
     # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
-    
-    puts "PURCHASEORDER AFTER ADVANCE UPDATE FROM Process", params.inspect
-    puts "purchase_order_params", purchase_order_params.inspect
-    puts "purchase_order before", purchase_order.inspect
+
     purchase_order.assign_attributes(purchase_order_params)
-    puts "purchase_order after", purchase_order.inspect
-    # binding.pry
     if purchase_order.valid?
 
       purchase_order.save
-      # # binding.pry
       purchase_order.save
       # purchase_order.process_line_item_calculation
 

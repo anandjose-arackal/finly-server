@@ -6,8 +6,6 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.procurement = user.company.procurements.find_by id: params[:procurement_id]
     vendor_id = purchase_order_params[:vendor_id]
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
-    # binding.pry
-    puts "PURCHASEORDER CREATE from init params", params.inspect
   end
 
   def validate

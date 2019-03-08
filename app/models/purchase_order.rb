@@ -424,8 +424,6 @@ class PurchaseOrder < ApplicationRecord
       self.balance_amount.value = total_amount - self.advance_amount.value
     end
 
-    # binding.pry
-
     # self.save
   end
 
