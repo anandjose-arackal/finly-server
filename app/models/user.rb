@@ -970,6 +970,13 @@ class User < ApplicationRecord
     RequestStore.store[:current_user]
   end
 
+  def relevant
+    {
+      email: self.email,
+      company_id: self.company_id
+    }
+  end
+
   private
 
 end

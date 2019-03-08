@@ -3325,12 +3325,17 @@ Rails.application.routes.draw do
 
 
   ## Procurement APIs start ##########################################
+
+  get 'grn/pending', to: 'procure/procurements#index'
+
   namespace :procure do
     get 'procurements/filter_config', to: "procurements#filter_config"
     get 'procurements/count', to: 'procurements#count'
     resources :procurements do
     end
 
+    get 'grn_pending', to: 'procurements#grn_pending'
+    get 'grn_received', to: 'procurements#grn_received'
 
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
 
