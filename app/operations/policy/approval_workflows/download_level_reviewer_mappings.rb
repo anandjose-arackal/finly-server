@@ -32,7 +32,7 @@ class Policy::ApprovalWorkflows::DownloadLevelReviewerMappings < Policy::Approva
       users.each do |user|
         mapping_row = []
         mapping_row << "#{user.name}"
-        levels = self.policy.levels.where(associated_entity_type: provider)
+        levels = self.policy.levels.non_deleted.where(associated_entity_type: provider)
         headers += levels.pluck(:name)
         levels.each do |level|
           lurms = level.level_user_reviewer_mappings.where(user_id: user.id)
@@ -72,11 +72,11 @@ class Policy::ApprovalWorkflows::DownloadLevelReviewerMappings < Policy::Approva
 
     # now set this in the various sheets that are present
     provider_mappings.each do |provider, contents|
-      sheet_details = [
+      sheet_details = {
           item_headers: contents[:headers],
           item_contents: contents[:contents],
           name: provider.gsub("Provider", "")
-      ]
+      }
       self.sheets << sheet_details
     end
   end
