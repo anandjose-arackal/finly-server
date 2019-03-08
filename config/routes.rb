@@ -3345,11 +3345,14 @@ Rails.application.routes.draw do
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
       put 'void', to: 'purchase_orders#void'
+      put 'mark_send_to_vendor', to: 'purchase_orders#mark_send_to_vendor'
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
+      get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
     end
+
 
     resources :inward_documents do
 

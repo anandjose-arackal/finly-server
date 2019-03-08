@@ -95,10 +95,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
           if purchase_order.can_unapprove?(user)
             actions[:unapprove] = {url: Rails.application.routes.url_helpers.procure_purchase_order_unapprove_path(purchase_order_id: purchase_order.id), method: "PUT"}
           end
-          # actions[:close] = {
-          #     url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
-          #     method: "PUT"
-          # }
+          actions[:close] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
 
           actions[:document_editable] = false
         end

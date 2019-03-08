@@ -34,6 +34,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         add_message :error, 'Policy cannot be blank'
       end
     end
+
+    unless self.purchase_order.procurement.invoices.blank? && self.purchase_order.procurement.inward_documents.blank?
+      add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
+    end
   end
 
   def pre_process

@@ -29,6 +29,7 @@ class TrailAction < ApplicationRecord
         :reimbursement_confirmed,
         :closed,
         :downloaded,
+        :revision,
         :hold,
         :release,
         # Bank Payment Request
