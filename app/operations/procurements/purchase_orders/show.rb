@@ -27,10 +27,11 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement
 
     def init
       self.purchase_order = params[:purchase_order]
+      self.procurement = self.purchase_order.procurement
       self.actions = get_actions
       self.departments = user.company.departments.roots
       self.locations = user.company.locations
@@ -78,6 +79,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         actions[:show_comments] = true
       end
 
+
+
       if document_owner? && (self.purchase_order.open? || self.purchase_order.retracted? || self.purchase_order.rejected?)
         actions[:submit] = {url: Rails.application.routes.url_helpers.procure_purchase_order_submit_path(purchase_order_id: purchase_order.id),method: "PUT"}
         actions[:save] = {url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),method: "PUT"}
@@ -113,6 +116,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       if purchase_order.sent_to_vendor?
         if user_in_level? || document_owner?
           actions[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions_path(purchase_order_id: purchase_order.id), method: "GET"}
+        end
+
+        if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
+          actions[:document_editable] = false
         end
       end
 

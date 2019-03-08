@@ -30,7 +30,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, 'Purchase Order not found'
     end
 
-    unless self.procurement.po_revisions.blank?
+    if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
       add_message :error, 'Revision for this purchase order found. Original purchase order can no longer be modified. Check trails.'
     end
 
