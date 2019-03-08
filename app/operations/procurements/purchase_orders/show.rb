@@ -119,7 +119,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         end
 
         if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
-          actions[:document_editable] = false
+          actions[:original_po_editable] = false
         end
       end
 
