@@ -10,12 +10,9 @@ class Procure::ProcurementsController < ApplicationController
   end
 
   def grn_pending
-    # {"view"=>"admin", "menu"=>{"main"=>"procurements"}, "page"=>"1", "per_page"=>"30", "filter_procurement_type"=>"purchase_order", "filter_status_tags"=>["7"], "filter_po_status"=>" ", "filter_submission_date"=>"", "filter_creation_date_from"=>"", "filter_creation_date_to"=>""}
-    puts "params from grn pending", params.inspect
     params[:filter_procurement_type] = "purchase_order"
     params[:filter_status_tags] = ["7"]
     @result = Procurements::Index.(current_user, params)
-    # render file: Rails.root.join('app/views/procure/procurements/index.json')
 
     if @result.success?
       respond_to do |format|
@@ -30,13 +27,10 @@ class Procure::ProcurementsController < ApplicationController
   end
 
   def grn_received
-    # {"view"=>"admin", "menu"=>{"main"=>"procurements"}, "page"=>"1", "per_page"=>"30", "filter_procurement_type"=>"purchase_order", "filter_status_tags"=>["7"], "filter_po_status"=>" ", "filter_submission_date"=>"", "filter_creation_date_from"=>"", "filter_creation_date_to"=>""}
-    puts "params from grn pending", params.inspect
     params[:filter_procurement_type] = "purchase_order"
     params[:filter_status_tags] = ["8"]
 
     @result = Procurements::Index.(current_user, params)
-    # render file: Rails.root.join('app/views/procure/procurements/index.json')
 
     if @result.success?
       respond_to do |format|
