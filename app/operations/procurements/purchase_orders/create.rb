@@ -53,6 +53,11 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
       CustomField::SetFields.(purchase_order, FieldParentType.id_for(:purchase_order), reset_fields: true, save: true)
 
+      # params[:purchase_order_id] = self.purchase_order.id
+      # params[:receiving_user_type] = self.vendor.class&.name
+      # params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id
+      # params[:receiving_account_id] = self.vendor.id
+
     else
       add_message :error, purchase_order.errors.full_messages
     end

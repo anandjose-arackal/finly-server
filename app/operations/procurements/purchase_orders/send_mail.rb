@@ -27,7 +27,7 @@ class Procurements::PurchaseOrders::SendMail < Procurements::PurchaseOrders::Bas
   end
 
   def process
-    ProcurementMailer.delay.send_purchase_order(purchase_order, email_options, user)
+    ProcurementMailer.delay.send_purchase_order_mail(purchase_order, email_options, user)
   end
 
   def post_process

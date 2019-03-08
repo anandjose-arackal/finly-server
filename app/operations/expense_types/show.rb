@@ -92,7 +92,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
       self.per_diem_config[:per_diems] = []
       policy.per_diems.active.each do |per_diem|
         self.per_diem_config[:per_diems] << {
-            name: per_diem.name,
+            name: "#{per_diem.name} - #{policy.name}",
             rate: per_diem.rate_value,
             id: per_diem.id
         }
@@ -102,7 +102,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
       self.per_diem_config[:per_diems] = []
       policy.per_diems.active.each do |per_diem|
         self.per_diem_config[:per_diems] << {
-            name: per_diem.name,
+            name: "#{per_diem.name} - #{policy.name}",
             rate: per_diem.rate_value,
             id: per_diem.id
         }

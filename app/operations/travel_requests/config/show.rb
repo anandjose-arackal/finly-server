@@ -11,7 +11,11 @@ class TravelRequests::Config::Show < BaseOperation
       add_message :error, result.messages[:error]
       return
     end
-    self.policies = result.policies
+    if user.enforce_policy_enabled?
+      self.policies = result.policies.non_deleted.with_application(current_app).non_default
+    else
+      self.policies =  result.policies.non_deleted.with_application(current_app)
+    end
   end
 
   def success

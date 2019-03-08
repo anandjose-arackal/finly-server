@@ -3,7 +3,7 @@
                 :updating_policy_config, :updating_policy_records
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :vendor_payments_admin]
   end
 
   def pre_validate

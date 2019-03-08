@@ -22,47 +22,51 @@ class Statements::Show < Statements::Base
     pocket_id = params[:user_pocket_id] # in case the statements are being requested for a user's pocket
 
     case statement_type
-      when :company
-        case account_type
-          when :card_transfer_credits
-            self.account = user.company.itz_cash_company_account
-          when :bank_transfer_credits
-            self.account = user.company.yes_bank_company_account
+    when :company
+      case account_type
+      when :card_transfer_credits
+        self.account = user.company.itz_cash_company_account
+      when :bank_transfer_credits
+        self.account = user.company.yes_bank_company_account
+      end
+    when :user
+      user_presenter = User::Show.(user, params)
+      unless user_presenter.success?
+        add_message :error, user_presenter.messages[:error]
+        return
+      end
+      sel_user = user_presenter.selected_user
+      case account_type
+      when :expense_card, :reimbursement_card
+        card_id = params[:card_id]
+        if personal_view?
+          self.account = Card.unscoped.with_user(sel_user.id).with_id(card_id)&.first
+        else
+          user_presenter = User::Index.(user, params)
+          unless user_presenter.success?
+            add_message :error, user_presenter.messages[:error]
+            return
+          end
+          users = user_presenter.team
+          self.account = Card.unscoped.with_user(users.pluck(:id)).with_id(card_id)&.first
         end
-      when :user
-        user_presenter = User::Show.(user, params)
-        unless user_presenter.success?
-          add_message :error, user_presenter.messages[:error]
-          return
-        end
-        sel_user = user_presenter.selected_user
-        case account_type
-          when :expense_card, :reimbursement_card
-            user_presenter = User::Index.(user, params)
-            unless user_presenter.success?
-              add_message :error, user_presenter.messages[:error]
-              return
-            end
-            users = user_presenter.team
-            card_id = params[:card_id]
-            self.account = Card.unscoped.with_user(users.pluck(:id)).with_id(card_id)&.first
-          when :finly_money_card_transfer
-            self.account = sel_user.wallet
-          when :finly_money_bank_transfer
-            self.account = sel_user.bank_wallet
-          when :cash_on_hand
-            self.account = sel_user.cash_on_hand
-          when :user_pocket
-            self.account = sel_user.user_pockets.find_by(id: pocket_id)
-        end
-      when :card
-        user_presenter = User::Index.(user, params)
-        unless user_presenter.success?
-          add_message :error, user_presenter.messages[:error]
-          return
-        end
-        users = user_presenter.team
-        self.account = Card.with_user(users.pluck(:id)).with_proxy(params[:proxy])&.first
+      when :finly_money_card_transfer
+        self.account = sel_user.wallet
+      when :finly_money_bank_transfer
+        self.account = sel_user.bank_wallet
+      when :cash_on_hand
+        self.account = sel_user.cash_on_hand
+      when :user_pocket
+        self.account = sel_user.user_pockets.find_by(id: pocket_id)
+      end
+    when :card
+      user_presenter = User::Index.(user, params)
+      unless user_presenter.success?
+        add_message :error, user_presenter.messages[:error]
+        return
+      end
+      users = user_presenter.team
+      self.account = Card.with_user(users.pluck(:id)).with_proxy(params[:proxy])&.first
     end
 
     if params[:with_date_range].nil?

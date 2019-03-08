@@ -17,6 +17,7 @@ config/data_store.yml
 config/sentry.yml
 config/aws_config.yml
 config/mailer_config.yml
+.rubocop.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*

@@ -47,11 +47,17 @@ json.policies do
   end
 end
 
-# binding.pry
-
 json.cost_centers do
   json.array!(@result.cost_centers.cost_centers) do |cost_center|
     json.name cost_center.name
     json.id cost_center.id
   end
+end
+
+json.tds_slabs do
+    json.array!(@result.tds_slabs.tds_slabs) do |tds_slab|
+      json.id tds_slab.id
+      json.name tds_slab.name
+      json.tds tds_slab.tds
+    end
 end

@@ -39,6 +39,7 @@
 #  cost_center_id         :integer
 #  created_by_id          :integer
 #  modified_by_id         :integer
+#  deleted_at             :datetime
 #
 
 class Expense < ApplicationRecord
@@ -638,7 +639,7 @@ class Expense < ApplicationRecord
         rate = ''
         if distance_expense.vehicle_rate.present?
           rate = simple ? " @ " : " at "
-          rate += "#{distance_expense.vehicle_rate.rate.currency.symbol}#{distance_expense.vehicle_rate&.rate&.value} #{distance_expense.vehicle_rate.rate.currency.country_code} per KM"
+          rate += "#{distance_expense.vehicle_rate&.rate&.currency&.symbol}#{distance_expense.vehicle_rate&.rate&.value} #{distance_expense.vehicle_rate&.rate&.currency&.country_code} per KM"
         end
         return "#{self.distance_expense.distance_value} KM#{rate}"
       elsif self.time_expense?

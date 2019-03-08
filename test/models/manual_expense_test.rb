@@ -8,8 +8,8 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  is_deleted :boolean          default(FALSE)
+#  deleted_at :datetime
 #
-
 
 require 'test_helper'
 

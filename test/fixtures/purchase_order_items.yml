@@ -29,6 +29,7 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #  account                :string(255)
 #  tax_rate_id            :integer
+#  deleted_at             :datetime
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

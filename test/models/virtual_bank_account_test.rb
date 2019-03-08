@@ -35,6 +35,7 @@
 #  application                   :string(255)      not null
 #  customer_id                   :integer
 #  default_account               :boolean
+#  deleted_at                    :datetime
 #
 
 require 'test_helper'

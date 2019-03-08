@@ -1,4 +1,4 @@
-class Expense::Exports::Base < ::Export::Report::Base
+class Expense::Exports::Base < ::Export::Reports::Base
   attr_accessor :preferences, :default_column_names, :custom_field_column_names, :cf_data, :cf_headers
 
   def authorized_user_types

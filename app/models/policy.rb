@@ -14,6 +14,7 @@
 #  base_currency_id       :integer          default(1)
 #  application            :string(255)
 #  settlement_currency_id :integer          default(1), not null
+#  deleted_at             :datetime
 #
 
 class Policy < ApplicationRecord
@@ -32,6 +33,7 @@ class Policy < ApplicationRecord
 
   has_many :expense_rules, dependent: :destroy
   has_many :budget_rules, dependent: :destroy
+  has_many :policy_user_roles, dependent: :destroy
 
   has_one :distance_expense_config
   has_one :time_expense_config
@@ -50,7 +52,7 @@ class Policy < ApplicationRecord
   scope :without_id, ->(id) {where.not id: id}
   scope :not_deleted, -> {where is_deleted: false}
   scope :find_from_id, -> (id) {find_by(id: id)}
-  scope :with_application, -> (application) {where application: application}
+  scope :with_application, -> (application) {where( application: application).or(default)}
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
   scope :include_user_mapping, -> { includes :user_mapping }
 
@@ -61,6 +63,8 @@ class Policy < ApplicationRecord
   has_many :policy_field_mappings
   has_many :field_configurations, through: :policy_field_mappings
   has_many :levels, class_name: 'ReviewalLevel', dependent: :destroy
+  has_many :level_user_reviewer_mappings, dependent: :destroy
+
 
   validates :company_id, presence: true
   validate :one_default_per_company

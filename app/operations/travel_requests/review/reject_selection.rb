@@ -10,10 +10,10 @@ class TravelRequests::Review::RejectSelection < TravelRequests::Review::Base
   end
 
   def validate
-    unless self.travel_request.controlling_user_id == user.id
-      add_message :error, 'You cannot perform this action at the moment'
-      return
-    end
+    # unless self.travel_request.controlling_user_id == user.id
+    #   add_message :error, 'You cannot perform this action at the moment'
+    #   return
+    # end
     unless manager_view?
       add_message :error, 'You cannot perform this action at the moment'
       return
@@ -25,31 +25,47 @@ class TravelRequests::Review::RejectSelection < TravelRequests::Review::Base
   end
 
   def process
-    selector, selector_role_id = travel_booking_selector
-    controlling_user_role_id = travel_request.controlling_user_role_id
-    # Set reviewer as controlling user
-    if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:selection_rejected),
-                                        controlling_user_id: selector&.id,
-                                        controlling_user_role_id: selector_role_id
+    # selector, selector_role_id = travel_booking_selector
+    # controlling_user_role_id = travel_request.controlling_user_role_id
+    # # Set reviewer as controlling user
+    # if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:selection_rejected),
+    #                                     controlling_user_id: selector&.id,
+    #                                     controlling_user_role_id: selector_role_id
+    #
+    #   travel_request.travel_request_trails.create action_user: user,
+    #                                               action_user_role_id: controlling_user_role_id,
+    #                                               action_id: TravelRequestTrailAction.id_for(:selection_rejected),
+    #                                               modified_user_id: selector&.id,
+    #                                               modified_user_role_id: controlling_user_role_id
+    #
+    #   travel_request.money_requests.status_pending.update_all(
+    #       controlling_user: travel_request.controlling_user,
+    #       controlling_user_role_id: travel_request.controlling_user_role_id
+    #   )
+    # else
+    #   add_message :error, travel_request.errors.full_messages
+    # end
 
-      travel_request.travel_request_trails.create action_user: user,
-                                                  action_user_role_id: controlling_user_role_id,
-                                                  action_id: TravelRequestTrailAction.id_for(:selection_rejected),
-                                                  modified_user_id: selector&.id,
-                                                  modified_user_role_id: controlling_user_role_id
+    #NEW CODE
+    #  Workflow Manager
+    params[:document] = self.travel_request
+    params[:aasm_event] = 'reject_selection'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
 
-      travel_request.money_requests.status_pending.update_all(
-          controlling_user: travel_request.controlling_user,
-          controlling_user_role_id: travel_request.controlling_user_role_id
-      )
-    else
-      add_message :error, travel_request.errors.full_messages
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
     end
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process
+    travel_request.comments.create user_id: user.id,
+                                   action_id: TravelRequestCommentAction.id_for(:selection_rejected)
     Event::ETravelRequest::RejectSelection.(user, travel_request: travel_request)
-    add_message :success, 'Selection has been successfully confirmed'
+    add_message :success, 'Selection has been rejected'
   end
 
   protected

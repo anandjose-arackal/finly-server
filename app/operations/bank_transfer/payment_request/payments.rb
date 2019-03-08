@@ -9,7 +9,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
     has_scope :filter_search
     
     attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments, :unpaid_payments,
-                  :count_before_filter, :filter_count
+                  :count_before_filter, :filter_count, :parent_details
 
     def init
       self.payments = params[:payments]      
@@ -52,7 +52,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
   end
 
   def process
-    self.payments = self.bank_payment_request.payment_order.payments
+    self.payments = self.bank_payment_request.payment_order.payments.include_for_index
   end
 
   def success

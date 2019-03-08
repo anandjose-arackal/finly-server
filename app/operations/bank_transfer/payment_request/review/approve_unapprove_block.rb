@@ -7,7 +7,7 @@ class BankTransfer::PaymentRequest::Review::ApproveUnapproveBlock < BankTransfer
   def init
     id = params[:id] || params[:bank_payment_request_id]
     self.bank_payment_request = BankPaymentRequest.find_by(id: id)
-    self.trails = self.bank_payment_request.bank_payment_request_trails #.trails_for_approval_chain
+    self.trails = self.bank_payment_request.trails #.trails_for_approval_chain
     self.approve_id = BankPaymentRequestTrailAction.id_for(:approve)
     self.unapprove_id = BankPaymentRequestTrailAction.id_for(:unapprove)
   end

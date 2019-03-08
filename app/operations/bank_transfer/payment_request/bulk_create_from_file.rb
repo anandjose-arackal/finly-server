@@ -3,9 +3,10 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation
+                :headers, :contents, :validate_operation, :policy_id
 
   def pre_validate
+    Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"
     if user.blank?
       add_message :error, 'User not found'
       return
@@ -17,6 +18,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   end
 
   def init
+    Rails.logger.fatal "FROM BulkCreateFromFile start of init,\n #{params.inspect}"
     self.file = params[:file]
     headers = [:name, :bank_account_number, :ifsc, :original_amount,
                :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
@@ -28,6 +30,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
                                                    {skip_empty_lines: true})
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
+    Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"
+    self.policy_id = params[:policy_id]
   end
 
   def validate
@@ -37,9 +41,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
 
     self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
-
-    puts "validate_operation", validate_operation.inspect
-    binding.pry
+    Rails.logger.fatal "FROM BulkCreateFromFile validate_operation,\n #{validate_operation.inspect}"
     if validate_operation.success?
       self.requested_amount = validate_operation.requested_amount
     else
@@ -55,6 +57,17 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     # asynchronously add payments to it one by one
     self.bank_payment_request_params = parse_payment_order_data
     self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
+
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+    params[:reviewal_document] = self.bank_payment_request.reload
+
+    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+    unless document_reviewer_mappings_op.success?
+      self.bank_payment_request.destroy
+      add_message :error, document_reviewer_mappings_op.messages[:error]
+      return
+    end
 
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
@@ -101,7 +114,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   private
 
   def parse_payment_order_data
-    policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
     payment_order_attributes = {
         initiating_user_id: user.id,
         payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
@@ -111,6 +123,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        scheduled_at: params[:scheduled_at],
         initiating_account_type: YesBankCompanyAccount.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -121,13 +134,13 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     bpr_attributes = {
         owner_id: user.id,
         status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
-        controlling_user_id: user.id,
+        # controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
             currency_id: 1
         },
         beneficiary_type_id: 2,
-        policy_id: policy&.id,
+        policy_id: self.policy_id,
         payment_order_attributes: payment_order_attributes,
         api_initiated: false
     }

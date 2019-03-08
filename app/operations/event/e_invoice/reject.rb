@@ -3,7 +3,7 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
 
   def init
     super
-    self.rejecting_user = self.invoice.trails.natural_order.last.action_user rescue nil
+    self.rejecting_user = self.invoice.trails.last.action_user rescue nil
   end
 
   def validate
@@ -22,7 +22,8 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
   end
 
   def affected_users
-    User::AssociatedUsers::Index.(self.user, document: self.invoice, user_before: self.user, amount: invoice.net_amount.value)
+    # User::AssociatedUsers::Index.(self.user, document: self.invoice, user_before: self.user, amount: invoice.net_amount.value)
+    self.invoice.affected_users(:reject)
   end
 
   # def get_token(user)
@@ -32,7 +33,8 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
 
 
   def notification_affected_users
-    self.controlling_users
+    # self.controlling_users
+    self.invoice.notification_affected_users(:reject)
   end
 
   # def send_push_notification(user)
@@ -52,7 +54,7 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
                                              path_object_type: "Invoice",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             # view_role_id: report.controlling_user_role_id,
+                                             view_role_id: role_id,
                                              application: RequestStore.store[:current_app]
     )
     notification.save
@@ -74,11 +76,12 @@ class Event::EInvoice::Reject < Event::EInvoice::Base
     end
   end
 
-  # def report_view_role(user)
-  #   if user.id == report.user_id
-  #     return nil
-  #   elsif user.id == report.controlling_user_id
-  #     return report.controlling_user_role_id
-  #   end
-  # end
+  def report_view_role(user)
+    # if user.id == report.user_id
+    #   return nil
+    # elsif user.id == report.controlling_user_id
+    #   return report.controlling_user_role_id
+    # end
+    invoice.get_reviewers.include?(user) ? UserRole.id_for(:manager) : UserRole.id_for(:employee)
+  end
 end

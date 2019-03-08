@@ -15,6 +15,7 @@
 #  is_deleted            :boolean          default(FALSE), not null
 #  procurement_type      :string(255)
 #  transaction_id        :string(255)
+#  deleted_at            :datetime
 #
 
 class Procurement < ApplicationRecord
@@ -196,7 +197,7 @@ class Procurement < ApplicationRecord
     if user.present?
       category_ids = user.company.categories.inward_invoice_line_items_only.filter_search(category_name).pluck(:id)
 
-      inventory_line_item_ids = user.company.inventory_line_items.with_category_id(category_ids)
+      inventory_line_item_ids = user.company.items.with_category_id(category_ids)
 
       purchase_order_ids = PurchaseOrderItem.with_inventory_line_item(inventory_line_item_ids).pluck(:purchase_order_id)
 
@@ -247,47 +248,50 @@ class Procurement < ApplicationRecord
 
   scope :filter_awaiting_approval, -> (user) {
     if user.vendor_payments_reviewer?
-      level_ids = []
+      # level_ids = []
 
-      policy_ids = user.company.policies.with_application(:vp).pluck(:id)
+      # policy_ids = user.company.policies.with_application(:vp).pluck(:id)
 
-      policy_level_ids = ReviewalLevel.with_entity_type(['PurchaseOrder', 'Invoice']).with_policy_ids(policy_ids).pluck(:id)
+      # policy_level_ids = ReviewalLevel.with_entity_type(['PurchaseOrderProvider', 'InvoiceProvider']).with_policy_ids(policy_ids).pluck(:id)
 
-      reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+      # reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
 
-      level_ids = policy_level_ids & reviewer_level_ids
+      # level_ids = policy_level_ids & reviewer_level_ids
 
-      # Find all the purchase order with controlling level from above
-      purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
-      # Find all the invoices with controlling level
-      invoice_ids = user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:id)
+      # # Find all the purchase order with controlling level from above
+      # purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
+      # # Find all the invoices with controlling level
+      # invoice_ids = user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:id)
 
-      # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
-      purchase_order_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+      # # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
+      # purchase_order_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
 
-      # Find all document level reviewer mapping with with the above list of level + reviewer and get their invoice_id
-      invoice_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('Invoice')
+      # # Find all document level reviewer mapping with with the above list of level + reviewer and get their invoice_id
+      # invoice_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('Invoice')
 
-      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
-      other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+      # # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+      # other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
 
-      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
-      other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
+      # # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+      # other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
 
-      purchase_order_ids -= other_reviewer_po_ids
-      invoice_ids -= other_reviewer_invoice_ids
+      # purchase_order_ids -= other_reviewer_po_ids
+      # invoice_ids -= other_reviewer_invoice_ids
 
-      purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids).with_status_ids(PurchaseOrderStatus.id_for(:processing))
-      invoices = user.company.inward_invoices.with_id(invoice_ids).with_status_id(InwardInvoiceStatus.id_for(:processing))
+      # purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids).with_status_ids(PurchaseOrderStatus.id_for(:processing))
+      # invoices = user.company.inward_invoices.with_id(invoice_ids).with_status_id(InwardInvoiceStatus.id_for(:processing))
 
-      all_level_po_ids = purchase_orders.pluck(:controlling_level_id)
-      all_level_invoice_ids = invoices.pluck(:controlling_level_id)
+      # all_level_po_ids = purchase_orders.pluck(:controlling_level_id)
+      # all_level_invoice_ids = invoices.pluck(:controlling_level_id)
 
-      purchase_orders = purchase_orders.with_controlling_level_ids(level_ids & all_level_po_ids)
-      invoices = invoices.with_controlling_level_ids(level_ids & all_level_invoice_ids)
+      # purchase_orders = purchase_orders.with_controlling_level_ids(level_ids & all_level_po_ids)
+      # invoices = invoices.with_controlling_level_ids(level_ids & all_level_invoice_ids)
 
-      procurement_ids = purchase_orders.pluck(:procurement_id) + invoices.pluck(:procurement_id)
+      # procurement_ids = purchase_orders.pluck(:procurement_id) + invoices.pluck(:procurement_id)
 
+      # where(id: procurement_ids.uniq)
+      procurement_ids = PurchaseOrder.awaiting_action_items(user).pluck(:procurement_id).compact
+      procurement_ids += Invoice.awaiting_action_items(user).pluck(:procurement_id).compact
       where(id: procurement_ids.uniq)
     end
   }

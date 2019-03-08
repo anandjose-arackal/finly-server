@@ -156,9 +156,9 @@ json.expenses do
 # sending all the currencies and the respective symbols and codes
     json.currencies do
       json.array!(Currency.all) do |currency|
-        json.symbol currency.symbol
-        json.country_code currency.country_code
-        json.id currency.id
+        json.symbol currency&.symbol
+        json.country_code currency&.country_code
+        json.id currency&.id
       end
     end
 

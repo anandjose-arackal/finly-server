@@ -47,6 +47,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def unapprove
+    @result = Procurements::PurchaseOrders::Unapprove.(current_user, params)
+    respond
+  end
+
   def bulk_approve
     @result = Procurements::PurchaseOrders::BulkApprove.(current_user, params)
     respond
@@ -115,6 +120,21 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def po_advances
+    @result = Procurements::PurchaseOrders::PoAdvances.(current_user, params)
+    respond
+  end
+
+  def po_advance_ticket
+    @result = Procurements::Payments::CreatePoAdvanceTicket.(current_user, params)
+    respond
+  end
+
+  def po_with_advance
+    @result = Procurements::PurchaseOrders::PoWithAdvance.(current_user, params)
+    respond
+  end
+
   # Templates
   def template_create
     @result = Procurements::PurchaseOrders::Templates::Create.(current_user, params)
@@ -144,6 +164,11 @@ class Procure::PurchaseOrdersController < ApplicationController
   def template_destroy
     @result = Procurements::PurchaseOrders::Templates::Destroy.(current_user, params)
     respond response: @result.success? ? :success : :failure
+  end
+
+  def actions_configuration
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
   end
 
 end
