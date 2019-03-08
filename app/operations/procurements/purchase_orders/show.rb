@@ -116,10 +116,14 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       if purchase_order.sent_to_vendor?
         if user_in_level? || document_owner?
           actions[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions_path(purchase_order_id: purchase_order.id), method: "GET"}
+          actions[:close] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
         end
 
         if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
-          actions[:original_po_editable] = false
+          actions[:original_po_blocked] = true
         end
       end
 
