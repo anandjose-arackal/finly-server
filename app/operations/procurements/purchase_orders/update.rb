@@ -6,7 +6,7 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
-                :vendor
+                :vendor, :procurement
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -14,6 +14,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order_id = params[:id] || params[:purchase_order_id]
     # self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
+    self.procurement = self.purchase_order.procurement
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
     purchase_order_params.delete(:document_reviewer_mappings)
 
@@ -27,6 +28,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   def validate
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
+    end
+
+    unless self.procurement.po_revisions.blank?
+      add_message :error, 'Revision for this purchase order found. Original purchase order can no longer be modified. Check trails.'
     end
 
     unless self.purchase_order_params[:policy_id].present?
