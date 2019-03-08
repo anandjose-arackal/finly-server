@@ -112,7 +112,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       if purchase_order.sent_to_vendor?
         if user_in_level? || document_owner?
-          action[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions_path(purchase_order_id: purchase_order.id), method: "GET"}
+          actions[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions_path(purchase_order_id: purchase_order.id), method: "GET"}
         end
       end
 
