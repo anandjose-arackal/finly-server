@@ -35,6 +35,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.duplicate_po.revision_of_id = self.purchase_order.id
     self.duplicate_po.revision_number = self.purchase_order.revision_number + 1
     self.duplicate_po.po_number = nil
+    self.duplicate_po.controlling_level_id = nil
     self.duplicate_po.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
 
     op = Procurements::DocumentNumbers::Generate.(user, {document: self.duplicate_po})
@@ -52,6 +53,14 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
         self.purchase_order.__send__(k).each do |po|
           self.duplicate_po.__send__(k) << po.dup
         end
+
+        if k == :document_level_reviewer_mappings
+          dlrms_attr = {taken_control:false, taken_control_by_id: nil, viewable: false, action_taken_by_id: nil, action_id: nil}
+          # self.duplicate_po.document_level_reviewer_mappings.assign_attributes(dlrms_attr)
+          self.duplicate_po.document_level_reviewer_mappings.each {|dlrm| dlrm.assign_attributes(dlrms_attr)}
+
+        end
+
       end
 
     end
