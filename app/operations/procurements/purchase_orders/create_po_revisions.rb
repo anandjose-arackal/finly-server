@@ -36,7 +36,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.duplicate_po.revision_number = self.purchase_order.revision_number + 1
     self.duplicate_po.po_number = nil
     self.duplicate_po.controlling_level_id = nil
-    self.duplicate_po.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
+    self.duplicate_po.purchase_order_status_id = (user.vendor_payment_admin? ? PurchaseOrderStatus.id_for(:auto_approved) : PurchaseOrderStatus.id_for(:open))
 
     op = Procurements::DocumentNumbers::Generate.(user, {document: self.duplicate_po})
     if op.success?
