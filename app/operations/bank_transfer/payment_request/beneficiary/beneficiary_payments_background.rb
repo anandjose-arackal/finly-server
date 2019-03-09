@@ -174,7 +174,6 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     bp = BeneficiaryPayment.new(bp_params)
     bp.calculate_tax_and_amount
     bp.save
-    # binding.pry
     return bp
   end
 

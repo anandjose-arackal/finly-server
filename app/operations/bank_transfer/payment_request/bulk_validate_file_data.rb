@@ -104,6 +104,18 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:bank_account_number] = 'No bank account entered'
       end
 
+      if gst_type_id.blank?
+        self.valid =false
+        self.error_messages << "Please select a Gst Type"
+        self.issue_item[:gst_type_id] = "Please select a Gst Type"
+      end
+
+      if tax.blank?
+        self.valid =false
+        self.error_messages << "Please select a relevant tax amount"
+        self.issue_item[:tax] = "Please select a relevant tax amount"
+      end
+
       # check for format of the Bank account number
       pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
       unless bank_account_no =~ pattern

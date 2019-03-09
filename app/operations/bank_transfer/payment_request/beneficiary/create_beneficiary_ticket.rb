@@ -29,6 +29,9 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	      add_message :error, 'Vendor params not sent for processing.'
 	      return
 	    end
+	    unless params[:policy_id].present?
+	        add_message :error, 'Policy cannot be blank'
+	    end
 	end
 
 	def init
@@ -56,6 +59,10 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    if payments_attributes.blank?
 	      add_message :error, 'Nothing to process'
 	      return
+	    end
+
+	    unless self.policy.present?
+	        add_message :error, 'Policy not found'
 	    end
 
 	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})

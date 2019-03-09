@@ -38,7 +38,7 @@ class BeneficiaryPayment < ApplicationRecord
 
   belongs_to :company, optional: true
   belongs_to :gst_type
-  belongs_to :tds_slab, class_name: 'TdsRatesList'
+  belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
 
   belongs_to :status, class_name: 'BeneficiaryPaymentStatus'
 
