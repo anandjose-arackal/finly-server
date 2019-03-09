@@ -35,7 +35,7 @@ class TrailAction < ApplicationRecord
         # Bank Payment Request
         :mark_as_credited,
         :credit,
-        :sent_to_vendor,
+        :send_to_vendor,
 
         # TravelRequestBookingActions
         :confirm_selection,
