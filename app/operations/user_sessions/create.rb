@@ -131,6 +131,7 @@ class UserSessions::Create < BaseOperation
     # args[:user_agent] = RequestStoreUtil.current_request.user_agent
     # # Temporary as frontend dev is not available
     # return if true
+    return if user.nil?
     result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
       args[:status_id] = UserSessionStatus.id_for(:failed)
