@@ -55,6 +55,10 @@ json.can_create_reports @result.can_create_reports?
 json.show_reports @result.show_reports?
 json.show_add_money_requests @result.show_add_money_requests?
 
+json.booking_types do
+  json.extract! @result.travel_request.policy.configuration, :booking_type_flight, :booking_type_car_rental, :booking_type_bus, :booking_type_train, :booking_type_hotel, :booking_type_restaurant, :booking_type_other
+end
+
 # json.summary @result.travel_request.summary
 
 json.money_requests do

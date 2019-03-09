@@ -83,7 +83,7 @@ class User < ApplicationRecord
   has_many :receipts, dependent: :destroy
   has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
-  has_many :policies, through: :policy_user_mappings, dependent: :destroy
+  has_many :policies,-> { where(:'policy_user_mappings.deleted_at' => nil)}, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
   has_many :reports, inverse_of: :user, dependent: :destroy
@@ -200,6 +200,7 @@ class User < ApplicationRecord
   has_many :procurements
   has_many :level_reviewer_mappings
   has_many :level_user_reviewer_mappings
+  alias_method :lurms, :level_user_reviewer_mappings
   has_many :procurement_attachments
 
   has_one :individual_kyc, dependent: :destroy

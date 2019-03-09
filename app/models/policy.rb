@@ -25,7 +25,7 @@ class Policy < ApplicationRecord
   belongs_to :settlement_currency, optional: true, class_name: 'Currency'
   has_one :configuration, class_name: 'PolicyConfiguration', dependent: :destroy
   has_many :user_mapping, class_name: 'PolicyUserMapping', dependent: :destroy
-  has_many :users, through: :user_mapping
+  has_many :users, -> { where(:'policy_user_mappings.deleted_at' => nil)}, through: :user_mapping
   has_many :user_team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
 
   has_many :reports

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_21_115929) do
+ActiveRecord::Schema.define(version: 2019_03_08_064158) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2118,6 +2118,7 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.string "provider_name"
     t.decimal "threshold", precision: 20, scale: 5
     t.boolean "active", default: true
+    t.boolean "wo_exception", default: true
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
@@ -2646,6 +2647,20 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.index ["name"], name: "index_gst_types_on_name"
   end
 
+  create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "AGGRNAME"
+    t.string "AGGRID"
+    t.string "URN"
+    t.string "UNIQUEID"
+    t.string "REQUESTID"
+    t.string "TXNSTATUS"
+    t.string "UTRNUMBER"
+    t.string "CORPID"
+    t.string "USERID"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -3090,11 +3105,12 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.integer "level_id"
     t.integer "reviewer_id"
     t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
-    t.boolean "exception", default: false
+    t.boolean "exception", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_reviewer_mappings_on_level_id"
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
@@ -3106,8 +3122,9 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "threshold", precision: 20, scale: 5
-    t.boolean "exception", default: false
+    t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
+    t.boolean "exception", default: true
+    t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_level_user_reviewer_mappings_on_policy_id"
     t.index ["reviewer_id"], name: "index_level_user_reviewer_mappings_on_reviewer_id"
@@ -3491,6 +3508,7 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.string "scopes", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "confidential", default: true, null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
@@ -3929,6 +3947,14 @@ ActiveRecord::Schema.define(version: 2019_02_21_115929) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "booking_type_flight", default: true
+    t.boolean "booking_type_car_rental", default: true
+    t.boolean "booking_type_bus", default: true
+    t.boolean "booking_type_train", default: true
+    t.boolean "booking_type_hotel", default: true
+    t.boolean "booking_type_restaurant", default: true
+    t.boolean "booking_type_other", default: true
+    t.boolean "trips_money_request", default: true
     t.index ["default_tag_id"], name: "index_policy_configurations_on_default_tag_id"
     t.index ["policy_id"], name: "index_policy_configurations_on_policy_id"
     t.index ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id"

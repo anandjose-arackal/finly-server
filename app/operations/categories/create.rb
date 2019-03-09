@@ -14,7 +14,7 @@ class Categories::Create < Categories::Base
   end
 
   def process
-    if self.category.present?
+    if self.category.present? && self.category.root?
       self.category.assign_attributes(category_params)
       self.category.update(active: true)
     else
