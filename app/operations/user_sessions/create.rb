@@ -126,8 +126,11 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_device(args)
-    args[:client_type] = params[:temporary_client_type]
-    return if true
+    # # Temporary as frontend dev is not available
+    # args[:client_type] = params[:temporary_client_type]
+    # args[:user_agent] = RequestStoreUtil.current_request.user_agent
+    # # Temporary as frontend dev is not available
+    # return if true
     result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
       args[:status_id] = UserSessionStatus.id_for(:failed)

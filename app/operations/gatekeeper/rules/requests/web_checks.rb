@@ -27,6 +27,26 @@ Gatekeeper::Checker.new 'On New Request' do
         fail
       end
     end
+
+    # # todo Temporary as device is not available at the moment because of lack of frontend dev
+    # rule 'User agent is required for the request' do
+    #   if RequestStoreUtil.current_request.user_agent.nil?
+    #     message 'User agent is blank in the request'
+    #     session_status_id UserSessionStatus.id_for(:blocked)
+    #     response_code 401
+    #     fail
+    #   end
+    # end
+    #
+    # rule 'User agent has to match session user agent' do
+    #   if RequestStoreUtil.current_request.user_agent != RequestStoreUtil.current_session.user_agent
+    #     message 'User agent does not match the user session user agent'
+    #     session_status_id UserSessionStatus.id_for(:blocked)
+    #     response_code 401
+    #     fail
+    #   end
+    # end
+    # # todo Temporary as device is not available at the moment because of lack of frontend dev
   end
 
 end
