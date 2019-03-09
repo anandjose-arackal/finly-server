@@ -6,10 +6,10 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       [
           :dashboard,
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_policy, :po_company]},
-          {shipments: [:shipments_pending, :shipment_history]},
+          {shipments: [:shipments_pending, :shipments_history]},
           {payables: [:unbilled_items, :po_advances, :invoices, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
-          {create: [:create_purchase_order, :create_invoice, :create_payment_ticket]}
+          {create: [:create_purchase_order, :create_po_invoice, :create_non_po_invoice, :create_payment_ticket]}
       ]
   )
   register_structure(
@@ -91,8 +91,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'Vendors', id: 'manage_vendors', url: 'manage/vendors'}
   end
 
-  def manage_catalogue
-    {name: 'Catalogue', id: 'manage_catalogue', url: 'manage/catalogue'}
+  def manage_item_master
+    {name: 'Item Master', id: 'manage_item_master', url: 'manage/item_master'}
   end
 
   def manage_rate_contracts
@@ -105,6 +105,10 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_purchase_order
     {name: 'New Purchase Order', id: 'create_purchase_order', url: 'purchase_orders/new'}
+  end
+
+  def create_po_invoice
+    {name: 'New PO Invoice', id: 'create_po_invoice', url: 'purchase_orders/invoices/new'}
   end
 
   def create_non_po_invoice

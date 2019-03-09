@@ -2,7 +2,7 @@ class Navbar::Master::Collect::NavConfig < Navbar::Master::Base
 
   register_app :fc
   register_structure(
-      [
+      :tabs, [
           :customers,
           :transactions,
           :inventory,

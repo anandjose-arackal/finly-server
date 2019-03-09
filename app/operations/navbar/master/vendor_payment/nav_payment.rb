@@ -1,4 +1,4 @@
-class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
+class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
 
   register_app :vp
   register_structure(
