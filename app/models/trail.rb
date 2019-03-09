@@ -149,6 +149,8 @@ class Trail < ApplicationRecord
         action = " closed"
       when TrailAction.id_for(:void)
         action = " voided"
+      when TrailAction.id_for(:send_to_vendor)
+        action = " sent to vendor"
       else
         action = ""
     end
