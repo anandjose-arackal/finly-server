@@ -27,7 +27,7 @@ class PolicyUserRoles::Index < PolicyUserRoles::Base
 
     def init
       self.policy_user_roles = params[:policy_user_roles]
-      # self.policy_user_roles = apply_scopes(self.policy_user_roles, params)
+      self.policy_user_roles = apply_scopes(self.policy_user_roles, params)
       self.user_roles = params[:user_roles]
     end
   end

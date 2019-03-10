@@ -6,9 +6,9 @@ json.result do
       json.merge! purm.user.as_json
     end
   end
-  json.user_roles do
-    json.array!(@result.user_roles) do |user_role|
-      json.merge! user_role.as_json
-    end
-  end
+  # json.user_roles do
+  #   json.array!(@result.user_roles) do |user_role|
+  #     json.merge! user_role.as_json
+  #   end
+  # end
 end
