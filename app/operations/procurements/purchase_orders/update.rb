@@ -6,15 +6,23 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
-                :vendor, :procurement
+                :vendor, :procurement, :bank_account, :original_purchase_order
 
-  def init
+ def init
     self.purchase_order_params = purchase_order_parameters
     # self.procurement = user.company.procurements.find_by params[:procurement_id]
     purchase_order_id = params[:id] || params[:purchase_order_id]
     # self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
+
+    self.purchase_order_params.delete(:advance_amount_attributes)
+    # params[:bank_account_id] = '80'
+    if purchase_order_params[:bank_account_id]
+      self.bank_account = self.purchase_order.vendor.bank_accounts.find_by(id: purchase_order_params[:bank_account_id])
+    end
+
     self.procurement = self.purchase_order.procurement
+    self.original_purchase_order = self.procurement.purchase_order
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
     purchase_order_params.delete(:document_reviewer_mappings)
 
@@ -26,6 +34,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def validate
+
+    if purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?
+      add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
+    end
+
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
     end
@@ -40,33 +53,33 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    unless self.purchase_order.procurement.invoices.blank? && self.purchase_order.procurement.inward_documents.blank?
-      add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
-    end
+    # if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
+    #   add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
+    # end
 
     # advance amount needs 2 attributes
-    unless self.purchase_order_params[:advance_amount_attributes].blank?  && self.purchase_order_params[:advance_amount_attributes][:value].blank? && self.bank_account.blank?
-      valid = true
-      Rails.logger.fatal purchase_order_params.inspect
-      Rails.logger.fatal params.inspect
-      if self.purchase_order_params[:advance_amount_attributes][:value].blank? || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
-        add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
-        valid = false
+    # unless self.purchase_order_params[:advance_amount_attributes].blank?  && self.purchase_order_params[:advance_amount_attributes][:value].blank? && self.bank_account.blank?
+    #   valid = true
+    #   Rails.logger.fatal purchase_order_params.inspect
+    #   Rails.logger.fatal params.inspect
+    #   if self.purchase_order_params[:advance_amount_attributes][:value].blank?  || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
+    #     add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
+    #     valid = false
 
-      elsif self.purchase_order_params[:due_date].blank?
-        add_message :error, 'Bro add the due date for the advance bro.'
-        valid = false
+    #   elsif self.purchase_order_params[:due_date].blank?
+    #     add_message :error, 'Bro add the due date for the advance bro.'
+    #     valid = false
 
-      elsif self.bank_account.blank?
-        add_message :error, 'Please select the bank account of the vendor.'
-        valid = false
+    #   elsif self.bank_account.blank?
+    #     add_message :error, 'Please select the bank account of the vendor.'
+    #     valid = false
 
-      end
+    #   end
 
-      if valid && purchase_order.advance_amount_status_empty
-        purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
-      end
-    end
+    #   if valid && purchase_order.advance_amount_status_empty
+    #     purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+    #   end
+    # end
 
   end
 
@@ -114,6 +127,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         purchase_order.trails.create action_user: user,
                                      action_id: TrailAction.id_for(:update),
                                      action_level: purchase_order.trails.last.action_level
+
+
+        if self.procurement.po_revisions
+          self.original_purchase_order.trails.create action_user: user,
+                                     action_id: TrailAction.id_for(:update),
+                                     action_level: purchase_order.trails.last.action_level,
+                                     note: "Revised PO # #{purchase_order.po_number} updated"
+        end
       end
 
       # Create track

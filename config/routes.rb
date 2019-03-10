@@ -3338,6 +3338,7 @@ Rails.application.routes.draw do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
       put 'retract', to: 'purchase_orders#retract'
+      put 'reopen', to: 'purchase_orders#reopen'
       put 'approve', to: 'purchase_orders#approve'
       put 'unapprove', to: 'purchase_orders#unapprove'
       put 'reject', to: 'purchase_orders#reject'

@@ -42,6 +42,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def reopen
+    @result = Procurements::PurchaseOrders::Reopen.(current_user, params)
+    respond
+  end
+
   def approve
     @result = Procurements::PurchaseOrders::Approve.(current_user, params)
     respond

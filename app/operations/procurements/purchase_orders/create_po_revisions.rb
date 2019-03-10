@@ -3,12 +3,13 @@
 # 
 class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOrders::Base
 
-  attr_accessor :purchase_order, :procurement, :klass, :foreign_keys, :duplicate_po
+  attr_accessor :purchase_order, :procurement, :klass, :foreign_keys, :duplicate_po, :original_purchase_order
 
   def init
     id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by(id: id)
     self.procurement = self.purchase_order.procurement
+    self.original_purchase_order = self.procurement.purchase_order
     self.klass = PurchaseOrder.reflect_on_all_associations(:has_many).map(&:name)
     self.klass.delete(:dlrms)
     self.klass.delete(:trails)
@@ -68,6 +69,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.duplicate_po.process_line_item_calculation
 
     if self.duplicate_po.save
+      self.original_purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
       self.purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision)
       self.duplicate_po.trails.create action_user: user, action_id: TrailAction.id_for(:create)
     else
