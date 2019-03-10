@@ -25,6 +25,14 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       accepted = item[:accepted] || 0
       rejected = item[:rejected] || 0
 
+      po_items = self.inward_document.items.find_by(id: item[:id])
+
+      if delivered.to_f > po_items.quantity.to_f
+        add_message :error, "Now Delivering cannot be more than the Requested Quantity"
+        break
+      end
+
+
       unless delivered.to_f == accepted.to_f + rejected.to_f
         add_message :error, "Accepted & Rejected quantity does't match with delivered quantity"
         break

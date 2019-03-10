@@ -6,7 +6,7 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
-                :vendor, :bank_account
+                :vendor, :procurement, :bank_account
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -18,6 +18,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     if purchase_order_params[:bank_account_id]
       self.bank_account = self.purchase_order.vendor.bank_accounts.find_by(id: purchase_order_params[:bank_account_id])
     end
+    self.procurement = self.purchase_order.procurement
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
     purchase_order_params.delete(:document_reviewer_mappings)
 
@@ -37,10 +38,18 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, 'Purchase Order not found'
     end
 
+    if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
+      add_message :error, 'Revision for this purchase order found. Original purchase order can no longer be modified. Check trails.'
+    end
+
     unless self.purchase_order_params[:policy_id].present?
       if self.purchase_order.policy.blank?
         add_message :error, 'Policy cannot be blank'
       end
+    end
+
+    unless self.purchase_order.procurement.invoices.blank? && self.purchase_order.procurement.inward_documents.blank?
+      add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
     end
 
     # advance amount needs 2 attributes

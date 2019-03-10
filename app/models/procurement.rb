@@ -32,6 +32,7 @@ class Procurement < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
   has_one :purchase_order, dependent: :destroy
+  has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy
   has_many :bill_of_supplies, dependent: :destroy
@@ -435,7 +436,7 @@ class Procurement < ApplicationRecord
 
     data.sort_by!{ |doc| doc.created_at}.reverse!
   end
-
+  
   def attached_documents
     attachments = []
     if self.purchase_order.present?

@@ -34,6 +34,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
     # self.advance_amount = params[:advance_amount] || 999
+
     # self.receiving_account = user.company.bank_accounts.find_by(id: params[:receiving_account_id])
 
   end
@@ -92,6 +93,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
       unless self.payment.save
         add_message :error, self.payment.errors.full_messages
       end
+
 
     end
 

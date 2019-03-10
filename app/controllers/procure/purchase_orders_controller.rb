@@ -77,6 +77,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def mark_send_to_vendor
+    @result = Procurements::PurchaseOrders::MarkSendToVendor.(current_user, params)
+    @respond
+  end
+
   def export_items
     @result = Procurements::PurchaseOrders::ExportItems.(current_user, params)
     respond
@@ -87,6 +92,13 @@ class Procure::PurchaseOrdersController < ApplicationController
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     @purchase_order = @result.purchase_order
     @company = @purchase_order.company
+
+    if params[:origin] == 'download_action'
+      @purchase_order.trails.create action_user: current_user,
+                                     action_id: TrailAction.id_for(:downloaded),
+                                     action_level: @purchase_order.trails.last.action_level
+    end
+    
     respond_to do |format|
       format.pdf {
           render pdf: "PO-#{@result.purchase_order.po_number}",
@@ -132,6 +144,11 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def po_with_advance
     @result = Procurements::PurchaseOrders::PoWithAdvance.(current_user, params)
+    respond
+  end
+
+  def create_po_revisions
+    @result = Procurements::PurchaseOrders::CreatePoRevisions.(current_user, params)
     respond
   end
 
