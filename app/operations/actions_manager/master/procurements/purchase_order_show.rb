@@ -15,7 +15,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def mark_send_to_vendor
-    # binding.pry
+
     (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
   end
 

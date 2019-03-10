@@ -72,7 +72,6 @@ class Procurements::Index < Procurements::Base
     end
 
     self.procurements = user.company.procurements.with_ids(procurement_ids.uniq)
-    # binding.pry
 
   end
 
@@ -113,7 +112,7 @@ class Procurements::Index < Procurements::Base
       per_page = params[:per_page] || 30
       self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).include_details
       self.count = self.procurements.count
-      # binding.pry
+
     end
 
     def apply_filter

@@ -10,7 +10,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
       add_message :error, result.messages[:error]
       return
     end
-    # binding.pry
+
     self.inward_document = result.inward_document
   end
 

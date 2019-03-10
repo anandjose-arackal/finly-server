@@ -98,29 +98,3 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
   end
 
 end
-
-
-# klass.each_with_index do |k, kid| 
-#   obj = po.send(k)
-
-#   if obj.present?
-#     binding.pry
-#     testpo.send("#{k}=", self.purchase_order.send(k))
-#   end
-
-#   # if obj.present?
-#   #   obj.each_with_index do |o, index|
-#   #     # binding.pry
-#   #     puts o.id
-#   #     puts o.send(foreign_keys[kid])
-#   #     puts "next"
-#   #   end
-#   # end
-# end
-
-# duplicate_po.save!
-
-
-
-
-

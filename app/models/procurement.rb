@@ -84,8 +84,6 @@ class Procurement < ApplicationRecord
 
   scope :filter_delivery_date, -> (delivery_date) {
     date = Date.parse(delivery_date) rescue nil
-    puts "DATE=======0", date
-    # binding.pry
 
     if date
       filtered_ids = InwardDocument.filter_delivery_date(date).pluck(:procurement_id)
