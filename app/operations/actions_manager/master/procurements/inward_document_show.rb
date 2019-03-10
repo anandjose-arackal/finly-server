@@ -1,21 +1,28 @@
 class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager::Master::Base
 
   register_handle :proc_inward_document_show
-  register_actions [:update_document]
+  register_actions [:update_document, :editable]
+
+  def initialize(user=nil, params={})
+    super
+    result = ::Procurements::InwardDocuments::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+    # binding.pry
+    self.inward_document = result.inward_document
+  end
 
 
   def update_document
     true
   end
 
-  # def initializing(user=nil, params={})
-  #   result = ::Procurements::Invoices::Show.(user, params)
-  #   unless result.success?
-  #     add_message :error, result.messages[:error]
-  #     return
-  #   end
-  #   self.invoice = result.invoice
-  # end
+  def editable
+    e = inward_document.items.map {|i| i.quantity >= i.accepted}
+    e.include? true
+  end
 
   # # alias_method :invoice, :input
 

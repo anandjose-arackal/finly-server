@@ -43,6 +43,31 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     unless self.purchase_order.procurement.invoices.blank? && self.purchase_order.procurement.inward_documents.blank?
       add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
     end
+
+    # advance amount needs 2 attributes
+    unless self.purchase_order_params[:advance_amount_attributes].blank?  && self.purchase_order_params[:advance_amount_attributes][:value].blank? && self.bank_account.blank?
+      valid = true
+      Rails.logger.fatal purchase_order_params.inspect
+      Rails.logger.fatal params.inspect
+      if self.purchase_order_params[:advance_amount_attributes][:value].blank? || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
+        add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
+        valid = false
+
+      elsif self.purchase_order_params[:due_date].blank?
+        add_message :error, 'Bro add the due date for the advance bro.'
+        valid = false
+
+      elsif self.bank_account.blank?
+        add_message :error, 'Please select the bank account of the vendor.'
+        valid = false
+
+      end
+
+      if valid && purchase_order.advance_amount_status_empty
+        purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+      end
+    end
+
   end
 
   def pre_process
