@@ -163,8 +163,8 @@ class UserSessions::Create < BaseOperation
       return
     end
 
-    args[:user_ip] = result.ip
-    unless result.ip.valid? and UserIpStatus.ids_for(:unverified, :verified).include?(result.ip.status_id)
+    args[:user_ip_id] = result.ip.id
+    unless result.ip.valid?
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.device.message
       add_message :error, result.device.message

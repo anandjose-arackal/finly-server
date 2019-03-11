@@ -49,7 +49,7 @@ class UserSession < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :access_token, class_name: 'Doorkeeper::AccessToken', optional: true
   belongs_to :status, class_name: 'UserSessionStatus'
-  belongs_to :user_ip
+  belongs_to :user_ip, optional: true
 
   has_many :events, class_name: 'UserSessionEvent', dependent: :destroy
   belongs_to :user_device, optional: true

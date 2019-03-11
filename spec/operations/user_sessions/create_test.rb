@@ -15,13 +15,9 @@ class UserSessionCreateHelper
 
         @username = @user1.email
 
-        allow(RequestStoreUtil).to receive(:current_request).and_return(
-            double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post'})
-        )
-
-        allow(UserDevices::FindOrCreate).to receive(:call).and_return(
-            double({device: @device, success?: true})
-        )
+        allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post'}))
+        allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({device: @device, success?: true}))
+        allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
 
         response = double({token: @token})
 
@@ -44,14 +40,10 @@ class UserSessionCreateHelper
 
         @username = @user1.email
 
-        allow(RequestStoreUtil).to receive(:current_request).and_return(
-            double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post'})
-        )
+        allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post'}))
         @message = 'Failed reason goes here'
-
-        allow(UserDevices::FindOrCreate).to receive(:call).and_return(
-            double({device: @device, success?: true})
-        )
+        allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({device: @device, success?: true}))
+        allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
 
         response = double({token: @token})
 
@@ -81,11 +73,7 @@ class UserSessionCreateHelper
       expect(@result.event.message).to eq(@message)
       expect(@result.event.response_code).to be_nil
     end
-
-    instance.it 'should associated the respective UserDevice' do
-      expect(@result.session.user_device).to eq(@device)
-    end
-
+    
     instance.it 'should set the correct DateTime' do
       expect(@result.session.started_at).to_not be_nil
       expect(@result.session.last_request_at).to_not be_nil
@@ -110,6 +98,14 @@ class UserSessionCreateHelper
       expect(@result.session.company).to eq(@company)
       expect(@result.session.username).to eq(@username)
     end
+
+    instance.it 'should set the UserSession IP to request IP' do
+      expect(@result.session.user_ip_id).to eq(@ip_addr.id)
+    end
+
+    instance.it 'should have UserDevice be set' do
+      expect(@result.session.user_device_id).to eq(@device.id)
+    end
   end
 
   def self.user_absence_check(instance)
@@ -117,6 +113,14 @@ class UserSessionCreateHelper
       expect(@result.session.user).to be_nil
       expect(@result.session.company).to be_nil
       expect(@result.session.username).to eq(@username)
+    end
+
+    instance.it 'should have UserSession IP nil' do
+      expect(@result.session.user_ip_id).to be_nil
+    end
+
+    instance.it 'should have UserDevice as nil' do
+      expect(@result.session.user_device_id).to be_nil
     end
   end
 end
@@ -131,7 +135,8 @@ RSpec.describe 'UserSessions::Create' do
       @user2 = create :em_user, company: @company
       @user_device_browser = create :user_device_browser
       @device = create :user_device, client: @user_device_browser, company: @company, user: @user1
-      @ip = random_ip
+      @ip = '106.51.25.1'
+      @ip_addr = create :user_ip, ip: @ip, user_id: @user1.id
       @referer = 'https://www.google.com'
       @original_url = 'https://www.finly.io/oauth/login'
     end
