@@ -472,4 +472,30 @@ class PurchaseOrder < ApplicationRecord
   def self.finance_associated_status_ids
     PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
   end
+
+  def self.roles
+    {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer'}
+  end
+
+  def self.role_based_associated_status_ids(user)
+    # self.status_ids(self.role_based_statuses(user))
+    PurchaseOrderStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:purchase_order_initiator) == role_id.to_i)
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed]
+        elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
+          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :closed, :voided]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
 end

@@ -6,6 +6,13 @@ class Procurements::Show < Procurements::Base
     self.procurement = user.company.procurements.find_by id: id
   end
 
+  def validate
+    if procurement.blank?
+      add_message :error, 'Record not found'
+      return
+    end
+  end
+
   def process
   end
 

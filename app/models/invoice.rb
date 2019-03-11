@@ -576,4 +576,28 @@ class Invoice < ApplicationRecord
     InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
   end
 
+  def self.role_based_associated_status_ids(user)
+    self.status_ids(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:invoice_initiator) == role_id.to_i)
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        elsif (UserRole.id_for(:invoice_reviewer) == role_id.to_i)
+          statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.roles
+    {'1'=> 'admin', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer'}
+  end
+
 end

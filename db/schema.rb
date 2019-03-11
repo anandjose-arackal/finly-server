@@ -132,7 +132,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
-  create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "advance_amount_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -459,7 +459,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["user_id"], name: "index_balance_sheets_on_user_id"
   end
 
-  create_table "balance_tally_ledgers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "balance_tally_ledgers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.date "date"
     t.integer "api_balance_id"
     t.integer "finly_database_balance_id"
@@ -613,13 +613,13 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "beneficiary_payment_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "beneficiary_payments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.integer "vendor_id"
     t.integer "bank_account_id"
@@ -973,7 +973,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["budget_id"], name: "index_budget_modification_trails_on_budget_id"
   end
 
-  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
@@ -991,7 +991,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["category_id"], name: "index_budget_rule_category_mappings_on_category_id"
   end
 
-  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "department_id", null: false
     t.datetime "created_at", null: false
@@ -1000,7 +1000,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["department_id"], name: "index_budget_rule_department_mappings_on_department_id"
   end
 
-  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "expense_type_id", null: false
     t.datetime "created_at", null: false
@@ -2823,30 +2823,6 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["user_id"], name: "index_individual_kycs_on_user_id"
   end
 
-  create_table "inventory_line_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
-    t.decimal "tax", precision: 20, scale: 10
-    t.decimal "discount", precision: 20, scale: 10
-    t.string "hsn_sac"
-    t.integer "company_id"
-    t.string "sku"
-    t.decimal "rate", precision: 20, scale: 10
-    t.text "description"
-    t.integer "category_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "note"
-    t.integer "tax_rate_id"
-    t.boolean "is_deleted", default: false, null: false
-    t.string "item_code"
-    t.string "account"
-    t.integer "supply_item_type_id"
-    t.datetime "deleted_at"
-    t.index ["category_id"], name: "index_inventory_line_items_on_category_id"
-    t.index ["company_id"], name: "index_inventory_line_items_on_company_id"
-    t.index ["supply_item_type_id"], name: "index_inventory_line_items_on_supply_item_type_id"
-    t.index ["tax_rate_id"], name: "index_inventory_line_items_on_tax_rate_id"
-  end
-
   create_table "invoice_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "attached_file_file_name"
     t.string "attached_file_content_type"
@@ -3193,7 +3169,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
 
-  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "level_id"
     t.integer "user_id"
     t.integer "reviewer_id"
@@ -5287,7 +5263,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
-  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
@@ -6064,10 +6040,6 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
-  add_foreign_key "inventory_line_items", "categories"
-  add_foreign_key "inventory_line_items", "companies"
-  add_foreign_key "inventory_line_items", "supply_item_types"
-  add_foreign_key "inventory_line_items", "tax_rates"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"
@@ -6075,7 +6047,6 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
   add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
   add_foreign_key "invoices", "payment_terms"
-  add_foreign_key "inward_document_items", "inventory_line_items"
   add_foreign_key "inward_document_items", "inward_documents"
   add_foreign_key "inward_document_items", "items", column: "inventory_line_item_id"
   add_foreign_key "inward_document_items", "purchase_order_items"

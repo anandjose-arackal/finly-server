@@ -2,7 +2,11 @@ class Procure::ProcurementsController < ApplicationController
   before_action -> { finly_authorize! :web }
 
   def index
-    @result = Procurements::Index.(current_user, params)
+    if params['filter_procurement_type'] == 'purchase_order'
+      @result = Procurements::Index.(current_user,params)
+    elsif params['filter_procurement_type'] == 'non_po_invoice'
+      @result = Procurements::NonPoIndex.(current_user,params)
+    end
     respond
   end
 

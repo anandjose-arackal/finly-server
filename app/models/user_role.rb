@@ -44,7 +44,7 @@ class UserRole < ApplicationRecord
       bank_payment_request_creditor:19,
       item_master_manager: 20,
       inventory_manager: 21,
-      vendor_manager: 22,
+      vendor_creator: 22,
       vendor_reviewer: 23,
       policy_admin: 24
   }
@@ -82,7 +82,7 @@ class UserRole < ApplicationRecord
       bank_payment_request_creditor:19,
       item_master_manager: 20,
       inventory_manager: 21,
-      vendor_manager: 22,
+      vendor_creator: 22,
       vendor_reviewer: 23,
       policy_admin: 24
   }

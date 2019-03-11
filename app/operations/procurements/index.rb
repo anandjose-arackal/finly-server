@@ -6,72 +6,77 @@ class Procurements::Index < Procurements::Base
   end
 
   def process
-    # Find trail user for invoice
-
-    procurement_ids = []
-
-    # Find procurement from invoice trails
-    invoice_trails = Trail.with_action_user_id(user.id).with_parent_type('Invoice')
-    procurement_ids += user.company.inward_invoices.with_id(invoice_trails.pluck(:parent_id)).pluck(:procurement_id).uniq
-
-
-    # Find procurement from purchase order trails
-    purchase_order_trails = Trail.with_action_user_id(user.id).with_parent_type('PurchaseOrder')
-    procurement_ids += user.company.purchase_orders.with_id(purchase_order_trails.pluck(:parent_id)).pluck(:procurement_id).uniq
-
-
-    # Find own procurements
-    if user.vendor_payments_initiator?
-      procurement_ids += user.company.purchase_orders.with_user_id(user.id).pluck(:procurement_id)
-      procurement_ids += user.company.inward_invoices.with_procurement.with_created_by_user_id(user.id).pluck(:procurement_id)
+    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
+      self.procurements = user.company.procurements.with_ids(::PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles)&.pluck(:procurement_id)&.uniq)
+    else
+      self.procurements = user.procurements
     end
+    # # Find trail user for invoice
 
-    # If reviewer or awaiting reviewal
-    if user.vendor_payments_reviewer?
-      #todo lrm
-      level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+    # procurement_ids = []
 
-      # policies = user.company.policies.with_application(:vp)
-      # policies.each do |policy|
-      #   levels = policy.levels
-      #   levels.each do |level|
-      #     if level.reviewers.pluck(:id).include? user.id
-      #       level_ids.push(level.id)
-      #     end
-      #   end
-      # end
+    # # Find procurement from invoice trails
+    # invoice_trails = Trail.with_action_user_id(user.id).with_parent_type('Invoice')
+    # procurement_ids += user.company.inward_invoices.with_id(invoice_trails.pluck(:parent_id)).pluck(:procurement_id).uniq
 
-      # For PO
-      # procurement_ids.push(user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:procurement_id))
-      purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
-      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
-      other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
-      purchase_order_ids -= other_reviewer_po_ids
-      procurement_ids += user.company.purchase_orders.with_id(purchase_order_ids).pluck(:procurement_id)
 
-      # For Invoice
-      # procurement_ids.push(user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:procurement_id))
+    # # Find procurement from purchase order trails
+    # purchase_order_trails = Trail.with_action_user_id(user.id).with_parent_type('PurchaseOrder')
+    # procurement_ids += user.company.purchase_orders.with_id(purchase_order_trails.pluck(:parent_id)).pluck(:procurement_id).uniq
 
-      invoice_ids = user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:id)
-      # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
-      other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
-      invoice_ids -= other_reviewer_invoice_ids
-      procurement_ids += user.company.inward_invoices.with_id(invoice_ids).pluck(:procurement_id)
-    end
+
+    # # Find own procurements
+    # if user.vendor_payments_initiator?
+    #   procurement_ids += user.company.purchase_orders.with_user_id(user.id).pluck(:procurement_id)
+    #   procurement_ids += user.company.inward_invoices.with_procurement.with_created_by_user_id(user.id).pluck(:procurement_id)
+    # end
+
+    # # If reviewer or awaiting reviewal
+    # if user.vendor_payments_reviewer?
+    #   #todo lrm
+    #   level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+
+    #   # policies = user.company.policies.with_application(:vp)
+    #   # policies.each do |policy|
+    #   #   levels = policy.levels
+    #   #   levels.each do |level|
+    #   #     if level.reviewers.pluck(:id).include? user.id
+    #   #       level_ids.push(level.id)
+    #   #     end
+    #   #   end
+    #   # end
+
+    #   # For PO
+    #   # procurement_ids.push(user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:procurement_id))
+    #   purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
+    #   # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+    #   other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
+    #   purchase_order_ids -= other_reviewer_po_ids
+    #   procurement_ids += user.company.purchase_orders.with_id(purchase_order_ids).pluck(:procurement_id)
+
+    #   # For Invoice
+    #   # procurement_ids.push(user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:procurement_id))
+
+    #   invoice_ids = user.company.inward_invoices.with_controlling_level_ids(level_ids).pluck(:id)
+    #   # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
+    #   other_reviewer_invoice_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('Invoice').pluck(:document_reviewer_mappable_id)
+    #   invoice_ids -= other_reviewer_invoice_ids
+    #   procurement_ids += user.company.inward_invoices.with_id(invoice_ids).pluck(:procurement_id)
+    # end
 
     # If creditor: find approved, unpaid, partially paid, paid invoices and their procurements
-    if user.vendor_payment_creditor?
-      invoice_status_ids = [InwardInvoiceStatus.id_for(:approved), InwardInvoiceStatus.id_for(:unpaid), InwardInvoiceStatus.id_for(:partially_paid), InwardInvoiceStatus.id_for(:paid)]
-      procurement_ids += user.company.inward_invoices.with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)
-    end
+    # if user.vendor_payment_creditor?
+    #   invoice_status_ids = [InwardInvoiceStatus.id_for(:approved), InwardInvoiceStatus.id_for(:unpaid), InwardInvoiceStatus.id_for(:partially_paid), InwardInvoiceStatus.id_for(:paid)]
+    #   procurement_ids += user.company.inward_invoices.with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)
+    # end
 
-    # If admin, select all procurements
-    if user.vendor_payment_admin?
-      procurement_ids += user.company.purchase_orders.pluck(:procurement_id)
-      procurement_ids += user.company.inward_invoices.with_type_non_po_invoice.pluck(:procurement_id)
-    end
+    # # If admin, select all procurements
+    # if user.vendor_payment_admin?
+    #   procurement_ids += user.company.purchase_orders.pluck(:procurement_id)
+    #   procurement_ids += user.company.inward_invoices.with_type_non_po_invoice.pluck(:procurement_id)
+    # end
 
-    self.procurements = user.company.procurements.with_ids(procurement_ids.uniq)
+    # self.procurements = user.company.procurements.with_ids(procurement_ids.uniq)
 
   end
 

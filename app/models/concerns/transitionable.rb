@@ -341,6 +341,35 @@ module Transitionable
 
       User.with_id(user_ids)
     end
+
+    def validate_if_owner(user)
+      self.document_owner_id == user.id
+    end
+
+    def validate_if_admin(user)
+      if self.policy.present?
+        self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:admin)).pluck(:user_id).include?(user.id)
+      end
+    end
+    
+    def validate_if_reviewer(user)
+      if self.policy.present?
+        if self.document_level_reviewer_mappings.present?
+          self.document_level_reviewer_mappings.pluck(:reviewer_id).include?(user.id)
+        end
+      end
+    end
+
+    def validate_if_creditor(user)
+      if self.policy.present?
+        if self.approved? || self.auto_approved?
+          if self.policy.policy_user_roles.present?
+            self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor)).pluck(:user_id).include?(user.id)
+          end
+        end
+      end
+    end
+
   end
 
   module ClassMethods
@@ -499,7 +528,7 @@ module Transitionable
       policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq rescue nil
       unless policy_ids.blank?
         self.where(policy_id: policy_ids)
-            .where("#{self.document_status_attribute} in (?)", role_based_associated_status_ids(user))
+            .where("#{self.document_status_attribute} in (?)", self.role_based_associated_status_ids(user))
       end
     end
 
@@ -514,9 +543,9 @@ module Transitionable
         when :purchase_request_reviewer, 'purchase_request_reviewer'
           data = []
         when :purchase_order_initiator, 'purchase_order_initiator'
-          data = []
+          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
         when :purchase_order_reviewer, 'purchase_order_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id, options={})
+          data = role_based_reviewer_associated_items(user, role_id)
         when :goods_receiver, 'goods_receiver'
           data = []
         when :invoice_initiator, 'invoice_initiator'
@@ -533,10 +562,10 @@ module Transitionable
           data = role_based_manager_associated_items(user, role_id)
         when :inventory_manager, 'inventory_manager'
           data = []
-        when :vendor_manager, 'vendor_manager'
+        when :vendor_creator, 'vendor_creator'
           data = []
         when :vendor_reviewer, 'vendor_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id, options={})
+          data = role_based_reviewer_associated_items(user, role_id, options)
         when :policy_admin, 'policy_admin'
           data = []
         else
@@ -579,7 +608,7 @@ module Transitionable
                                                         taken_control_by_id: user.id
         ).pluck(:document_reviewer_mappable_id)
 
-        self.status_based_associated_items.where(id: document_ids, policy_id: policy_ids)
+        self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
     end
 
     def role_based_creditor_associated_items(user, role_id, options={})
@@ -597,19 +626,19 @@ module Transitionable
       end
     end
 
-    def associated_items(user)
-      payment_requests = nil
+    def associated_items(user, resource_roles)
+      data = nil
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         puts "#{role_id}"
-        if !BankPaymentRequest.role_based_associated_items(user, role_id, options={}).blank?
-          if payment_requests.blank?
-            payment_requests = BankPaymentRequest.role_based_associated_items(user, role_id)
+        if !self.role_based_associated_items(user, role_id).blank? && !resource_roles.fetch(role_id.to_s, nil).blank?
+          if data.blank?
+            data = self.role_based_associated_items(user, role_id)
           else
-            payment_requests = payment_requests.or(BankPaymentRequest.role_based_associated_items(user, role_id))
+            data = data.or(self.role_based_associated_items(user, role_id))
           end
         end
       end
-      return payment_requests
+      return data
     end
   end
 end

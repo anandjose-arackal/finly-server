@@ -1035,7 +1035,7 @@ class User < ApplicationRecord
     #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
     #   when :inventory_manager, 'inventory_manager'
     #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
-    #   when :vendor_manager, 'vendor_manager'
+    #   when :vendor_creator, 'vendor_creator'
     #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
     #   when :vendor_reviewer, 'vendor_reviewer'
     #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)

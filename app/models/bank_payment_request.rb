@@ -378,7 +378,7 @@ class BankPaymentRequest < ApplicationRecord
 
   
   def self.role_based_associated_status_ids(user)
-    self.status_ids(self.role_based_statuses(user))
+    BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
   end
 
   def self.role_based_statuses(user)
@@ -397,5 +397,9 @@ class BankPaymentRequest < ApplicationRecord
       end
     end
     return statuses.uniq
+  end
+
+  def self.roles
+    {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
   end
 end
