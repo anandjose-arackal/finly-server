@@ -13,7 +13,6 @@ RSpec.describe 'UserIps::FindOrCreate' do
 
   describe '> Correct Params' do
     describe '> New IP' do
-
       before(:all) do
         RSpec::Mocks.with_temporary_scope do
           @before_ip_count = UserIp.count
