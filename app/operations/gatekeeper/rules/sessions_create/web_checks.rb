@@ -6,7 +6,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
   premise :after_session_create do
     # todo un-skip once frontend is implemented
-    xsection 'X-Finly-RP' do
+    section 'X-Finly-RP' do
       # Web specific checks
       rule 'X-Finly-RP is required for all web requests' do
         headers = RequestStoreUtil.current_request.headers
