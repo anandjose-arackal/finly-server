@@ -3104,6 +3104,7 @@ Rails.application.routes.draw do
   get 'non_po_action_config', to: 'procure/purchase_orders#actions_configuration'
   get 'procurement_action_config',to: 'procure/procurements#actions_configuration'
   get 'vp_user_action_config', to: 'bank_transfer/users#actions_configuration'
+  get 'policy_user_role_config', to: 'policy_user_roles#vp_role_config'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'
