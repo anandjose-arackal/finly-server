@@ -101,7 +101,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     if self.purchase_order_params[:advance_amount_attributes][:value].present?
       purchase_order_params[:advance_amount_attributes][:id] = self.purchase_order&.advance_amount&.id
-      purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+      # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
     else
       self.purchase_order_params[:advance_amount_attributes][:value] = self.purchase_order&.advance_amount&.value
     end

@@ -34,6 +34,13 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       add_message :error, op.messages[:error]
       return
     end
+
+    if purchase_order.advance_amount&.present?
+      if purchase_order.advance_amount.value > 0
+        purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:to_be_processed)
+      end
+    end
+
     if purchase_order.approved? || purchase_order.auto_approved?
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))

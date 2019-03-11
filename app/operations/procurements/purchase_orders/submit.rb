@@ -55,6 +55,12 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       return
     end
 
+    if purchase_order.advance_amount&.present?
+      if purchase_order.advance_amount.value > 0
+        purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:po_processing)
+      end
+    end
+
     if purchase_order.auto_approved?
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
