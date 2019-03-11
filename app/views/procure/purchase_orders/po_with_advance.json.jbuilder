@@ -5,6 +5,7 @@ json.results do
     #   json.account_number purchase_order.receiving_account.account_number
     #   json.ifsc purchase_order.receiving_account.ifsc
     # end
+    json.created_by purchase_order.user.name || ""
     json.po_due_date purchase_order.due_date.strftime("%d-%m-%Y")
     json.po_created_at purchase_order.created_at.strftime("%d-%m-%Y")
     # json.po_advance_amount_value purchase_order.advance_amount.value
