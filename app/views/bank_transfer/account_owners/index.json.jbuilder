@@ -3,8 +3,10 @@ json.results do
     json.extract! account_owner, :id, :name, :email, :mobile_number
 
     if account_owner.is_a?(YesBankVendor)
-      display_name = account_owner.business_name || account_owner.name
-      json.display_name display_name
+      # display_name = account_owner.business_name || account_owner.name
+      # json.display_name display_name
+      json.display_name account_owner.name rescue nil
+      json.business_name account_owner.business_name rescue nil
       json.vendor_id account_owner.vendor_id
       json.description account_owner.description
       json.beneficiary_type 2

@@ -73,7 +73,6 @@ Rails.application.configure do
   #   end
   #   hash.as_json
   # end
-
   # config.action_mailer.default_url_options = { host: "localhost" }
   # config.action_mailer.delivery_method = :smtp
   # config.action_mailer.smtp_settings = {
@@ -85,6 +84,7 @@ Rails.application.configure do
   #     # ssl:                  true,
   #     # tls:                  true,
   #     authentication:       :plain,
+
   #     enable_starttls_auto: true,
   #     :openssl_verify_mode  => 'none'
   # }

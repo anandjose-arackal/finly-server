@@ -2215,7 +2215,7 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
-  mount_griddler('/email/incoming')
+  # mount_griddler('/email/incoming')
   # mount_opro_oauth controllers: {
   #     oauth_new: 'oauth/auth',
   #     oauth_token: 'oauth/token'
@@ -3104,6 +3104,7 @@ Rails.application.routes.draw do
   get 'non_po_action_config', to: 'procure/purchase_orders#actions_configuration'
   get 'procurement_action_config',to: 'procure/procurements#actions_configuration'
   get 'vp_user_action_config', to: 'bank_transfer/users#actions_configuration'
+  get 'policy_user_role_config', to: 'policy_user_roles#vp_role_config'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'
@@ -3112,6 +3113,7 @@ Rails.application.routes.draw do
     end
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
+    post 'payment_requests', to: 'bank_payment_requests#create'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'
     post 'payment_requests/process_account_ids', to: 'bank_payment_requests#process_account_ids'
     patch 'payment_requests/update_details', to: 'bank_payment_requests#update_details'
@@ -3121,7 +3123,14 @@ Rails.application.routes.draw do
     patch 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
-    # patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
+    patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
+
+    post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
+    post 'unified_payment_ticket' => 'bank_payment_requests#unified_payment_ticket', as: :unified_payment_ticket
+
+    post 'create_invoice_ticket', to: 'bank_payment_requests#create_invoice_ticket', as: :create_invoice_ticket
+
+    get 'configuration_data', to: 'bank_payment_requests#configuration_data', as: :configuration_data
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
     get 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
     post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
@@ -3265,7 +3274,10 @@ Rails.application.routes.draw do
     get 'inventory_item_config', to: 'inventory_line_items#inventory_item_config', as: :inventory_item_config
     put 'inventory_line_items/import', to: 'inventory_line_items#import', as: :inventory_line_items_import
     get 'inventory_line_items/import_template', to: 'inventory_line_items#import_template', as: :inventory_line_items_import_template
-    resources :inventory_line_items
+    resources :inventory_line_items do 
+      put 'upload_attachments', to: 'inventory_line_items#upload_attachments'
+      put 'destroy_attachments', to: 'inventory_line_items#destroy_attachments'
+    end
     resources :payment_terms
     resources :reminders
     patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds
@@ -3344,7 +3356,11 @@ Rails.application.routes.draw do
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
+
     end
+    get 'po_advances', to: 'purchase_orders#po_advances', as: :po_advances
+    post 'po_advance_ticket', to: 'purchase_orders#po_advance_ticket', as: :po_advance_ticket
+    get 'po_with_advance', to: 'purchase_orders#po_with_advance', as: :po_with_advance
 
     resources :inward_documents do
 
@@ -3417,9 +3433,19 @@ Rails.application.routes.draw do
   ######## Dashbaord Ends ##############
 
 
+  ######### Rate Contract API start #############
+  resources :rate_contracts do
+    collection do
+      get 'configuration', to: 'rate_contracts#configuration'
+    end
+  end
+  ######### Rate Contract API end ################
 
-
-
+  ########### Rate Contract Line Item API start #############
+  resources :rate_contract_line_items do
+    put 'import', to: 'rate_contract_line_items#import'
+  end
+  ########### Rate Contract Line Item API end ###############
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

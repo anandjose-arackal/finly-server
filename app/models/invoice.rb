@@ -75,7 +75,7 @@
 #              2 - CGST + SGST
 
 class Invoice < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable
+  include SoftDeletable, Templatable, Transitionable, MathUtil
 
   include Sequenced::ActsAsSequenced
 
@@ -259,6 +259,66 @@ class Invoice < ApplicationRecord
     where invoice_type_id: InwardInvoiceType.id_for(invoice_type)
   }
 
+  scope :filter_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
+  }
+
+  scope :filter_non_po_invoice, -> {
+    where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+  }
+
+  scope :filter_invoice_type, -> (type) {
+    case type
+    when 'po_invoice'
+      where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
+    when 'non_po_invoice'        
+      where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
+    else
+      return nil
+    end      
+  }
+
+  scope :filter_status, -> (status_name) {
+    all_statuses = InwardInvoiceStatus.all.pluck(:name)
+    if status_name.present? && all_statuses.include?(status_name)
+      where invoice_status_id: InwardInvoiceStatus.id_for(status_name)
+    end
+  }
+
+  scope :non_beneficiary, ->  {
+    where(invoice_type_id: [InwardInvoiceType.id_for(:tax_invoice),
+                            InwardInvoiceType.id_for(:advance),
+                            InwardInvoiceType.id_for(:non_po_invoice),
+                            nil])
+  }
+
+  scope :filter_by_created_at, -> (created_at) {
+    created_at = Date.parse(created_at).strftime('%Y-%m-%d')
+    # where created_at: created_at
+    where("DATE(created_at) >= ?", created_at)
+  }
+
+  scope :filter_vendor_id, -> (ids){
+    where vendor_id: ids
+  }
+
+  scope :filter_po_number, -> (po_number) {
+    # ipid = where(invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)).pluck(:procurement_id)
+    # poid = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
+
+    # procs = ipid & poid
+    poid = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
+
+    where(procurement_id: poid)
+
+  }
+
+  scope :include_for_index, -> {
+        includes( :amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab,
+           :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
+           :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount])#.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
+  }
+
   after_create :set_defaults
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
@@ -327,7 +387,26 @@ class Invoice < ApplicationRecord
 
   def item_amounts_total
     if self.invoice_items.present?
-      return self.invoice_items.joins(:amount).sum(:value)
+      # return self.invoice_items.joins(:amount).sum(:value)
+      return self.invoice_items.map {|p| p.amount.value}.sum
+    else
+      return 0
+    end
+  end
+
+  def payment_amounts_total
+    if self.payments.present?
+      # return self.payments.successful.joins(:amount).sum(:value)
+      return self.payments.successful.map {|p| p.amount.value}.sum
+    else
+      return 0
+    end
+  end
+
+  def item_quantity_total
+    if self.invoice_items.present?
+      # return self.invoice_items.sum(:quantity)
+      return self.invoice_items.map {|p| p.quantity}.sum
     else
       return 0
     end
@@ -385,6 +464,65 @@ class Invoice < ApplicationRecord
     self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
   end
 
+  def as_json
+    {
+      id: self.id,
+      advance: self.advance,
+      advance_amount: self.advance_amount&.value,
+      tax_amount: precision_value(self.tax_amount&.value),
+      tds_amount: precision_value(self.tds_amount&.value),
+      tax: precision_value(self.tax),
+      tds: precision_value(self.tds),      
+      gst_type_id: self.gst_type_id,
+      tax_type_id: self.tax_type_id,
+      tds_type_id: self.tds_type_id,
+      discount_amount: precision_value(self.discount_amount&.value),
+      discount: precision_value(self.discount),
+      date: self.date,
+      discount_type_id: self.discount_type_id,
+      due_date: self.due_date,
+      invoice_number: self.invoice_number,
+      inclusive_of_taxes: self.inclusive_of_taxes,
+      freight_amount: self.freight_amount&.value,
+      roundoff_amount: self.roundoff_amount,
+      net_payable_amount: self.balance_due&.value,
+      balance_due: self.balance_due&.value,
+      taxable_amount: precision_value(self.gross_amount&.value),
+      editable: self.unpaid?,
+      tax_rate: precision_value(self.tax_rate),
+      tds_rate: precision_value(self.tds_rate),
+      discount_rate: precision_value(self.discount_rate),
+      advance_rate: precision_value(self.advance_rate),
+      invoice_attachment: {
+        url: self.invoice_attachments.first&.attached_file&.url,
+        thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+        content_type: self.invoice_attachments.first&.attached_file&.content_type,
+        file_name: self.invoice_attachments.first&.attached_file&.original_filename
+      },
+      net_amount: precision_value(self.net_amount&.value),
+      gross_amount: precision_value(self.gross_amount&.value),
+      custom_fields: self.custom_fields,
+      category_id: self.category_id,
+      category_name: self.category&.name,
+
+      cost_center_id: self.cost_center_id,
+      cost_center_name: self.cost_center&.name,
+
+      tds_slab_id: self.tds_slab_id,
+      tds_slab_name: self.tds_slab&.name,
+      tds_rate: self.tds,
+
+      # invoice amounts total
+      item_amounts_total: self.item_amounts_total,
+
+      # paid amount for this invoice
+      # paid_amount: self.payments.successful.joins(:amount).sum(:value),
+      # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+      paid_amount: payment_amounts_total, 
+      remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total)
+    }
+  end
+
   private
 
   def set_defaults
@@ -436,6 +574,30 @@ class Invoice < ApplicationRecord
 
   def self.finance_associated_status_ids
     InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+  end
+
+  def self.role_based_associated_status_ids(user)
+    InwardInvoiceStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:invoice_initiator) == role_id.to_i)
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        elsif (UserRole.id_for(:invoice_reviewer) == role_id.to_i)
+          statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.roles
+    {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
   end
 
 end

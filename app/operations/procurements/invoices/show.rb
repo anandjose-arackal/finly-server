@@ -7,9 +7,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   end
 
   def validate
-    unless self.invoice.present?
-      add_message :error, 'Invoice not found'
-    end
+    return if record_not_present
+    validate_association
   end
 
   def success
@@ -173,7 +172,25 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       false
     end
-
-
   end
+
+  def validate_presence
+    if invoice.blank?
+      add_message :error, 'Record not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_association
+    # Validate of current user is owner of PO
+    return if invoice.validate_if_owner(user)
+    return if invoice.validate_if_admin(user)
+    return if invoice.validate_if_reviewer(user)
+  end
+
 end

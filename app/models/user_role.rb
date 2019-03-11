@@ -31,7 +31,22 @@ class UserRole < ApplicationRecord
       travel_manager: 6,
       purchaser: 7,
       receiver: 8,
-      creditor: 9
+      creditor: 9,
+      purchase_request_initiator: 10,
+      purchase_request_reviewer: 11,
+      purchase_order_initiator: 12,
+      purchase_order_reviewer: 13,
+      goods_receiver: 14,
+      invoice_initiator: 15,
+      invoice_reviewer: 16,
+      bank_payment_request_initiator: 17,
+      bank_payment_request_reviewer: 18,
+      bank_payment_request_creditor:19,
+      item_master_manager: 20,
+      inventory_manager: 21,
+      vendor_creator: 22,
+      vendor_reviewer: 23,
+      policy_admin: 24
   }
 
   VALUES_EM = {
@@ -54,7 +69,22 @@ class UserRole < ApplicationRecord
       travel_manager: 6,
       purchaser: 7,
       receiver: 8,
-      creditor: 9
+      creditor: 9,
+      purchase_request_initiator: 10,
+      purchase_request_reviewer: 11,
+      purchase_order_initiator: 12,
+      purchase_order_reviewer: 13,
+      goods_receiver: 14,
+      invoice_initiator: 15,
+      invoice_reviewer: 16,
+      bank_payment_request_initiator: 17,
+      bank_payment_request_reviewer: 18,
+      bank_payment_request_creditor:19,
+      item_master_manager: 20,
+      inventory_manager: 21,
+      vendor_creator: 22,
+      vendor_reviewer: 23,
+      policy_admin: 24
   }
 
   def self.seed_data

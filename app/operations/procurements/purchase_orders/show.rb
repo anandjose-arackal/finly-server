@@ -6,9 +6,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   def validate
-    unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not Found'
-    end
+    return if record_not_present
+    validate_association
   end
 
   def process
@@ -178,5 +177,24 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       false
     end
+  end
+
+  def validate_presence
+    if purchase_order.blank?
+      add_message :error, 'Record not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_association
+    # Validate of current user is owner of PO
+    return if purchase_order.validate_if_owner(user)
+    return if purchase_order.validate_if_admin(user)
+    return if purchase_order.validate_if_reviewer(user)
   end
 end

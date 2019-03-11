@@ -3,6 +3,7 @@ class Procurements::Create < Procurements::Base
 
   def init
     self.procurement_params = procurement_parameters
+    puts "PROCUREMENTS from init params", params.inspect
   end
 
   def validate

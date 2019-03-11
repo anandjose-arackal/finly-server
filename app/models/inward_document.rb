@@ -58,4 +58,9 @@ class InwardDocument < ApplicationRecord
         document_type: self.class.name
     }
   end
+
+  def self.roles
+    {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
+  end
+
 end

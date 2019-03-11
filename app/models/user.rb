@@ -213,6 +213,8 @@ class User < ApplicationRecord
   has_many :user_branch_location_mappings
   has_many :branch_locations, through: :user_branch_location_mappings
 
+  has_many :rate_contracts, foreign_key: :creator_id
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
@@ -967,6 +969,92 @@ class User < ApplicationRecord
   def current_user
     RequestStore.store[:current_user]
   end
+
+  def purchase_request_initiator_in_any_policy?
+    policy_user_role_for(UserRole.id_for(:purchase_request_initiator))
+  end
+
+  def purchase_order_initiator_in_any_policy?
+    policy_user_role_for(UserRole.id_for(:purchase_order_initiator))
+  end
+
+  def invoice_initiator_in_any_policy?
+    policy_user_role_for(UserRole.id_for(:invoice_initiator))
+  end
+
+  def bank_payment_request_initiator_in_any_policy?
+    policy_user_role_for(UserRole.id_for(:bank_payment_request_initiator))
+  end
+
+  def item_master_initiator_in_any_policy?
+    policy_user_role_for(UserRole.id_for(:item_master_initiator))
+  end
+
+  def inventory_creator_in_any_policy?
+    policy_user_role_for(UserRole.id_for(:inventory_creator))
+  end
+
+  def vendor_creator_in_any_policy?
+    policy_user_role_for(UserRole.id_for(:vendor_creator))
+  end
+
+  # Check if user is present with initiator role in any of the company policies
+  def policy_user_role_for(role_id=nil)
+    if role_id.present?
+      policy_user_role = self.company.policies.joins(:policy_user_roles).where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i) rescue nil
+    end
+    return policy_user_role.present?
+  end
+
+  # *********** resource specific roles start ************
+    # def has_role?(role_name, resource=nil)
+    #   role_id = UserRole.id_for(role_name.to_sym)
+    #   data = nil
+    #   case role_name
+    #   when :purchase_request_initiator, 'purchase_request_initiator'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   when :purchase_request_reviewer, 'purchase_request_reviewer'
+    #     data = resource.policy.policy_user_roles.find_by_role_id role_id
+    #   when :purchase_order_initiator, 'purchase_order_initiator'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   when :purchase_order_reviewer, 'purchase_order_reviewer'
+    #     data = resource.policy.policy_user_roles.find_by_role_id role_id
+    #   when :goods_receiver, 'goods_receiver'
+    #     data = resource.policy.policy_user_roles.find_by_role_id role_id
+    #   when :invoice_initiator, 'invoice_initiator'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   when :invoice_reviewer, 'invoice_reviewer'
+    #     data = resource.policy.policy_user_roles.find_by_role_id role_id
+    #   when :bank_payment_request_initiator, 'bank_payment_request_initiator'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   when :bank_payment_request_reviewer, 'bank_payment_request_reviewer'
+    #     data = resource.policy.policy_user_roles.find_by_role_id role_id
+    #   when :bank_payment_request_creditor, 'bank_payment_request_creditor'
+    #     data = resource.policy.policy_user_roles.find_by_role_id role_id
+    #   when :item_master_manager, 'item_master_manager'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   when :inventory_manager, 'inventory_manager'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   when :vendor_creator, 'vendor_creator'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   when :vendor_reviewer, 'vendor_reviewer'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   when :policy_admin, 'policy_admin'
+    #     data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+    #   end
+    #   data.present?
+    # end
+
+    def has_policy_role?(role_id, resource=nil)
+      # role_id = UserRole.id_for(role_name.to_sym)
+      if resource.present?
+        data = resource.policy.policy_user_roles.find_by_role_id role_id
+      else
+        data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+      end
+      data.present?
+    end
+  # *********** resource specific roles end **************
 
   private
 

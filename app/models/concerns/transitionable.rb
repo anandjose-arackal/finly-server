@@ -341,6 +341,35 @@ module Transitionable
 
       User.with_id(user_ids)
     end
+
+    def validate_if_owner(user)
+      self.document_owner_id == user.id
+    end
+
+    def validate_if_admin(user)
+      if self.policy.present?
+        self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:admin)).pluck(:user_id).include?(user.id)
+      end
+    end
+    
+    def validate_if_reviewer(user)
+      if self.policy.present?
+        if self.document_level_reviewer_mappings.present?
+          self.document_level_reviewer_mappings.pluck(:reviewer_id).include?(user.id)
+        end
+      end
+    end
+
+    def validate_if_creditor(user)
+      if self.policy.present?
+        if self.approved? || self.auto_approved?
+          if self.policy.policy_user_roles.present?
+            self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor)).pluck(:user_id).include?(user.id)
+          end
+        end
+      end
+    end
+
   end
 
   module ClassMethods
@@ -492,6 +521,124 @@ module Transitionable
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.travel_associated_status_ids)
       end
+    end
+
+    def status_based_associated_items(user, role_id, options={})
+      # Only those documents which contain policies with user in it
+      policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq rescue nil
+      unless policy_ids.blank?
+        self.where(policy_id: policy_ids)
+            .where("#{self.document_status_attribute} in (?)", self.role_based_associated_status_ids(user))
+      end
+    end
+
+    def role_based_associated_items(user, role_id, options={})
+      if user.has_policy_role?(role_id)
+        # role_id = UserRole.id_for(role_name.to_sym)
+        role_name = UserRole.find_by_id(role_id).name
+        data = nil
+        case role_name
+        when :purchase_request_initiator, 'purchase_request_initiator'
+          data = []
+        when :purchase_request_reviewer, 'purchase_request_reviewer'
+          data = []
+        when :purchase_order_initiator, 'purchase_order_initiator'
+          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+        when :purchase_order_reviewer, 'purchase_order_reviewer'
+          data = role_based_reviewer_associated_items(user, role_id)
+        when :goods_receiver, 'goods_receiver'
+          data = []
+        when :invoice_initiator, 'invoice_initiator'
+          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+        when :invoice_reviewer, 'invoice_reviewer'
+          data = role_based_reviewer_associated_items(user, role_id)
+        when :bank_payment_request_initiator, 'bank_payment_request_initiator'
+          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+        when :bank_payment_request_reviewer, 'bank_payment_request_reviewer'
+          data = role_based_reviewer_associated_items(user, role_id)
+        when :bank_payment_request_creditor, 'bank_payment_request_creditor'
+          data = role_based_creditor_associated_items(user, role_id)
+        when :item_master_manager, 'item_master_manager'
+          data = role_based_manager_associated_items(user, role_id)
+        when :inventory_manager, 'inventory_manager'
+          data = []
+        when :vendor_creator, 'vendor_creator'
+          data = []
+        when :vendor_reviewer, 'vendor_reviewer'
+          data = role_based_reviewer_associated_items(user, role_id, options)
+        when :policy_admin, 'policy_admin'
+          data = []
+        else
+          data = []
+        end
+        data
+      end
+    end
+
+    def role_based_reviewer_associated_items(user, role_id, options={})
+        policy_ids = user.policy_user_roles.where(role_id: role_id).pluck(:policy_id).uniq rescue nil
+        # Get controlling level id from all documents
+        if self.column_names.include? 'company_id'
+          controlling_level_ids = self.where(company_id: user.company.id).pluck(:controlling_level_id).flatten.compact
+        else
+          # Models like Report doesn't has company_id attribute
+          user_ids = user.company.users.pluck(:id)
+
+          controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:controlling_level_id).flatten.compact
+        end
+
+        # Get all the documents without viewable
+        document_ids = DocumentLevelReviewerMapping.where(
+                                                       reviewer_id: user.id,
+                                                       document_reviewer_mappable_type: self.name,
+                                                       level_id: controlling_level_ids
+        ).pluck(:document_reviewer_mappable_id)
+
+        # Get all the documents where the user had previously interacted with
+        document_ids += DocumentLevelReviewerMapping.where(
+            reviewer_id: user.id,
+            document_reviewer_mappable_type: self.name,
+            viewable: true,
+        ).pluck(:document_reviewer_mappable_id)
+
+        # Get all the taken control items for admin user
+        document_ids += DocumentLevelReviewerMapping.where(
+                                                        taken_control: true,
+                                                        document_reviewer_mappable_type: self.name,
+                                                        taken_control_by_id: user.id
+        ).pluck(:document_reviewer_mappable_id)
+
+        self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
+    end
+
+    def role_based_creditor_associated_items(user, role_id, options={})
+      policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq
+      if policy_ids.present?
+        self.where(policy_id: policy_ids)
+            .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
+      end
+    end
+
+    def role_based_manager_associated_items(user, role_id, options={})
+      policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq
+      if policy_ids.present?
+        self.where(policy_id: policy_ids)
+      end
+    end
+
+    def associated_items(user, resource_roles)
+      data = nil
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        puts "#{role_id}"
+        if !self.role_based_associated_items(user, role_id).blank? && !resource_roles.fetch(role_id.to_s, nil).blank?
+          if data.blank?
+            data = self.role_based_associated_items(user, role_id)
+          else
+            data = data.or(self.role_based_associated_items(user, role_id))
+          end
+        end
+      end
+      return data
     end
   end
 end
