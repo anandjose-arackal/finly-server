@@ -433,14 +433,11 @@ class PurchaseOrder < ApplicationRecord
       self.build_balance_amount(value: total_amount, currency_id: 1)
     end
 
-    if self.advance_amount.present?  && self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
-      self.balance_amount.value = total_amount - self.advance_amount.value
+    if self.advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+      # self.balance_amount.value = total_amount - self.advance_amount.value
     else
       self.advance_amount  = Amount.new(value: 0, currency_id: 1)
     end
-
-    # binding.pry
-
     # self.save
   end
 
