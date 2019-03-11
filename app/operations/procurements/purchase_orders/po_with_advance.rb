@@ -15,6 +15,8 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
     has_scope :filter_po_number
     has_scope :filter_vendor_id
     has_scope :filter_by_created_at
+    has_scope :filter_payable_advances
+    has_scope :filter_user_id
 
 
     def init
@@ -26,7 +28,7 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
   end
 
   def init
-    self.purchase_orders = user.company.purchase_orders.filter_payable_advances
+    self.purchase_orders = user.company.purchase_orders.filter_all_advances
   end
 
   def validate

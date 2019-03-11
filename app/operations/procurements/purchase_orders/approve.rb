@@ -35,17 +35,16 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       return
     end
 
-    if purchase_order.advance_amount&.present?
-      if purchase_order.advance_amount.value > 0
-        purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:to_be_processed)
-      end
-    end
-
     if purchase_order.approved? || purchase_order.auto_approved?
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+      if purchase_order.advance_amount&.present?
+        if purchase_order.advance_amount.value > 0
+          purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:to_be_processed)
+        end
+      end
     end
 
     self.workflow_output = op.workflow_output
