@@ -73,7 +73,7 @@ class UserSessionCreateHelper
       expect(@result.event.message).to eq(@message)
       expect(@result.event.response_code).to be_nil
     end
-    
+
     instance.it 'should set the correct DateTime' do
       expect(@result.session.started_at).to_not be_nil
       expect(@result.session.last_request_at).to_not be_nil
