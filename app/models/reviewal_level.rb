@@ -22,7 +22,7 @@ class ReviewalLevel < ApplicationRecord
   has_many :level_reviewer_mappings, foreign_key: :level_id, dependent: :destroy
   has_many :reviewers, class_name: 'User', through: :level_reviewer_mappings
 
-  has_many :level_user_reviewer_mappings, foreign_key: :level_id
+  has_many :level_user_reviewer_mappings, foreign_key: :level_id, dependent: :destroy
   alias_method :lurms, :level_user_reviewer_mappings
 
   validates :policy_id, presence: true
