@@ -20,11 +20,12 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def po_revision
+    # can only be done after the po status is set to "sent to vendor"
     (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
   end
 
   def reopen
-    purchase_order.closed?
+    ( (purchase_order.closed?) && (user_in_level? || document_owner? || user.vendor_payment_admin?) ) # || (purchase_order.auto_approved? && user.vendor_payment_admin? )
   end
 
   def more_details_button
@@ -74,12 +75,15 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def void
-    PurchaseOrderStatus.status_ids_for_voidable.include?(purchase_order.purchase_order_status_id) &&
-    user.vendor_payment_admin? && purchase_order.procurement.invoices.blank? && purchase_order.procurement.inward_documents.blank?
+    # only po initiator or the admin can void the po)
+    # and if the procurement has any document, they cant void
+    (document_owner? || user.vendor_payment_admin?) && ( PurchaseOrderStatus.status_ids_for_voidable.include?(purchase_order.purchase_order_status_id) && purchase_order.procurement.invoices.blank? && purchase_order.procurement.inward_documents.blank?)
   end
 
   def save_btn
-    (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.auto_approved? && !purchase_order.closed?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
+    # admin can save provided it is open or processing or the provided condiftions
+    # document owner can save provided po is open, retracted or rejected
+    (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
     (purchase_order.processing? && user_in_level?)
 
     # user.vendor_payment_admin? || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )

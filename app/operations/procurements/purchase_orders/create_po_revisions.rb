@@ -51,7 +51,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
 
       if obj.present?
         # self.duplicate_po.__send__("#{k}=", self.purchase_order.__send__(k))
-        self.purchase_order.__send__(k).each do |po|
+        obj.each do |po|
           self.duplicate_po.__send__(k) << po.dup
         end
 
@@ -68,10 +68,10 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     # important to keep this line to preserve calculated values
     self.duplicate_po.process_line_item_calculation
 
+    self.purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
     if self.duplicate_po.save
-      self.original_purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
-      self.purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision)
-      self.duplicate_po.trails.create action_user: user, action_id: TrailAction.id_for(:create)
+      # self.original_purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
+      self.duplicate_po.trails.create action_user: user, action_id: TrailAction.id_for(:create), note: "Revised PO created from, ##{self.purchase_order.po_number}"
     else
       add_message :error, self.duplicate_po.errors.full_messages
     end

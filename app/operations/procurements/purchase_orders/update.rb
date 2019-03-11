@@ -34,7 +34,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def validate
 
-    if purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?
+    if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && !user.vendor_payment_admin?
       add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
     end
 
@@ -158,12 +158,12 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
                                      action_level: purchase_order.trails.last.action_level
 
 
-        if self.procurement.po_revisions
-          self.original_purchase_order.trails.create action_user: user,
-                                     action_id: TrailAction.id_for(:update),
-                                     action_level: purchase_order.trails.last.action_level,
-                                     note: "Revised PO # #{purchase_order.po_number} updated"
-        end
+        # if self.procurement.po_revisions
+        #   self.original_purchase_order.trails.create action_user: user,
+        #                              action_id: TrailAction.id_for(:update),
+        #                              action_level: purchase_order.trails.last.action_level,
+        #                              note: "Revised PO # #{purchase_order.po_number} updated"
+        # end
       end
 
       # Create track

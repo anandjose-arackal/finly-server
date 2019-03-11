@@ -36,20 +36,50 @@ class AuditTrails::Index < AuditTrails::Base
 
   def success
     params[:trails] = self.trails
+    params[:document] = self.document
+    params[:document_type] = self.document_type
     AuditTrails::Index::IndexPresenter.new(user, params, messages)
   end
 
   class AuditTrails::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :trails
+    attr_accessor :trails, :document, :document_type
 
     def init
-      self.trails = []
-      all_trails = params[:trails]
-      all_trails.each do |trail|
-        self.trails.push trail.as_json(user)
+      if params[:document_type] == 'PurchaseOrder'
+        self.trails = po_document_trails
+      else
+        self.trails = []
+        all_trails = params[:trails]
+        all_trails.each do |trail|
+          self.trails.push trail.as_json(user)
+        end
+
       end
 
     end
+
+    def po_document_trails
+      self.document = params[:document]
+      if params[:document_type] == 'PurchaseOrder'
+        po_trails = []
+        if self.document.procurement.po_revisions.present?
+          self.document.procurement.po_revisions.each do |document|
+            document.trails.each do |trail|
+              po_trails.push trail.as_json(user)
+            end
+          end
+        end
+
+        params[:trails].each do |trail|
+          po_trails.push trail.as_json(user)
+        end
+
+        po_trails.sort_by!{ |doc| doc[:created_at]}
+        po_trails
+      end
+
+    end
+
   end
 
 end
