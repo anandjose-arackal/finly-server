@@ -32,4 +32,9 @@ class ReviewalLevelsController < BaseControllers::WebBase
     respond
   end
 
+  def download_mappings
+    @result = Policy::ApprovalWorkflows::DownloadLevelReviewerMappings.(current_user, params)
+    respond
+  end
+
 end

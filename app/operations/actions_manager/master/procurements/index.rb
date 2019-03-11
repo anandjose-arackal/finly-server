@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
 
   register_handle :procurements_index
-  register_actions [:new_procurements, :bulk_actions, :approve_purchase_order, :export, :bulk_import_advances]
+  register_actions [:new_procurements, :bulk_actions, :approve_purchase_order, :export, :bulk_import_advances, :approve_tax_invoices]
 
 
   def new_procurements
@@ -13,7 +13,9 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
   end
 
   def approve_purchase_order
-    true
+    if user.vendor_payments_admin? || user.vendor_payments_reviewer?
+      true
+    end
   end
 
   def export
@@ -24,4 +26,9 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
     true
   end
 
+  def approve_tax_invoices
+    if user.vendor_payments_admin? || user.vendor_payments_reviewer?
+      return true
+    end
+  end
 end

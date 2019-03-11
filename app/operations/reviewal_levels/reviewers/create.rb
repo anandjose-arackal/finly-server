@@ -46,7 +46,7 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
   private
 
   def reviewer_parameters
-    params.require(:level_reviewer_mapping).permit(:level_id, :reviewer_id, :threshold, :exception)
+    params.require(:level_reviewer_mapping).permit(:level_id, :reviewer_id, :threshold, :exception, :wo_exception)
   end
 
 end

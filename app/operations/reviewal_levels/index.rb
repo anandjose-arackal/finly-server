@@ -5,6 +5,7 @@ class ReviewalLevels::Index < ReviewalLevels::Base
     attr_accessor :reviewal_levels
 
     has_scope :filter_policy
+    has_scope :filter_policy_id
     has_scope :filter_associated_entity_type
     # has_scope :reviewal_level_id
 

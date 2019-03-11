@@ -1155,6 +1155,13 @@
 #                                                         DELETE /payments/companies/:id(.:format)                                                                                   companies#destroy
 #                                   request_index_configs GET    /payment_request_configs(.:format)                                                                                  bank_transfer/bank_payment_requests#index_configurations
 #                                         request_filters GET    /payment_request_filters(.:format)                                                                                  bank_transfer/bank_payment_requests#index_configurations
+#                            payment_ticket_action_config GET    /payment_ticket_action_config(.:format)                                                                             bank_transfer/bank_payment_requests#actions_configuration
+#                               beneficiary_action_config GET    /beneficiary_action_config(.:format)                                                                                bank_transfer/account_owners#actions_configuration
+#                            inward_invoice_action_config GET    /inward_invoice_action_config(.:format)                                                                             bank_transfer/inward_invoices#actions_configuration
+#                       inventory_line_item_action_config GET    /inventory_line_item_action_config(.:format)                                                                        invoicing/inventory_line_items#actions_configuration
+#                                    non_po_action_config GET    /non_po_action_config(.:format)                                                                                     procure/purchase_orders#actions_configuration
+#                               procurement_action_config GET    /procurement_action_config(.:format)                                                                                procure/procurements#actions_configuration
+#                                   vp_user_action_config GET    /vp_user_action_config(.:format)                                                                                    bank_transfer/users#actions_configuration
 #                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                                                       bank_transfer/payment_orders#count
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                                                     bank_transfer/payment_orders#balance
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                                                             bank_transfer/payment_orders#index
@@ -1568,6 +1575,9 @@
 #                                                         PUT    /procure/configs/doc_number_configs/:id(.:format)                                                                   procure/configs/doc_number_configs#update
 #                               procure_configs_send_mail POST   /procure/configs/send_mail(.:format)                                                                                procure/configs/mailer#send_mail
 #                                        procure_comments POST   /procure/comments(.:format)                                                                                         procure/comments#create
+#                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
+#                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
+#                       reviewal_levels_download_mappings GET    /reviewal_levels/download_mappings(.:format)                                                                        reviewal_levels#download_mappings
 #                                reviewal_level_reviewers GET    /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#index
 #                                                         POST   /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#create
 #                             new_reviewal_level_reviewer GET    /reviewal_levels/:reviewal_level_id/reviewers/new(.:format)                                                         reviewers#new
@@ -1584,6 +1594,14 @@
 #                                                         PATCH  /reviewal_levels/:id(.:format)                                                                                      reviewal_levels#update
 #                                                         PUT    /reviewal_levels/:id(.:format)                                                                                      reviewal_levels#update
 #                                                         DELETE /reviewal_levels/:id(.:format)                                                                                      reviewal_levels#destroy
+#                                    level_user_reviewers GET    /level_user_reviewers(.:format)                                                                                     level_user_reviewers#index
+#                                                         POST   /level_user_reviewers(.:format)                                                                                     level_user_reviewers#create
+#                                 new_level_user_reviewer GET    /level_user_reviewers/new(.:format)                                                                                 level_user_reviewers#new
+#                                edit_level_user_reviewer GET    /level_user_reviewers/:id/edit(.:format)                                                                            level_user_reviewers#edit
+#                                     level_user_reviewer GET    /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#show
+#                                                         PATCH  /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#update
+#                                                         PUT    /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#update
+#                                                         DELETE /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#destroy
 #                                            audit_trails GET    /audit_trails(.:format)                                                                                             audit_trails#index
 #                               policy_user_role_mappings GET    /policy_user_role_mappings(.:format)                                                                                policy_user_role_mappings#index
 #                                                         POST   /policy_user_role_mappings(.:format)                                                                                policy_user_role_mappings#create
@@ -3397,6 +3415,7 @@ Rails.application.routes.draw do
   ######## Reviewal Workflow ##########
   get 'reviewal_levels/index_user_level', to: "reviewal_levels#index_user_level"
   get 'reviewal_levels/show_user_level', to: "reviewal_levels#show_user_level"
+  get 'reviewal_levels/download_mappings', to: 'reviewal_levels#download_mappings'
   resources :reviewal_levels do
     resources :reviewers
   end
