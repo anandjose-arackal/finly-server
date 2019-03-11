@@ -325,7 +325,20 @@ class PurchaseOrder < ApplicationRecord
     calculate_line_items
   end
 
+  # def prepopulate_amounts
+  #   populate_advance_amount
+  # end
+
+  
   private
+
+  # def populate_advance_amount
+  #   if self.advance_amount.blank?
+  #     # no change in net amount
+  #     self.advance_amount = Amount.new(value: 0, currency_id: 1)
+  #     return
+  #   end
+  # end
 
   def calculate_line_items
     total_before_tax_amount = 0
@@ -420,8 +433,10 @@ class PurchaseOrder < ApplicationRecord
       self.build_balance_amount(value: total_amount, currency_id: 1)
     end
 
-    if self.advance_amount.present? # && self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+    if self.advance_amount.present?  && self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       self.balance_amount.value = total_amount - self.advance_amount.value
+    else
+      self.advance_amount  = Amount.new(value: 0, currency_id: 1)
     end
 
     # binding.pry

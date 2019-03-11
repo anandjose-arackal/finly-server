@@ -16,7 +16,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
     # params[:bank_account_id] = '80'
     if purchase_order_params[:bank_account_id]
-      self.bank_account = self.purchase_order.vendor.bank_accounts.find_by(id: purchase_order_params[:bank_account_id])
+      self.bank_account = self.purchase_order&.vendor&.bank_accounts&.find_by(id: purchase_order_params[:bank_account_id]) rescue nil
     end
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
     purchase_order_params.delete(:document_reviewer_mappings)
@@ -43,30 +43,41 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    # advance amount needs 2 attributes
-    unless self.purchase_order_params[:advance_amount_attributes].blank?  && self.purchase_order_params[:advance_amount_attributes][:value].blank? && self.bank_account.blank?
-      valid = true
-      Rails.logger.fatal purchase_order_params.inspect
-      Rails.logger.fatal params.inspect
-      # binding.pry
-      if self.purchase_order_params[:advance_amount_attributes][:value].blank? || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
-        add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
-        valid = false
-
-      elsif self.purchase_order_params[:due_date].blank?
-        add_message :error, 'Bro add the due date for the advance bro.'
-        valid = false
-
-      elsif self.bank_account.blank?
-        add_message :error, 'Please select the bank account of the vendor.'
-        valid = false
-
-      end
-
-      if valid && purchase_order.advance_amount_status_empty
-        purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
-      end
+    if self.bank_account.blank?
+      add_message :error, 'Please select the bank account of the vendor.'
     end
+
+    # # advance amount needs 2 attributes
+    # unless self.purchase_order_params[:advance_amount_attributes].blank?  && self.purchase_order_params[:advance_amount_attributes][:value].blank? && self.bank_account.blank?
+    #   valid = true
+    #   Rails.logger.fatal purchase_order_params.inspect
+    #   Rails.logger.fatal params.inspect
+    #   # binding.pry
+    #   if self.purchase_order_params[:advance_amount_attributes][:value].blank? || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
+    #     add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
+    #     valid = false
+
+    #   elsif self.purchase_order_params[:due_date].blank?
+    #     add_message :error, 'Bro add the due date for the advance bro.'
+    #     valid = false
+
+    #   elsif self.bank_account.blank?
+    #     add_message :error, 'Please select the bank account of the vendor.'
+    #     valid = false
+
+    #   end
+
+    #   if valid && purchase_order.advance_amount_status_empty
+    #     purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+    #   end
+    # end
+
+    if purchase_order_params&.dig(:advance_amount_attributes).present?
+      if self.purchase_order_params[:due_date].blank?
+        add_message :error, 'Due date for the advance amount has not been set.'
+        valid = false
+      end
+    end    
 
   end
 
@@ -77,6 +88,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     #old attachments
     self.po_old_attachments = self.purchase_order.attachments
+
+    if purchase_order_params&.dig(:advance_amount_attributes).present?
+      purchase_order_params[:advance_amount_attributes][:id] = self.purchase_order&.advance_amount&.id
+      purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+    end
   end
 
   def process
