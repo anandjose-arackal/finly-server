@@ -193,8 +193,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   def validate_association
     # Validate of current user is owner of PO
-    purchase_order.validate_if_owner(user)
-    purchase_order.validate_if_admin(user)
-    purchase_order.validate_if_reviewer(user)
+    return if purchase_order.validate_if_owner(user)
+    return if purchase_order.validate_if_admin(user)
+    return if purchase_order.validate_if_reviewer(user)
   end
 end

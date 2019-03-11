@@ -549,7 +549,7 @@ module Transitionable
         when :goods_receiver, 'goods_receiver'
           data = []
         when :invoice_initiator, 'invoice_initiator'
-          data = []
+          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
         when :invoice_reviewer, 'invoice_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :bank_payment_request_initiator, 'bank_payment_request_initiator'

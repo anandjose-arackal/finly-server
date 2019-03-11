@@ -474,7 +474,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.roles
-    {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer'}
+    {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
   end
 
   def self.role_based_associated_status_ids(user)

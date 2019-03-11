@@ -577,7 +577,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.role_based_associated_status_ids(user)
-    self.status_ids(self.role_based_statuses(user))
+    InwardInvoiceStatus.ids_for(self.role_based_statuses(user))
   end
 
   def self.role_based_statuses(user)
@@ -597,7 +597,7 @@ class Invoice < ApplicationRecord
   end
 
   def self.roles
-    {'1'=> 'admin', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer'}
+    {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
   end
 
 end
