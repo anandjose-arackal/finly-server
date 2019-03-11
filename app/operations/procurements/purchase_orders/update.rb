@@ -15,7 +15,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
 
-    self.purchase_order_params.delete(:advance_amount_attributes)
     # params[:bank_account_id] = '80'
     if purchase_order_params[:bank_account_id]
       self.bank_account = self.purchase_order&.vendor&.bank_accounts&.find_by(id: purchase_order_params[:bank_account_id]) rescue nil
@@ -83,11 +82,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #   end
     # end
 
-
-    if purchase_order_params&.dig(:advance_amount_attributes).present?
+    if self.purchase_order_params[:advance_amount_attributes][:value].present?
       if self.purchase_order_params[:due_date].blank?
         add_message :error, 'Due date for the advance amount has not been set.'
-        valid = false
       end
     end    
 
@@ -101,9 +98,12 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #old attachments
     self.po_old_attachments = self.purchase_order.attachments
 
-    if purchase_order_params&.dig(:advance_amount_attributes).present?
+
+    if self.purchase_order_params[:advance_amount_attributes][:value].present?
       purchase_order_params[:advance_amount_attributes][:id] = self.purchase_order&.advance_amount&.id
       purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+    else
+      self.purchase_order_params[:advance_amount_attributes][:value] = self.purchase_order&.advance_amount&.value
     end
   end
 
@@ -116,6 +116,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
 
     purchase_order.assign_attributes(purchase_order_params)
+
     if purchase_order.valid?
 
       purchase_order.save
