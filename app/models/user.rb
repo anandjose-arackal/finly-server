@@ -210,6 +210,8 @@ class User < ApplicationRecord
   has_many :user_sessions
   has_many :user_devices
 
+  has_many :user_ips
+
   has_many :user_branch_location_mappings
   has_many :branch_locations, through: :user_branch_location_mappings
 

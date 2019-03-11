@@ -40,6 +40,8 @@
 #  username         :string(255)
 #  user_device_id   :integer
 #  client_type      :string(255)
+#  user_agent       :text(65535)
+#  user_ip_id       :integer          not null
 #
 
 class UserSession < ApplicationRecord
@@ -47,6 +49,7 @@ class UserSession < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :access_token, class_name: 'Doorkeeper::AccessToken', optional: true
   belongs_to :status, class_name: 'UserSessionStatus'
+  belongs_to :user_ip
 
   has_many :events, class_name: 'UserSessionEvent', dependent: :destroy
   belongs_to :user_device, optional: true

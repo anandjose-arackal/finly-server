@@ -57,6 +57,7 @@ class UserSessions::Create < BaseOperation
     enrich_access args
     enrich_geo_location args
     enrich_device args
+    enrich_ip args
     set_event args
     return if has_errors?
     self.session = UserSession.new args
@@ -132,6 +133,7 @@ class UserSessions::Create < BaseOperation
     # # Temporary as frontend dev is not available
     # return if true
     return if user.nil?
+
     result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
       args[:status_id] = UserSessionStatus.id_for(:failed)
@@ -143,6 +145,26 @@ class UserSessions::Create < BaseOperation
     args[:user_device_id] = result.device.id
     args[:client_type] = result.device.client_type
     unless result.device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(result.device.status_id)
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.device.message
+      add_message :error, result.device.message
+      return
+    end
+  end
+
+  def enrich_ip(args)
+    return if user.nil?
+
+    result = UserIps::FindOrCreate.(user, params)
+    unless result.success?
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.messages[:error].to_sentence
+      add_message :error, result.messages[:error].to_sentence
+      return
+    end
+
+    args[:user_ip] = result.ip
+    unless result.ip.valid? and UserIpStatus.ids_for(:unverified, :verified).include?(result.ip.status_id)
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.device.message
       add_message :error, result.device.message

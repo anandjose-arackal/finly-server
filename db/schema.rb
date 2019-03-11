@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_09_155447) do
+ActiveRecord::Schema.define(version: 2019_03_11_071631) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -5349,6 +5349,33 @@ ActiveRecord::Schema.define(version: 2019_03_09_155447) do
     t.index ["name"], name: "index_user_groups_on_name"
   end
 
+  create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_ip_statuses_on_name"
+  end
+
+  create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "ip", null: false
+    t.string "ip_type", null: false
+    t.integer "user_id", null: false
+    t.integer "status_id", null: false
+    t.string "verification_mode"
+    t.string "verification_key"
+    t.datetime "verification_code_sent_at"
+    t.datetime "verified_at"
+    t.integer "verification_code_count"
+    t.integer "verification_code_failed_attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ip"], name: "index_user_ips_on_ip"
+    t.index ["ip_type"], name: "index_user_ips_on_ip_type"
+    t.index ["status_id"], name: "index_user_ips_on_status_id"
+    t.index ["user_id"], name: "index_user_ips_on_user_id"
+    t.index ["verification_mode"], name: "index_user_ips_on_verification_mode"
+  end
+
   create_table "user_login_tracks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -5568,6 +5595,7 @@ ActiveRecord::Schema.define(version: 2019_03_09_155447) do
     t.integer "user_device_id"
     t.string "client_type"
     t.text "user_agent"
+    t.integer "user_ip_id", null: false
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"
