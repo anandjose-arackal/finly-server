@@ -31,7 +31,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
   def init
     self.order_details = params[:order_details]
-    # binding.pry
     self.contents = []
     self.headers = retrieve_header_names
     # setting the valid as true here, so that even if one line item failed in the
@@ -104,6 +103,18 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:bank_account_number] = 'No bank account entered'
       end
 
+      if gst_type_id.blank?
+        self.valid =false
+        self.error_messages << "Please select a Gst Type"
+        self.issue_item[:gst_type_id] = "Please select a Gst Type"
+      end
+
+      if tax.blank?
+        self.valid =false
+        self.error_messages << "Please select a relevant tax amount"
+        self.issue_item[:tax] = "Please select a relevant tax amount"
+      end
+
       # check for format of the Bank account number
       pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
       unless bank_account_no =~ pattern
@@ -174,8 +185,6 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       #self.issue_item.each {|k, v| self.issue_item.delete(k) if v.blank?} # delete unnecessary keys which have no error
       self.issues << self.issue_item
     end
-    puts "self.issues", self.issues.inspect
-    # binding.pry
   end
 
   def success?

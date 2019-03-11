@@ -94,7 +94,6 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
           inv_id = payment.invoice.id
           # payment.invoice.update(invoice_status_id: invoices_status[inv_id])
           invoice = self.invoices.find(params[:invoice_id])
-          # binding.pry
           invoice.update(invoice_status_id: invoices_status[inv_id.to_s])
           # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
           payment.save

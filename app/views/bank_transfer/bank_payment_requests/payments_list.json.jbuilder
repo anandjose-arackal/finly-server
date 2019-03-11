@@ -139,14 +139,10 @@ json.payments do
   end
 end
 
-
-
 # json.payments_count @result.ordered_payments.count
 # json.payments_status_ids @result.payment_status_ids
 # json.payment_status_id_count @result.payment_status_id_count
-
 json.payments_count @result.ordered_payments.size
-
 # non-paginated payments listing all payments in this payment order
 json.filter_count @result.filter_count
 unless current_company.id == 118

@@ -40,7 +40,7 @@ class Item < ApplicationRecord
   validates :description, presence: true
 
 
-  accepts_nested_attributes_for :artifacts
+  accepts_nested_attributes_for :artifacts, allow_destroy: true
 
   scope :with_category_id, -> (id){
     where category_id: id

@@ -26,10 +26,11 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement
 
     def init
       self.purchase_order = params[:purchase_order]
+      self.procurement = self.purchase_order.procurement
       self.actions = get_actions
       self.departments = user.company.departments.roots
       self.locations = user.company.locations
@@ -77,6 +78,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         actions[:show_comments] = true
       end
 
+
+
       if document_owner? && (self.purchase_order.open? || self.purchase_order.retracted? || self.purchase_order.rejected?)
         actions[:submit] = {url: Rails.application.routes.url_helpers.procure_purchase_order_submit_path(purchase_order_id: purchase_order.id),method: "PUT"}
         actions[:save] = {url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),method: "PUT"}
@@ -89,15 +92,16 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       if purchase_order.approved? || purchase_order.auto_approved?
         if user_in_level? || document_owner?
           actions[:send_mail] = {url: Rails.application.routes.url_helpers.procure_configs_send_mail_path, method: "POST"}
+          actions[:mark_send_to_vendor] = {url: Rails.application.routes.url_helpers.procure_purchase_order_mark_send_to_vendor_path(purchase_order_id: purchase_order.id), method: "PUT"}
 
           # todo
           if purchase_order.can_unapprove?(user)
             actions[:unapprove] = {url: Rails.application.routes.url_helpers.procure_purchase_order_unapprove_path(purchase_order_id: purchase_order.id), method: "PUT"}
           end
-          # actions[:close] = {
-          #     url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
-          #     method: "PUT"
-          # }
+          actions[:close] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
 
           actions[:document_editable] = false
         end
@@ -106,6 +110,20 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
           actions[:make_advance_payment] = {url: Rails.application.routes.url_helpers.procure_purchase_order_make_advance_payment_path(purchase_order_id: purchase_order.id),method: "PUT"}
         end
         actions[:download] = true
+      end
+
+      if purchase_order.sent_to_vendor?
+        if user_in_level? || document_owner?
+          actions[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions_path(purchase_order_id: purchase_order.id), method: "GET"}
+          actions[:close] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+        end
+
+        if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
+          actions[:original_po_blocked] = true
+        end
       end
 
       if PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id

@@ -3326,12 +3326,17 @@ Rails.application.routes.draw do
 
 
   ## Procurement APIs start ##########################################
+
+  get 'grn/pending', to: 'procure/procurements#index'
+
   namespace :procure do
     get 'procurements/filter_config', to: "procurements#filter_config"
     get 'procurements/count', to: 'procurements#count'
     resources :procurements do
     end
 
+    get 'grn_pending', to: 'procurements#grn_pending'
+    get 'grn_received', to: 'procurements#grn_received'
 
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
 
@@ -3345,6 +3350,7 @@ Rails.application.routes.draw do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
       put 'retract', to: 'purchase_orders#retract'
+      put 'reopen', to: 'purchase_orders#reopen'
       put 'approve', to: 'purchase_orders#approve'
       put 'unapprove', to: 'purchase_orders#unapprove'
       put 'reject', to: 'purchase_orders#reject'
@@ -3352,15 +3358,18 @@ Rails.application.routes.draw do
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
       put 'void', to: 'purchase_orders#void'
+      put 'mark_send_to_vendor', to: 'purchase_orders#mark_send_to_vendor'
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
 
+      get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
     end
     get 'po_advances', to: 'purchase_orders#po_advances', as: :po_advances
     post 'po_advance_ticket', to: 'purchase_orders#po_advance_ticket', as: :po_advance_ticket
     get 'po_with_advance', to: 'purchase_orders#po_with_advance', as: :po_with_advance
+
 
     resources :inward_documents do
 

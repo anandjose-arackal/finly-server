@@ -87,7 +87,7 @@ class Trail < ApplicationRecord
 
   def as_json(user)
     {
-        action_type: self.action.name,
+        action_type: self.action&.name,
         action_user: self.action_user&.as_json,
         body: generate_trail_body,
         created_at_date: self.created_at.strftime("%d-%b-%Y"),
@@ -149,6 +149,8 @@ class Trail < ApplicationRecord
         action = " closed"
       when TrailAction.id_for(:void)
         action = " voided"
+      when TrailAction.id_for(:send_to_vendor)
+        action = " sent to vendor"
       else
         action = ""
     end

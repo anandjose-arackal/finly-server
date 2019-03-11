@@ -90,11 +90,10 @@ class BankTransfer::PaymentRequest::NewAddPaymentsBackground < BackgroundOperati
       params[:payment_order_id] = self.bank_payment_request.payment_order.id
       payment = ::Payment.new(params)
       payment = self.bank_payment_request.payment_order.payments.build(params)
-      # binding.pry
+
       if payment.save
         case self.ticket_type
         when "invoice"
-          puts "invoice SUCCESSFULS", payment.id
           # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
           payment.invoice.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
         when "po_advance"

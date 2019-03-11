@@ -83,7 +83,7 @@ class User < ApplicationRecord
   has_many :receipts, dependent: :destroy
   has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
-  has_many :policies, through: :policy_user_mappings, dependent: :destroy
+  has_many :policies,-> { where(:'policy_user_mappings.deleted_at' => nil)}, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
   has_many :reports, inverse_of: :user, dependent: :destroy
@@ -1055,6 +1055,13 @@ class User < ApplicationRecord
       data.present?
     end
   # *********** resource specific roles end **************
+
+  def relevant
+    {
+      email: self.email,
+      company_id: self.company_id
+    }
+  end
 
   private
 

@@ -127,7 +127,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   def initialize_payment_objects
     payment_params = []
     self.inward_invoices.each do |invoice|
-      # binding.pry
+
       bank_account = invoice.vendor&.bank_accounts&.where(default_account: true).first
       payment_params << {
           name: invoice.vendor&.name,

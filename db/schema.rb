@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_04_124115) do
+ActiveRecord::Schema.define(version: 2019_03_09_095212) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -356,7 +356,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["user_id"], name: "index_approval_routes_on_user_id"
   end
 
-  create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "artifacts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "resource_id"
     t.string "resource_type"
     t.string "attachment_file_name"
@@ -4290,6 +4290,9 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.date "due_date"
     t.integer "advance_amount_status_id"
     t.integer "bank_account_id"
+    t.integer "revised_po_id"
+    t.integer "revision_of_id"
+    t.integer "revision_number", default: 0
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -4305,6 +4308,9 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["procurement_id"], name: "index_purchase_orders_on_procurement_id"
     t.index ["procurement_term_id"], name: "index_purchase_orders_on_procurement_term_id"
     t.index ["purchase_order_status_id"], name: "index_purchase_orders_on_purchase_order_status_id"
+    t.index ["revised_po_id"], name: "index_purchase_orders_on_revised_po_id"
+    t.index ["revision_number"], name: "index_purchase_orders_on_revision_number"
+    t.index ["revision_of_id"], name: "index_purchase_orders_on_revision_of_id"
     t.index ["tax_amount_id"], name: "index_purchase_orders_on_tax_amount_id"
     t.index ["total_after_tax_id"], name: "index_purchase_orders_on_total_after_tax_id"
     t.index ["total_before_tax_id"], name: "index_purchase_orders_on_total_before_tax_id"
@@ -4414,7 +4420,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.integer "reference_type_id"
   end
 
-  create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "rate_contract_line_items", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "location_id"
     t.integer "item_id"
     t.datetime "start_date"
@@ -4425,7 +4431,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.integer "amount_id"
   end
 
-  create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "rate_contracts", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.integer "vendor_id"
     t.boolean "renewable"
@@ -5666,7 +5672,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
 
-  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
