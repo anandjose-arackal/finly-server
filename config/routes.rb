@@ -3369,6 +3369,7 @@ Rails.application.routes.draw do
     get 'po_advances', to: 'purchase_orders#po_advances', as: :po_advances
     post 'po_advance_ticket', to: 'purchase_orders#po_advance_ticket', as: :po_advance_ticket
     get 'po_with_advance', to: 'purchase_orders#po_with_advance', as: :po_with_advance
+    get 'po_with_advance_count', to: 'purchase_orders#po_with_advance_count', as: :po_with_advance_count
 
 
     resources :inward_documents do

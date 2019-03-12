@@ -198,7 +198,7 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_all_advances, -> {
-    where.not(advance_amount_status_id: nil, advance_amount_id: nil)
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil)
   }
 
   scope :filter_by_due_date, -> (due_date) {
@@ -210,8 +210,6 @@ class PurchaseOrder < ApplicationRecord
     # where created_at: created_at
     where("DATE(created_at) >= ?", created_at)
   }
-
-
 
   before_save :calculate_line_items
   after_save :budget_trail_entry

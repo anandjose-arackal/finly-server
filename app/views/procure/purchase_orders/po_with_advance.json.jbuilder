@@ -16,5 +16,6 @@ json.results do
     # json.po_status purchase_order.status&.name&.humanize
     json.po_number purchase_order.po_number
     json.po_vendor_name purchase_order.vendor.name
+    json.po_advance_status purchase_order.advance_amount_status&.name&.humanize || ""
   end
 end
