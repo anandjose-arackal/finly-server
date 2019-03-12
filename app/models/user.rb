@@ -1045,16 +1045,17 @@ class User < ApplicationRecord
     #   data.present?
     # end
 
-    def has_policy_role?(role_id, resource=nil)
+    def has_policy_role?(role_id, document=nil)
       # role_id = UserRole.id_for(role_name.to_sym)
-      if resource.present?
-        data = resource.policy.policy_user_roles.find_by_role_id role_id
+      if document.present?
+        policy = Policy.find_by_id document.policy_id
+        data = policy.policy_user_roles.find_by_user_role_id role_id
       else
         data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
       end
       data.present?
     end
-  # *********** resource specific roles end **************
+  # *********** document specific roles end **************
 
   def relevant
     {

@@ -13,7 +13,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::Index < ActionsManag
   end
 
   def approve_invoices
-    user.vendor_payments_admin? || user.vendor_payment_reviewer?
+    user.has_policy_role?(UserRole.id_for(:admin)) || user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer))
   end
 
   def export_all

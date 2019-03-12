@@ -22,7 +22,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def send_mail
     if (invoice.approved? || invoice.auto_approved?)
-      (user.vendor_payments_admin? || document_owner?)
+      (user.has_policy_role?(UserRole.id_for(:admin), invoice) || document_owner?)
     end
   end
 
@@ -66,16 +66,16 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def save_btn
-    # (user.vendor_payment_admin?) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
+    # (user.has_policy_role?(UserRole.id_for(:admin), invoice)) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
     # (invoice.processing? && user_in_level?)
     # 
-    user.vendor_payments_admin? || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
+    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) || user.has_policy_role?(UserRole.id_for(:admin), invoice)
   end
 
   def save_and_submit
     # ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
     # (invoice.processing? && user_in_level?) ||
-    # (user.vendor_payment_admin?)
+    # (user.has_policy_role?(UserRole.id_for(:admin), invoice))
     ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
@@ -89,7 +89,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def make_payment
     (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?) &&
-    ((user_in_level? && user.vendor_payment_creditor?) || user.vendor_payment_creditor?)
+    ((user_in_level? && user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice)) || user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice))
   end
 
   def audit_trail

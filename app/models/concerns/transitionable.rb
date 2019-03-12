@@ -566,6 +566,8 @@ module Transitionable
           data = []
         when :vendor_reviewer, 'vendor_reviewer'
           data = role_based_reviewer_associated_items(user, role_id, options)
+        when :vendor_manager, 'vendor_manager'
+          data = []
         when :policy_admin, 'policy_admin'
           data = []
         else
@@ -626,11 +628,13 @@ module Transitionable
       end
     end
 
-    def associated_items(user, resource_roles)
+    def associated_items(user, document_roles)
       data = nil
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        role_name = UserRole.find_by_id(role_id).name
+        valid_role = document_roles.include?(role_name.to_sym)
         puts "#{role_id}"
-        if !self.role_based_associated_items(user, role_id).blank? && !resource_roles.fetch(role_id.to_s, nil).blank?
+        if !self.role_based_associated_items(user, role_id).blank? && valid_role
           if data.blank?
             data = self.role_based_associated_items(user, role_id)
           else

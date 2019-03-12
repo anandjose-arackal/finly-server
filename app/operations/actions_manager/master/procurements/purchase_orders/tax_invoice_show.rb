@@ -64,7 +64,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def save_btn
-    user.vendor_payment_admin? || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
+    user.has_policy_role?(UserRole.id_for(:admin), invoice) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def export_po_items
@@ -93,7 +93,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
 
   def make_payment
     if (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?)
-      (user_in_level? && user.vendor_payment_creditor?) || user.vendor_payment_creditor?
+      (user_in_level? && user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice)) || user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice)
     end
   end
 

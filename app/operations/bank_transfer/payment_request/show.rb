@@ -20,7 +20,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
   def validate
     # Check of bank_payment_request exists
-    return if !validate_presence
+    return if record_not_present
     # Validate if user is associated with the bank_payment_request
     validate_association
   end
@@ -690,6 +690,10 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       return false
     end
     true
+  end
+
+  def record_not_present
+    !validate_presence
   end
 
   def validate_association

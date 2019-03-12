@@ -6,10 +6,7 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
   end
 
   def validate
-    unless self.inward_document.present?
-      add_message :error, 'Inward Document not found'
-      return
-    end
+    return if record_not_present
   end
 
   def process
@@ -33,6 +30,21 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
       self.inward_document = params[:inward_document]
       self.purchase_order = params[:purchase_order]
     end
+  end
+
+  def validate_presence
+    if self.inward_document.blank?
+      add_message :error, 'Inward Document not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_ownership
   end
 
 end
