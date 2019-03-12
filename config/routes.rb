@@ -3427,8 +3427,11 @@ Rails.application.routes.draw do
 
   ######## Dashboards ##################
   namespace :dashboards do
-    namespace :vp do
-    end
+    get 'vp/configs', to: 'vendor_payments#configs'
+    get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
+    get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
+    get 'vp/invoices', to: 'vendor_payments#invoices'
+    get 'vp/budgets', to: 'vendor_payments#budgets'
   end
   ######## Dashbaord Ends ##############
 

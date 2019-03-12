@@ -164,6 +164,10 @@ class PurchaseOrder < ApplicationRecord
     # where(id: ids)
   }
 
+  scope :filter_status_id, -> (status_ids) {
+    with_status_ids(status_ids)
+  }
+
   scope :filter_sub_department_id, -> (ids) {
     where sub_department_id: ids
   }
