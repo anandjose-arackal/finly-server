@@ -152,6 +152,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def po_with_advance_count
+    @result = Procurements::PurchaseOrders::PoWithAdvanceCount.(current_user, params)
+    render json: { count: @result.count.as_json, status_count: @result.status_count.as_json }
+  end
+
   def create_po_revisions
     @result = Procurements::PurchaseOrders::CreatePoRevisions.(current_user, params)
     respond
