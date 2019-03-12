@@ -1,8 +1,8 @@
-class Vendors::Submit < Vendors::Base
+class Vendors::Approve < Vendors::Base
 
   def process
     params[:document] = self.vendor
-    params[:aasm_event] = 'submit'
+    params[:aasm_event] = 'approve'
 
     op = WorkflowManager::Base.(user, params)
     unless op.success?
