@@ -2,35 +2,39 @@
 #
 # Table name: yes_bank_vendors
 #
-#  id                :integer          not null, primary key
-#  name              :string(255)
-#  company_id        :integer
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  email             :string(255)
-#  mobile_number     :string(255)
-#  authorized        :boolean
-#  description       :text(65535)
-#  is_deleted        :boolean          default(FALSE)
-#  pan               :string(255)
-#  tin               :string(255)
-#  gst               :string(255)
-#  gst_registered    :boolean
-#  state             :string(255)
-#  state_code_id     :integer
-#  created_by_id     :integer
-#  vendor_type_id    :integer
-#  address           :string(255)
-#  business_name     :string(255)
-#  payment_term_id   :integer
-#  currency_id       :integer
-#  tds_rates_list_id :integer
-#  vendor_id         :string(255)
-#  disabled          :boolean          default(FALSE)
-#  deleted_at        :datetime
+#  id                   :integer          not null, primary key
+#  name                 :string(255)
+#  company_id           :integer
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  email                :string(255)
+#  mobile_number        :string(255)
+#  authorized           :boolean
+#  description          :text(65535)
+#  is_deleted           :boolean          default(FALSE)
+#  pan                  :string(255)
+#  tin                  :string(255)
+#  gst                  :string(255)
+#  gst_registered       :boolean
+#  state                :string(255)
+#  state_code_id        :integer
+#  created_by_id        :integer
+#  vendor_type_id       :integer
+#  address              :string(255)
+#  business_name        :string(255)
+#  payment_term_id      :integer
+#  currency_id          :integer
+#  tds_rates_list_id    :integer
+#  vendor_id            :string(255)
+#  disabled             :boolean          default(FALSE)
+#  deleted_at           :datetime
+#  status_id            :integer
+#  policy_id            :integer
+#  controlling_level_id :integer
 #
 
 class YesBankVendor < ApplicationRecord
+  include Transitionable
   include Sequenced::ActsAsSequenced
 
   include SoftDeletable
@@ -41,6 +45,7 @@ class YesBankVendor < ApplicationRecord
   belongs_to :state_code, optional: true, class_name: "GstStateCode"
   belongs_to :created_by, optional: true, class_name: "User"
   belongs_to :vendor_type, optional: true
+  belongs_to :status, class_name: "VendorStatus", optional: true # todo remove optional after creation of migration
 
   belongs_to :currency, optional: true
   belongs_to :payment_term, optional: true
