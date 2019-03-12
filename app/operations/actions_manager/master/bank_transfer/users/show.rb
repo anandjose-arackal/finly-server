@@ -6,7 +6,7 @@ class ActionsManager::Master::BankTransfer::Users::Show < ActionsManager::Master
   def credit
     # Available for all user roles except auditor
     # user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_initiator?
-    user.has_policy_role?(UserRole.id_for(:admin)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
+    user.vendor_payments_admin? || user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
   end
 
   def debit
@@ -39,12 +39,12 @@ class ActionsManager::Master::BankTransfer::Users::Show < ActionsManager::Master
 
   def resend_invite
     # Available for all user roles
-    user.has_policy_role?(UserRole.id_for(:admin)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator))
+    user.vendor_payments_admin? || user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator))
   end
 
   def delete_invite
     # Available for all user roles
-    user.has_policy_role?(UserRole.id_for(:admin)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator))
+    user.vendor_payments_admin? || user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer)) || user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator))
   end
 
 end

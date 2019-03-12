@@ -18,7 +18,7 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::Show < ActionsManage
   end
 
   def update_invoice
-    (user.has_policy_role?(UserRole.id_for(:invoice_initiator)) || user.has_policy_role?(UserRole.id_for(:invoice_reviewer)) || user.has_policy_role?(UserRole.id_for(:admin))) && invoice.processing? 
+    (user.has_policy_role?(UserRole.id_for(:invoice_initiator)) || user.has_policy_role?(UserRole.id_for(:invoice_reviewer)) || user.vendor_payments_admin?) && invoice.processing? 
   end
 
   def make_payment

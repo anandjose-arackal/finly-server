@@ -1049,7 +1049,7 @@ class User < ApplicationRecord
       # role_id = UserRole.id_for(role_name.to_sym)
       if document.present?
         policy = Policy.find_by_id document.policy_id
-        data = self.company.policies.joins(:policy_user_roles).find_by_user_role_id role_id.to_i
+        data = policy.policy_user_roles.where(user_id: self.id, user_role_id: role_id)
       else
         data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
       end

@@ -52,11 +52,11 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
 
   def void
     (PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id) && 
-      user.has_policy_role?(UserRole.id_for(:admin), purchase_order)
+      user.vendor_payments_admin?
   end
 
   def save_btn
-    (user.has_policy_role?(UserRole.id_for(:admin), purchase_order) && !purchase_order.voided?) || (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) || 
+    (user.vendor_payments_admin? && !purchase_order.voided?) || (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) || 
     (purchase_order.processing? && user_in_level?)
     # (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
   end

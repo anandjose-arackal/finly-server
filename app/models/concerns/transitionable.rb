@@ -347,9 +347,7 @@ module Transitionable
     end
 
     def validate_if_admin(user)
-      if self.policy.present?
-        self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:admin)).pluck(:user_id).include?(user.id)
-      end
+      user.admin?
     end
     
     def validate_if_reviewer(user)
@@ -543,7 +541,8 @@ module Transitionable
         when :purchase_request_reviewer, 'purchase_request_reviewer'
           data = []
         when :purchase_order_initiator, 'purchase_order_initiator'
-          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+          # data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+          data = role_based_initiator_associated_items(user, role_id)
         when :purchase_order_reviewer, 'purchase_order_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :goods_receiver, 'goods_receiver'
@@ -553,7 +552,7 @@ module Transitionable
         when :invoice_reviewer, 'invoice_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :bank_payment_request_initiator, 'bank_payment_request_initiator'
-          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+          data = role_based_initiator_associated_items(user, role_id)
         when :bank_payment_request_reviewer, 'bank_payment_request_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :bank_payment_request_creditor, 'bank_payment_request_creditor'
@@ -565,10 +564,14 @@ module Transitionable
         when :vendor_creator, 'vendor_creator'
           data = []
         when :vendor_reviewer, 'vendor_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id, options)
+          data = role_based_reviewer_associated_items(user, role_id)
         when :vendor_manager, 'vendor_manager'
           data = []
         when :policy_admin, 'policy_admin'
+          data = []
+        when :bank_payment_request_auditor, 'bank_payment_request_auditor'
+          data = []
+        when :budget_manager, 'budget_manager'
           data = []
         else
           data = []
@@ -576,6 +579,23 @@ module Transitionable
         data
       end
     end
+
+
+
+  def role_based_admin_associated_items(user, role_id, options={})
+    if user.instance_of?(User)
+      if self.column_names.include? 'company_id'
+        self.where(company_id: user.company.id)
+      else
+        user_ids = user.company.users.pluck(:id)
+        self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+      end
+    end
+  end
+
+  def role_based_initiator_associated_items(user, role_id, options={})
+    user.send("#{self.table_name}")
+  end
 
     def role_based_reviewer_associated_items(user, role_id, options={})
         policy_ids = user.policy_user_roles.where(role_id: role_id).pluck(:policy_id).uniq rescue nil
@@ -634,7 +654,7 @@ module Transitionable
         role_name = UserRole.find_by_id(role_id).name
         valid_role = document_roles.include?(role_name.to_sym)
         puts "#{role_id}"
-        if !self.role_based_associated_items(user, role_id).blank? && valid_role
+        if valid_role && self.role_based_associated_items(user, role_id).present? 
           if data.blank?
             data = self.role_based_associated_items(user, role_id)
           else

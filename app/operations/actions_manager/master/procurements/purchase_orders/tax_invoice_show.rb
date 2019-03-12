@@ -64,7 +64,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def save_btn
-    user.has_policy_role?(UserRole.id_for(:admin), invoice) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
+    user.vendor_payments_admin? || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 
   def export_po_items

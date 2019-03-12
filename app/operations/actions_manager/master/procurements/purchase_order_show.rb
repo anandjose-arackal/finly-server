@@ -16,16 +16,16 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def mark_send_to_vendor
 
-    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.has_policy_role?(UserRole.id_for(:admin), purchase_order))
+    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
   end
 
   def po_revision
     # can only be done after the po status is set to "sent to vendor"
-    (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.has_policy_role?(UserRole.id_for(:admin), purchase_order))
+    (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
   end
 
   def reopen
-    ( (purchase_order.closed?) && (user_in_level? || document_owner? || user.has_policy_role?(UserRole.id_for(:admin), purchase_order)) ) # || (purchase_order.auto_approved? && user.has_policy_role?(UserRole.id_for(:admin), purchase_order) )
+    ( (purchase_order.closed?) && (user_in_level? || document_owner? || user.vendor_payments_admin?) ) # || (purchase_order.auto_approved? && user.vendor_payments_admin? )
   end
 
   def more_details_button
@@ -33,7 +33,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def send_mail
-    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.has_policy_role?(UserRole.id_for(:admin), purchase_order))
+    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
 
   end
 
@@ -77,23 +77,23 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   def void
     # only po initiator or the admin can void the po)
     # and if the procurement has any document, they cant void
-    (document_owner? || user.has_policy_role?(UserRole.id_for(:admin), purchase_order)) && ( PurchaseOrderStatus.status_ids_for_voidable.include?(purchase_order.purchase_order_status_id) && purchase_order.procurement.invoices.blank? && purchase_order.procurement.inward_documents.blank?)
+    (document_owner? || user.vendor_payments_admin?) && ( PurchaseOrderStatus.status_ids_for_voidable.include?(purchase_order.purchase_order_status_id) && purchase_order.procurement.invoices.blank? && purchase_order.procurement.inward_documents.blank?)
   end
 
   def save_btn
     # admin can save provided it is open or processing or the provided condiftions
     # document owner can save provided po is open, retracted or rejected
-    (user.has_policy_role?(UserRole.id_for(:admin), purchase_order) && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
+    (user.vendor_payments_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
     (purchase_order.processing? && user_in_level?)
 
-    # user.has_policy_role?(UserRole.id_for(:admin), purchase_order) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )
+    # user.vendor_payments_admin? || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )
   end
 
   def save_and_submit
     # ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
     # (purchase_order.processing? && user_in_level?) ||
-    # (user.has_policy_role?(UserRole.id_for(:admin), purchase_order) && purchase_order.voided?)
-    ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )# || user.has_policy_role?(UserRole.id_for(:admin), purchase_order)
+    # (user.vendor_payments_admin? && purchase_order.voided?)
+    ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )# || user.vendor_payments_admin?
   end
 
   def delete
@@ -118,7 +118,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def send_btn
     if (purchase_order.approved? || purchase_order.auto_approved?)
-      (user_in_level? || document_owner? || user.has_policy_role?(UserRole.id_for(:admin), purchase_order))
+      (user_in_level? || document_owner? || user.vendor_payments_admin?)
     end
   end
 

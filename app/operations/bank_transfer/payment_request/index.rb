@@ -90,6 +90,12 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     # ********* Workflow manager changes end ************************
 
     # ****************** Policy User Role based index start ****************
+
+    if user.vendor_payments_admin?
+      self.payment_requests = ::BankPaymentRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin)).not_open.or(user.bank_payment_requests)
+      return
+    end
+
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.payment_requests = ::BankPaymentRequest.associated_items(user, ::BankPaymentRequest.roles)
     else

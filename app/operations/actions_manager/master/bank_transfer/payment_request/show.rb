@@ -15,20 +15,20 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def mark_as_credited
     ############# Admin logic start ####################
-    # if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    # if user.vendor_payments_admin?
     #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.open? && bank_payment_request.action_users(:return_control).include?(user)
     #     return true
     #   end
 
     # if admin is not creditor
-    # if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request) && !bank_payment_request.document_role_users(:creditor).include?(user)
+    # if user.vendor_payments_admin? && !bank_payment_request.document_role_users(:creditor).include?(user)
     #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.approved?
     #     return true
     #   end
     # end
 
     # If admin is creditor too
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if bank_payment_request.payment_order.partially_completed? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
@@ -42,7 +42,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     end
 
 
-    # if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    # if user.vendor_payments_admin?
     #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
     #     return true
     #   end
@@ -102,9 +102,9 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Initiator logic start ####################
     # if user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), bank_payment_request)
     #   if (bank_payment_request.open? || bank_payment_request.rejected?) && (bank_payment_request.owner_id == user.id)
-    #     return user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request) ? true : false
+    #     return user.vendor_payments_admin? ? true : false
     #   elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
-    #     return user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    #     return user.vendor_payments_admin?
     #   end
     # end
     ############# Initiator logic end ####################
@@ -112,7 +112,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def delete
     ############# Admin logic start #######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
@@ -129,7 +129,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def submit
     ############# Admin logic start #######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
@@ -145,31 +145,31 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def credit
     ############# Admin logic start #######################
-    # if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    # if user.vendor_payments_admin?
     #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.open? && !bank_payment_request.approved? && bank_payment_request.action_users(:return_control).include?(user)
     #     return true
     #   end
     # end
     # if admin is not creditor
-    # if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request) && !bank_payment_request.document_role_users(:creditor).include?(user)
+    # if user.vendor_payments_admin? && !bank_payment_request.document_role_users(:creditor).include?(user)
     #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.approved?
     #     return true
     #   end
     # end
     # # If admin is creditor too
-    # if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request) && bank_payment_request.document_role_users(:creditor).include?(user)
+    # if user.vendor_payments_admin? && bank_payment_request.document_role_users(:creditor).include?(user)
     #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?)
     #     return true
     #   end
     # end
 
-    # if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    # if user.vendor_payments_admin?
     #   if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && bank_payment_request.approved?
     #     return true
     #   end
     # end
 
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if bank_payment_request.payment_order.partially_completed? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted? 
         return true
       end
@@ -220,14 +220,14 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     #     balance = retrieve_balance(:vendor_payment_wallet, user)
     #     if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval) && !bank_payment_request.credit_card?
     #       return true
-    #     elsif user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request) && !bank_payment_request.credit_card?
+    #     elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
     #       return true
     #     end
     #   elsif (bank_payment_request.approved? && bank_payment_request.owner_id == user.id)
     #     balance = retrieve_balance(:vendor_payment_wallet, user)
     #     if balance >= bank_payment_request.requested_amount_value
     #       return true
-    #     elsif user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request) && !bank_payment_request.credit_card?
+    #     elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
     #       return true
     #     end
     #   elsif (bank_payment_request.credited? && bank_payment_request.payment_order.initiating_user_id == user.id)
@@ -241,7 +241,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def credit_options
     ############# Admin logic start #######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if (!bank_payment_request.credited? || bank_payment_request.payment_order.partially_completed?) && !bank_payment_request.credit_card?
         company_credits = retrieve_balance(:company_credits, user) rescue nil
         finly_money = retrieve_balance(:vendor_payment_wallet, user) rescue nil
@@ -260,7 +260,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     #     if (balance >= bank_payment_request.requested_amount_value) && !bank_payment_request.require_approval
     #       return true
     #     else
-    #       if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    #       if user.vendor_payments_admin?
     #         balance = retrieve_balance(:company_credits, user)
     #         return true if (balance >= bank_payment_request.requested_amount_value)
     #       end
@@ -292,7 +292,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       #     if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval)
       #       return !bank_payment_request.credit_card?
       #     else
-      #       if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+      #       if user.vendor_payments_admin?
       #         balance = retrieve_balance(:company_credits, user)
       #         if balance >= bank_payment_request.requested_amount_value
       #           return !bank_payment_request.credit_card?
@@ -330,7 +330,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def add_payments
     ############# Admin logic start #######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if !bank_payment_request.credited?
         return true
       end
@@ -384,7 +384,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       return true if bank_payment_request.action_users(:return_control).include?(user)
       return true if (bank_payment_request.approved? || bank_payment_request.auto_approved?)
       return true if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) 
@@ -398,7 +398,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def payments_history
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       return true
     end
     ############# Admin logic end ####################
@@ -420,7 +420,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def edit_payment_history
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       # if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user) && bank_payment_request.processing?
       #   return true
       # end
@@ -449,12 +449,12 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def delete_payment_history
     ############# Admin logic start ####################
-    # if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    # if user.vendor_payments_admin?
     #   if !bank_payment_request.credited? && bank_payment_request.action_users(:return_control).include?(user)
     #     return true
     #   end
     # end
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if !bank_payment_request.credited?
         return true
       end
@@ -479,7 +479,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   def attachments_editable
 
     ############# Admin logic start #######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
         return true
       end
@@ -513,7 +513,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def reject
     ############# Admin logic start #########################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
         return true
       end
@@ -551,7 +551,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def approve
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       last_trail = bank_payment_request.trails.last rescue nil
       if bank_payment_request.processing? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && bank_payment_request.action_users(:approve).include?(user)
         if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
@@ -604,7 +604,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def take_control
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if (bank_payment_request.processing? && bank_payment_request.get_reviewers.exclude?(user))
         return true
       end
@@ -617,7 +617,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def return_control
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if bank_payment_request.processing?
         return true if bank_payment_request.action_users(:return_control).include?(user)
       end
@@ -627,7 +627,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def unapprove
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       last_trail = bank_payment_request.trails.last rescue nil
       if bank_payment_request.processing? && !bank_payment_request.open? && (last_trail.action_id == TrailAction.id_for(:approve)) &&
           (last_trail.action_user_id == user.id)
@@ -650,7 +650,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def cancel_scheduled_payment
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       bank_payment_request.scheduled?
     end
     ############# Admin logic end ####################
@@ -666,7 +666,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def retry_payment
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if (bank_payment_request.payment_order.partially_completed? || bank_payment_request.payment_order.failed?)
         return true
       end
@@ -696,7 +696,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def approve_forward
     ############# Admin logic start ####################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       bank_payment_request.approved?
     end
     ############# Admin logic end ####################
@@ -723,7 +723,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def credit_in_credit_options
     ############# Admin logic start #######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if (bank_payment_request.processing? && bank_payment_request.get_reviewers.include?(user))
         return !bank_payment_request.credit_card?
       end
@@ -732,7 +732,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def policy_editable
     ############# Admin logic start ######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
@@ -760,7 +760,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def order_name
     ############# Admin logic start ######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if !bank_payment_request.credited?
         return true
       end
@@ -780,7 +780,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   
   def transfer_type
     ############# Admin logic start ######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if !bank_payment_request.credited?
         return true
       end
@@ -810,7 +810,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def scheduled_date
     ############# Admin logic start ######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if !bank_payment_request.credited?
         return true
       end
@@ -840,7 +840,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def description_field
     ############# Admin logic start ######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
@@ -860,7 +860,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def reviewal_flow
     ############# Admin logic start ######################
-    if user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    if user.vendor_payments_admin?
       if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
         return true
       end
@@ -881,11 +881,11 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def your_finly_money
-    user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request) || bank_payment_request.document_role_users(:creditor).include?(user)
+    user.vendor_payments_admin? || bank_payment_request.document_role_users(:creditor).include?(user)
   end
 
   def company_credits
-    user.has_policy_role?(UserRole.id_for(:admin), bank_payment_request)
+    user.vendor_payments_admin?
   end
 
   # def credit_threshold_notice

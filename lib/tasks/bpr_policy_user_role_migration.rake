@@ -16,11 +16,11 @@ task :bpr_policy_user_role_migration => :environment do
       end
       # If any company users have user role as admin, then add him as admin to all policies for bank_payment_request
       # FOR THAT, get all company policies, add user as admin if not already present
-      if mapping.user.vendor_payment_admin?
-        if policy.policy_user_roles.where(user_id: mapping.user.id, user_role_id: UserRole.id_for(:admin)).blank?
-          policy.policy_user_roles.create!(user_id: mapping.user.id, user_role_id: UserRole.id_for(:admin))
-        end
-      end
+      # if mapping.user.vendor_payment_admin?
+      #   if policy.policy_user_roles.where(user_id: mapping.user.id, user_role_id: UserRole.id_for(:admin)).blank?
+      #     policy.policy_user_roles.create!(user_id: mapping.user.id, user_role_id: UserRole.id_for(:admin))
+      #   end
+      # end
     end
 
 

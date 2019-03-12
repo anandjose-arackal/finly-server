@@ -13,7 +13,7 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
   end
 
   def approve_purchase_order
-    if user.has_policy_role?(UserRole.id_for(:admin)) || user.has_policy_role?(UserRole.id_for(:purchase_request_reviewer))
+    if user.vendor_payments_admin? || user.has_policy_role?(UserRole.id_for(:purchase_request_reviewer))
       true
     end
   end
@@ -27,7 +27,7 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
   end
 
   def approve_tax_invoices
-    if user.has_policy_role?(UserRole.id_for(:admin)) || user.has_policy_role?(UserRole.id_for(:purchase_request_reviewer))
+    if user.vendor_payments_admin? || user.has_policy_role?(UserRole.id_for(:purchase_request_reviewer))
       return true
     end
   end

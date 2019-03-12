@@ -22,7 +22,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def send_mail
     if (invoice.approved? || invoice.auto_approved?)
-      (user.has_policy_role?(UserRole.id_for(:admin), invoice) || document_owner?)
+      (user.vendor_payments_admin? || document_owner?)
     end
   end
 
@@ -66,16 +66,16 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def save_btn
-    # (user.has_policy_role?(UserRole.id_for(:admin), invoice)) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
+    # (user.vendor_payments_admin?) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
     # (invoice.processing? && user_in_level?)
     # 
-    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) || user.has_policy_role?(UserRole.id_for(:admin), invoice)
+    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) || user.vendor_payments_admin?
   end
 
   def save_and_submit
     # ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
     # (invoice.processing? && user_in_level?) ||
-    # (user.has_policy_role?(UserRole.id_for(:admin), invoice))
+    # (user.vendor_payments_admin?)
     ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
   end
 

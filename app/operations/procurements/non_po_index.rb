@@ -6,6 +6,11 @@ class Procurements::NonPoIndex < Procurements::Base
   end
 
   def process
+    if user.vendor_payments_admin?
+      self.procurements = user.company.procurements.with_ids(::Invoice.role_based_admin_associated_items(user, UserRole.id_for(:admin))&.pluck(:procurement_id)&.uniq).or(user.procurements)
+      return
+    end
+
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       resource_roles = ::Invoice.roles
       self.procurements = user.company.procurements.with_ids(::Invoice.associated_items(user, resource_roles)&.pluck(:procurement_id)&.uniq)

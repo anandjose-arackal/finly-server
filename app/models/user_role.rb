@@ -48,7 +48,8 @@ class UserRole < ApplicationRecord
       vendor_reviewer: 23,
       policy_admin: 24,
       vendor_manager: 25,
-      bank_payment_request_auditor: 26
+      bank_payment_request_auditor: 26,
+      budget_manager: 27
   }
 
   VALUES_EM = {
