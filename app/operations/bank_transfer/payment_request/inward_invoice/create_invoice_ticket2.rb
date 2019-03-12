@@ -40,6 +40,19 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         add_message :error, 'No Invoices sent for processing.'
         return
       end
+      unless params[:policy_id].present?
+          add_message :error, 'Policy cannot be blank'
+          return
+      end
+      unless params[:scheduled_at].present?
+        add_message :error, 'Please specify a scheduled date for your payment ticket.'
+        return
+      end
+
+      unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) > Date.today)
+        add_message :error, 'Cannot create back dated payment tickets'
+        return
+      end
   end
 
   def init
