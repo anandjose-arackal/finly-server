@@ -39,7 +39,7 @@ class ActionsManager::Master::BankTransfer::AccountOwners::VendorShow < ActionsM
   end
 
   def create_beneficiaries
-    account_owner.is_a?(YesBankVendor) && (user.permission.create_beneficiaries || user.vendor_payments_admin?)
+    account_owner.is_a?(YesBankVendor) && (user.permission.create_beneficiaries || user.has_policy_role?(UserRole.id_for(:admin)))
   end
 
 

@@ -18,15 +18,15 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::Show < ActionsManage
   end
 
   def update_invoice
-    (user.vendor_payments_initiator? || user.vendor_payments_reviewer? || user.vendor_payments_admin?) && invoice.processing? 
+    (user.has_policy_role?(UserRole.id_for(:invoice_initiator)) || user.has_policy_role?(UserRole.id_for(:invoice_reviewer)) || user.has_policy_role?(UserRole.id_for(:admin))) && invoice.processing? 
   end
 
   def make_payment
-    user.vendor_payments_creditor?
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
   end
 
   def delete_invoice
-    (invoice.open? && user.vendor_payments_initiator?)
+    (invoice.open? && user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)))
   end
 
 end
