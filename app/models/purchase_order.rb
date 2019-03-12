@@ -218,7 +218,7 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  # These two filters created because two different indexes requires data to be handles differently by design
+  # These two filters created because two different indexes requires data to be handled differently by design
 
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
