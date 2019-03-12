@@ -25,7 +25,7 @@ class ItzCash::Base < BaseHandler
         file_logger_params(
             path: p,
             post_params: params,
-            response: response,
+            ebix_response: response,
             status: status_code,
             itz_cash_action: env_key
         )
