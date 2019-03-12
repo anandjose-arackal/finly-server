@@ -175,6 +175,33 @@ class PurchaseOrder < ApplicationRecord
     where payment_term_id: ids
   }
 
+  scope :filter_payable_advances, -> (enabled) {
+    if StringUtils.to_bool(enabled)
+      where( purchase_order_status_id: [
+                                          PurchaseOrderStatus.id_for(:approved),
+                                          PurchaseOrderStatus.id_for(:auto_approved)
+                                       ], 
+             advance_amount_status_id: [
+                                          AdvanceAmountStatus.id_for(:to_be_processed),
+                                          AdvanceAmountStatus.id_for(:failed)
+                                       ])
+    end
+  }
+
+  scope :filter_all_advances, -> {
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil)
+  }
+
+  scope :filter_by_due_date, -> (due_date) {
+    where due_date: due_date
+  }
+
+  scope :filter_by_created_at, -> (created_at) {
+    created_at = Date.parse(created_at).strftime('%Y-%m-%d')
+    # where created_at: created_at
+    where("DATE(created_at) >= ?", created_at)
+  }
+
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
