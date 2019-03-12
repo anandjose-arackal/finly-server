@@ -211,6 +211,31 @@ class PurchaseOrder < ApplicationRecord
     where("DATE(created_at) >= ?", created_at)
   }
 
+  scope :filter_status, -> (status_name) {
+    all_statuses = AdvanceAmountStatus.all.pluck(:name)
+    if status_name.present? && all_statuses.include?(status_name)
+      where advance_amount_status_id: AdvanceAmountStatus.id_for(status_name)
+    end
+  }
+
+  # These two filters created because two different indexes requires data to be handled differently by design
+
+  scope :due_date, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('due_date >= ? && due_date <= ?', from, to)
+  }
+
+  scope :po_advances_date, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('date >= ? && date <= ?', from, to)
+  }
+
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
