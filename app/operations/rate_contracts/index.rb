@@ -23,9 +23,9 @@ class RateContracts::Index < RateContracts::Base
 
     def init  
       self.rate_contracts = params[:rate_contracts]
-      self.count = rate_contracts.count
       self.rate_contracts = apply_scopes(rate_contracts)
       self.paginated_rate_contracts = rate_contracts.paginate(page: params[:page], per_page: 30) rescue nil
+      self.count = rate_contracts.count
     end
   end
 end
