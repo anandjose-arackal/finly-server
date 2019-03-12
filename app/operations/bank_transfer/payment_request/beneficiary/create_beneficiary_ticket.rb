@@ -39,7 +39,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    	return
 	    end
 
-	    unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) > Date.today)
+	    unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) >= Date.today)
 	    	add_message :error, 'Cannot create back dated payment tickets'
 	    	return
 	    end
