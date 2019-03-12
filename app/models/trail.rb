@@ -92,6 +92,7 @@ class Trail < ApplicationRecord
         body: generate_trail_body,
         created_at_date: self.created_at.strftime("%d-%b-%Y"),
         created_at_time: self.created_at.strftime("%I:%M%p"),
+        created_at: self.created_at,
         note: self.note
     }
   end
@@ -150,7 +151,9 @@ class Trail < ApplicationRecord
       when TrailAction.id_for(:void)
         action = " voided"
       when TrailAction.id_for(:send_to_vendor)
-        action = " sent to vendor"
+        action = " has sent to vendor"
+      when TrailAction.id_for(:revision)
+        action = " created a revision for this"
       else
         action = ""
     end

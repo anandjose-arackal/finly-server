@@ -397,7 +397,7 @@ class Invoice < ApplicationRecord
   def payment_amounts_total
     if self.payments.present?
       # return self.payments.successful.joins(:amount).sum(:value)
-      return self.payments.successful.map {|p| p.amount.value}.sum
+      return self.payments.successful.map {|p| p.amount&.value}&.sum
     else
       return 0
     end
@@ -597,7 +597,8 @@ class Invoice < ApplicationRecord
   end
 
   def self.roles
-    {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
+    # {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
+    [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
   end
 
 end

@@ -44,6 +44,8 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     if purchase_order.valid?
       purchase_order.save
 
+      purchase_order.save
+
       # Create Trail for it
       purchase_order.trails.create action_user: user,
                                    action_id: TrailAction.id_for(:create)

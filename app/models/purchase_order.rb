@@ -184,15 +184,21 @@ class PurchaseOrder < ApplicationRecord
     where payment_term_id: ids
   }
 
-  scope :filter_payable_advances, -> {
-    where( purchase_order_status_id: [
-                                        PurchaseOrderStatus.id_for(:approved),
-                                        PurchaseOrderStatus.id_for(:auto_approved)
-                                     ], 
-           advance_amount_status_id: [
-                                        AdvanceAmountStatus.id_for(:to_be_processed),
-                                        AdvanceAmountStatus.id_for(:failed)
-                                     ])
+  scope :filter_payable_advances, -> (enabled) {
+    if StringUtils.to_bool(enabled)
+      where( purchase_order_status_id: [
+                                          PurchaseOrderStatus.id_for(:approved),
+                                          PurchaseOrderStatus.id_for(:auto_approved)
+                                       ], 
+             advance_amount_status_id: [
+                                          AdvanceAmountStatus.id_for(:to_be_processed),
+                                          AdvanceAmountStatus.id_for(:failed)
+                                       ])
+    end
+  }
+
+  scope :filter_all_advances, -> {
+    where.not(advance_amount_status_id: nil, advance_amount_id: nil)
   }
 
   scope :filter_by_due_date, -> (due_date) {
@@ -325,7 +331,20 @@ class PurchaseOrder < ApplicationRecord
     calculate_line_items
   end
 
+  # def prepopulate_amounts
+  #   populate_advance_amount
+  # end
+
+  
   private
+
+  # def populate_advance_amount
+  #   if self.advance_amount.blank?
+  #     # no change in net amount
+  #     self.advance_amount = Amount.new(value: 0, currency_id: 1)
+  #     return
+  #   end
+  # end
 
   def calculate_line_items
     total_before_tax_amount = 0
@@ -420,8 +439,10 @@ class PurchaseOrder < ApplicationRecord
       self.build_balance_amount(value: total_amount, currency_id: 1)
     end
 
-    if self.advance_amount.present? # && self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
-      self.balance_amount.value = total_amount - self.advance_amount.value
+    if self.advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+      # self.balance_amount.value = total_amount - self.advance_amount.value
+    else
+      self.advance_amount  = Amount.new(value: 0, currency_id: 1)
     end
 
     # self.save

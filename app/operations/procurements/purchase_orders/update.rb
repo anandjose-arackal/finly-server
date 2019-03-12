@@ -15,10 +15,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
 
-    self.purchase_order_params.delete(:advance_amount_attributes)
     # params[:bank_account_id] = '80'
     if purchase_order_params[:bank_account_id]
-      self.bank_account = self.purchase_order.vendor.bank_accounts.find_by(id: purchase_order_params[:bank_account_id])
+      self.bank_account = self.purchase_order&.vendor&.bank_accounts&.find_by(id: purchase_order_params[:bank_account_id]) rescue nil
     end
 
     self.procurement = self.purchase_order.procurement
@@ -35,7 +34,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def validate
 
-    if purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?
+    if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && !user.vendor_payment_admin?
       add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
     end
 
@@ -57,12 +56,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #   add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
     # end
 
-    # advance amount needs 2 attributes
+    if self.bank_account.blank?
+      add_message :error, 'Please select the bank account of the vendor.'
+    end
+
     # unless self.purchase_order_params[:advance_amount_attributes].blank?  && self.purchase_order_params[:advance_amount_attributes][:value].blank? && self.bank_account.blank?
     #   valid = true
     #   Rails.logger.fatal purchase_order_params.inspect
     #   Rails.logger.fatal params.inspect
-    #   if self.purchase_order_params[:advance_amount_attributes][:value].blank?  || self.purchase_order_params[:advance_amount_attributes][:currency_id].blank?
     #     add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
     #     valid = false
 
@@ -81,6 +82,12 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #   end
     # end
 
+    if self.purchase_order_params[:advance_amount_attributes][:value].present?
+      if self.purchase_order_params[:due_date].blank?
+        add_message :error, 'Due date for the advance amount has not been set.'
+      end
+    end    
+
   end
 
   def pre_process
@@ -90,6 +97,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     #old attachments
     self.po_old_attachments = self.purchase_order.attachments
+
+
+    if self.purchase_order_params[:advance_amount_attributes][:value].present?
+      purchase_order_params[:advance_amount_attributes][:id] = self.purchase_order&.advance_amount&.id
+      # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+    else
+      self.purchase_order_params[:advance_amount_attributes][:value] = self.purchase_order&.advance_amount&.value
+    end
   end
 
   def process
@@ -101,6 +116,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
 
     purchase_order.assign_attributes(purchase_order_params)
+
     if purchase_order.valid?
 
       purchase_order.save
@@ -142,12 +158,12 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
                                      action_level: purchase_order.trails.last.action_level
 
 
-        if self.procurement.po_revisions
-          self.original_purchase_order.trails.create action_user: user,
-                                     action_id: TrailAction.id_for(:update),
-                                     action_level: purchase_order.trails.last.action_level,
-                                     note: "Revised PO # #{purchase_order.po_number} updated"
-        end
+        # if self.procurement.po_revisions
+        #   self.original_purchase_order.trails.create action_user: user,
+        #                              action_id: TrailAction.id_for(:update),
+        #                              action_level: purchase_order.trails.last.action_level,
+        #                              note: "Revised PO # #{purchase_order.po_number} updated"
+        # end
       end
 
       # Create track
