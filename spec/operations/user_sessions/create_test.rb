@@ -20,7 +20,6 @@ class UserSessionCreateHelper
         allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
 
         response = double({token: @token})
-
         @result = UserSessions::Create.(@status, {user: @user1, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
       end
     end
@@ -46,7 +45,7 @@ class UserSessionCreateHelper
         allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
 
         response = double({token: @token})
-
+        block.call if block_given?
         @result = UserSessions::Create.(@status, {user: nil, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
       end
     end
@@ -191,6 +190,39 @@ RSpec.describe 'UserSessions::Create' do
         UserSessionCreateHelper.init_with_user(self)
         UserSessionCreateHelper.user_session_property_check(self)
         UserSessionCreateHelper.user_presence_check(self)
+      end
+
+      describe '> With user with FailurePresenter from UserDevices::FindOrCreate' do
+        before do
+          RSpec::Mocks.with_temporary_scope do
+            @before_user_session_count = UserSession.count
+            @before_session_event_count = UserSessionEvent.count
+
+            headers = {}
+            @controller = 'oauth/token'
+            @action = 'create'
+            @path = 'oauth/login'
+
+            @username = @user1.email
+            @issue_string = 'Issue issue'
+
+            allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post'}))
+            allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({success?: false, messages: {error: [@issue_string]}}))
+            allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
+
+            response = double({token: @token})
+            @result = UserSessions::Create.(@status, {user: @user1, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
+          end
+        end
+
+        it 'should succeed' do
+          expect(@result.success?).to eq(true)
+        end
+
+        it 'should set UserSession as failed' do
+          expect(@result.session.status_id).to eq(UserSessionStatus.id_for(:failed))
+          expect(@result.session.message).to eq(@issue_string)
+        end
       end
 
       describe '> Without user' do
