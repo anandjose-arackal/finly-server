@@ -154,6 +154,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       if user.vendor_payment_admin?
         unless purchase_order.voided?
+          actions[:policy_editable] = true
           actions[:document_editable] = true
           actions[:save] = {url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),method: "PUT"}
           actions[:procurement_terms_editable] = user.permission.edit_terms_within_po

@@ -273,6 +273,55 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
+  def advance_to_be_processed?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:to_be_processed)
+  end
+
+  def advance_pending?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:pending)
+  end
+
+  def advance_initiated?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:initiated)
+  end
+
+  def advance_failed?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:failed)
+  end
+
+  def advance_paid?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:paid)
+  end
+
+  def advance_can_be_paid?
+    advance_to_be_processed? || advance_failed?
+  end
+
+  def advance_amount_status_empty
+    self.advance_amount_status.blank?
+  end
+
+  def updatable?
+    self.open? || self.processing?
+  end
+
+  def document_owner?(user)
+    self.user_id.eql?(user.id)
+  end
+
+  # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
+  def as_json2
+    {
+      original_amount: precision_value(self.total_after_tax&.value),
+      advance_amount: precision_value(self.advance_amount&.value),
+      balance_due: precision_value(self.balance_amount&.value)
+      # balance_due: {
+      #   value: precision_value(self.balance_amount&.value),
+      #   id: self.balance_amount&.id,
+      #   currency_id: self.balance_amount&.currency&.id
+      # }
+    }
+  end
   # Public Method
 
   def process_line_item_calculation

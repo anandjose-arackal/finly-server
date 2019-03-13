@@ -1,5 +1,5 @@
 class Procurements::PurchaseOrders::MarkSendToVendor < Procurements::PurchaseOrders::Base
-  attr_accessor :purchase_order, :procurement, :purchase_order_params
+  attr_accessor :purchase_order, :procurement, :purchase_order_params, :workflow_output
 
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
