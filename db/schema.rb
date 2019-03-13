@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_12_145246) do
+ActiveRecord::Schema.define(version: 2019_03_13_085115) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -582,6 +582,7 @@ ActiveRecord::Schema.define(version: 2019_03_12_145246) do
     t.string "error_sub_code"
     t.integer "bank_transaction_type_id"
     t.boolean "account_name_check", default: false
+    t.string "beneficiary_full_name"
     t.index ["amount_id"], name: "index_bank_transactions_on_amount_id"
     t.index ["beneficiary_bank_account_id"], name: "index_bank_transactions_on_beneficiary_bank_account_id"
     t.index ["company_id"], name: "index_bank_transactions_on_company_id"
