@@ -29,6 +29,10 @@ class UserDevices::FindOrCreate < BaseOperation
     request = RequestStoreUtil.current_request
     headers = request.headers
     request_properties = headers['X-Finly-RP']
+    if request_properties.nil?
+      add_message :error, 'X-Finly-RP not found'
+      return
+    end
     if request_properties.present?
       request_properties = Base64.decode64(request_properties)
       request_properties = JSON.parse(request_properties) if request_properties.is_a?(String)
@@ -61,6 +65,7 @@ class UserDevices::FindOrCreate < BaseOperation
   end
 
   def client_for(config_class, x_finly_rp)
+    x_finly_rp ||= {}
     attributes = client_attributes_for config_class, x_finly_rp
     client = config_class.completed.find_by(fingerprint: attributes[:fingerprint])
     # If the device with the same fingerprint is found, then check if attributes are matching

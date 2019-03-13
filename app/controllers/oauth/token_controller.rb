@@ -28,6 +28,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
       if sessions_result.success?
         result = Gatekeeper::Event.(:after_session_create, params)
         if result.success?
+          @require_otp_verification = result.require_otp
           on_create_success(response)
           return
         else

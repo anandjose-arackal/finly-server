@@ -138,7 +138,7 @@ class UserSessions::Create < BaseOperation
     unless result.success?
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.messages[:error].to_sentence
-      add_message :error, result.messages[:error].to_sentence
+      # add_message :error, result.messages[:error].to_sentence
       return
     end
 
@@ -147,7 +147,7 @@ class UserSessions::Create < BaseOperation
     unless result.device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(result.device.status_id)
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.device.message
-      add_message :error, result.device.message
+      # add_message :error, result.device.message
       return
     end
   end
@@ -159,7 +159,7 @@ class UserSessions::Create < BaseOperation
     unless result.success?
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.messages[:error].to_sentence
-      add_message :error, result.messages[:error].to_sentence
+      # add_message :error, result.messages[:error].to_sentence
       return
     end
 
@@ -167,7 +167,7 @@ class UserSessions::Create < BaseOperation
     unless result.ip.valid?
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.device.message
-      add_message :error, result.device.message
+      # add_message :error, result.device.message
       return
     end
   end

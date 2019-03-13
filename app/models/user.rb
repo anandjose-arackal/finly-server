@@ -951,6 +951,12 @@ class User < ApplicationRecord
 
   end
 
+  def obfuscated_mobile_number
+    return nil if mobile_number.nil?
+
+    "XXXXXXX#{mobile_number[(mobile_number.length - 3)..mobile_number.length]}"
+  end
+
   def status
     "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
     if self.active and self.invitation_token.blank? and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite

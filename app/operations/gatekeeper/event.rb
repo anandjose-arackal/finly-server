@@ -13,14 +13,18 @@ class Gatekeeper::Event
   end
 
   def run
+    require_otp = false
     Gatekeeper::Registry.subscribers(event)&.each do |rule|
       result = rule.verdict(self.params)
       unless result.success?
         Gatekeeper::Log.(result, params)
         return result
       end
+      require_otp ||= result.require_otp
     end
-    Gatekeeper::Checker::Verdict.success_verdict
+    verdict = Gatekeeper::Checker::Verdict.success_verdict
+    verdict.require_otp(require_otp)
+    verdict
   end
 
 end
