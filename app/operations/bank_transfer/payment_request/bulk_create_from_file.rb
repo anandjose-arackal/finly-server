@@ -25,7 +25,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
       return
     end
 
-    valid_date = Date.parse(params[:due_date]) rescue false 
+    valid_date = Date.parse(params[:scheduled_at]) rescue false 
     unless valid_date
         add_message :error, 'Invalid date provided'
         return
