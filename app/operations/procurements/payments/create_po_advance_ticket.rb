@@ -40,7 +40,13 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         return
       end
 
-      unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) > Date.today)
+      valid_date = Date.parse(params[:scheduled_at]) rescue false 
+      unless valid_date
+          add_message :error, 'Invalid date provided'
+          return
+      end
+
+      unless (Date.parse(params[:scheduled_at]) >= Date.today)
         add_message :error, 'Cannot create back dated payment tickets'
         return
       end
