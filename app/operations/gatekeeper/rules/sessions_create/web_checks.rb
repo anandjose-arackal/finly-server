@@ -47,7 +47,36 @@ Gatekeeper::Checker.new 'On Web Authentication' do
             fail
           end
         end
+
+        rule 'Unverified devices need to be verified before proceeding' do
+          web = RequestStoreUtil.current_device
+          next unless web.status_id == UserDeviceStatus.id_for(:unverified)
+          require_otp true
+        end
+
+        [:incomplete, :attribute_mismatch, :complete].each do |status_name|
+          rule "Do not allow login from devices with status #{status_name}" do
+            web = RequestStoreUtil.current_device
+            next unless web.status_id == UserDeviceStatus.id_for(status_name)
+            response_code 401
+            fail
+          end
+        end
       end
+
+      section 'If IP is available' do
+        before do
+          skip if RequestStoreUtil.current_session.user_ip.nil?
+        end
+
+        rule 'Unverified IPs need to be verified before proceeding' do
+          ip = RequestStoreUtil.current_session.user_ip
+          next unless ip.status_id == UserIpStatus.id_for(:unverified)
+          require_otp true
+        end
+
+      end
+
     end
 
     section 'Active Session' do

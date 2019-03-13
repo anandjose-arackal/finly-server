@@ -1,13 +1,13 @@
 json.success true
-json.otp_verified @require_otp_verification
+json.otp_verified !@require_otp_verification
 json.kyc_required @user.company.kyc_required?
-if @require_otp_verification
-  json.data do
-    json.user do
-      json.extract! @user, :id, :email, :obfuscated_mobile_number
-    end
-  end
-else
+# if @require_otp_verification
+#   json.data do
+#     json.user do
+#       json.extract! @user, :id, :email, :obfuscated_mobile_number
+#     end
+#   end
+# else
   json.data do
     json.access_token @token.token
     # json.token_type 'bearer'
@@ -44,4 +44,4 @@ else
       end
     end
   end
-end
+# end
