@@ -49,7 +49,13 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         return
       end
 
-      unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) > Date.today)
+      valid_date = Date.parse(params[:due_date]) rescue false 
+      unless valid_date
+          add_message :error, 'Invalid date provided'
+          return
+      end
+
+      unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) >= Date.today)
         add_message :error, 'Cannot create back dated payment tickets'
         return
       end
@@ -90,6 +96,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
   def validate
     if self.inward_invoices.empty?
       add_message :error, "Nothing to add"
+      return
+    end
+
+    if self.policy.blank?
+      add_message :error, "Policy not found."
       return
     end
 

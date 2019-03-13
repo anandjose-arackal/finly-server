@@ -39,7 +39,13 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    	return
 	    end
 
-	    unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) >= Date.today)
+	    valid_date = Date.parse(params[:due_date]) rescue false 
+	    unless valid_date
+	        add_message :error, 'Invalid date provided'
+	        return
+	    end
+
+	    unless (Date.parse(params[:scheduled_at]) >= Date.today)
 	    	add_message :error, 'Cannot create back dated payment tickets'
 	    	return
 	    end
@@ -55,7 +61,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
-				yes = YesBankVendor.find(pa[:vendor_id])
+				# yes = YesBankVendor.find(pa[:vendor_id])
+				yes = user.company.yes_bank_vendors.find(pa[:vendor_id])
 				ba = yes.bank_accounts.where(id: pa[:bank_account_id])
 				pa[:bank_account_number] = ba.pluck(:account_number).first
 				pa[:ifsc] = ba.pluck(:ifsc).first

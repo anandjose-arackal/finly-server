@@ -233,7 +233,7 @@ class PurchaseOrder < ApplicationRecord
     to = Date.today if to.blank?
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
-    where('date >= ? && date <= ?', from, to)
+    where('created_at >= ? && created_at <= ?', from, to)
   }
 
   before_save :calculate_line_items
@@ -333,6 +333,10 @@ class PurchaseOrder < ApplicationRecord
 
   def advance_amount_status_empty
     self.advance_amount_status.blank?
+  end
+
+  def updatable?
+    self.open? || self.processing?
   end
 
   # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
