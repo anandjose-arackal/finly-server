@@ -47,14 +47,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
-    if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && !user.vendor_payment_admin?
-      add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
-    end    
-
-    if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
-      add_message :error, 'Revision for this purchase order found. Original purchase order can no longer be modified. Check trails.'
-    end
-
     unless self.purchase_order_params[:policy_id].present?
       if self.purchase_order.policy.blank?
         add_message :error, 'Policy not found.'
