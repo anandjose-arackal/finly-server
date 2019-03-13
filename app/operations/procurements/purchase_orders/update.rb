@@ -30,19 +30,27 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def validate
-    if purchase_order.approved? || purchase_order.auto_approved?
-      add_message :error, "Cant update Purchase Orders which are already approved"
-    end
-
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
     end
 
+    if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && !user.vendor_payment_admin?
+      add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
+    end    
+
+    if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
+      add_message :error, 'Revision for this purchase order found. Original purchase order can no longer be modified. Check trails.'
+    end
+
     unless self.purchase_order_params[:policy_id].present?
       if self.purchase_order.policy.blank?
-        add_message :error, 'Policy cannot be blank'
+        add_message :error, 'Policy not found.'
       end
     end
+
+    # if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
+    #   add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
+    # end
 
     if self.bank_account.blank?
       add_message :error, 'Please select the bank account of the vendor.'
