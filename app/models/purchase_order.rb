@@ -339,6 +339,10 @@ class PurchaseOrder < ApplicationRecord
     self.open? || self.processing?
   end
 
+  def document_owner?(user)
+    self.user_id.eql?(user.id)
+  end
+
   # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
   def as_json2
     {

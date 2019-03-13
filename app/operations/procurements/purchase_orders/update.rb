@@ -38,7 +38,13 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
-    if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && !user.vendor_payment_admin?
+    if purchase_order.sent_to_vendor?
+      add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+      return
+    end
+
+
+    if (purchase_order.approved? || purchase_order.auto_approved?) && !user.vendor_payment_admin?
       add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
     end
 
