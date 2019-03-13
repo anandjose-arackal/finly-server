@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation, :policy_id
+                :headers, :contents, :validate_operation, :policy_id, :policy
 
   def pre_validate
     Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"

@@ -124,6 +124,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       Rails.logger.fatal "BEFORE inward_invoices,\n #{inward_invoices.inspect}"
       self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
       Rails.logger.fatal "AFTER inward_invoices,\n #{inward_invoices.inspect}"
+      self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:initiated))
       payment_params = initialize_payment_objects
       op = BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, invoices_status: invoices_status})
     else
