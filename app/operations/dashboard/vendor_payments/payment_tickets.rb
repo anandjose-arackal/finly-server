@@ -7,7 +7,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
 
   def success
     params[:payment_tickets] = self.payment_tickets
-    Dashboard::VendorPayments::PurchaseOrders::DashboardPresenter.new(user, params, messages)
+    Dashboard::VendorPayments::PaymentTickets::DashboardPresenter.new(user, params, messages)
   end
 
 
@@ -24,6 +24,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
       if user.vendor_payments_admin?
         admin_data = {
           type: 'admin',
+          title: "Company Payment Tickets",
           data: [
             {
               title: "Total",
@@ -50,6 +51,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
       if user.vendor_payment_initiator?
         personal_data = {
           type: 'personal',
+          title: "My Payment Tickets",
           data: [
             {
               title: "Total",
@@ -71,6 +73,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
       if user.vendor_payments_reviewer?
         reviewer_data = {
           type: "reviewer",
+          title: "Teams' Payment Tickets",
           data: [
             {
               title: "Awaiting Approval",
