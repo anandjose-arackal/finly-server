@@ -22,14 +22,12 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         end
       end
 
-      # # todo Temporary as device is not available at the moment because of lack of frontend dev
-      # rule 'User agent is required for a session to be created' do
-      #   if RequestStoreUtil.current_request.user_agent.nil?
-      #     response 401
-      #     fail
-      #   end
-      # end
-      # # todo Temporary as device is not available at the moment because of lack of frontend dev
+      rule 'User agent is required for a session to be created' do
+        if RequestStoreUtil.current_request.user_agent.nil?
+          response_code 401
+          fail
+        end
+      end
 
       section 'If device is available' do
         before do

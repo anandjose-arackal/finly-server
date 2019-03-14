@@ -16,6 +16,8 @@ RSpec.describe 'UserAuthentication > Password' do
 
   describe '> Invalid Password' do
     it 'should throw 401 unless correct username is entered' do
+      allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
+
       expect do
         post '/oauth/token.json', params: {
             email: 'asd',
@@ -60,6 +62,7 @@ RSpec.describe 'UserAuthentication > Password' do
     it 'should return 200 with tokens when correct username and password is entered' do
       @ip = random_ip
       allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@ip)
+      allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
 
       expect do
         post '/oauth/token.json', params: {

@@ -20,6 +20,8 @@ RSpec.describe 'UserSession' do
         sessions = []
         expect(@user1.user_sessions.count).to eq(0)
 
+        allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
+
         2.times.each do
           expect do
             post '/oauth/token.json', params: {

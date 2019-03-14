@@ -28,7 +28,12 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
-    # # todo Temporary as device is not available at the moment because of lack of frontend dev
+    # todo Check for all fields in X-Finly-RP
+    # todo do not allow any api apart from send otp and verify otp for unverified device/ip
+    # todo do not allow any api for incomplete, attribute_mismatch requests
+    # todo set attribute mismatch
+    # todo ensure user session, user device and user ip is created and verified
+
     # rule 'User agent is required for the request' do
     #   if RequestStoreUtil.current_request.user_agent.nil?
     #     message 'User agent is blank in the request'
@@ -46,7 +51,6 @@ Gatekeeper::Checker.new 'On New Request' do
     #     fail
     #   end
     # end
-    # # todo Temporary as device is not available at the moment because of lack of frontend dev
   end
 
 end

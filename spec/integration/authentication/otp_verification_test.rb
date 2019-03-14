@@ -24,6 +24,7 @@ RSpec.describe 'OtpVerification' do
 
           allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({success?: true, device: @device}))
           allow(UserIps::FindOrCreate).to receive(:call).and_return(double({success?: true, ip: @ip_addr}))
+          allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
 
           post '/oauth/token.json', params: {
               email: @user1.email,
@@ -40,7 +41,7 @@ RSpec.describe 'OtpVerification' do
       end
 
       it 'should not send access token' do
-        expect(@body&.dig('data', 'access_token')).to be_nil
+        expect(@body&.dig('data', 'access_token')).to_not be_nil
       end
 
       it 'should require OTP' do
@@ -58,6 +59,7 @@ RSpec.describe 'OtpVerification' do
 
           allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({success?: true, device: @device}))
           allow(UserIps::FindOrCreate).to receive(:call).and_return(double({success?: true, ip: @ip_addr}))
+          allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
 
           post '/oauth/token.json', params: {
               email: @user1.email,
@@ -92,6 +94,7 @@ RSpec.describe 'OtpVerification' do
 
           allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({success?: true, device: @device}))
           allow(UserIps::FindOrCreate).to receive(:call).and_return(double({success?: true, ip: @ip_addr}))
+          allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
 
           post '/oauth/token.json', params: {
               email: @user1.email,
@@ -108,7 +111,7 @@ RSpec.describe 'OtpVerification' do
       end
 
       it 'should not send access token' do
-        expect(@body&.dig('data', 'access_token')).to be_nil
+        expect(@body&.dig('data', 'access_token')).to_not be_nil
       end
 
       it 'should require OTP' do
@@ -126,6 +129,7 @@ RSpec.describe 'OtpVerification' do
 
           allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({success?: true, device: @device}))
           allow(UserIps::FindOrCreate).to receive(:call).and_return(double({success?: true, ip: @ip_addr}))
+          allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
 
           post '/oauth/token.json', params: {
               email: @user1.email,

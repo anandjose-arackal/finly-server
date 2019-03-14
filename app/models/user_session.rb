@@ -65,4 +65,9 @@ class UserSession < ApplicationRecord
 
   delegate :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
 
+  def verify(verification_mode)
+    self.user_ip.update_attributes(status_id: UserIpStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
+    self.user_device.update_attributes(status_id: UserDeviceStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
+  end
+
 end

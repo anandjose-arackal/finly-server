@@ -19,6 +19,8 @@ RSpec.describe 'AccountLock' do
       expect(@user1.locked_at).to be_nil
       expect(@user1.failed_attempts).to eq(0)
 
+      allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
+
       4.times.each do
         expect do
           post '/oauth/token.json', params: {
@@ -64,6 +66,8 @@ RSpec.describe 'AccountLock' do
   describe '> Locked accounts' do
     it 'should automatically unlock after 30 minutes' do
       time = Time.now
+
+      allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
 
       expect(@user2.reload.locked_at).to be_nil
       @user2.update(locked_at: time)

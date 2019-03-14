@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_11_071631) do
+ActiveRecord::Schema.define(version: 2019_03_14_103639) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2710,6 +2710,7 @@ ActiveRecord::Schema.define(version: 2019_03_11_071631) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "rule"
+    t.integer "score", default: 1, null: false
     t.index ["company_id"], name: "index_gatekeeper_blocks_on_company_id"
     t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
@@ -4307,6 +4308,10 @@ ActiveRecord::Schema.define(version: 2019_03_11_071631) do
     t.date "due_date"
     t.integer "advance_amount_status_id"
     t.integer "bank_account_id"
+    t.integer "revised_po_id"
+    t.integer "revision_of_id"
+    t.integer "revision_number", default: 0
+    t.text "note"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -4322,6 +4327,9 @@ ActiveRecord::Schema.define(version: 2019_03_11_071631) do
     t.index ["procurement_id"], name: "index_purchase_orders_on_procurement_id"
     t.index ["procurement_term_id"], name: "index_purchase_orders_on_procurement_term_id"
     t.index ["purchase_order_status_id"], name: "index_purchase_orders_on_purchase_order_status_id"
+    t.index ["revised_po_id"], name: "index_purchase_orders_on_revised_po_id"
+    t.index ["revision_number"], name: "index_purchase_orders_on_revision_number"
+    t.index ["revision_of_id"], name: "index_purchase_orders_on_revision_of_id"
     t.index ["tax_amount_id"], name: "index_purchase_orders_on_tax_amount_id"
     t.index ["total_after_tax_id"], name: "index_purchase_orders_on_total_after_tax_id"
     t.index ["total_before_tax_id"], name: "index_purchase_orders_on_total_before_tax_id"
@@ -5595,7 +5603,7 @@ ActiveRecord::Schema.define(version: 2019_03_11_071631) do
     t.integer "user_device_id"
     t.string "client_type"
     t.text "user_agent"
-    t.integer "user_ip_id", null: false
+    t.integer "user_ip_id"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"

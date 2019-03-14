@@ -32,7 +32,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
           on_create_success(response)
           return
         else
-          invalidate_session UserSessionStatus.id_for(:failed), result.message
+          invalidate_session UserSessionStatus.id_for(:failed), (result.message || result.rule.description)
         end
       end
 
