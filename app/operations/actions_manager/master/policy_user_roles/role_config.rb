@@ -1,7 +1,7 @@
 class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Master::Base
 
   register_handle :vp_role_config
-  register_actions [:purchase_request_initiator, :purchase_request_reviewer, :purchase_order_initiator, :purchase_order_reviewer, :goods_receiver, :invoice_initiator, :invoice_reviewer, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :item_master_manager, :inventory_manager, :vendor_manager, :vendor_reviewer, :policy_admin]
+  register_actions [:purchase_request_initiator, :purchase_request_reviewer, :purchase_order_initiator, :purchase_order_reviewer, :goods_receiver, :invoice_initiator, :invoice_reviewer, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :item_master_manager, :inventory_manager, :vendor_manager, :vendor_reviewer, :policy_admin, :vendor_manager, :budget_manager]
 
   def purchase_request_initiator
     true
@@ -60,6 +60,17 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def policy_admin
+    true
+  end
+
+  def vendor_manager
+    true
+  end
+
+  def bank_payment_request_auditor
+  end
+
+  def budget_manager
     true
   end
 end
