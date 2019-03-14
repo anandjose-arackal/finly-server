@@ -39,7 +39,13 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    	return
 	    end
 
-	    unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) >= Date.today)
+	    valid_date = Date.parse(params[:scheduled_at]) rescue false 
+	    unless valid_date
+	        add_message :error, 'Invalid date provided'
+	        return
+	    end
+
+	    unless (Date.parse(params[:scheduled_at]) >= Date.today)
 	    	add_message :error, 'Cannot create back dated payment tickets'
 	    	return
 	    end
@@ -55,7 +61,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
-				yes = YesBankVendor.find(pa[:vendor_id])
+				# yes = YesBankVendor.find(pa[:vendor_id])
+				yes = user.company.yes_bank_vendors.find(pa[:vendor_id])
 				ba = yes.bank_accounts.where(id: pa[:bank_account_id])
 				pa[:bank_account_number] = ba.pluck(:account_number).first
 				pa[:ifsc] = ba.pluck(:ifsc).first
@@ -99,6 +106,17 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	    Rails.logger.fatal "self.bank_payment_request.id,\n #{self.bank_payment_request.id}"
 	    Rails.logger.fatal "self.validate_operation.order_details,\n #{self.validate_operation.order_details.inspect}"
+
+	    # Create Document Level Reviewer Mapping
+	    # For setting level specific reviewers from reviewal chain for a document
+	    params[:reviewal_document] = self.bank_payment_request.reload
+
+	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+	    unless document_reviewer_mappings_op.success?
+	      self.bank_payment_request.destroy
+	      add_message :error, document_reviewer_mappings_op.messages[:error]
+	      return
+	    end
 
 	    # Delegate payment creation to the background operation
 		BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})

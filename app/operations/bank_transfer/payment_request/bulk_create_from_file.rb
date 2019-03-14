@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation, :policy_id
+                :headers, :contents, :validate_operation, :policy_id, :policy
 
   def pre_validate
     Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"
@@ -13,6 +13,26 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     end
     if params.blank? or params[:file].blank?
       add_message :error, 'Error loading file. File not uploaded correctly'
+      return
+    end
+    unless params[:policy_id].present?
+        add_message :error, 'Policy cannot be blank'
+        return
+    end
+
+    unless params[:scheduled_at].present?
+      add_message :error, 'Please specify a scheduled date for your payment ticket.'
+      return
+    end
+
+    valid_date = Date.parse(params[:scheduled_at]) rescue false 
+    unless valid_date
+        add_message :error, 'Invalid date provided'
+        return
+    end
+
+    unless (Date.parse(params[:scheduled_at]) >= Date.today)
+      add_message :error, 'Cannot create back dated payment tickets'
       return
     end
   end
@@ -32,11 +52,17 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     self.scheduled_at = params[:scheduled_at]
     Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"
     self.policy_id = params[:policy_id]
+    self.policy = current_company.policies.find_by(id: self.policy_id)
   end
 
   def validate
     if parsed_data.blank?
       add_message :error, 'Nothing to process'
+      return
+    end
+
+    if self.policy.blank?
+      add_message :error, "Policy not found."
       return
     end
 
@@ -71,7 +97,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
-    op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    op = BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
     # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
   end
