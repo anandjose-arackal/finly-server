@@ -970,17 +970,63 @@ class User < ApplicationRecord
     RequestStore.store[:current_user]
   end
 
-    def has_policy_role?(role_id, document=nil)
-      # role_id = UserRole.id_for(role_name.to_sym)
-      if document.present?
-        policy = Policy.find_by_id document.policy_id
-        data = policy.policy_user_roles.where(user_id: self.id, user_role_id: role_id)
-      else
-        data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
-      end
-      data.present?
+  def has_policy_role?(role_id, document=nil)
+    if document.present?
+      policy = Policy.find_by_id document.policy_id
+      data = policy.policy_user_roles.where(user_id: self.id, user_role_id: role_id)
+    else
+      data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
     end
-  # *********** document specific roles end **************
+    data.present?
+  end
+
+  # ********** User Roles for Vendor Payments ******************
+
+  def is_vendor_manger?
+    self.has_policy_role?(UserRole.id_for(:vendor_manager))
+  end
+
+  def is_vendor_initiator?
+    self.has_policy_role?(UserRole.id_for(:vendor_creator))
+  end
+
+  def is_vendor_reviewer?
+    self.has_policy_role?(UserRole.id_for(:vendor_reviewer))
+  end
+
+  def is_item_master_manager?
+    self.has_policy_role?(UserRole.id_for(:item_master_manager))
+  end
+
+  def is_purchase_order_initiator?
+    self.has_policy_role?(UserRole.id_for(:purchase_order_initiator))
+  end
+
+  def is_purchase_request_reviewer?
+    self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer))
+  end
+
+  def is_bank_payment_request_initiator?
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator))
+  end
+
+  def is_bank_payment_request_reviewer?
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer))
+  end
+
+  def is_bank_payment_request_creditor?
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
+  end
+
+  def is_invoice_initiator?
+    self.has_policy_role?(UserRole.id_for(:invoice_initiator))
+  end
+
+  def is_invoice_reviewer?
+    self.has_policy_role?(UserRole.id_for(:invoice_reviewer))
+  end
+
+  # ************ User Role for vendor payments ******************
 
   def relevant
     {

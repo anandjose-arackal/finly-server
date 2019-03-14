@@ -44,7 +44,9 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   end
 
   def create_payment_ticket
-    {name: 'New Payment Ticket', id: 'create_payment_ticket', url: 'payment_tickets/new'}
+    if is_bank_payment_request_initiator? || user.vendor_payments_admin?
+      {name: 'New Payment Ticket', id: 'create_payment_ticket', url: 'payment_tickets/new'}
+    end
   end
 
 end
