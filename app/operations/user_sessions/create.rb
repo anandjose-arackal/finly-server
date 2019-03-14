@@ -98,6 +98,7 @@ class UserSessions::Create < BaseOperation
   def enrich_request(args)
     args[:referrer] = RequestStoreUtil.current_request.referer
     args[:ip] = RequestStoreUtil.current_request.remote_ip
+    args[:user_agent] = RequestStoreUtil.current_request.user_agent
     ip_type = nil
     if RequestStoreUtil.current_request.remote_ip =~ Resolv::IPv4::Regex
       ip_type = 'ipv4'
@@ -127,27 +128,30 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_device(args)
-    # # Temporary as frontend dev is not available
-    # args[:client_type] = params[:temporary_client_type]
-    # args[:user_agent] = RequestStoreUtil.current_request.user_agent
-    # # Temporary as frontend dev is not available
+    # todo Temporary as frontend dev is not available
+    args[:client_type] = params[:temporary_client_type]
+    # todo Temporary as frontend dev is not available
     # return if true
+
     return if user.nil?
+    # return
 
     result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
-      args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.messages[:error].to_sentence
-      # add_message :error, result.messages[:error].to_sentence
+      # todo enable this once frontend is sending the X-Finly-RP headers
+      # args[:status_id] = UserSessionStatus.id_for(:failed)
+      # args[:message] = result.messages[:error].to_sentence
+      # todo enable this once frontend is sending the X-Finly-RP headers
       return
     end
 
     args[:user_device_id] = result.device.id
     args[:client_type] = result.device.client_type
     unless result.device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(result.device.status_id)
-      args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.device.message
-      # add_message :error, result.device.message
+      # todo enable this once frontend is sending the X-Finly-RP headers
+      # args[:status_id] = UserSessionStatus.id_for(:failed)
+      # args[:message] = result.device.message
+      # todo enable this once frontend is sending the X-Finly-RP headers
       return
     end
   end

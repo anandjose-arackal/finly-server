@@ -2,7 +2,7 @@ require 'rails_helper'
 
 # Testing Instructions
 
-RSpec.describe "Report Workflow -- " do
+RSpec.xdescribe "Report Workflow -- " do
   before(:all) do
     @company = create(:company)
     # Create Users
