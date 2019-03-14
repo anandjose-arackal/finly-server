@@ -1,5 +1,5 @@
 # this is a sample for the frontend
-(1..10).to_a.each do |i|
+json.array!((1..10).to_a) do |i|
   json.id i
   json.title "Sample Title"
   json.department "Sample Dept"

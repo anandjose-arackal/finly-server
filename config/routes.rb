@@ -1575,6 +1575,14 @@
 #                                                         PUT    /procure/configs/doc_number_configs/:id(.:format)                                                                   procure/configs/doc_number_configs#update
 #                               procure_configs_send_mail POST   /procure/configs/send_mail(.:format)                                                                                procure/configs/mailer#send_mail
 #                                        procure_comments POST   /procure/comments(.:format)                                                                                         procure/comments#create
+#                               procure_purchase_requests GET    /procure/purchase_requests(.:format)                                                                                procure/purchase_requests#index
+#                                                         POST   /procure/purchase_requests(.:format)                                                                                procure/purchase_requests#create
+#                            new_procure_purchase_request GET    /procure/purchase_requests/new(.:format)                                                                            procure/purchase_requests#new
+#                           edit_procure_purchase_request GET    /procure/purchase_requests/:id/edit(.:format)                                                                       procure/purchase_requests#edit
+#                                procure_purchase_request GET    /procure/purchase_requests/:id(.:format)                                                                            procure/purchase_requests#show
+#                                                         PATCH  /procure/purchase_requests/:id(.:format)                                                                            procure/purchase_requests#update
+#                                                         PUT    /procure/purchase_requests/:id(.:format)                                                                            procure/purchase_requests#update
+#                                                         DELETE /procure/purchase_requests/:id(.:format)                                                                            procure/purchase_requests#destroy
 #                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
 #                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
 #                       reviewal_levels_download_mappings GET    /reviewal_levels/download_mappings(.:format)                                                                        reviewal_levels#download_mappings
@@ -3408,6 +3416,9 @@ Rails.application.routes.draw do
     end
 
     resources :comments, only: [:create]
+
+    # adding routes for purchase requests
+    resources :purchase_requests
   end
 
   ## Procurement APIs end   ##########################################
