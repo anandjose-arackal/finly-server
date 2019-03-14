@@ -10,6 +10,15 @@ class Procurements::PurchaseOrders::Void < Procurements::PurchaseOrders::Base
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
     end
+
+    # unless InwardDocument.where(id: PurchaseOrder.find(1414).procurement_id).blank? && Invoice.where(id: PurchaseOrder.find(1414).procurement_id).blank?
+    #   add_message :error, "Can't cancel a purchase order which has a GRN or Invoice attached."
+    # end
+
+    unless self.purchase_order.procurement.invoices.blank? && self.purchase_order.procurement.inward_documents.blank?
+      add_message :error, "Can't cancel a purchase order which has a GRN or Invoice attached."
+    end
+
   end
 
   def process

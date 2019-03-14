@@ -213,6 +213,8 @@ class User < ApplicationRecord
   has_many :user_branch_location_mappings
   has_many :branch_locations, through: :user_branch_location_mappings
 
+  has_many :rate_contracts, foreign_key: :creator_id
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
@@ -966,6 +968,13 @@ class User < ApplicationRecord
 
   def current_user
     RequestStore.store[:current_user]
+  end
+
+  def relevant
+    {
+      email: self.email,
+      company_id: self.company_id
+    }
   end
 
   private

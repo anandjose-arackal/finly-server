@@ -3,9 +3,10 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation, :policy_id
+                :headers, :contents, :validate_operation, :policy_id, :policy
 
   def pre_validate
+    Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"
     if user.blank?
       add_message :error, 'User not found'
       return
@@ -14,9 +15,30 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
       add_message :error, 'Error loading file. File not uploaded correctly'
       return
     end
+    unless params[:policy_id].present?
+        add_message :error, 'Policy cannot be blank'
+        return
+    end
+
+    unless params[:scheduled_at].present?
+      add_message :error, 'Please specify a scheduled date for your payment ticket.'
+      return
+    end
+
+    valid_date = Date.parse(params[:scheduled_at]) rescue false 
+    unless valid_date
+        add_message :error, 'Invalid date provided'
+        return
+    end
+
+    unless (Date.parse(params[:scheduled_at]) >= Date.today)
+      add_message :error, 'Cannot create back dated payment tickets'
+      return
+    end
   end
 
   def init
+    Rails.logger.fatal "FROM BulkCreateFromFile start of init,\n #{params.inspect}"
     self.file = params[:file]
     headers = [:name, :bank_account_number, :ifsc, :original_amount,
                :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
@@ -28,7 +50,9 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
                                                    {skip_empty_lines: true})
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
+    Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"
     self.policy_id = params[:policy_id]
+    self.policy = current_company.policies.find_by(id: self.policy_id)
   end
 
   def validate
@@ -37,7 +61,13 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
       return
     end
 
+    if self.policy.blank?
+      add_message :error, "Policy not found."
+      return
+    end
+
     self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
+    Rails.logger.fatal "FROM BulkCreateFromFile validate_operation,\n #{validate_operation.inspect}"
     if validate_operation.success?
       self.requested_amount = validate_operation.requested_amount
     else
@@ -67,7 +97,8 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
 
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
-    op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    op = BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
     # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
   end
@@ -119,6 +150,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        scheduled_at: params[:scheduled_at],
         initiating_account_type: YesBankCompanyAccount.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),

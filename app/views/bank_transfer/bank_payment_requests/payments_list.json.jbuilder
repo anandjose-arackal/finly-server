@@ -130,11 +130,21 @@ json.payments do
         json.balance_due payment.amount&.value
       end
     end
+
+    json.parent_type payment.parent_type
+    json.parent_id payment.parent_id
+    # json.invoice_details payment.invoice.invoice_amount_details
+    json.parent_details payment.parent_details
+
   end
 end
 
+# json.payments_count @result.ordered_payments.count
+# json.payments_status_ids @result.payment_status_ids
+# json.payment_status_id_count @result.payment_status_id_count
 json.payments_count @result.ordered_payments.size
 # non-paginated payments listing all payments in this payment order
+json.filter_count @result.filter_count
 unless current_company.id == 118
 json.unpaid_payments do
   json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|
