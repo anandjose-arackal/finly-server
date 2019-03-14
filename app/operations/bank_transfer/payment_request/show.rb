@@ -685,7 +685,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
   end
 
   def validate_presence
-    if bank_payment_request.blank?
+    if bank_payment_request.blank? || (bank_payment_request.company_id != user.company_id)
       add_message :error, "Payment ticket not found!"
       return false
     end

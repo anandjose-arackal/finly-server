@@ -233,6 +233,8 @@ class BankPaymentRequest < ApplicationRecord
     end
   end
 
+  before_save :add_company
+
   def can_submit?
     open? || retracted? || rejected?
   end
@@ -358,6 +360,10 @@ class BankPaymentRequest < ApplicationRecord
   def is_crediting_user?
     user = RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
+  end
+
+  def add_company
+    self.company_id = user.company_id
   end
 
   private

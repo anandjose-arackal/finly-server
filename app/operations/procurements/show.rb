@@ -7,7 +7,7 @@ class Procurements::Show < Procurements::Base
   end
 
   def validate
-    if procurement.blank?
+    if procurement.blank? || procurement.company_id != user.company_id
       add_message :error, 'Record not found'
       return
     end

@@ -198,7 +198,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   def validate_presence
-    if purchase_order.blank?
+    if purchase_order.blank? || (purchase_order.company_id != user.company_id)
       add_message :error, 'Record not found'
       return false
     end
