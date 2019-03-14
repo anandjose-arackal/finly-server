@@ -34,10 +34,9 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
     # self.advance_amount = params[:advance_amount] || 999
-    # self.receiving_account = user.company.bank_accounts.find_by(id: params[:receiving_account_id])
-    puts "ADDADVANCE from init params", params.inspect
 
-    # binding.pry
+    # self.receiving_account = user.company.bank_accounts.find_by(id: params[:receiving_account_id])
+
   end
 
   def validate
@@ -65,7 +64,6 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
 
   def process
     # self.payment_request_params = advance_payment_request_params
-    puts "ADDADVANCE from process",self.payment_request_params.inspect
     # self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     # if self.bank_payment_request.save
     #   # any changes to be made here? #todo
@@ -79,16 +77,13 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
                                       procurement_id: self.procurement.id, payment_purpose_id: 39 )
       
       if self.payment
-        # binding.pry
         # self.payment.amount_attributes = { value: advance_payment[:amount_attributes][:value] } if advance_payment[:amount_attributes]
         self.payment.amount.value = advance_payment[:amount_attributes][:value] if advance_payment[:amount_attributes]
         self.payment.scheduled_at = advance_payment[:scheduled_at] if advance_payment[:scheduled_at]
 
-        puts "advance_payment[:amount_attributes]", advance_payment[:amount_attributes].inspect
-        puts "advance_payment[:scheduled_at]", advance_payment[:scheduled_at].inspect
+
 
       else
-        # binding.pry
         self.payment_request_params = advance_payment_request_params(advance_payment)
         self.payment = Payment.new(self.payment_request_params)
       end
@@ -98,6 +93,7 @@ class Procurements::Payments::AddAdvance < Procurements::Payments::Base
       unless self.payment.save
         add_message :error, self.payment.errors.full_messages
       end
+
 
     end
 

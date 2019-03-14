@@ -15,6 +15,8 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
     has_scope :filter_po_number
     has_scope :filter_vendor_id
     has_scope :filter_by_created_at
+    has_scope :filter_payable_advances
+    has_scope :filter_user_id
 
 
     def init
@@ -23,10 +25,19 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
       self.paginated_purchase_order = self.purchase_order.paginate(page: params[:page], per_page: (params[:per_page] || 30))
     end
 
+
+    def get_status_counts
+      raw_count = self.purchase_order.where.not(advance_amount_status_id: nil).group(:advance_amount_status_id).count
+      h = {}
+      AdvanceAmountStatus.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = raw_count[ps.id] else h[ps.name] = 0 end}
+      h.delete("po_processing") # for now we would only be showing advances where po are only auto/approved
+      return h
+    end
+
   end
 
   def init
-    self.purchase_orders = user.company.purchase_orders.filter_payable_advances
+    self.purchase_orders = user.company.purchase_orders.filter_all_advances
   end
 
   def validate

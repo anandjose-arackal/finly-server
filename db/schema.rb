@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_04_124115) do
+ActiveRecord::Schema.define(version: 2019_03_14_043511) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -574,6 +574,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.datetime "deleted_at"
     t.integer "controlling_level_id"
     t.datetime "approved_at"
+    t.integer "company_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
@@ -939,7 +940,6 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.string "contact_mobile_number"
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
-    t.string "location_code"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
   end
@@ -2184,7 +2184,6 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.string "provider_name"
     t.decimal "threshold", precision: 20, scale: 5
     t.boolean "active", default: true
-    t.boolean "wo_exception", default: true
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
@@ -4290,6 +4289,10 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.date "due_date"
     t.integer "advance_amount_status_id"
     t.integer "bank_account_id"
+    t.integer "revised_po_id"
+    t.integer "revision_of_id"
+    t.integer "revision_number", default: 0
+    t.text "note"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -4305,6 +4308,9 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.index ["procurement_id"], name: "index_purchase_orders_on_procurement_id"
     t.index ["procurement_term_id"], name: "index_purchase_orders_on_procurement_term_id"
     t.index ["purchase_order_status_id"], name: "index_purchase_orders_on_purchase_order_status_id"
+    t.index ["revised_po_id"], name: "index_purchase_orders_on_revised_po_id"
+    t.index ["revision_number"], name: "index_purchase_orders_on_revision_number"
+    t.index ["revision_of_id"], name: "index_purchase_orders_on_revision_of_id"
     t.index ["tax_amount_id"], name: "index_purchase_orders_on_tax_amount_id"
     t.index ["total_after_tax_id"], name: "index_purchase_orders_on_total_after_tax_id"
     t.index ["total_before_tax_id"], name: "index_purchase_orders_on_total_before_tax_id"
@@ -4436,6 +4442,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
     t.integer "renewal_alert_number"
     t.integer "renewal_alert_period_id"
     t.string "note"
+    t.integer "company_id"
   end
 
   create_table "rate_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5993,7 +6000,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_124115) do
   add_foreign_key "departments", "cost_centers"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
-  add_foreign_key "document_items", "items", column: "inventory_line_item_id"
+  add_foreign_key "document_items", "inventory_line_items"
   add_foreign_key "document_items", "purchase_order_items"
   add_foreign_key "document_level_reviewer_mappings", "policies"
   add_foreign_key "document_number_configs", "companies"

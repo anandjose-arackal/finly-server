@@ -115,7 +115,7 @@ class PurchaseOrder < ApplicationRecord
   # validates :policy_id, presence: true
   # validates :items, presence: true
   scope :document_number_generated_in_finly, -> {where override_po_number: [false, nil]}
-
+  scope :not_open, -> {where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:open)}
   scope :with_id, -> (id) {where id: id}
   scope :with_user_id, -> (user_ids) {where user_id: user_ids}
   scope :with_status_ids, -> (status_ids) {where purchase_order_status_id: status_ids}
@@ -188,15 +188,21 @@ class PurchaseOrder < ApplicationRecord
     where payment_term_id: ids
   }
 
-  scope :filter_payable_advances, -> {
-    where( purchase_order_status_id: [
-                                        PurchaseOrderStatus.id_for(:approved),
-                                        PurchaseOrderStatus.id_for(:auto_approved)
-                                     ], 
-           advance_amount_status_id: [
-                                        AdvanceAmountStatus.id_for(:to_be_processed),
-                                        AdvanceAmountStatus.id_for(:failed)
-                                     ])
+  scope :filter_payable_advances, -> (enabled) {
+    if StringUtils.to_bool(enabled)
+      where( purchase_order_status_id: [
+                                          PurchaseOrderStatus.id_for(:approved),
+                                          PurchaseOrderStatus.id_for(:auto_approved)
+                                       ], 
+             advance_amount_status_id: [
+                                          AdvanceAmountStatus.id_for(:to_be_processed),
+                                          AdvanceAmountStatus.id_for(:failed)
+                                       ])
+    end
+  }
+
+  scope :filter_all_advances, -> {
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil)
   }
 
   scope :filter_by_due_date, -> (due_date) {
@@ -208,8 +214,6 @@ class PurchaseOrder < ApplicationRecord
     # where created_at: created_at
     where("DATE(created_at) >= ?", created_at)
   }
-
-
 
   before_save :calculate_line_items
   after_save :budget_trail_entry
@@ -329,7 +333,32 @@ class PurchaseOrder < ApplicationRecord
     calculate_line_items
   end
 
+  # def prepopulate_amounts
+  #   populate_advance_amount
+  # end
+
+  # For user role as purchase order initiator
+  def is_initiating_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:purchase_order_initiator), self)
+  end
+
+  # For user role as purchase order reviewer
+  def is_reviewing_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
+  end
+
+  
   private
+
+  # def populate_advance_amount
+  #   if self.advance_amount.blank?
+  #     # no change in net amount
+  #     self.advance_amount = Amount.new(value: 0, currency_id: 1)
+  #     return
+  #   end
+  # end
 
   def calculate_line_items
     total_before_tax_amount = 0
@@ -424,11 +453,11 @@ class PurchaseOrder < ApplicationRecord
       self.build_balance_amount(value: total_amount, currency_id: 1)
     end
 
-    if self.advance_amount.present? # && self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
-      self.balance_amount.value = total_amount - self.advance_amount.value
+    if self.advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+      # self.balance_amount.value = total_amount - self.advance_amount.value
+    else
+      self.advance_amount  = Amount.new(value: 0, currency_id: 1)
     end
-
-    # binding.pry
 
     # self.save
   end
@@ -478,7 +507,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.roles
-    {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
+    [:purchase_order_initiator, :purchase_order_reviewer]
   end
 
   def self.role_based_associated_status_ids(user)
@@ -500,6 +529,10 @@ class PurchaseOrder < ApplicationRecord
       end
     end
     return statuses.uniq
+  end
+
+  def self.initiator_associated_items(user, role_id)
+    PurchaseOrder.where(id: user.procurements&.joins(:purchase_order)&.pluck("purchase_orders.id"))
   end
 
 end

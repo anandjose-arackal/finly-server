@@ -40,7 +40,7 @@ class Item < ApplicationRecord
   validates :description, presence: true
 
 
-  accepts_nested_attributes_for :artifacts
+  accepts_nested_attributes_for :artifacts, allow_destroy: true
 
   scope :with_category_id, -> (id){
     where category_id: id
@@ -96,6 +96,18 @@ class Item < ApplicationRecord
 
   def tax_amount
     self.tax_rate&.rate
+  end
+
+  # def validate_if_owner?(user)
+  #   self.creator_id == user.id
+  # end
+
+  def validate_if_manager?(user)
+    user.is_item_master_manager?
+  end
+
+  def validate_if_admin?(user)
+    user.admin?
   end
 
   private

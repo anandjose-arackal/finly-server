@@ -90,6 +90,12 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     # ********* Workflow manager changes end ************************
 
     # ****************** Policy User Role based index start ****************
+
+    if user.vendor_payments_admin?
+      self.payment_requests = ::BankPaymentRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin)).not_open.or(user.bank_payment_requests)
+      return
+    end
+
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.payment_requests = ::BankPaymentRequest.associated_items(user, ::BankPaymentRequest.roles)
     else
@@ -164,6 +170,27 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
         end
       end
       self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page)
+    end
+
+    def status_count
+      # grab all relevant ids whose filter count needs to be sent
+      bpr_ids = [ BankPaymentRequestStatus.id_for(:open), BankPaymentRequestStatus.id_for(:processing),
+                  BankPaymentRequestStatus.id_for(:retracted), BankPaymentRequestStatus.id_for(:rejected),
+                  BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited) ]
+      po_ids = [ PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
+
+      # get raw count and then replace the id with its status name
+      bpr = self.payment_requests.where(status_id: bpr_ids).group(:status_id).count
+      bpr_name = {}
+      BankPaymentRequestStatus.all.each {|ps| if bpr.keys.include? ps.id then bpr_name[ps.name] = bpr[ps.id] end}
+
+      # get raw count and then replace the id with its status name
+      po = self.payment_requests.joins(:payment_order).where('payment_orders.payment_order_status_id': po_ids).group(:payment_order_status_id).count      
+      po_name = {}
+      PaymentOrderStatus.all.each {|ps| if po.keys.include? ps.id then po_name[ps.name] = po[ps.id] end}
+
+      # merge
+      bpr_name.reverse_merge(po_name)
     end
   end
 

@@ -61,7 +61,7 @@ when :itzcash_production, :aws_production, :background_production
   linked_files << "config/sidekiq.yml"
   linked_files << "config/elastic_apm.yml"
   # linked_files << "config/sentry.yml"
-when :development_3
+when :development_3, :migrated_test
   linked_files << "config/sidekiq.yml"
 end
 set :linked_files, linked_files

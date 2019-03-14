@@ -40,7 +40,6 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     self.payment_params = []
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
-      # binding.pry
       self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
           application: "vp",
@@ -127,7 +126,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
       custom_fields = params[:custom_fields]
       params.delete(:custom_fields)
       payment = self.bank_payment_request.payment_order.payments.build(params)
-      # binding.pry
+
       if payment.save
         # perform the required calculations
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
@@ -159,7 +158,6 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   end
 
   def retrieve_bank_account(order_details)
-    # binding.pry
     if order_details[:account_id].present?
       id = order_details[:account_id]
       ba = BankAccount.find_by(id: id)
