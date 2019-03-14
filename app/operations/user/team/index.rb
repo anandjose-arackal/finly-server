@@ -131,7 +131,7 @@ class User::Team::Index < User::Team::Base
     # self.response = user.company.users.with_id(user_ids)
     #
     # NEW CODE
-    user_ids = PolicyUserMapping.where(policy_id: policy_ids).pluck(:user_id)
+    user_ids = PolicyUserMapping.non_deleted.where(policy_id: policy_ids).pluck(:user_id)
     user_ids.uniq! if user_ids.present?
     self.response = user.company.users.with_id(user_ids)
   end
