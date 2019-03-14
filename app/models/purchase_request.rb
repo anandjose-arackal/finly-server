@@ -15,4 +15,6 @@
 #
 
 class PurchaseRequest < ApplicationRecord
+
+  belongs_to :status, class_name: "PurchaseRequestStatus"
 end
