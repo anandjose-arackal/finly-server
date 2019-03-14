@@ -21,7 +21,8 @@ class PurchaseRequestStatus < ApplicationRecord
         :retracted,
         :rejected,
         :closed,
-        :order_initiated
+        :order_initiated,
+        :cancelled
     ]
   end
 end

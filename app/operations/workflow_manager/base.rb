@@ -33,6 +33,8 @@ class WorkflowManager::Base < BaseOperation
       end
     when 'BankPaymentRequest'
       self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
+    when 'PurchaseRequest'
+      self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestProvider.new self.document, violations_present, user
     else
       add_message :error, 'Unknown document type'
     end
