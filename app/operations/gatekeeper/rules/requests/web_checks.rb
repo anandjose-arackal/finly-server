@@ -28,6 +28,14 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
+    rule 'Do not allow access for unverified IPs' do
+
+    end
+
+    rule '' do
+
+    end
+
     # todo Check for all fields in X-Finly-RP
     # todo do not allow any api apart from send otp and verify otp for unverified device/ip
     # todo do not allow any api for incomplete, attribute_mismatch requests
