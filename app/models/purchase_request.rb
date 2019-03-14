@@ -17,4 +17,8 @@
 class PurchaseRequest < ApplicationRecord
 
   belongs_to :status, class_name: "PurchaseRequestStatus"
+  belongs_to :department
+  belongs_to :location
+  belongs_to :policy
+  belongs_to :company
 end
