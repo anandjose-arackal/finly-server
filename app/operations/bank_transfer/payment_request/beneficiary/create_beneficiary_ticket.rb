@@ -107,6 +107,17 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    Rails.logger.fatal "self.bank_payment_request.id,\n #{self.bank_payment_request.id}"
 	    Rails.logger.fatal "self.validate_operation.order_details,\n #{self.validate_operation.order_details.inspect}"
 
+	    # Create Document Level Reviewer Mapping
+	    # For setting level specific reviewers from reviewal chain for a document
+	    params[:reviewal_document] = self.bank_payment_request.reload
+
+	    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+	    unless document_reviewer_mappings_op.success?
+	      self.bank_payment_request.destroy
+	      add_message :error, document_reviewer_mappings_op.messages[:error]
+	      return
+	    end
+
 	    # Delegate payment creation to the background operation
 		BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 

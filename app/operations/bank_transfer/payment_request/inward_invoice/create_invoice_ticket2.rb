@@ -121,8 +121,21 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.payment_request_params = bank_payment_request_params
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     if self.bank_payment_request.save
+
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.bank_payment_request.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        self.bank_payment_request.destroy
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
+      
       Rails.logger.fatal "BEFORE inward_invoices,\n #{inward_invoices.inspect}"
-      self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
+      # self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
       Rails.logger.fatal "AFTER inward_invoices,\n #{inward_invoices.inspect}"
       self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:initiated))
       payment_params = initialize_payment_objects
