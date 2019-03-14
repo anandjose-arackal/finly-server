@@ -2,7 +2,7 @@ class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
   attr_accessor :po_advances
 
   def init
-    self.= BankTransfer::PaymentRequest::Index.(user, params).payment_requests
+    self = BankTransfer::PaymentRequest::Index.(user, params).payment_requests
   end
 
   def success
