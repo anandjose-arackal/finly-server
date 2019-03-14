@@ -1,5 +1,5 @@
 require 'rails_helper'
-RSpec.describe 'UserAuthentication' do
+RSpec.describe 'UserAuthentication > Password' do
 
   before :all do
     @company = create :company

@@ -45,7 +45,8 @@ FactoryBot.define do
     user_agent = Faker::Internet.user_agent
     ua_client = DeviceDetector.new(user_agent)
 
-    timestamp {DateTime.now.strftime('%Q')}
+
+    timestamp_s {DateTime.now.strftime('%Q')}
     user_agent {user_agent}
     timezone {'Indian Standard Time'}
     fingerprint {SecureRandom.hex(32)}

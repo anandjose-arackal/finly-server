@@ -28,7 +28,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
       if sessions_result.success? and sessions_result.session.status_id == UserSessionStatus.id_for(:authorized)
         result = Gatekeeper::Event.(:after_session_create, params)
         if result.success?
-          @require_otp_verification = result.require_otp
+          @user.otp_verified = !result.require_otp
           on_create_success(response)
           return
         else

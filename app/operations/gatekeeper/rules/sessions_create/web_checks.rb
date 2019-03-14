@@ -1,7 +1,7 @@
 Gatekeeper::Checker.new 'On Web Authentication' do
 
   before do
-    skip unless RequestStoreUtil.current_device&.client_type == 'UserDeviceBrowser'
+    skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
   end
 
   premise :after_session_create do
@@ -49,8 +49,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         end
 
         rule 'Unverified devices need to be verified before proceeding' do
-          web = RequestStoreUtil.current_device
-          next unless web.status_id == UserDeviceStatus.id_for(:unverified)
+          next unless RequestStoreUtil.current_device.status_id == UserDeviceStatus.id_for(:unverified)
           require_otp true
         end
 
@@ -64,14 +63,16 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         end
       end
 
-      section 'If IP is available' do
-        before do
-          skip if RequestStoreUtil.current_session.user_ip.nil?
+      section 'Ip Check' do
+
+        rule 'UserIP has to be created for every session' do
+          next unless RequestStoreUtil.current_session&.user_ip.nil?
+          response_code 401
+          fail
         end
 
         rule 'Unverified IPs need to be verified before proceeding' do
-          ip = RequestStoreUtil.current_session.user_ip
-          next unless ip.status_id == UserIpStatus.id_for(:unverified)
+          next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
           require_otp true
         end
 
