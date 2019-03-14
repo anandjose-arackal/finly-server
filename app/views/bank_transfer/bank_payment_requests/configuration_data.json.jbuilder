@@ -47,8 +47,6 @@ json.policies do
   end
 end
 
-# binding.pry
-
 json.cost_centers do
   json.array!(@result.cost_centers.cost_centers) do |cost_center|
     json.name cost_center.name

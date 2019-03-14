@@ -191,6 +191,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     return if invoice.validate_if_owner(user)
     return if invoice.validate_if_admin(user)
     return if invoice.validate_if_reviewer(user)
+    raise_unauthorized_exception
   end
 
 end

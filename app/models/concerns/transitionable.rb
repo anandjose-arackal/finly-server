@@ -347,9 +347,7 @@ module Transitionable
     end
 
     def validate_if_admin(user)
-      if self.policy.present?
-        self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:admin)).pluck(:user_id).include?(user.id)
-      end
+      user.admin?
     end
     
     def validate_if_reviewer(user)
@@ -543,17 +541,18 @@ module Transitionable
         when :purchase_request_reviewer, 'purchase_request_reviewer'
           data = []
         when :purchase_order_initiator, 'purchase_order_initiator'
-          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+          data = PurchaseOrder.initiator_associated_items(user, role_id)
         when :purchase_order_reviewer, 'purchase_order_reviewer'
+          # Get data for purchase order reviewer
           data = role_based_reviewer_associated_items(user, role_id)
         when :goods_receiver, 'goods_receiver'
           data = []
         when :invoice_initiator, 'invoice_initiator'
-          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+          data = user.company.inward_invoices.where(created_by_user_id: user.id)
         when :invoice_reviewer, 'invoice_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :bank_payment_request_initiator, 'bank_payment_request_initiator'
-          data = status_based_associated_items(user, role_id).where("#{self.document_owner_attribute} = (?)", user.id)
+          data = role_based_initiator_associated_items(user, role_id)
         when :bank_payment_request_reviewer, 'bank_payment_request_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :bank_payment_request_creditor, 'bank_payment_request_creditor'
@@ -565,8 +564,14 @@ module Transitionable
         when :vendor_creator, 'vendor_creator'
           data = []
         when :vendor_reviewer, 'vendor_reviewer'
-          data = role_based_reviewer_associated_items(user, role_id, options)
+          data = role_based_reviewer_associated_items(user, role_id)
+        when :vendor_manager, 'vendor_manager'
+          data = []
         when :policy_admin, 'policy_admin'
+          data = []
+        when :bank_payment_request_auditor, 'bank_payment_request_auditor'
+          data = []
+        when :budget_manager, 'budget_manager'
           data = []
         else
           data = []
@@ -575,8 +580,26 @@ module Transitionable
       end
     end
 
+
+
+  def role_based_admin_associated_items(user, role_id, options={})
+    if user.instance_of?(User)
+      if self.column_names.include? 'company_id'
+        self.where(company_id: user.company.id)
+      else
+        user_ids = user.company.users.pluck(:id)
+        self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+      end
+    end
+  end
+
+  def role_based_initiator_associated_items(user, role_id, options={})
+    document_table_name = options[:document_table_name]
+    document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
+  end
+
     def role_based_reviewer_associated_items(user, role_id, options={})
-        policy_ids = user.policy_user_roles.where(role_id: role_id).pluck(:policy_id).uniq rescue nil
+        policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
         # Get controlling level id from all documents
         if self.column_names.include? 'company_id'
           controlling_level_ids = self.where(company_id: user.company.id).pluck(:controlling_level_id).flatten.compact
@@ -626,11 +649,14 @@ module Transitionable
       end
     end
 
-    def associated_items(user, resource_roles)
+    def associated_items(user, document_roles)
       data = nil
+      role_ids = UserRole.where(name: document_roles).pluck(:id) rescue []
+      policy_ids = user.policy_user_roles.where(user_role_id: role_ids).pluck(:policy_id)&.uniq rescue nil
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
-        puts "#{role_id}"
-        if !self.role_based_associated_items(user, role_id).blank? && !resource_roles.fetch(role_id.to_s, nil).blank?
+        role_name = UserRole.find_by_id(role_id).name
+        valid_role = document_roles.include?(role_name.to_sym)
+        if valid_role && self.role_based_associated_items(user, role_id).present? 
           if data.blank?
             data = self.role_based_associated_items(user, role_id)
           else

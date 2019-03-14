@@ -18,11 +18,15 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
   end
 
   def init
-    self.inventory_line_items = user.company.items
+    if user.has_policy_role?(UserRole.id_for(:item_master_manager))
+      self.inventory_line_items = user.company.items
+    end
   end
 
   def validate
-
+    if inventory_line_items.blank?
+      add_message :error, 'No record found'
+    end
   end
 
   def success

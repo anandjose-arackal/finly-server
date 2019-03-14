@@ -6,7 +6,7 @@ json.vendor @result.purchase_order.vendor.as_json
 
 json.actions @result.actions
 
-if @result.purchase_order.advance_payments.present?
+if @result.purchase_order.advance_payments&.present?
   json.show_advance_payments true
   json.advance_payments_count @result.purchase_order.advance_payments.count
 end

@@ -37,8 +37,8 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
 
   belongs_to :company, optional: true
-  belongs_to :gst_type
-  belongs_to :tds_slab, class_name: 'TdsRatesList'
+  belongs_to :gst_type, optional: true
+  belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
 
   belongs_to :status, class_name: 'BeneficiaryPaymentStatus'
 
@@ -111,7 +111,6 @@ class BeneficiaryPayment < ApplicationRecord
   	tax_amount = 0
   	balance_due_amount = 0
 
-  	# binding.pry
     if self.inclusive_of_taxes # calculate the other amounts retrospectively
       # first calculate the gross amount by deducting the discount from
       # the original amount entered
@@ -220,7 +219,7 @@ class BeneficiaryPayment < ApplicationRecord
   #     self.tax_amount = 0
   #     return
   #   end
-  #   # binding.pry
+  #   
   #   self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.original_amount, (self.tax))
   #   self.tax_amount = self.original_amount - self.gross_amount
   # end

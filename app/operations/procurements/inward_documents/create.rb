@@ -12,6 +12,10 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
     end
+
+    if self.purchase_order.closed?
+      add_message :error, "This Purchase Order is closed. No further actions can be taken."
+    end
   end
 
   def process

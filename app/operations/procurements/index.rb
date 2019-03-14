@@ -6,8 +6,25 @@ class Procurements::Index < Procurements::Base
   end
 
   def process
+
+    if user.vendor_payments_admin?
+      self.procurements = user.company.procurements.with_ids(::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin))&.pluck(:procurement_id)&.uniq).or(user.procurements)
+      return
+    end
+
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.procurements = user.company.procurements.with_ids(::PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles)&.pluck(:procurement_id)&.uniq)
+      # 'Model.none' returns blank active record relation
+      self.procurements = user.company.procurements.with_ids(::PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles)&.pluck(:procurement_id)&.uniq) rescue ::Procurement.none
+      # For Tax invoice/Inward invoice
+      self.procurements = procurements.or(user.company.procurements.with_ids(::Invoice.associated_items(user, resource_roles= ::Invoice.roles)&.pluck(:procurement_id)&.uniq)) rescue ::Procurement.none
+      # For inward document/ Goods receiver
+      self.procurements = procurements.or(user.company.procurements.with_ids(::InwardDocument.associated_items(user, resource_roles= ::InwardDocument.roles)&.pluck(:procurement_id)&.uniq)) rescue ::Procurement.none
+      # If user is bank payment request creditor in the policy
+      if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
+        invoice_status_ids = [InwardInvoiceStatus.id_for(:approved), InwardInvoiceStatus.id_for(:unpaid), InwardInvoiceStatus.id_for(:partially_paid), InwardInvoiceStatus.id_for(:paid)]
+        policy_ids = user.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", user.id, UserRole.id_for(:bank_payment_request_creditor))&.pluck(:id)
+        self.procurements = procurements.or(Procurement.where(id: user.company.inward_invoices.where(policy_id: policy_ids).with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)))
+      end
     else
       self.procurements = user.procurements
     end
@@ -89,7 +106,7 @@ class Procurements::Index < Procurements::Base
     attr_accessor :procurements, :paginated_procurements, :count
 
     has_scope :filter_status_tags, type: :array
-    has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number
+    has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number, :filter_doc_number
     has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
     has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
     has_scope :filter_user, using: [:user_details, :user_id], type: :hash
@@ -98,6 +115,7 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_po_status
     has_scope :filter_invoice_status
     has_scope :filter_submission_date
+    has_scope :filter_delivery_date
     has_scope :filter_procurement_name
     has_scope :filter_procurement_type
     has_scope :filter_invoice_serial
@@ -116,6 +134,7 @@ class Procurements::Index < Procurements::Base
       per_page = params[:per_page] || 30
       self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).include_details
       self.count = self.procurements.count
+
     end
 
     def apply_filter
@@ -130,6 +149,13 @@ class Procurements::Index < Procurements::Base
 
     end
 
+    def get_status_counts
+      st_ids = StatusTag.all.pluck(:id)
+      pr_ids = self.procurements.filter_procurement_type("purchase_order").pluck(:id)
+      # ProcurementStatusTaggable.group(:status_tag_id).where(status_tag_id: st_ids).with_procurement_ids(pr_ids).size
+      ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).group(:status_tag_id).count
+    end
+
     def awaiting_action?(procurement)
     end
     
@@ -139,6 +165,8 @@ class Procurements::Index < Procurements::Base
           params[:filter_invoice_number] = params[:search_query]
         when 'po_number'
           params[:filter_po_number] = params[:search_query]
+        when 'doc_number'
+          params[:filter_doc_number] = params[:search_query]
         when 'procurement_name'
           params[:filter_procurement_name] = params[:search_query]
         when 'sub_department_name'

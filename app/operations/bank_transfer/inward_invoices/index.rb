@@ -44,7 +44,13 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
   attr_accessor :invoices
 
   def init
-    self.invoices = user.company.inward_invoices.non_beneficiary.created_at_desc
+    if user.vendor_payments_admin?
+      self.invoices = user.company.inward_invoices.non_beneficiary.created_at_desc
+      return
+    end
+    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
+      self.invoices  = ::Invoice.associated_items(user, ::Invoice.roles)
+    end
   end
 
   def success

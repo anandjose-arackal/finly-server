@@ -19,6 +19,7 @@ json.result do
           json.amount_attributes do
             json.currency_id line_item&.amount&.currency_id
             json.value line_item&.amount&.value
+            json.id line_item&.amount&.id
           end
           if line_item.artifacts.present?
             json.artifacts_attributes do

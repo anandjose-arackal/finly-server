@@ -20,6 +20,7 @@
 #  booking_type_hotel      :boolean          default(TRUE)
 #  booking_type_restaurant :boolean          default(TRUE)
 #  booking_type_other      :boolean          default(TRUE)
+#  trips_money_request     :boolean          default(TRUE)
 #
 
 require 'test_helper'

@@ -29,6 +29,20 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	      add_message :error, 'Vendor params not sent for processing.'
 	      return
 	    end
+	    unless params[:policy_id].present?
+	        add_message :error, 'Policy cannot be blank'
+	        return
+	    end
+
+	    unless params[:scheduled_at].present?
+	    	add_message :error, 'Please specify a scheduled date for your payment ticket.'
+	    	return
+	    end
+
+	    unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) >= Date.today)
+	    	add_message :error, 'Cannot create back dated payment tickets'
+	    	return
+	    end
 	end
 
 	def init
@@ -56,6 +70,10 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    if payments_attributes.blank?
 	      add_message :error, 'Nothing to process'
 	      return
+	    end
+
+	    unless self.policy.present?
+	        add_message :error, 'Policy not found'
 	    end
 
 	    self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.payments_attributes})

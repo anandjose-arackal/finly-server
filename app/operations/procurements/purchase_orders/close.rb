@@ -14,7 +14,7 @@ class Procurements::PurchaseOrders::Close < Procurements::PurchaseOrders::Base
 
   def process
     params[:document] = self.purchase_order
-    params[:aasm_event] = 'approve'
+    params[:aasm_event] = 'close'
     params[:violation_present] = false #todo Check violations
     op = WorkflowManager::Base.(user, params)
     unless op.success?

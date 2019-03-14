@@ -44,7 +44,6 @@ class BankTransfer::PaymentRequest::NewPr < BankTransfer::PaymentRequest::Base
 			end
 		end
 
-
 		self.payments_attributes = params[:payments_attributes]
 	end
 
