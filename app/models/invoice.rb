@@ -523,6 +523,18 @@ class Invoice < ApplicationRecord
     }
   end
 
+  # For user role as invoice initiator
+  def is_initiating_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:invoice_initiator), self)
+  end
+
+  # For user role as invoice reviewer
+  def is_reviewing_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
+  end
+
   private
 
   def set_defaults
@@ -597,8 +609,8 @@ class Invoice < ApplicationRecord
   end
 
   def self.roles
-    # {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
-    [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
+    # [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
+    [:invoice_initiator, :invoice_reviewer]
   end
 
 end

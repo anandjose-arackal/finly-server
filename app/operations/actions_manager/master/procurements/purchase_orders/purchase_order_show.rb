@@ -9,8 +9,10 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
   
   def send_mail
-    (purchase_order.approved? || purchase_order.auto_approved?) && 
-    (user_in_level? || document_owner?)
+    if purchase_order.is_initiating_user?
+      (purchase_order.approved? || purchase_order.auto_approved?) && 
+      (user_in_level? || document_owner?)
+    end
   end
   
   def export_items
@@ -18,12 +20,16 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def submit
-    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    if purchase_order.is_initiating_user?
+      document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    end
   end
 
   def reject
-    purchase_order.processing? &&
-    user_in_level?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      user_in_level?
+    end
   end
 
   def close
@@ -31,8 +37,10 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def approve
-    purchase_order.processing? &&
-    user_in_level?
+    if purchase_order.is_reviewing_user?
+      purchase_order.processing? &&
+      user_in_level?
+    end
   end
 
   def remind
@@ -41,13 +49,17 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def retract
-    purchase_order.processing? &&
-    document_owner?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      document_owner?
+    end
   end
 
   def remind_approver
-    purchase_order.processing? &&
-    document_owner?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      document_owner?
+    end
   end
 
   def void
@@ -70,11 +82,15 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def delete
-    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    if purchase_order.is_initiating_user?
+      document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    end
   end
 
   def save_and_submit
-    (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
+    if purchase_order.is_initiating_user?
+      (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
+    end
   end
 
   def more_actions

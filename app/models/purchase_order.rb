@@ -333,6 +333,18 @@ class PurchaseOrder < ApplicationRecord
   #   populate_advance_amount
   # end
 
+  # For user role as purchase order initiator
+  def is_initiating_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:purchase_order_initiator), self)
+  end
+
+  # For user role as purchase order reviewer
+  def is_reviewing_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
+  end
+
   
   private
 
@@ -491,8 +503,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.roles
-    # {'1'=> 'admin', '12'=> 'purchase_order_initiator', '13'=> 'purchase_order_reviewer', '15'=> 'invoice_initiator', '16'=> 'invoice_reviewer', '14'=> 'goods_receiver'}
-    [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
+    [:purchase_order_initiator, :purchase_order_reviewer]
   end
 
   def self.role_based_associated_status_ids(user)
@@ -514,6 +525,10 @@ class PurchaseOrder < ApplicationRecord
       end
     end
     return statuses.uniq
+  end
+
+  def self.initiator_associated_items(user, role_id)
+    PurchaseOrder.where(id: user.procurements&.joins(:purchase_order)&.pluck("purchase_orders.id"))
   end
 
 end

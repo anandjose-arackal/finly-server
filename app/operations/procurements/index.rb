@@ -13,7 +13,18 @@ class Procurements::Index < Procurements::Base
     end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.procurements = user.company.procurements.with_ids(::PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles)&.pluck(:procurement_id)&.uniq)
+      # 'Model.none' returns blank active record relation
+      self.procurements = user.company.procurements.with_ids(::PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles)&.pluck(:procurement_id)&.uniq) rescue ::Procurement.none
+      # For Tax invoice/Inward invoice
+      self.procurements = procurements.or(user.company.procurements.with_ids(::Invoice.associated_items(user, resource_roles= ::Invoice.roles)&.pluck(:procurement_id)&.uniq)) rescue ::Procurement.none
+      # For inward document/ Goods receiver
+      self.procurements = procurements.or(user.company.procurements.with_ids(::InwardDocument.associated_items(user, resource_roles= ::InwardDocument.roles)&.pluck(:procurement_id)&.uniq)) rescue ::Procurement.none
+      # If user is bank payment request creditor in the policy
+      if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
+        invoice_status_ids = [InwardInvoiceStatus.id_for(:approved), InwardInvoiceStatus.id_for(:unpaid), InwardInvoiceStatus.id_for(:partially_paid), InwardInvoiceStatus.id_for(:paid)]
+        policy_ids = user.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", user.id, UserRole.id_for(:bank_payment_request_creditor))&.pluck(:id)
+        self.procurements = procurements.or(Procurement.where(id: user.company.inward_invoices.where(policy_id: policy_ids).with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)))
+      end
     else
       self.procurements = user.procurements
     end

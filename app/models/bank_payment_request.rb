@@ -344,6 +344,22 @@ class BankPaymentRequest < ApplicationRecord
     self.payment_order.amount_requested&.value
   end
 
+  # For user role as bank payment request initiator 
+  def is_initiating_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), self)
+  end
+
+  def is_reviewing_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), self)
+  end
+
+  def is_crediting_user?
+    user = RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
+  end
+
   private
 
   def self.status_ids(*statuses)
@@ -403,4 +419,7 @@ class BankPaymentRequest < ApplicationRecord
     # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
     [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor]
   end
+
+
+
 end

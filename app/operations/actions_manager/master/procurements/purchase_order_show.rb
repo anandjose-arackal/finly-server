@@ -15,8 +15,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def mark_send_to_vendor
-
-    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
+    if purchase_order.is_reviewing_user?
+      (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
+    end
   end
 
   def po_revision
@@ -42,36 +43,50 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def submit
-    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    if purchase_order.is_initiating_user?
+      document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    end
   end
   
   def reject
-    purchase_order.processing? &&
-    user_in_level?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      user_in_level?
+    end
   end
 
   def close
-    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && (user_in_level? || document_owner?)
+    if user.vendor_payments_admin? || purchase_order.is_initiating_user? || purchase_order.is_reviewing_user?
+      (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && (user_in_level? || document_owner?)
+    end
   end
 
   def approve
-    purchase_order.processing? &&
-    user_in_level?
+    if purchase_order.is_reviewing_user?
+      purchase_order.processing? &&
+      user_in_level?
+    end
   end
 
   def remind
-    purchase_order.processing? &&
-    document_owner?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      document_owner?
+    end
   end
 
   def retract
-    purchase_order.processing? &&
-    document_owner?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      document_owner?
+    end
   end
 
   def remind_approver
-    purchase_order.processing? &&
-    document_owner?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      document_owner?
+    end
   end
 
   def void
@@ -97,7 +112,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def delete
-    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    if purchase_order.is_initiating_user?
+      document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    end
   end
 
   def more_actions
@@ -105,7 +122,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def make_payment
-    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level?)
+    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || user.vendor_payments_admin?)
   end
 
   def audit_trail

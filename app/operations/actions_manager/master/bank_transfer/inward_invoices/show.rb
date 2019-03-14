@@ -22,11 +22,17 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::Show < ActionsManage
   end
 
   def make_payment
-    user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
+    user.vendor_payments_admin? || user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
   end
 
   def delete_invoice
-    (invoice.open? && user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator)))
+    if (!invoice.open? && !invoice.rejected? && !invoice.retracted? && !invoice.closed?) && user.vendor_payments_admin?
+      return true
+    end
+
+    if (invoice.open? || invoice.rejected? || invoice.retracted?) && user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator))
+      return true
+    end
   end
 
 end

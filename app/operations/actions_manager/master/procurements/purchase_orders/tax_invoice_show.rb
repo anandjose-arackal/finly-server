@@ -21,8 +21,10 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
   
   def send_mail
-    (invoice.approved? || invoice.auto_approved?) &&
-    (user_in_level?) || (document_owner?)
+    if invoice.is_initiating_user?
+      (invoice.approved? || invoice.auto_approved?) &&
+      (user_in_level?) || (document_owner?)
+    end
   end
   
   def export_items
@@ -30,11 +32,15 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def submit
-    document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
+    if invoice.is_initiating_user?
+      document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
+    end
   end
 
   def reject
-    invoice.processing? && user_in_level?
+    if invoice.is_reviewing_user?
+      invoice.processing? && user_in_level?
+    end
   end
 
   # def close
@@ -42,7 +48,9 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   # end
 
   def approve
-    invoice.processing? && user_in_level?
+    if invoice.is_reviewing_user?
+      invoice.processing? && user_in_level?
+    end
   end
 
   def remind
@@ -51,12 +59,16 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def retract
-    invoice.processing? && document_owner?
+    if invoice.is_initiating_user?
+      invoice.processing? && document_owner?
+    end
   end
 
   def remind_approver
-    invoice.processing? &&
-    document_owner?
+    if invoice.is_initiating_user?
+      invoice.processing? &&
+      document_owner?
+    end
   end
 
   def void
@@ -84,7 +96,9 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def save_and_submit
-    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
+    if invoice.is_initiating_user?
+      ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
+    end
   end
 
   def more_actions
