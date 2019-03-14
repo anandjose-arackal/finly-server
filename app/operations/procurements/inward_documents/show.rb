@@ -7,6 +7,8 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
 
   def validate
     return if record_not_present
+    validate_association
+    raise_unauthorized_exception
   end
 
   def process
@@ -44,7 +46,11 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
     !validate_presence
   end
 
-  def validate_ownership
+  def validate_association
+    return if rate_contract.validate_if_admin?(user)
+    return if rate_contract.validate_if_owner?(user)
+    return if rate_contract.validate_if_manager?(user)
+    raise_unauthorized_exception
   end
 
 end

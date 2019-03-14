@@ -70,4 +70,16 @@ class InwardDocument < ApplicationRecord
     [:goods_receiver]
   end
 
+  def validate_if_owner?(user)
+    self.user_id == user.id
+  end
+
+  def validate_if_manager?(user)
+    user.is_goods_receiver?
+  end
+
+  def validate_if_admin?(user)
+    user.admin?
+  end
+
 end

@@ -697,7 +697,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
   end
 
   def validate_association
-    # Owner of document is allowed to access the bank_payment_request, no further validation required 
+    # Owner of document is allowed to access the bank_payment_request, no further validation required
     return if bank_payment_request.validate_if_owner(user)
     return if bank_payment_request.validate_if_admin(user)
     return if  bank_payment_request.validate_if_reviewer(user)

@@ -98,6 +98,18 @@ class Item < ApplicationRecord
     self.tax_rate&.rate
   end
 
+  # def validate_if_owner?(user)
+  #   self.creator_id == user.id
+  # end
+
+  def validate_if_manager?(user)
+    user.is_item_master_manager?
+  end
+
+  def validate_if_admin?(user)
+    user.admin?
+  end
+
   private
 
   def budget_trail_entry
