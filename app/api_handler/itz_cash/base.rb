@@ -1,5 +1,5 @@
 class ItzCash::Base < BaseHandler
-  attr_accessor :response_code, :response_description
+  attr_accessor :response_code, :response_description, :file_logger
 
   def parse
     self.parsed_response = self.response.body.split(',') rescue []
@@ -7,6 +7,37 @@ class ItzCash::Base < BaseHandler
       self.response_code = parsed_response[0]
       self.response_description = parsed_response.last
     end
+  end
+
+  def init
+    super
+    self.file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_itz_cash_api.log', sync: true)
+  end
+
+  def process
+    super
+    # logging the request / response
+    p = self.path
+    params = post_params
+    response = self.response.body
+    status_code = self.response_code
+    self.file_logger.info(
+        file_logger_params(
+            path: p,
+            post_params: params,
+            ebix_response: response,
+            status: status_code,
+            itz_cash_action: env_key
+        )
+    )
+  end
+
+  def file_logger_base_params
+    {}
+  end
+
+  def file_logger_params(logger_params)
+    file_logger_base_params.merge(logger_params).merge(request_id: Security.generate_hmac_hex(self.object_id.to_s, DateTime.now.to_s))
   end
 
   def success_response_code
