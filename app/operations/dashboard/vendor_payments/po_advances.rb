@@ -1,84 +1,47 @@
 class Dashboard::VendorPayments::POAdvances < Dashboard::VendorPayments::Base
-  attr_accessor :po_advances, :payment_tickets
+  attr_accessor :purchase_orders
 
   def init
-    self.payment_tickets = BankTransfer::PaymentRequest::Index.(user, params).payment_requests
+    params[:filter_po_advances]
+    self.purchase_orders = Procurements::PurchaseOrders::Index.(user, params).purchase_orders
   end
 
   def success
-    params[:payment_tickets] = self.payment_tickets
+    params[:purchase_orders] = self.purchase_orders
     Dashboard::VendorPayments::POAdvances::DashboardPresenter.new(user, params, messages)
   end
 
 
   class Dashboard::VendorPayments::POAdvances::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment_tickets, :counts
+    attr_accessor :purchase_orders, :counts
 
-    has_scope :filter_status_id
-    has_scope :filter_user_id
+    has_scope :filter_all_advances
+    has_scope :filter_payable_advances
 
     def init
-      self.payment_tickets = params[:payment_tickets]
+      self.purchase_orders = params[:purchase_orders]
       self.counts = []
 
-      if user.vendor_payments_admin?
-        admin_data = {
-          type: 'admin',
+      if user.is_bank_payment_request_creditor?
+
+        # policy_ids = Policy::Index.(user, params).policies
+        
+        creditor_data = {
+          type: 'creditor',
+          title: "Teams' Purchase Orders",
           data: [
             {
-              title: "Total",
-              count: payment_tickets.count
+              title: "Total POs with Advances",
+              count: apply_scopes(purchase_orders, {filter_all_advances: true})&.count
             },
             {
-              title: "Processing",
-              count: apply_scopes(payment_tickets, {filter_status_id: BankPaymentRequestStatus.id_for(:processing)})&.count
-            },
-            {
-              title: "Approved",
-              count: apply_scopes(payment_tickets, {filter_status_id: BankPaymentRequestStatus.id_for(:approved)})&.count
-            },
-            {
-              title: "Credited",
-              count: apply_scopes(payment_tickets, {filter_status_id: BankPaymentRequestStatus.id_for(:credited)})&.count
+              title: "Payable POs",
+              count: apply_scopes(purchase_orders, {filter_payable_advances: true})&.count
             }
           ]
         }
 
-        self.counts.push(admin_data)
-      end
-
-      if user.vendor_payment_initiator?
-        personal_data = {
-          type: 'personal',
-          data: [
-            {
-              title: "Total",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id})&.count
-            },
-            {
-              title: "Processing",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status_id: BankPaymentRequestStatus.id_for(:processing)})&.count
-            },
-            {
-              title: "Approved",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status_id: BankPaymentRequestStatus.id_for(:approved)})&.count
-            }
-          ]
-        }
-        self.counts.push(personal_data)
-      end
-
-      if user.vendor_payments_reviewer?
-        reviewer_data = {
-          type: "reviewer",
-          data: [
-            {
-              title: "Awaiting Approval",
-              count: BankPaymentRequest.awaiting_action_items(user)&.count
-            }
-          ]
-        }
-        self.counts.push(reviewer_data)
+        self.counts.push(creditor_data)
       end
     end
   end

@@ -16,11 +16,16 @@ class Dashboards::VendorPaymentsController < ApplicationController
     respond
   end
 
+  def po_advances
+    @result = Dashboard::VendorPayments::POAdvances.(current_user, params)
+    respond
+  end
+
   def po_invoices
     params[:filter_inward_invoice_type] = 'tax_invoice'
     @result = Dashboard::VendorPayments::Invoices.(current_user, params)
     respond
-  end
+  end 
 
   def non_po_invoices
     params[:filter_inward_invoice_type] = 'non_po_invoice'
@@ -34,6 +39,11 @@ class Dashboards::VendorPaymentsController < ApplicationController
 
   def payment_tickets
     @result = Dashboard::VendorPayments::PaymentTickets.(current_user, params)
+    respond
+  end
+
+  def grns
+    @result = Dashboard::VendorPayments::Grns.(current_user, params)
     respond
   end
 end
