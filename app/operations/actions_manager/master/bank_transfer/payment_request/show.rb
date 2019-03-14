@@ -538,7 +538,6 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
   end
 
   def retract
-    binding.pry
     ############# Initiator logic start ####################
     if bank_payment_request.is_initiating_user?
       if (bank_payment_request.processing? && bank_payment_request.owner_id == user.id)
