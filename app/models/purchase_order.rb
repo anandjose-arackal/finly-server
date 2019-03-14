@@ -334,14 +334,14 @@ class PurchaseOrder < ApplicationRecord
   # end
 
   # For user role as purchase order initiator
-  def is_initiating_user?
-    user = RequestStore.store[:current_user]
+  def is_initiating_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:purchase_order_initiator), self)
   end
 
   # For user role as purchase order reviewer
-  def is_reviewing_user?
-    user = RequestStore.store[:current_user]
+  def is_reviewing_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
   end
 

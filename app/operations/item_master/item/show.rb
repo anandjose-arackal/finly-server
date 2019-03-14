@@ -30,10 +30,10 @@ class ItemMaster::Item::Show < ItemMaster::Item::Base
   end
 
   def validate_association
-    return if rate_contract.validate_if_admin?(user)
+    return if inventory_line_item.validate_if_admin?(user)
     # Creator ID not present on Item table
-    # return if rate_contract.validate_if_owner?(user)
-    return if rate_contract.validate_if_manager?(user)
+    # return if item.validate_if_owner?(user)
+    return if inventory_line_item.validate_if_manager?(user)
     raise_unauthorized_exception
   end
 

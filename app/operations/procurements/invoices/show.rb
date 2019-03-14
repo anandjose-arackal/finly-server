@@ -33,8 +33,10 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
-      policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
-      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      # policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
+      self.policies = Policy::VendorPayments::Index.(user, params).policies rescue Invoice.none
 
       self.reviewal_chains = []
 

@@ -4,7 +4,7 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
 
   class ItemMaster::Item::Index::InventoryLineItemsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :inventory_line_items, :paginated_line_items
+    attr_accessor :inventory_line_items, :paginated_line_items, :offset
 
     has_scope :search
     has_scope :filter_category_id
@@ -13,7 +13,7 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
     def init
       self.inventory_line_items = apply_scopes(params[:inventory_line_items], params)
       per_page = params[:per_page] || 30
-      self.paginated_line_items = self.inventory_line_items.paginate(page: params[:page], per_page: per_page)
+      self.paginated_line_items = self.inventory_line_items&.order(created_at: :desc)&.paginate(page: params[:page], per_page: per_page)
     end
   end
 

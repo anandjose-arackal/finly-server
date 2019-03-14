@@ -524,14 +524,14 @@ class Invoice < ApplicationRecord
   end
 
   # For user role as invoice initiator
-  def is_initiating_user?
-    user = RequestStore.store[:current_user]
+  def is_initiating_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:invoice_initiator), self)
   end
 
   # For user role as invoice reviewer
-  def is_reviewing_user?
-    user = RequestStore.store[:current_user]
+  def is_reviewing_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
   end
 
