@@ -32,19 +32,19 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_initiator
-    {name: 'Your Purchase Orders', id: 'procurements', url: 'procurements'}
+    {name: 'Your POs', id: 'procurements', url: 'procurements'}
   end
 
   def po_awaiting_approval
-    {name: 'PO Awaiting Approval', id: 'procurements', url: 'procurements'}
+    {name: 'POs Awaiting Approval', id: 'procurements', url: 'procurements'}
   end
 
   def po_team
-    {name: 'PO Awaiting Approval', id: 'procurements', url: 'procurements'}
+    {name: 'Team POs', id: 'procurements', url: 'procurements'}
   end
 
   def po_company
-    {name: 'PO Awaiting Approval', id: 'procurements', url: 'procurements'}
+    {name: 'Company POs', id: 'procurements', url: 'procurements'}
   end
 
   def receive
