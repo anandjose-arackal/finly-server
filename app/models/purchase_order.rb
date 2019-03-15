@@ -223,8 +223,7 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_awaiting_approval, -> (user=nil) {
-    if user.present? && user.instance_of(User)
-      # do nothing
+    if user.present? && user.instance_of?(User)
       user_id = user.id
     else
       user_id = RequestStore.store[:current_user]&.id
@@ -235,6 +234,36 @@ class PurchaseOrder < ApplicationRecord
       with_id(ids)
     end
   }
+
+  scope :filter_user, -> (user=nil) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    elsif user.instance_of?(TrueClass)
+      user_id = RequestStore.store[:current_user]&.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+
+
+    if user_id.present?
+      filter_user_id(user_id)
+    end
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ? OR extract(year from created_at) = ?', year, year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ? OR extract(month from created_at) = ?', month, month)
+  }
+
 
   # These two filters created because two different indexes requires data to be handled differently by design
 

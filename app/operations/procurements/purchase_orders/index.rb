@@ -38,6 +38,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_awaiting_approval
     has_scope :filter_month
     has_scope :filter_year
+    has_scope :filter_user
 
     def init
       self.purchase_orders = params[:purchase_orders]
