@@ -73,7 +73,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Processing",
               count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               filters: [
-                {search_type: user_details},
+                {search_type: 'user_details'},
                 {search_query: user.email},
                 {filter_po_status: PurchaseOrderStatus.id_for(:processing)}
               ]
@@ -82,7 +82,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Approved",
               count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count,
               filters: [
-                {search_type: user_details},
+                {search_type: 'user_details'},
                 {search_query: user.email},
                 {filter_po_status: PurchaseOrderStatus.id_for(:approved)}
               ]
