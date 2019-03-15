@@ -79,6 +79,11 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	      return
 	    end
 
+	    if self.payment_mode.blank?
+	      add_message :error, "Payment mode cannot be blank"
+	      return
+	    end
+
 	    unless self.policy.present?
 	        add_message :error, 'Policy not found'
 	    end
