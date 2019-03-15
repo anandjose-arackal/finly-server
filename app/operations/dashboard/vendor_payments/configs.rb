@@ -1,8 +1,10 @@
 class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
-  attr_accessor :departments, :sub_departments, :request_types
+  attr_accessor :departments, :sub_departments, :request_types, :policies, :locations
 
   def init
     self.departments = Company::Departments::Index.(user, params).departments
+    self.policies = Policy::VendorPayments::Index.(user, params).policies
+    self.locations = user.company.locations
     self.request_types = {
       payment_tickets: false,
       purchase_orders: false,
@@ -39,7 +41,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       when UserRole.id_for(:bank_payment_request_creditor)
         request_types[:payment_tickets] = true
         request_types[:po_advances] = true
-      end
+      endd
     end
 
 
@@ -48,17 +50,24 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
   def success
     params[:departments] = self.departments
     params[:request_types] = self.request_types
+    params[:policies] = self.policies
+    params[:locations] = self.locations
     Dashboard::VendorPayments::Configs::DashboardPresenter.new(user, params, messages)
   end
 
   class Dashboard::VendorPayments::Configs::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :departments, :request_types
+    attr_accessor :departments, :sub_departments, :request_types, :policies, :locations
 
     has_scope :filter_status_id
     has_scope :filter_user_id
 
     def init
-      self.departments = params[:departments]
+      self.departments = params[:departments].only_roots
+      self.sub_departments = self.sub_departments.only_sub_departments
+      self.policies = params[:policies]
+      self.locations = params[:locations]
+      self.policies = params[:policies]
+      self.locations = params[:locations]
       self.request_types = params[:request_types]
     end
   end
