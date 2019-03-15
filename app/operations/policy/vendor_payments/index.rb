@@ -36,7 +36,6 @@ class Policy::VendorPayments::Index < Policy::Base
   end
 
   class Policy::VendorPayments::Index::IndexPresenter < Policy::Base::PolicyPresenter
-    include HasScope
     attr_accessor :policies, :policy_user_roles
 
     has_scope :filter_role_id, type: :array
@@ -48,8 +47,4 @@ class Policy::VendorPayments::Index < Policy::Base
       self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.exclude_deleted
     end
   end
-
-
-
-
 end

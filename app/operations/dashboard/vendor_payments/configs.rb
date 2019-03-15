@@ -60,10 +60,11 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
 
     has_scope :filter_status_id
     has_scope :filter_user_id
+    has_scope :filter_only_roots
 
     def init
-      self.departments = params[:departments].only_roots
-      self.sub_departments = self.sub_departments.only_sub_departments
+      self.departments = apply_scopes(params[:departments], {filter_only_roots: true})
+      self.sub_departments = params[:departments].only_sub_departments
       self.policies = params[:policies]
       self.locations = params[:locations]
       self.policies = params[:policies]
