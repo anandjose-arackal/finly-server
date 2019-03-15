@@ -30,7 +30,8 @@ json.array! @result.paginated_money_request_processors do |processor|
           if item.status.completed?
             money_request_count += 1
           end
-          json.extract! money_request, :id, :name, :policy
+          json.extract! money_request, :id, :policy
+          json.name "#{money_request.id} - #{money_request.name}"
           json.submitted_on DateUtils.date_formatted(money_request.submitted_at)
           json.approved_on DateUtils.date_formatted(money_request.approved_at)
           json.user money_request.user
