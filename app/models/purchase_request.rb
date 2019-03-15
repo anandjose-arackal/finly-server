@@ -17,4 +17,10 @@
 class PurchaseRequest < ApplicationRecord
 
   belongs_to :status, class_name: "PurchaseRequestStatus"
+  belongs_to :department
+  belongs_to :location, class_name: "BranchLocation"
+  belongs_to :policy
+  belongs_to :company
+
+  belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 end
