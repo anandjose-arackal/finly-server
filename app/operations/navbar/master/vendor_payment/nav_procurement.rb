@@ -5,7 +5,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_policy, :po_company]},
+          {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company]},
           {shipments: [:shipments_pending, :shipments_history]},
           {payables: [:po_advances, :invoices, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
@@ -40,10 +40,6 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_team
-    {name: 'PO Awaiting Approval', id: 'procurements', url: 'procurements'}
-  end
-
-  def po_policy
     {name: 'PO Awaiting Approval', id: 'procurements', url: 'procurements'}
   end
 
