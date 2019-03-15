@@ -52,6 +52,9 @@ set :branch, ENV['BRANCH'] || :master
   when :migrated_script_testing
     set :deploy_to, '/home/centos/app_3'
     set :rails_env, 'staging'
+  when :migrated_test_2
+    set :deploy_to, '/home/centos/app_3'
+    set :rails_env, 'staging'
 end
 
 set :pty, false

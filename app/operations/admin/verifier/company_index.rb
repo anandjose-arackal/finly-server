@@ -37,7 +37,7 @@ class Admin::Verifier::CompanyIndex < Admin::Cards::AssignRequests::Base
     if individual_kycs_user_ids.present?
       user_ids << individual_kycs_user_ids
     end
-    user_ids.uniq!
+    user_ids = user_ids.flatten.uniq
 
     pending_company_ids = User.with_id(user_ids).pluck(:company_id)
     self.companies = Company.with_id(pending_company_ids)
