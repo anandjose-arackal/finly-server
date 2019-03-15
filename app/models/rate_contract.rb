@@ -56,7 +56,7 @@ class RateContract < ApplicationRecord
   end
 
   def add_company
-    self.company_id = user.company_id
+    self.company_id = self.creator.company_id
   end
 
 end

@@ -363,7 +363,7 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   def add_company
-    self.company_id = user.company_id
+    self.company_id = self.owner.company_id
   end
 
   private
