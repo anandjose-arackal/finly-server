@@ -42,6 +42,12 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
+    section 'Throttling' do
+      rule 'A single IP cannot send more than 100 requests per 10 seconds' do
+
+      end
+    end
+
     # todo Check for all fields in X-Finly-RP
     # todo do not allow any api apart from send otp and verify otp for unverified device/ip
     # todo do not allow any api for incomplete, attribute_mismatch requests
