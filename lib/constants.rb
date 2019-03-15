@@ -12,6 +12,8 @@ module Constants
 
   OTP_RESEND_INTERVAL = 60
 
+  PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
+
   # todo - needs to be edited once we get the account details.
   if Rails.env.production?
     ITZCASH_EMAIL_ID = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'sabhishek@itzcash.com']

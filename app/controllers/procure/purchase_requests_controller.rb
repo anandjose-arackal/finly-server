@@ -27,6 +27,9 @@ class Procure::PurchaseRequestsController < ApplicationController
     respond
   end
 
-
+  def edit_config
+    @result = Procurements::PurchaseRequests::PurchaseRequestEditConfig.(current_user, params)
+    respond
+  end
 
 end
