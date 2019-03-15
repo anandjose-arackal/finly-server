@@ -109,7 +109,8 @@ class User::Team::Index < User::Team::Base
         # manager_association = :has_manager
         # approves_to_association = :has_approves_to
         # NEW CODE
-        level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
+        level_ids = LevelReviewerMapping.non_deleted.with_reviewer_id(user.id).pluck(:level_id)
+        level_ids += LevelUserReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
         policy_ids = ReviewalLevel.with_id(level_ids).pluck(:policy_id)
       when UserRole.id_for(:travel_manager)
         # manager_association = :has_travel_manager
@@ -130,7 +131,7 @@ class User::Team::Index < User::Team::Base
     # self.response = user.company.users.with_id(user_ids)
     #
     # NEW CODE
-    user_ids = PolicyUserMapping.where(policy_id: policy_ids).pluck(:user_id)
+    user_ids = PolicyUserMapping.non_deleted.where(policy_id: policy_ids).pluck(:user_id)
     user_ids.uniq! if user_ids.present?
     self.response = user.company.users.with_id(user_ids)
   end
