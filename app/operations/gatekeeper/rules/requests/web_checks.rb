@@ -9,12 +9,26 @@ Gatekeeper::Checker.new 'On New Request' do
     rule 'Request IP has to match Session IP' do
       request = RequestStoreUtil.current_request
       session = RequestStoreUtil.current_session
-      unless request.remote_ip == session.ip
-        message 'Browser IP mismatch'
-        session_status_id UserSessionStatus.id_for(:blocked)
-        response_code 401
-        fail
-      end
+      next if request.remote_ip == session.ip
+      next if request.remote_ip == session.user_ip&.ip
+
+      message 'Browser IP mismatch'
+      session_status_id UserSessionStatus.id_for(:blocked)
+      response_code 401
+      fail
+
+    end
+
+    rule 'Request UserAgent has to match Session IP' do
+      request = RequestStoreUtil.current_request
+      session = RequestStoreUtil.current_session
+      next if request.user_agent == session.user_agent
+
+      message 'UserAgent mismatch'
+      session_status_id UserSessionStatus.id_for(:blocked)
+      response_code 401
+      fail
+
     end
 
     rule 'Session should timeout after 30 minute of inactivity' do
@@ -26,14 +40,6 @@ Gatekeeper::Checker.new 'On New Request' do
         response_code 401
         fail
       end
-    end
-
-    rule 'Do not allow access for unverified IPs' do
-
-    end
-
-    rule '' do
-
     end
 
     # todo Check for all fields in X-Finly-RP
