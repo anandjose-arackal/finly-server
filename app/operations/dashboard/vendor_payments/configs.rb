@@ -41,7 +41,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       when UserRole.id_for(:bank_payment_request_creditor)
         request_types[:payment_tickets] = true
         request_types[:po_advances] = true
-      endd
+      end
     end
 
 
