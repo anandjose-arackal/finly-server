@@ -33,22 +33,29 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def validate
-
-    if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && !user.vendor_payment_admin?
-      add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
-    end
-
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found'
+      return
+    end
+
+    if purchase_order.sent_to_vendor?
+      add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+      return
+    end
+
+
+    if (purchase_order.approved? || purchase_order.auto_approved?) && !user.vendor_payment_admin?
+      add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
     end
 
     if self.procurement.po_revisions.pluck(:revision_of_id).include? self.purchase_order.id
       add_message :error, 'Revision for this purchase order found. Original purchase order can no longer be modified. Check trails.'
+      return
     end
 
     unless self.purchase_order_params[:policy_id].present?
       if self.purchase_order.policy.blank?
-        add_message :error, 'Policy cannot be blank'
+        add_message :error, 'Policy not found.'
       end
     end
 
@@ -56,8 +63,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #   add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
     # end
 
+    # need to recheck this logic
+    unless self.purchase_order.updatable? || user.vendor_payment_admin?
+      add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
+    end
+
     if self.bank_account.blank?
       add_message :error, 'Please select the bank account of the vendor.'
+      return
     end
 
     # unless self.purchase_order_params[:advance_amount_attributes].blank?  && self.purchase_order_params[:advance_amount_attributes][:value].blank? && self.bank_account.blank?
@@ -82,10 +95,20 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #   end
     # end
 
-    if self.purchase_order_params[:advance_amount_attributes][:value].present?
+    if self.purchase_order_params[:advance_amount_attributes][:value].present? && self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
       if self.purchase_order_params[:due_date].blank?
         add_message :error, 'Due date for the advance amount has not been set.'
       end
+      valid_date = Date.parse(self.purchase_order_params[:due_date]) rescue false 
+      unless valid_date
+        add_message :error, 'Invalid date provided'
+        return
+      end
+      unless (Date.parse(self.purchase_order_params[:due_date]) >= Date.today)
+        add_message :error, 'Cannot create back dated payment tickets'
+      end
+    else
+      self.purchase_order_params[:due_date] = nil
     end    
 
   end

@@ -10,7 +10,8 @@ class RateContract < ApplicationRecord
 
   before_save :add_company
 
-  validates :renewal_alert_period, :renewal_alert_number, :vendor, presence: true
+  validates :renewal_alert_period, :renewal_alert_number, presence: true
+  validates :vendor, presence: true
 
   accepts_nested_attributes_for :rate_contract_line_items, allow_destroy: true
   accepts_nested_attributes_for :artifacts, allow_destroy: true
@@ -55,7 +56,7 @@ class RateContract < ApplicationRecord
   end
 
   def add_company
-    self.company_id = user.company_id
+    self.company_id = self.creator.company_id
   end
 
 end

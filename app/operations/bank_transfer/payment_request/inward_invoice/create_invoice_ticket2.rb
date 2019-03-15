@@ -49,7 +49,13 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
         return
       end
 
-      unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) > Date.today)
+      valid_date = Date.parse(params[:scheduled_at]) rescue false 
+      unless valid_date
+          add_message :error, 'Invalid date provided'
+          return
+      end
+
+      unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) >= Date.today)
         add_message :error, 'Cannot create back dated payment tickets'
         return
       end
@@ -93,6 +99,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       return
     end
 
+    if self.policy.blank?
+      add_message :error, "Policy not found."
+      return
+    end
+
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
       remaining_amount = (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
@@ -110,9 +121,23 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
     self.payment_request_params = bank_payment_request_params
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     if self.bank_payment_request.save
+
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.bank_payment_request.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        self.bank_payment_request.destroy
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
+      
       Rails.logger.fatal "BEFORE inward_invoices,\n #{inward_invoices.inspect}"
-      self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
+      # self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:pending))
       Rails.logger.fatal "AFTER inward_invoices,\n #{inward_invoices.inspect}"
+      self.inward_invoices.update_all(invoice_status_id: InwardInvoiceStatus.id_for(:initiated))
       payment_params = initialize_payment_objects
       op = BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params, invoices_status: invoices_status})
     else

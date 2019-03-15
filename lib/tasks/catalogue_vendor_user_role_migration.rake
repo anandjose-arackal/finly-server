@@ -17,13 +17,11 @@ task :catalogue_vendor_user_role_migration => :environment do
           policy.policy_user_roles.create!(user_id: mapping.user_id, user_role_id: UserRole.id_for(:item_master_manager))
         end
       end
-      # If any company users have user role as admin, then add him as admin to all policies for purchase_order
-      # FOR THAT, get all company policies, add user as admin if not already present
-      # if mapping.user.vendor_payment_admin?
-      #   if policy.policy_user_roles.where(user_id: mapping.user.id, user_role_id: UserRole.id_for(:admin)).blank?
-      #     policy.policy_user_roles.create!(user_id: mapping.user.id, user_role_id: UserRole.id_for(:admin))
-      #   end
-      # end
+      if mapping.user.company.feature_subscription.budgeting_system
+        if policy.policy_user_roles.where(user_id: mapping.user_id, user_role_id: UserRole.id_for(:budget_manager)).blank?
+          policy.policy_user_roles.create!(user_id: mapping.user_id, user_role_id: UserRole.id_for(:budget_manager))
+        end
+      end
     end
   end
   #-------=================-------- V1 SCRIPT Condition end -------=======================--------------

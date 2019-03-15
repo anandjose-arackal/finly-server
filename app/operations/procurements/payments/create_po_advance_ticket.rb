@@ -40,7 +40,13 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         return
       end
 
-      unless Date.parse(params[:scheduled_at]) && (Date.parse(params[:scheduled_at]) > Date.today)
+      valid_date = Date.parse(params[:scheduled_at]) rescue false 
+      unless valid_date
+          add_message :error, 'Invalid date provided'
+          return
+      end
+
+      unless (Date.parse(params[:scheduled_at]) >= Date.today)
         add_message :error, 'Cannot create back dated payment tickets'
         return
       end
@@ -208,6 +214,19 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
 
     if self.bank_payment_request
       self.all_purchase_orders.update_all(advance_amount_status_id: AdvanceAmountStatus.id_for(:pending))
+
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.bank_payment_request.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        self.bank_payment_request.destroy
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
+      
       # now pass this particular bank payment request and the payments data to the
       # background operation where it will continue creating payments till the data is exhausted
       op = Procurements::Payments::PoAdvancePaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: payment_params})

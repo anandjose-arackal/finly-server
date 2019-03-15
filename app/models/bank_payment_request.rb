@@ -347,23 +347,23 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   # For user role as bank payment request initiator 
-  def is_initiating_user?
-    user = RequestStore.store[:current_user]
+  def is_initiating_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), self)
   end
 
-  def is_reviewing_user?
-    user = RequestStore.store[:current_user]
+  def is_reviewing_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), self)
   end
 
-  def is_crediting_user?
-    user = RequestStore.store[:current_user]
+  def is_crediting_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
   end
 
   def add_company
-    self.company_id = user.company_id
+    self.company_id = self.owner.company_id
   end
 
   private

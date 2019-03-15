@@ -43,8 +43,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
-      policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
-      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      # policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
+      self.policies = Policy::VendorPayments::Index.(user, params).policies rescue PurchaseOrder.none
 
       # Show taxes as applicable in the pdf based on this
       self.taxes_applicable_flag = taxes_applicable_flag?
@@ -153,6 +155,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       if user.vendor_payment_admin?
         unless purchase_order.voided?
+          actions[:policy_editable] = true
           actions[:document_editable] = true
           actions[:save] = {url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),method: "PUT"}
           actions[:procurement_terms_editable] = user.permission.edit_terms_within_po

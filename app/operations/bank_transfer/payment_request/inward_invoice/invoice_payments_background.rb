@@ -93,8 +93,11 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
           puts "invoice SUCCESSFULS", payment.id
           inv_id = payment.invoice.id
           # payment.invoice.update(invoice_status_id: invoices_status[inv_id])
-          invoice = self.invoices.find(params[:invoice_id])
-          invoice.update(invoice_status_id: invoices_status[inv_id.to_s])
+          
+          # will get back later
+          # invoice = self.invoices.find(params[:invoice_id])
+          # invoice.update(invoice_status_id: invoices_status[inv_id.to_s])
+          
           # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
           payment.save
         # now save the custom fields to the invoice
