@@ -18,7 +18,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       add_message :error, "Payment not found"
     end
     # validate custom fields
-    if payment.invoice.present?
+    if payment&.invoice.present?
       set_fields = set_custom_fields(false)
       unless set_fields&.success?
         add_message :error, set_fields&.messages&.dig(:error)
@@ -49,7 +49,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def pre_process
     # adding the invoice id so that it gets updated and not created again
     # if it already exists in the database
-    if self.payment.invoice.present? && self.payment_params[:invoice_attributes].present?
+    if self.payment&.invoice.present? && self.payment_params[:invoice_attributes].present?
       self.payment_params[:invoice_attributes][:id] = self.payment.invoice.id
     end
 
@@ -64,16 +64,16 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     if self.payment_params&.dig(:invoice_attributes, :invoice_attachments_attributes)
       # only if the actual attached file is present, do you even make it save
       if self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:attached_file].present?
-        if self.payment.invoice&.invoice_attachments.present?
-          self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:id] = self.payment.invoice.invoice_attachments.first&.id
+        if self.payment&.invoice&.invoice_attachments.present?
+          self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:id] = self.payment&.invoice.invoice_attachments.first&.id
         end
         self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first.delete(:remove_file)
       elsif self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:remove_file] == '1'
         self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:_destroy] = true
-        self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:id] = self.payment.invoice.invoice_attachments.first&.id
+        self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:id] = self.payment&.invoice.invoice_attachments.first&.id
         self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first.delete(:remove_file)
       else
-        if self.payment.invoice&.invoice_attachments.present?
+        if self.payment&.invoice&.invoice_attachments.present?
           self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first.delete(:remove_file)
         else
           self.payment_params[:invoice_attributes].delete(:invoice_attachments_attributes)
@@ -122,7 +122,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       add_message :error, self.payment.errors.full_messages
       return
     end
-    if payment.invoice.present?
+    if payment.invoice&.present?
       calculate_tax_and_discounts
     end
 
