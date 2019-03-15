@@ -65,7 +65,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Total",
               count: apply_scopes(purchase_orders, {filter_user_id: user.id})&.count,
               filters: [
-                {search_type: user_details},
+                {search_type: 'user_details'},
                 {search_query: user.email}
               ]
             },
