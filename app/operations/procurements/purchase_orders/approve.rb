@@ -51,19 +51,6 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   end
 
   def awaiting_action_from?
-    # find document level reviewer mapping
-    dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
-    level = purchase_order.level
-
-    if dlrm.present?
-      # dlrm.pluck(:reviewer_id).include? user.id
-      if dlrm.pluck(:reviewer_id).include?(nil)
-        level.level_reviewer_mappings.with_threshold(self.purchase_order.balance_amount.value).pluck(:reviewer_id).include? user.id
-      else
-        dlrm.pluck(:reviewer_id).include? user.id
-      end
-    else
-      level.level_reviewer_mappings.with_threshold(self.purchase_order.balance_amount.value).pluck(:reviewer_id).include? user.id
-    end
+    self.purchase_order.get_reviewers.inlcude?(user)   
   end
 end

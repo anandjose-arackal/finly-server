@@ -167,16 +167,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     end
 
     def user_in_level? # todo put document level reviewer mapping here
-      current_level = purchase_order.level
-      amount = purchase_order&.balance_amount&.value || 0
-
-      if current_level.present?
-        if current_level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include? user.id
-          return true
-        end
-      end
-
-      false
+      self.purchase_order.get_reviewers.inlcude?(user)
     end
   end
 end
