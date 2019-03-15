@@ -51,6 +51,6 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
   end
 
   def awaiting_action_from?
-    self.purchase_order.get_reviewers.inlcude?(user)   
+    self.purchase_order.get_reviewers.include?(user)   
   end
 end

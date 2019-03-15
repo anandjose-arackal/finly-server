@@ -167,7 +167,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     end
 
     def user_in_level? # todo put document level reviewer mapping here
-      self.purchase_order.get_reviewers.inlcude?(user)
+      self.purchase_order.get_reviewers.include?(user)
     end
   end
 end
