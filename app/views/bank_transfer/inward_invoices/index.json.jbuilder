@@ -1,8 +1,10 @@
 json.results do
-  json.array!(@result.paginated_invoices) do |invoice|
+  json.array!(@result.paginated_invoices.include_for_index) do |invoice|
     json.id invoice.id
     json.invoice do
       json.id invoice.id
+      json.procurement_id invoice.procurement_id || ""
+      json.created_at invoice.created_at
       json.status_id invoice.invoice_status_id
       json.status_name invoice.invoice_status&.name&.humanize
       json.advance invoice.advance
@@ -62,9 +64,11 @@ json.results do
       json.item_amounts_total invoice.item_amounts_total
 
       # paid amount for this invoice
-      json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
-      json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+      # json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
+      # json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
+      json.paid_amount invoice.payment_amounts_total
+      json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payment_amounts_total)
       json.raw_amount precision_value invoice&.amount&.value
       # conditionally set the original amount as invoice amount is there are line items
       if invoice&.invoice_items.present?
@@ -74,6 +78,8 @@ json.results do
       end
 
       # invoice items
+      json.po_number invoice.procurement&.purchase_order&.po_number || ""
+      
       json.invoice_items do
         json.array!(invoice.invoice_items) do |item|
           json.rate item.rate
@@ -92,6 +98,8 @@ json.results do
           json.taxable_amount precision_value item.taxable_amount&.value
         end
       end
+
+      json.invoice_items_count invoice.invoice_items.size
 
       if invoice.vendor.present?
         json.vendor do

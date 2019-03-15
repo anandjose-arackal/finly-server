@@ -54,12 +54,21 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
       transitions :from => [:approved, :auto_approved, :sent_to_vendor, :closed], to: :voided
     end
 
+    event :reopen do
+      transitions from: :closed, to: :auto_approved, guard: :user_is_admin?
+      transitions from: :closed, to: :approved
+    end
+
     after_all_events :change_state
     # after_all_transitions :log_status_change
     # success :change_state
   end
 
-  # private
+  private
+
+  def user_is_admin?
+    user.vendor_payment_admin?
+  end
   #
   # # def set_state
   # #   aasm.current_state = self.po_state

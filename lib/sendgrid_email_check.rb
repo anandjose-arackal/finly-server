@@ -1,12 +1,10 @@
 # require 'sendgrid-ruby'
 # include SendGrid
-#
 # # Encapsulates demo email send functionality using sendgrid
 # class SendGridEmailCheck
 #   def initialize
 #     @sg = SendGrid::API.new(api_key: ENV['SENDGRID_API_KEY'])
 #   end
-#
 #   def send_email
 #     response = @sg.client.mail._('send').post(JSON.parse('{
 #       "from": {

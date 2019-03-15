@@ -1,12 +1,12 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
               :payment_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
-              :billing_address, :shipping_address
+              :billing_address, :shipping_address, :note
 json.vendor @result.purchase_order.vendor.as_json
 
 json.actions @result.actions
 
-if @result.purchase_order.advance_payments.present?
+if @result.purchase_order.advance_payments&.present?
   json.show_advance_payments true
   json.advance_payments_count @result.purchase_order.advance_payments.count
 end
@@ -18,6 +18,12 @@ json.total_before_tax do
   json.id @result.purchase_order.total_before_tax&.id
   json.value @result.purchase_order.total_before_tax&.value
   json.currency_id @result.purchase_order.total_before_tax&.currency&.id
+end
+json.advance_amount do
+  json.id @result.purchase_order.advance_amount&.id
+  json.value @result.purchase_order.advance_amount&.value
+  json.currency_id @result.purchase_order.advance_amount&.currency&.id
+  json.due_date @result.purchase_order.due_date
 end
 json.tax do
   json.value @result.purchase_order.tax_amount&.value

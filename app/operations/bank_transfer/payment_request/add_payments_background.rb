@@ -1,3 +1,6 @@
+# called when user adds excel sheet or manually adds new payments
+# This would create multiple individual payments for payment ticket/bankpaymentrequest in the background
+
 class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
   sidekiq_options queue: :payments_queue
 
@@ -19,9 +22,9 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     self.run
   end
 
-  def initialize
+  # def initialize
 
-  end
+  # end
 
   def pre_validate
     if self.bank_payment_request.blank?
@@ -66,15 +69,19 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
           invoice_attributes: {
               category_id: payment[:category_id],
               cost_center_id: payment[:cost_center_id],
-              inclusive_of_taxes: payment[:inclusive_of_taxes],
+              inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
               gst_type_id: payment[:gst_type_id],
               tds_slab_id: payment[:tds_slab_id],
-              invoice_number: payment[:invoice_number],
-              date: payment[:invoice_date],
-              due_date: payment[:due_date],
+              # 
+              # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
+              # 
+              # invoice_number: payment[:invoice_number],
+              # date: payment[:invoice_date],
+              # due_date: payment[:due_date],
               tax: payment[:tax],
               discount: payment[:discount],
               invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
+              invoice_type_id: InwardInvoiceType.id_for(:beneficiary),
               company_id: self.user.company_id,
               receiving_account_type: "BankAccount",
               receiving_account_id: bank_account.id,
@@ -92,13 +99,34 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
 
   end
 
+  # def process
+  #   self.payment_params.each do |params|
+  #     custom_fields = params[:custom_fields]
+  #     params.delete(:custom_fields)
+  #     params[:payment_order_id] = self.bank_payment_request.payment_order.id
+  #     # payment = ::Payment.new(params)
+  #     payment = self.bank_payment_request.payment_order.payments.build(params)
+  #     if payment.save
+  #       # perform the required calculations
+  #       InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+  #       payment.save
+  #       # now save the custom fields to the invoice
+  #       set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
+  #     end
+  #   end
+
+  #   # now once the payment request has been created and the payments saved, we can mark it as open
+  #   self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
+  #   self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
+  #   # puts 'SUCCESSFUL!'
+  # end
+
   def process
     self.payment_params.each do |params|
       custom_fields = params[:custom_fields]
       params.delete(:custom_fields)
-      params[:payment_order_id] = self.bank_payment_request.payment_order.id
-      payment = ::Payment.new(params)
-      # payment = self.bank_payment_request.payment_order.payments.build(params)
+      payment = self.bank_payment_request.payment_order.payments.build(params)
+
       if payment.save
         # perform the required calculations
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
@@ -116,6 +144,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
     # For setting level specific reviewers from reviewal chain for a document
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, {reviewal_document: self.bank_payment_request.reload})
     # puts 'SUCCESSFUL!'
+
   end
 
   private

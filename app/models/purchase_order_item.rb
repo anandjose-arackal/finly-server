@@ -39,7 +39,7 @@ class PurchaseOrderItem < ApplicationRecord
 
   belongs_to :tax_rate, optional: true
   belongs_to :purchase_order, optional: true
-  belongs_to :inventory_line_item, optional: true
+  belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :tax_amount, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount"
   belongs_to :total_amount, optional: true, class_name: "Amount"

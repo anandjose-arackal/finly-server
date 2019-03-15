@@ -49,6 +49,7 @@ class YesBankVendor < ApplicationRecord
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :beneficiary_payments, foreign_key: :vendor_id
 
   default_scope { unscope(:where) }
 

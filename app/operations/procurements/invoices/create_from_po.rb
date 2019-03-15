@@ -1,6 +1,6 @@
 class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
-  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
+  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision
 
   def personalizer
     {
@@ -14,6 +14,10 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     id = params[:id] || params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
     self.purchase_order = self.procurement.purchase_order
+    self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+    if po_revision.present?
+      self.purchase_order = self.po_revision
+    end
     self.invoice_params = set_invoice_parameters
   end
 

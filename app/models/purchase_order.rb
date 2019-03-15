@@ -53,16 +53,18 @@
 #
 
 class PurchaseOrder < ApplicationRecord
-  include SoftDeletable, Templatable, Transitionable
+  include SoftDeletable, Templatable, Transitionable, MathUtil
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :procurement, optional: true
   belongs_to :location, optional: true, class_name: 'BranchLocation'
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
+  belongs_to :bank_account, optional: true
   belongs_to :payment_term, optional: true
   belongs_to :procurement_term, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
+  belongs_to :advance_amount_status, optional: true
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: "Department", foreign_key: :sub_department_id
   belongs_to :cost_center, optional: true
@@ -78,6 +80,8 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :total_after_tax, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount", autosave: true
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
+  # IF PO HAS ANY ADVANCE AMOUNT, WE ADD IT HERE
+  belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
@@ -93,13 +97,18 @@ class PurchaseOrder < ApplicationRecord
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :advance_payments, class_name: "Payment"
 
+  has_many :payments, as: :parent
+
   has_many :trails, as: :parent
+
+  belongs_to :bank_account, optional: true
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, allow_destroy: true
-  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
+  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount
   accepts_nested_attributes_for :custom_fields
+  # accepts_nested_attributes_for :advance_payments
 
 
   validates :purchase_order_status_id, presence: true
@@ -175,6 +184,58 @@ class PurchaseOrder < ApplicationRecord
     where payment_term_id: ids
   }
 
+  scope :filter_payable_advances, -> (enabled) {
+    if StringUtils.to_bool(enabled)
+      where( purchase_order_status_id: [
+                                          PurchaseOrderStatus.id_for(:approved),
+                                          PurchaseOrderStatus.id_for(:auto_approved)
+                                       ], 
+             advance_amount_status_id: [
+                                          AdvanceAmountStatus.id_for(:to_be_processed),
+                                          AdvanceAmountStatus.id_for(:failed)
+                                       ])
+    end
+  }
+
+  scope :filter_all_advances, -> {
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil)
+  }
+
+  scope :filter_by_due_date, -> (due_date) {
+    where due_date: due_date
+  }
+
+  scope :filter_by_created_at, -> (created_at) {
+    created_at = Date.parse(created_at).strftime('%Y-%m-%d')
+    # where created_at: created_at
+    where("DATE(created_at) >= ?", created_at)
+  }
+
+  scope :filter_status, -> (status_name) {
+    all_statuses = AdvanceAmountStatus.all.pluck(:name)
+    if status_name.present? && all_statuses.include?(status_name)
+      where advance_amount_status_id: AdvanceAmountStatus.id_for(status_name)
+    end
+  }
+
+  # These two filters created because two different indexes requires data to be handled differently by design
+
+  scope :due_date, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('due_date >= ? && due_date <= ?', from, to)
+  }
+
+  scope :po_advances_date, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('created_at >= ? && created_at <= ?', from, to)
+  }
+
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
@@ -246,13 +307,75 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
+  def advance_to_be_processed?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:to_be_processed)
+  end
+
+  def advance_pending?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:pending)
+  end
+
+  def advance_initiated?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:initiated)
+  end
+
+  def advance_failed?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:failed)
+  end
+
+  def advance_paid?
+    self.advance_amount_status_id == AdvanceAmountStatus.id_for(:paid)
+  end
+
+  def advance_can_be_paid?
+    advance_to_be_processed? || advance_failed?
+  end
+
+  def advance_amount_status_empty
+    self.advance_amount_status.blank?
+  end
+
+  def updatable?
+    self.open? || self.processing?
+  end
+
+  def document_owner?(user)
+    self.user_id.eql?(user.id)
+  end
+
+  # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
+  def as_json2
+    {
+      original_amount: precision_value(self.total_after_tax&.value),
+      advance_amount: precision_value(self.advance_amount&.value),
+      balance_due: precision_value(self.balance_amount&.value)
+      # balance_due: {
+      #   value: precision_value(self.balance_amount&.value),
+      #   id: self.balance_amount&.id,
+      #   currency_id: self.balance_amount&.currency&.id
+      # }
+    }
+  end
   # Public Method
 
   def process_line_item_calculation
     calculate_line_items
   end
 
+  # def prepopulate_amounts
+  #   populate_advance_amount
+  # end
+
+  
   private
+
+  # def populate_advance_amount
+  #   if self.advance_amount.blank?
+  #     # no change in net amount
+  #     self.advance_amount = Amount.new(value: 0, currency_id: 1)
+  #     return
+  #   end
+  # end
 
   def calculate_line_items
     total_before_tax_amount = 0
@@ -311,11 +434,13 @@ class PurchaseOrder < ApplicationRecord
       end
     end
 
+
     if self.total_before_tax.present?
       self.total_before_tax.value = total_before_tax_amount
     else
       self.total_before_tax = Amount.new(value: total_before_tax_amount, currency_id: 1)
     end
+
 
     if self.total_after_tax.present?
       self.total_after_tax.value = total_after_tax_amount
@@ -343,6 +468,12 @@ class PurchaseOrder < ApplicationRecord
       self.balance_amount.value = total_amount
     else
       self.build_balance_amount(value: total_amount, currency_id: 1)
+    end
+
+    if self.advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+      # self.balance_amount.value = total_amount - self.advance_amount.value
+    else
+      self.advance_amount  = Amount.new(value: 0, currency_id: 1)
     end
 
     # self.save
