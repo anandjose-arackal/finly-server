@@ -189,6 +189,9 @@ class User < ApplicationRecord
   has_many :user_delegate_mappings
   has_many :delegated_for_users, class_name: "User", through: :user_delegate_mappings, source: :delegate_for_user
 
+  # P2P Documents
+  has_many :purchase_orders
+
   # Budgets
 
   # many-to-many mapping between user and budget

@@ -222,6 +222,20 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
+  scope :filter_awaiting_approval, -> (user=nil) {
+    if user.present? && user.instance_of(User)
+      # do nothing
+      user_id = user.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+    
+    if user_id.present?
+      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      with_id(ids)
+    end
+  }
+
   # These two filters created because two different indexes requires data to be handled differently by design
 
   scope :due_date, -> (from, to) {

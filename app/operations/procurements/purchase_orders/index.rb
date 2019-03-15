@@ -9,10 +9,21 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
   end
 
   def process
-    # Only used for getting pending approval
-    if user.vendor_payments_reviewer?
+    # # Only used for getting pending approval
+    # if user.vendor_payments_reviewer?
+    #   self.purchase_orders = PurchaseOrder.awaiting_action_items(user)
+    # end
 
-      self.purchase_orders = PurchaseOrder.awaiting_action_items(user)
+
+    if user.vendor_payments_admin?
+      self.purchase_orders = ::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin)).not_open.or(user.purchase_orders)
+      return
+    end
+
+    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
+      self.purchase_orders = ::PurcahseOrder.associated_items(user, ::PurcahseOrder.roles)
+    else
+      self.purchase_orders = user.purchase_orders
     end
   end
 
@@ -24,9 +35,13 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
   class Procurements::PurchaseOrders::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_orders
 
+    has_scope :filter_awaiting_approval
+    has_scope :filter_month
+    has_scope :filter_year
+
     def init
       self.purchase_orders = params[:purchase_orders]
+      self.purchase_orders = apply_scopes(self.purchase_orders, params)
     end
-
   end
 end
