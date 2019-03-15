@@ -15,7 +15,7 @@ class Orders::OrderCards::Show < Orders::OrderCards::Base
   end
 
   def init
-    self.payment_order = user.company.payment_orders.with_id(params[:id]).first rescue nil
+    self.payment_order = user.company.payment_orders.with_id(params[:id]).includes_for_show.first rescue nil
     self.actions = {}
   end
 
