@@ -940,6 +940,7 @@ ActiveRecord::Schema.define(version: 2019_03_14_050020) do
     t.string "contact_mobile_number"
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.string "location_code"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
   end
