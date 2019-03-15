@@ -14,7 +14,7 @@ class Policy::VendorPayments::Index < Policy::Base
       if user&.enforce_policy_enabled?
         ids = user.company.policies.joins(:policy_user_roles).where("policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?", UserRole::VP_ROLES.values, user.id)
       else
-        ids = user.company.policies.joins(:policy_user_roles).where("policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?", UserRole::VP_ROLES.values, user.id)
+        ids = user.company.policies.joins(:policy_user_roles).where("policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?", UserRole::VP_ROLES.values, user.id)&.pluck(:id)
       end
     else
       if user&.enforce_policy_enabled?
@@ -43,7 +43,7 @@ class Policy::VendorPayments::Index < Policy::Base
     def init
       self.policy_user_roles = params[:policy_user_roles]
       self.policy_user_roles = apply_scopes(policy_user_roles)
-      self.policy_user_roles = self.policy_user_roles.where(user_role_id: params[:filter_role_id], user_id: user.id)&.uniq
+      self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.uniq
       self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.exclude_deleted
     end
   end
