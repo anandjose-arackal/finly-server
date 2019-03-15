@@ -53,4 +53,6 @@ class Navbar::Master::Base
     false
   end
 
+
+
 end

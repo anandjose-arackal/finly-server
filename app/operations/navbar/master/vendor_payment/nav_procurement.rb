@@ -115,4 +115,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'New Payment Ticket', id: 'new_payment_ticket', url: 'new_payment_ticket'}
   end
 
+  def attachments
+    {name: 'Attachments', id: 'attachments', url: 'attachments'}
+  end
+
 end
