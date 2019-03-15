@@ -6,7 +6,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       [
           :dashboard,
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company]},
-          {shipments: [:shipments_pending, :shipments_history]},
+          {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :invoices, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket]}
@@ -47,16 +47,16 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'PO Awaiting Approval', id: 'procurements', url: 'procurements'}
   end
 
-  def shipments
-    {name: 'Shipments', id: 'po_shipments', url: 'purchase_orders/shipments'}
+  def receive
+    {name: 'Receive', id: 'receive', url: 'receive'}
   end
 
-  def shipments_pending
-    {name: 'Pending Shipments', id: 'pending_po_shipments', url: 'purchase_orders/shipments'}
+  def receive_pending
+    {name: 'Pending', id: 'receive', url: 'receive'}
   end
 
-  def shipments_history
-    {name: 'Pending Shipments', id: 'pending_po_shipments', url: 'purchase_orders/shipments'}
+  def receive_history
+    {name: 'Received', id: 'receive', url: 'receive'}
   end
 
   def payables
@@ -76,7 +76,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def payment_tickets
-    {name: 'Payment Tickets', id: 'payables_payment_tickets', url: 'payables/payment_tickets'}
+    {name: 'Payment Tickets', id: 'orders', url: 'orders'}
   end
 
   def manage
