@@ -14,6 +14,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.klass.delete(:dlrms)
     self.klass.delete(:trails)
     self.klass.delete(:advance_payments)
+    self.klass.delete(:payments)
     # self.foreign_keys = klass.map {|k| PurchaseOrder.reflections[k.to_s].foreign_key}
   end
 

@@ -43,6 +43,7 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       if purchase_order.advance_amount&.present?
         if purchase_order.advance_amount.value > 0
           purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:to_be_processed)
+          purchase_order.save
         end
       end
     end
