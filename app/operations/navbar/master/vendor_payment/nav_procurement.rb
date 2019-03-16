@@ -7,7 +7,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           :dashboard,
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company]},
           {receive: [:receive_pending, :receive_history]},
-          {payables: [:po_advances, :invoices, :payment_tickets]},
+          {payables: [:po_advances, :po_invoices, :non_po_invoices, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
           {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket]}
       ]
@@ -83,9 +83,14 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'PO Advances', id: 'new_payment_po_advances', url: 'new_payment_po_advances'}
   end
 
-  def invoices
+  def po_invoices
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices'}
+    {name: 'Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices/params={"filter_invoice_type":"po_invoice"}'}
+  end
+
+  def non_po_invoices
+    return nil unless user.is_bank_payment_request_initiator?
+    {name: 'Non PO Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices/params={"filter_invoice_type":"non_po_invoice"}'}
   end
 
   def payment_tickets
