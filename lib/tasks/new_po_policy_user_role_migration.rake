@@ -13,6 +13,12 @@ task :new_po_policy_user_role_migration => :environment do
         if policy.policy_user_roles.where(user_id: mapping.user_id, user_role_id: UserRole.id_for(:purchase_order_initiator)).blank?
           policy.policy_user_roles.create!(user_id: mapping.user_id, user_role_id: UserRole.id_for(:purchase_order_initiator))
         end
+        if policy.policy_user_roles.where(user_id: mapping.user_id, user_role_id: UserRole.id_for(:goods_receiver)).blank?
+          policy.policy_user_roles.create!(user_id: mapping.user_id, user_role_id: UserRole.id_for(:goods_receiver))
+        end
+        if policy.policy_user_roles.where(user_id: mapping.user_id, user_role_id: UserRole.id_for(:invoice_initiator)).blank?
+          policy.policy_user_roles.create!(user_id: mapping.user_id, user_role_id: UserRole.id_for(:invoice_initiator))
+        end
       end
       # If any company users have user role as admin, then add him as admin to all policies for purchase_order
       # FOR THAT, get all company policies, add user as admin if not already present

@@ -5,16 +5,21 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_policy, :po_company]},
-          {shipments: [:shipments_pending, :shipments_history]},
-          {payables: [:unbilled_items, :po_advances, :invoices, :payment_tickets]},
+          {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company]},
+          {receive: [:receive_pending, :receive_history]},
+          {payables: [:po_advances, :invoices, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
-          {create: [:create_purchase_order, :create_po_invoice, :create_non_po_invoice, :create_payment_ticket]}
+          {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket]}
       ]
   )
   register_structure(
       :cog,
-      [:attachments]
+      [
+          :attachments, :users,
+          :load_company_balance, :statements,
+          :organization_account,
+          :finly_expense_management, :finly_disburse, :finly_collect
+      ]
   )
 
   def self.accept?
@@ -28,85 +33,83 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def procure
-    {name: 'Procure', id: 'procure', url: 'procure'}
+    {name: 'Procure', id: 'procurements', url: 'procurements'}
   end
 
   def po_initiator
-    if is_purchase_order_initiator?
-      {name: 'Your Purchase Orders', id: 'purchase_orders', url: 'purchase_orders'}
-    end
+    return nil unless user.is_purchase_order_initiator?
+    {name: 'Your POs', id: 'procurements', url: 'procurements'}
   end
 
   def po_awaiting_approval
-    if is_purchase_request_reviewer? || user.vendor_payments_admin?
-      {name: 'PO Awaiting Approval', id: 'purchase_orders', url: 'purchase_orders/vendors'}
-    end
+    return nil unless user.is_purchase_request_reviewer? || user.vendor_payments_admin?
+    {name: 'POs Awaiting Approval', id: 'procurements', url: 'procurements'}
   end
 
   def po_team
-    {name: 'PO Awaiting Approval', id: 'purchase_orders', url: 'purchase_orders/vendors'}
-  end
-
-  def po_policy
-    {name: 'PO Awaiting Approval', id: 'purchase_orders', url: 'purchase_orders/vendors'}
+    return nil unless user.is_purchase_request_reviewer?
+    {name: 'Team POs', id: 'procurements', url: 'procurements'}
   end
 
   def po_company
-    {name: 'PO Awaiting Approval', id: 'purchase_orders', url: 'purchase_orders/vendors'}
+    return nil unless user.vendor_payments_admin?
+    {name: 'Company POs', id: 'procurements', url: 'procurements'}
   end
 
-  def shipments
-    {name: 'Shipments', id: 'po_shipments', url: 'purchase_orders/shipments'}
+  def receive
+    {name: 'Receive', id: 'receive', url: 'receive'}
   end
 
-  def shipments_pending
-    {name: 'Pending Shipments', id: 'pending_po_shipments', url: 'purchase_orders/shipments'}
+  def receive_pending
+    return nil unless user.is_goods_receiver?
+    {name: 'Pending', id: 'receive', url: 'receive'}
   end
 
-  def shipments_history
-    {name: 'Pending Shipments', id: 'pending_po_shipments', url: 'purchase_orders/shipments'}
+  def receive_history
+    return nil unless user.is_goods_receiver?
+    {name: 'Received', id: 'receive', url: 'receive'}
   end
 
   def payables
-    {name: 'Payables', id: 'payables', url: 'payables'}
+    {name: 'Payables', id: 'orders', url: 'orders'}
   end
 
-  def unbilled_items
-    {name: 'Unbilled Items', id: 'payables_unbilled_items', url: 'payables/unbilled_items'}
-  end
+  # def unbilled_items
+  #   {name: 'Unbilled Items', id: 'payables_unbilled_items', url: 'payables/unbilled_items'}
+  # end
 
   def po_advances
-    {name: 'PO Advances', id: 'payables_po_advances', url: 'payables/po_advances'}
+    return nil unless user.is_bank_payment_request_initiator?
+    {name: 'PO Advances', id: 'new_payment_po_advances', url: 'new_payment_po_advances'}
   end
 
   def invoices
-    {name: 'Invoices', id: 'payables_invoices', url: 'payables/invoices'}
+    return nil unless user.is_bank_payment_request_initiator?
+    {name: 'Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices'}
   end
 
   def payment_tickets
-    {name: 'Payment Tickets', id: 'payables_payment_tickets', url: 'payables/payment_tickets'}
+    return nil unless user.is_bank_payment_request_initiator? || user.is_bank_payment_request_reviewer? || user.is_bank_payment_request_creditor?
+    {name: 'Payment Tickets', id: 'orders', url: 'orders'}
   end
 
   def manage
-    {name: 'Manage', id: 'manage', url: 'manage'}
+    {name: 'Manage', id: 'beneficiaries', url: 'beneficiaries'}
   end
 
   def manage_vendors
-    if user.is_vendor_manger? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vendor_payments_admin?
-      {name: 'Vendors', id: 'manage_vendors', url: 'manage/vendors'}
-    end 
+    return nil unless user.is_vendor_manger? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vendor_payments_admin?
+    {name: 'Vendors', id: 'beneficiaries', url: 'beneficiaries'}
   end
 
   def manage_item_master
-    if user.is_item_master_manager? || user.vendor_payments_admin?
-      {name: 'Item Master', id: 'manage_item_master', url: 'manage/item_master'}
-    end
+    return nil unless user.is_item_master_manager? || user.vendor_payments_admin?
+    {name: 'Item Master', id: 'inventory', url: 'inventory'}
   end
 
   def manage_rate_contracts
-    if user.is_item_master_manager? || user.vendor_payments_admin?
-      {name: 'Rate Contracts', id: 'manage_rate_contracts', url: 'manage/rate_contracts'}
-    end
+    return nil unless user.is_item_master_manager? || user.vendor_payments_admin?
+    {name: 'Rate Contracts', id: 'inventory', url: 'inventory'}
   end
 
   def create
@@ -114,27 +117,27 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def create_purchase_order
-    if user.is_purchase_order_initiator? || user.vendor_payments_admin?
-      {name: 'New Purchase Order', id: 'create_purchase_order', url: 'purchase_orders/new'}
-    end
+    return nil unless user.is_purchase_order_initiator? || user.vendor_payments_admin?
+    {name: 'New Purchase Order', id: 'create_purchase_order', url: 'purchase_orders/new'}
   end
 
-  def create_po_invoice
-    if user.is_invoice_initiator? || user.vendor_payments_admin?
-      {name: 'New PO Invoice', id: 'create_po_invoice', url: 'purchase_orders/invoices/new'}
-    end
-  end
+  # def create_po_invoice
+  #   {name: 'New PO Invoice', id: 'create_po_invoice', url: 'purchase_orders/invoices/new'}
+  # end
 
   def create_non_po_invoice
-    if user.is_invoice_initiator? || user.vendor_payments_admin?
-      {name: 'New Non PO Invoice', id: 'create_non_po_invoice', url: 'non_po_invoices/new'}
-    end
+    return nil unless user.is_invoice_initiator? || user.vendor_payments_admin?
+    {name: 'New Non PO Invoice', id: 'create_non_po_invoice', url: 'non_po_invoices/new'}
   end
 
   def create_payment_ticket
-    if user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
-      {name: 'New Payment Ticket', id: 'create_payment_ticket', url: 'payment_tickets/new'}
-    end
+    return nil unless user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
+    {name: 'New Payment Ticket', id: 'new_payment_ticket', url: 'new_payment_ticket'}
+  end
+
+  def attachments
+    return nil unless user.is_bank_payment_request_initiator?
+    {name: 'Attachments', id: 'attachments', url: 'attachments'}
   end
 
 end

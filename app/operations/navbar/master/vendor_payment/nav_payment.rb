@@ -4,11 +4,10 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   register_structure(
       :tabs, [
           :dashboard,
-          :invoices,
           :payment_tickets,
           :vendors,
           :item_master,
-          {create: [:create_invoice, :create_payment_ticket]},
+          {create: [:create_payment_ticket]},
       ]
   )
 
@@ -23,20 +22,16 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
     {name: 'Dashboard', id: 'dashboard', url: 'dashboard'}
   end
 
-  def invoices
-    {name: 'Invoices', id: 'payables_invoices', url: 'payables/invoices'}
-  end
-
   def payment_tickets
-    {name: 'Payment Tickets', id: 'payables_payment_tickets', url: 'payables/payment_tickets'}
+    {name: 'Payment Tickets', id: 'orders', url: 'orders'}
   end
 
   def vendors
-    {name: 'Vendors', id: 'manage_vendors', url: 'manage/vendors'}
+    {name: 'Vendors', id: 'beneficiaries', url: 'beneficiaries'}
   end
 
   def item_master
-    {name: 'Item Master', id: 'item_master', url: 'manage/item_master'}
+    {name: 'Item Master', id: 'inventory', url: 'inventory'}
   end
 
   def create

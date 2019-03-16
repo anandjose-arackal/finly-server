@@ -38,6 +38,13 @@ class Navbar::Config < BaseOperation
   end
 
   def process_master(klass)
+    config = {}
+    config[:nav_bar] = process_nav_bar(klass)
+    config[:cog] = process_cog(klass)
+    config
+  end
+
+  def process_nav_bar(klass)
     menu_data = []
     structure = klass.structure(:tabs)
     master = klass.new
@@ -62,10 +69,29 @@ class Navbar::Config < BaseOperation
           sub_conf = master.send sub_menu_key
           conf[:sub_menu] << sub_conf unless sub_conf.nil?
         end
+        next if conf[:sub_menu].blank?
       end
       menu_data << conf
     end
     menu_data
+  end
+
+  def process_cog(klass)
+    cog_data = []
+    structure = klass.structure(:cog)
+    master = klass.new
+    structure.each do |item|
+      if item.is_a?(Symbol)
+        menu_key = item
+      else
+        raise 'Invalid type item'
+      end
+      conf = master.send menu_key
+      next if conf.nil?
+
+      cog_data << conf
+    end
+    cog_data
   end
 
   def success
