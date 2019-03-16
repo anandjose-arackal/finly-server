@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_14_103639) do
+ActiveRecord::Schema.define(version: 2019_03_16_015815) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2189,6 +2189,62 @@ ActiveRecord::Schema.define(version: 2019_03_14_103639) do
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
     t.index ["reviewer_id"], name: "index_document_level_reviewer_mappings_on_reviewer_id"
+  end
+
+  create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "receiptable_document_id", null: false
+    t.string "receiptable_document_type", null: false
+    t.integer "document_message_id", null: false
+    t.datetime "browser_push_sent_at"
+    t.datetime "app_push_sent_at"
+    t.datetime "email_sent_at"
+    t.datetime "read_at"
+    t.datetime "trashed_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_push_sent_at"], name: "index_document_message_receipts_on_app_push_sent_at"
+    t.index ["browser_push_sent_at"], name: "index_document_message_receipts_on_browser_push_sent_at"
+    t.index ["deleted_at"], name: "index_document_message_receipts_on_deleted_at"
+    t.index ["document_message_id"], name: "index_document_message_receipts_on_document_message_id"
+    t.index ["email_sent_at"], name: "index_document_message_receipts_on_email_sent_at"
+    t.index ["read_at"], name: "index_document_message_receipts_on_read_at"
+    t.index ["receiptable_document_id"], name: "index_document_message_receipts_on_receiptable_document_id"
+    t.index ["receiptable_document_type"], name: "index_document_message_receipts_on_receiptable_document_type"
+    t.index ["trashed_at"], name: "index_document_message_receipts_on_trashed_at"
+    t.index ["user_id"], name: "index_document_message_receipts_on_user_id"
+  end
+
+  create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_document_message_types_on_name"
+  end
+
+  create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "order"
+    t.integer "user_id"
+    t.integer "type_id"
+    t.text "body"
+    t.string "attachment_file_name"
+    t.string "attachment_content_type"
+    t.bigint "attachment_file_size"
+    t.datetime "attachment_updated_at"
+    t.datetime "deleted_at"
+    t.datetime "trashed_at"
+    t.integer "messageable_document_id", null: false
+    t.string "messageable_document_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_document_messages_on_deleted_at"
+    t.index ["messageable_document_id"], name: "index_document_messages_on_messageable_document_id"
+    t.index ["messageable_document_type"], name: "index_document_messages_on_messageable_document_type"
+    t.index ["order"], name: "index_document_messages_on_order"
+    t.index ["trashed_at"], name: "index_document_messages_on_trashed_at"
+    t.index ["type_id"], name: "index_document_messages_on_type_id"
+    t.index ["user_id"], name: "index_document_messages_on_user_id"
   end
 
   create_table "document_number_config_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -5534,6 +5590,7 @@ ActiveRecord::Schema.define(version: 2019_03_14_103639) do
     t.integer "current_resolution_width"
     t.integer "mouse_pos_x"
     t.integer "mouse_pos_y"
+    t.string "ip"
     t.index ["action"], name: "index_user_session_events_on_action"
     t.index ["app"], name: "index_user_session_events_on_app"
     t.index ["controller"], name: "index_user_session_events_on_controller"

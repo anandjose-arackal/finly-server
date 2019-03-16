@@ -9,7 +9,7 @@ Gatekeeper::Checker.new 'On New Request' do
     rule 'Request IP has to match Session IP' do
       request = RequestStoreUtil.current_request
       session = RequestStoreUtil.current_session
-      next if request.remote_ip == session.ip
+      next if request.remote_ip == session.remote_ip
       next if request.remote_ip == session.user_ip&.ip
 
       message 'Browser IP mismatch'

@@ -178,6 +178,7 @@ class UserSessions::Create < BaseOperation
 
   def set_event(args)
     args[:events_attributes] = [{}]
+    args[:events_attributes][0][:ip] = RequestStoreUtil.current_request.remote_ip
     args[:events_attributes][0][:http_method] = RequestStoreUtil.current_request.method_symbol
     args[:events_attributes][0][:app] = RequestStoreUtil.current_app
     args[:events_attributes][0][:path] = RequestStoreUtil.current_request.path

@@ -36,7 +36,7 @@ Rails.application.configure do
     hash = {params: RequestStore.store[:request_params]&.except(:password, :password_confirmation)}
     hash[:current_app] = (controller.current_app rescue nil)
     hash[:current_device] = (controller.current_device rescue nil)
-    hash[:ip] = controller.request.ip
+    hash[:ip] = controller.request.remote_ip
     hash[:request_id] = controller.request.request_id
     if user.present?
       hash[:user_id] = user&.id

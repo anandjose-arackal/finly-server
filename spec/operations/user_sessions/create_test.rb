@@ -73,6 +73,7 @@ class UserSessionCreateHelper
       expect(@result.event.status_id).to eq(UserSessionStatus.id_for(@status))
       expect(@result.event.message).to eq(@message)
       expect(@result.event.response_code).to be_nil
+      expect(@result.event.ip).to eq(@ip)
     end
 
     instance.it 'should set the correct DateTime' do
