@@ -17,9 +17,25 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
     has_scope :filter_procurement_type
     has_scope :filter_status_tags
 
+    # General Filters from frontend
+    has_scope :filter_policy_id
+    has_scope :filter_department_id
+    has_scope :filter_sub_department_id
+    has_scope :filter_month
+    has_scope :filter_year
+
     def init
+      general_filter_params = {
+        filter_policy_id: params[:filter_policy],
+        filter_department_id: params[:filter_department],
+        filter_sub_department_id: params[:filter_sub_department],
+        filter_month: params[:filter_month],
+        filter_year: params[:filter_year],
+        filter_procurement_type: 'purchase_order'
+      }
+
       self.procurements = params[:procurements]
-      self.procurements = apply_scopes(self.procurements, {filter_procurement_type: 'purchase_order'})
+      self.procurements = apply_scopes(self.procurements, general_filter_params)
       self.counts = []
 
       if user.is_goods_receiver?

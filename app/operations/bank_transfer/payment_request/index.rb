@@ -157,6 +157,8 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     # has_scope :filter_controlling_user
     has_scope :filter_payment_ids
     has_scope :filter_vendor_id
+    has_scope :filter_month
+    has_scope :filter_year
 
     def init
       self.payment_requests = params[:payment_requests]
