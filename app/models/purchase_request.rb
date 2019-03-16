@@ -23,4 +23,8 @@ class PurchaseRequest < ApplicationRecord
   belongs_to :company
 
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+  has_many :line_items, class_name: "PurchaseOrderItem", dependent: :destroy
+
+  accepts_nested_attributes_for :line_items
+
 end
