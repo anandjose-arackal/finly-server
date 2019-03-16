@@ -104,12 +104,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def manage_item_master
     return nil unless user.is_item_master_manager? || user.vendor_payments_admin?
-    {name: 'Item Master', id: 'catalogue', url: 'catalogue'}
+    {name: 'Item Master', id: 'item_master', url: 'catalogue/params={"tabName": "item_master"}'}
   end
 
   def manage_rate_contracts
     return nil unless user.is_item_master_manager? || user.vendor_payments_admin?
-    {name: 'Rate Contracts', id: 'catalogue', url: 'catalogue'}
+    {name: 'Rate Contracts', id: 'rate_contracts', url: 'catalogue/params={"tabName": "rate_contract"}'}
   end
 
   def create
