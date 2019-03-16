@@ -11,6 +11,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
       add_message :error, result.messages[:error]
       return
     end
+    self.procurement = result.procurement
     self.purchase_order = result.purchase_order
   end
 
@@ -21,7 +22,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def po_revision
     # can only be done after the po status is set to "sent to vendor"
-    (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
+    unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
+      (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
+    end
   end
 
   def reopen
