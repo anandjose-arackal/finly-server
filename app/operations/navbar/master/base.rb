@@ -53,6 +53,45 @@ class Navbar::Master::Base
     false
   end
 
+  protected
+  def users
+    return nil unless RequestStoreUtil.current_user.company_admin?
+    {name: 'Users', id: 'users', url: '#users'}
+  end
 
+  def load_company_balance
+    return nil unless RequestStoreUtil.current_user.company_admin?
+    {name: 'Load Company Balance', id: 'load-company-balance', url: '#load-company-balance'}
+  end
+
+  def statements
+    return nil unless RequestStoreUtil.current_user.company_admin?
+    {name: 'Statements', id: 'statements', url: '#statements'}
+  end
+
+  def organization_account
+    return nil unless RequestStoreUtil.current_user.company_admin?
+    {name: 'Organization Account', id: 'organization_account', url: '#organization_account'}
+  end
+
+  def finly_expense_management
+    return nil unless RequestStoreUtil.current_user.company.expense_management_enabled?
+    {name: 'Expense Management', id: 'expense_management', url: '/'}
+  end
+
+  def finly_vendor_payments
+    return nil unless RequestStoreUtil.current_company.feature_subscription.yes_bank_account and RequestStoreUtil.current_user.user_panel_subscription.yes_bank_account_transfer
+    {name: 'Vendor Payments', id: 'vendor_payments', url: '/payments'}
+  end
+
+  def finly_disburse
+    return nil unless RequestStoreUtil.current_user.user_panel_subscription.disburse && RequestStoreUtil.current_user.company.cards_enabled?
+    {name: 'Fund Disbursement', id: 'disburse', url: '/disburse'}
+  end
+
+  def finly_collect
+    return nil unless RequestStoreUtil.current_company.feature_subscription.invoicing_system && RequestStoreUtil.current_user.user_panel_subscription.invoicing_system
+    {name: 'Finly Collect', id: 'collect', url: '/collect'}
+  end
 
 end

@@ -14,7 +14,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   )
   register_structure(
       :cog,
-      [:attachments]
+      [
+          :attachments, :users,
+          :load_company_balance, :statements,
+          :organization_account,
+          :finly_expense_management, :finly_disburse, :finly_collect
+      ]
   )
 
   def self.accept?

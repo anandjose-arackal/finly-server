@@ -41,6 +41,7 @@ class Navbar::Config < BaseOperation
     config = {}
     config[:nav_bar] = process_nav_bar(klass)
     config[:cog] = process_cog(klass)
+    config
   end
 
   def process_nav_bar(klass)
