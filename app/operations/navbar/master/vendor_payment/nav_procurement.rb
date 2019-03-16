@@ -37,22 +37,22 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_initiator
-    return nil unless user.is_purchase_order_initiator?
+    return nil unless RequestStoreUtil.current_user.is_purchase_order_initiator?
     {name: 'Your POs', id: 'procurements', url: 'procurements'}
   end
 
   def po_awaiting_approval
-    return nil unless user.is_purchase_request_reviewer? || user.vendor_payments_admin?
+    return nil unless RequestStoreUtil.current_user.is_purchase_request_reviewer? || RequestStoreUtil.current_user.vendor_payments_admin?
     {name: 'POs Awaiting Approval', id: 'procurements', url: 'procurements'}
   end
 
   def po_team
-    return nil unless user.is_purchase_request_reviewer?
+    return nil unless RequestStoreUtil.current_user.is_purchase_request_reviewer?
     {name: 'Team POs', id: 'procurements', url: 'procurements'}
   end
 
   def po_company
-    return nil unless user.vendor_payments_admin?
+    return nil unless RequestStoreUtil.current_user.vendor_payments_admin?
     {name: 'Company POs', id: 'procurements', url: 'procurements'}
   end
 
@@ -61,12 +61,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def receive_pending
-    return nil unless user.is_goods_receiver?
+    return nil unless RequestStoreUtil.current_user.is_goods_receiver?
     {name: 'Pending', id: 'receive', url: 'receive'}
   end
 
   def receive_history
-    return nil unless user.is_goods_receiver?
+    return nil unless RequestStoreUtil.current_user.is_goods_receiver?
     {name: 'Received', id: 'receive', url: 'receive'}
   end
 
@@ -79,17 +79,17 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   # end
 
   def po_advances
-    return nil unless user.is_bank_payment_request_initiator?
+    return nil unless RequestStoreUtil.current_user.is_bank_payment_request_initiator?
     {name: 'PO Advances', id: 'new_payment_po_advances', url: 'new_payment_po_advances'}
   end
 
   def invoices
-    return nil unless user.is_bank_payment_request_initiator?
+    return nil unless RequestStoreUtil.current_user.is_bank_payment_request_initiator?
     {name: 'Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices'}
   end
 
   def payment_tickets
-    return nil unless user.is_bank_payment_request_initiator? || user.is_bank_payment_request_reviewer? || user.is_bank_payment_request_creditor?
+    return nil unless RequestStoreUtil.current_user.is_bank_payment_request_initiator? || RequestStoreUtil.current_user.is_bank_payment_request_reviewer? || RequestStoreUtil.current_user.is_bank_payment_request_creditor?
     {name: 'Payment Tickets', id: 'orders', url: 'orders'}
   end
 
@@ -98,17 +98,17 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_vendors
-    return nil unless user.is_vendor_manger? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vendor_payments_admin?
+    return nil unless RequestStoreUtil.current_user.is_vendor_manger? || RequestStoreUtil.current_user.is_vendor_initiator? || RequestStoreUtil.current_user.is_vendor_reviewer? || RequestStoreUtil.current_user.vendor_payments_admin?
     {name: 'Vendors', id: 'beneficiaries', url: 'beneficiaries'}
   end
 
   def manage_item_master
-    return nil unless user.is_item_master_manager? || user.vendor_payments_admin?
+    return nil unless RequestStoreUtil.current_user.is_item_master_manager? || RequestStoreUtil.current_user.vendor_payments_admin?
     {name: 'Item Master', id: 'inventory', url: 'inventory'}
   end
 
   def manage_rate_contracts
-    return nil unless user.is_item_master_manager? || user.vendor_payments_admin?
+    return nil unless RequestStoreUtil.current_user.is_item_master_manager? || RequestStoreUtil.current_user.vendor_payments_admin?
     {name: 'Rate Contracts', id: 'inventory', url: 'inventory'}
   end
 
@@ -117,7 +117,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def create_purchase_order
-    return nil unless user.is_purchase_order_initiator? || user.vendor_payments_admin?
+    return nil unless RequestStoreUtil.current_user.is_purchase_order_initiator? || RequestStoreUtil.current_user.vendor_payments_admin?
     {name: 'New Purchase Order', id: 'create_purchase_order', url: 'purchase_orders/new'}
   end
 
@@ -126,17 +126,17 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   # end
 
   def create_non_po_invoice
-    return nil unless user.is_invoice_initiator? || user.vendor_payments_admin?
+    return nil unless RequestStoreUtil.current_user.is_invoice_initiator? || RequestStoreUtil.current_user.vendor_payments_admin?
     {name: 'New Non PO Invoice', id: 'create_non_po_invoice', url: 'non_po_invoices/new'}
   end
 
   def create_payment_ticket
-    return nil unless user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
+    return nil unless RequestStoreUtil.current_user.is_bank_payment_request_initiator? || RequestStoreUtil.current_user.vendor_payments_admin?
     {name: 'New Payment Ticket', id: 'new_payment_ticket', url: 'new_payment_ticket'}
   end
 
   def attachments
-    return nil unless user.is_bank_payment_request_initiator?
+    return nil unless RequestStoreUtil.current_user.is_bank_payment_request_initiator?
     {name: 'Attachments', id: 'attachments', url: 'attachments'}
   end
 
