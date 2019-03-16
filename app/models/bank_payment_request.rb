@@ -43,6 +43,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :controlling_for_user, optional: true, class_name: "User"
   belongs_to :controlling_for_user_role, optional: true, class_name: "UserRole"
   belongs_to :policy, optional: true
+  belongs_to :company, optional: true
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
