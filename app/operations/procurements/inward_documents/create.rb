@@ -5,9 +5,13 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     self.procurement = user.company.procurements.find_by id: procurement_id
     # self.inward_document_params = inward_document_parameters
     self.purchase_order = self.procurement&.purchase_order
-    self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
-    if po_revision.present?
-      self.purchase_order = self.po_revision
+
+    if self.procurement.po_revisions.present?
+      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+      self.po_revision = self.procurement.po_revisions.last
+      if po_revision.present?
+        self.purchase_order = self.po_revision
+      end
     end
     self.inward_document_create_params = create_inward_document_params
   end
