@@ -54,6 +54,10 @@ class Navbar::Master::Base
   end
 
   protected
+  def user
+    RequestStoreUtil.current_user
+  end
+
   def users
     return nil unless RequestStoreUtil.current_user.company_admin?
     {name: 'Users', id: 'users', url: '#users'}
