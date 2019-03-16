@@ -171,7 +171,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       #     self.payment_requests = self.payment_requests.order_by(:submitted_at)#.order_by(:manager_controlling_user, user.id)
       #   end
       # end
-      if self.payment_requests.order_by(:submitted_at)
+      self.payment_requests.order_by(:submitted_at)
       self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page)
     end
 
