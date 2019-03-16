@@ -15,15 +15,15 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       grns: false
     }
 
-    user_roles = user.roles
+    user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
 
-    user_roles.each do |role|
+    user_roles.each do |role_id|
       # if role.vendor_payments_admin?
       #   request_types.keys.map {|key| request_types[key] = true }
       #   break
       # elsif ven
 
-      case role.id
+      case role_id
       when UserRole.id_for(:admin)
         request_types.keys.map {|key| request_types[key] = true }
         break
