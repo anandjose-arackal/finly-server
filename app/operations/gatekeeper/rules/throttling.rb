@@ -1,13 +1,13 @@
 Gatekeeper::Checker.new 'Throttling' do
 
   section 'Lookup' do
-    before :all do
+    before do
       skip unless RequestStoreUtil.current_request.path.include?('/lookup')
     end
 
-    rule 'Throttle 10 requests per minute' do
-
-    end
+    # rule 'Throttle 10 requests per minute' do
+    #   UserSessionEvent
+    # end
   end
 
   section 'Login Attempt' do
