@@ -174,14 +174,14 @@ class BankPaymentRequest < ApplicationRecord
     if year.blank?
       year = Date.today.year
     end
-    where('extract(year from created_at) = ? OR extract(year from created_at) = ?', year, year)
+    where('extract(year from bank_payment_requests.created_at) = ? OR extract(year from bank_payment_requests.created_at) = ?', year, year)
   }
 
   scope :filter_month, -> (month) {
     if month.blank?
       month = Date.today.month
     end
-    where('extract(month from created_at) = ? OR extract(month from created_at) = ?', month, month)
+    where('extract(month from bank_payment_requests.created_at) = ? OR extract(month from bank_payment_requests.created_at) = ?', month, month)
   }
 
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}

@@ -38,6 +38,15 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
       self.invoices = apply_scopes(self.invoices, general_filter_params)
       self.counts = []
 
+      if params[:action] == 'non_po_invoices'
+        invoice_type = 'non_po_invoices'
+      elsif params[:action] == 'tax_invoice'
+        invoice_type = 'non_po_invoices'
+      else
+        # nothin
+      end
+          
+
       if user.vendor_payments_admin?
         admin_data = {
           type: 'admin',
@@ -45,12 +54,15 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
             {
               title: "Total",
               count: invoices.count,
-              filters: []
+              filters: [
+                {filter_invoice_type: invoice_type}
+              ]
             },
             {
               title: "Processing",
               count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count,
               filters: [
+                {filter_invoice_type: invoice_type},
                 {filter_status: "processing"}
               ]
             },
@@ -58,6 +70,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
               title: "Approved",
               count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count,
               filters: [
+                {filter_invoice_type: invoice_type},
                 {filter_status: "approved"}
               ]
             },
@@ -65,6 +78,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
               title: "Credited",
               count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:credited)})&.count,
               filters: [
+                {filter_invoice_type: invoice_type},
                 {filter_status: "paid"}
               ]
             }
@@ -82,6 +96,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
               title: "Total",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id})&.count,
               filter: [
+                {filter_invoice_type: invoice_type},
                 {filter_user: true}
               ]
             },
@@ -89,6 +104,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
               title: "Processing",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count,
               filter: [
+                {filter_invoice_type: invoice_type},
                 {filter_user: true},
                 {filter_status: "processing"}
               ]
@@ -97,6 +113,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
               title: "Approved",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count,
               filter: [
+                {filter_invoice_type: invoice_type},
                 {filter_user: true},
                 {filter_status: "approved"}
               ]
@@ -113,7 +130,11 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
           data: [
             {
               title: "Awaiting Approval",
-              count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: params[:filter_inward_invoice_type]})&.count
+              count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: params[:filter_inward_invoice_type]})&.count,
+              filters: [
+                {filter_invoice_type: invoice_type},
+                {filter_awaiting_approval: true}
+              ]
             }
           ]
         }
