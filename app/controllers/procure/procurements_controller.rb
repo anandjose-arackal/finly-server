@@ -12,7 +12,7 @@ class Procure::ProcurementsController < ApplicationController
 
   def grn_pending
     params[:filter_procurement_type] = "purchase_order"
-    params[:filter_status_tags] = ["7"]
+    params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
     @result = Procurements::Index.(current_user, params)
 
     if @result.success?
@@ -29,7 +29,7 @@ class Procure::ProcurementsController < ApplicationController
 
   def grn_received
     params[:filter_procurement_type] = "purchase_order"
-    params[:filter_status_tags] = ["8"]
+    params[:filter_status_tags] = [StatusTag.id_for(:shipment_received)]
 
     @result = Procurements::Index.(current_user, params)
 

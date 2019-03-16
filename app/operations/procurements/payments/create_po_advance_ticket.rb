@@ -145,12 +145,12 @@ class Procurements::Payments::CreatePoAdvanceTicket < Procurements::Payments::Ba
         next
       end
 
-      # if advance_amount >= purchase_order.balance_amount&.value
-      #   row_details << "Advance cannot be greater than the balance amount in the PO"
-      #   self.contents << row_details
-      #   errors_found = true
-      #   next
-      # end
+      if advance_amount >= purchase_order.balance_amount&.value
+        row_details << "Advance cannot be greater than the balance amount in the PO"
+        self.contents << row_details
+        errors_found = true
+        next
+      end
 
       if vendor.bank_accounts.empty?
         row_details << "This vendor doesn't have any bank accounts"

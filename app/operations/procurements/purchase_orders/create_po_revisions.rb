@@ -14,6 +14,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     self.klass.delete(:dlrms)
     self.klass.delete(:trails)
     self.klass.delete(:advance_payments)
+    self.klass.delete(:payments)
     # self.foreign_keys = klass.map {|k| PurchaseOrder.reflections[k.to_s].foreign_key}
   end
 
@@ -44,6 +45,7 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
       self.duplicate_po.po_number = op.document_number
     end
 
+    self.purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
     self.duplicate_po.save
 
     self.klass.each_with_index do |k, kid| 
@@ -68,7 +70,6 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     # important to keep this line to preserve calculated values
     self.duplicate_po.process_line_item_calculation
 
-    self.purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
     if self.duplicate_po.save
       # self.original_purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
       self.duplicate_po.trails.create action_user: user, action_id: TrailAction.id_for(:create), note: "Revised PO created from, ##{self.purchase_order.po_number}"
