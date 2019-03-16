@@ -85,7 +85,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_invoices
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices/params={"filter_invoice_type":"po_invoice"}'}
+    {name: 'PO Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices/params={"filter_invoice_type":"po_invoice"}'}
   end
 
   def non_po_invoices
