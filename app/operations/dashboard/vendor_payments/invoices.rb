@@ -14,12 +14,28 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
   class Dashboard::VendorPayments::Invoices::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoices, :counts
 
-    has_scope :filter_status
+    has_scope :filter_status_id
     has_scope :with_created_by_user_id
     has_scope :filter_inward_invoice_type
 
+    # General Filters from frontend
+    has_scope :filter_policy_id
+    has_scope :filter_department_id
+    has_scope :filter_sub_department_id
+    has_scope :filter_month
+    has_scope :filter_year
+
     def init
+      general_filter_params = {
+        filter_policy_id: params[:filter_policy],
+        filter_department_id: params[:filter_department],
+        filter_sub_department_id: params[:filter_sub_department],
+        filter_month: params[:filter_month],
+        filter_year: params[:filter_year]
+      }
+
       self.invoices = params[:invoices]
+      self.invoices = apply_scopes(self.invoices, general_filter_params)
       self.counts = []
 
       if user.vendor_payments_admin?
@@ -28,19 +44,29 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
           data: [
             {
               title: "Total",
-              count: invoices.count
+              count: invoices.count,
+              filters: []
             },
             {
               title: "Processing",
-              count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count
+              count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count,
+              filters: [
+                {filter_status: "processing"}
+              ]
             },
             {
               title: "Approved",
-              count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count
+              count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count,
+              filters: [
+                {filter_status: "approved"}
+              ]
             },
             {
               title: "Credited",
-              count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:credited)})&.count
+              count: apply_scopes(invoices, {filter_status_id: InwardInvoiceStatus.id_for(:credited)})&.count,
+              filters: [
+                {filter_status: "paid"}
+              ]
             }
           ]
         }
@@ -54,24 +80,35 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
           data: [
             {
               title: "Total",
-              count: apply_scopes(invoices, {with_created_by_user_id: user.id})&.count
+              count: apply_scopes(invoices, {with_created_by_user_id: user.id})&.count,
+              filter: [
+                {filter_user: true}
+              ]
             },
             {
               title: "Processing",
-              count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count
+              count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count,
+              filter: [
+                {filter_user: true},
+                {filter_status: "processing"}
+              ]
             },
             {
               title: "Approved",
-              count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count
+              count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count,
+              filter: [
+                {filter_user: true},
+                {filter_status: "approved"}
+              ]
             }
           ]
         }
         self.counts.push(personal_data)
       end
 
-      if user.is_invoice_reviewer?
+      if user.is_invoice_reviewer? && user.is_bank_payment_request_creditor?
         awaiting_invoices = Invoice.awaiting_action_items(user)
-        reviewer_data = {
+        data = {
           type: "reviewer",
           data: [
             {
@@ -80,7 +117,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
             }
           ]
         }
-        self.counts.push(reviewer_data)
+        self.counts.push(data)
       end
     end
   end

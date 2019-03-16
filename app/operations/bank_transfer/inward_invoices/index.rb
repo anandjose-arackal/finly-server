@@ -17,6 +17,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_status
     has_scope :filter_invoice_type
     has_scope :filter_po_number
+    has_scope :filter_user
 
     def init
       self.invoices = params[:invoices]

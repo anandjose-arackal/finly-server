@@ -123,6 +123,8 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_invoice_id, type: :array
     has_scope :filter_creation_date_from
     has_scope :filter_creation_date_to
+    has_scope :filter_month
+    has_scope :filter_year
 
 
     def init
