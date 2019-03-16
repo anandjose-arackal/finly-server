@@ -28,7 +28,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def reopen
-    ( (purchase_order.closed?) && (user_in_level? || document_owner? || user.vendor_payment_admin?) ) # || (purchase_order.auto_approved? && user.vendor_payment_admin? )
+    unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
+      ( (purchase_order.closed?) && (user_in_level? || document_owner? || user.vendor_payment_admin?) ) # || (purchase_order.auto_approved? && user.vendor_payment_admin? )
+    end
   end
 
   def more_details_button
@@ -86,8 +88,10 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   def save_btn
     # admin can save provided it is open or processing or the provided condiftions
     # document owner can save provided po is open, retracted or rejected
-    (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
-    (purchase_order.processing? && user_in_level?)
+    unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
+      (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
+      (purchase_order.processing? && user_in_level?)
+    end
 
     # user.vendor_payment_admin? || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )
   end
