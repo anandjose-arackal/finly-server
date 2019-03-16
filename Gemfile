@@ -22,6 +22,9 @@ gem 'daemons', '~> 1.3.1'
 gem 'rollbar', '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
+# Firewall
+gem 'rack-attack', '5.4.2'
+
 # gem '-raven', '~> 2.8'
 
 gem 'health-monitor-rails', '~> 8.4.0'

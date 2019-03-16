@@ -352,6 +352,8 @@ GEM
     public_suffix (3.0.3)
     puma (3.12.0)
     rack (2.0.6)
+    rack-attack (5.4.2)
+      rack (>= 1.0, < 3)
     rack-mini-profiler (1.0.2)
       rack (>= 1.2.0)
     rack-test (1.1.0)
@@ -600,6 +602,7 @@ DEPENDENCIES
   pry (~> 0.12.2)
   puma (~> 3.12.0)
   quickbooks-ruby!
+  rack-attack (= 5.4.2)
   rack-mini-profiler (~> 1.0.1)
   rails (~> 5.2.2)
   rails-perftest (~> 0.0.7)

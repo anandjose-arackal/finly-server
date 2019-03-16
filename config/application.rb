@@ -14,6 +14,7 @@ module Finly
 
     config.time_zone = 'Kolkata'
     config.active_record.default_timezone = :local
+    config.middleware.use Rack::Attack
 
     # config.autoload_paths += %W(#{config.root}/lib)
 
