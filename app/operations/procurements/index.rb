@@ -133,7 +133,7 @@ class Procurements::Index < Procurements::Base
       # ProcurementStatusTaggable.group(:status_tag_id).where(status_tag_id: st_ids).with_procurement_ids(pr_ids).size
       raw_count = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).group(:status_tag_id).count
       h = {}
-      StatusTag.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name.humanize] = raw_count[ps.id] else h[ps.name.humanize] = 0 end}
+      StatusTag.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = raw_count[ps.id] else h[ps.name] = 0 end}
       return h
     end
 
