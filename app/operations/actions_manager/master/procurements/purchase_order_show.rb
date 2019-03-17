@@ -22,8 +22,11 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def po_revision
     # can only be done after the po status is set to "sent to vendor"
-    unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
-      (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
+    # prevent revision if procurement has invoice or grn attached
+    if (procurement.invoices.blank? && procurement.inward_documents.blank?)
+      unless procurement.po_revisions.pluck(:revision_of_id).include?(purchase_order.id)
+        (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
+      end
     end
   end
 
@@ -70,8 +73,10 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def retract
-    purchase_order.processing? &&
-    document_owner?
+    if (procurement.invoices.blank? && procurement.inward_documents.blank?)
+      purchase_order.processing? &&
+      document_owner?
+    end
   end
 
   def remind_approver

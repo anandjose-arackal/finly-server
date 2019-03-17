@@ -12,10 +12,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.purchase_order_params = purchase_order_parameters
     # self.procurement = user.company.procurements.find_by params[:procurement_id]
     purchase_order_id = params[:id] || params[:purchase_order_id]
-    # self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
 
-    # params[:bank_account_id] = '80'
     if purchase_order_params[:bank_account_id]
       self.bank_account = self.purchase_order&.vendor&.bank_accounts&.find_by(id: purchase_order_params[:bank_account_id]) rescue nil
     end
@@ -64,7 +62,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # end
 
     # need to recheck this logic
-    unless self.purchase_order.updatable? || user.vendor_payment_admin?
+    unless self.purchase_order.updatable?# || user.vendor_payment_admin?
       add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
     end
 
@@ -72,28 +70,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, 'Please select the bank account of the vendor.'
       return
     end
-
-    # unless self.purchase_order_params[:advance_amount_attributes].blank?  && self.purchase_order_params[:advance_amount_attributes][:value].blank? && self.bank_account.blank?
-    #   valid = true
-    #   Rails.logger.fatal purchase_order_params.inspect
-    #   Rails.logger.fatal params.inspect
-    #     add_message :error, 'Bro you have chosen to add advance amount but it is empty.'
-    #     valid = false
-
-    #   elsif self.purchase_order_params[:due_date].blank?
-    #     add_message :error, 'Bro add the due date for the advance bro.'
-    #     valid = false
-
-    #   elsif self.bank_account.blank?
-    #     add_message :error, 'Please select the bank account of the vendor.'
-    #     valid = false
-
-    #   end
-
-    #   if valid && purchase_order.advance_amount_status_empty
-    #     purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
-    #   end
-    # end
 
     if self.purchase_order_params[:advance_amount_attributes][:value].present? && self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
       if self.purchase_order_params[:due_date].blank?
@@ -131,12 +107,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def process
-
-    # self.purchase_order = procurement.build_purchse_order(purchase_order_params)
-    # advance_amount_attributes: [:value, :currency_id]
-    # purchase_order_params[:advance_amount_attributes] = {value: 300, currency_id: 1}
-    # purchase_order_params[:due_date] = "2019-02-22"
-    # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
 
     purchase_order.assign_attributes(purchase_order_params)
 

@@ -336,7 +336,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def updatable?
-    self.open? || self.processing?
+    if (self.procurement.invoices.blank? && self.procurement.inward_documents.blank?)
+      self.open? || self.processing?
+    else
+      false
+    end
   end
 
   def document_owner?(user)
