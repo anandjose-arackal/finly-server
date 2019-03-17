@@ -123,7 +123,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_purchase_order
     return nil unless user.is_purchase_order_initiator? || user.vendor_payments_admin?
-    {name: 'New Purchase Order', id: 'create_purchase_order', url: 'purchase_orders/new'}
+    {name: 'New Purchase Order', id: 'create_purchase_order', url: 'procurements/params={"action":"new_procurement"}'}
   end
 
   # def create_po_invoice
@@ -132,7 +132,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_non_po_invoice
     return nil unless user.is_invoice_initiator? || user.vendor_payments_admin?
-    {name: 'New Non PO Invoice', id: 'create_non_po_invoice', url: 'non_po_invoices/new'}
+    {name: 'New Non PO Invoice', id: 'create_non_po_invoice', url: 'new_payment_invoices/params={"action":"new_invoice"}'}
   end
 
   def create_payment_ticket
