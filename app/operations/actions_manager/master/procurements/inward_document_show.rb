@@ -16,12 +16,21 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
 
 
   def update_document
-    true
+    e = inward_document.items.map {|i| i.delivered == i.quantity}
+    unless e.uniq.size == 1
+      true
+    end
   end
 
   def editable
-    e = inward_document.items.map {|i| i.quantity >= i.accepted}
-    e.include? true
+    # edit button only appears after we have updated it with some items 
+    # do not show edit button while the doc has just been created
+    # after doc has been updated with some delivered items, show the edit button
+    e = inward_document.items.map {|i| i.delivered == 0}
+    unless e.include? true
+      e = inward_document.items.map {|i| i.quantity >= i.accepted}
+      e.include? true
+    end
   end
 
   # # alias_method :invoice, :input
