@@ -16,17 +16,17 @@
 
 class PurchaseRequest < ApplicationRecord
 
-  belongs_to :status, class_name: "PurchaseRequestStatus"
-  belongs_to :department
-  belongs_to :location, class_name: "BranchLocation"
+  belongs_to :status, optional: true, class_name: "PurchaseRequestStatus", foreign_key: :purchase_request_status_id
+  belongs_to :department, optional: true
+  belongs_to :location,optional: true, class_name: "BranchLocation"
   belongs_to :policy
-  belongs_to :company
+  belongs_to :company, optional: true
 
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
-  has_many :line_items, class_name: "PurchaseOrderItem", dependent: :destroy
+  has_many :line_items,class_name: "PurchaseOrderItem", dependent: :destroy
 
   accepts_nested_attributes_for :line_items
-  accepts_nested_attributes_for :policy
+  # accepts_nested_attributes_for :policy
   accepts_nested_attributes_for :department
   accepts_nested_attributes_for :location
 

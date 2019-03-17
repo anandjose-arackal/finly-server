@@ -11,9 +11,11 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
 
   def process
     self.purchase_request = PurchaseRequest.new(self.purchase_request_params)
+    self.purchase_request.user = user
+    self.purchase_request.company = user.company
 
     if self.purchase_request.save
-      self.purchase_request.update(status_id: PurchaseRequestStatus.id_for(:draft))
+      self.purchase_request.update(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))
     else
       add_message :error, purchase_request.errors.full_messages
     end
@@ -25,7 +27,7 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   end
 
   def success
-    # params[:purchase_requests] = self.purchase_requests
+    params[:purchase_request] = self.purchase_request
     Procurements::PurchaseRequests::Create::IndexPresenter.new(user, params, messages)
   end
 

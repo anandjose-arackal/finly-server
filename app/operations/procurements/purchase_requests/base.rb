@@ -12,9 +12,10 @@ class Procurements::PurchaseRequests::Base < BaseOperation
       :id, :location_id, :vendor_id, :sub_department_id, :note, :title,
         :policy_id, :department_id,        
         line_items_attributes: [
-            :id, :delivery_date, :purpose, :delivery_location_id, :quantity, :unit_type, unit_amount: [:id, :value, :currency_id], inventory_line_item: [:id, :name],
+            :id, :delivery_date, :purpose, :delivery_location_id, :quantity, :vendor_id, :unit_type, unit_amount: [:value, :currency_id], inventory_line_item: [:id],
             vendor: [:id, :name], estimated_amount: [:id, :value, :currency_id]
         ]
+        #policy: [:id, :name]
     )
   end
 end
