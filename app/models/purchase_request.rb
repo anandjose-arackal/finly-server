@@ -26,5 +26,8 @@ class PurchaseRequest < ApplicationRecord
   has_many :line_items, class_name: "PurchaseOrderItem", dependent: :destroy
 
   accepts_nested_attributes_for :line_items
+  accepts_nested_attributes_for :policy
+  accepts_nested_attributes_for :department
+  accepts_nested_attributes_for :location
 
 end
