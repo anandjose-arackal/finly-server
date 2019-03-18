@@ -24,8 +24,8 @@ class Procurements::PurchaseOrders::PoWithAdvanceCount < Procurements::PurchaseO
   end
 
   def success
-    params[:count] = self.count
-    params[:status_count] = self.status_count
+    params[:count] = self.count || 0
+    params[:status_count] = self.status_count || {}
     Procurements::PurchaseOrders::PoWithAdvanceCount::CountPresenter.new(user, params, messages)
   end
 end

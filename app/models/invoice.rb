@@ -175,6 +175,7 @@ class Invoice < ApplicationRecord
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) { where.not(id: id) }
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
+  scope :not_open, -> {where.not invoice_status_id: InwardInvoiceStatus.id_for(:open)}
   scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
   scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
@@ -285,6 +286,10 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_status_id, -> (ids) {
+    with_status_id(ids)
+  }
+
   scope :non_beneficiary, ->  {
     where(invoice_type_id: [InwardInvoiceType.id_for(:tax_invoice),
                             InwardInvoiceType.id_for(:advance),
@@ -317,6 +322,36 @@ class Invoice < ApplicationRecord
         includes( :amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
            :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
            :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount])#.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
+  }
+
+  scope :filter_user, -> (user=nil) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    elsif user.instance_of?(TrueClass)
+      user_id = RequestStore.store[:current_user]&.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+
+
+    if user_id.present?
+      with_created_by_user_id(user_id)
+    end
+  }
+
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
   }
 
   after_create :set_defaults

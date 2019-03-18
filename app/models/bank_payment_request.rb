@@ -169,6 +169,21 @@ class BankPaymentRequest < ApplicationRecord
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
+  
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from bank_payment_requests.created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from bank_payment_requests.created_at) = ?', month)
+  }
+
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
 
   # scope :filter_controlling_user, -> (user_id) {

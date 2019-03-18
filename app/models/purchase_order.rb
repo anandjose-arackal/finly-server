@@ -164,6 +164,10 @@ class PurchaseOrder < ApplicationRecord
     # where(id: ids)
   }
 
+  scope :filter_status_id, -> (status_ids) {
+    with_status_ids(status_ids)
+  }
+
   scope :filter_sub_department_id, -> (ids) {
     where sub_department_id: ids
   }
@@ -217,6 +221,49 @@ class PurchaseOrder < ApplicationRecord
       where advance_amount_status_id: AdvanceAmountStatus.id_for(status_name)
     end
   }
+
+  scope :filter_awaiting_approval, -> (user=nil) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+    
+    if user_id.present?
+      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      with_id(ids)
+    end
+  }
+
+  scope :filter_user, -> (user=nil) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    elsif user.instance_of?(TrueClass)
+      user_id = RequestStore.store[:current_user]&.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+
+
+    if user_id.present?
+      filter_user_id(user_id)
+    end
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
+  }
+
 
   # These two filters created because two different indexes requires data to be handled differently by design
 

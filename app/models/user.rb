@@ -182,12 +182,18 @@ class User < ApplicationRecord
   has_many :purchase_order_templates, -> { filter_resource_type(:purchase_orders) }, class_name: 'ResourceTemplate', foreign_key: :user_id
   has_many :invoice_templates, -> { filter_resource_type(:invoices) }, class_name: 'ResourceTemplate', foreign_key: :user_id
 
+  # Inward Invoices
+  has_many :inward_invoices, class_name: "Invoice", foreign_key: :created_by_user_id
+
   has_many :user_department_mappings
   has_many :departments, through: :user_department_mappings
 
   # adding a many to many association for user and his/her delegates
   has_many :user_delegate_mappings
   has_many :delegated_for_users, class_name: "User", through: :user_delegate_mappings, source: :delegate_for_user
+
+  # P2P Documents
+  has_many :purchase_orders
 
   # Budgets
 
