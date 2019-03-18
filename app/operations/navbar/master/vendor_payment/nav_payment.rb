@@ -32,15 +32,15 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   end
 
   def payment_tickets
-    {name: 'Payment Tickets', id: 'orders', url: 'orders'}
+    {name: 'Payment Tickets', id: 'payment_tickets', url: 'orders'}
   end
 
   def vendors
-    {name: 'Vendors', id: 'beneficiaries', url: 'beneficiaries'}
+    {name: 'Vendors', id: 'vendors', url: 'beneficiaries'}
   end
 
   def item_master
-    {name: 'Item Master', id: 'inventory', url: 'inventory'}
+    {name: 'Item Master', id: 'item_master', url: 'inventory'}
   end
 
   def create
