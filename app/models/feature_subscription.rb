@@ -28,6 +28,7 @@
 #  em_tax_tracking            :boolean          default(FALSE)
 #  procurement                :boolean          default(FALSE)
 #  custom_currency_conversion :boolean          default(FALSE)
+#  bank_service_provider      :string(255)
 #
 
 class FeatureSubscription < ApplicationRecord

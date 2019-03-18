@@ -1,4 +1,4 @@
-class AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter < AccountManager::BaseAdapter
+class AccountManager::ReimbursementPockets::ReimbursementPocketsAdapter < AccountManager::UserPockets::UserPocketsAdapter
 
   def account_class
     UserPocket

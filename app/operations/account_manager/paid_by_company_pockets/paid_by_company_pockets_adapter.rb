@@ -1,4 +1,4 @@
-class AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter < AccountManager::BaseAdapter
+class AccountManager::PaidByCompanyPockets::PaidByCompanyPocketsAdapter < AccountManager::UserPockets::UserPocketsAdapter
 
   def account_class
     UserPocket
