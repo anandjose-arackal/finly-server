@@ -10,8 +10,11 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
 
     def init
       self.purchase_request = params[:purchase_request]
-      self.locations = user.branch_locations
-      self.departments = user.departments
+      # self.locations = user.branch_locations
+      self.locations = user.company.locations
+      # self.departments = user.departments
+      self.departments = user.company.departments
+      # todo - change the above before deploy. Or should we? :thinking face:
       self.policies = user.policies
       self.reviewal_chains = []
       self.policies.each do |policy|
