@@ -45,9 +45,7 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
             {
               title: "Total POs Awaiting Shipments",
               count: apply_scopes(procurements, {filter_status_tags: [7]})&.count,
-              filters: [
-                {"active-tab": "pending-tab"}
-              ]
+              filters: []
             }
           ]
         }
