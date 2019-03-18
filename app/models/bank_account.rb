@@ -37,8 +37,8 @@ class BankAccount < ApplicationRecord
   validates :account_number, presence: true #, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
+  validates :company_id, presence: true
   validate :valid_bank_account
-  validate :company_id, presence: true
 
   accepts_nested_attributes_for :account_owner
 

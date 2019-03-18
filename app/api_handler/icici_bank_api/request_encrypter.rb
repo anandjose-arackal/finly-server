@@ -3,5 +3,5 @@
 # scheme, we can use the same class for all of them
 class IciciBankApi::RequestEncrypter < IciciBankApi::Base
 
-  
+
 end
