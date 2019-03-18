@@ -107,13 +107,10 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     validate_custom_fields_invoice
     return if has_errors?
 
-    if self.inward_invoice.save
-      recalculate_totals(self.inward_invoice, self.inward_invoice_params)
-
-      
+    if inward_invoice.valid?
       if Invoice.status_ids(:open, :retracted, :rejected).include?(inward_invoice.invoice_status_id) && inward_invoice.created_by_user_id == user.id
 
-        params[:reviewal_document] = self.inward_invoice.reload
+        params[:reviewal_document] = self.inward_invoice
         params[:document_reviewer_mappings] = document_reviewer_mappings_params
 
         document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
@@ -122,6 +119,10 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
           return
         end
       end
+    end
+
+    if self.inward_invoice.save
+      recalculate_totals(self.inward_invoice, self.inward_invoice_params)
 
       self.invoice_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
       self.invoice_current_attachments.update_all(procurement_document_id: inward_invoice.id, procurement_document_type: inward_invoice.class.name)

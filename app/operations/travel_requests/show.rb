@@ -381,6 +381,7 @@ class TravelRequests::Show < TravelRequests::Base
 
     def show_add_money_requests?
       return false if user.id != travel_request.user_id
+      return false if travel_request.policy.configuration.trips_money_request == false
       return false if TravelRequestStatus.ids_for(:open, :retracted, :rejected).exclude?(self.travel_request.status_id)
       true
     end

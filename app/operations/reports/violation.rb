@@ -126,7 +126,7 @@ class Reports::Violation < Reports::Base
     message = ''
     if rule.greater_than_amount_value && rule.greater_than_amount_value != 0
       expense_amount = expense.amount.send(base_currency_code.to_sym)
-      if expense_amount and expense_amount >= rule.greater_than_amount_value
+      if expense_amount and expense_amount > rule.greater_than_amount_value
         message += ' above ' + rule.greater_than_amount_value.to_s
       else
         return false
