@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
-                :id_current_attachments
+                :id_current_attachments, :po_revision
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -8,6 +8,14 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.inward_document = procurement.inward_documents.find_by id: inward_document_id
     self.inward_document_params = inward_document_parameters
     self.purchase_order = self.procurement&.purchase_order
+
+    if self.procurement.po_revisions.present?
+      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+      self.po_revision = self.procurement.po_revisions.last
+      if po_revision.present?
+        self.purchase_order = self.po_revision
+      end
+    end
   end
 
   def validate

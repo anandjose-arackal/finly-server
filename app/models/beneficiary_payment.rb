@@ -156,35 +156,40 @@ class BeneficiaryPayment < ApplicationRecord
 
     # assign gross amount
     if self.gross_amount.present?
-      self.gross_amount.value = gross_amount
+      # self.gross_amount.value = gross_amount
+      self.gross_amount.update(value: gross_amount)
     else
       self.gross_amount = Amount.new(value: gross_amount, currency_id: 1)
     end
 
     # assign tax amount
     if self.tax_amount.present?
-      self.tax_amount.value = tax_amount
+      # self.tax_amount.value = tax_amount
+      self.tax_amount.update(value: tax_amount)
     else
       self.tax_amount = Amount.new(value: tax_amount, currency_id: 1)
     end
 
     # assign TDS amount
     if self.tds_amount.present?
-      self.tds_amount.value = tds_amount
+      # self.tds_amount.value = tds_amount
+      self.tds_amount.update(value: tds_amount)
     else
       self.tds_amount = Amount.new(value: tds_amount, currency_id: 1)
     end
 
     # assign net amount
     if self.net_amount.present?
-      self.net_amount.value = net_amount
+      # self.net_amount.value = net_amount
+      self.net_amount.update(value: net_amount)
     else
       self.net_amount = Amount.new(value: net_amount, currency_id: 1)
     end
 
     # assign balance due
     if self.balance_due.present?
-      self.balance_due.value = balance_due_amount
+      # self.balance_due.value = balance_due_amount
+      self.balance_due.update(value: balance_due_amount)
     else
       self.balance_due = Amount.new(value: balance_due_amount, currency_id: 1)
     end
