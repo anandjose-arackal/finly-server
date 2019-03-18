@@ -6,10 +6,8 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
   end
 
   def validate
-    unless self.inward_document.present?
-      add_message :error, 'Inward Document not found'
-      return
-    end
+    return if record_not_present
+    validate_association
   end
 
   def process
@@ -33,6 +31,29 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
       self.inward_document = params[:inward_document]
       self.purchase_order = params[:purchase_order]
     end
+  end
+
+  def validate_presence
+    if self.inward_document.blank? || (inward_document.company_id != user.company_id)
+      add_message :error, 'Inward Document not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_association
+    return if inward_document.validate_if_admin?(user)
+    return if inward_document.validate_if_owner?(user)
+    return if inward_document.validate_if_manager?(user)
+    # As show page is consolidated, allow user to access this  page if he is allowed to access one or all document
+    return if purchase_order.validate_if_owner(user)
+    return if purchase_order.validate_if_admin(user)
+    return if purchase_order.validate_if_reviewer(user)
+    raise_unauthorized_exception
   end
 
 end

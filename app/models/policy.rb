@@ -55,6 +55,7 @@ class Policy < ApplicationRecord
   scope :with_application, -> (application) {where( application: application).or(default)}
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
   scope :include_user_mapping, -> { includes :user_mapping }
+  scope :with_company_id, -> (company_id) {where company_id: company_id}
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
