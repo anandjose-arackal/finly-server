@@ -520,6 +520,7 @@ GEM
     wkhtmltopdf-binary (0.12.4)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    zxcvbn-ruby (0.1.2)
 
 PLATFORMS
   ruby
@@ -635,6 +636,7 @@ DEPENDENCIES
   wicked_pdf (~> 1.1.0)
   will_paginate (~> 3.1.6)
   wkhtmltopdf-binary (~> 0.12.4)
+  zxcvbn-ruby (= 0.1.2)
 
 RUBY VERSION
    ruby 2.6.0p0

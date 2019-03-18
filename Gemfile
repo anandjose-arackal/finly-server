@@ -24,6 +24,7 @@ gem 'oj', '~> 3.7.6'
 
 # Firewall
 gem 'rack-attack', '5.4.2'
+gem 'zxcvbn-ruby', '0.1.2', require: 'zxcvbn'
 
 # gem '-raven', '~> 2.8'
 
