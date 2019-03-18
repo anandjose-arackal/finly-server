@@ -40,8 +40,8 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
 
       if params[:action] == 'non_po_invoices'
         invoice_type = 'non_po_invoices'
-      elsif params[:action] == 'po_invoice'
-        invoice_type = 'po_invoice'
+      elsif params[:action] == 'po_invoices'
+        invoice_type = 'po_invoices'
       else
         # nothin
       end
