@@ -254,14 +254,14 @@ class PurchaseOrder < ApplicationRecord
     if year.blank?
       year = Date.today.year
     end
-    where('extract(year from created_at) = ? OR extract(year from created_at) = ?', year, year)
+    where('extract(year from created_at) = ?', year)
   }
 
   scope :filter_month, -> (month) {
     if month.blank?
       month = Date.today.month
     end
-    where('extract(month from created_at) = ? OR extract(month from created_at) = ?', month, month)
+    where('extract(month from created_at) = ?', month)
   }
 
 
