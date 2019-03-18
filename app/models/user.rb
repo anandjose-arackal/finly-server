@@ -253,9 +253,29 @@ class User < ApplicationRecord
   scope :only_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
-  scope :filter_vendor_payments_reviewers, -> (flag) {
-    # passed argument is only for has scope, no effect here
-    with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
+  # scope :filter_vendor_payments_reviewers, -> (flag) {
+  #   # passed argument is only for has scope, no effect here
+  #   with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
+  # }
+
+  scope :filter_vendor_payments_reviewers, -> (flag) { return flag }
+
+  # Use only for has_scope filter, scope to policy_user_roles
+  scope :policy_id, -> (policy_id) {
+     where('policy_user_roles.policy_id = ?', policy_id )
+  }
+
+  scope :reviewer_type, -> (type) {
+    if filter_vendor_payments_reviewers
+      case type
+      when 'PurchaseOrderProvider', :PurchaseOrderProvider
+        joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:purchase_order_reviewer)).distinct
+      when 'InvoiceProvider', :InvoiceProvider
+        joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
+      when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
+        joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
+      end
+    end
   }
 
   scope :filter_em_reviewers, -> (flag) {
@@ -541,6 +561,10 @@ class User < ApplicationRecord
       without_id(user_ids)
     end
 
+  }
+
+  scope :with_policy_user_roles, -> {
+    joins(:policy_user_roles)
   }
 
 
