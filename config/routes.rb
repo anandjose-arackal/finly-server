@@ -2602,6 +2602,7 @@ Rails.application.routes.draw do
   get 'policies/policy_members' => 'policies#policy_members'
   get 'policies/create_rule' => 'policies#create_rule'
   get 'policies/policy_member_settings/' => 'policies#policy_member_settings'
+  get 'policies/index_vp', to: 'policies#index_vp'
 
   get 'policies/details' => 'policies#details'
   get 'policies/personal' => 'policies#show_personal'
