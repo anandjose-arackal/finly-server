@@ -12,7 +12,11 @@ class VendorStatus < ApplicationRecord
   include Seedable
 
   def self.values
-    %w( draft awaiting_approval rejected approved auto_approved )
+    %w( draft awaiting_approval retracted rejected approved auto_approved )
+  end
+
+  def retracted?
+    self.id == VendorStatus.id_for(:retracted)
   end
 
   def draft?
