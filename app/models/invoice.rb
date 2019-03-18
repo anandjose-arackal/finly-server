@@ -484,6 +484,11 @@ class Invoice < ApplicationRecord
     return (self.invoice_status_id == InwardInvoiceStatus.id_for(:partially_paid))
   end
 
+  def initiated?
+    return nil if self.invoice_status.blank?
+    return (self.invoice_status_id == InwardInvoiceStatus.id_for(:initiated))
+  end
+
   def procurement_index_details
     {
         id: id,
@@ -523,7 +528,7 @@ class Invoice < ApplicationRecord
       net_payable_amount: self.balance_due&.value,
       balance_due: self.balance_due&.value,
       taxable_amount: precision_value(self.gross_amount&.value),
-      editable: self.unpaid?,
+      editable: self.unpaid? || self.initiated?,
       tax_rate: precision_value(self.tax_rate),
       tds_rate: precision_value(self.tds_rate),
       discount_rate: precision_value(self.discount_rate),

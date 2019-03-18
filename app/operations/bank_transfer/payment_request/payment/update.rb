@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   attr_accessor :payment, :payment_request, :payment_params, :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance, :advance_amount, :payment_order, :payment_amount
+                :advance, :advance_amount, :payment_order, :payment_amount, :bp_params
 
   def init
     super
@@ -11,6 +11,11 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
     self.payment_amount = self.payment_params&.dig(:amount_attributes, :value).to_f
+
+    if self.payment.parent_type == "BeneficiaryPayment"
+      construct_bp_params
+    end
+
   end
 
   def validate
@@ -132,6 +137,15 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     else
       add_message :error, self.payment.errors.full_messages
     end
+
+    case payment.parent_type
+    when 'BeneficiaryPayment'
+      bp = BeneficiaryPayment.find_by(id: payment.parent_id)
+      self.bp_params[:original_amount_attributes][:id] = bp.original_amount_id
+      bp.assign_attributes(self.bp_params)
+      bp.calculate_tax_and_amount
+      bp.save
+    end
   end
 
   def post_process
@@ -186,6 +200,20 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
     end
     self.payment.save
+  end
+
+  def construct_bp_params
+
+    bp_payment = {}
+
+    bp_payment[:gst_type_id] = self.payment_params[:invoice_attributes][:gst_type_id]
+    bp_payment[:tds_slab_id] = self.payment_params[:invoice_attributes][:tds_slab_id]
+    bp_payment[:inclusive_of_taxes] = self.payment_params[:invoice_attributes][:inclusive_of_taxes]
+    bp_payment[:tax] = self.payment_params[:invoice_attributes][:tax]
+    bp_payment[:original_amount_attributes] = self.payment_params[:invoice_attributes][:original_amount_attributes]
+
+    self.bp_params = bp_payment
+
   end
 
 end

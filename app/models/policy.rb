@@ -56,6 +56,19 @@ class Policy < ApplicationRecord
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
   scope :include_user_mapping, -> { includes :user_mapping }
   scope :with_company_id, -> (company_id) {where company_id: company_id}
+  scope :with_policy_user_roles, -> { joins(:policy_user_roles) }
+  scope :with_policy_id, -> (policy_id){ where "policies.id = ? ", policy_id }
+  scope :with_purchase_order_initiator_role, -> {
+    where("policy_user_roles.user_role_id", UserRole.id_for(:purchase_order_initiator))
+  }
+
+  scope :with_invoice_initiator_role, -> {
+    where("policy_user_roles.user_role_id", UserRole.id_for(:invoice_initiator))
+  }
+
+  scope :with_bank_payment_request_initiator_role, -> {
+    where("policy_user_roles.user_role_id", UserRole.id_for(:bank_payment_request_initiator))
+  }
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
