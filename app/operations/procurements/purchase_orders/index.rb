@@ -21,7 +21,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.purchase_orders = ::PurcahseOrder.associated_items(user, ::PurcahseOrder.roles)
+      self.purchase_orders = ::PurchaseOrder.associated_items(user, ::PurchaseOrder.roles)
     else
       self.purchase_orders = user.purchase_orders
     end
