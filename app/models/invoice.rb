@@ -523,6 +523,18 @@ class Invoice < ApplicationRecord
     }
   end
 
+  # For user role as invoice initiator
+  def is_initiating_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:invoice_initiator), self)
+  end
+
+  # For user role as invoice reviewer
+  def is_reviewing_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
+  end
+
   private
 
   def set_defaults
@@ -574,6 +586,31 @@ class Invoice < ApplicationRecord
 
   def self.finance_associated_status_ids
     InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+  end
+
+  def self.role_based_associated_status_ids(user)
+    InwardInvoiceStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:invoice_initiator) == role_id.to_i)
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        elsif (UserRole.id_for(:invoice_reviewer) == role_id.to_i)
+          statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.roles
+    # [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
+    [:invoice_initiator, :invoice_reviewer]
   end
 
 end

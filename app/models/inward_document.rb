@@ -21,7 +21,8 @@
 #
 
 class InwardDocument < ApplicationRecord
-  include SoftDeletable
+  include SoftDeletable,
+          Transitionable
   belongs_to :procurement, optional: true
   belongs_to :user, optional: true
   belongs_to :company, optional: true
@@ -64,4 +65,21 @@ class InwardDocument < ApplicationRecord
 
     }
   end
+
+  def self.roles
+    [:goods_receiver]
+  end
+
+  def validate_if_owner?(user)
+    self.user_id == user.id
+  end
+
+  def validate_if_manager?(user)
+    user.is_goods_receiver?
+  end
+
+  def validate_if_admin?(user)
+    user.admin?
+  end
+
 end
