@@ -51,21 +51,21 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Processing",
               count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               filters: [
-                {filter_status_id: PurchaseOrderStatus.id_for(:processing)}
+                {filter_po_status: PurchaseOrderStatus.id_for(:processing)}
               ]
             },
             {
               title: "Approved",
               count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count,
               filters: [
-                {filter_status_id: PurchaseOrderStatus.id_for(:approved)}
+                {filter_po_status: PurchaseOrderStatus.id_for(:approved)}
               ]
             },
             {
               title: "Sent to Vendor",
               count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)})&.count,
               filters: [
-                {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)}
+                {filter_po_status: PurchaseOrderStatus.id_for(:sent_to_vendor)}
               ]
             }
           ]
