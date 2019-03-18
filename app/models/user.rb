@@ -264,7 +264,7 @@ class User < ApplicationRecord
   #   with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
   # }
 
-  scope :filter_vendor_payments_reviewers, -> (flag) { return flag }
+  scope :filter_vendor_payments_reviewers, -> (flag) { }
 
   # Use only for has_scope filter, scope to policy_user_roles
   scope :policy_id, -> (policy_id) {
@@ -272,15 +272,13 @@ class User < ApplicationRecord
   }
 
   scope :reviewer_type, -> (type) {
-    if filter_vendor_payments_reviewers
-      case type
-      when 'PurchaseOrderProvider', :PurchaseOrderProvider
-        joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:purchase_order_reviewer)).distinct
-      when 'InvoiceProvider', :InvoiceProvider
-        joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
-      when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
-        joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
-      end
+    case type
+    when 'PurchaseOrderProvider', :PurchaseOrderProvider
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:purchase_order_reviewer)).distinct
+    when 'InvoiceProvider', :InvoiceProvider
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
+    when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
     end
   }
 
