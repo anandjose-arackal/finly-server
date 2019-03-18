@@ -157,18 +157,21 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     # has_scope :filter_controlling_user
     has_scope :filter_payment_ids
     has_scope :filter_vendor_id
+    has_scope :filter_month
+    has_scope :filter_year
 
     def init
       self.payment_requests = params[:payment_requests]
       self.payment_requests = apply_scopes(payment_requests)
       per_page = params[:per_page] || 30
-      if self.payment_requests.present?
-        if personal_view?
-          self.payment_requests = self.payment_requests.order_by(:created_at)#.order_by(:controlling_user, user.id)
-        else
-          self.payment_requests = self.payment_requests.order_by(:submitted_at)#.order_by(:manager_controlling_user, user.id)
-        end
-      end
+      # if self.payment_requests.present?
+      #   if personal_view?
+      #     self.payment_requests = self.payment_requests.order_by(:created_at)#.order_by(:controlling_user, user.id)
+      #   else
+      #     self.payment_requests = self.payment_requests.order_by(:submitted_at)#.order_by(:manager_controlling_user, user.id)
+      #   end
+      # end
+      self.payment_requests.order_by(:submitted_at)
       self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page)
     end
 

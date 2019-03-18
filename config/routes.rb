@@ -3455,9 +3455,21 @@ Rails.application.routes.draw do
   resources :audit_trails, only: [:index]
   ### Audit Trails End ##
 
-  ######## Reviewal Workflow ##########
-  resources :policy_user_role_mappings
-  ######## Reviewal Workflow End ##########
+
+  ######## Dashboards ##################
+  namespace :dashboards do
+    get 'vp/configs', to: 'vendor_payments#configs'
+    get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
+    get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
+    get 'vp/po_invoices', to: 'vendor_payments#po_invoices'
+    get 'vp/non_po_invoices', to: 'vendor_payments#non_po_invoices'
+    get 'vp/po_advances', to: 'vendor_payments#po_advances'
+    get 'vp/grns', to: 'vendor_payments#grns'
+
+    get 'vp/budgets', to: 'vendor_payments#budgets'
+  end
+  ######## Dashbaord Ends ##############
+
 
   ######### Rate Contract API start #############
   resources :rate_contracts do

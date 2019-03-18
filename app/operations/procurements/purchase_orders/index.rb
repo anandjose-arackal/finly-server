@@ -9,37 +9,21 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
   end
 
   def process
-    # Only used for getting pending approval
-    if user.vendor_payments_reviewer?
-      # level_ids = []
+    # # Only used for getting pending approval
+    # if user.vendor_payments_reviewer?
+    #   self.purchase_orders = PurchaseOrder.awaiting_action_items(user)
+    # end
 
-      # # Get all the policies
-      # policy_ids = user.company.policies.with_application(:vp).pluck(:id)
 
-      # # Get all level ids of type purchase order and with policy ids from above
-      # policy_level_ids = ReviewalLevel.with_entity_type('PurchaseOrderProvider').with_policy_ids(policy_ids).pluck(:id)
+    if user.vendor_payments_admin?
+      self.purchase_orders = ::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin)).not_open.or(user.purchase_orders)
+      return
+    end
 
-      # # Get all level ids from level reviewer mapping with current user id
-      # reviewer_level_ids = LevelReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
-
-      # # Get common levels
-      # level_ids = policy_level_ids & reviewer_level_ids
-
-      # # Find all the purchase order with controlling level from above
-      # purchase_order_ids = user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:id)
-      # # Find all document level reviewer mapping with with the above list of level + reviewer and get their po id
-      # purchase_order_ids += ::DocumentLevelReviewerMapping.with_level_ids(level_ids).with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
-      # # Find all document level reviewer mappings with above list of level + NOT reviewer and their pos
-      # other_reviewer_po_ids = ::DocumentLevelReviewerMapping.with_level_ids(level_ids).not_with_reviewer_ids(user.id).with_document_type('PurchaseOrder').pluck(:document_reviewer_mappable_id)
-
-      # purchase_order_ids -= other_reviewer_po_ids
-
-      # self.purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids).with_status_ids(PurchaseOrderStatus.id_for(:processing))
-
-      # all_level_ids = self.purchase_orders.pluck(:controlling_level_id)
-
-      # self.purchase_orders = self.purchase_orders.with_controlling_level_ids(level_ids & all_level_ids)
-      self.purchase_orders = PurchaseOrder.awaiting_action_items(user)
+    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
+      self.purchase_orders = ::PurcahseOrder.associated_items(user, ::PurcahseOrder.roles)
+    else
+      self.purchase_orders = user.purchase_orders
     end
   end
 
@@ -51,9 +35,14 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
   class Procurements::PurchaseOrders::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_orders
 
+    has_scope :filter_awaiting_approval
+    has_scope :filter_month
+    has_scope :filter_year
+    has_scope :filter_user
+
     def init
       self.purchase_orders = params[:purchase_orders]
+      self.purchase_orders = apply_scopes(self.purchase_orders, params)
     end
-
   end
 end

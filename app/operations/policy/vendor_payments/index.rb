@@ -50,8 +50,4 @@ class Policy::VendorPayments::Index < Policy::Base
       self.admin_policies = user.company.policies.exclude_deleted
     end
   end
-
-
-
-
 end

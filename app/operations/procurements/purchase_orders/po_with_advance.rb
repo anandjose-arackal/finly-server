@@ -68,9 +68,9 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
     #     end
     # end
 
-    if self.purchase_orders.blank?
-      add_message :error, "Purchase order with advance amount still to be processed or failed, were not found."
-    end
+    # if self.purchase_orders.blank?
+    #   add_message :error, "Purchase order with advance amount still to be processed or failed, were not found."
+    # end
   end
 
   def process
