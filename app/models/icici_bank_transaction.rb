@@ -22,5 +22,6 @@
 #
 
 class IciciBankTransaction < ApplicationRecord
-  belongs_to :currency
+  belongs_to :amount
+  belongs_to :receiving_account, class_name: "BankAccount"
 end
