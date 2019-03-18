@@ -210,6 +210,8 @@ class User < ApplicationRecord
   has_many :user_sessions
   has_many :user_devices
 
+  has_many :user_ips
+
   has_many :user_branch_location_mappings
   has_many :branch_locations, through: :user_branch_location_mappings
 
@@ -947,6 +949,12 @@ class User < ApplicationRecord
 
   def reimbursements_awaiting_confirmation?
 
+  end
+
+  def obfuscated_mobile_number
+    return nil if mobile_number.nil?
+
+    "XXXXXXX#{mobile_number[(mobile_number.length - 3)..mobile_number.length]}"
   end
 
   def status

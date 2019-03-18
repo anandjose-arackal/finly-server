@@ -4,16 +4,28 @@ module DynamicProperty
     base.extend ClassMethods
   end
 
-  def dynamic_property_map
-    DEFINABLE_PROPERTY_MAP[self.class.name] = {} if DEFINABLE_PROPERTY_MAP[self.class.name].nil?
-    DEFINABLE_PROPERTY_MAP[self.class.name]
+  def dynamic_property_map(scope=:singleton)
+    case scope
+    when :singleton
+      DEFINABLE_PROPERTY_MAP[self.class.name] = {} if DEFINABLE_PROPERTY_MAP[self.class.name].nil?
+      DEFINABLE_PROPERTY_MAP[self.class.name]
+    when :instance
+      RequestStore.store[self.class.name] = {} if RequestStore.store[self.class.name].nil?
+      RequestStore.store[self.class.name]
+    end
   end
 
   module ClassMethods
 
-    def dynamic_property_map
-      DEFINABLE_PROPERTY_MAP[self.name] = {} if DEFINABLE_PROPERTY_MAP[self.name].nil?
-      DEFINABLE_PROPERTY_MAP[self.name]
+    def dynamic_property_map(scope = :singleton)
+      case scope
+      when :singleton
+        DEFINABLE_PROPERTY_MAP[self.name] = {} if DEFINABLE_PROPERTY_MAP[self.name].nil?
+        DEFINABLE_PROPERTY_MAP[self.name]
+      when :instance
+        RequestStore.store[self.name] = {} if RequestStore.store[self.name].nil?
+        RequestStore.store[self.name]
+      end
     end
 
     def define_property(scope, *attrs)
@@ -21,9 +33,9 @@ module DynamicProperty
       attrs.each do |method|
         send property_type, method do |value = NoObject|
           unless value == NoObject
-            self.dynamic_property_map[method] = value
+            dynamic_property_map(scope)[method] = value
           end
-          self.dynamic_property_map[method]
+          dynamic_property_map(scope)[method]
         end
       end
     end
@@ -32,18 +44,19 @@ module DynamicProperty
       property_type = property_type_for scope
       attrs.each do |method|
         send property_type, method do |value = NoObject|
-          if dynamic_property_map[method].nil?
-            dynamic_property_map[method] = []
+          if dynamic_property_map(scope)[method].nil?
+            dynamic_property_map(scope)[method] = []
           end
           unless value == NoObject
-            dynamic_property_map[method] << value
+            dynamic_property_map(scope)[method] << value
           end
-          dynamic_property_map[method]
+          dynamic_property_map(scope)[method]
         end
       end
     end
 
     private
+
     def property_type_for(scope)
       case scope
       when :singleton
@@ -54,7 +67,7 @@ module DynamicProperty
         raise "Invalid scope : #{scope}"
       end
     end
-    
+
   end
 
 end

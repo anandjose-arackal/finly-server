@@ -53,52 +53,58 @@ class UserDeviceBrowser < ApplicationRecord
   delegate :incomplete?, :attribute_mismatch?, :complete?, to: :status
 
   # {
-  #     '11': '1549636286',
-  #     '16': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.96 Safari/537.36',
-  #     '19': 'India Standard Time',
-  #     '7': '3202771635',
-  #     '5': 'en-IN',
-  #     '20': nil,
-  #     '27': 'Chrome',
-  #     '21': '72.0.3626.96',
-  #     '8': 'WebKit',
-  #     '23': '537.36',
-  #     '18': 'Mac OS',
-  #     '25': '10.14.1',
-  #     '10': '1920',
-  #     '24': '1080',
-  #     '2': nil,
-  #     '26': nil,
-  #     '13': '24',
-  #     '15': false,
-  #     '17': nil,
-  #     '30': false,
-  #     '12': nil,
-  #     '29': false,
-  #     '6': nil,
-  #     '9': true,
-  #     '4': ', Portable Document Format, Native Client Executable, Portable Native Client Executable',
-  #     '1': 'Adobe Fangsong Std, Adobe Hebrew, Adobe Ming Std, Arial Black, Arial, Bauhaus 93, Calibri, Chalkduster, Comic Sans MS, Courier New, Georgia, Hiragino Sans GB, Impact, Kozuka Gothic Pr6N, Menlo, Microsoft Sans Serif, Papyrus, Plantagenet Cherokee, Rockwell, Symbol, Tahoma, Times New Roman, Trebuchet MS, Verdana, Webdings, Wingdings',
-  #     '3': true,
-  #     '14': true,
-  #     '22': true,
-  #     '28': 'Chrome PDF Plugin, Chrome PDF Viewer, Native Client',
-  #     '31': true
+  #     'X-Finly-RP': {
+  #         '11': '1549636286',
+  #         '13': {
+  #             '16': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.96 Safari/537.36',
+  #             '19': 'India Standard Time',
+  #             '7': '3202771635',
+  #             '5': 'en-IN',
+  #             '20': nil,
+  #             '27': 'Chrome',
+  #             '21': '72.0.3626.96',
+  #             '8': 'WebKit',
+  #             '23': '537.36',
+  #             '18': 'Mac OS',
+  #             '25': '10.14.1',
+  #             '10': '1920',
+  #             '24': '1080',
+  #             '2': nil,
+  #             '26': nil,
+  #             '13': '24',
+  #             '15': false,
+  #             '17': nil,
+  #             '30': false,
+  #             '12': nil,
+  #             '29': false,
+  #             '6': nil,
+  #             '9': true,
+  #             '4': ', Portable Document Format, Native Client Executable, Portable Native Client Executable',
+  #             '1': 'Adobe Fangsong Std, Adobe Hebrew, Adobe Ming Std, Arial Black, Arial, Bauhaus 93, Calibri, Chalkduster, Comic Sans MS, Courier New, Georgia, Hiragino Sans GB, Impact, Kozuka Gothic Pr6N, Menlo, Microsoft Sans Serif, Papyrus, Plantagenet Cherokee, Rockwell, Symbol, Tahoma, Times New Roman, Trebuchet MS, Verdana, Webdings, Wingdings',
+  #             '3': true,
+  #             '14': true,
+  #             '22': true,
+  #             '28': 'Chrome PDF Plugin, Chrome PDF Viewer, Native Client',
+  #             '31': true
+  #         }
+  #     }
   # }
 
   # Compares all attributes of current model with the hash provided in arguments. Returns the differences
   def differences(attrs)
     differences = []
-    [:user_agent, :timezone, :fingerprint, :language, :system_language,
-     :browser, :browser_version, :browser_engine, :browser_engine_version,
-     :os_name, :os_version,
-     :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
-     :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
-     :silver_light_version,
-     :is_mime_types, :mime_types_list,
-     :fonts_list,
-     :is_local_storage, :is_session_storage, :is_cookie,
-     :plugins, :is_mobile].each do |attr|
+    [
+        :user_agent, :timezone, :fingerprint, :language, :system_language,
+        :browser, :browser_version, :browser_engine, :browser_engine_version,
+        :os_name, :os_version,
+        :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
+        :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
+        :silver_light_version,
+        :is_mime_types, :mime_types_list,
+        :fonts_list,
+        :is_local_storage, :is_session_storage, :is_cookie,
+        :plugins, :is_mobile
+    ].each do |attr|
       differences << attr unless self.send(attr)&.to_s == attrs[attr]&.to_s
     end
     differences

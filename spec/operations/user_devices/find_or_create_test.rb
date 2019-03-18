@@ -10,6 +10,27 @@ RSpec.describe 'UserDevices::FindOrCreate' do
   end
 
   describe '> Browser' do
+    describe '> No X-Finly-RP' do
+      before(:all) do
+        RSpec::Mocks.with_temporary_scope do
+          @before_device_count = UserDevice.count
+          @before_device_browser_count = UserDeviceBrowser.count
+          @headers = {'X-Finly-RP': nil}
+          allow(RequestStoreUtil).to receive(:current_request).and_return(double(headers: @headers))
+          @result = UserDevices::FindOrCreate.(@user1, {scope: ['web']})
+        end
+      end
+
+      it 'should not succeed' do
+        expect(@result.success?).to eq(false)
+      end
+
+      it 'should not create a new UserDevice' do
+        expect(@before_device_count).to eq(UserDevice.count)
+        expect(@before_device_browser_count).to eq(UserDevice.count)
+      end
+    end
+
     describe '> Correct Parameters' do
 
       # Create Device1

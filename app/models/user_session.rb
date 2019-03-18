@@ -40,6 +40,8 @@
 #  username         :string(255)
 #  user_device_id   :integer
 #  client_type      :string(255)
+#  user_agent       :text(65535)
+#  user_ip_id       :integer
 #
 
 class UserSession < ApplicationRecord
@@ -47,6 +49,7 @@ class UserSession < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :access_token, class_name: 'Doorkeeper::AccessToken', optional: true
   belongs_to :status, class_name: 'UserSessionStatus'
+  belongs_to :user_ip, optional: true
 
   has_many :events, class_name: 'UserSessionEvent', dependent: :destroy
   belongs_to :user_device, optional: true
@@ -58,7 +61,13 @@ class UserSession < ApplicationRecord
   scope :with_ip, ->(ip) {where ip: ip}
   scope :started_after, ->(datetime) {where 'started_at >= ?', datetime}
   scope :authorized, -> {where status_id: UserSessionStatus.id_for(:authorized)}
+  scope :web, -> {where client_type: 'UserDeviceBrowser'}
 
   delegate :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
+
+  def verify(verification_mode)
+    self.user_ip.update_attributes(status_id: UserIpStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
+    self.user_device.update_attributes(status_id: UserDeviceStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
+  end
 
 end

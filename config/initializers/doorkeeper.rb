@@ -69,7 +69,7 @@ Doorkeeper.configure do
       else
         Gatekeeper::Event.(:user_login_invalid_username)
         params[:user] = u
-        params[:message] = 'Invalid Password'
+        params[:message] = 'Invalid Username'
         UserSessions::Create.(:failed, params)
       end
     end

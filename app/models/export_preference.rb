@@ -36,13 +36,13 @@ class ExportPreference < ApplicationRecord
       return false
     end
     fields = ExportField.all
-    ExportPreference.create company: company, export_field_id: ExportField.type_report_name, name: fields.find_by_id(ExportField.type_report_name).name
-    ExportPreference.create company: company, export_field_id: ExportField.type_employee_name, name: fields.find_by_id(ExportField.type_employee_name).name
-    ExportPreference.create company: company, export_field_id: ExportField.type_expense_merchant, name: fields.find_by_id(ExportField.type_expense_merchant).name
-    ExportPreference.create company: company, export_field_id: ExportField.type_expense_date, name: fields.find_by_id(ExportField.type_expense_date).name
-    ExportPreference.create company: company, export_field_id: ExportField.type_expense_category_name, name: fields.find_by_id(ExportField.type_expense_category_name).name
-    ExportPreference.create company: company, export_field_id: ExportField.type_expense_currency, name: fields.find_by_id(ExportField.type_expense_currency).name
-    ExportPreference.create company: company, export_field_id: ExportField.type_expense_amount, name: fields.find_by_id(ExportField.type_expense_amount).name
+    ExportPreference.create company: company, export_field_id: ExportField.type_report_name, name: ExportField.find_by_id(ExportField.type_report_name).name
+    ExportPreference.create company: company, export_field_id: ExportField.type_employee_name, name: ExportField.find_by_id(ExportField.type_employee_name).name
+    ExportPreference.create company: company, export_field_id: ExportField.type_expense_merchant, name: ExportField.find_by_id(ExportField.type_expense_merchant).name
+    ExportPreference.create company: company, export_field_id: ExportField.type_expense_date, name: ExportField.find_by_id(ExportField.type_expense_date).name
+    ExportPreference.create company: company, export_field_id: ExportField.type_expense_category_name, name: ExportField.find_by_id(ExportField.type_expense_category_name).name
+    ExportPreference.create company: company, export_field_id: ExportField.type_expense_currency, name: ExportField.find_by_id(ExportField.type_expense_currency).name
+    ExportPreference.create company: company, export_field_id: ExportField.type_expense_amount, name: ExportField.find_by_id(ExportField.type_expense_amount).name
     true
   end
 end

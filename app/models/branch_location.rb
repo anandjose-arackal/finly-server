@@ -19,6 +19,7 @@
 #  contact_mobile_number :string(255)
 #  is_deleted            :boolean          default(FALSE), not null
 #  deleted_at            :datetime
+#  location_code         :string(255)
 #
 
 class BranchLocation < ApplicationRecord

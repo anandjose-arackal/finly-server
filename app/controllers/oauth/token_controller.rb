@@ -21,14 +21,18 @@ class Oauth::TokenController < Doorkeeper::TokensController
       @user = current_user(response&.token)
       params[:user] = @user
       params[:response] = response
+      # Jugaad as frontend is not developed for capturing device_type
+      params[:temporary_client_type] = 'UserDeviceBrowser'
+      # Jugaad end as frontend is not developed for capturing device_type
       sessions_result = UserSessions::Create.(:authorized, params)
-      if sessions_result.success?
+      if sessions_result.success? and sessions_result.session.status_id == UserSessionStatus.id_for(:authorized)
         result = Gatekeeper::Event.(:after_session_create, params)
         if result.success?
+          @user.otp_verified = !result.require_otp
           on_create_success(response)
           return
         else
-          invalidate_session UserSessionStatus.id_for(:failed), result.message
+          invalidate_session UserSessionStatus.id_for(:failed), (result.message || result.rule.description)
         end
       end
 

@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: bank_transactions
+# Table name: yes_bank_transactions
 #
 #  id                          :integer          not null, primary key
 #  unique_request_number       :string(255)
@@ -17,9 +17,11 @@
 #  refunded                    :boolean
 #  error_sub_code              :string(255)
 #  bank_transaction_type_id    :integer
+#  account_name_check          :boolean          default(FALSE)
+#  beneficiary_full_name       :string(255)
 #
 
-class BankTransaction < ApplicationRecord
+class YesBankTransaction < ApplicationRecord
   belongs_to :amount, optional: true
   belongs_to :company, optional: true
   belongs_to :beneficiary_bank_account, optional: true, class_name: "BankAccount"

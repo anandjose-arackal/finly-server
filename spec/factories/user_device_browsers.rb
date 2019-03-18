@@ -1,23 +1,43 @@
 # == Schema Information
 #
-# Table name: user_devices
+# Table name: user_device_browsers
 #
-#  id                           :bigint(8)        not null, primary key
-#  user_id                      :integer
-#  company_id                   :integer
-#  fingerprint                  :string(255)
-#  status_id                    :integer          not null
-#  verification_mode            :string(255)
-#  verification_key             :string(255)
-#  verification_code_sent_at    :datetime
-#  verified_at                  :datetime
-#  verification_code_count      :integer
-#  verification_failed_attempts :integer
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  client_id                    :integer
-#  client_type                  :string(255)
-#  message                      :text(65535)
+#  id                     :bigint(8)        not null, primary key
+#  timestamp              :datetime
+#  user_agent             :string(255)
+#  timezone               :string(255)
+#  fingerprint            :string(255)
+#  language               :string(255)
+#  system_language        :string(255)
+#  browser                :string(255)
+#  browser_version        :string(255)
+#  browser_engine         :string(255)
+#  browser_engine_version :string(255)
+#  os_name                :string(255)
+#  os_version             :string(255)
+#  screen_width           :integer
+#  screen_height          :integer
+#  device_x_dpi           :integer
+#  device_y_dpi           :integer
+#  color_depth            :integer
+#  java_enabled           :boolean
+#  java_version           :string(255)
+#  flash_enabled          :boolean
+#  flash_version          :string(255)
+#  silver_light_enabled   :boolean
+#  silver_light_version   :string(255)
+#  is_mime_types          :boolean
+#  mime_types_list        :string(255)
+#  fonts_list             :text(65535)
+#  is_local_storage       :boolean
+#  is_session_storage     :boolean
+#  is_cookie              :boolean
+#  plugins                :text(65535)
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  is_mobile              :boolean
+#  status_id              :integer          not null
+#  message                :text(65535)
 #
 
 FactoryBot.define do
@@ -25,7 +45,8 @@ FactoryBot.define do
     user_agent = Faker::Internet.user_agent
     ua_client = DeviceDetector.new(user_agent)
 
-    timestamp {DateTime.now.strftime('%Q')}
+
+    timestamp_s {DateTime.now.strftime('%Q')}
     user_agent {user_agent}
     timezone {'Indian Standard Time'}
     fingerprint {SecureRandom.hex(32)}

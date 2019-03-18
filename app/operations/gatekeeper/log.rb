@@ -52,13 +52,16 @@ class Gatekeeper::Log < BaseOperation
   end
 
   def base_params
+    score = (self.verdict.score.to_s[/\d+/] || 1)
+    score = 1 if score < 1
     {
         params: RequestStoreUtil.request_params,
         headers: RequestStoreUtil.current_request.headers['X-Finly-RP'],
         act: self.verdict.act.to_s,
         premise: self.verdict.premise.to_s,
         rule: self.verdict.rule.to_s,
-        verdict: (self.verdict.message || self.verdict.description)
+        verdict: (self.verdict.message || self.verdict.description),
+        score: score
     }
   end
 

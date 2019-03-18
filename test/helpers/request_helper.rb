@@ -1,7 +1,8 @@
 module RequestHelper
 
   def random_ip
-    IPAddr.new(rand(2 ** 32), Socket::AF_INET).to_s
+    # IPAddr.new(rand(2 ** 32), Socket::AF_INET).to_s
+    Faker::Internet.ip_v4_address
   end
 
   def authentication_headers_for(type, properties = {})

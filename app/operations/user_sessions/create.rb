@@ -1,6 +1,6 @@
 require 'resolv'
 class UserSessions::Create < BaseOperation
-  attr_accessor :oauth_response, :user, :status, :session
+  attr_accessor :user, :status, :session, :token
 
   class UserSessions::Create::Success < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :session, :event
@@ -19,7 +19,7 @@ class UserSessions::Create < BaseOperation
   def initialize(status, params)
     super(params[:user], params)
     self.status = status
-    self.oauth_response = params[:response]
+    self.token = params[:response]&.token || RequestStoreUtil.current_token
   end
 
   def pre_validate
@@ -36,16 +36,16 @@ class UserSessions::Create < BaseOperation
         add_message :error, 'User not found'
         return
       end
-      if self.oauth_response.blank?
+      if self.token.blank?
         add_message :error, 'Token not found'
         return
       end
     end
 
-    if self.params[:username].blank?
-      add_message :error, 'Username not found'
-      return
-    end
+    # if self.params[:username].blank?
+    #   add_message :error, 'Username not found'
+    #   return
+    # end
   end
 
   def process
@@ -57,6 +57,7 @@ class UserSessions::Create < BaseOperation
     enrich_access args
     enrich_geo_location args
     enrich_device args
+    enrich_ip args
     set_event args
     return if has_errors?
     self.session = UserSession.new args
@@ -72,6 +73,8 @@ class UserSessions::Create < BaseOperation
     RequestStoreUtil.set_current_session self.session
     RequestStoreUtil.set_current_event self.session.events.last
     RequestStoreUtil.set_current_device self.session.user_device
+
+    self.token&.update(status_id: self.session.status_id, message: self.session.message)
   end
 
   def success
@@ -83,7 +86,7 @@ class UserSessions::Create < BaseOperation
   def enrich_user(args)
     args[:company_id] = user&.company_id
     args[:user_id] = user&.id
-    args[:access_token] = self.oauth_response&.token
+    args[:access_token] = self.token
     args[:username] = params[:username]
   end
 
@@ -95,6 +98,7 @@ class UserSessions::Create < BaseOperation
   def enrich_request(args)
     args[:referrer] = RequestStoreUtil.current_request.referer
     args[:ip] = RequestStoreUtil.current_request.remote_ip
+    args[:user_agent] = RequestStoreUtil.current_request.user_agent
     ip_type = nil
     if RequestStoreUtil.current_request.remote_ip =~ Resolv::IPv4::Regex
       ip_type = 'ipv4'
@@ -106,8 +110,8 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_geo_location(args)
-    # geo_ip = Geocoder.search(RequestStoreUtil.current_request.remote_ip)
-    geo_ip = Geocoder.search('106.51.71.232')
+    geo_ip = Geocoder.search(RequestStoreUtil.current_request.remote_ip)
+    # geo_ip = Geocoder.search('106.51.71.232')
     geo_ip = geo_ip.first if geo_ip.respond_to?(:each)
     data = geo_ip.data
     args[:continent_name] = data&.dig('continent', 'names', 'en')
@@ -124,20 +128,50 @@ class UserSessions::Create < BaseOperation
   end
 
   def enrich_device(args)
+    # todo Temporary as frontend dev is not available
+    args[:client_type] = params[:temporary_client_type]
+    # todo Temporary as frontend dev is not available
+    # return if true
+
+    return if user.nil?
+    # return
+
     result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
-      args[:status_id] = UserSessionStatus.id_for(:failed)
-      args[:message] = result.messages[:error].to_sentence
-      add_message :error, result.messages[:error].to_sentence
+      # todo enable this once frontend is sending the X-Finly-RP headers
+      # args[:status_id] = UserSessionStatus.id_for(:failed)
+      # args[:message] = result.messages[:error].to_sentence
+      # todo enable this once frontend is sending the X-Finly-RP headers
       return
     end
 
     args[:user_device_id] = result.device.id
     args[:client_type] = result.device.client_type
     unless result.device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(result.device.status_id)
+      # todo enable this once frontend is sending the X-Finly-RP headers
+      # args[:status_id] = UserSessionStatus.id_for(:failed)
+      # args[:message] = result.device.message
+      # todo enable this once frontend is sending the X-Finly-RP headers
+      return
+    end
+  end
+
+  def enrich_ip(args)
+    return if user.nil?
+
+    result = UserIps::FindOrCreate.(user, params)
+    unless result.success?
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.messages[:error].to_sentence
+      # add_message :error, result.messages[:error].to_sentence
+      return
+    end
+
+    args[:user_ip_id] = result.ip.id
+    unless result.ip.valid?
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.device.message
-      add_message :error, result.device.message
+      # add_message :error, result.device.message
       return
     end
   end
