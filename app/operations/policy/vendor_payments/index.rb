@@ -36,7 +36,8 @@ class Policy::VendorPayments::Index < Policy::Base
   end
 
   class Policy::VendorPayments::Index::IndexPresenter < Policy::Base::PolicyPresenter
-    attr_accessor :policies, :policy_user_roles
+    include HasScope
+    attr_accessor :policies, :policy_user_roles, :admin_policies
 
     has_scope :filter_role_id, type: :array
 
@@ -45,6 +46,8 @@ class Policy::VendorPayments::Index < Policy::Base
       self.policy_user_roles = apply_scopes(policy_user_roles)
       self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.uniq
       self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.exclude_deleted
+      # Jugaad as we do not have policy admin in place
+      self.admin_policies = user.company.policies.exclude_deleted
     end
   end
 end
