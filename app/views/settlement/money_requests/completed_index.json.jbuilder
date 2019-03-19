@@ -1,6 +1,7 @@
 json.array! @result.paginated_money_requests do |money_request|
 
-  json.extract! money_request, :id, :name
+  json.extract! money_request, :id
+  json.name "#{money_request.id} - #{money_request.name}"
   json.user do
     json.id money_request.user_id
     json.name money_request.user.name
