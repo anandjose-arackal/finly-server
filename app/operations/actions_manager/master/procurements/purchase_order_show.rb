@@ -119,9 +119,10 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def user_in_level?
-    level = purchase_order.level
-    amount = purchase_order.balance_amount.value rescue 0
-    level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+    # level = purchase_order.level
+    # amount = purchase_order.balance_amount.value rescue 0
+    # level.present? ? level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+    purchase_order.get_reviewers.include?(user)
   end
 
 end

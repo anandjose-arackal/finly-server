@@ -152,6 +152,11 @@ class PaymentOrder < ApplicationRecord
   scope :from_disburse, -> {where application: ["fd", "ft"]}
   scope :from_vendor_payments, -> {where application: "vp"}
 
+  scope :includes_for_show, -> do
+    includes(:initiating_user, :payment_order_status, :initiating_user, {amount_requested: :currency},{amount_processed: :currency}, payments: [{amount: :currency}, :payment_status, :payment_type, :initiating_user, :receiving_user,:system_messages])
+  end
+
+
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
   delegate :amount_requested_value, to: :amount_requested
   delegate :amount_processed_value, to: :amount_processed

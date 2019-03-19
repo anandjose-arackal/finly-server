@@ -11,6 +11,7 @@ class TransferTimingUtils
     else
       date.change(hour: 8, min: 1, sec: 0)
     end
+    return true if date > DateUtils.local_date # because we are only checking for today's shit
     case payment_mode&.upcase
       when "IMPS"
         return true
@@ -77,9 +78,9 @@ class TransferTimingUtils
     # todo check if the timezone is actually the current one
     start_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 8, 0, 0, "IST")
     case payment_mode
-      when "NEFT"
+      when "NEFT", "neft"
         end_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 18, 30, 0, "IST")
-      when "RTGS"
+      when "RTGS", "rtgs"
         end_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 16, 10, 0, "IST")
       else
         # defaulting to RTGS times just to be sure
