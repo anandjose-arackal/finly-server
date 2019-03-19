@@ -4,10 +4,10 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   register_structure(
       :tabs, [
       :dashboard,
-      :payment_tickets,
-      :vendors,
       :item_master,
-      {create: [:create_payment_ticket]},
+      :vendors,
+      :payment_tickets,
+      {create: [:create_payment_ticket]}
   ]
   )
 
