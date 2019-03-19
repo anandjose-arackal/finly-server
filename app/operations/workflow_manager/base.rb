@@ -65,7 +65,8 @@ class WorkflowManager::Base < BaseOperation
     # If user delegation is allowed
     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
     if self.document_class_name == "PurchaseOrder"
-      if self.document.procurement.po_revisions.present?
+      # if self.document.procurement.po_revisions.present? 
+      if self.document.procurement.po_revisions.pluck(:id).include?(self.document.id)
         note = "Revised PO # #{self.document.po_number}, #{aasm_event.humanize}"
       end
     end
