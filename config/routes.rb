@@ -1589,8 +1589,6 @@
 #                                        procure_comments POST   /procure/comments(.:format)                                                                                         procure/comments#create
 #                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
 #                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
-#                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
-#                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
 #                       reviewal_levels_download_mappings GET    /reviewal_levels/download_mappings(.:format)                                                                        reviewal_levels#download_mappings
 #                                reviewal_level_reviewers GET    /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#index
 #                                                         POST   /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#create

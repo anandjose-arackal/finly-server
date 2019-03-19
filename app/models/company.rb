@@ -38,6 +38,7 @@ class Company < ApplicationRecord
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
   has_many :yes_bank_transactions
+  has_many :icici_bank_transactions
   has_many :inventory_line_items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"

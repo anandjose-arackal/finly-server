@@ -33,7 +33,7 @@ class BaseHandler
 
   def path
     key = self.env_key
-    if key.present?
+    if key.present?r
       ENV["#{key}_path"]
     end
   end

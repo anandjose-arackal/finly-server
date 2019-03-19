@@ -7,6 +7,10 @@ class IciciBankApi::Registration < IciciBankApi::Base
 
   end
 
+  def icici_bank_action
+    'registration'
+  end
+
   def post_params
     encrypt_params(
         AGGRID: self.company_details[:AGGR_ID],
@@ -17,4 +21,6 @@ class IciciBankApi::Registration < IciciBankApi::Base
         URN: self.company.icici_bank_config.urn
     )
   end
+
+
 end

@@ -62,6 +62,10 @@ default: &default
   icici_bank_validate_account:
     base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'ValidateLinkedAccount'
+  icici_bank_transaction_status:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'TransactionInquiry'
+
 
 staging:
   <<: *default

@@ -34,7 +34,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
       return
     end
 
-    unless transfer_request.class.name == "TransferRequest"
+    unless transfer_request.class.name == "YesBankTransferRequest"
       add_message :error, "Invalid parameters"
     end
 
