@@ -57,7 +57,6 @@ class WorkflowManager::Base < BaseOperation
 
   def process
     # Run event
-    debugger
     action = self.aasm_document.send(self.aasm_event)
 
 
