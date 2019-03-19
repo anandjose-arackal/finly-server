@@ -31,11 +31,11 @@ Rack::Attack.throttle('Request/IP throttling - 1 day', limit: 15000, period: 1.d
 end
 # Request Throttling End
 
-# Lookup Throttling Start
+# Public-Sensitive Throttling Start
 # 3/6 seconds
 # 20/1 minute
 # 40/10 minutes
-# 60/100 minutes
+# 80/100 minutes
 # 200/1000 minutes
 {
     lookup: 'lookup',
@@ -64,7 +64,7 @@ end
     req.ip if req.path.include?(pattern)
   end
 end
-# Lookup Throttling End
+# Public-Sensitive Throttling Start
 
 # Safelist API requests from known providers
 # Throttle Lookups
