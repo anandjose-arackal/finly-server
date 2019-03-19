@@ -39,9 +39,9 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
       self.counts = []
 
       if params[:action] == 'non_po_invoices'
-        invoice_type = 'non_po_invoices'
+        invoice_type = 'non_po_invoice'
       elsif params[:action] == 'po_invoices'
-        invoice_type = 'po_invoices'
+        invoice_type = 'po_invoice'
       else
         # nothin
       end

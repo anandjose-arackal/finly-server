@@ -27,12 +27,12 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       self.paginated_invoices = self.invoices.paginate(page: params[:page], per_page: (params[:per_page] || 30))
     end
 
-    def po_invoice_status_count
-      get_count(1)
+    def po_invoice_status_count    
+      get_count(InwardInvoiceType.id_for(:tax_invoice))
     end
 
     def non_po_invoice_status_count
-      get_count(3)
+      get_count(InwardInvoiceType.id_for(:non_po_invoice))
     end
 
     def get_count(id)
