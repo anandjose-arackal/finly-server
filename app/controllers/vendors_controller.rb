@@ -1,5 +1,30 @@
 class VendorsController < ApplicationController
-  before_action -> { finly_authorize! :web } 
+  before_action -> { finly_authorize! :web }
+
+  def index
+    @result = Vendors::Index.(current_user, params)
+    respond
+  end
+
+  def show
+    @result = Vendors::Show.(current_user, params)
+    respond
+  end
+
+  def new_vendor_config
+    @result = Vendors::NewVendorConfig.(current_user, params)
+    respond
+  end
+
+  def create
+    @result = Vendors::Create.(current_user, params)
+    respond
+  end
+
+  def update
+    @result = Vendors::Update.(current_user, params)
+    respond
+  end
 
   def submit
     @result = Vendors::Submit.(current_user, params)

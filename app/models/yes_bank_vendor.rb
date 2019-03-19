@@ -54,6 +54,8 @@ class YesBankVendor < ApplicationRecord
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :vendor_tds_rates, dependent: :destroy, foreign_key: :vendor_id
+  has_many :tds_rates, through: :vendor_tds_rates#, foreign_key: :tds_rates_list_id
 
   default_scope { unscope(:where) }
 
@@ -71,6 +73,7 @@ class YesBankVendor < ApplicationRecord
 
   accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
+  accepts_nested_attributes_for :vendor_tds_rates, allow_destroy: true
   # accepts_nested_attributes_for :pan_attachment, allow_destroy: true
   # accepts_nested_attributes_for :gstin_certificate_attachment, allow_destroy: true
   # accepts_nested_attributes_for :cancelled_cheque_attachment, allow_destroy: true

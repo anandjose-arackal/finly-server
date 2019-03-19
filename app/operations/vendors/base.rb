@@ -9,7 +9,7 @@ class Vendors::Base < BaseOperation
 
   def init
     self.company = user.company
-    id = params[:vendor_id] || params[:yes_bank_vendor] || params[:id] 
+    id = params[:vendor_id] || params[:yes_bank_vendor_id] || params[:id] 
     self.vendor = Vendors::Show.(user, params).vendors.with_id(id).first rescue nil
   end
 

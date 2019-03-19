@@ -1,6 +1,6 @@
 class Vendors::NewVendorConfig < Vendors::Base
   attr_accessor :states, :vendor_types, :payment_terms, :currencies, :tds_rates,
-                :field_configurations
+                :field_configurations, :policies
   def init
     self.states = GstStateCode.all
     self.vendor_types = user.company.vendor_types
@@ -8,6 +8,11 @@ class Vendors::NewVendorConfig < Vendors::Base
     self.payment_terms = user.company.payment_terms
     self.tds_rates = user.company.tds_slabs
     self.field_configurations = current_company.field_configurations.with_parent_type(FieldParentType.id_for(:vendor))
+
+    self.policies = "todo"
+  end
+
+  def validate
   end
 
   def success

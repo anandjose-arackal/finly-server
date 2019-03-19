@@ -2575,6 +2575,7 @@ Rails.application.routes.draw do
         resources :bank_accounts
       end
       scope :vendors do
+        #todo vendor Emp
         post '', to: 'vendors#create'
       end
     end
@@ -3430,6 +3431,14 @@ Rails.application.routes.draw do
   ######## Reviewal Workflow ##########
   resources :policy_user_role_mappings
   ######## Reviewal Workflow End ##########
+
+
+  ######### New Vendor Empanelment ########
+  get 'vendors/new_vendor_config', to: "vendors#new_vendor_config"  
+  resources :vendors do
+
+  end
+  ######### New Vendor Empanelment Ends ##
 
 
 
