@@ -83,7 +83,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
         'Cheque Number',
         'Chq / Trn Date',
         'MICR Number',
-        'IFC Code',
+        'IFS Code',
         'Beneficery Bank Name',
         'Beneficiary Bank Branch Name',
         'Beneficiary email id'
