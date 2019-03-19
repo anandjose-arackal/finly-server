@@ -8,8 +8,7 @@ class Vendors::NewVendorConfig < Vendors::Base
     self.payment_terms = user.company.payment_terms
     self.tds_rates = user.company.tds_slabs
     self.field_configurations = current_company.field_configurations.with_parent_type(FieldParentType.id_for(:vendor))
-
-    self.policies = "todo"
+    self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
   end
 
   def validate
