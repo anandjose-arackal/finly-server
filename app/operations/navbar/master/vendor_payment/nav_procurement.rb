@@ -33,26 +33,27 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def procure
+    return nil unless user.company.procurement_enabled?
     {name: 'Procure', id: 'procure', url: 'procurements'}
   end
 
   def po_initiator
-    return nil unless user.is_purchase_order_initiator?
+    return nil unless user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
     {name: 'Your POs', id: 'procure', url: 'procurements'}
   end
 
   def po_awaiting_approval
-    return nil unless user.is_purchase_request_reviewer? || user.vendor_payments_admin?
+    return nil unless user.is_purchase_order_reviewer? || user.vp_admin_or_auditor?
     {name: 'POs Awaiting Approval', id: 'procure', url: 'procurements'}
   end
 
   def po_team
-    return nil unless user.is_purchase_request_reviewer?
+    return nil unless user.is_purchase_order_reviewer? || user.vp_admin_or_auditor?
     {name: 'Team POs', id: 'procure', url: 'procurements'}
   end
 
   def po_company
-    return nil unless user.vendor_payments_admin?
+    return nil unless user.vp_admin_or_auditor?
     {name: 'Company POs', id: 'procure', url: 'procurements'}
   end
 

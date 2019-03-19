@@ -16,7 +16,8 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
 
 
     if user.vendor_payments_admin?
-      self.purchase_orders = ::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin)).not_open.or(user.purchase_orders)
+      admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
+      self.purchase_orders = ::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.purchase_orders)
       return
     end
 

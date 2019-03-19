@@ -585,10 +585,10 @@ module Transitionable
   def role_based_admin_associated_items(user, role_id, options={})
     if user.instance_of?(User)
       if self.column_names.include? 'company_id'
-        self.where(company_id: user.company.id)
+        self.where(company_id: user.company.id).where.not("#{self.document_status_attribute} in (?)", options[:admin_restricted_status_ids])
       else
         user_ids = user.company.users.pluck(:id)
-        self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+        self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).where.not("#{self.document_status_attribute} in (?)", options[:admin_restricted_status_ids])
       end
     end
   end

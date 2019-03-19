@@ -59,6 +59,19 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
     has_scope :filter_state, type: :array
     has_scope :filter_role, type: :array
     has_scope :filter_vendor_payments
+    has_scope :filter_unassigned_purchase_order_initiator_for_policy
+    has_scope :filter_unassigned_purchase_order_reviewer_for_policy
+    has_scope :filter_unassigned_goods_receiver_for_policy
+    has_scope :filter_unassigned_invoice_initiator_for_policy
+    has_scope :filter_unassigned_invoice_reviewer_for_policy
+    has_scope :filter_unassigned_bank_payment_request_initiator_for_policy
+    has_scope :filter_unassigned_bank_payment_request_reviewer_for_policy
+    has_scope :filter_unassigned_bank_payment_request_creditor_for_policy
+    has_scope :filter_unassigned_item_master_manager_for_policy
+    has_scope :filter_unassigned_vendor_creator_for_policy
+    has_scope :filter_unassigned_vendor_reviewer_for_policy
+    has_scope :filter_unassigned_vendor_manager_for_policy
+    has_scope :filter_unassigned_budget_manager_for_policy
 
     def init
       fix_scopes

@@ -48,7 +48,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
   def init
     if user.vendor_payments_admin?
-      self.invoices = user.company.inward_invoices.non_beneficiary.created_at_desc
+      self.invoices = user.company.inward_invoices.not_open.non_beneficiary.created_at_desc
       return
     end
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
