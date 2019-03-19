@@ -74,7 +74,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
         self.counts.push(admin_data)
       end
 
-      if user.vendor_payment_initiator?
+      if user.is_bank_payment_request_initiator?
         personal_data = {
           type: 'personal',
           title: "My Payment Tickets",

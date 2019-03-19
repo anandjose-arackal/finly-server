@@ -36,7 +36,7 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   end
 
   def vendors
-    return nil unless user.is_vendor_payments_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_vendor_creator? || user.vp_admin_or_auditor?
     {name: 'Vendors', id: 'vendors', url: 'beneficiaries'}
   end
 

@@ -1121,6 +1121,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:vendor_creator))
   end
 
+  def is_vendor_creator?
+    self.has_policy_role?(UserRole.id_for(:vendor_creator))
+  end
+
   def is_vendor_reviewer?
     self.has_policy_role?(UserRole.id_for(:vendor_reviewer))
   end
@@ -1131,6 +1135,10 @@ class User < ApplicationRecord
 
   def is_purchase_order_initiator?
     self.has_policy_role?(UserRole.id_for(:purchase_order_initiator))
+  end
+
+  def is_purchase_order_reviewer?
+    self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer))
   end
 
   def is_purchase_request_reviewer?

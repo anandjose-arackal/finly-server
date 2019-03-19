@@ -17,13 +17,13 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
 
   def init
     # initialize the role id for a particular user
-    self.role_id = params[:role_id]
-    if self.role_id.blank? && params[:view].present?
-      if params[:view] == 'finance'
-        params[:view] = 'finance_manager'
-      end
-      self.role_id = UserRole::VALUES[params[:view].to_sym]
-    end
+    # self.role_id = params[:role_id]
+    # if self.role_id.blank? && params[:view].present?
+    #   if params[:view] == 'finance'
+    #     params[:view] = 'finance_manager'
+    #   end
+    #   self.role_id = UserRole::VALUES[params[:view].to_sym]
+    # end
     params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
@@ -32,17 +32,20 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
   end
 
   def validate
-    unless role_id.present?
-      add_message :error, "User role not defined"
+    # unless role_id.present?
+    #   add_message :error, "User role not defined"
+    # end
+    unless user.vendor_payments_admin? || user.vendor_payments_auditor?
+      add_message :error, "Role not found"
+      return
     end
   end
 
   def process
-    case role_id
-      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
-        self.users = user.company.users
-      else
-        self.users = []
+    if user.vendor_payments_admin? || user.vendor_payments_auditor?
+      self.users = user.company.users
+    else
+      self.users = []
     end
   end
 

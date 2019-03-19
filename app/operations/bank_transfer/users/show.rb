@@ -12,21 +12,21 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
   end
 
   def init
-    self.role_id = params[:role_id]
-    if role_id.blank? && params[:view].present?
-      self.role_id = UserRole::VALUES[params[:view].to_sym]
-    end
+    # self.role_id = params[:role_id]
+    # if role_id.blank? && params[:view].present?
+    #   self.role_id = UserRole::VALUES[params[:view].to_sym]
+    # end
   end
 
   def validate
-    unless role_id.present?
+    unless user.vp_admin_or_auditor?
       add_message :error, "User role not defined"
+      return
     end
   end
 
   def process
-    case role_id
-    when UserRole.id_for(:admin)
+    if user.vp_admin_or_auditor?
       team = BankTransfer::Users::Index.(user, params).users rescue []
       id = params[:id] || params[:user_id]
       self.selected_user = team.find_by(id: id)
