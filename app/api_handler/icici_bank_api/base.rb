@@ -13,13 +13,17 @@ class IciciBankApi::Base < BaseHandler
       type = self.company.id
     end
     self.company_details = values[type]
+
+    super()
   end
 
   def encrypt_params(params = {})
     json_params = params.to_json
     # todo - check if this is the right file to use for encryption
-    public_key = OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/cibnextapiuat.pem'))
-    encrypted_params = Base64.encode64(public_key.public_encrypt(json_params))
+    # public_key = OpenSSL::PKey::RSA.new(File.read(Dir.home + '/certificates/cibnextapiuat.pem'))
+    # encrypted_params = Base64.encode64(public_key.public_encrypt(json_params))
+    # todo - temporary
+    encrypted_params = json_params
   end
 
   def process
@@ -42,6 +46,8 @@ class IciciBankApi::Base < BaseHandler
         req.body = request_params
       end
 
+      puts "Response: "
+      ap self.response.body
 
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       # handle this case by updating the bank transaction to possible failure and then checking the

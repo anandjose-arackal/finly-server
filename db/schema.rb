@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_19_103321) do
+ActiveRecord::Schema.define(version: 2019_03_19_125253) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2717,7 +2717,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_103321) do
   end
 
   create_table "icici_bank_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "alias"
+    t.string "alias_id"
     t.string "urn"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

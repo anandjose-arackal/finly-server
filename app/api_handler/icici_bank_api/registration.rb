@@ -10,6 +10,10 @@ class IciciBankApi::Registration < IciciBankApi::Base
     'icici_bank_registration'
   end
 
+  def env_key
+    'icici_bank_registration'
+  end
+
   def raw_api_params
     {
         AGGRID: self.company_details[:AGGR_ID],
