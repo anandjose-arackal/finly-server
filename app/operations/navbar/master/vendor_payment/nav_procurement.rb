@@ -33,27 +33,27 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def procure
-    {name: 'Procure', id: 'procurements', url: 'procurements'}
+    {name: 'Procure', id: 'procure', url: 'procurements'}
   end
 
   def po_initiator
     return nil unless user.is_purchase_order_initiator?
-    {name: 'Your POs', id: 'procurements', url: 'procurements'}
+    {name: 'Your POs', id: 'procure', url: 'procurements'}
   end
 
   def po_awaiting_approval
     return nil unless user.is_purchase_request_reviewer? || user.vendor_payments_admin?
-    {name: 'POs Awaiting Approval', id: 'procurements', url: 'procurements'}
+    {name: 'POs Awaiting Approval', id: 'procure', url: 'procurements'}
   end
 
   def po_team
     return nil unless user.is_purchase_request_reviewer?
-    {name: 'Team POs', id: 'procurements', url: 'procurements'}
+    {name: 'Team POs', id: 'procure', url: 'procurements'}
   end
 
   def po_company
     return nil unless user.vendor_payments_admin?
-    {name: 'Company POs', id: 'procurements', url: 'procurements'}
+    {name: 'Company POs', id: 'procure', url: 'procurements'}
   end
 
   def receive
@@ -62,16 +62,16 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def receive_pending
     return nil unless user.is_goods_receiver?
-    {name: 'Pending', id: 'receive_pending', url: '#receive/params={"active_tab":"pending-tab"}'}
+    {name: 'Pending', id: 'receive', url: '#receive/params={"active_tab":"pending-tab"}'}
   end
 
   def receive_history
     return nil unless user.is_goods_receiver?
-    {name: 'Received', id: 'receive_received', url: '#receive/params={"active_tab":"receive-tab"}'}
+    {name: 'Received', id: 'receive', url: '#receive/params={"active_tab":"receive-tab"}'}
   end
 
   def payables
-    {name: 'Payables', id: 'orders', url: 'orders'}
+    {name: 'Payables', id: 'payables', url: 'orders'}
   end
 
   # def unbilled_items
@@ -80,41 +80,41 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_advances
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'PO Advances', id: 'new_payment_po_advances', url: 'new_payment_po_advances'}
+    {name: 'PO Advances', id: 'payables', url: 'new_payment_po_advances'}
   end
 
   def po_invoices
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'PO Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices/params={"filter_invoice_type":"po_invoice"}'}
+    {name: 'PO Invoices', id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"po_invoice"}'}
   end
 
   def non_po_invoices
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'Non PO Invoices', id: 'new_payment_invoices', url: 'new_payment_invoices/params={"filter_invoice_type":"non_po_invoice"}'}
+    {name: 'Non PO Invoices', id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"non_po_invoice"}'}
   end
 
   def payment_tickets
     return nil unless user.is_bank_payment_request_initiator? || user.is_bank_payment_request_reviewer? || user.is_bank_payment_request_creditor?
-    {name: 'Payment Tickets', id: 'orders', url: 'orders'}
+    {name: 'Payment Tickets', id: 'payables', url: 'orders'}
   end
 
   def manage
-    {name: 'Manage', id: 'beneficiaries', url: 'beneficiaries'}
+    {name: 'Manage', id: 'manage', url: 'beneficiaries'}
   end
 
   def manage_vendors
     return nil unless user.is_vendor_manger? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vendor_payments_admin?
-    {name: 'Vendors', id: 'beneficiaries', url: 'beneficiaries'}
+    {name: 'Vendors', id: 'manage', url: 'beneficiaries'}
   end
 
   def manage_item_master
     return nil unless user.is_item_master_manager? || user.vendor_payments_admin?
-    {name: 'Item Master', id: 'item_master', url: 'catalogue/params={"tabName": "item_master"}'}
+    {name: 'Item Master', id: 'manage', url: 'catalogue/params={"tabName": "item_master"}'}
   end
 
   def manage_rate_contracts
     return nil unless user.is_item_master_manager? || user.vendor_payments_admin?
-    {name: 'Rate Contracts', id: 'rate_contracts', url: 'catalogue/params={"tabName": "rate_contract"}'}
+    {name: 'Rate Contracts', id: 'manage', url: 'catalogue/params={"tabName": "rate_contract"}'}
   end
 
   def create
@@ -123,7 +123,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_purchase_order
     return nil unless user.is_purchase_order_initiator? || user.vendor_payments_admin?
-    {name: 'New Purchase Order', id: 'create_purchase_order', url: 'procurements/params={"action":"new_procurement"}'}
+    {name: 'New Purchase Order', id: 'create', url: 'procurements/params={"action":"new_procurement"}'}
   end
 
   # def create_po_invoice
@@ -132,12 +132,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_non_po_invoice
     return nil unless user.is_invoice_initiator? || user.vendor_payments_admin?
-    {name: 'New Non PO Invoice', id: 'create_non_po_invoice', url: 'new_payment_invoices/params={"action":"new_invoice"}'}
+    {name: 'New Non PO Invoice', id: 'create', url: 'new_payment_invoices/params={"action":"new_invoice"}'}
   end
 
   def create_payment_ticket
     return nil unless user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
-    {name: 'New Payment Ticket', id: 'new_payment_ticket', url: 'new_payment_ticket'}
+    {name: 'New Payment Ticket', id: 'create', url: 'new_payment_ticket'}
   end
 
   def attachments

@@ -24,7 +24,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   def po_revision
     # can only be done after the po status is set to "sent to vendor"
     # prevent revision if procurement has invoice or grn attached
-    if (procurement.invoices.blank? && procurement.inward_documents.blank?)
+    if po_modifiable?
       unless procurement.po_revisions.pluck(:revision_of_id).include?(purchase_order.id)
         (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
       end
@@ -106,9 +106,11 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   def save_btn
     # admin can save provided it is open or processing or the provided condiftions
     # document owner can save provided po is open, retracted or rejected
-    unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
-      (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
-      (purchase_order.processing? && user_in_level?)
+    if po_modifiable?
+      unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
+        (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed? && !purchase_order.sent_to_vendor?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
+        (purchase_order.processing? && user_in_level?)
+      end
     end
 
     # user.vendor_payments_admin? || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )
@@ -155,6 +157,10 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def update_btn
     true
+  end
+
+  def po_modifiable?
+    (procurement.invoices.blank? && procurement.inward_documents.blank?)
   end
 
   def document_owner?
