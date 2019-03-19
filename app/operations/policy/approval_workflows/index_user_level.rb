@@ -1,5 +1,5 @@
 class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Base
-  attr_accessor :reviewal_levels, :policy_users, :policy
+  attr_accessor :reviewal_levels, :policy_users, :policy, :provider
 
   class Policy::ApprovalWorkflows::IndexUserLevel::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reviewal_levels, :policy_users, :paginated_users, :levels_data, :count
@@ -43,6 +43,7 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
 
   def init
     policy_id = params[:policy_id]
+    self.provider = params[:filter_associated_entity_type]
     self.policy = user.company.policies.find_by(id: policy_id)
 
     unless self.policy.present?
@@ -50,8 +51,8 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
     end
 
     self.reviewal_levels = ReviewalLevel.with_policy_ids(self.policy.id)
-
-    self.policy_users = User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id))
+    user_ids = scope_users_by_role
+    self.policy_users = User.where(id: user_ids)
   end
 
   def validate
@@ -62,5 +63,18 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
     params[:policy_users] = self.policy_users
     params[:reviewal_levels] = self.reviewal_levels
     Policy::ApprovalWorkflows::IndexUserLevel::IndexPresenter.new(user, params, messages)
+  end
+
+  def scope_users_by_role
+    if provider.present?
+      case provider
+      when 'PurchaseOrderProvider'
+        PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:purchase_order_initiator)).pluck(:user_id).uniq rescue []
+      when 'InvoiceProvider'
+        PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:invoice_initiator)).pluck(:user_id).uniq rescue []
+      when 'BankPaymentRequestProvider' 
+        PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id).uniq rescue []
+      end
+    end
   end
 end

@@ -6,9 +6,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   def validate
-    unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not Found'
-    end
+    return if record_not_present
+    validate_association
   end
 
   def process
@@ -44,8 +43,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
-      policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
-      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      # policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
+      self.policies = Policy::VendorPayments::Index.(user, params).policies rescue PurchaseOrder.none
 
       # Show taxes as applicable in the pdf based on this
       self.taxes_applicable_flag = taxes_applicable_flag?
@@ -197,5 +198,25 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       false
     end
+  end
+
+  def validate_presence
+    if purchase_order.blank? || (purchase_order.company_id != user.company_id)
+      add_message :error, 'Record not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_association
+    # Validate of current user is owner of PO
+    return if purchase_order.validate_if_owner(user)
+    return if purchase_order.validate_if_admin(user)
+    return if purchase_order.validate_if_reviewer(user)
+    raise_unauthorized_exception
   end
 end

@@ -65,7 +65,7 @@ json.payments do
         json.net_payable_amount invoice.balance_due&.value
         json.balance_due invoice.balance_due&.value
         json.taxable_amount precision_value invoice.gross_amount&.value
-        json.editable invoice.unpaid?
+        json.editable invoice.unpaid? || invoice.initiated?
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate

@@ -40,6 +40,9 @@ class Department < ApplicationRecord
     where("departments.name like ?", "%#{name}%")
   }
 
+  scope :filter_only_roots, -> {
+    where("departments.ancestry IS NULL")
+  }
   scope :only_sub_departments, -> {
     where("departments.ancestry IS NOT NULL")
   }

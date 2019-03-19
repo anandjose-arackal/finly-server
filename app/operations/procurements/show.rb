@@ -6,6 +6,13 @@ class Procurements::Show < Procurements::Base
     self.procurement = user.company.procurements.find_by id: id
   end
 
+  def validate
+    if procurement.blank? || procurement.company_id != user.company_id
+      add_message :error, 'Record not found'
+      return
+    end
+  end
+
   def process
   end
 
@@ -38,8 +45,8 @@ class Procurements::Show < Procurements::Base
       self.procurement_terms = user.company.procurement_terms
       self.status_tags = self.procurement.status_tags.reverse
       self.actions = get_actions
-
-      policies_op = Policy::Index.(user, view: params[:view])
+      params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:invoice_initiator), UserRole.id_for(:goods_receiver)]
+      policies_op = Policy::VendorPayments::Index.(user, params)
       if policies_op.success?
         self.policies = policies_op.policies
       end

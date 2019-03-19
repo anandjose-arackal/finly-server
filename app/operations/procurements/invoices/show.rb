@@ -7,9 +7,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   end
 
   def validate
-    unless self.invoice.present?
-      add_message :error, 'Invoice not found'
-    end
+    return if record_not_present
+    validate_association
   end
 
   def success
@@ -34,8 +33,10 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
 
-      policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
-      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      # policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
+      self.policies = Policy::VendorPayments::Index.(user, params).policies rescue Invoice.none
 
       self.reviewal_chains = []
 
@@ -173,7 +174,26 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       false
     end
-
-
   end
+
+  def validate_presence
+    if invoice.blank?
+      add_message :error, 'Record not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_association
+    # Validate of current user is owner of PO
+    return if invoice.validate_if_owner(user)
+    return if invoice.validate_if_admin(user)
+    return if invoice.validate_if_reviewer(user)
+    raise_unauthorized_exception
+  end
+
 end
