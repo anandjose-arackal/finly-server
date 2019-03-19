@@ -1,3 +1,4 @@
+
 class YesBankApi::Base < BaseHandler
 
   attr_accessor :client_id, :client_secret, :auth_username,

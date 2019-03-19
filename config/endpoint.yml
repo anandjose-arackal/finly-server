@@ -44,6 +44,24 @@ default: &default
   finly_collect:
     base: 'https://collect-staging.finly.io'
     path: 'receivables'
+  icici_bank_registration:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'Registration'
+  icici_bank_transaction_otp:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'TransactionOTP'
+  icici_bank_transaction_initiate:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'Create'
+  icici_bank_balance_inquiry:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'BalanceInquiry'
+  icici_bank_account_statement:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'AccountStatement'
+  icici_bank_validate_account:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'ValidateLinkedAccount'
 
 staging:
   <<: *default
@@ -102,33 +120,23 @@ itzcash_uat:
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
 
 production:
-#  base_url: "http://naradaapp.itzcash.com:8280"
   base_url: "https://middleman.finly.io/itz_cash_api"
   itzcash_account_details:
-#    base: "http://cvms1.itzcash.com:8080"
     base: "https://middleman.finly.io/itz_cash_api"
-#    path: "myaccount/servlet/ItzCashAccountDetailsServlet"
     path: "account_details"
   itzcash_account_details_yse:
-#    path: "itzgift/servlet/NaradaAccountDetailsServlet"
     path: "account_details"
   itzcash_credit_debit:
-#    path: "itzgift/servlet/NaradaCreditDebitServlet"
     path: "credit_debit"
   itzcash_block_unblock:
-#    path: "itzgift/servlet/NaradaBlockUnblockServlet"
     path: "card_block_unblock"
   itzcash_corporate_balance:
-#    path: "itzgift/servlet/CorporateBalanceServlet"
     path: "corporate_balance"
   itzcash_card_restriction:
-#    path: "itzgift/servlet/NaradaSetTransactionLimitsServlet"
     path: "card_restriction"
   itzcash_mcc_group_restriction:
-#    path: "itzgift/servlet/NaradaSetAdditionalRestrictionsServlet"
     path: "mcc_group_restriction"
   itzcash_company_statement_by_date:
-#    path: "itzgift/servlet/CorporateTransactionStatementByDateRangeServlet"
     path: "company_statement_by_date"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
@@ -145,5 +153,23 @@ production:
   finly_collect:
     base: 'http://172.33.74.252'
     path: 'receivables'
-
+  # todo - using the same as UAT till we get the production URLs
+  icici_bank_registration:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'Registration'
+  icici_bank_transaction_otp:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'TransactionOTP'
+  icici_bank_transaction_initiate:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'Create'
+  icici_bank_balance_inquiry:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'BalanceInquiry'
+  icici_bank_account_statement:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'AccountStatement'
+  icici_bank_validate_account:
+    base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
+    path: 'ValidateLinkedAccount'
 

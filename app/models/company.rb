@@ -58,6 +58,7 @@ class Company < ApplicationRecord
   has_one :collect_company_detail
   has_one :enforce_budget_configuration
   has_one :custom_export_configuration, as: :configurable
+  has_one :icici_bank_config
 
   has_many :payment_orders
   has_many :user_groups
