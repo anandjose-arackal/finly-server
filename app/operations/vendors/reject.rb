@@ -14,6 +14,6 @@ class Vendors::Reject < Vendors::Base
   end
 
   def post_process
-    add_message :success, "Submitted vendor for approval"
+    add_message :success, "You've rejected reviewal of vendor"
   end
 end

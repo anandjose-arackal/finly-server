@@ -142,4 +142,57 @@ class YesBankVendor < ApplicationRecord
         bank_accounts: bank_accounts
     }
   end
+
+  def self.document_owner_attribute
+    'created_by_id'
+  end
+
+  def self.document_status_attribute
+    'status_id'
+  end
+
+  def self.document_status_class_name
+    'VendorStatus'
+  end
+
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push VendorStatus.id_for(status)
+    end
+
+    status_ids.reject { |status_id| status_id.nil? }
+  end
+
+  def self.finance_associated_status_ids
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved)
+  end
+
+  def self.roles
+    [:vendor_creator, :vendor_reviewer, :vendor_manager, :admin]
+  end
+
+  def self.role_based_associated_status_ids(user)
+    self.status_ids(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:vendor_creator) == role_id.to_i)
+          statuses += [:retracted, :rejected, :draft, :awaiting_approval, :approved, :auto_approved]
+        elsif (UserRole.id_for(:vendor_reviewer) == role_id.to_i)
+          statuses += [:awaiting_approval, :retracted, :rejected, :approved, :auto_approved]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:retracted, :rejected, :awaiting_approval, :approved, :auto_approved]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.initiator_associated_items(user, role_id=nil)
+    self.where(id: user.yes_bank_vendors)
+  end
 end

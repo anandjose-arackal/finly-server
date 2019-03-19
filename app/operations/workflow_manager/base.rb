@@ -33,6 +33,8 @@ class WorkflowManager::Base < BaseOperation
       end
     when 'BankPaymentRequest'
       self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
+    when 'YesBankVendor'
+      self.aasm_document = ::WorkflowManager::Aasm::YesBankVendorProvider.new self.document, violations_present, user
     else
       add_message :error, 'Unknown document type'
     end
@@ -55,6 +57,7 @@ class WorkflowManager::Base < BaseOperation
 
   def process
     # Run event
+    debugger
     action = self.aasm_document.send(self.aasm_event)
 
 

@@ -1,6 +1,7 @@
 class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::BaseProvider
   aasm :whiny_transitions => false do
     state :draft, initial: true, :before_enter => :set_state
+    state :approved
     state :awaiting_approval
     state :authorized
     state :rejected

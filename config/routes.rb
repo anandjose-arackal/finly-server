@@ -3472,9 +3472,14 @@ Rails.application.routes.draw do
   ######## Dashbaord Ends ##############
 
   ######### New Vendor Empanelment ########
-  get 'vendors/new_vendor_config', to: "vendors#new_vendor_config"  
+  get 'vendors/new_vendor_config', to: "vendors#new_vendor_config"
+  post 'vendors/submit', to: "vendors#submit"
   resources :vendors do
-
+    put 'approve', to: "vendors#approve"
+    put 'reject', to: "vendors#reject"
+    put 'retract', to: "vendors#retract"
+    put 'take_control', to: "vendors#take_control"
+    put 'return_control', to: "vendors#return_control"
   end
   ######### New Vendor Empanelment Ends ##
 

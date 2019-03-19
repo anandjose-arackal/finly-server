@@ -20,26 +20,27 @@ class Vendors::Create < Vendors::Base
   end
 
   def init
-    super()
+    # super()
     self.vendor_parameters = vendor_attributes
     # setting account owner type as vendor
-
   end
 
   def validate
     # Policy Selection
-    policies = user.company.policies
+    if user.company.vendor_empanelment_workflow_enabled?
+      policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
 
-    parameters = {
-      filter_associated_entity_type: "YesBankVendorProvider",
-      filter_policy_ids: policies.pluck(:id)
-    }
+      parameters = {
+        filter_associated_entity_type: "YesBankVendorProvider",
+        filter_policy_ids: policies.pluck(:id)
+      }
 
-    levels = ReviewalLevels::Index.(user, parameters).levels
+      levels = ReviewalLevels::Index.(user, parameters).levels
 
-    if levels.present?
-      unless self.vendor_parameters[:policy_id].present?
-        add_message :error, "Please select a policy"
+      if levels.present?
+        unless self.vendor_parameters[:policy_id].present?
+          add_message :error, "Please select a policy"
+        end
       end
     end
 
@@ -96,10 +97,26 @@ class Vendors::Create < Vendors::Base
       # also mark the vendor as authorized now
       self.vendor.update(authorized: true)
     else
-      self.vendor = company.yes_bank_vendors.build(vendor_parameters)
+      self.vendor = user.company.yes_bank_vendors.build(vendor_parameters)
       validate_custom_fields(true)
       return if has_errors?
-      unless self.vendor.save
+      if self.vendor.save
+        if user.company.vendor_empanelment_workflow_enabled?
+          self.vendor.update(status_id: VendorStatus.id_for(:draft))
+
+          # Create Document Level Reviewer Mapping
+          # For setting level specific reviewers from reviewal chain for a document
+          params[:reviewal_document] = self.vendor
+
+          document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+          unless document_reviewer_mappings_op.success?
+            add_message :error, document_reviewer_mappings_op.messages[:error]
+          end
+          return
+        else
+          self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+        end
+      else
         add_message :error, vendor.errors.full_messages
       end
     end

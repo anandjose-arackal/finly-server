@@ -15,6 +15,10 @@ class VendorStatus < ApplicationRecord
     %w( draft awaiting_approval retracted rejected approved auto_approved )
   end
 
+  scope :with_id, -> (ids) {
+    where id: ids
+  }
+
   def retracted?
     self.id == VendorStatus.id_for(:retracted)
   end

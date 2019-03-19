@@ -1,5 +1,4 @@
 class Vendors::Approve < Vendors::Base
-
   def process
     params[:document] = self.vendor
     params[:aasm_event] = 'approve'
@@ -14,6 +13,6 @@ class Vendors::Approve < Vendors::Base
   end
 
   def post_process
-    add_message :success, "Submitted vendor for approval"
+    add_message :success, "Approved Vendor"
   end
 end

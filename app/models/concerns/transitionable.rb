@@ -579,59 +579,56 @@ module Transitionable
         data
       end
     end
-
-
-
-  def role_based_admin_associated_items(user, role_id, options={})
-    if user.instance_of?(User)
-      if self.column_names.include? 'company_id'
-        self.where(company_id: user.company.id)
-      else
-        user_ids = user.company.users.pluck(:id)
-        self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+    def role_based_admin_associated_items(user, role_id, options={})
+      if user.instance_of?(User)
+        if self.column_names.include? 'company_id'
+          self.where(company_id: user.company.id)
+        else
+          user_ids = user.company.users.pluck(:id)
+          self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+        end
       end
     end
-  end
 
-  def role_based_initiator_associated_items(user, role_id, options={})
-    document_table_name = options[:document_table_name]
-    document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
-  end
+    def role_based_initiator_associated_items(user, role_id, options={})
+      document_table_name = options[:document_table_name]
+      document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
+    end
 
     def role_based_reviewer_associated_items(user, role_id, options={})
-        policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
-        # Get controlling level id from all documents
-        if self.column_names.include? 'company_id'
-          controlling_level_ids = self.where(company_id: user.company.id).pluck(:controlling_level_id).flatten.compact
-        else
-          # Models like Report doesn't has company_id attribute
-          user_ids = user.company.users.pluck(:id)
+      policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
+      # Get controlling level id from all documents
+      if self.column_names.include? 'company_id'
+        controlling_level_ids = self.where(company_id: user.company.id).pluck(:controlling_level_id).flatten.compact
+      else
+        # Models like Report doesn't has company_id attribute
+        user_ids = user.company.users.pluck(:id)
 
-          controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:controlling_level_id).flatten.compact
-        end
+        controlling_level_ids = self.where("#{self.document_owner_attribute} in (?)", user_ids).pluck(:controlling_level_id).flatten.compact
+      end
 
-        # Get all the documents without viewable
-        document_ids = DocumentLevelReviewerMapping.where(
-                                                       reviewer_id: user.id,
-                                                       document_reviewer_mappable_type: self.name,
-                                                       level_id: controlling_level_ids
-        ).pluck(:document_reviewer_mappable_id)
+      # Get all the documents without viewable
+      document_ids = DocumentLevelReviewerMapping.where(
+                                                     reviewer_id: user.id,
+                                                     document_reviewer_mappable_type: self.name,
+                                                     level_id: controlling_level_ids
+      ).pluck(:document_reviewer_mappable_id)
 
-        # Get all the documents where the user had previously interacted with
-        document_ids += DocumentLevelReviewerMapping.where(
-            reviewer_id: user.id,
-            document_reviewer_mappable_type: self.name,
-            viewable: true,
-        ).pluck(:document_reviewer_mappable_id)
+      # Get all the documents where the user had previously interacted with
+      document_ids += DocumentLevelReviewerMapping.where(
+          reviewer_id: user.id,
+          document_reviewer_mappable_type: self.name,
+          viewable: true,
+      ).pluck(:document_reviewer_mappable_id)
 
-        # Get all the taken control items for admin user
-        document_ids += DocumentLevelReviewerMapping.where(
-                                                        taken_control: true,
-                                                        document_reviewer_mappable_type: self.name,
-                                                        taken_control_by_id: user.id
-        ).pluck(:document_reviewer_mappable_id)
+      # Get all the taken control items for admin user
+      document_ids += DocumentLevelReviewerMapping.where(
+                                                      taken_control: true,
+                                                      document_reviewer_mappable_type: self.name,
+                                                      taken_control_by_id: user.id
+      ).pluck(:document_reviewer_mappable_id)
 
-        self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
+      self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
     end
 
     def role_based_creditor_associated_items(user, role_id, options={})

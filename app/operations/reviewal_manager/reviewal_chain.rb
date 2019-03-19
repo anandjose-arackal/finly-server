@@ -10,7 +10,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.provider_name = params[:provider_name] || self.document&.get_default_provider
     self.violations_present = !!params[:violations_present]
     self.chain = []
-    self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider )
+    self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider )
     policy_id = params[:policy_id]
 
     # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
@@ -42,8 +42,12 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       else
         mappings = level.level_reviewer_mappings.with_exception(violations_present).non_deleted
       end
-      selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
-      selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
+      if self.document.present?
+        selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
+        selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
+      else
+        selected_reviewer = nil
+      end
       level_data = {
           level_number: level.level_number,
           level_id: level.id,
