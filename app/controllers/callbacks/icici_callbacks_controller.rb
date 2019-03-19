@@ -1,14 +1,28 @@
-class IciciCallbacksController < BaseControllers::WebBase
+class Callbacks::IciciCallbacksController < ApplicationController
 
-  # this action will take in details of the transaction callback from ICICI bank and
-  # update the transactions in our DB accordingly
-  def transactions
+  # todo - add IP whitelisting to this API
 
-  end
-
-  # this action will take in details of every registration callback that we have from ICICI and
-  # update the same in our database
+  # this is the callback that will accept successful registrations and
+  # trigger whatever associated logic we have in our system
   def registrations
 
   end
+
+  # this is the callback that will accept successful transactions
+  # and trigger whatever associated logic we have wrt to the payment
+  def transactions
+    # for now just saving the details into a model - can later be changed to the operation
+    IciciTransactionCallback.create(
+                                AGGRNAME: params[:AGGRNAME],
+                                AGGRID: params[:AGGRID],
+                                URN: params[:URN],
+                                UNIQUEID: params[:UNIQUEID],
+                                REQUESTID: params[:REQUESTID],
+                                TXNSTATUS: params[:TXNSTATUS],
+                                UTRNUMBER: params[:UTRNUMBER],
+                                CORPID: params[:CORPID],
+                                USERID: params[:USERID]
+    )
+  end
+
 end

@@ -487,8 +487,10 @@
 #              admin_users_bank_transfers_get_bulk_status POST   /admin_users/bank_transfers/get_bulk_status(.:format)                                                               admin_users/bank_transfers#get_bulk_status
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                                           admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                                              admin_users/users#admin_menus
-#                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                                                  api/callbacks#successful_vendor_payment
-#                            api_invoice_payment_received POST   /api/callbacks/invoice_payment_received(.:format)                                                                   api/callbacks#invoice_payment_received
+#                               successful_vendor_payment POST   /callbacks/successful_vendor_payment(.:format)                                                                      callbacks/callbacks#successful_vendor_payment
+#                                invoice_payment_received POST   /callbacks/invoice_payment_received(.:format)                                                                       callbacks/callbacks#invoice_payment_received
+#                                     icici_registrations POST   /callbacks/icici_callbacks/registrations(.:format)                                                                  callbacks/icici_callbacks#registrations
+#                                      icici_transactions POST   /callbacks/icici_callbacks/transactions(.:format)                                                                   callbacks/icici_callbacks#transactions
 #                                                         GET    /virtual_accounts/:account_number(.:format)                                                                         api/fc/invoices/virtual_bank_accounts#show
 #                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                                         api/fc/invoices/virtual_bank_accounts#create
 #                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                                         api/fc/invoices/virtual_bank_accounts#update
@@ -499,6 +501,7 @@
 #                                                         GET    /invoices/customers/:id(.:format)                                                                                   api/fc/invoices/customers#show
 #                   api_vp_bank_transfer_initiate_payment POST   /api/vp/bank_transfer/initiate_payment(.:format)                                                                    api/vp/bank_transfer/bank_payment_requests#initiate_payment
 #                     api_vp_bank_transfer_payment_status GET    /api/vp/bank_transfer/payment_status/:id(.:format)                                                                  api/vp/bank_transfer/bank_payment_requests#payment_status
+#        api_vp_bank_transfer_payment_status_external_ref GET    /api/vp/bank_transfer/payment_status_by_external_id/:id(.:format)                                                   api/vp/bank_transfer/bank_payment_requests#payment_status_by_external_ref
 #              api_vp_bank_transfer_bulk_initiate_payment POST   /api/vp/bank_transfer/bulk_initiate_payment(.:format)                                                               api/vp/bank_transfer/bank_payment_requests#bulk_initiate_payment
 #        api_vp_bank_transfer_bank_payment_request_credit PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)                               api/vp/bank_transfer/bank_payment_requests#credit
 #        api_vp_bank_transfer_bank_payment_request_review PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)                               api/vp/bank_transfer/bank_payment_requests#review
@@ -535,6 +538,15 @@
 #                                                         PATCH  /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#update
 #                                                         PUT    /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#update
 #                                                         DELETE /api/vp/v1/bank_accounts/:id(.:format)                                                                              api/vp/v1/bank_accounts#destroy
+#                                      api_vp_v1_payments GET    /api/vp/v1/payments(.:format)                                                                                       api/vp/v1/payments#index
+#                                                         POST   /api/vp/v1/payments(.:format)                                                                                       api/vp/v1/payments#create
+#                                   new_api_vp_v1_payment GET    /api/vp/v1/payments/new(.:format)                                                                                   api/vp/v1/payments#new
+#                                  edit_api_vp_v1_payment GET    /api/vp/v1/payments/:id/edit(.:format)                                                                              api/vp/v1/payments#edit
+#                                       api_vp_v1_payment GET    /api/vp/v1/payments/:id(.:format)                                                                                   api/vp/v1/payments#show
+#                                                         PATCH  /api/vp/v1/payments/:id(.:format)                                                                                   api/vp/v1/payments#update
+#                                                         PUT    /api/vp/v1/payments/:id(.:format)                                                                                   api/vp/v1/payments#update
+#                                                         DELETE /api/vp/v1/payments/:id(.:format)                                                                                   api/vp/v1/payments#destroy
+#                                api_vp_v1_bank_transfers GET    /api/vp/v1/bank_transfers(.:format)                                                                                 api/vp/v1/payments#all_payments
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                                           api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                                                junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                                                users#menu_data
@@ -1577,6 +1589,8 @@
 #                                        procure_comments POST   /procure/comments(.:format)                                                                                         procure/comments#create
 #                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
 #                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
+#                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
+#                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
 #                       reviewal_levels_download_mappings GET    /reviewal_levels/download_mappings(.:format)                                                                        reviewal_levels#download_mappings
 #                                reviewal_level_reviewers GET    /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#index
 #                                                         POST   /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#create
@@ -2535,14 +2549,14 @@ Rails.application.routes.draw do
 
   ######### ADMIN PANEL END ###########
 
-  ################### API Callbacks Start ######################
+  ################### API Callbacks ######################
 
-    # the below two APIs are used for testing the API callback on successful vendor payment and other things
-  post 'callbacks/successful_vendor_payment', to: 'callbacks#successful_vendor_payment', as: :successful_vendor_payment
-  post 'callbacks/invoice_payment_received', to: 'callbacks#invoice_payment_received', as: :invoice_payment_received
+  post 'callbacks/successful_vendor_payment', to: 'callbacks/callbacks#successful_vendor_payment', as: :successful_vendor_payment
+  post 'callbacks/invoice_payment_received', to: 'callbacks/callbacks#invoice_payment_received', as: :invoice_payment_received
+  post 'callbacks/icici_callbacks/registrations', to: 'callbacks/icici_callbacks#registrations', as: :icici_registrations
+  post 'callbacks/icici_callbacks/transactions', to: 'callbacks/icici_callbacks#transactions', as: :icici_transactions
 
-  post 'icici_bank/transactions', to: 'icici_callbacks#transactions', as: :icici_transactions
-  post 'icici_bank/registrations', to: 'icici_callbacks#registrations', as: :icici_registrations
+  ################### API Callbacks ######################
 
   ############# Virtual Bank Accounts and Collect API Start ######################
 
@@ -2564,6 +2578,7 @@ Rails.application.routes.draw do
       namespace :bank_transfer do
         post 'initiate_payment', to: 'bank_payment_requests#initiate_payment', as: :initiate_payment
         get 'payment_status/:id', to: 'bank_payment_requests#payment_status', as: :payment_status
+        get 'payment_status_by_external_id/:id', to: 'bank_payment_requests#payment_status_by_external_ref', as: :payment_status_external_ref
         post 'bulk_initiate_payment', to: 'bank_payment_requests#bulk_initiate_payment', as: :bulk_initiate_payment
         resources :bank_payment_requests do
           patch 'credit', to: 'bank_payment_requests#credit', as: :credit
@@ -2575,6 +2590,8 @@ Rails.application.routes.draw do
         resources :inward_invoice_attachments
         patch 'bank_accounts/disable', to: 'bank_accounts#disable', as: :bank_account_disable
         resources :bank_accounts
+        resources :payments
+        get 'bank_transfers', to: 'payments#all_payments'
       end
       scope :vendors do
         post '', to: 'vendors#create'

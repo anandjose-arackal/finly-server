@@ -43,6 +43,13 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < BaseControllers::Ap
 
   # this action will take a particular payment ID and return the status of that particular payment
   def payment_status
+    params[:search_type] = 'id'
+    @result = BankTransfer::Payments::ApiPayments::GetPaymentStatus.(current_user, params)
+    respond
+  end
+
+  def payment_status_by_external_ref
+    params[:search_type] = 'external_id'
     @result = BankTransfer::Payments::ApiPayments::GetPaymentStatus.(current_user, params)
     respond
   end
