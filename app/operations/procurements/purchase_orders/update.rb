@@ -57,14 +57,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    # if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
-    #   add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
-    # end
-
-    # need to recheck this logic
-    unless self.purchase_order.updatable?# || user.vendor_payment_admin?
+    if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
       add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
     end
+
+    # need to recheck this logic
+    # unless self.purchase_order.updatable? # || user.vendor_payment_admin?
+    #   add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
+    # end
 
     if self.bank_account.blank?
       add_message :error, 'Please select the bank account of the vendor.'
@@ -81,7 +81,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         return
       end
       unless (Date.parse(self.purchase_order_params[:due_date]) >= Date.today)
-        add_message :error, 'Cannot create back dated payment tickets'
+        add_message :error, 'Cannot create back dated scheduled payments for advances.'
       end
     else
       self.purchase_order_params[:due_date] = nil

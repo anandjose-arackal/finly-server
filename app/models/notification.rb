@@ -419,7 +419,7 @@ class Notification < ApplicationRecord
         end
       when "Purchase Order"
         document = PurchaseOrder.unscoped.find_by(id: self.path_object_id)
-        if document.blank? && document&.procurement.blank?
+        if document.blank? || document&.procurement.blank?
         # if path_object.is_deleted?
           path = "procurements"
         else
@@ -429,7 +429,7 @@ class Notification < ApplicationRecord
         suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id},\"document_type\":\"purchase_order\",\"document_id\":#{document.id}"
       when 'Invoice'
         document = Invoice.unscoped.find_by(id: self.path_object_id)
-        if document.blank? && document&.procurement.blank?
+        if document.blank? || document&.procurement.blank?
           path = "procurements"
         else
           path = "procurements/#{document.procurement.id}"

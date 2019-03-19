@@ -5,7 +5,7 @@ json.results do
       json.id invoice.id
       json.controlling_user invoice.get_reviewers.first&.name
       json.procurement_id invoice.procurement_id || ""
-      json.created_at invoice.created_at
+      json.created_at invoice.created_at&.strftime("%d-%m-%Y")
       json.status_id invoice.invoice_status_id
       json.status_name invoice.invoice_status&.name&.humanize
       json.advance invoice.advance
@@ -22,9 +22,9 @@ json.results do
       json.advance_type_id invoice.advance_type_id
       json.advance invoice.advance
       json.freight_amount invoice.freight_amount&.value
-      json.date invoice.date
+      json.date invoice.date&.strftime("%d-%m-%Y")
       json.discount_type_id invoice.discount_type_id
-      json.due_date invoice.due_date
+      json.due_date invoice.due_date&.strftime("%d-%m-%Y")
       json.invoice_number invoice.invoice_number
       json.inclusive_of_taxes invoice.inclusive_of_taxes
       json.freight_amount invoice.freight_amount&.value
