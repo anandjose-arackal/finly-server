@@ -92,7 +92,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           tax: item.tax,
           discount: item.discount,
           rate: item.rate,
-          quantity: item.delivered,
+          quantity: item.accepted,
           hsn_sac: item.hsn_sac,
           description: item.description,
           gst_type_id: self.purchase_order.gst_type_id,
