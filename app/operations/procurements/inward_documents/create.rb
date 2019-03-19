@@ -24,6 +24,21 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     if self.purchase_order.closed?
       add_message :error, "This Purchase Order is closed. No further actions can be taken."
     end
+    if self.purchase_order.all_items_shipped?
+      add_message :error, "Cant add new GRN if previous GRN has all items shipped?"
+    end
+
+    if self.procurement.invoices.present?
+      inv_items = self.procurement.invoices.includes(:items)
+      self.inward_document.items.each do |item|
+        item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
+        if self.inward_document.items.pluck(:accepted).first < item_q.first.quantity
+          add_message :error, "Items in GRN cant be lower than items in Invoice"
+          break
+        end
+      end
+    end
+
   end
 
   def process
@@ -82,7 +97,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
         product_id: po_item.product_id,
         description: po_item.description,
         quantity: po_item.quantity,
-        previously_delivered: po_item.delivered,
+        previously_delivered: po_item.accepted,
         delivered: 0,
         accepted: 0,
         rejected: 0
