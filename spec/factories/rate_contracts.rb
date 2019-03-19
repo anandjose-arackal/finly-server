@@ -1,3 +1,21 @@
+# == Schema Information
+#
+# Table name: rate_contracts
+#
+#  id                      :bigint(8)        not null, primary key
+#  name                    :string(255)
+#  vendor_id               :integer
+#  renewable               :boolean
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  item_id                 :integer
+#  creator_id              :integer
+#  renewal_alert_number    :integer
+#  renewal_alert_period_id :integer
+#  note                    :string(255)
+#  company_id              :integer
+#
+
 FactoryBot.define do
   factory :rate_contract do
     name { "MyString" }

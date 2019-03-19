@@ -38,4 +38,8 @@ class VendorStatus < ApplicationRecord
   def rejected?
     self.id == VendorStatus.id_for(:rejected)
   end
+
+  def as_json
+    {id: id, name: name, display_name: name.split("_").map(&:capitalize).join(" ")}
+  end
 end

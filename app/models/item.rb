@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: inventory_line_items
+# Table name: items
 #
 #  id                  :integer          not null, primary key
 #  tax                 :decimal(20, 10)

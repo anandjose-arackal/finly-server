@@ -21,6 +21,10 @@ json.vendor do
   json.created_at @result.vendor.created_at.strftime "%b %d %yy"
 end
 json.id @result.vendor.id
+json.status do
+  json.id @result.vendor.status.id
+  json.name @result.vendor.status.name
+end
 json.bank_accounts do
   json.array!(@result.bank_accounts) do |bank_account|
     json.account_number bank_account.account_number
