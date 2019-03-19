@@ -9,6 +9,8 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
     BankAccount
   end
 
+  # this method will only initiate a payment in the net bank portal of ICICI, which will then need to be approved
+  # Once approved, the transaction will be executed and the UTR will be sent back to us using a callback request
   def credit(payment, options = {})
     super
     transfer_type = options[:bank_transfer_type]
@@ -44,10 +46,11 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       return false
     end
 
-    op = YesBankApi::Transfer::BankTransfer.({
-        transfer_request: transfer_request,
-        payment: payment
-    })
+    op = IciciBankApi::TransactionInitiate.(
+      transfer_request: transfer_request,
+      payment: payment
+    )
+
 
     # bank_transaction = op.bank_transaction
     bank_transaction = op.bank_transaction
@@ -128,11 +131,13 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
     bank_transaction = company.icici_bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
-                                                        transfer_type: transfer_request.transfer_type,
-                                                        bank_reference_number: transfer_request.bank_reference_number,
-                                                        beneficiary_bank_account: self.account,
+                                                        txn_type: transfer_request.transfer_type,
+                                                        receiving_account: self.account,
                                                         transfer_status_id: transfer_status_id,
                                                         bank_response: transfer_request.transaction_result,
+                                                        remarks: self.payment.note,
+                                                        customer_induced: "N",
+
                                                         amount_attributes: {
                                                             value: payment.amount_value,
                                                             currency_id: Currency.first.id

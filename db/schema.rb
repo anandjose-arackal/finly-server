@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_19_081100) do
+ActiveRecord::Schema.define(version: 2019_03_19_085439) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2744,6 +2744,8 @@ ActiveRecord::Schema.define(version: 2019_03_19_081100) do
     t.string "transfer_type"
     t.string "unique_request_number"
     t.string "utr"
+    t.integer "transfer_status_id"
+    t.integer "company_id"
   end
 
   create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

@@ -13,6 +13,6 @@ class BankTransactionType < ApplicationRecord
   include Seedable
 
   def self.values
-    [:yes_bank, :outside_finly]
+    [:yes_bank, :outside_finly, :icici_bank]
   end
 end

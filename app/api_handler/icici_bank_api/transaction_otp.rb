@@ -1,6 +1,7 @@
 class IciciBankApi::TransactionOtp < IciciBankApi::Base
 
 
+
   def post_params
     encrypt_params(
         AGGRID: self.company_details[:AGGR_ID],

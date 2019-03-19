@@ -22,6 +22,8 @@
 #  transfer_type         :string(255)
 #  unique_request_number :string(255)
 #  utr                   :string(255)
+#  transfer_status_id    :integer
+#  company_id            :integer
 #
 
 require 'rails_helper'
