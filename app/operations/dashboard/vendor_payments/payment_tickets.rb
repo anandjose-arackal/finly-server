@@ -83,7 +83,8 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
               title: "Total",
               count: apply_scopes(payment_tickets, {filter_user_id: user.id})&.count,
               filters: [
-                {filter_user_name: user.name}
+                {filter_user_name: user.name},
+                {filter_user_id: user.id}
               ]
             },
             {
@@ -91,7 +92,8 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
               count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status_id: BankPaymentRequestStatus.id_for(:processing)})&.count,
               filters: [
                 {filter_status_id: BankPaymentRequestStatus.id_for(:processing)},
-                {filter_user_name: user.name}
+                {filter_user_name: user.name},
+                {filter_user_id: user.id}
               ]
             },
             {
@@ -99,7 +101,8 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
               count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status_id: BankPaymentRequestStatus.id_for(:approved)})&.count,
               filters: [
                 {filter_status_id: BankPaymentRequestStatus.id_for(:approved)},
-                {filter_user_name: user.name}
+                {filter_user_name: user.name},
+                {filter_user_id: user.id}
               ]
             }
           ]
