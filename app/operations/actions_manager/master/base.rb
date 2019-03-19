@@ -1,7 +1,7 @@
 class ActionsManager::Master::Base
 
   cattr_accessor :data_map
-  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order, :inward_document
+  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order, :inward_document, :procurement
 
   MASTERS ||= {
     payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
@@ -28,6 +28,7 @@ class ActionsManager::Master::Base
     proc_payment_item_show: '::ActionsManager::Master::Procurements::PaymentItemShow',
     users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
     users_show: '::ActionsManager::Master::BankTransfer::Users::Show',
+    vp_role_config: '::ActionsManager::Master::PolicyUserRoles::RoleConfig',
     purchase_request_show: '::ActionsManager::Master::Procurements::PurchaseRequests::Show',
     purchase_request_index: '::ActionsManager::Master::Procurements::PurchaseRequests::Index'
 

@@ -4,11 +4,14 @@ class RateContract < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :item, optional: true, class_name: 'Item'
   belongs_to :renewal_alert_period, class_name: 'Period', foreign_key: :renewal_alert_period_id
-  
+  belongs_to :company, optional: true
   has_many :rate_contract_line_items, dependent: :destroy
   has_many :artifacts, as: :resource, dependent: :destroy
 
-  validates :renewal_alert_period, :renewal_alert_number, :vendor, presence: true
+  before_save :add_company
+
+  validates :renewal_alert_period, :renewal_alert_number, presence: true
+  validates :vendor, presence: true
 
   accepts_nested_attributes_for :rate_contract_line_items, allow_destroy: true
   accepts_nested_attributes_for :artifacts, allow_destroy: true
@@ -38,6 +41,22 @@ class RateContract < ApplicationRecord
       default_location_name: (rate_contract_line_items.where.not(location_id: nil).first.location.name rescue nil),
       locations_count: (rate_contract_line_items.pluck(:location_id).count rescue 0),
     }
+  end
+
+  def validate_if_owner?(user)
+    self.creator_id == user.id
+  end
+
+  def validate_if_manager?(user)
+    user.is_item_master_manager?
+  end
+
+  def validate_if_admin?(user)
+    user.admin?
+  end
+
+  def add_company
+    self.company_id = self.creator.company_id
   end
 
 end

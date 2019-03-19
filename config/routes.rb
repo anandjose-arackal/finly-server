@@ -2629,6 +2629,7 @@ Rails.application.routes.draw do
   get 'junk/show', to: 'junk#show'
 
   get 'menu_data', to: 'users#menu_data'
+  get 'nav_bar/config', to: 'nav_bar#show'
 
   # adding admin oauth token creation for admin login
   post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: {format: 'json'}
@@ -2645,6 +2646,7 @@ Rails.application.routes.draw do
   get 'policies/policy_members' => 'policies#policy_members'
   get 'policies/create_rule' => 'policies#create_rule'
   get 'policies/policy_member_settings/' => 'policies#policy_member_settings'
+  get 'policies/index_vp', to: 'policies#index_vp'
 
   get 'policies/details' => 'policies#details'
   get 'policies/personal' => 'policies#show_personal'
@@ -3166,6 +3168,7 @@ Rails.application.routes.draw do
   get 'non_po_action_config', to: 'procure/purchase_orders#actions_configuration'
   get 'procurement_action_config',to: 'procure/procurements#actions_configuration'
   get 'vp_user_action_config', to: 'bank_transfer/users#actions_configuration'
+  get 'policy_user_role_config', to: 'policy_user_roles#vp_role_config'
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'
@@ -3501,9 +3504,21 @@ Rails.application.routes.draw do
   resources :audit_trails, only: [:index]
   ### Audit Trails End ##
 
-  ######## Reviewal Workflow ##########
-  resources :policy_user_role_mappings
-  ######## Reviewal Workflow End ##########
+
+  ######## Dashboards ##################
+  namespace :dashboards do
+    get 'vp/configs', to: 'vendor_payments#configs'
+    get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
+    get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
+    get 'vp/po_invoices', to: 'vendor_payments#po_invoices'
+    get 'vp/non_po_invoices', to: 'vendor_payments#non_po_invoices'
+    get 'vp/po_advances', to: 'vendor_payments#po_advances'
+    get 'vp/grns', to: 'vendor_payments#grns'
+
+    get 'vp/budgets', to: 'vendor_payments#budgets'
+  end
+  ######## Dashbaord Ends ##############
+
 
   ######### Rate Contract API start #############
   resources :rate_contracts do

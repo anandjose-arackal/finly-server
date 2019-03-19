@@ -50,7 +50,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     # else
     #   self.payment_requests = user.bank_payment_requests
     # end
-
+    # ********* Workflow manager changes start ************************
     # role_ids = user.role_mapping.vendor_payments.pluck(:user_role_id)
     # payment_request_ids = []
     # if role_ids.include?(UserRole.id_for(:admin))
@@ -66,24 +66,45 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     #   payment_request_ids += user.bank_payment_requests.map(&:id)
     # end
 
-    role_ids = user.role_mapping.vendor_payments.pluck(:user_role_id)
-    payment_request_ids = []
-    if role_ids.include?(UserRole.id_for(:admin)) || role_ids.include?(UserRole.id_for(:auditor))
-      self.payment_requests = BankPaymentRequest.admin_associated_items(user).not_open.or(user.bank_payment_requests)
-    elsif role_ids.include?(UserRole.id_for(:reviewer)) || role_ids.include?(UserRole.id_for(:creditor))
-      if role_ids.include?(UserRole.id_for(:reviewer))
-        self.payment_requests = BankPaymentRequest.reviewer_associated_items(user).or(user.bank_payment_requests)
-      end
-      if role_ids.include?(UserRole.id_for(:creditor))
-        if self.payment_requests.present?
-          self.payment_requests = self.payment_requests.or(BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests))
-        else
-          self.payment_requests = BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests)
-        end
-      end
+    # role_ids = user.role_mapping.vendor_payments.pluck(:user_role_id)
+    # payment_request_ids = []
+    # if role_ids.include?(UserRole.id_for(:admin)) || role_ids.include?(UserRole.id_for(:auditor))
+    #   self.payment_requests = BankPaymentRequest.admin_associated_items(user).not_open.or(user.bank_payment_requests)
+    # elsif role_ids.include?(UserRole.id_for(:reviewer)) || role_ids.include?(UserRole.id_for(:creditor))
+    #   if role_ids.include?(UserRole.id_for(:reviewer))
+    #     self.payment_requests = BankPaymentRequest.reviewer_associated_items(user).or(user.bank_payment_requests)
+    #   end
+    #   if role_ids.include?(UserRole.id_for(:creditor))
+    #     if self.payment_requests.present?
+    #       self.payment_requests = self.payment_requests.or(BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests))
+    #     else
+    #       self.payment_requests = BankPaymentRequest.creditor_associated_items(user).or(user.bank_payment_requests)
+    #     end
+    #   end
+    # else
+    #   self.payment_requests = user.bank_payment_requests
+    # end
+
+    # self.payment_requests = BankPaymentRequest.role_based_associated_items(user)
+    
+    # ********* Workflow manager changes end ************************
+
+    # ****************** Policy User Role based index start ****************
+
+    if user.vendor_payments_admin?
+      self.payment_requests = ::BankPaymentRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin)).not_open.or(user.bank_payment_requests)
+      return
+    end
+
+    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
+      self.payment_requests = ::BankPaymentRequest.associated_items(user, ::BankPaymentRequest.roles)
     else
       self.payment_requests = user.bank_payment_requests
     end
+
+
+    # ******************Policy User Role based index end ******************* 
+    
 
     # self.payment_requests = BankPaymentRequest.with_id(payment_request_ids)
 
@@ -136,18 +157,21 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     # has_scope :filter_controlling_user
     has_scope :filter_payment_ids
     has_scope :filter_vendor_id
+    has_scope :filter_month
+    has_scope :filter_year
 
     def init
       self.payment_requests = params[:payment_requests]
       self.payment_requests = apply_scopes(payment_requests)
       per_page = params[:per_page] || 30
-      if self.payment_requests.present?
-        if personal_view?
-          self.payment_requests = self.payment_requests.order_by(:created_at)#.order_by(:controlling_user, user.id)
-        else
-          self.payment_requests = self.payment_requests.order_by(:submitted_at)#.order_by(:manager_controlling_user, user.id)
-        end
-      end
+      # if self.payment_requests.present?
+      #   if personal_view?
+      #     self.payment_requests = self.payment_requests.order_by(:created_at)#.order_by(:controlling_user, user.id)
+      #   else
+      #     self.payment_requests = self.payment_requests.order_by(:submitted_at)#.order_by(:manager_controlling_user, user.id)
+      #   end
+      # end
+      self.payment_requests.order_by(:submitted_at)
       self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page)
     end
 
@@ -158,6 +182,9 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
                   BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited) ]
       po_ids = [ PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
 
+      awaiting_ids = self.payment_requests.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      awaiting_approval = self.payment_requests.with_id(awaiting_ids).count
+
       # get raw count and then replace the id with its status name
       bpr = self.payment_requests.where(status_id: bpr_ids).group(:status_id).count
       bpr_name = {}
@@ -167,6 +194,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       po = self.payment_requests.joins(:payment_order).where('payment_orders.payment_order_status_id': po_ids).group(:payment_order_status_id).count      
       po_name = {}
       PaymentOrderStatus.all.each {|ps| if po.keys.include? ps.id then po_name[ps.name] = po[ps.id] end}
+      po_name[:awaiting_approval] = awaiting_approval || 0
 
       # merge
       bpr_name.reverse_merge(po_name)

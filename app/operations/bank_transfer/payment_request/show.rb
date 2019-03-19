@@ -14,14 +14,15 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
   def init
     id = params[:id] || params[:payment_request_id] || params[:bank_payment_request_id]
-    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
+    # self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
+    self.bank_payment_request = BankPaymentRequest.find_by_id id
   end
 
   def validate
-    if bank_payment_request.blank?
-      add_message :error, "Payment order not found"
-      return
-    end
+    # Check of bank_payment_request exists
+    return if record_not_present
+    # Validate if user is associated with the bank_payment_request
+    validate_association
   end
 
   def process
@@ -682,4 +683,53 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       actions
     end
   end
+
+  def validate_presence
+    if bank_payment_request.blank? || (bank_payment_request.company_id != user.company_id)
+      add_message :error, "Payment ticket not found!"
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_association
+    # Owner of document is allowed to access the bank_payment_request, no further validation required
+    return if bank_payment_request.validate_if_owner(user)
+    return if bank_payment_request.validate_if_admin(user)
+    return if  bank_payment_request.validate_if_reviewer(user)
+    add_message :error, 'Payment ticket not found!'
+    # raise_unauthorized_exception
+  end
+
+  # def validate_ownership
+  #   bank_payment_request.owner_id == user.id
+  # end
+
+  # def validate_if_admin
+  #   if !bank_payment_request.policy.blank?
+  #     bank_payment_request.policy.policy_user_roles.pluck(:user_role_id).include?(UserRole.id_for(:admin))
+  #   end
+  # end
+
+  # def validate_if_reviewer
+  #   if bank_payment_request.policy.present?
+  #     if bank_payment_request.document_level_reviewer_mappings.present?
+  #       bank_payment_request.document_level_reviewer_mappings.pluck(:reviewer_id).include?(user.id)
+  #     end
+  #   end
+  # end
+
+  # def validate_if_creditor
+  #   if bank_payment_request.policy.present?
+  #     if bank_payment_request.approved? || bank_payment_request.auto_approved?
+  #       if !bank_payment_request.policy.policy_user_roles.blank?
+  #         bank_payment_request.policy.policy_user_roles.pluck(:user_role_id).include?(UserRole.id_for(:bank_payment_request_creditor))
+  #       end
+  #     end
+  #   end
+  # end
 end

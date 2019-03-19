@@ -1,15 +1,23 @@
 class Procurements::Invoices::Update < Procurements::Invoices::Base
 
-  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
+  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision
 
   def init
     id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
-    # self.purchase_order = self.procurement.purchase_order
+    self.purchase_order = self.procurement.purchase_order
 
     invoice_id = params[:id] || params[:invoice_id]
     self.invoice = user.company.invoices.find_by(id: invoice_id)
     self.invoice_params = set_invoice_parameters
+
+    if self.procurement.po_revisions.present?
+      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+      self.po_revision = self.procurement.po_revisions.last
+      if po_revision.present?
+        self.purchase_order = self.po_revision
+      end
+    end
   end
 
   def validate
@@ -18,10 +26,10 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
       return
     end
 
-    # if self.purchase_order.blank?
-    #   add_message :error, "Purchase order not present"
-    #   return
-    # end
+    if self.purchase_order.blank?
+      add_message :error, "Purchase order not present"
+      return
+    end
 
     if self.invoice_params.blank?
       add_message :error, "Procurement or purchase order not present"

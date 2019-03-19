@@ -14,9 +14,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     id = params[:id] || params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
     self.purchase_order = self.procurement.purchase_order
-    self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
-    if po_revision.present?
-      self.purchase_order = self.po_revision
+    if self.procurement.po_revisions.present?
+      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+      self.po_revision = self.procurement.po_revisions.last
+      if po_revision.present?
+        self.purchase_order = self.po_revision
+      end
     end
     self.invoice_params = set_invoice_parameters
   end
@@ -89,7 +92,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           tax: item.tax,
           discount: item.discount,
           rate: item.rate,
-          quantity: item.quantity,
+          quantity: item.accepted,
           hsn_sac: item.hsn_sac,
           description: item.description,
           gst_type_id: self.purchase_order.gst_type_id,

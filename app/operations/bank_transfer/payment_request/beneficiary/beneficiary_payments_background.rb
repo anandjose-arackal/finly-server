@@ -69,33 +69,28 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
           api_initiated: true,
           beneficiary_payment_id: beneficiary_payment.id,
           parent_type: beneficiary_payment.class.name,
-          parent_id: beneficiary_payment.id
-          # invoice_attributes: {
-          #     category_id: payment[:category_id],
-          #     cost_center_id: payment[:cost_center_id],
-          #     inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
-          #     gst_type_id: payment[:gst_type_id],
-          #     tds_slab_id: payment[:tds_slab_id],
-          #     # 
-          #     # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
-          #     # 
-          #     # invoice_number: payment[:invoice_number],
-          #     # date: payment[:invoice_date],
-          #     # due_date: payment[:due_date],
-          #     tax: payment[:tax],
-          #     discount: payment[:discount],
-          #     invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
-          #     invoice_type_id: InwardInvoiceType.id_for(:beneficiary),
-          #     company_id: self.user.company_id,
-          #     original_amount_attributes: {
-          #         value: payment[:original_amount],
-          #         currency_id: 1
-          #     },
-          #     advance_amount_attributes: {
-          #       value: payment[:advance_amount],
-          #       currency_id: 1
-          #     }
-          # },
+          parent_id: beneficiary_payment.id,
+          invoice_attributes: {
+              category_id: payment[:category_id],
+              cost_center_id: payment[:cost_center_id],
+              inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
+              gst_type_id: payment[:gst_type_id],
+              tds_slab_id: payment[:tds_slab_id],
+              # 
+              # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
+              # 
+              # invoice_number: payment[:invoice_number],
+              # date: payment[:invoice_date],
+              # due_date: payment[:due_date],
+              tax: payment[:tax],
+              invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
+              invoice_type_id: InwardInvoiceType.id_for(:beneficiary),
+              company_id: self.user.company_id,
+              original_amount_attributes: {
+                  value: payment[:original_amount],
+                  currency_id: 1
+              }
+          }
           # custom_fields: payment[:custom_fields]
       }
     end
