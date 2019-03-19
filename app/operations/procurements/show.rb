@@ -6,6 +6,13 @@ class Procurements::Show < Procurements::Base
     self.procurement = user.company.procurements.find_by id: id
   end
 
+  def validate
+    if procurement.blank? || procurement.company_id != user.company_id
+      add_message :error, 'Record not found'
+      return
+    end
+  end
+
   def process
   end
 
@@ -17,7 +24,7 @@ class Procurements::Show < Procurements::Base
   class Procurements::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations,
                   :payment_terms, :bill_of_supplies, :delivery_challans, :vendor,
-                  :procurement_terms, :policies, :e_way_bills, :status_tags, :actions
+                  :procurement_terms, :policies, :e_way_bills, :status_tags, :actions, :po_revisions
 
     def init
       self.procurement = params[:procurement]
@@ -30,6 +37,7 @@ class Procurements::Show < Procurements::Base
       self.bill_of_supplies = self.procurement.bill_of_supplies
       self.delivery_challans = self.procurement.delivery_challans
       self.e_way_bills = self.procurement.e_way_bills
+      self.po_revisions = self.procurement.po_revisions
 
       self.procurement_trail = get_procurement_trail
       self.locations = user.company.locations
@@ -37,8 +45,8 @@ class Procurements::Show < Procurements::Base
       self.procurement_terms = user.company.procurement_terms
       self.status_tags = self.procurement.status_tags.reverse
       self.actions = get_actions
-
-      policies_op = Policy::Index.(user, view: params[:view])
+      params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:invoice_initiator), UserRole.id_for(:goods_receiver)]
+      policies_op = Policy::VendorPayments::Index.(user, params)
       if policies_op.success?
         self.policies = policies_op.policies
       end
@@ -47,8 +55,12 @@ class Procurements::Show < Procurements::Base
 
     def get_actions
       actions = {}
-      if purchase_order.present?
-        if (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)
+      if po_revisions.present?
+        if (po_revisions.last.approved? || po_revisions.last.auto_approved? || po_revisions.last.sent_to_vendor?) && (user_in_level? || document_owner?)
+          actions[:add_document] = true
+        end
+      elsif purchase_order.present?
+        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && (user_in_level? || document_owner?)
           actions[:add_document] = true
         end
       end
@@ -104,6 +116,7 @@ class Procurements::Show < Procurements::Base
       documents += self.bill_of_supplies
       documents += self.delivery_challans
       documents += self.e_way_bills
+      documents += self.po_revisions
 
       documents.sort_by!{ |doc| doc.created_at}.reverse!
       documents

@@ -179,6 +179,21 @@
       </div>
     </div>
   </div>
+  
+
+  <div class="col col-xs-12 notes-container mg-top-5">
+    <h4 class="section-title">Note to Vendor</h4>
+    <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
+      <% if @result.purchase_order.note.blank? %>
+        <%= simple_format "<i>Empty </i>", {}, wrapper_tag: "div" %>
+      <% else %>
+        <%= simple_format @result.purchase_order.note, {}, wrapper_tag: "div" %>
+      <% end %>
+    </div>
+  </div>
+
+
+
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
     <h4 class="section-title">Terms and Conditions</h4>
     <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
@@ -504,7 +519,7 @@
       color: #26C965 !important;
       -webkit-print-color-adjust: exact;
     }
-    .terms-and-conditions-container{
+    .terms-and-conditions-container, .notes-container{
       /*page-break-inside: avoid;*/
     }
     .fc-dark-red{

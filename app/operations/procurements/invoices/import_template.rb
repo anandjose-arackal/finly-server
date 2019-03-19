@@ -58,7 +58,7 @@ class Procurements::Invoices::ImportTemplate < Procurements::Invoices::Base
 
     ##################################################
     # Add Non PO items list
-    op = Invoicing::InventoryLineItem::Index.(user, {filter_item_type: [SupplyItemType.id_for(:non_po_item)]})
+    op = ItemMaster::Item::Index.(user, {filter_item_type: [SupplyItemType.id_for(:non_po_item)]})
     items = op.inventory_line_items
 
     item_headers = ["ID", "Description", "Category", "Rate", "Tax Rate", "Discount" "Note"]

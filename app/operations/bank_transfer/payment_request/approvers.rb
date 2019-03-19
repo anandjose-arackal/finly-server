@@ -80,9 +80,9 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
           action_id: trail.action_id,
           controlling_user: false,
           action_user: {
-              name: trail.action_user.name,
-              email: trail.action_user.email,
-              mobile_number: trail.action_user.mobile_number,
+              name: trail.action_user&.name,
+              email: trail.action_user&.email,
+              mobile_number: trail.action_user&.mobile_number,
           },
           role: {
               id: trail.action_user_role_id,
