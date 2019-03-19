@@ -14,15 +14,15 @@ end
 # 500request per 5minutes
 # 2000request per hour
 # 15000request per day
-Rack::Attack.throttle('Request/IP throttling-Minute', limit: 120, period: 1.minutes) do |req|
+Rack::Attack.throttle('Request/IP throttling - Minute', limit: 120, period: 1.minutes) do |req|
   req.ip
 end
 
-Rack::Attack.throttle('Request/IP throttling- 5 minutes', limit: 500, period: 5.minutes) do |req|
+Rack::Attack.throttle('Request/IP throttling - 5 minutes', limit: 500, period: 5.minutes) do |req|
   req.ip
 end
 
-Rack::Attack.throttle('Request/IP throttling- 1 hour', limit: 2000, period: 1.hour) do |req|
+Rack::Attack.throttle('Request/IP throttling - 1 hour', limit: 2000, period: 1.hour) do |req|
   req.ip
 end
 
@@ -32,32 +32,36 @@ end
 # Request Throttling End
 
 # Lookup Throttling Start
+# 3/6 seconds
 # 20/1 minute
 # 40/10 minutes
 # 60/100 minutes
 # 200/1000 minutes
 {
-    lookup: '/lookup',
-    token: '/token',
+    lookup: 'lookup',
+    token: 'token',
     send_otp: 'send_verification_otp',
     verify_otp: 'verify_user_otp',
     set_password: 'users/password'
 }.each do |key, pattern|
-
-  Rack::Attack.throttle('Lookup IP throttling - 1 minute', limit: 20, period: 1.minute) do |req|
-    req.ip
+  Rack::Attack.throttle("#{key} throttling - 6 seconds", limit: 3, period: 6.seconds) do |req|
+    req.ip if req.path.include?(pattern)
   end
 
-  Rack::Attack.throttle('Lookup IP throttling - 10 minute', limit: 40, period: 10.minute) do |req|
-    req.ip
+  Rack::Attack.throttle("#{key} throttling - 1 minute", limit: 20, period: 1.minute) do |req|
+    req.ip if req.path.include?(pattern)
   end
 
-  Rack::Attack.throttle('Lookup IP throttling - 10 minute', limit: 80, period: 100.minute) do |req|
-    req.ip
+  Rack::Attack.throttle("#{key} throttling - 10 minute", limit: 40, period: 10.minute) do |req|
+    req.ip if req.path.include?(pattern)
   end
 
-  Rack::Attack.throttle('Lookup IP throttling - 10 minute', limit: 200, period: 1000.minute) do |req|
-    req.ip
+  Rack::Attack.throttle("#{key} throttling - 100 minute", limit: 80, period: 100.minute) do |req|
+    req.ip if req.path.include?(pattern)
+  end
+
+  Rack::Attack.throttle("#{key} throttling - 1000 minute", limit: 200, period: 1000.minute) do |req|
+    req.ip if req.path.include?(pattern)
   end
 end
 # Lookup Throttling End
