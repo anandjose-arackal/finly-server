@@ -1,7 +1,7 @@
 class IciciBankApi::Balance < IciciBankApi::Base
 
   def icici_bank_action
-    'balance_inquiry'
+    'icici_bank_balance_inquiry'
   end
 
   def raw_api_params

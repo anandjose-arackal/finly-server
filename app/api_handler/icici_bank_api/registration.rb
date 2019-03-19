@@ -7,7 +7,7 @@ class IciciBankApi::Registration < IciciBankApi::Base
   end
 
   def icici_bank_action
-    'registration'
+    'icici_bank_registration'
   end
 
   def raw_api_params
@@ -25,6 +25,58 @@ class IciciBankApi::Registration < IciciBankApi::Base
     encrypt_params(
         raw_api_params
     )
+  end
+
+
+  def post_process
+    case self.response.status
+      when 404
+
+      when 500
+
+      when 200
+        self.parsed_response = JSON.parse(self.response.body)
+    end
+  end
+
+  def success?
+    self.parsed_response["Response"]&.upcase == "SUCCESS"
+  end
+
+  def failure?
+    if self.parsed_response["Response"]&.upcase == "FAILURE"
+      add_message :error, "Registration was not successful"
+    end
+  end
+
+  def success
+    IciciBankApi::Registration::RegistrationSuccessPresenter.new(params, messages)
+  end
+
+  def failure
+    IciciBankApi::Registration::RegistrationFailurePresenter.new(params, messages)
+  end
+
+  class IciciBankApi::Registration::RegistrationSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :transfer_request, :bank_transaction
+
+    def initialize(params, messages)
+      self.messages = messages
+      self.transfer_request = params[:transfer_request]
+      self.bank_transaction = params[:bank_transaction]
+    end
+  end
+
+  class IciciBankApi::Registration::RegistrationFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+
+    attr_accessor :transfer_request, :bank_transaction
+
+    def initialize(params, messages)
+      self.messages = messages
+      self.transfer_request = params[:transfer_request]
+      self.bank_transaction = params[:bank_transaction]
+    end
   end
 
 

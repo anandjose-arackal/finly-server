@@ -7,7 +7,7 @@ class IciciBankApi::TransactionStatus < IciciBankApi::Base
   end
 
   def icici_bank_action
-    'transaction_status'
+    'icici_bank_transaction_status'
   end
 
   def raw_api_params

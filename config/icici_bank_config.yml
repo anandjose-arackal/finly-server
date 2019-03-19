@@ -10,6 +10,7 @@ default: &default
   REQUEST_FROM: "AGTR"
   REQUEST_TYPE: "AGTXN"
   BANK_ID: "ICI"
+  API_KEY: "ANHYjh87hu14j"
 
 2: &sample
   AGGR_ID: "AGGR0059"
@@ -23,6 +24,7 @@ default: &default
   REQUEST_FROM: "AGTR"
   REQUEST_TYPE: "AGTXN"
   BANK_ID: "ICI"
+  API_KEY: "ANHYjh87hu14j"
 
 
 development:

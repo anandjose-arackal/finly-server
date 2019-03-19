@@ -131,7 +131,7 @@ class YesBankApi::Base < BaseHandler
       self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
       # create a failed bank transaction so that the record is preserved
       self.company = Company.find_by(id: self.transfer_request.company_id)
-      if self.payment&.reference_resource&.is_a?(BankTransaction)
+      if self.payment&.reference_resource&.is_a?(YesBankTransaction)
         # just update the bank transaction with the latest details
         self.bank_transaction = payment.reference_resource
         self.bank_transaction.update(

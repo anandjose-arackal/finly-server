@@ -29,12 +29,14 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def init
+    self.company = self.payment.company
+    super # so that the variables are initialized from the config file
     self.icici_bank_transaction = self.payment.reference_resource
     self.receiving_account = self.icici_bank_transaction.receiving_account
   end
 
   def icici_bank_action
-    'transaction_initiate'
+    'icici_bank_transaction_initiate'
   end
 
   def raw_api_params
@@ -68,7 +70,15 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   end
 
   def post_process
+    case self.response.status
+      when 404
 
+      when 500
+
+      when 200
+        self.parsed_response = JSON.parse(self.response.body)
+
+    end
   end
 
   def success?
@@ -82,16 +92,16 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
   def success
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
-    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params, messages)
+    IciciBankApi::TransactionInitiate::TransactionSuccessPresenter.new(params, messages)
   end
 
   def failure
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
-    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(params, messages)
+    IciciBankApi::TransactionInitiate::TransactionFailurePresenter.new(params, messages)
   end
 
-  class YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class IciciBankApi::TransactionInitiate::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :transfer_request, :bank_transaction
 
@@ -102,7 +112,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
     end
   end
 
-  class YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+  class IciciBankApi::TransactionInitiate::TransactionFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :transfer_request, :bank_transaction
 

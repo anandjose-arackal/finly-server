@@ -3,7 +3,7 @@ class IciciBankApi::Base < BaseHandler
   attr_accessor :company_details, :company
 
   def init
-    self.company = params[:company]
+    self.company = user.company if self.company.blank?
     if Rails.env.production?
       values = Finly::SecureStorage::Connector.read('core/icici_bank')
       type = self.company.id.to_s
@@ -25,12 +25,29 @@ class IciciBankApi::Base < BaseHandler
   def process
     p = self.path
     raw_params = raw_api_params
+    request_params = post_params
     # start of the path for posting data to ICICI's servers
     begin
 
       puts "Posting path: #{p}"
       puts "Post Params: #{raw_params}"
 
+      self.response = self.connection.post do |req|
+        req.url p
+        req.headers['accept'] = "*/*"
+        req.headers['content-type'] = "text/plain"
+        req.headers['apikey'] = self.company_details["API_KEY"]
+        req.headers['x-forwarded-for'] = "35.154.97.60" # todo - temporary, will be changed in production
+
+        req.body = request_params
+      end
+
+
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed
+      # handle this case by updating the bank transaction to possible failure and then checking the
+      # status of the transaction later using the TransactionCheck API call
+
+    rescue Faraday::ResourceNotFound
 
 
     end
@@ -38,7 +55,7 @@ class IciciBankApi::Base < BaseHandler
 
   protected
 
-  def load_connection
+  def load_connection(url = base_url)
     # adding the ssl options here for the request
     # verify certificate only in production
     # todo - need to check if we need to use SSL options in the request as well
