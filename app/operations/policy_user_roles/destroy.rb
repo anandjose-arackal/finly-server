@@ -4,7 +4,7 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
   def init
     id = params[:id] || params[:policy_user_role_id]
     self.policy_user_role = PolicyUserRoles::Index.(user, params).policy_user_roles.find_by(id: id) rescue nil
-    self.reviewer_type = params[:reviewer_type] || 'purchase_order_reviewer'
+    self.reviewer_type = params[:reviewer_type]
     self.policy = Policy.find_by_id params[:policy_id]
     self.destroy_user_id = PolicyUserRole.find_by_id(params[:id]).user_id
   end
