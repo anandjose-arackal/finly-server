@@ -39,9 +39,9 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
       self.counts = []
 
       if params[:action] == 'non_po_invoices'
-        invoice_type = 'non_po_invoices'
+        invoice_type = 'non_po_invoice'
       elsif params[:action] == 'po_invoices'
-        invoice_type = 'po_invoices'
+        invoice_type = 'po_invoice'
       else
         # nothin
       end
@@ -95,7 +95,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
             {
               title: "Total",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id})&.count,
-              filter: [
+              filters: [
                 {filter_invoice_type: invoice_type},
                 {filter_user: true}
               ]
@@ -103,7 +103,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
             {
               title: "Processing",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:processing)})&.count,
-              filter: [
+              filters: [
                 {filter_invoice_type: invoice_type},
                 {filter_user: true},
                 {filter_status: "processing"}
@@ -112,7 +112,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
             {
               title: "Approved",
               count: apply_scopes(invoices, {with_created_by_user_id: user.id, filter_status_id: InwardInvoiceStatus.id_for(:approved)})&.count,
-              filter: [
+              filters: [
                 {filter_invoice_type: invoice_type},
                 {filter_user: true},
                 {filter_status: "approved"}
