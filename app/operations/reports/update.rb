@@ -67,7 +67,7 @@ class Reports::Update < Reports::Base
       end
 
       # Update report DLRMs only when the owner does it
-      if self.report.user.id == user.id && params[:view] == 'personal'
+      if self.report.user.id == user.id && (params[:view].blank? || params[:view] == 'personal')
         # Create Document Level Reviewer Mapping
         # For setting level specific reviewers from reviewal chain for a document
         check_for_violations
