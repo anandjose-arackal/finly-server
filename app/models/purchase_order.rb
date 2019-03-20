@@ -604,7 +604,7 @@ class PurchaseOrder < ApplicationRecord
         elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
           statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :closed, :voided]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
+          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
         end
       end
     end

@@ -8,7 +8,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   def validate
     return if record_not_present
-    validate_association
+    validate_document_access
   end
 
   def success
@@ -188,12 +188,20 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     !validate_presence
   end
 
-  def validate_association
+  def validate_document_access
     # Validate of current user is owner of PO
     return if invoice.validate_if_owner(user)
     return if invoice.validate_if_admin(user)
     return if invoice.validate_if_reviewer(user)
+    # Jugaad because invoice show, po show, inward doc show.. all are on procurement show. So if one has access to one document , he will have access to all documents as all documents are being shown
+    return if validate_po_access
     raise_unauthorized_exception
+  end
+
+  def validate_po_access
+    po_params = params
+    po_params["id"] = invoice.procurement.purchase_order.id rescue nil
+    Procurements::PurchaseOrders::Show.(user, po_params).success? if po_params["id"].present?
   end
 
 end

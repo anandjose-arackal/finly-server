@@ -74,7 +74,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
         self.counts.push(admin_data)
       end
 
-      if user.vendor_payment_initiator?
+      if user.is_purchase_order_initiator?
         personal_data = {
           type: 'personal',
           data: [

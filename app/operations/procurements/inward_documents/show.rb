@@ -50,10 +50,17 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
     return if inward_document.validate_if_owner?(user)
     return if inward_document.validate_if_manager?(user)
     # As show page is consolidated, allow user to access this  page if he is allowed to access one or all document
-    return if purchase_order.validate_if_owner(user)
-    return if purchase_order.validate_if_admin(user)
-    return if purchase_order.validate_if_reviewer(user)
+    return if validate_po_access
+    # return if purchase_order.validate_if_owner(user)
+    # return if purchase_order.validate_if_admin(user)
+    # return if purchase_order.validate_if_reviewer(user)
     raise_unauthorized_exception
+  end
+
+  def validate_po_access
+    po_params = params
+    po_params["id"] = inward_document.procurement.purchase_order.id rescue nil
+    Procurements::PurchaseOrders::Show.(user, po_params).success? if po_params["id"].present?
   end
 
 end

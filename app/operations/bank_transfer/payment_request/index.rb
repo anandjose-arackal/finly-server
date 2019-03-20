@@ -91,15 +91,16 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     # ****************** Policy User Role based index start ****************
 
-    if user.vendor_payments_admin?
-      self.payment_requests = ::BankPaymentRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin)).not_open.or(user.bank_payment_requests)
+    if user.vp_admin_or_auditor?
+      admin_restricted_status_ids = [BankPaymentRequestStatus.id_for(:open)]
+      self.payment_requests = ::BankPaymentRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.bank_payment_requests)
       return
     end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.payment_requests = ::BankPaymentRequest.associated_items(user, ::BankPaymentRequest.roles)
     else
-      self.payment_requests = user.bank_payment_requests
+      self.payment_requests = BankPaymentRequest.none
     end
 
 

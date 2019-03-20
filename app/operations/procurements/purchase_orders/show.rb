@@ -7,7 +7,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   def validate
     return if record_not_present
-    validate_association
+    validate_document_access
   end
 
   def process
@@ -203,10 +203,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     !validate_presence
   end
 
-  def validate_association
+  def validate_document_access
     # Validate of current user is owner of PO
     return if purchase_order.validate_if_owner(user)
-    return if purchase_order.validate_if_admin(user)
+    return if purchase_order.validate_if_admin(user) && (!purchase_order.open? || purchase_order.user_id == user.id)
     return if purchase_order.validate_if_reviewer(user)
     raise_unauthorized_exception
   end

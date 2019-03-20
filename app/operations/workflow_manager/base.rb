@@ -96,7 +96,7 @@ class WorkflowManager::Base < BaseOperation
     # end
 
     if self.note.present?
-      self.trail.note += "\n#{self.note}"
+      self.trail.note = "\n#{self.note}"
     end
 
     self.trail.save
