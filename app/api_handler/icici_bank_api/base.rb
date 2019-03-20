@@ -19,11 +19,10 @@ class IciciBankApi::Base < BaseHandler
 
   def encrypt_params(params = {})
     json_params = params.to_json
-    # todo - check if this is the right file to use for encryption
-    # public_key = OpenSSL::PKey::RSA.new(File.read(Dir.home + '/certificates/cibnextapiuat.pem'))
-    # encrypted_params = Base64.encode64(public_key.public_encrypt(json_params))
-    # todo - temporary
-    encrypted_params = json_params
+    path = Dir.home + '/certificates/certificate_experiments/cibnextapiuat.pem'
+    cert = OpenSSL::X509::Certificate.new(File.read(path))
+    public_key = cert.public_key
+    encrypted_params = Base64.encode64(public_key.public_encrypt(json_params))
   end
 
   def process
