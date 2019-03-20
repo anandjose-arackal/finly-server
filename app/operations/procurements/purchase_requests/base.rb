@@ -9,13 +9,12 @@ class Procurements::PurchaseRequests::Base < BaseOperation
 
   def purchase_request_parameters
     params.require(:purchase_request).permit(
-      :id, :location_id, :vendor_id, :sub_department_id, :note, :title,
-        :policy_id, :department_id,        
-        line_items_attributes: [
-            :id, :delivery_date, :purpose, :delivery_location_id, :quantity, :vendor_id, :unit_type, unit_amount: [:value, :currency_id], inventory_line_item: [:id],
-            vendor: [:id, :name], estimated_amount: [:id, :value, :currency_id]
+      :id, :location_id, :department_id, :note, :description,
+        :policy_id,
+        purchase_request_items_attributes: [
+            :id, :item_id, :required_by_date, :purpose, :delivery_location_id, :quantity, :vendor_id, :_destroy, per_unit_estimated_amount_attributes: [:id, :value, :currency_id, :_destroy]
         ]
-        #policy: [:id, :name]
     )
   end
+
 end

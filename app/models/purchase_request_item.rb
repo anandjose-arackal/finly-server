@@ -15,15 +15,12 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
-  belongs_to :purchase_request
-  belongs_to :inventory_line_item, optional: true, class_name: 'Item'
-  belongs_to :unit_amount, optional: true, class_name: "Amount"
-  belongs_to :estimated_amount, optional: true, class_name: "Amount"
-
+  belongs_to :purchase_request, optional: true
+  belongs_to :item, optional: true
+  belongs_to :per_unit_estimated_amount, optional: true, class_name: "Amount", dependent: :destroy
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
 
-  accepts_nested_attributes_for :unit_amount, :estimated_amount
+  accepts_nested_attributes_for :per_unit_estimated_amount, allow_destroy: true
 
-  validates :inventory_line_item_id, presence: true
 end

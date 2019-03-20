@@ -10,14 +10,12 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   end
 
   def process
-    self.purchase_request = PurchaseRequest.new(self.purchase_request_params)
-    self.purchase_request.user = user
-    self.purchase_request.company = user.company
-
-    if self.purchase_request.save
-      self.purchase_request.update(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))
-    else
+    self.purchase_request = PurchaseRequest.new(purchase_request_params)
+    self.purchase_request.creator_id = user.id
+    unless self.purchase_request.save
+      # self.purchase_request.update(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))
       add_message :error, purchase_request.errors.full_messages
+      return
     end
 
   end

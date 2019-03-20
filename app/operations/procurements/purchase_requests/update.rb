@@ -3,7 +3,7 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   def init
     self.purchase_request_params = purchase_request_parameters
     pr_id = params[:id] || params[:purchase_request_id]
-    self.purchase_request = user.company.purchase_requests.find_by(id: pr_id)
+    # self.purchase_request = user.company.purchase_requests.find_by(id: pr_id)
 
   end
 

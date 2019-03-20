@@ -18,16 +18,21 @@ class PurchaseRequest < ApplicationRecord
 
   belongs_to :status, optional: true, class_name: "PurchaseRequestStatus", foreign_key: :purchase_request_status_id
   belongs_to :department, optional: true
-  belongs_to :location,optional: true, class_name: "BranchLocation"
-  belongs_to :policy
+  belongs_to :location, optional: true, class_name: "BranchLocation"
+  belongs_to :policy, optional: true
   belongs_to :company, optional: true
-
+  belongs_to :creator, optional: true, class_name: 'User'
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
-  has_many :line_items,class_name: "PurchaseOrderItem", dependent: :destroy
 
-  accepts_nested_attributes_for :line_items
-  # accepts_nested_attributes_for :policy
-  accepts_nested_attributes_for :department
-  accepts_nested_attributes_for :location
+  # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
+  has_many :purchase_request_items, dependent: :destroy
+
+  before_save :add_company
+
+  accepts_nested_attributes_for :purchase_request_items
+
+  def add_company
+    self.company_id = self.creator.company_id
+  end
 
 end
