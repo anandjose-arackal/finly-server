@@ -1,0 +1,2 @@
+class RequestImpression < ApplicationRecord
+end

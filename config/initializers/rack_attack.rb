@@ -32,6 +32,11 @@ end
 # Request Throttling End
 
 # Public-Sensitive Throttling Start
+# # Throttle Lookups
+# # Throttle ForgotPassword
+# # Throttle Send OTP
+# # Throttle Login
+
 # 3/6 seconds
 # 20/1 minute
 # 40/10 minutes
@@ -64,15 +69,12 @@ end
     req.ip if req.path.include?(pattern)
   end
 end
+
+
 # Public-Sensitive Throttling Start
 
 # Safelist API requests from known providers
-# Throttle Lookups
-# Throttle ForgotPassword
-# Throttle Send OTP
-# Throttle Login
 # Throttle Credit APIs -> Bulk + Individual + API
-# Throttle Requests per minute, 1 hour, 8 hours, 24 hours
 # Throttle Approve
 # Block Request without UserAgent for web requests
 #
