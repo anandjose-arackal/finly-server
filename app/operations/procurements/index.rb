@@ -6,8 +6,15 @@ class Procurements::Index < Procurements::Base
   end
 
   def process
+      # For grn index page, consider only inward document based procurement and it's PO
+      # if params[:filter_status_tags].present?
+      #   && ( [StatusTag.id_for(:receiving_shipment),  StatusTag.id_for(:shipment_received)].include?(params[:filter_status_tags]) )
+      #     && (user.is_goods_receiver? || user.vp_admin_or_auditor?)
+      #   self. procurements = user.company.procurements.joins(:inward_documents)&.distinct
+      # return
+      # end
 
-    if user.vendor_payments_admin?
+    if user.vp_admin_or_auditor?
       admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
       self.procurements = user.company.procurements.with_ids(::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids})&.pluck(:procurement_id)&.uniq).or(user.procurements)
       return
@@ -27,7 +34,8 @@ class Procurements::Index < Procurements::Base
         self.procurements = procurements.or(Procurement.where(id: user.company.inward_invoices.where(policy_id: policy_ids).with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)))
       end
     else
-      self.procurements = user.procurements
+      # Nullify
+      self.procurements = PurchaseOrder.none
     end
     # # Find trail user for invoice
 
