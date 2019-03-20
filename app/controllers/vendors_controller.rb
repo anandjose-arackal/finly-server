@@ -55,4 +55,9 @@ class VendorsController < ApplicationController
     @result = Vendors::ReturnControl.(current_user, params)
     respond
   end
+
+  def penny_test
+    @result = Vendors::PennyTest.(current_user, params)
+    respond
+  end
 end
