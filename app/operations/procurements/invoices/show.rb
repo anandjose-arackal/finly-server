@@ -36,7 +36,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       # policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
       params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
-      self.policies = Policy::VendorPayments::Index.(user, params).policies rescue Invoice.none
+      self.policies = Policy::VendorPayments::Index.(invoice.created_by, params).policies rescue Invoice.none
 
       self.reviewal_chains = []
 
