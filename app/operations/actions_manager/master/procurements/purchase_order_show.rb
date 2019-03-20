@@ -15,7 +15,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def mark_send_to_vendor
-    if purchase_order.is_reviewing_user?
+    if purchase_order.is_initiating_user? || user.vendor_payments_admin?
       (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
     end
   end
@@ -41,8 +41,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def send_mail
-    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
-
+    if purchase_order.is_initiating_user? || user.vendor_payments_admin?
+      (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
+    end
   end
 
   def export_items
@@ -100,8 +101,8 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def retract
     if purchase_order.is_initiating_user? || user.vendor_payments_admin?
-      if (procurement.invoices.blank? && procurement.inward_documents.blank?) && purchase_order.sent_to_vendor?
-        purchase_order.processing? &&
+      if (procurement.invoices.blank? && procurement.inward_documents.blank?) && !purchase_order.sent_to_vendor?
+        purchase_order.processing? || purchase_order.approved? || purchase_order.auto_approved?
         document_owner?
       end
     end
@@ -137,13 +138,18 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     # ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
     # (purchase_order.processing? && user_in_level?) ||
     # (user.vendor_payments_admin? && purchase_order.voided?)
-    ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )# || user.vendor_payments_admin?
+    if purchase_order.is_initiating_user?
+      ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )# || user.vendor_payments_admin?
+    end
   end
 
   def delete
     if purchase_order.is_initiating_user?
-      document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+      if document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+        return true
+      end
     end
+
   end
 
   def more_actions

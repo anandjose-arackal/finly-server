@@ -22,7 +22,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def send_mail
     if (invoice.approved? || invoice.auto_approved?)
-      (user.vendor_payments_admin? || document_owner?)
+      (user.vendor_payments_admin? || (document_owner? && invoice.is_initiating_user?))
     end
   end
 
@@ -32,11 +32,15 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def submit
-    document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
+    if invoice.is_initiating_user?
+      document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
+    end
   end
   
   def reject
-    invoice.processing? && user_in_level?
+    if (user.vendor_payments_admin? || invoice.is_reviewing_user?)
+      invoice.processing? && user_in_level?
+    end
   end
 
   def close
@@ -44,16 +48,22 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def approve
-    invoice.processing? && user_in_level?
+    if user.vendor_payments_admin? || invoice.is_reviewing_user?
+      invoice.processing? && user_in_level?
+    end
   end
 
   def remind
-    invoice.processing? &&
-    document_owner?
+    if invoice.is_initiating_user?
+      invoice.processing? &&
+      document_owner?
+    end
   end
 
   def retract
-    invoice.processing? && document_owner?
+    if invoice.is_initiating_user?
+      invoice.processing? && document_owner?
+    end
   end
 
   def remind_approver
