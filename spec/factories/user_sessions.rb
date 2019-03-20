@@ -40,7 +40,7 @@
 #  user_device_id   :integer
 #  client_type      :string(255)
 #  user_agent       :text(65535)
-#  user_ip_id       :integer          not null
+#  user_ip_id       :integer
 #
 
 FactoryBot.define do

@@ -13,6 +13,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  rule       :string(255)
+#  score      :integer          default(1), not null
 #
 
 class GatekeeperBlock < ApplicationRecord

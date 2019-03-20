@@ -7,12 +7,14 @@ class ApplicationController < ActionController::Base
   # include AbstractController::Callbacks
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
+  include Helpers::RequestImpressionHelper
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
   protect_from_forgery with: :null_session
   # before_action :set_paper_trail_whodunnit
 
+  around_action :save_request_impression
   before_action :finly_authorize!
 
   # before_action :load_global_variables

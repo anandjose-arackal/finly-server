@@ -3,9 +3,10 @@ class CreateRequestImpressions < ActiveRecord::Migration[5.2]
     create_table :request_impressions do |t|
       t.string :ip, null: false, index: true
       t.string :ip_type
+      t.string :user_agent, index: true
+      t.string :username, index: true
       t.integer :user_id, index: true, foreign_key: true, references: 'users'
       t.integer :company_id, index: true, foreign_key: true, references: 'companies'
-      t.string :username, index: true
       t.text :referrer
       t.string :referring_domain
       t.text :landing_page
@@ -34,8 +35,12 @@ class CreateRequestImpressions < ActiveRecord::Migration[5.2]
       t.boolean :blocked
       t.string :block_by
       t.string :block_reason
-      t.integer :response_code, index: true
-      t.integer :response_time, index: true
+      t.decimal :response_code, index: true
+      t.decimal :response_time, index: true
+      t.integer :user_session_id, index: true, foreign_key: true, references: 'user_sessions'
+      t.integer :access_token_id, references: 'oauth_access_tokens', index: true, foreign_key: true
+      t.integer :user_device_id, references: 'user_devices', index: true, foreign_key: true
+      t.integer :user_ip_id, references: 'user_ips', index: true, foreign_key: true
 
       t.timestamps
     end
