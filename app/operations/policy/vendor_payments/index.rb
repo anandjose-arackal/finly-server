@@ -18,7 +18,7 @@ class Policy::VendorPayments::Index < Policy::Base
       end
     else
       if user&.enforce_policy_enabled?
-        ids = user&.policy_user_roles.where.not(default: true).pluck(:policy_id)&.uniq
+        ids = user.company.policies.joins(:policy_user_roles).where.not(default: true).where('policy_user_roles.user_id = ?', user.id).pluck(:id)&.uniq
       else
         ids = user&.policy_user_roles.pluck(:policy_id)&.uniq
       end
