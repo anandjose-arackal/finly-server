@@ -220,6 +220,12 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_awaiting_approval, -> (enabled) {
+    if StringUtils.to_bool(enabled)
+      where(invoice_status_id: InwardInvoiceStatus.id_for(:processing))
+    end
+  }
+
   scope :filter_department_id, -> (ids) {
     where department_id: ids
   }

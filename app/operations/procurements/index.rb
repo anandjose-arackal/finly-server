@@ -84,7 +84,7 @@ class Procurements::Index < Procurements::Base
     attr_accessor :procurements, :paginated_procurements, :count
 
     has_scope :filter_status_tags, type: :array
-    has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number, :filter_doc_number
+    has_scope :filter_po_number, :filter_invoice_number, :filter_doc_number
     has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
     has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
     has_scope :filter_user, using: [:user_details, :user_id], type: :hash

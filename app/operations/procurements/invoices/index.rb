@@ -47,6 +47,7 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
     attr_accessor :invoices
 
     has_scope :filter_inward_invoice_type
+    has_scope :filter_awaiting_approval
 
     def init
       self.invoices = params[:invoices]

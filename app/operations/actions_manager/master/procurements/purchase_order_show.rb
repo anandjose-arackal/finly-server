@@ -2,7 +2,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   register_handle :proc_purchase_order_show
   validate :input
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove]
 
   def initialize(user=nil, params={})
     super
@@ -59,7 +59,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def close
-    (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && (user_in_level? || document_owner?)
+    unless purchase_order.procurement.invoices.blank? && purchase_order.procurement.inward_documents.blank?
+      (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && (user_in_level? || document_owner?)
+    end
   end
 
   def approve
@@ -74,7 +76,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def retract
     if (procurement.invoices.blank? && procurement.inward_documents.blank?)
-      purchase_order.processing? &&
+      (purchase_order.processing? || purchase_order.approved? || purchase_order.auto_approved? ) &&
       document_owner?
     end
   end
@@ -142,6 +144,37 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     true
   end
 
+  def unapprove
+    # if user_in_level? && last_level?
+    #   state = (user_in_level? && (final_reviewers.include? user.id)) ? false : true
+    # end
+
+    # if user_in_level?
+    #   state = (last_level? && (final_reviewers.include? user.id)) ? false : true
+    # else
+    #   previous_reviewer.include? user.id
+    # end
+
+    # if user_in_level?
+    #   if previous_reviewer.include? user.id
+    #     state = true
+    #   end
+    # end
+
+    unless purchase_order.approved?
+      if last_level?        
+        state = (previous_reviewer.include? user.id) ? true : false
+      else
+        previous_reviewer.include? user.id
+      end
+    end
+
+  end
+
+  def po_modifiable?
+    (procurement.invoices.blank? && procurement.inward_documents.blank?)
+  end
+
   def document_owner?
     purchase_order.user_id.eql?(user.id)
   end
@@ -150,6 +183,20 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     level = purchase_order.level
     amount = purchase_order.balance_amount.value rescue 0
     level.present? ? level.level_reviewer_mappings.non_deleted.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+  end
+
+  def final_reviewers
+    r_ids = purchase_order.get_reviewal_chain.last[:reviewers].pluck(:id)
+  end
+
+  def last_level?
+    if purchase_order.processing?
+      purchase_order.get_reviewal_chain&.last[:level_number] == purchase_order.level&.level_number
+    end
+  end
+
+  def previous_reviewer
+    purchase_order.get_reviewers('previous').pluck(:id)
   end
 
 end

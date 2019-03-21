@@ -55,8 +55,9 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
     end
 
     event :reopen do
-      transitions from: :closed, to: :auto_approved, guard: :user_is_admin?
-      transitions from: :closed, to: :approved
+      transitions from: :closed, to: :auto_approved, guard: :is_auto_approve?
+      transitions from: :closed, to: :approved, guard: :is_approve?
+      transitions from: :closed, to: :sent_to_vendor, guard: :is_send_to_vendor?
     end
 
     after_all_events :change_state
@@ -69,6 +70,27 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
   def user_is_admin?
     user.vendor_payment_admin?
   end
+
+  def previous_state
+    ps = self.document.trails.where(action_id: [5,7,33])
+    ps.last.action_id
+  end
+
+  def is_approve?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == 5 ) ? true : false
+  end
+
+  def is_auto_approve?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == 7 ) ? true : false
+  end
+
+  def is_send_to_vendor?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == 33 ) ? true : false
+  end
+
   #
   # # def set_state
   # #   aasm.current_state = self.po_state

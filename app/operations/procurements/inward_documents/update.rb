@@ -28,12 +28,23 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
+    unless self.inward_document.id == self.procurement.inward_documents.last.id
+      add_message :error, "Cant update old GRNs"
+      return
+    end
+
     inward_document_params[:items_attributes].each do |item|
       delivered = item[:delivered] || 0
       accepted = item[:accepted] || 0
       rejected = item[:rejected] || 0
 
       po_items = self.inward_document.items.find_by(id: item[:id])
+
+
+      if (po_items.quantity.to_f - po_items.previously_delivered.to_f) < delivered.to_f
+        add_message :error, "Previously deliverd cant be less than what is delivered now."
+        break
+      end 
 
       if delivered.to_f > po_items.quantity.to_f
         add_message :error, "Now Delivering cannot be more than the Requested Quantity"
@@ -97,6 +108,9 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+      # self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:closed))
+      params[:purchase_order_id] = self.purchase_order.id
+      Procurements::PurchaseOrders::Close.(current_user, params) if self.purchase_order.all_items_accepted?
     else
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
@@ -128,12 +142,18 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     delivered = purchase_order_item.delivered
 
     if item.changes.present?
+
       if item.changes[:delivered].present?
-        accepted = (accepted - item.changes[:delivered][0]) + item.changes[:delivered][1]
+        # Why the f*k was it like this before?
+        # donkey
+
+        # accepted = (accepted - item.changes[:delivered][0]) + item.changes[:delivered][1]
+        accepted = (accepted - item.changes[:accepted][0]) + item.changes[:accepted][1]
       end
 
       if item.changes[:accepted].present?
-        delivered = (delivered - item.changes[:accepted][0]) + item.changes[:accepted][1]
+        # delivered = (delivered - item.changes[:accepted][0]) + item.changes[:accepted][1]
+        delivered = (delivered - item.changes[:delivered][0]) + item.changes[:delivered][1]
       end
 
       if item.changes[:rejected].present?

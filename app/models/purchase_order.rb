@@ -281,6 +281,17 @@ class PurchaseOrder < ApplicationRecord
     shipped
   end
 
+  def all_items_accepted?
+    shipped = true
+    self.items.each do |item|
+      unless item.quantity == item.accepted
+        shipped = false
+        break
+      end
+    end
+    shipped
+  end
+
   def procurement_index_details
     {
         id: id,
