@@ -70,7 +70,7 @@ class RequestImpressions::Create < BaseOperation
     geo_ip = Geocoder.search(self.current_request.remote_ip)
     # geo_ip = Geocoder.search('106.51.71.232')
     geo_ip = geo_ip.first if geo_ip.respond_to?(:each)
-    data = geo_ip.data
+    data = geo_ip&.data
     args[:continent_name] = data&.dig('continent', 'names', 'en')
     args[:continent_code] = data&.dig('continent', 'code')
     args[:country_name] = data&.dig('country', 'names', 'en')

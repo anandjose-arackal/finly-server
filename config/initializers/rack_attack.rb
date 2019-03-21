@@ -1,5 +1,6 @@
 redis_config = Rails.application.config_for(:redis_config)
 redis_client = Redis.new({url: redis_config['url'], password: redis_config['password']})
+rack_attack_logger = LogStashLogger.new(type: :file, path: 'log/rack_attack_block.log', sync: true)
 Rack::Attack.cache.store = Rack::Attack::StoreProxy::RedisStoreProxy.new(redis_client)
 
 # unless Rails.env.production?
@@ -84,6 +85,8 @@ ActiveSupport::Notifications.subscribe('rack.attack') do |name, start, finish, r
       response_code: 429
   }
   RequestImpressions::OnRackAttackBlock.call_async(request, req.params)
+
+  rack_attack_logger.info request.merge({params: req.params})
 end
 
 
