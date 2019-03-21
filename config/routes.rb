@@ -2449,6 +2449,7 @@ Rails.application.routes.draw do
         end
         post 'funds/credit', to: 'funds#credit'
         post 'funds/debit', to: 'funds#debit'
+        get 'balances', to: 'users#balances'
         # post 'cards/request', to: 'cards#request'
       end
     end
