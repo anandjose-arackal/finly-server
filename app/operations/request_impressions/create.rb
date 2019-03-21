@@ -49,7 +49,7 @@ class RequestImpressions::Create < BaseOperation
   protected
 
   def enrich_username(args)
-    args[:username] = params[:username]
+    args[:username] = params[:username] || params[:email_mobile] || params[:email]
   end
 
   def enrich_request(args)

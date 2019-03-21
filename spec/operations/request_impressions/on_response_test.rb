@@ -89,8 +89,4 @@ RSpec.describe 'RequestImpressions::OnResponse' do
     end
   end
 
-  describe '> Rack Attack block' do
-
-  end
-
 end

@@ -73,7 +73,17 @@ end
 ActiveSupport::Notifications.subscribe('rack.attack') do |name, start, finish, request_id, req|
   next unless [:throttle, :blocklist].include?(req.env["rack.attack.match_type"])
 
-
+  request = {
+      referrer: req.referer,
+      ip: req.ip,
+      user_agent: req.user_agent,
+      langing_page: req.url,
+      http_method: req.request_method,
+      path: req.path,
+      block_reason: req.env["rack.attack.match_type"],
+      response_code: 429
+  }
+  RequestImpressions::OnRackAttackBlock.call_async(request, req.params)
 end
 
 
