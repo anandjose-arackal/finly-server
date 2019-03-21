@@ -115,6 +115,10 @@ class YesBankVendor < ApplicationRecord
     includes(:state_code, :bank_accounts)
   }
 
+  scope :include_details, -> {
+    includes(:status, :created_by, :bank_accounts)
+  }
+
   after_create do
     if self.vendor_account.blank?
       self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save

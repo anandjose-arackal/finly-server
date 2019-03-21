@@ -1,6 +1,11 @@
 class VendorsController < ApplicationController
   before_action -> { finly_authorize! :web }
 
+  def filter_config
+    @result = Vendors::FilterConfig.(current_user, params)
+    respond
+  end
+
   def index
     @result = Vendors::Index.(current_user, params)
     respond

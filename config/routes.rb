@@ -3473,6 +3473,7 @@ Rails.application.routes.draw do
 
   ######### New Vendor Empanelment ########
   get 'vendors/new_vendor_config', to: "vendors#new_vendor_config"
+  get 'vendors/filter_config', to: "vendors#filter_config"
   post 'vendors/submit', to: "vendors#submit"
   post 'vendors/penny_test', to: 'vendors#penny_test'
   resources :vendors do
