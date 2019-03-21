@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_21_123837) do
+
+ActiveRecord::Schema.define(version: 2019_03_21_013909) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -62,7 +63,7 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.datetime "updated_at", null: false
     t.boolean "trigger_email", default: false, null: false
     t.boolean "reviewer", default: false, null: false
-    t.integer "admin_user_id", null: false
+    t.integer "admin_user_id"
     t.datetime "email_triggered_at"
     t.index ["admin_review_workflow_id"], name: "index_admin_review_workflow_levels_on_admin_review_workflow_id"
     t.index ["position"], name: "index_admin_review_workflow_levels_on_position"
@@ -2208,6 +2209,62 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.index ["reviewer_id"], name: "index_document_level_reviewer_mappings_on_reviewer_id"
   end
 
+  create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "receiptable_document_id", null: false
+    t.string "receiptable_document_type", null: false
+    t.integer "document_message_id", null: false
+    t.datetime "browser_push_sent_at"
+    t.datetime "app_push_sent_at"
+    t.datetime "email_sent_at"
+    t.datetime "read_at"
+    t.datetime "trashed_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_push_sent_at"], name: "index_document_message_receipts_on_app_push_sent_at"
+    t.index ["browser_push_sent_at"], name: "index_document_message_receipts_on_browser_push_sent_at"
+    t.index ["deleted_at"], name: "index_document_message_receipts_on_deleted_at"
+    t.index ["document_message_id"], name: "index_document_message_receipts_on_document_message_id"
+    t.index ["email_sent_at"], name: "index_document_message_receipts_on_email_sent_at"
+    t.index ["read_at"], name: "index_document_message_receipts_on_read_at"
+    t.index ["receiptable_document_id"], name: "index_document_message_receipts_on_receiptable_document_id"
+    t.index ["receiptable_document_type"], name: "index_document_message_receipts_on_receiptable_document_type"
+    t.index ["trashed_at"], name: "index_document_message_receipts_on_trashed_at"
+    t.index ["user_id"], name: "index_document_message_receipts_on_user_id"
+  end
+
+  create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_document_message_types_on_name"
+  end
+
+  create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "order"
+    t.integer "user_id"
+    t.integer "type_id"
+    t.text "body"
+    t.string "attachment_file_name"
+    t.string "attachment_content_type"
+    t.bigint "attachment_file_size"
+    t.datetime "attachment_updated_at"
+    t.datetime "deleted_at"
+    t.datetime "trashed_at"
+    t.integer "messageable_document_id", null: false
+    t.string "messageable_document_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_document_messages_on_deleted_at"
+    t.index ["messageable_document_id"], name: "index_document_messages_on_messageable_document_id"
+    t.index ["messageable_document_type"], name: "index_document_messages_on_messageable_document_type"
+    t.index ["order"], name: "index_document_messages_on_order"
+    t.index ["trashed_at"], name: "index_document_messages_on_trashed_at"
+    t.index ["type_id"], name: "index_document_messages_on_type_id"
+    t.index ["user_id"], name: "index_document_messages_on_user_id"
+  end
+
   create_table "document_number_config_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -2714,6 +2771,22 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.index ["status_id"], name: "index_finly_transactions_on_status_id"
     t.index ["transaction_reference_id"], name: "index_finly_transactions_on_transaction_reference_id"
     t.index ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id"
+  end
+
+  create_table "gatekeeper_blocks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.text "params"
+    t.text "headers"
+    t.string "act"
+    t.string "premise"
+    t.string "verdict"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "rule"
+    t.integer "score", default: 1, null: false
+    t.index ["company_id"], name: "index_gatekeeper_blocks_on_company_id"
+    t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
 
   create_table "gst_state_codes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -3567,6 +3640,8 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.datetime "created_at", null: false
     t.string "scopes"
     t.string "previous_refresh_token", default: "", null: false
+    t.integer "status_id", default: 1
+    t.text "message"
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
@@ -3581,6 +3656,7 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.string "scopes", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "confidential", default: true, null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
@@ -4828,6 +4904,69 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
 
+  create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "ip", null: false
+    t.string "ip_type"
+    t.string "user_agent"
+    t.string "username"
+    t.integer "user_id"
+    t.integer "company_id"
+    t.text "referrer"
+    t.string "referring_domain"
+    t.text "landing_page"
+    t.string "app_version"
+    t.string "continent_name"
+    t.string "continent_code"
+    t.string "country_name"
+    t.string "country_code"
+    t.string "region_code"
+    t.string "region_name"
+    t.string "city"
+    t.string "zip"
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.string "utm_source"
+    t.string "utm_medium"
+    t.string "utm_term"
+    t.string "utm_content"
+    t.string "utm_campaign"
+    t.string "http_method", null: false
+    t.string "app"
+    t.string "path", null: false
+    t.string "controller"
+    t.string "action"
+    t.string "view"
+    t.boolean "blocked"
+    t.string "block_by"
+    t.string "block_reason"
+    t.decimal "response_code", precision: 10
+    t.decimal "response_time", precision: 10
+    t.integer "user_session_id"
+    t.integer "access_token_id"
+    t.integer "user_device_id"
+    t.integer "user_ip_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "accuracy_radius"
+    t.string "blocked_by"
+    t.index ["access_token_id"], name: "index_request_impressions_on_access_token_id"
+    t.index ["action"], name: "index_request_impressions_on_action"
+    t.index ["app"], name: "index_request_impressions_on_app"
+    t.index ["company_id"], name: "index_request_impressions_on_company_id"
+    t.index ["controller"], name: "index_request_impressions_on_controller"
+    t.index ["country_name"], name: "index_request_impressions_on_country_name"
+    t.index ["ip"], name: "index_request_impressions_on_ip"
+    t.index ["path"], name: "index_request_impressions_on_path"
+    t.index ["response_code"], name: "index_request_impressions_on_response_code"
+    t.index ["response_time"], name: "index_request_impressions_on_response_time"
+    t.index ["user_agent"], name: "index_request_impressions_on_user_agent"
+    t.index ["user_device_id"], name: "index_request_impressions_on_user_device_id"
+    t.index ["user_id"], name: "index_request_impressions_on_user_id"
+    t.index ["user_ip_id"], name: "index_request_impressions_on_user_ip_id"
+    t.index ["user_session_id"], name: "index_request_impressions_on_user_session_id"
+    t.index ["username"], name: "index_request_impressions_on_username"
+  end
+
   create_table "resource_requests", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -5012,83 +5151,6 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id"
-  end
-
-  create_table "tracker_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "tracker_visit_id", null: false
-    t.string "http_method"
-    t.string "app"
-    t.string "path"
-    t.string "controller", null: false
-    t.string "action", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "view"
-    t.index ["action"], name: "index_tracker_events_on_action"
-    t.index ["app"], name: "index_tracker_events_on_app"
-    t.index ["controller"], name: "index_tracker_events_on_controller"
-    t.index ["path"], name: "index_tracker_events_on_path"
-    t.index ["tracker_visit_id"], name: "index_tracker_events_on_tracker_visit_id"
-  end
-
-  create_table "tracker_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "company_id", null: false
-    t.string "app"
-    t.string "device"
-    t.string "view"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["app"], name: "index_tracker_notifications_on_app"
-    t.index ["company_id"], name: "index_tracker_notifications_on_company_id"
-    t.index ["device"], name: "index_tracker_notifications_on_device"
-    t.index ["user_id"], name: "index_tracker_notifications_on_user_id"
-    t.index ["view"], name: "index_tracker_notifications_on_view"
-  end
-
-  create_table "tracker_visits", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "company_id"
-    t.string "ip", null: false
-    t.string "ip_type"
-    t.string "user_agent"
-    t.text "referrer"
-    t.string "referring_domain"
-    t.text "landing_page"
-    t.string "device"
-    t.string "browser"
-    t.string "os"
-    t.string "os_version"
-    t.string "app_version"
-    t.string "device_type"
-    t.string "platform"
-    t.string "screen_height"
-    t.string "screen_width"
-    t.string "continent_name"
-    t.string "continent_code"
-    t.string "country_name"
-    t.string "country_code"
-    t.string "region_code"
-    t.string "region_name"
-    t.string "city"
-    t.string "zip"
-    t.decimal "latitude", precision: 20, scale: 10
-    t.decimal "longitude", precision: 20, scale: 10
-    t.string "utm_source"
-    t.string "utm_medium"
-    t.string "utm_term"
-    t.string "utm_content"
-    t.string "utm_campaign"
-    t.datetime "started_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["company_id"], name: "index_tracker_visits_on_company_id"
-    t.index ["device"], name: "index_tracker_visits_on_device"
-    t.index ["ip"], name: "index_tracker_visits_on_ip"
-    t.index ["latitude"], name: "index_tracker_visits_on_latitude"
-    t.index ["longitude"], name: "index_tracker_visits_on_longitude"
-    t.index ["started_at"], name: "index_tracker_visits_on_started_at"
-    t.index ["user_id"], name: "index_tracker_visits_on_user_id"
   end
 
   create_table "trail_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -5385,6 +5447,74 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.index ["user_id"], name: "index_user_department_mappings_on_user_id"
   end
 
+  create_table "user_device_browsers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "timestamp"
+    t.string "user_agent"
+    t.string "timezone"
+    t.string "fingerprint"
+    t.string "language"
+    t.string "system_language"
+    t.string "browser"
+    t.string "browser_version"
+    t.string "browser_engine"
+    t.string "browser_engine_version"
+    t.string "os_name"
+    t.string "os_version"
+    t.integer "screen_width"
+    t.integer "screen_height"
+    t.integer "device_x_dpi"
+    t.integer "device_y_dpi"
+    t.integer "color_depth"
+    t.boolean "java_enabled"
+    t.string "java_version"
+    t.boolean "flash_enabled"
+    t.string "flash_version"
+    t.boolean "silver_light_enabled"
+    t.string "silver_light_version"
+    t.boolean "is_mime_types"
+    t.string "mime_types_list"
+    t.text "fonts_list"
+    t.boolean "is_local_storage"
+    t.boolean "is_session_storage"
+    t.boolean "is_cookie"
+    t.text "plugins"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "is_mobile"
+    t.integer "status_id", null: false
+    t.text "message"
+  end
+
+  create_table "user_device_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_device_statuses_on_name"
+  end
+
+  create_table "user_devices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.string "fingerprint"
+    t.integer "status_id", null: false
+    t.string "verification_mode"
+    t.string "verification_key"
+    t.datetime "verification_code_sent_at"
+    t.datetime "verified_at"
+    t.integer "verification_code_count"
+    t.integer "verification_failed_attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "client_id"
+    t.string "client_type"
+    t.text "message"
+    t.index ["company_id"], name: "index_user_devices_on_company_id"
+    t.index ["fingerprint"], name: "index_user_devices_on_fingerprint"
+    t.index ["status_id"], name: "index_user_devices_on_status_id"
+    t.index ["user_id"], name: "index_user_devices_on_user_id"
+    t.index ["verification_mode"], name: "index_user_devices_on_verification_mode"
+  end
+
   create_table "user_group_item_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
     t.integer "user_group_item_id"
@@ -5417,6 +5547,33 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_user_groups_on_company_id"
     t.index ["name"], name: "index_user_groups_on_name"
+  end
+
+  create_table "user_ip_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_ip_statuses_on_name"
+  end
+
+  create_table "user_ips", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "ip", null: false
+    t.string "ip_type", null: false
+    t.integer "user_id", null: false
+    t.integer "status_id", null: false
+    t.string "verification_mode"
+    t.string "verification_key"
+    t.datetime "verification_code_sent_at"
+    t.datetime "verified_at"
+    t.integer "verification_code_count"
+    t.integer "verification_code_failed_attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ip"], name: "index_user_ips_on_ip"
+    t.index ["ip_type"], name: "index_user_ips_on_ip_type"
+    t.index ["status_id"], name: "index_user_ips_on_status_id"
+    t.index ["user_id"], name: "index_user_ips_on_user_id"
+    t.index ["verification_mode"], name: "index_user_ips_on_verification_mode"
   end
 
   create_table "user_login_tracks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5550,6 +5707,102 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "user_session_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "user_session_id", null: false
+    t.string "http_method"
+    t.string "app"
+    t.string "path"
+    t.string "controller", null: false
+    t.string "action", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "view"
+    t.integer "status_id"
+    t.string "message"
+    t.integer "response_code"
+    t.integer "current_resolution_height"
+    t.integer "current_resolution_width"
+    t.integer "mouse_pos_x"
+    t.integer "mouse_pos_y"
+    t.string "ip"
+    t.index ["action"], name: "index_user_session_events_on_action"
+    t.index ["app"], name: "index_user_session_events_on_app"
+    t.index ["controller"], name: "index_user_session_events_on_controller"
+    t.index ["path"], name: "index_user_session_events_on_path"
+    t.index ["user_session_id"], name: "index_user_session_events_on_user_session_id"
+  end
+
+  create_table "user_session_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "company_id", null: false
+    t.string "app"
+    t.string "device"
+    t.string "view"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status_id"
+    t.string "message"
+    t.index ["app"], name: "index_user_session_notifications_on_app"
+    t.index ["company_id"], name: "index_user_session_notifications_on_company_id"
+    t.index ["device"], name: "index_user_session_notifications_on_device"
+    t.index ["user_id"], name: "index_user_session_notifications_on_user_id"
+    t.index ["view"], name: "index_user_session_notifications_on_view"
+  end
+
+  create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_session_statuses_on_name"
+  end
+
+  create_table "user_sessions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.string "ip", null: false
+    t.string "ip_type"
+    t.text "referrer"
+    t.string "referring_domain"
+    t.text "landing_page"
+    t.string "app_version"
+    t.string "continent_name"
+    t.string "continent_code"
+    t.string "country_name"
+    t.string "country_code"
+    t.string "region_code"
+    t.string "region_name"
+    t.string "city"
+    t.string "zip"
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.string "utm_source"
+    t.string "utm_medium"
+    t.string "utm_term"
+    t.string "utm_content"
+    t.string "utm_campaign"
+    t.datetime "started_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "access_token_id"
+    t.datetime "last_request_at"
+    t.bigint "duration"
+    t.integer "status_id"
+    t.string "message"
+    t.string "login_username"
+    t.integer "accuracy_radius"
+    t.string "username"
+    t.integer "user_device_id"
+    t.string "client_type"
+    t.text "user_agent"
+    t.integer "user_ip_id"
+    t.index ["company_id"], name: "index_user_sessions_on_company_id"
+    t.index ["ip"], name: "index_user_sessions_on_ip"
+    t.index ["latitude"], name: "index_user_sessions_on_latitude"
+    t.index ["longitude"], name: "index_user_sessions_on_longitude"
+    t.index ["started_at"], name: "index_user_sessions_on_started_at"
+    t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
   create_table "user_tags", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5744,7 +5997,7 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
 
-  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
@@ -6264,8 +6517,6 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
   add_foreign_key "tax_rates", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
-  add_foreign_key "tracker_notifications", "companies"
-  add_foreign_key "tracker_notifications", "users"
   add_foreign_key "transaction_details", "amounts"
   add_foreign_key "transaction_details", "finly_transactions"
   add_foreign_key "transcribed_expenses", "amounts"
@@ -6304,6 +6555,8 @@ ActiveRecord::Schema.define(version: 2019_03_21_123837) do
   add_foreign_key "user_profiles", "users"
   add_foreign_key "user_role_mappings", "user_roles"
   add_foreign_key "user_role_mappings", "users"
+  add_foreign_key "user_session_notifications", "companies"
+  add_foreign_key "user_session_notifications", "users"
   add_foreign_key "user_tags", "users"
   add_foreign_key "user_team_group_item_mappings", "user_group_items"
   add_foreign_key "user_team_group_item_mappings", "user_groups"

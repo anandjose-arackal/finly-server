@@ -8,7 +8,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   def validate
     return if record_not_present
-    validate_association
+    validate_document_access
   end
 
   def success
@@ -36,7 +36,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       # policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
       params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
-      self.policies = Policy::VendorPayments::Index.(user, params).policies rescue Invoice.none
+      self.policies = Policy::VendorPayments::Index.(invoice.created_by, params).policies rescue Invoice.none
 
       self.reviewal_chains = []
 
@@ -188,12 +188,20 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     !validate_presence
   end
 
-  def validate_association
+  def validate_document_access
     # Validate of current user is owner of PO
     return if invoice.validate_if_owner(user)
     return if invoice.validate_if_admin(user)
     return if invoice.validate_if_reviewer(user)
+    # Jugaad because invoice show, po show, inward doc show.. all are on procurement show. So if one has access to one document , he will have access to all documents as all documents are being shown
+    return if validate_po_access
     raise_unauthorized_exception
+  end
+
+  def validate_po_access
+    po_params = params
+    po_params["id"] = invoice.procurement.purchase_order.id rescue nil
+    Procurements::PurchaseOrders::Show.(user, po_params).success? if po_params["id"].present?
   end
 
 end

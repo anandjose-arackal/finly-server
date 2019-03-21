@@ -3471,6 +3471,7 @@ Rails.application.routes.draw do
       put 'close', to: 'inward_invoices#close'
       post 'save_as_template', to: 'inward_invoices#template_create'
       post 'apply_template', to: 'inward_invoices#template_apply'
+      delete 'delete', to: 'inward_invoices#destroy'
     end
 
     resources :delivery_challans

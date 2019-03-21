@@ -10,13 +10,16 @@ class BankTransfer::Vendors::Index < BankTransfer::Vendors::Base
 
     def init
       self.vendors = params[:vendors]
-      self.vendors = apply_scopes(self.vendors, params)
+      unless params[:without_bank_accounts]
+        self.vendors = self.vendors.includes_bank_accounts
+      end
+      self.vendors = apply_scopes(self.vendors, params).paginate(page: params[:page], per_page: 30)
     end
 
   end
 
   def init
-    self.vendors = user.company.yes_bank_vendors.non_deleted.includes_bank_accounts
+    self.vendors = user.company.yes_bank_vendors.non_deleted
   end
 
   def success

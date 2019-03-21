@@ -6,9 +6,17 @@ class Procurements::Index < Procurements::Base
   end
 
   def process
+      # For grn index page, consider only inward document based procurement and it's PO
+      # if params[:filter_status_tags].present?
+      #   && ( [StatusTag.id_for(:receiving_shipment),  StatusTag.id_for(:shipment_received)].include?(params[:filter_status_tags]) )
+      #     && (user.is_goods_receiver? || user.vp_admin_or_auditor?)
+      #   self. procurements = user.company.procurements.joins(:inward_documents)&.distinct
+      # return
+      # end
 
-    if user.vendor_payments_admin?
-      self.procurements = user.company.procurements.with_ids(::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin))&.pluck(:procurement_id)&.uniq).or(user.procurements)
+    if user.vp_admin_or_auditor?
+      admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
+      self.procurements = user.company.procurements.with_ids(::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids})&.pluck(:procurement_id)&.uniq).or(user.procurements)
       return
     end
 
@@ -26,7 +34,8 @@ class Procurements::Index < Procurements::Base
         self.procurements = procurements.or(Procurement.where(id: user.company.inward_invoices.where(policy_id: policy_ids).with_procurement.with_status_id(invoice_status_ids).pluck(:procurement_id)))
       end
     else
-      self.procurements = user.procurements
+      # Nullify
+      self.procurements = PurchaseOrder.none
     end
     # # Find trail user for invoice
 
@@ -106,7 +115,7 @@ class Procurements::Index < Procurements::Base
     attr_accessor :procurements, :paginated_procurements, :count
 
     has_scope :filter_status_tags, type: :array
-    has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number, :filter_doc_number
+    has_scope :filter_po_number, :filter_invoice_number, :filter_doc_number
     has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
     has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
     has_scope :filter_user, using: [:user_details, :user_id], type: :hash

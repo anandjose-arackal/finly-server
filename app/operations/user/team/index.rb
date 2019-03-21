@@ -107,18 +107,21 @@ class User::Team::Index < User::Team::Base
         #
         # NEW CODE
         policy_ids = PolicyUserRole.with_user_id(user.id).with_role_id(role_id).pluck(:policy_id)
+        user_ids = PolicyUserMapping.non_deleted.where(policy_id: policy_ids).pluck(:user_id)
       when UserRole.manager_id
         # manager_association = :has_manager
         # approves_to_association = :has_approves_to
         # NEW CODE
         level_ids = LevelReviewerMapping.non_deleted.with_reviewer_id(user.id).pluck(:level_id)
-        level_ids += LevelUserReviewerMapping.with_reviewer_id(user.id).pluck(:level_id)
         policy_ids = ReviewalLevel.with_id(level_ids).pluck(:policy_id)
+        user_ids = PolicyUserMapping.non_deleted.where(policy_id: policy_ids).pluck(:user_id)
+        user_ids += LevelUserReviewerMapping.with_reviewer_id(user.id).pluck(:user_id)
       when UserRole.id_for(:travel_manager)
         # manager_association = :has_travel_manager
         #approves_to_association = :has_approves_travel_to
         # NEW CODE
         policy_ids = PolicyUserRole.with_user_id(user.id).with_role_id(role_id).pluck(:policy_id)
+        user_ids = PolicyUserMapping.non_deleted.where(policy_id: policy_ids).pluck(:user_id)
     else
       return
     end
@@ -133,7 +136,6 @@ class User::Team::Index < User::Team::Base
     # self.response = user.company.users.with_id(user_ids)
     #
     # NEW CODE
-    user_ids = PolicyUserMapping.non_deleted.where(policy_id: policy_ids).pluck(:user_id)
     user_ids.uniq! if user_ids.present?
     self.response = user.company.users.with_id(user_ids)
   end

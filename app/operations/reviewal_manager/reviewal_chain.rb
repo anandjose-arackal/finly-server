@@ -38,9 +38,9 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
 
     levels.each do |level|
       if level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).present?
-        mappings = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present)
+        mappings = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).includes(:reveiwer)
       else
-        mappings = level.level_reviewer_mappings.with_exception(violations_present).non_deleted
+        mappings = level.level_reviewer_mappings.with_exception(violations_present).non_deleted.includes(:reviewer)
       end
       if self.document.present?
         selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)

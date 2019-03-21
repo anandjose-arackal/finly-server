@@ -55,7 +55,10 @@ set :branch, ENV['BRANCH'] || :master
   when :migrated_test_2
     set :deploy_to, '/home/centos/app_3'
     set :rails_env, 'staging'
-end
+  when :uat
+    set :deploy_to, '/home/centos/app'
+    set :rails_env, 'staging'
+  end
 
 set :pty, false
 linked_files = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}

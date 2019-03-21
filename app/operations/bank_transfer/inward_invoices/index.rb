@@ -17,6 +17,8 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_status
     has_scope :filter_invoice_type
     has_scope :filter_po_number
+    has_scope :filter_awaiting_approval
+    has_scope :filter_inward_invoice_type
     has_scope :filter_user
     has_scope :filter_year
     has_scope :filter_month
@@ -47,12 +49,16 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
   attr_accessor :invoices
 
   def init
-    if user.vendor_payments_admin?
-      self.invoices = user.company.inward_invoices.non_beneficiary.created_at_desc
+    if user.vp_admin_or_auditor?
+      admin_restricted_status_ids = [InwardInvoiceStatus.id_for(:open)]
+      self.invoices = ::Invoice.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).not_open.or(user.inward_invoices)
+      self.invoices.not_open.non_beneficiary.created_at_desc
       return
     end
+
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.invoices  = ::Invoice.associated_items(user, ::Invoice.roles)
+      self.invoices = invoices.not_open.non_beneficiary.created_at_desc unless invoices.blank?
     end
   end
 

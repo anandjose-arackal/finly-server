@@ -6,7 +6,7 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
-                :vendor, :procurement, :bank_account, :original_purchase_order
+                :vendor, :procurement, :bank_account, :original_purchase_order, :department
 
  def init
     self.purchase_order_params = purchase_order_parameters
@@ -28,21 +28,19 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     vendor_id = params[:purchase_order][:vendor_id]
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
+
+    self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
   end
 
   def validate
-    unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found'
-      return
-    end
-
+    return if record_not_present
     if purchase_order.sent_to_vendor?
       add_message :error, "Cant update purchase order marked as 'sent to vendor'"
       return
     end
 
 
-    if (purchase_order.approved? || purchase_order.auto_approved?) && !user.vendor_payment_admin?
+    if (purchase_order.approved? || purchase_order.auto_approved?) && !user.vp_admin_or_auditor?
       add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
     end
 
@@ -55,6 +53,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       if self.purchase_order.policy.blank?
         add_message :error, 'Policy not found.'
       end
+    end
+
+    if self.department.blank?
+      add_message :error, "Please select a department"
     end
 
     if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
@@ -72,6 +74,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     end
 
     if self.purchase_order_params[:advance_amount_attributes][:value].present? && self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
+      if self.purchase_order_params[:advance_amount_attributes][:value].to_i > params[:purchase_order][:total_after_tax_attributes][:value].to_i
+        add_message :error, "Advance amount cant be more than Total amount"
+        return
+      end
       if self.purchase_order_params[:due_date].blank?
         add_message :error, 'Due date for the advance amount has not been set.'
       end
@@ -85,8 +91,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     else
       self.purchase_order_params[:due_date] = nil
-    end    
-
+    end
+    # Validate if user has access to PO show page    
+    validate_document_access
+    # Validate if user has access to PO update
+    validate_association
   end
 
   def pre_process
@@ -202,4 +211,28 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   def post_process
     add_message :success, 'Successfully updated purchase order'
   end
+
+  def validate_presence
+    unless self.purchase_order.present?
+      add_message :error, 'Purchase Order not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_document_access
+    Procurements::PurchaseOrders::Show.(user, params).success?
+  end
+
+  def validate_association
+    return if purchase_order.update_if_owner(user) if PurchaseOrderStatus.status_ids_for_owner.include?(purchase_order.purchase_order_status_id)
+    return if purchase_order.update_if_admin(user) unless PurchaseOrderStatus.status_ids_for_owner.include?(purchase_order.purchase_order_status_id)
+    return if purchase_order.update_if_reviewer(user) if PurchaseOrderStatus.status_ids_for_reviewer.include?(purchase_order.purchase_order_status_id)
+    add_message :error, 'Unable to update'
+  end
+
 end
