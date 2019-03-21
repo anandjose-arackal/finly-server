@@ -102,7 +102,7 @@ class MoneyRequests::Update < MoneyRequests::Base
       end
 
       # Update money_request DLRMs only when the owner does it
-      if money_request.user_id == user.id && params[:view] == 'personal' && money_request.travel_request.blank?
+      if money_request.user_id == user.id && (params[:view].blank? || params[:view] == 'personal') && money_request.travel_request.blank?
         # Create Document Level Reviewer Mapping
         # For setting level specific reviewers from reviewal chain for a document
         params[:reviewal_document] = self.money_request.reload
