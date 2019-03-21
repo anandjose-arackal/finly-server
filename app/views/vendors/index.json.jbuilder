@@ -6,6 +6,7 @@ json.result do
     json.vendor_id vendor&.vendor_id
 
     json.extract! vendor, :id, :name, :email, :mobile_number
+    json.policy vendor.policy.as_json
 
     json.status vendor.status.as_json
 

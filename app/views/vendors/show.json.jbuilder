@@ -20,10 +20,8 @@ json.vendor do
   end
   json.created_at @result.vendor.created_at.strftime "%b %d %yy"
 end
-json.id @result.vendor.id
 json.status do
-  json.id @result.vendor.status.id
-  json.name @result.vendor.status.name
+  json.merge! @result.vendor.status&.as_json
 end
 json.bank_accounts do
   json.array!(@result.bank_accounts) do |bank_account|
@@ -91,4 +89,10 @@ json.actions @result.actions
 
 json.custom_fields do
   json.array! @result.custom_fields
+end
+
+if @result.vendor.policy.present?
+  json.policy do 
+    json.extract! @result.vendor&.policy, :id, :name  
+  end
 end

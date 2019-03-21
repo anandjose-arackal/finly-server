@@ -119,6 +119,16 @@ class YesBankVendor < ApplicationRecord
     includes(:status, :created_by, :bank_accounts)
   }
 
+  # Scopes for ordering
+  scope :sort_business_name, -> (type) { ['asc', 'desc'].include?(type) ? reorder(business_name: type.to_sym) : reorder(business_name: :asc) }
+  scope :sort_vendor_id, -> (type) { ['asc', 'desc'].include?(type) ? reorder(vendor_id: type.to_sym) : reorder(vendor_id: :asc) }
+  scope :sort_business_name, -> (type) { ['asc', 'desc'].include?(type) ? reorder(business_name: type.to_sym) : reorder(business_name: :asc) }
+  scope :sort_business_name, -> (type) { ['asc', 'desc'].include?(type) ? reorder(business_name: type.to_sym) : reorder(business_name: :asc) }
+  scope :sort_business_name, -> (type) { ['asc', 'desc'].include?(type) ? reorder(business_name: type.to_sym) : reorder(business_name: :asc) }
+
+
+  # Scopes for ordering ends
+
   after_create do
     if self.vendor_account.blank?
       self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save

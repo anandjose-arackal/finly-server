@@ -8,6 +8,8 @@ class Vendors::Index < Vendors::Base
 
     has_scope :filter_name_search
 
+    has_scope :sort_vendor_id
+
     def init
       self.vendors = params[:vendors]
       self.vendors = apply_scopes(self.vendors, params)
