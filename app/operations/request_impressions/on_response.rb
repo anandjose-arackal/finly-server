@@ -1,13 +1,14 @@
 class RequestImpressions::OnResponse < BaseOperation
   attr_accessor :duration, :response
 
-  def self.call(duration, response)
-    self.new(duration, response).run
+  def self.call(duration, response, params)
+    self.new(duration, response, params).run
   end
 
-  def initialize(duration, response)
+  def initialize(duration, response, params)
     self.duration = duration
     self.response = response
+    self.params = params
   end
 
   def pre_validate
@@ -22,7 +23,7 @@ class RequestImpressions::OnResponse < BaseOperation
     block_reason = params[:block_reason]
     if blocked
       blocked_by = :rack_attack
-    else
+    elsif RequestStoreUtil.current_session.present?
       user_session = RequestStoreUtil.current_session
       if UserSessionStatus.ids_for(:revoked, :blocked, :failed, :expired).include?(user_session.status_id)
         blocked = true
@@ -34,11 +35,11 @@ class RequestImpressions::OnResponse < BaseOperation
     RequestStoreUtil.request_impression.update(
         {
             response_time: self.duration,
-            response_status: self.response&.status,
+            response_code: self.response&.status,
             user_id: RequestStoreUtil.current_user&.id,
             company_id: RequestStoreUtil.current_company&.id,
-            app: RequestStoreUtil.current_app,
-            view: RequestStoreUtil.current_view,
+            app: current_app,
+            view: current_view,
             blocked: blocked,
             blocked_by: blocked_by,
             block_reason: block_reason,

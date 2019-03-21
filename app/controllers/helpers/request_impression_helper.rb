@@ -6,12 +6,12 @@ module Helpers::RequestImpressionHelper
 
   def save_request_impression
     start = Time.now
-    RequestImpressions::Create.(params)
+    RequestImpressions::Create.(request, params)
     begin
       yield
     ensure
       duration = Time.now - start
-      RequestImpressions::OnResponse(duration, response)
+      RequestImpressions::OnResponse.(duration, response, params)
     end
   end
 

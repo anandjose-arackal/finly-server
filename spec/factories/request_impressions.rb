@@ -46,6 +46,14 @@
 
 FactoryBot.define do
   factory :request_impression do
-    
+    ip {Faker::Internet.ip_v4_address}
+    ip_type {'ipv4'}
+    user_agent {Faker::Internet.user_agent}
+    controller {'expenses'}
+    action {'index'}
+    view {'personal'}
+    app {'em'}
+    path {'/expenses'}
+    http_method {'get'}
   end
 end

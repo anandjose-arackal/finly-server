@@ -21,6 +21,7 @@ class CreateRequestImpressions < ActiveRecord::Migration[5.2]
       t.string :zip
       t.decimal :latitude, precision: 20, scale: 10
       t.decimal :longitude, precision: 20, scale: 10
+      t.integer :accuracy_radius
       t.string :utm_source
       t.string :utm_medium
       t.string :utm_term
@@ -32,9 +33,9 @@ class CreateRequestImpressions < ActiveRecord::Migration[5.2]
       t.string :controller, index: true
       t.string :action, index: true
       t.string :view
-      t.boolean :blocked
-      t.string :block_by
-      t.string :block_reason
+      t.boolean :blocked, index: true
+      t.string :block_by, index: true
+      t.string :block_reason, index: true
       t.decimal :response_code, index: true
       t.decimal :response_time, index: true
       t.integer :user_session_id, index: true, foreign_key: true, references: 'user_sessions'

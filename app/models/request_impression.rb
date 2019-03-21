@@ -45,4 +45,9 @@
 #
 
 class RequestImpression < ApplicationRecord
+
+  validates :ip, presence: true
+  validates :http_method, presence: true
+  validates :path, presence: true
+
 end

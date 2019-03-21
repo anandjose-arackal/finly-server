@@ -2,12 +2,12 @@ redis_config = Rails.application.config_for(:redis_config)
 redis_client = Redis.new({url: redis_config['url'], password: redis_config['password']})
 Rack::Attack.cache.store = Rack::Attack::StoreProxy::RedisStoreProxy.new(redis_client)
 
-unless Rails.env.production?
-  Rack::Attack.safelist('allow from localhost') do |req|
-    # Requests are allowed if the return value is truthy
-    '127.0.0.1' == req.ip || '::1' == req.ip
-  end
-end
+# unless Rails.env.production?
+#   Rack::Attack.safelist('allow from localhost') do |req|
+#     # Requests are allowed if the return value is truthy
+#     '127.0.0.1' == req.ip || '::1' == req.ip
+#   end
+# end
 
 # Request Throttling Start
 # 120rpm
@@ -68,6 +68,10 @@ end
   Rack::Attack.throttle("#{key} throttling - 1000 minute", limit: 200, period: 1000.minute) do |req|
     req.ip if req.path.include?(pattern)
   end
+end
+
+ActiveSupport::Notifications.subscribe('rack.attack') do |name, start, finish, request_id, req|
+  binding.pry
 end
 
 

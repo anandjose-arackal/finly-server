@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_16_060609) do
+ActiveRecord::Schema.define(version: 2019_03_19_155838) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -4832,6 +4832,67 @@ ActiveRecord::Schema.define(version: 2019_03_16_060609) do
     t.index ["report_processor_group_mapping_id"], name: "index_reports_on_report_processor_group_mapping_id"
     t.index ["report_status_id"], name: "index_reports_on_report_status_id"
     t.index ["user_id"], name: "index_reports_on_user_id"
+  end
+
+  create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "ip", null: false
+    t.string "ip_type"
+    t.string "user_agent"
+    t.string "username"
+    t.integer "user_id"
+    t.integer "company_id"
+    t.text "referrer"
+    t.string "referring_domain"
+    t.text "landing_page"
+    t.string "app_version"
+    t.string "continent_name"
+    t.string "continent_code"
+    t.string "country_name"
+    t.string "country_code"
+    t.string "region_code"
+    t.string "region_name"
+    t.string "city"
+    t.string "zip"
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.string "utm_source"
+    t.string "utm_medium"
+    t.string "utm_term"
+    t.string "utm_content"
+    t.string "utm_campaign"
+    t.string "http_method", null: false
+    t.string "app"
+    t.string "path", null: false
+    t.string "controller"
+    t.string "action"
+    t.string "view"
+    t.boolean "blocked"
+    t.string "block_by"
+    t.string "block_reason"
+    t.decimal "response_code", precision: 10
+    t.decimal "response_time", precision: 10
+    t.integer "user_session_id"
+    t.integer "access_token_id"
+    t.integer "user_device_id"
+    t.integer "user_ip_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["access_token_id"], name: "index_request_impressions_on_access_token_id"
+    t.index ["action"], name: "index_request_impressions_on_action"
+    t.index ["app"], name: "index_request_impressions_on_app"
+    t.index ["company_id"], name: "index_request_impressions_on_company_id"
+    t.index ["controller"], name: "index_request_impressions_on_controller"
+    t.index ["country_name"], name: "index_request_impressions_on_country_name"
+    t.index ["ip"], name: "index_request_impressions_on_ip"
+    t.index ["path"], name: "index_request_impressions_on_path"
+    t.index ["response_code"], name: "index_request_impressions_on_response_code"
+    t.index ["response_time"], name: "index_request_impressions_on_response_time"
+    t.index ["user_agent"], name: "index_request_impressions_on_user_agent"
+    t.index ["user_device_id"], name: "index_request_impressions_on_user_device_id"
+    t.index ["user_id"], name: "index_request_impressions_on_user_id"
+    t.index ["user_ip_id"], name: "index_request_impressions_on_user_ip_id"
+    t.index ["user_session_id"], name: "index_request_impressions_on_user_session_id"
+    t.index ["username"], name: "index_request_impressions_on_username"
   end
 
   create_table "resource_requests", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

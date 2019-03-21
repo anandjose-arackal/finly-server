@@ -1,5 +1,5 @@
 class RequestImpressions::Create < BaseOperation
-  attr_accessor :request_impression, :request
+  attr_accessor :request_impression, :current_request
 
   class RequestImpressions::Create::Success < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :request_impression
@@ -15,7 +15,7 @@ class RequestImpressions::Create < BaseOperation
   end
   
   def initialize(request, params)
-    self.request = request
+    self.current_request = request
     self.params = params
   end
 
@@ -28,6 +28,7 @@ class RequestImpressions::Create < BaseOperation
     enrich_username args
     enrich_request args
     enrich_geo_location args
+    set_event args
     return if has_errors?
     self.request_impression = RequestImpression.new args
     unless self.request_impression.valid?
