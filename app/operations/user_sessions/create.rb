@@ -69,6 +69,8 @@ class UserSessions::Create < BaseOperation
   end
 
   def post_process
+    self.user.update(last_activity_at: DateTime.now)
+
     RequestStoreUtil.set_current_user self.user
     RequestStoreUtil.set_current_session self.session
     RequestStoreUtil.set_current_event self.session.events.last

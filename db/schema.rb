@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_19_155838) do
+ActiveRecord::Schema.define(version: 2019_03_21_132616) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3126,8 +3126,10 @@ ActiveRecord::Schema.define(version: 2019_03_19_155838) do
     t.string "account"
     t.integer "supply_item_type_id"
     t.datetime "deleted_at"
+    t.integer "product_type", default: 1
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id"], name: "index_items_on_company_id"
+    t.index ["product_type"], name: "index_items_on_product_type"
     t.index ["supply_item_type_id"], name: "index_items_on_supply_item_type_id"
     t.index ["tax_rate_id"], name: "index_items_on_tax_rate_id"
   end
@@ -3639,6 +3641,15 @@ ActiveRecord::Schema.define(version: 2019_03_19_155838) do
     t.datetime "updated_at", null: false
     t.boolean "confidential", default: true, null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
+  end
+
+  create_table "old_passwords", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "encrypted_password", null: false
+    t.string "password_archivable_type", null: false
+    t.integer "password_archivable_id", null: false
+    t.string "password_salt"
+    t.datetime "created_at"
+    t.index ["password_archivable_type", "password_archivable_id"], name: "index_password_archivable"
   end
 
   create_table "opro_auth_grants", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4272,6 +4283,12 @@ ActiveRecord::Schema.define(version: 2019_03_19_155838) do
     t.string "prepaid_cards"
   end
 
+  create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "purchase_order_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "purchase_order_id"
     t.integer "inventory_line_item_id"
@@ -4877,6 +4894,8 @@ ActiveRecord::Schema.define(version: 2019_03_19_155838) do
     t.integer "user_ip_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "accuracy_radius"
+    t.string "blocked_by"
     t.index ["access_token_id"], name: "index_request_impressions_on_access_token_id"
     t.index ["action"], name: "index_request_impressions_on_action"
     t.index ["app"], name: "index_request_impressions_on_app"
@@ -5841,6 +5860,9 @@ ActiveRecord::Schema.define(version: 2019_03_19_155838) do
     t.boolean "delegation_enabled"
     t.text "gl_config"
     t.boolean "vacation_delegate_enabled"
+    t.datetime "password_changed_at"
+    t.datetime "last_activity_at"
+    t.datetime "expired_at"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

@@ -24,8 +24,9 @@ gem 'oj', '~> 3.7.6'
 
 # Firewall
 gem 'rack-attack', '5.4.2'
-gem 'zxcvbn-ruby', '0.1.2', require: 'zxcvbn'
-
+# gem 'zxcvbn-ruby', '0.1.2', require: 'zxcvbn'
+gem 'devise_zxcvbn', '4.4.1'
+gem 'devise-security', '0.13.0'
 # gem '-raven', '~> 2.8'
 
 gem 'health-monitor-rails', '~> 8.4.0'
