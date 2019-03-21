@@ -3,20 +3,22 @@ class Company::Departments::Index < Company::Departments::Base
   attr_accessor :departments
 
   class Company::Locations::Index::DepartmentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
     attr_accessor :departments
+
+    has_scope :filter_only_roots
 
     def init
       self.departments = params[:departments]
+      self.departments = apply_scopes(self.departments, params)
     end
   end
 
 
   def process
     if user.company_admin? || user.vendor_payment_admin?
-      self.departments = self.company.departments.roots
+      self.departments = self.company.departments
     else
-      self.departments = user.departments.roots
+      self.departments = user.departments
     end
   end
 

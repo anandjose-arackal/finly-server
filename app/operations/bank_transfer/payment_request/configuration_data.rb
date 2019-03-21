@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
   def init
     params[:departments] = Company::Departments::Index.(current_user, params)
     params[:categories] = Categories::Index.(current_user, params)
-    params[:policies] = Policy::Index.(current_user, params)
+    params[:policies] = Policy::VendorPayments::Index.(current_user, params)
     params[:cost_centers] = CostCenters::Index.(current_user, params)
     params[:tds_slabs] = TdsSlabs::Index.(current_user, params)
 

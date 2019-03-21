@@ -2,27 +2,28 @@ class Procure::ProcurementsController < ApplicationController
   before_action -> { finly_authorize! :web }
 
   def index
-    puts 'params from Procurements', params.inspect
-    puts "was it performed?", performed?
-
-    @result = Procurements::Index.(current_user, params)
+    if params['filter_procurement_type'] == 'purchase_order'
+      @result = Procurements::Index.(current_user,params)
+    elsif params['filter_procurement_type'] == 'non_po_invoice'
+      @result = Procurements::NonPoIndex.(current_user,params)
+    end
     respond
   end
 
   def grn_pending
     params[:filter_procurement_type] = "purchase_order"
     params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
-    @result = Procurements::Index.(current_user, params)
-
-    if @result.success?
-      respond_to do |format|
-        format.json {
-          render 'index'
-        }
-      end
-    else
-      respond response: :failure, message: @result.messages[:error] || 'Error while finding details. Please check the parameters sent.'
-    end
+    @result = Procurements::Grn::Pending::Index.(current_user, params)
+    respond
+    # if @result.success?
+    #   respond_to do |format|
+    #     format.json {
+    #       render 'index'
+    #     }
+    #   end
+    # else
+    #   respond response: :failure, message: @result.messages[:error] || 'Error while finding details. Please check the parameters sent.'
+    # end
 
   end
 
@@ -30,17 +31,17 @@ class Procure::ProcurementsController < ApplicationController
     params[:filter_procurement_type] = "purchase_order"
     params[:filter_status_tags] = [StatusTag.id_for(:shipment_received)]
 
-    @result = Procurements::Index.(current_user, params)
-
-    if @result.success?
-      respond_to do |format|
-        format.json {
-          render 'index'
-        }
-      end
-    else
-      respond response: :failure, message: @result.messages[:error] || 'Error while finding details. Please check the parameters sent.'
-    end
+    @result = Procurements::Grn::Received::Index.(current_user, params)
+    respond
+    # if @result.success?
+    #   respond_to do |format|
+    #     format.json {
+    #       render 'index'
+    #     }
+    #   end
+    # else
+    #   respond response: :failure, message: @result.messages[:error] || 'Error while finding details. Please check the parameters sent.'
+    # end
 
   end
 

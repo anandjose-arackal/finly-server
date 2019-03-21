@@ -115,7 +115,7 @@ class PurchaseOrder < ApplicationRecord
   # validates :policy_id, presence: true
   # validates :items, presence: true
   scope :document_number_generated_in_finly, -> {where override_po_number: [false, nil]}
-
+  scope :not_open, -> {where.not purchase_order_status_id: PurchaseOrderStatus.id_for(:open)}
   scope :with_id, -> (id) {where id: id}
   scope :with_user_id, -> (user_ids) {where user_id: user_ids}
   scope :with_status_ids, -> (status_ids) {where purchase_order_status_id: status_ids}
@@ -162,6 +162,10 @@ class PurchaseOrder < ApplicationRecord
     # ids = pluck(:id)
     # ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
     # where(id: ids)
+  }
+
+  scope :filter_status_id, -> (status_ids) {
+    with_status_ids(status_ids)
   }
 
   scope :filter_sub_department_id, -> (ids) {
@@ -217,6 +221,49 @@ class PurchaseOrder < ApplicationRecord
       where advance_amount_status_id: AdvanceAmountStatus.id_for(status_name)
     end
   }
+
+  scope :filter_awaiting_approval, -> (user=nil) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+    
+    if user_id.present?
+      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      with_id(ids)
+    end
+  }
+
+  scope :filter_user, -> (user=nil) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    elsif user.instance_of?(TrueClass)
+      user_id = RequestStore.store[:current_user]&.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+
+
+    if user_id.present?
+      filter_user_id(user_id)
+    end
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
+  }
+
 
   # These two filters created because two different indexes requires data to be handled differently by design
 
@@ -381,6 +428,18 @@ class PurchaseOrder < ApplicationRecord
   #   populate_advance_amount
   # end
 
+  # For user role as purchase order initiator
+  def is_initiating_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:purchase_order_initiator), self)
+  end
+
+  # For user role as purchase order reviewer
+  def is_reviewing_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
+  end
+
   
   private
 
@@ -537,4 +596,34 @@ class PurchaseOrder < ApplicationRecord
   def self.finance_associated_status_ids
     PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
   end
+
+  def self.roles
+    [:purchase_order_initiator, :purchase_order_reviewer]
+  end
+
+  def self.role_based_associated_status_ids(user)
+    # self.status_ids(self.role_based_statuses(user))
+    PurchaseOrderStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:purchase_order_initiator) == role_id.to_i)
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed]
+        elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
+          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :closed, :voided]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.initiator_associated_items(user, role_id)
+    PurchaseOrder.where(id: user.procurements&.joins(:purchase_order)&.pluck("purchase_orders.id"))
+  end
+
 end

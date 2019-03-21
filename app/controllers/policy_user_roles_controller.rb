@@ -20,4 +20,9 @@ class PolicyUserRolesController < ApplicationController
     @result = PolicyUserRoles::Destroy.(current_user, params)
     respond
   end
+
+  def vp_role_config
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
 end

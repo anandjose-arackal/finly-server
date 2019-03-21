@@ -175,6 +175,7 @@ class Invoice < ApplicationRecord
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) { where.not(id: id) }
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
+  scope :not_open, -> {where.not invoice_status_id: InwardInvoiceStatus.id_for(:open)}
   scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
   scope :with_controlling_user_id, -> (id) {where controlling_user_id: id}
   scope :with_procurement_id, ->(procurement_id) {where procurement_id: procurement_id}
@@ -291,6 +292,10 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_status_id, -> (ids) {
+    with_status_id(ids)
+  }
+
   scope :non_beneficiary, ->  {
     where(invoice_type_id: [InwardInvoiceType.id_for(:tax_invoice),
                             InwardInvoiceType.id_for(:advance),
@@ -323,6 +328,36 @@ class Invoice < ApplicationRecord
         includes( :amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
            :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
            :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount])#.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
+  }
+
+  scope :filter_user, -> (user=nil) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    elsif user.instance_of?(TrueClass)
+      user_id = RequestStore.store[:current_user]&.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+
+
+    if user_id.present?
+      with_created_by_user_id(user_id)
+    end
+  }
+
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
   }
 
   after_create :set_defaults
@@ -455,6 +490,11 @@ class Invoice < ApplicationRecord
     return (self.invoice_status_id == InwardInvoiceStatus.id_for(:partially_paid))
   end
 
+  def initiated?
+    return nil if self.invoice_status.blank?
+    return (self.invoice_status_id == InwardInvoiceStatus.id_for(:initiated))
+  end
+
   def procurement_index_details
     {
         id: id,
@@ -494,7 +534,7 @@ class Invoice < ApplicationRecord
       net_payable_amount: self.balance_due&.value,
       balance_due: self.balance_due&.value,
       taxable_amount: precision_value(self.gross_amount&.value),
-      editable: self.unpaid?,
+      editable: self.unpaid? || self.initiated?,
       tax_rate: precision_value(self.tax_rate),
       tds_rate: precision_value(self.tds_rate),
       discount_rate: precision_value(self.discount_rate),
@@ -527,6 +567,18 @@ class Invoice < ApplicationRecord
       paid_amount: payment_amounts_total, 
       remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total)
     }
+  end
+
+  # For user role as invoice initiator
+  def is_initiating_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:invoice_initiator), self)
+  end
+
+  # For user role as invoice reviewer
+  def is_reviewing_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
   end
 
   private
@@ -580,6 +632,31 @@ class Invoice < ApplicationRecord
 
   def self.finance_associated_status_ids
     InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
+  end
+
+  def self.role_based_associated_status_ids(user)
+    InwardInvoiceStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:invoice_initiator) == role_id.to_i)
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        elsif (UserRole.id_for(:invoice_reviewer) == role_id.to_i)
+          statuses += [:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:unpaid, :partially_paid, :paid, :open, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.roles
+    # [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
+    [:invoice_initiator, :invoice_reviewer]
   end
 
 end

@@ -1,7 +1,6 @@
 class ActionsManager::Master::BankTransfer::AccountOwners::VendorShow < ActionsManager::Master::Base
 
   register_handle :beneficiaries_vendor_show
-  validate :input
   register_actions [:delete_vendor, :add_bank_account, :edit_bank_account, :delete_bank_account, :edit_vendor_details, :edit_attachment, :create_beneficiaries]
 
   def initialize(user=nil, params={})

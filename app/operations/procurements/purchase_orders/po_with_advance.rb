@@ -42,7 +42,16 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
   end
 
   def init
-    self.purchase_orders = user.company.purchase_orders.filter_all_advances
+    if user.vp_admin_or_auditor?
+      admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
+      self.purchase_orders = PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}).or(user.purchase_orders)
+      return
+    end
+
+    unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
+      self.purchase_orders = PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles) rescue ::Procurement.none
+    end
+    
   end
 
   def validate
@@ -68,12 +77,13 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
     #     end
     # end
 
-    if self.purchase_orders.blank?
-      add_message :error, "Purchase order with advance amount still to be processed or failed, were not found."
-    end
+    # if self.purchase_orders.blank?
+    #   add_message :error, "Purchase order with advance amount still to be processed or failed, were not found."
+    # end
   end
 
   def process
+    self.purchase_orders = purchase_orders.filter_all_advances unless self.purchase_orders.blank?
     params[:purchase_order] = self.purchase_orders
   end
 
