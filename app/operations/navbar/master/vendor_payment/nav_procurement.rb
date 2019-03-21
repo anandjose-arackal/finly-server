@@ -81,7 +81,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_advances
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'PO Advances', id: 'payables', url: 'new_payment_po_advances'}
+    {name: 'PO Advances', id: 'payables', url: 'new_payment_po_advances/params={}'}
   end
 
   def po_invoices
@@ -100,12 +100,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage
-    {name: 'Manage', id: 'manage', url: 'beneficiaries'}
+    {name: 'Manage', id: 'manage', url: 'beneficiaries/params={}'}
   end
 
   def manage_vendors
     return nil unless user.is_vendor_manger? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vendor_payments_admin?
-    {name: 'Vendors', id: 'manage', url: 'beneficiaries'}
+    {name: 'Vendors', id: 'manage', url: 'beneficiaries/params={}'}
   end
 
   def manage_item_master
@@ -138,12 +138,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_payment_ticket
     return nil unless user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
-    {name: 'New Payment Ticket', id: 'create', url: 'new_payment_ticket'}
+    {name: 'New Payment Ticket', id: 'create', url: 'new_payment_ticket/params={}'}
   end
 
   def attachments
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'Attachments', id: 'attachments', url: 'attachments'}
+    {name: 'Attachments', id: 'attachments', url: 'attachments/params={}'}
   end
 
 end
