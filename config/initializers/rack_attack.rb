@@ -71,6 +71,16 @@ end
   end
 end
 
+# Do not allow requests without any user agent
+Rack::Attack.blocklist('Blocklist request without user agent') do |req|
+  # `filter` returns truthy value if request fails, or if it's from a previously banned IP
+  # so the request is blocked
+  Rack::Attack::Fail2Ban.filter("no_user_agent-#{req.ip}", maxretry: 1, findtime: 10.minutes, bantime: 1.hour) do
+    # The count for the IP is incremented if the return value is truthy
+    req.ip unless req.user_agent
+  end
+end
+
 ActiveSupport::Notifications.subscribe('rack.attack') do |name, start, finish, request_id, req|
   next unless [:throttle, :blocklist].include?(req.env["rack.attack.match_type"])
 
