@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_04_053710) do
+ActiveRecord::Schema.define(version: 2019_03_08_064158) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -907,7 +907,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.index ["budget_id"], name: "index_budget_modification_trails_on_budget_id"
   end
 
-  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
@@ -925,7 +925,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.index ["category_id"], name: "index_budget_rule_category_mappings_on_category_id"
   end
 
-  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "department_id", null: false
     t.datetime "created_at", null: false
@@ -934,7 +934,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.index ["department_id"], name: "index_budget_rule_department_mappings_on_department_id"
   end
 
-  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "expense_type_id", null: false
     t.datetime "created_at", null: false
@@ -2118,6 +2118,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.string "provider_name"
     t.decimal "threshold", precision: 20, scale: 5
     t.boolean "active", default: true
+    t.boolean "wo_exception", default: true
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
@@ -3104,24 +3105,26 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.integer "level_id"
     t.integer "reviewer_id"
     t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
-    t.boolean "exception", default: false
+    t.boolean "exception", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_reviewer_mappings_on_level_id"
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
 
-  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "level_id"
     t.integer "user_id"
     t.integer "reviewer_id"
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.decimal "threshold", precision: 20, scale: 5
-    t.boolean "exception", default: false
+    t.decimal "threshold", precision: 20, scale: 5, default: "0.0"
+    t.boolean "exception", default: true
+    t.boolean "wo_exception", default: true
     t.index ["level_id"], name: "index_level_user_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_level_user_reviewer_mappings_on_policy_id"
     t.index ["reviewer_id"], name: "index_level_user_reviewer_mappings_on_reviewer_id"
@@ -3944,6 +3947,14 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "booking_type_flight", default: true
+    t.boolean "booking_type_car_rental", default: true
+    t.boolean "booking_type_bus", default: true
+    t.boolean "booking_type_train", default: true
+    t.boolean "booking_type_hotel", default: true
+    t.boolean "booking_type_restaurant", default: true
+    t.boolean "booking_type_other", default: true
+    t.boolean "trips_money_request", default: true
     t.index ["default_tag_id"], name: "index_policy_configurations_on_default_tag_id"
     t.index ["policy_id"], name: "index_policy_configurations_on_policy_id"
     t.index ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id"
@@ -4158,6 +4169,8 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"
@@ -4218,8 +4231,6 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.string "template_name"
     t.integer "resource_template_id"
     t.datetime "deleted_at"
-    t.datetime "submitted_at"
-    t.datetime "approved_at"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
     t.index ["company_id"], name: "index_purchase_orders_on_company_id"
     t.index ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id"
@@ -5165,7 +5176,7 @@ ActiveRecord::Schema.define(version: 2019_03_04_053710) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
-  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
