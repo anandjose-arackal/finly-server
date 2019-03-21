@@ -28,11 +28,11 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
   end
 
   def dashboard
-    {name: 'Dashboard', id: 'dashboard', url: 'dashboard/params={}'}
+    {name: 'Dashboard', id: 'dashboard', url: 'dashboard'}
   end
 
   def payment_tickets
-    {name: 'Payment Tickets', id: 'payment_tickets', url: 'orders/params={}'}
+    {name: 'Payment Tickets', id: 'payment_tickets', url: 'orders'}
   end
 
   def vendors
