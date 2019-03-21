@@ -907,7 +907,7 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.index ["budget_id"], name: "index_budget_modification_trails_on_budget_id"
   end
 
-  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
@@ -925,7 +925,7 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.index ["category_id"], name: "index_budget_rule_category_mappings_on_category_id"
   end
 
-  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "department_id", null: false
     t.datetime "created_at", null: false
@@ -934,7 +934,7 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.index ["department_id"], name: "index_budget_rule_department_mappings_on_department_id"
   end
 
-  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "expense_type_id", null: false
     t.datetime "created_at", null: false
@@ -2647,20 +2647,6 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.index ["name"], name: "index_gst_types_on_name"
   end
 
-  create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "AGGRNAME"
-    t.string "AGGRID"
-    t.string "URN"
-    t.string "UNIQUEID"
-    t.string "REQUESTID"
-    t.string "TXNSTATUS"
-    t.string "UTRNUMBER"
-    t.string "CORPID"
-    t.string "USERID"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -3115,7 +3101,7 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
 
-  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "level_id"
     t.integer "user_id"
     t.integer "reviewer_id"
@@ -3508,7 +3494,6 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.string "scopes", default: "", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "confidential", default: true, null: false
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
@@ -4169,6 +4154,8 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"
@@ -4229,8 +4216,6 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.string "template_name"
     t.integer "resource_template_id"
     t.datetime "deleted_at"
-    t.datetime "submitted_at"
-    t.datetime "approved_at"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
     t.index ["company_id"], name: "index_purchase_orders_on_company_id"
     t.index ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id"
@@ -5176,7 +5161,7 @@ ActiveRecord::Schema.define(version: 2019_03_08_064158) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
-  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
