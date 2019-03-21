@@ -2252,6 +2252,10 @@ Rails.application.routes.draw do
   post 'collect/test_transaction', to: 'finly_collect#notify'
   ######### FINLY COLLECT END ###########
 
+  ######### ATTACHMENT START ############
+  resources :attachments
+  ######### ATTACHMENT END ##############
+
   ######### GEMS SPECIFIC START ###########
 
   # mount HealthMonitor::Engine, at: '/health/'
@@ -3396,8 +3400,8 @@ Rails.application.routes.draw do
   namespace :procure do
     get 'procurements/filter_config', to: "procurements#filter_config"
     get 'procurements/count', to: 'procurements#count'
-    get 'purchase_request_action_config', to: 'procurements#actions_configuration'
     resources :procurements do
+      get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
     end
 
     get 'grn_pending', to: 'procurements#grn_pending'
