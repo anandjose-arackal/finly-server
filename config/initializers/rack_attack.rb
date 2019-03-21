@@ -71,7 +71,9 @@ end
 end
 
 ActiveSupport::Notifications.subscribe('rack.attack') do |name, start, finish, request_id, req|
-  binding.pry
+  next unless [:throttle, :blocklist].include?(req.env["rack.attack.match_type"])
+
+
 end
 
 
