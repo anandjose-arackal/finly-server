@@ -6,7 +6,7 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
-                :vendor, :procurement, :bank_account, :original_purchase_order
+                :vendor, :procurement, :bank_account, :original_purchase_order, :department
 
  def init
     self.purchase_order_params = purchase_order_parameters
@@ -28,6 +28,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     vendor_id = params[:purchase_order][:vendor_id]
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
+
+    self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
   end
 
   def validate
@@ -57,6 +59,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
+    if self.department.blank?
+      add_message :error, "Please select a department"
+    end
+
     if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
       add_message :error, "Can't modify a purchase order which has a GRN or Invoice attached."
     end
@@ -72,6 +78,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     end
 
     if self.purchase_order_params[:advance_amount_attributes][:value].present? && self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
+      if self.purchase_order_params[:advance_amount_attributes][:value].to_i > params[:purchase_order][:total_after_tax_attributes][:value].to_i
+        add_message :error, "Advance amount cant be more than Total amount"
+        return
+      end
       if self.purchase_order_params[:due_date].blank?
         add_message :error, 'Due date for the advance amount has not been set.'
       end
