@@ -25,7 +25,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
 
   def validate
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
     end
 
     if self.purchase_order.closed?
