@@ -2,6 +2,7 @@ json.result do
   json.purchase_request do
     json.id @result.purchase_request.id
     json.description @result.purchase_request&.description
+    json.note @result.purchase_request&.note
     json.created_by do
       json.name @result.purchase_request.creator&.name
       json.created_at @result.purchase_request&.created_at&.to_date
