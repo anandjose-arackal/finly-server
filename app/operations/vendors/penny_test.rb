@@ -48,7 +48,7 @@ class Vendors::PennyTest < Vendors::Base
     if item =~ pattern
       return true
     else
-      return true    
+      return false
     end
   end
 
@@ -57,7 +57,7 @@ class Vendors::PennyTest < Vendors::Base
     if item =~ pattern
       return true
     else
-      return true    
+      return false
     end
   end
 end
