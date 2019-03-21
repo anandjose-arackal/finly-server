@@ -1,6 +1,6 @@
 class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
-  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
+  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision, :previous_invoices
 
   def personalizer
     {
@@ -14,6 +14,16 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     id = params[:id] || params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
     self.purchase_order = self.procurement.purchase_order
+    if self.procurement.po_revisions.present?
+      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+      self.po_revision = self.procurement.po_revisions.last
+      if po_revision.present?
+        self.purchase_order = self.po_revision
+      end
+    end
+
+    self.previous_invoices = (self.procurement.invoices.present?) ? self.procurement.invoices.includes(:items) : nil
+
     self.invoice_params = set_invoice_parameters
   end
 
@@ -78,14 +88,37 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     if self.procurement.blank? || self.purchase_order.blank?
       return nil
     end
+
     receiving_account = self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
     invoice_items_attributes = []
     self.purchase_order.items.each do |item|
+
+      real_q = 0
+
+      if self.previous_invoices.present?
+
+        # This query does not hit the DB.
+        # we sum preious invoices line item
+        # if that turns out to be zero, invoice for this item is not created
+        # awesome stuff.
+
+        it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
+        if it_cal == 0
+          next
+        else
+          real_q = item.accepted.to_i - it_cal.to_i
+        end
+      else
+        real_q = item.accepted.to_i
+      end
+
+     
       invoice_items_attributes << {
           tax: item.tax,
           discount: item.discount,
           rate: item.rate,
-          quantity: item.quantity,
+          # quantity: item.accepted,
+          quantity: real_q,
           hsn_sac: item.hsn_sac,
           description: item.description,
           gst_type_id: self.purchase_order.gst_type_id,
@@ -94,6 +127,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           tax_rate_id: item.tax_rate_id
       }
     end
+    
+    if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a GRN first." end
+    
     invoice_params = {
       vendor_id: self.purchase_order.vendor_id,
       invoice_status_id: ::InwardInvoiceStatus.id_for(:open),
@@ -115,3 +151,5 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     }
   end
 end
+
+

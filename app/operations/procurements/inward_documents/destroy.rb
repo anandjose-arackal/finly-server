@@ -12,11 +12,11 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
 
   def validate
     unless self.inward_document.present?
-      add_message :error, 'Inward Document not found'
+      add_message :error, 'GRN not found'
       return
     end
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
       return
     end
   end
@@ -52,7 +52,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
   end
 
   def post_process
-    add_message :success, 'Successfully updated Inward Document'
+    add_message :success, 'Successfully updated GRN'
   end
 
   private

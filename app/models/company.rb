@@ -38,7 +38,7 @@ class Company < ApplicationRecord
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
   has_many :bank_transactions
-  has_many :inventory_line_items
+  has_many :items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
   has_many :tax_rates
@@ -96,6 +96,7 @@ class Company < ApplicationRecord
 
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
+  has_many :bank_payment_requests
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

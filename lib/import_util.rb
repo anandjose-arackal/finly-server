@@ -34,6 +34,7 @@ class ImportUtil
     header_length = header.length
 
     list = []
+    return if sheet.last_row.nil?
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       map = {}

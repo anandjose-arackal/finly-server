@@ -3,6 +3,7 @@ class Procurements::Create < Procurements::Base
 
   def init
     self.procurement_params = procurement_parameters
+    puts "PROCUREMENTS from init params", params.inspect
   end
 
   def validate
@@ -11,7 +12,7 @@ class Procurements::Create < Procurements::Base
       return
     end
 
-    unless user.vendor_payment_initiator?
+    unless user.is_purchase_order_initiator?
       add_message :error, "You do not have permission for this action"
     end
 

@@ -55,7 +55,10 @@ set :branch, ENV['BRANCH'] || :master
   when :migrated_test_2
     set :deploy_to, '/home/centos/app_3'
     set :rails_env, 'staging'
-end
+  when :uat
+    set :deploy_to, '/home/centos/app'
+    set :rails_env, 'staging'
+  end
 
 set :pty, false
 linked_files = %w{
@@ -71,6 +74,8 @@ when :itzcash_production, :aws_production, :background_production
   linked_files << 'config/sidekiq.yml'
   linked_files << 'config/elastic_apm.yml'
   # linked_files << "config/sentry.yml"
+when :development_3, :migrated_test, :migrated_test_2
+  linked_files << "config/sidekiq.yml"
 end
 set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}

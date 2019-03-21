@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
-                :id_current_attachments
+                :id_current_attachments, :po_revision, :inv_items
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -8,15 +8,30 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.inward_document = procurement.inward_documents.find_by id: inward_document_id
     self.inward_document_params = inward_document_parameters
     self.purchase_order = self.procurement&.purchase_order
+
+    if self.procurement.po_revisions.present?
+      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+      self.po_revision = self.procurement.po_revisions.last
+      if po_revision.present?
+        self.purchase_order = self.po_revision
+      end
+    end
+
+    
   end
 
   def validate
     unless self.inward_document.present?
-      add_message :error, 'Inward Document not found'
+      add_message :error, 'GRN not found'
       return
     end
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
+      return
+    end
+
+    unless self.inward_document.id == self.procurement.inward_documents.last.id
+      add_message :error, 'You cannot modify the selected GRN'
       return
     end
 
@@ -25,9 +40,34 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       accepted = item[:accepted] || 0
       rejected = item[:rejected] || 0
 
-      unless delivered.to_f == accepted.to_f + rejected.to_f
-        add_message :error, "Accepted & Rejected quantity does't match with delivered quantity"
+      po_items = self.inward_document.items.find_by(id: item[:id])
+
+
+      if (po_items.quantity.to_f - po_items.previously_delivered.to_f) < delivered.to_f
+        add_message :error, 'You cannot add additional GRN for the follow item'
         break
+      end 
+
+      if delivered.to_f > po_items.quantity.to_f
+        add_message :error, 'Now Delivering cannot be more than the Requested Quantity'
+        break
+      end
+
+
+      unless delivered.to_f == accepted.to_f + rejected.to_f
+        add_message :error, 'Accepted & Rejected quantity does not match with delivered quantity'
+        break
+      end
+    end
+
+    if self.procurement.invoices.present?
+      inv_items = self.procurement.invoices.includes(:items)
+      self.inward_document.items.each do |item|
+        item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
+        if self.inward_document.items.pluck(:accepted).first < item_q.first.quantity
+          add_message :error, 'Items in GRN cannot be reduced as they have already been invoiced'
+          break
+        end
       end
     end
 
@@ -81,6 +121,9 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+      # self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:closed))
+      params[:purchase_order_id] = self.purchase_order.id
+      Procurements::PurchaseOrders::Close.(current_user, params) if self.purchase_order.all_items_accepted?
     else
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
@@ -91,7 +134,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
     end
 
-    add_message :success, 'Successfully updated Inward Document'
+    add_message :success, 'Successfully updated GRN'
   end
 
   private
@@ -112,12 +155,18 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     delivered = purchase_order_item.delivered
 
     if item.changes.present?
+
       if item.changes[:delivered].present?
-        accepted = (accepted - item.changes[:delivered][0]) + item.changes[:delivered][1]
+        # Why the f*k was it like this before?
+        # donkey
+
+        # accepted = (accepted - item.changes[:delivered][0]) + item.changes[:delivered][1]
+        accepted = (accepted - item.changes[:accepted][0]) + item.changes[:accepted][1]
       end
 
       if item.changes[:accepted].present?
-        delivered = (delivered - item.changes[:accepted][0]) + item.changes[:accepted][1]
+        # delivered = (delivered - item.changes[:accepted][0]) + item.changes[:accepted][1]
+        delivered = (delivered - item.changes[:delivered][0]) + item.changes[:delivered][1]
       end
 
       if item.changes[:rejected].present?

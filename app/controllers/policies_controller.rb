@@ -13,8 +13,16 @@ class PoliciesController < BaseControllers::WebBase
     respond
   end
 
+  # To be used by systems where policy user role is not used
   def index
     @result = Policy::Index.(current_user, view: params[:view])
+    respond
+  end
+
+  # Temporary action as exepense management is not currently using policy user roles and vendor payment is using policy based user roles
+  # This action filters policy on the basis of user roles
+  def index_vp
+    @result = Policy::VendorPayments::Index.(current_user, params[:filter_role_id])
     respond
   end
 

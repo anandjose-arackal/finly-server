@@ -32,6 +32,7 @@ class Procurement < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
   has_one :purchase_order, dependent: :destroy
+  has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy
   has_many :bill_of_supplies, dependent: :destroy
@@ -76,6 +77,20 @@ class Procurement < ApplicationRecord
     where id: filtered_ids
   }
 
+  scope :filter_doc_number, -> (doc_number) {
+    filtered_ids = InwardDocument.filter_doc_number(doc_number).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
+  scope :filter_delivery_date, -> (delivery_date) {
+    date = Date.parse(delivery_date) rescue nil
+
+    if date
+      filtered_ids = InwardDocument.filter_delivery_date(date).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_invoice_serial, -> (invoice_id) {
     filtered_ids = Invoice.filter_invoice_id(invoice_id).pluck(:procurement_id)
     where id: filtered_ids
@@ -117,6 +132,21 @@ class Procurement < ApplicationRecord
     if date
       where("created_at <= ?", date.end_of_day)
     end
+  }
+
+  
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
   }
 
   scope :filter_department, -> (department_name, user_id) {
@@ -181,7 +211,7 @@ class Procurement < ApplicationRecord
     if user.present?
       category_ids = user.company.categories.inward_invoice_line_items_only.filter_search(category_name).pluck(:id)
 
-      inventory_line_item_ids = user.company.inventory_line_items.with_category_id(category_ids)
+      inventory_line_item_ids = user.company.items.with_category_id(category_ids)
 
       purchase_order_ids = PurchaseOrderItem.with_inventory_line_item(inventory_line_item_ids).pluck(:purchase_order_id)
 
@@ -209,6 +239,7 @@ class Procurement < ApplicationRecord
   # }
 
   scope :filter_status_tags, -> (ids) {
+
     all_status_tag_ids = StatusTag.all.pluck(:id)
     status_tag_ids = all_status_tag_ids & ids.map(&:to_i)
 
@@ -418,7 +449,7 @@ class Procurement < ApplicationRecord
 
     data.sort_by!{ |doc| doc.created_at}.reverse!
   end
-
+  
   def attached_documents
     attachments = []
     if self.purchase_order.present?

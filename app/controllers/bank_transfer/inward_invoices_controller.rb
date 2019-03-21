@@ -38,7 +38,8 @@ class BankTransfer::InwardInvoicesController < BaseControllers::WebBase
 
   def count
     @result = BankTransfer::InwardInvoices::Count.(current_user, params)
-    render json: @result.as_json
+    # render json: @result.as_json
+    render json: { count: @result.count.as_json, status_count: @result.status_count.as_json, po_invoice_count: @result.po_invoice_count.as_json, non_po_invoice_count: @result.non_po_invoice_count.as_json  }
   end
 
   def actions_configuration
