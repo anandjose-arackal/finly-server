@@ -7,6 +7,7 @@ class RateContracts::Destroy < RateContracts::Base
   end
 
   def authorize
+    # Only rate contract creator can destroy for now
     unless rate_contract.present? && rate_contract.creator_id == user.id
       raise_unauthorized_exception
       return
