@@ -61,8 +61,15 @@ class VendorsController < ApplicationController
     respond
   end
 
+  # Support
+
   def penny_test
-    @result = Vendors::PennyTest.(current_user, params)
+    @result = Vendors::Support::PennyTest.(current_user, params)
+    respond
+  end
+
+  def validate_gstin
+    @result = Vendors::Support::ValidateGstin.(current_user, params)
     respond
   end
 end

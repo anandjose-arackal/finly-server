@@ -3476,6 +3476,7 @@ Rails.application.routes.draw do
   get 'vendors/filter_config', to: "vendors#filter_config"
   post 'vendors/submit', to: "vendors#submit"
   post 'vendors/penny_test', to: 'vendors#penny_test'
+  post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
   resources :vendors do
     put 'approve', to: "vendors#approve"
     put 'reject', to: "vendors#reject"

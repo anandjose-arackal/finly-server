@@ -35,7 +35,7 @@ class Vendors::NewVendorConfig < Vendors::Base
 
     def init
       self.actions = {
-        primary: {name: "Create", url: "vendors", method: "POST"}
+        primary: {name: "Create", url: "vendors", method: "POST", type: "create"}
       }
       self.policies = Policy.none
       self.states = params[:states]
@@ -45,7 +45,7 @@ class Vendors::NewVendorConfig < Vendors::Base
       self.tds_rates = params[:tds_rates]
       self.field_configurations = params[:field_configurations]
       if user.company.vendor_empanelment_workflow_enabled?
-        self.actions[:primary] = {name: "Submit for Approval", url: "vendors/submit", method: "POST"}
+        self.actions[:primary] = {name: "Submit for Approval", url: "vendors/submit", method: "POST", type: "submit"}
         self.reviewal_chains = []
         self.policies = params[:policies]
 
