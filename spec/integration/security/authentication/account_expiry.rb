@@ -112,20 +112,173 @@ RSpec.describe 'UserAuthentication > Expiry' do
   end
 
   describe '> User with weak passwords' do
+    it 'should mark the user as expired' do
+      weak_password = '12345678'
+      @user.assign_attributes(
+          {
+              password: weak_password,
+              password_confirmation: weak_password,
+              last_activity_at: DateTime,
+              password_changed_at: DateTime.now,
+              expired_at: nil
+          }
+      )
+      expect(@user.save(validate: false)).to be_truthy
+      expect(@user.expired?).to be_falsey
 
+      expect do
+        post '/oauth/token.json', params: {
+            email: @user.email,
+            password: weak_password,
+            otp_verified: true,
+            client_id: @doorkeeper_application.uid,
+            client_secret: @doorkeeper_application.secret
+        }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+      end.to \
+        change {GatekeeperBlock.count}.by(0).and \
+        change {Doorkeeper::AccessToken.count}.by(1).and \
+        change {UserSession.count}.by(1).and \
+        change {UserSessionEvent.count}.by(1).and \
+        change {RequestImpression.count}.by(1)
+
+      @body = JSON.parse response.body
+      @token_value = @body&.dig('data', 'access_token')
+      @session = UserSession.last
+
+      expect(@token_value).to_not be_nil
+      expect(@body['expired']).to be_truthy
+      expect(@body['otp_verified']).to be_falsey
+      expect(@user.reload.expired?).to be_truthy
+    end
   end
 
   describe '> User with old passwords' do
+    it 'should mark the user as expired' do
+      password = 'FW1g$18j0t!k19TJjL'
+      @user.assign_attributes(
+          {
+              password: password,
+              password_confirmation: password,
+              last_activity_at: DateTime,
+              password_changed_at: DateTime.now,
+              expired_at: nil
+          }
+      )
+      expect(@user.save(validate: false)).to be_truthy
+      expect(@user.expired?).to be_falsey
 
+      @user.update(password_changed_at: 91.days.ago)
+
+      expect do
+        post '/oauth/token.json', params: {
+            email: @user.email,
+            password: password,
+            otp_verified: true,
+            client_id: @doorkeeper_application.uid,
+            client_secret: @doorkeeper_application.secret
+        }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+      end.to \
+        change {GatekeeperBlock.count}.by(0).and \
+        change {Doorkeeper::AccessToken.count}.by(1).and \
+        change {UserSession.count}.by(1).and \
+        change {UserSessionEvent.count}.by(1).and \
+        change {RequestImpression.count}.by(1)
+
+      @body = JSON.parse response.body
+      @token_value = @body&.dig('data', 'access_token')
+      @session = UserSession.last
+
+      expect(@token_value).to_not be_nil
+      expect(@body['expired']).to be_truthy
+      expect(@body['otp_verified']).to be_falsey
+      expect(@user.reload.expired?).to be_truthy
+    end
   end
 
   describe '> Users with no activity' do
+    it 'should mark the user as expired' do
+      password = 'FW1g$18j0t!t19TJjL'
+      @user.assign_attributes(
+          {
+              password: password,
+              password_confirmation: password,
+              last_activity_at: DateTime,
+              password_changed_at: DateTime.now,
+              expired_at: nil
+          }
+      )
+      expect(@user.save(validate: false)).to be_truthy
+      expect(@user.expired?).to be_falsey
 
+      @user.update(last_activity_at: 91.days.ago)
+
+      expect do
+        post '/oauth/token.json', params: {
+            email: @user.email,
+            otp_verified: true,
+            password: password,
+            client_id: @doorkeeper_application.uid,
+            client_secret: @doorkeeper_application.secret
+        }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+      end.to \
+        change {GatekeeperBlock.count}.by(0).and \
+        change {Doorkeeper::AccessToken.count}.by(1).and \
+        change {UserSession.count}.by(1).and \
+        change {UserSessionEvent.count}.by(1).and \
+        change {RequestImpression.count}.by(1)
+
+      @body = JSON.parse response.body
+      @token_value = @body&.dig('data', 'access_token')
+      @session = UserSession.last
+
+      expect(@token_value).to_not be_nil
+      expect(@body['expired']).to be_truthy
+      expect(@body['otp_verified']).to be_falsey
+      expect(@user.reload.expired?).to be_truthy
+    end
   end
 
   describe '> Active User' do
     it 'should update users last_activity_at' do
+      password = 'FW1g$18jRt!t19TJjL'
+      old_last_activity = 10.minutes.ago
+      @user.assign_attributes(
+          {
+              password: password,
+              otp_verified: true,
+              password_confirmation: password,
+              last_activity_at: old_last_activity,
+              password_changed_at: DateTime.now,
+              expired_at: nil
+          }
+      )
+      expect(@user.save(validate: false)).to be_truthy
+      expect(@user.expired?).to be_falsey
+      expect(@user.last_activity_at).to_not eq(old_last_activity)
 
+      expect do
+        post '/oauth/token.json', params: {
+            email: @user.email,
+            password: password,
+            client_id: @doorkeeper_application.uid,
+            client_secret: @doorkeeper_application.secret
+        }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+      end.to \
+        change {GatekeeperBlock.count}.by(0).and \
+        change {Doorkeeper::AccessToken.count}.by(1).and \
+        change {UserSession.count}.by(1).and \
+        change {UserSessionEvent.count}.by(1).and \
+        change {RequestImpression.count}.by(1)
+
+      @body = JSON.parse response.body
+      @token_value = @body&.dig('data', 'access_token')
+      @session = UserSession.last
+
+      expect(@token_value).to_not be_nil
+      expect(@body['expired']).to be_falsey
+      expect(@body['otp_verified']).to be_truthy
+      expect(@user.reload.expired?).to be_falsey
+      expect(@user.last_activity_at).to_not eq(old_last_activity)
     end
   end
 
