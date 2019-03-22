@@ -62,8 +62,8 @@ class InwardDocument < ApplicationRecord
         amount: self.items_shipped,
         document_owner: self.user&.name,
         document_type: self.class.name,
-        delivery_date: self.delivery_date.strftime("%d-%m-%Y"),
-        received_date: self.updated_at.strftime("%d-%m-%Y")
+        delivery_date: self.delivery_date&.strftime("%d-%m-%Y"),
+        received_date: self.updated_at&.strftime("%d-%m-%Y")
 
     }
   end
