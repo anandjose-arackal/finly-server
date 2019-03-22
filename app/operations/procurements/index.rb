@@ -136,6 +136,10 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_creation_date_to
     has_scope :filter_month
     has_scope :filter_year
+    has_scope :filter_cost_center_id
+    has_scope :filter_location_id
+    has_scope :filter_department_id
+    has_scope :filter_sub_department_id
 
     def init
       self.procurements = params[:procurements]

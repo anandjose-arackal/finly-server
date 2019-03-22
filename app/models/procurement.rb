@@ -339,6 +339,27 @@ class Procurement < ApplicationRecord
     )
   }
 
+  scope :filter_location_id, -> (location_id) {
+    filtered_ids = PurchaseOrder.where(location_id: location_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_cost_center_id, -> (cost_center_id) {
+    filtered_ids = PurchaseOrder.where(cost_center_id: cost_center_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_department_id, -> (department_id) {
+    filtered_ids = PurchaseOrder.where(department_id: department_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_sub_department_id, -> (sub_department_id) {
+    filtered_ids = PurchaseOrder.where(sub_department_id: sub_department_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+
   def awaiting_action?(user)
     # Ideal method:
     # First check if controlling user is present and return
