@@ -1,5 +1,5 @@
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
-  attr_accessor :gstin_params, :connection, :api_response
+  attr_accessor :gstin_params, :connection, :api_response, :response_body
 
   class Vendors::Support::ValidateGstin::ValidatePresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :api_response, :match_percentile
@@ -15,16 +15,21 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   end
 
   def validate
-    if gstin_params[:gstin].blank? || !validate_gstin(bank_account_params[:account_number])
+    if gstin_params[:gstin].blank? || !validate_gstin(gstin_params[:gstin])
       add_message :error, "Please provide a valid GSTIN"
     end
   end
 
 
   def process
-    self.api_response = self.connection.get '/searchgstin', { :gstin => gstin_params[:gstin] }
+    # self.api_response = self.connection.get, { :gstin => gstin_params[:gstin] }
+    self.api_response = self.connection.get
 
-    self.api_response = self.api_response.as_json
+    if self.api_response.status && self.api_response.status == 200
+      self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
+      unless response_body[:error]
+      end
+    end
   end
 
   def success
@@ -42,10 +47,12 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   def setup_connection
     path = "#{Rails.root}/config/gstin_verification_config.yml"
     config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)[Rails.env]
-    url = config_data[:base_url]
-    headers = 
-    self.connection = Faraday.new do |req|
-      req.url = url
+    # url = config_data[:base_url] + '/searchgstin'
+    url = config_data[:base_url] + "/searchgstin?gstin=#{gstin_params[:gstin]}"
+    headers = config_data[:headers]
+    self.connection = Faraday.new(url: url) do |req|
+      # req.url = url
+      req.adapter Faraday.default_adapter # make requests with Net::HTTP
 
       headers.each do |header|
         req.headers[header.keys.first] = header.values.first
