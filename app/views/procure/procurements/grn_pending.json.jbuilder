@@ -87,10 +87,11 @@ json.results do
       end
     end
 
-    iwd = p.documents.detect {|d| d.class.name == 'InwardDocument'}
+    iwd = p.documents&.detect {|d| d.class.name == 'InwardDocument'}
 
-    json.grn_delivery_date iwd.delivery_date.strftime("%d-%m-%Y")
-    json.grn_received_date iwd.updated_at.strftime("%d-%m-%Y")
+    json.grn_delivery_date iwd&.delivery_date&.strftime("%d-%m-%Y") || nil
+    json.grn_received_date iwd&.updated_at&.strftime("%d-%m-%Y") || nil
+
 
     json.attachments do
       json.array! p.attached_documents do |attachment|
