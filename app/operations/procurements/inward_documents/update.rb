@@ -35,6 +35,11 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
+    unless self.inward_document.id == self.procurement.inward_documents.last.id
+      add_message :error, "Cant update old GRNs"
+      return
+    end
+
     inward_document_params[:items_attributes].each do |item|
       delivered = item[:delivered] || 0
       accepted = item[:accepted] || 0

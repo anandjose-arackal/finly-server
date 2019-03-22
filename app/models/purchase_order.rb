@@ -145,6 +145,11 @@ class PurchaseOrder < ApplicationRecord
       where location_id: location_ids
     end
   }
+  scope :filter_delivery_location, -> (name) {
+    if name.present?
+      joins(:delivery_location).where('name LIKE ?',"%#{name}%")
+    end
+  }
   scope :with_budgetable_user_ids, -> (user_ids) {
     if user_ids.present?
       where created_by_user_id: user_ids

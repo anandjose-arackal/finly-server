@@ -31,6 +31,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     if self.purchase_order.closed?
       add_message :error, "This Purchase Order is closed. No further actions can be taken."
     end
+
     if self.purchase_order.all_items_accepted?
       add_message :error, "Cant add new GRN if previous GRN has all items shipped."
     end
