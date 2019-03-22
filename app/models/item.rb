@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: inventory_line_items
+# Table name: items
 #
 #  id                  :integer          not null, primary key
 #  tax                 :decimal(20, 10)
@@ -20,7 +20,7 @@
 #  account             :string(255)
 #  supply_item_type_id :integer
 #  deleted_at          :datetime
-#  product_type        :integer
+#  product_type        :integer          default(1)
 #
 
 class Item < ApplicationRecord

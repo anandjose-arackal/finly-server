@@ -42,11 +42,8 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
-    section 'Throttling' do
-      rule 'A single IP cannot send more than 100 requests per 10 seconds' do
+    # todo do not allow API requests apart from send otp, and set password if the user is expired
 
-      end
-    end
 
     # todo Check for all fields in X-Finly-RP
     # todo do not allow any api apart from send otp and verify otp for unverified device/ip

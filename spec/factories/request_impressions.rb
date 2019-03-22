@@ -40,8 +40,13 @@
 #  response_code    :decimal(10, )
 #  response_time    :decimal(10, )
 #  user_session_id  :integer
+#  access_token_id  :integer
+#  user_device_id   :integer
+#  user_ip_id       :integer
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  accuracy_radius  :integer
+#  blocked_by       :string(255)
 #
 
 FactoryBot.define do

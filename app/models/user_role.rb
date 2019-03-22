@@ -137,6 +137,17 @@ class UserRole < ApplicationRecord
     VALUES[role]
   end
 
+  def self.ids_for(*keys)
+    if keys.present? and keys.first.class.name == Array.name
+      keys = keys.first
+    end
+    ids = []
+    VALUES.each do |key, value|
+      ids << value if keys.include? key&.to_sym&.downcase
+    end
+    ids
+  end
+
   def self.name_for(role_id)
     case RequestStore.store[:current_app]
       when 'em', :em

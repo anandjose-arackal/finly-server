@@ -51,6 +51,9 @@
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
 #  vacation_delegate_enabled :boolean
+#  password_changed_at       :datetime
+#  last_activity_at          :datetime
+#  expired_at                :datetime
 #
 
 class User < ApplicationRecord
@@ -265,17 +268,17 @@ class User < ApplicationRecord
   scope :with_roles, -> {joins :role_mapping}
   scope :only_managers, -> {with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))}
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
-  scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
+  scope :only_vendor_payment_reviewers, -> {with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   # scope :filter_vendor_payments_reviewers, -> (flag) {
   #   # passed argument is only for has scope, no effect here
   #   with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
   # }
 
-  scope :filter_vendor_payments_reviewers, -> (flag) { }
+  scope :filter_vendor_payments_reviewers, -> (flag) {}
 
   # Use only for has_scope filter, scope to policy_user_roles
   scope :policy_id, -> (policy_id) {
-     where('policy_user_roles.policy_id = ?', policy_id )
+    where('policy_user_roles.policy_id = ?', policy_id)
   }
 
   scope :reviewer_type, -> (type) {
@@ -578,7 +581,7 @@ class User < ApplicationRecord
     joins(:policy_user_roles)
   }
 
-  scope :filter_unassigned_purchase_order_initiator_for_policy, -> (policy_id){
+  scope :filter_unassigned_purchase_order_initiator_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:purchase_order_initiator)).pluck(:user_id)
@@ -586,7 +589,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_purchase_order_reviewer_for_policy, -> (policy_id){
+  scope :filter_unassigned_purchase_order_reviewer_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:purchase_order_reviewer)).pluck(:user_id)
@@ -594,7 +597,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_goods_receiver_for_policy, -> (policy_id){
+  scope :filter_unassigned_goods_receiver_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:goods_receiver)).pluck(:user_id)
@@ -602,7 +605,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_invoice_initiator_for_policy, -> (policy_id){
+  scope :filter_unassigned_invoice_initiator_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:invoice_initiator)).pluck(:user_id)
@@ -610,7 +613,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_invoice_reviewer_for_policy, -> (policy_id){
+  scope :filter_unassigned_invoice_reviewer_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).pluck(:user_id)
@@ -618,7 +621,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_bank_payment_request_initiator_for_policy, -> (policy_id){
+  scope :filter_unassigned_bank_payment_request_initiator_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id)
@@ -626,7 +629,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_bank_payment_request_reviewer_for_policy, -> (policy_id){
+  scope :filter_unassigned_bank_payment_request_reviewer_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:bank_payment_request_reviewer)).pluck(:user_id)
@@ -634,7 +637,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_bank_payment_request_creditor_for_policy, -> (policy_id){
+  scope :filter_unassigned_bank_payment_request_creditor_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:bank_payment_request_creditor)).pluck(:user_id)
@@ -642,7 +645,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_item_master_manager_for_policy, -> (policy_id){
+  scope :filter_unassigned_item_master_manager_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:item_master_manager)).pluck(:user_id)
@@ -650,7 +653,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_vendor_creator_for_policy, -> (policy_id){
+  scope :filter_unassigned_vendor_creator_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:vendor_creator)).pluck(:user_id)
@@ -658,7 +661,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_vendor_reviewer_for_policy, -> (policy_id){
+  scope :filter_unassigned_vendor_reviewer_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:vendor_reviewer)).pluck(:user_id)
@@ -666,7 +669,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_vendor_manager_for_policy, -> (policy_id){
+  scope :filter_unassigned_vendor_manager_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:vendor_manager)).pluck(:user_id)
@@ -674,7 +677,7 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_budget_manager_for_policy, -> (policy_id){
+  scope :filter_unassigned_budget_manager_for_policy, -> (policy_id) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:budget_manager)).pluck(:user_id)
@@ -731,11 +734,41 @@ class User < ApplicationRecord
   end
 
   def min_password_score
-    # todo creditor
-    if admin? #or creditor?
-      return 3
+    strict_password_requirements = UserRole.ids_for(
+        :admin,
+        :finance_manager,
+        :manager,
+        :reviewer,
+        :auditor,
+        :purchaser,
+        :creditor,
+        :purchase_request_reviewer,
+        :purchase_order_reviewer,
+        :invoice_reviewer,
+        :bank_payment_request_reviewer,
+        :bank_payment_request_creditor,
+        :item_master_manager,
+        :inventory_manager,
+        :vendor_reviewer,
+        :policy_admin,
+        :vendor_manager,
+        :bank_payment_request_auditor,
+        :budget_manager
+    )
+
+    return 3 if role_mapping.role(strict_password_requirements).present?
+    2
+  end
+
+  # Expires user if password is weak, old passwords and inactivity
+  def verify_expiration!(password = nil)
+    return true if expired?
+    user.expire! and return true if password_expired?
+    if password
+      self.password = password
+      expire! and return true if password_weak?
     end
-    super
+    false
   end
 
   def password_weak?
@@ -1145,7 +1178,7 @@ class User < ApplicationRecord
     RequestStore.store[:current_user]
   end
 
-  def has_policy_role?(role_id, document=nil)
+  def has_policy_role?(role_id, document = nil)
     if document.present?
       policy = Policy.with_company_id(self.company_id).find_by_id document.policy_id
       data = policy.policy_user_roles.where(user_id: self.id, user_role_id: role_id) rescue nil
@@ -1221,8 +1254,8 @@ class User < ApplicationRecord
 
   def relevant
     {
-      email: self.email,
-      company_id: self.company_id
+        email: self.email,
+        company_id: self.company_id
     }
   end
 

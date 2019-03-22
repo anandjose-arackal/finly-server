@@ -36,9 +36,7 @@ class UserRoleMapping < ApplicationRecord
   scope :invoicing, -> { where purpose_id: Purpose.id_for(:invoice)}
   scope :with_purpose, -> (purpose_id) { where purpose_id: purpose_id}
   scope :reviewer_mappings_only, -> { where user_role_id: [UserRole.id_for(:manager), UserRole.id_for(:finance_manager), UserRole.id_for(:reviewer), UserRole.id_for(:creditor)] }
-  scope :with_role_id, -> (role_id) {
-    role(role_id)
-  }
+  scope :with_role_id, -> (role_id) { role(role_id) }
 
   before_destroy do
     employee_role_presence
