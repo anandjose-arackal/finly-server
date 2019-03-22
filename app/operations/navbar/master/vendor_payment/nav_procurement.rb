@@ -44,7 +44,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_awaiting_approval
     return nil unless user.is_purchase_order_reviewer? || user.vp_admin_or_auditor?
-    {name: 'POs Awaiting Approval', id: 'procure', url: 'procurements'}
+    {name: 'POs Awaiting Approval', id: 'procure', url: 'procurements/params={"filter_procurement_type":"purchase_order", "filter_awaiting_approval":"1"}'}
   end
 
   def po_team
