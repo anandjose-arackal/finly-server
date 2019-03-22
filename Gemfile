@@ -220,6 +220,9 @@ group :development, :test do
   gem 'factory_bot'
   gem 'database_cleaner'
 
+  # Fuzzy String Match
+  gem 'fuzzy-string-match', '1.0.1'
+
 end
 
 group :development do
