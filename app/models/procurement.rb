@@ -91,6 +91,15 @@ class Procurement < ApplicationRecord
     end
   }
 
+  scope :filter_received_date, -> (received_date) {
+    date = Date.parse(received_date) rescue nil
+
+    if date
+      filtered_ids = InwardDocument.filter_received_date(date).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_invoice_serial, -> (invoice_id) {
     filtered_ids = Invoice.filter_invoice_id(invoice_id).pluck(:procurement_id)
     where id: filtered_ids
@@ -179,6 +188,15 @@ class Procurement < ApplicationRecord
     end
   }
 
+  scope :filter_location, -> (location, user_id) {
+    user = User.find_by id: user_id
+    if user.present?
+      filtered_ids = user.company.purchase_orders.filter_delivery_location(location).pluck(:procurement_id)
+      # filtered_ids = user.company.purchase_orders.joins(:delivery_location).where('name LIKE ?', '%#{location}%').pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_payment_term, -> (payment_term_name, user_id){
     user = User.find_by id: user_id
 
@@ -216,10 +234,10 @@ class Procurement < ApplicationRecord
 
   # scope :filter_vendor_name, -> (name) {
   #   vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
-  #
+  
   #   procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
   #   procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
-  #
+  
   #   where(id: procurement_ids)
   # }
 
