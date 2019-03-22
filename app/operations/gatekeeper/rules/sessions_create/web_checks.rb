@@ -84,6 +84,12 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
     end
 
+    section 'Expire' do
+      rule 'expires user if password is weak, old passwords and inactivity' do
+        @user.verify_expiration!(params[:password])
+      end
+    end
+
     section 'Active Session' do
       rule 'A user cannot have more than 2 active web sessions' do
         authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized

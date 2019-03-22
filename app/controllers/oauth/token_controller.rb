@@ -31,8 +31,6 @@ class Oauth::TokenController < Doorkeeper::TokensController
         result = Gatekeeper::Event.(:after_session_create, params)
         if result.success?
           @user.otp_verified = !result.require_otp
-          # Expires user if password is weak, old passwords and inactivity
-          @user.verify_expiration!
 
           on_create_success(response)
           return
