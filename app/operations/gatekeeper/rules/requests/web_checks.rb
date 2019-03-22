@@ -6,11 +6,13 @@ Gatekeeper::Checker.new 'On New Request' do
   end
 
   premise :on_authenticated_request do
+
     rule 'Request IP has to match Session IP' do
       request = RequestStoreUtil.current_request
       session = RequestStoreUtil.current_session
       next if request.remote_ip == session.ip
       next if request.remote_ip == session.user_ip&.ip
+      next if Rails.env.development?
 
       message 'Browser IP mismatch'
       session_status_id UserSessionStatus.id_for(:blocked)
@@ -18,7 +20,7 @@ Gatekeeper::Checker.new 'On New Request' do
       fail
     end
 
-    rule 'Request UserAgent has to match Session IP' do
+    rule 'Request UserAgent has to match Session UserAgent' do
       request = RequestStoreUtil.current_request
       session = RequestStoreUtil.current_session
       next if request.user_agent == session.user_agent
@@ -46,73 +48,105 @@ Gatekeeper::Checker.new 'On New Request' do
         skip unless RequestStoreUtil.current_user.expired?
       end
       rule 'cannot access the system apart from SendOTP API, OTP Verification API and set password API' do
+        pass = false
         [
-        'send_verification_otp',
-        'verify_user_otp',
-        'users/password'
-        ].each do |pattern|
-          next if RequestStoreUtil.current_request.path.include?(pattern)
+            'otp/resend',
+            'otp/verify',
+            'users/password'
+        ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+        next if pass
 
-          message 'User is expired'
-          session_status_id UserSessionStatus.id_for(:blocked)
-          response_code 401
-          fail
-        end
+        message 'User is expired'
+        session_status_id UserSessionStatus.id_for(:blocked)
+        response_code 401
+        fail
       end
     end
 
     section 'OTP unverified Users' do
       before do
-        skip unless RequestStoreUtil.current_user.otp_verified
+        skip if RequestStoreUtil.current_user.otp_verified
       end
 
-      rule 'cannot access the system apart from SendOTP API, OTP Verification API and set password API' do
+      rule 'cannot access the system apart from SendOTP API, OTP Verification API' do
+        pass = false
         [
-            'send_verification_otp',
-            'verify_user_otp',
-            'users/password'
-        ].each do |pattern|
-          next if RequestStoreUtil.current_request.path.include?(pattern)
+            'otp/resend',
+            'otp/verify'
+        ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+        next if pass
 
-          message 'User OTP is not verified'
-          session_status_id UserSessionStatus.id_for(:blocked)
-          response_code 401
-          fail
-        end
+        message 'User OTP is not verified'
+        session_status_id UserSessionStatus.id_for(:blocked)
+        response_code 401
+        fail
       end
     end
 
-    section 'New Devices' do
-      rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
-        [
-            'send_verification_otp',
-            'verify_user_otp'
-        ].each do |pattern|
-          next if RequestStoreUtil.current_request.path.include?(pattern)
-
-          message 'New device is not OTP verified'
-          session_status_id UserSessionStatus.id_for(:blocked)
-          response_code 401
-          fail
-        end
-      end
-    end
-
-    section 'New IP' do
-      rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
-        [
-            'send_verification_otp',
-            'verify_user_otp'
-        ].each do |pattern|
-          next if RequestStoreUtil.current_request.path.include?(pattern)
-
-          message 'User IP is not OTP verified'
-          session_status_id UserSessionStatus.id_for(:blocked)
-          response_code 401
-          fail
-        end
-      end
-    end
+    # section 'New Devices' do
+    #   section 'Unverified' do
+    #     before do
+    #       skip unless RequestStoreUtil.current_session.user_device.status_id == UserDeviceStatus.id_for(:unverified)
+    #     end
+    #     rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
+    #       pass = false
+    #       [
+    #           'otp/resend',
+    #           'otp/verify',
+    #       ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+    #       next if pass
+    #
+    #       message 'New device is not OTP verified'
+    #       session_status_id UserSessionStatus.id_for(:blocked)
+    #       response_code 401
+    #       fail
+    #     end
+    #   end
+    #   section 'block :incomplete, :attribute_mismatch' do
+    #     before do
+    #       skip unless UserIpStatus.ids_for(:incomplete, :attribute_mismatch).include?(RequestStoreUtil.current_session.user_ip.status_id)
+    #     end
+    #     rule 'do not allow access' do
+    #       message "User Device is #{RequestStoreUtil.current_session.user_ip.status.name}"
+    #       session_status_id UserSessionStatus.id_for(:blocked)
+    #       response_code 401
+    #       fail
+    #     end
+    #   end
+    # end
+    #
+    # section 'New IP' do
+    #   section 'Unverified' do
+    #     before do
+    #       skip unless RequestStoreUtil.current_session.user_ip.status_id == UserIpStatus.id_for(:unverified)
+    #     end
+    #     rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
+    #       pass = false
+    #       [
+    #           'otp/resend',
+    #           'otp/verify',
+    #       ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+    #       next if pass
+    #
+    #       message 'User IP is not OTP verified'
+    #       session_status_id UserSessionStatus.id_for(:blocked)
+    #       response_code 401
+    #       fail
+    #     end
+    #   end
+    #
+    #   section 'Blocked' do
+    #     before do
+    #       skip unless RequestStoreUtil.current_session.user_ip.status_id == UserIpStatus.id_for(:blocked)
+    #     end
+    #     rule 'do not allow access to blocked IPs' do
+    #       message 'User IP is blocked'
+    #       session_status_id UserSessionStatus.id_for(:blocked)
+    #       response_code 401
+    #       fail
+    #     end
+    #   end
+    # end
 
     # todo Check for all fields in X-Finly-RP
     # todo do not allow any api for incomplete, attribute_mismatch requests

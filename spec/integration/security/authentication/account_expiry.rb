@@ -69,15 +69,30 @@ RSpec.describe 'UserAuthentication > Expiry' do
 
     describe '> Access Limits' do
       it 'should allow send_otp endpoint' do
+        # Prevent OTP from being sent
+        allow(User::Verification::Otp::Create).to receive(:call).and_return(BaseOperation::BasePresenter::SuccessPresenter.new(@user, {}, nil))
 
+        expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
+        headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        post '/otp/resend.json', headers: headers
+        expect(response).to have_http_status(:ok)
+        expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
       end
 
       it 'should allow verify otp endpoint' do
-
+        expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
+        headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        post '/otp/verify.json', headers: headers, params: {mobile_number: @user.mobile_number, verification_code: @user.otp}
+        expect(response).to have_http_status(:ok)
+        expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
       end
 
       it 'should allow set passwords endpoint' do
-
+        expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
+        headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        post '/otp/verify.json', headers: headers, params: {mobile_number: @user.mobile_number, verification_code: @user.otp}
+        expect(response).to have_http_status(:ok)
+        expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
       end
 
       it 'should not allow any other endpoint' do

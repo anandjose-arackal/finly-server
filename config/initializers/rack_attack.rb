@@ -46,8 +46,8 @@ end
 {
     lookup: 'lookup',
     token: 'token',
-    send_otp: 'send_verification_otp',
-    verify_otp: 'verify_user_otp',
+    send_otp: 'otp/resend',
+    verify_otp: 'otp/verify',
     set_password: 'users/password'
 }.each do |key, pattern|
   Rack::Attack.throttle("#{key} throttling - 6 seconds", limit: 3, period: 6.seconds) do |req|
