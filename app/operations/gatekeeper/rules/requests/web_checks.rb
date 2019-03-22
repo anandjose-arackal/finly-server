@@ -20,6 +20,15 @@ Gatekeeper::Checker.new 'On New Request' do
       fail
     end
 
+    rule 'User agent is required for the request' do
+      if RequestStoreUtil.current_request.user_agent.nil?
+        message 'User agent is blank in the request'
+        session_status_id UserSessionStatus.id_for(:blocked)
+        response_code 401
+        fail
+      end
+    end
+
     rule 'Request UserAgent has to match Session UserAgent' do
       request = RequestStoreUtil.current_request
       session = RequestStoreUtil.current_session
@@ -153,23 +162,6 @@ Gatekeeper::Checker.new 'On New Request' do
     # todo set attribute mismatch
     # todo ensure user session, user device and user ip is created and verified
 
-    rule 'User agent is required for the request' do
-      if RequestStoreUtil.current_request.user_agent.nil?
-        message 'User agent is blank in the request'
-        session_status_id UserSessionStatus.id_for(:blocked)
-        response_code 401
-        fail
-      end
-    end
-
-    rule 'User agent has to match session user agent' do
-      if RequestStoreUtil.current_request.user_agent != RequestStoreUtil.current_session.user_agent
-        message 'User agent does not match the user session user agent'
-        session_status_id UserSessionStatus.id_for(:blocked)
-        response_code 401
-        fail
-      end
-    end
   end
 
 end

@@ -32,6 +32,10 @@ class Oauth::TokenController < Doorkeeper::TokensController
         if result.success?
           @user.otp_verified = !result.require_otp if @user.otp_verified
 
+          unless @user.expired?
+            @user.update(last_activity_at: DateTime.now)
+          end
+
           on_create_success(response)
           return
         else
