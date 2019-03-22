@@ -12,10 +12,9 @@ class RateContracts::Show < RateContracts::Base
   end
 
   def validate
-    unless rate_contract.present?
-      add_message :error, "Rate Contract not found"
-      return
-    end
+    return if record_not_present
+    # Validate if user is associated with the document
+    validate_association
   end
 
   def success
@@ -32,5 +31,25 @@ class RateContracts::Show < RateContracts::Base
       self.rate_contract_line_items = rate_contract.rate_contract_line_items if rate_contract.present?
     end
   end
+
+  def validate_presence
+    if rate_contract.blank? || rate_contract.company_id != user.company_id
+      add_message :error, "Rate Contract not found"
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_association
+    return if rate_contract.validate_if_admin?(user)
+    return if rate_contract.validate_if_owner?(user)
+    return if rate_contract.validate_if_manager?(user)
+    raise_unauthorized_exception
+  end
+
 
 end

@@ -9,7 +9,7 @@ class Procurements::EWayBills::Create < Procurements::EWayBills::Base
 
   def validate
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
       return
     end
   end

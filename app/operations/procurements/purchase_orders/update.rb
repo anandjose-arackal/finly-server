@@ -33,18 +33,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def validate
-    unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found'
-      return
-    end
-
+    return if record_not_present
     if purchase_order.sent_to_vendor?
       add_message :error, "Cant update purchase order marked as 'sent to vendor'"
       return
     end
 
 
-    if (purchase_order.approved? || purchase_order.auto_approved?) && !user.vendor_payment_admin?
+    if (purchase_order.approved? || purchase_order.auto_approved?) && !user.vp_admin_or_auditor?
       add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
     end
 
@@ -91,12 +87,15 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         return
       end
       unless (Date.parse(self.purchase_order_params[:due_date]) >= Date.today)
-        add_message :error, 'Cannot create back dated payment tickets'
+        add_message :error, 'Cannot create back dated scheduled payments for advances.'
       end
     else
       self.purchase_order_params[:due_date] = nil
-    end    
-
+    end
+    # Validate if user has access to PO show page    
+    validate_document_access
+    # Validate if user has access to PO update
+    validate_association
   end
 
   def pre_process
@@ -212,4 +211,28 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   def post_process
     add_message :success, 'Successfully updated purchase order'
   end
+
+  def validate_presence
+    unless self.purchase_order.present?
+      add_message :error, 'Purchase Order not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_document_access
+    Procurements::PurchaseOrders::Show.(user, params).success?
+  end
+
+  def validate_association
+    return if purchase_order.update_if_owner(user) if PurchaseOrderStatus.status_ids_for_owner.include?(purchase_order.purchase_order_status_id)
+    return if purchase_order.update_if_admin(user) unless PurchaseOrderStatus.status_ids_for_owner.include?(purchase_order.purchase_order_status_id)
+    return if purchase_order.update_if_reviewer(user) if PurchaseOrderStatus.status_ids_for_reviewer.include?(purchase_order.purchase_order_status_id)
+    add_message :error, 'Unable to update'
+  end
+
 end

@@ -27,7 +27,8 @@ class ActionsManager::Master::Base
     proc_tax_invoice_show: '::ActionsManager::Master::Procurements::TaxInvoiceShow',
     proc_payment_item_show: '::ActionsManager::Master::Procurements::PaymentItemShow',
     users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
-    users_show: '::ActionsManager::Master::BankTransfer::Users::Show' 
+    users_show: '::ActionsManager::Master::BankTransfer::Users::Show',
+    vp_role_config: '::ActionsManager::Master::PolicyUserRoles::RoleConfig'
 
   }.with_indifferent_access
 

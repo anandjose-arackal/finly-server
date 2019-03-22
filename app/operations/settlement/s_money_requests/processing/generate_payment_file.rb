@@ -52,6 +52,7 @@ class Settlement::SMoneyRequests::Processing::GeneratePaymentFile < Settlement::
           amount: mapping.amount.value,
           payment_mode: 'NEFT',
           date: Date.today,
+          beneficiary_ifsc: mapping.processor_accountable.ifsc,
           ifsc: mapping.processor_accountable.ifsc,
           email: mapping.user.email,
           receiving_mobile_number: mapping.user.mobile_number,

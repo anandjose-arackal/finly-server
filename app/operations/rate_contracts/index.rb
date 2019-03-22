@@ -3,8 +3,17 @@ class RateContracts::Index < RateContracts::Base
   attr_accessor :rate_contracts
 
 
-  def process
-    self.rate_contracts = user.rate_contracts
+
+  def init
+    if user.has_policy_role?(UserRole.id_for(:item_master_manager)) || user.vp_admin_or_auditor?
+      self.rate_contracts = user.rate_contracts
+    end
+  end
+
+  def validate
+    if rate_contracts.blank?
+      add_message :error, 'No record found'
+    end
   end
 
   def success

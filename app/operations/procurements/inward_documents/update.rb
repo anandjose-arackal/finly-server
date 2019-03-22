@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
-                :id_current_attachments, :po_revision
+                :id_current_attachments, :po_revision, :inv_items
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -16,15 +16,22 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         self.purchase_order = self.po_revision
       end
     end
+
+    
   end
 
   def validate
     unless self.inward_document.present?
-      add_message :error, 'Inward Document not found'
+      add_message :error, 'GRN not found'
       return
     end
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
+      return
+    end
+
+    unless self.inward_document.id == self.procurement.inward_documents.last.id
+      add_message :error, 'You cannot modify the selected GRN'
       return
     end
 
@@ -42,19 +49,30 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
 
       if (po_items.quantity.to_f - po_items.previously_delivered.to_f) < delivered.to_f
-        add_message :error, "Previously deliverd cant be less than what is delivered now."
+        add_message :error, 'You cannot add additional GRN for the follow item'
         break
       end 
 
       if delivered.to_f > po_items.quantity.to_f
-        add_message :error, "Now Delivering cannot be more than the Requested Quantity"
+        add_message :error, 'Now Delivering cannot be more than the Requested Quantity'
         break
       end
 
 
       unless delivered.to_f == accepted.to_f + rejected.to_f
-        add_message :error, "Accepted & Rejected quantity does't match with delivered quantity"
+        add_message :error, 'Accepted & Rejected quantity does not match with delivered quantity'
         break
+      end
+    end
+
+    if self.procurement.invoices.present?
+      inv_items = self.procurement.invoices.includes(:items)
+      self.inward_document.items.each do |item|
+        item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
+        if self.inward_document.items.pluck(:accepted).first < item_q.first.quantity
+          add_message :error, 'Items in GRN cannot be reduced as they have already been invoiced'
+          break
+        end
       end
     end
 
@@ -121,7 +139,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
     end
 
-    add_message :success, 'Successfully updated Inward Document'
+    add_message :success, 'Successfully updated GRN'
   end
 
   private

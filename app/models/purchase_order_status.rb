@@ -62,4 +62,18 @@ class PurchaseOrderStatus < ApplicationRecord
         PurchaseOrderStatus.id_for(:closed)
     ]
   end
+
+  def self.status_ids_for_owner
+    [
+      PurchaseOrderStatus.id_for(:open),
+      PurchaseOrderStatus.id_for(:rejected),
+      PurchaseOrderStatus.id_for(:retracted)
+    ]
+  end
+
+  def self.status_ids_for_reviewer
+    [
+      PurchaseOrderStatus.id_for(:processing)
+    ]
+  end
 end
