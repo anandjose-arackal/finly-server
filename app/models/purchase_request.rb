@@ -23,6 +23,7 @@ class PurchaseRequest < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :creator, optional: true, class_name: 'User'
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+  belongs_to :purchase_order, optional: true
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy

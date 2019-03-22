@@ -100,6 +100,7 @@ class PurchaseOrder < ApplicationRecord
   has_many :payments, as: :parent
 
   has_many :trails, as: :parent
+  has_many :purchase_request_items
 
   belongs_to :bank_account, optional: true
 
@@ -108,6 +109,7 @@ class PurchaseOrder < ApplicationRecord
   accepts_nested_attributes_for :items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount
   accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :purchase_request_items
   # accepts_nested_attributes_for :advance_payments
 
 
