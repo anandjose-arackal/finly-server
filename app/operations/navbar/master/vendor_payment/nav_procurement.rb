@@ -29,7 +29,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def dashboard
-    {name: 'Dashboard', id: 'dashboard', url: 'dashboard'}
+    {name: 'Dashboard', id: 'dashboard', url: 'dashboard/params={}'}
   end
 
   def procure
@@ -39,7 +39,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_initiator
     return nil unless user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
-    {name: 'Your POs', id: 'procure', url: 'procurements'}
+    {name: 'Your POs', id: 'procure', url: "procurements/params={\"search_type\":\"user_details\",\"search_query\":\"#{user.email}\"}"}
   end
 
   def po_awaiting_approval
