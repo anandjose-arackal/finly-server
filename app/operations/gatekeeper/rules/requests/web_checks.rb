@@ -16,7 +16,6 @@ Gatekeeper::Checker.new 'On New Request' do
       session_status_id UserSessionStatus.id_for(:blocked)
       response_code 401
       fail
-
     end
 
     rule 'Request UserAgent has to match Session IP' do
@@ -48,11 +47,11 @@ Gatekeeper::Checker.new 'On New Request' do
       end
       rule 'cannot access the system apart from SendOTP API, OTP Verification API and set password API' do
         [
-            'send_verification_otp',
-            'verify_user_otp',
-            'users/password'
+        'send_verification_otp',
+        'verify_user_otp',
+        'users/password'
         ].each do |pattern|
-          next unless RequestStoreUtil.current_request.path.include?(pattern)
+          next if RequestStoreUtil.current_request.path.include?(pattern)
 
           message 'User is expired'
           session_status_id UserSessionStatus.id_for(:blocked)
@@ -73,7 +72,7 @@ Gatekeeper::Checker.new 'On New Request' do
             'verify_user_otp',
             'users/password'
         ].each do |pattern|
-          next unless RequestStoreUtil.current_request.path.include?(pattern)
+          next if RequestStoreUtil.current_request.path.include?(pattern)
 
           message 'User OTP is not verified'
           session_status_id UserSessionStatus.id_for(:blocked)
@@ -89,7 +88,7 @@ Gatekeeper::Checker.new 'On New Request' do
             'send_verification_otp',
             'verify_user_otp'
         ].each do |pattern|
-          next unless RequestStoreUtil.current_request.path.include?(pattern)
+          next if RequestStoreUtil.current_request.path.include?(pattern)
 
           message 'New device is not OTP verified'
           session_status_id UserSessionStatus.id_for(:blocked)
@@ -105,7 +104,7 @@ Gatekeeper::Checker.new 'On New Request' do
             'send_verification_otp',
             'verify_user_otp'
         ].each do |pattern|
-          next unless RequestStoreUtil.current_request.path.include?(pattern)
+          next if RequestStoreUtil.current_request.path.include?(pattern)
 
           message 'User IP is not OTP verified'
           session_status_id UserSessionStatus.id_for(:blocked)

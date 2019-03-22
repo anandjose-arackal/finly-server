@@ -86,7 +86,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
     section 'Expire' do
       rule 'expires user if password is weak, old passwords and inactivity' do
-        @user.verify_expiration!(params[:password])
+        RequestStoreUtil.current_user.verify_expiration!(params[:password])
       end
     end
 

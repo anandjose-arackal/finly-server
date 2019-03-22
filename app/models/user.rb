@@ -776,7 +776,7 @@ class User < ApplicationRecord
     expired
   end
 
-  def expired!
+  def expire!
     super and update(otp_verified: false)
   end
 
