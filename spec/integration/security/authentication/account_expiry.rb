@@ -87,15 +87,20 @@ RSpec.describe 'UserAuthentication > Expiry' do
         expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
       end
 
-      it 'should allow set passwords endpoint' do
-        expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
-        headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
-        post '/otp/verify.json', headers: headers, params: {mobile_number: @user.mobile_number, verification_code: @user.otp}
-        expect(response).to have_http_status(:ok)
-        expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
-      end
+      # Todo as devise is using a different controller, not implementing this at the moment
+      # it 'should not allow set passwords endpoint unless otp_verified' do
+      #   expect(@user.expired?).to be_truthy
+      #   expect(@user.otp_verified).to_not be_truthy
+      #   expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
+      #   headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+      #   @new_password = 'FW1g$18j0t!k19TRe'
+      #   post '/users/password.json', headers: headers, params: {password: @new_password, password_confirmation: @new_password}
+      #   expect(response).to have_http_status(:unauthorized)
+      #   expect(@session.status_id).to eq(UserSessionStatus.id_for(:blocked))
+      # end
 
       it 'should not allow any other endpoint' do
+        @session.update(status_id: UserSessionStatus.id_for(:authorized))
         expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
         headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
         get '/menu_data.json', headers: headers
@@ -117,5 +122,12 @@ RSpec.describe 'UserAuthentication > Expiry' do
   describe '> Users with no activity' do
 
   end
+
+  describe '> Active User' do
+    it 'should update users last_activity_at' do
+
+    end
+  end
+
 
 end

@@ -52,7 +52,7 @@ Gatekeeper::Checker.new 'AccountLock' do
   section 'Browsers' do
     before do
       skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
-      skip unless RequestStoreUtil.current_user.locked?
+      skip unless RequestStoreUtil.current_user.access_locked?
     end
 
     premise :on_authenticated_request do

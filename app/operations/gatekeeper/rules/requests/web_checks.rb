@@ -56,12 +56,13 @@ Gatekeeper::Checker.new 'On New Request' do
       before do
         skip unless RequestStoreUtil.current_user.expired?
       end
-      rule 'cannot access the system apart from SendOTP API, OTP Verification API and set password API' do
+
+      rule 'OTP Unverified user cannot access the system apart from SendOTP API, OTP Verification API' do
+        next if RequestStoreUtil.current_user.otp_verified
         pass = false
         [
             'otp/resend',
-            'otp/verify',
-            'users/password'
+            'otp/verify'
         ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
         next if pass
 
@@ -70,6 +71,23 @@ Gatekeeper::Checker.new 'On New Request' do
         response_code 401
         fail
       end
+
+      # todo as devise uses a different controller, not usable at the moment
+      # rule 'OTP verified user cannot access the system apart from SendOTP API, OTP Verification API and set password API' do
+      #   next unless RequestStoreUtil.current_user.otp_verified
+      #   pass = false
+      #   [
+      #       'otp/resend',
+      #       'otp/verify',
+      #       'users/password'
+      #   ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+      #   next if pass
+      #
+      #   message 'User is expired'
+      #   session_status_id UserSessionStatus.id_for(:blocked)
+      #   response_code 401
+      #   fail
+      # end
     end
 
     section 'OTP unverified Users' do
