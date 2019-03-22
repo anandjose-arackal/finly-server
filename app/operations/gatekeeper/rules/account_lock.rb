@@ -49,4 +49,20 @@ Gatekeeper::Checker.new 'AccountLock' do
 
   end
 
+  section 'Browsers' do
+    before do
+      skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
+      skip unless RequestStoreUtil.current_user.locked?
+    end
+
+    premise :on_authenticated_request do
+      rule 'Do not allow access to locked accounts' do
+        message 'User Account is locked'
+        session_status_id UserSessionStatus.id_for(:blocked)
+        response_code 401
+        fail
+      end
+    end
+  end
+
 end
