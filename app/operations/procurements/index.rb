@@ -123,7 +123,7 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_category, using: [:category_name, :user_id], type: :hash
     has_scope :filter_po_status
     has_scope :filter_invoice_status
-    has_scope :filter_submission_date
+    has_scope :filter_submission_date, using: [:from, :to], type: :hash
     has_scope :filter_delivery_date
     has_scope :filter_received_date
     has_scope :filter_location, using: [:location_name, :user_id], type: :hash
