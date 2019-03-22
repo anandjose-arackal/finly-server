@@ -65,10 +65,6 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
     )
   end
 
-  def parse
-
-  end
-
   def post_process
     case self.response.status
       when 404
@@ -76,7 +72,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
       when 500
 
       when 200
-        self.parsed_response = JSON.parse(self.response.body)
+        # mark the transaction as processing.
 
     end
   end

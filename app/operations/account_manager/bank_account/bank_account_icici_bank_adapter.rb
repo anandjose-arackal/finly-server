@@ -46,6 +46,8 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       return false
     end
 
+    # this operation will merely initiate the transaction at the bank's end, and the status will
+    # be determined based on the callback that is triggered later
     op = IciciBankApi::TransactionInitiate.(
       transfer_request: transfer_request,
       payment: payment

@@ -1,9 +1,9 @@
 class IciciBankApi::Base < BaseHandler
 
-  attr_accessor :company_details, :company
+  attr_accessor :company_details, :company, :parsed_response
 
   def init
-    self.company = user.company if self.company.blank?
+    self.company = user&.company if self.company.blank?
     if Rails.env.production?
       values = Finly::SecureStorage::Connector.read('core/icici_bank')
       type = self.company.id.to_s
@@ -23,6 +23,13 @@ class IciciBankApi::Base < BaseHandler
     cert = OpenSSL::X509::Certificate.new(File.read(path))
     public_key = cert.public_key
     encrypted_params = Base64.encode64(public_key.public_encrypt(json_params))
+  end
+
+  def decrypt_response(body)
+    # enter logic to parse the encrypted response
+    # first decrypt the response
+    parsed_response = JSON.parse(body)
+    return parsed_response
   end
 
   def process
@@ -45,8 +52,14 @@ class IciciBankApi::Base < BaseHandler
         req.body = request_params
       end
 
-      puts "Response: "
+      puts "Encrypted Response: "
       ap self.response.body
+
+      puts "Unencrypted Response: "
+      ap decrypt_response(self.response.body)
+
+      # now parse the response and store it in the parsed_response
+      self.parsed_response = decrypt_response(self.response.body)
 
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       # handle this case by updating the bank transaction to possible failure and then checking the
