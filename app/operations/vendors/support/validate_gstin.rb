@@ -22,6 +22,9 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   end
 
   def setup_connection
+    path = "#{Rails.root}/config/gstin_verification_config.yml"
+    values = YAML.load_file(path)
+    config_data = YAML.load_file('config/gstin_verification_config.yml')[Rails.env]
     url = Constants::GstinProvider::BASE_API
     headers = Constants::GstinProvider::HEADERS
     self.connection = Faraday.new do |req|
