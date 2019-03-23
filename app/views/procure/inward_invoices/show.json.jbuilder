@@ -54,6 +54,11 @@ json.invoice do
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
                 :billing_address, :shipping_address, :invoice_id
 
+  json.po_advance invoice.po_advance
+  json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
+  json.po_adjusted_advance invoice.po_adjusted_advance
+  json.advance_amount_required invoice.advance_amount_required
+
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
   else
@@ -180,9 +185,15 @@ json.cost_centers do
   end
 end
 
+# json.departments do
+#   json.array! @result.departments do |dept|
+#     json.extract! dept, :id, :name, :cost_center_id
+#   end
+# end
+
 json.departments do
-  json.array! @result.departments do |dept|
-    json.extract! dept, :id, :name, :cost_center_id
+  json.array! @result.departments do |department|
+    json.merge! department.as_json3
   end
 end
 

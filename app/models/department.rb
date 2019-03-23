@@ -54,4 +54,26 @@ class Department < ApplicationRecord
     }
   end
 
+  def as_json2
+    {
+      id: self.id,
+      name: "#{self.parent&.name} / #{self.name}",
+      cost_center: self.cost_center
+    }
+  end
+
+  def as_json3
+    {
+      id: self.id,
+      name: dept_name,
+      cost_center: self.cost_center
+    }
+  end
+
+  def dept_name
+    self.parent.blank? ? self.name : "#{self.parent&.name} / #{self.name}"
+    # self.parent.blank? ? self.name : self.ancestors.pluck(:name).join(' / ')
+  end
+
+
 end

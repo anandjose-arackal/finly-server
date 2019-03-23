@@ -24,6 +24,13 @@ json.advance_amount do
   json.value @result.purchase_order.advance_amount&.value
   json.currency_id @result.purchase_order.advance_amount&.currency&.id
   json.due_date @result.purchase_order.due_date
+  json.tds_slab_id @result.purchase_order.advance_tds_slab_id
+  json.tds_slab_name @result.purchase_order.advance_tds_slab&.name
+  json.tds_amount @result.purchase_order.advance_tds_amount&.value
+  json.status do
+    json.id @result.purchase_order.advance_amount_status&.id
+    json.name @result.purchase_order.advance_amount_status&.name
+  end
 end
 json.tax do
   json.value @result.purchase_order.tax_amount&.value
@@ -97,9 +104,10 @@ end
 
 json.departments do
   json.array! @result.departments do |department|
-    json.extract! department, :id, :name, :cost_center_id
+    json.merge! department.as_json3
   end
 end
+
 
 json.sub_departments do
   json.array! @result.sub_departments do |dept|

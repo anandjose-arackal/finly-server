@@ -30,6 +30,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
 
     self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
+    # self.purchase_order_params[:policy_id] = 457
   end
 
   def validate
@@ -75,11 +76,12 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     if self.purchase_order_params[:advance_amount_attributes][:value].present? && self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
       if self.purchase_order_params[:advance_amount_attributes][:value].to_i > params[:purchase_order][:total_after_tax_attributes][:value].to_i
-        add_message :error, "Advance amount cant be more than Total amount"
+        add_message :error, "Advance amount can't be more than Total amount"
         return
       end
       if self.purchase_order_params[:due_date].blank?
         add_message :error, 'Due date for the advance amount has not been set.'
+        return
       end
       valid_date = Date.parse(self.purchase_order_params[:due_date]) rescue false 
       unless valid_date
@@ -111,7 +113,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       purchase_order_params[:advance_amount_attributes][:id] = self.purchase_order&.advance_amount&.id
       # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
     else
-      self.purchase_order_params[:advance_amount_attributes][:value] = self.purchase_order&.advance_amount&.value
+      self.purchase_order_params[:advance_amount_attributes][:value] = self.purchase_order&.advance_amount&.value || 0
     end
   end
 
@@ -122,8 +124,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     if purchase_order.valid?
 
       purchase_order.save
+      purchase_order.process_line_item_calculation
       purchase_order.save
-      # purchase_order.process_line_item_calculation
 
       # Directly update the columns because we have callbacks,
       # and those callbacks are validating data which were not previously formatted, like ifsc, (we have some gibberrish ifsc values which  were allowed to be saved before)

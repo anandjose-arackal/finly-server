@@ -47,6 +47,7 @@ class Policy::VendorPayments::Index < Policy::Base
       self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.uniq
       self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.with_application(current_app)&.exclude_deleted
       # Jugaad as we do not have policy admin in place
+      # It's the company admin
       self.admin_policies = user.company.policies.with_application(current_app)&.exclude_deleted
     end
   end
