@@ -1,3 +1,4 @@
+json.id @result.vendor.id
 json.vendor do
   json.extract! @result.vendor, :id, :name, :email, :mobile_number
   if @result.vendor.is_a?(YesBankVendor)
@@ -102,3 +103,70 @@ if @result.vendor.policy.present?
     json.extract! @result.vendor&.policy, :id, :name  
   end
 end
+
+json.edit_config do
+  json.codes do
+    json.array! @result.edit_config.states, :id, :name
+  end
+  json.vendor_types do
+    json.array! @result.edit_config.vendor_types, :id, :name
+  end
+
+  json.payment_terms do
+    json.array! @result.edit_config.payment_terms, :id, :name, :description
+  end
+
+  json.currencies do
+    json.array! @result.edit_config.currencies do |currency|
+      json.merge! currency.as_json
+    end
+  end
+
+  json.tds_rates do
+    json.array! @result.edit_config.tds_rates do |tds_rate|
+      json.extract! tds_rate, :id, :name, :tds
+    end
+  end
+
+  json.custom_fields_config @result.edit_config.field_configurations
+
+  json.policies do
+    json.array! @result.edit_config.policies do |policy|
+      json.extract! policy, :id, :name
+    end
+  end
+
+  json.locations do
+    json.array! @result.edit_config.locations do |location|
+      json.extract! location, :id, :name
+    end
+  end
+
+
+  json.reviewal_chains do
+    json.array! @result.edit_config.reviewal_chains do |chain|
+      json.policy_id chain[:policy_id]
+      json.reviewal_chain do
+        json.array! chain[:reviewal_chain] do |item|
+          json.level_number item[:level_number]
+          json.level_name item[:level_name]
+          json.level_id item[:level_id]
+          if item[:selected_reviewer].present?
+            json.selected_reviewer do
+              json.reviewer_details item[:selected_reviewer].as_json
+              json.threshold item[:selected_reviewer_threshold]
+            end
+          end
+          json.reviewers do
+            json.array! item[:reviewers] do |reviewer|
+              json.extract! reviewer, :id, :exception, :threshold
+              json.reviewer_details reviewer.reviewer.as_json
+            end
+          end
+        end
+      end
+    end
+  end
+
+end
+

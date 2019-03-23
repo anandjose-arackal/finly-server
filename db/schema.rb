@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_19_100457) do
+ActiveRecord::Schema.define(version: 2019_03_23_113728) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2745,6 +2745,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_100457) do
     t.string "api_provider"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "address"
   end
 
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

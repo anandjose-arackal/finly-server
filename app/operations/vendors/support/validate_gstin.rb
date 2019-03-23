@@ -83,6 +83,9 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   end
 
   def gstin_master_params(response_body)
+
+    addr_array = response_body[:data][:pradr][:addr].values.reject {|i| i.empty?}
+
     data = {
       gstin: response_body[:data][:gstin],
       api_response: response_body,
@@ -91,7 +94,8 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
       date_of_registration: response_body[:data][:rgdt],
       constitution_of_business: response_body[:data][:ctb],
       status: response_body[:data][:sts],
-      api_provider: response_body[:data][:masters_india]
+      api_provider: response_body[:data][:masters_india],
+      address: addr_array.join(", ")
     }
 
     data

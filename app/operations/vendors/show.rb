@@ -22,7 +22,7 @@ class Vendors::Show < Vendors::Base
   class Vendors::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :receiving_transactions, :bank_accounts, :vendor, :actions, :procurement_data,
-                  :custom_fields
+                  :custom_fields, :edit_config
 
     def init
       self.receiving_transactions = params[:receiving_transactions]
@@ -30,6 +30,7 @@ class Vendors::Show < Vendors::Base
       self.vendor = params[:vendor]
 
       self.actions = get_actions
+      self.edit_config = Vendors::NewVendorConfig.(self.vendor.created_by, params)
 
       if self.vendor.is_a?(YesBankVendor)
         self.procurement_data = get_procurement_data
