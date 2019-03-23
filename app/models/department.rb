@@ -57,7 +57,7 @@ class Department < ApplicationRecord
   def as_json2
     {
       id: self.id,
-      name: "#{self.parent&.name}/#{self.name}",
+      name: "#{self.parent&.name} / #{self.name}",
       cost_center: self.cost_center
     }
   end
