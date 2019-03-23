@@ -1,5 +1,6 @@
+require 'fuzzystringmatch'
+
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
-  require 'fuzzystringmatch'
   attr_accessor :gstin_params, :connection, :api_response, :response_body,
     :match_percentile, :valid_response, :gstin_master
 
