@@ -40,6 +40,7 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
 
     event :retract do
       transitions :from => :processing, :to => :retracted
+      transitions :from => :approved, :to => :retracted
     end
 
     event :send_to_vendor do
