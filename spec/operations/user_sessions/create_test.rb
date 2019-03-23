@@ -12,13 +12,13 @@ class UserSessionCreateHelper
         @controller = 'oauth/token'
         @action = 'create'
         @path = 'oauth/login'
-        @user_agent = Faker::Internet.user_agent
 
         @username = @user1.email
 
         allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post', user_agent: @user_agent}))
         allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({device: @device, success?: true}))
         allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
+        allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
 
         response = double({token: @token})
         @result = UserSessions::Create.(@status, {user: @user1, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
@@ -37,7 +37,6 @@ class UserSessionCreateHelper
         @controller = 'oauth/token'
         @action = 'create'
         @path = 'oauth/login'
-        @user_agent = Faker::Internet.user_agent
 
         @username = @user1.email
 
@@ -45,6 +44,7 @@ class UserSessionCreateHelper
         @message = 'Failed reason goes here'
         allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({device: @device, success?: true}))
         allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
+        allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
 
         response = double({token: @token})
         block.call if block_given?
@@ -108,6 +108,10 @@ class UserSessionCreateHelper
     instance.it 'should have UserDevice be set' do
       expect(@result.session.user_device_id).to eq(@device.id)
     end
+
+    instance.it 'should have UserAgent set' do
+      expect(@result.session.user_agent_client_id).to eq(@user_agent_client.id)
+    end
   end
 
   def self.user_absence_check(instance)
@@ -124,6 +128,10 @@ class UserSessionCreateHelper
     instance.it 'should have UserDevice as nil' do
       expect(@result.session.user_device_id).to be_nil
     end
+
+    instance.it 'should have UserAgent as nil' do
+      expect(@result.session.user_agent_client_id).to be_nil
+    end
   end
 end
 
@@ -139,6 +147,8 @@ RSpec.describe 'UserSessions::Create' do
       @device = create :user_device, client: @user_device_browser, company: @company, user: @user1
       @ip = '106.51.25.1'
       @ip_addr = create :user_ip, ip: @ip, user_id: @user1.id
+      @user_agent = Faker::Internet.user_agent
+      @user_agent_client = create :user_agent_client, user_agent: @user_agent, user_id: @user1.id
       @referer = 'https://www.google.com'
       @original_url = 'https://www.finly.io/oauth/login'
     end
@@ -240,7 +250,6 @@ RSpec.describe 'UserSessions::Create' do
             @controller = 'oauth/token'
             @action = 'create'
             @path = 'oauth/login'
-            @user_agent = Faker::Internet.user_agent
 
             @username = @user1.email
             @issue_string = 'Issue issue'
@@ -248,6 +257,7 @@ RSpec.describe 'UserSessions::Create' do
             allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post', user_agent: @user_agent}))
             allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({device: @device, success?: true}))
             allow(UserIps::FindOrCreate).to receive(:call).and_return(double({success?: false, messages: {error: [@issue_string]}}))
+            allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
 
             response = double({token: @token})
             @result = UserSessions::Create.(@status, {user: @user1, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})

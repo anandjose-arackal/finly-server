@@ -58,6 +58,7 @@ class UserSessions::Create < BaseOperation
     enrich_geo_location args
     enrich_device args
     enrich_ip args
+    enrich_user_agent args
     set_event args
     return if has_errors?
     self.session = UserSession.new args
@@ -169,6 +170,26 @@ class UserSessions::Create < BaseOperation
 
     args[:user_ip_id] = result.ip.id
     unless result.ip.valid?
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.device.message
+      # add_message :error, result.device.message
+      return
+    end
+  end
+
+  def enrich_user_agent(args)
+    return if user.nil?
+
+    result = UserAgentClients::FindOrCreate.(user, params)
+    unless result.success?
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.messages[:error].to_sentence
+      # add_message :error, result.messages[:error].to_sentence
+      return
+    end
+
+    args[:user_agent_client_id] = result.user_agent_client.id
+    unless result.user_agent_client.valid?
       args[:status_id] = UserSessionStatus.id_for(:failed)
       args[:message] = result.device.message
       # add_message :error, result.device.message

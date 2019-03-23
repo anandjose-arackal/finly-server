@@ -50,9 +50,10 @@ class UserSession < ApplicationRecord
   belongs_to :access_token, class_name: 'Doorkeeper::AccessToken', optional: true
   belongs_to :status, class_name: 'UserSessionStatus'
   belongs_to :user_ip, optional: true
+  belongs_to :user_agent_client, optional: true
+  belongs_to :user_device, optional: true
 
   has_many :events, class_name: 'UserSessionEvent', dependent: :destroy
-  belongs_to :user_device, optional: true
 
   accepts_nested_attributes_for :events
 
@@ -67,7 +68,8 @@ class UserSession < ApplicationRecord
 
   def verify(verification_mode)
     self.user_ip.update_attributes(status_id: UserIpStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
-    self.user_device.update_attributes(status_id: UserDeviceStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
+    self.user_agent&.update_attributes(status_id: UserAgentClientStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
+    self.user_device&.update_attributes(status_id: UserDeviceStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
   end
 
 end
