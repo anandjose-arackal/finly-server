@@ -18,6 +18,7 @@
 #  contact_name          :string(255)
 #  contact_mobile_number :string(255)
 #  is_deleted            :boolean          default(FALSE), not null
+#  nature_of_office      :string(255)
 #  deleted_at            :datetime
 #
 

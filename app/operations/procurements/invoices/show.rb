@@ -22,7 +22,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
     def init
       self.invoice = params[:invoice]
-      self.departments = user.company.departments.roots
+      # self.departments = user.company.departments.roots
+      self.departments = user.company.departments
 
       self.locations = user.company.locations
       if invoice.created_by&.departments.present?

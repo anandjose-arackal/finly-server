@@ -185,9 +185,15 @@ json.cost_centers do
   end
 end
 
+# json.departments do
+#   json.array! @result.departments do |dept|
+#     json.extract! dept, :id, :name, :cost_center_id
+#   end
+# end
+
 json.departments do
-  json.array! @result.departments do |dept|
-    json.extract! dept, :id, :name, :cost_center_id
+  json.array! @result.departments do |department|
+    json.merge! department.as_json3
   end
 end
 

@@ -64,6 +64,24 @@ class ReviewalLevel < ApplicationRecord
                                         }).first
   end
 
+  def set_reviewer_role_in_policy(reviewer)
+    associated_entity_type = self.associated_entity_type
+    case associated_entity_type
+    when 'PurchaseOrderProvider', :PurchaseOrderProvider
+      if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:purchase_order_reviewer)).blank?
+        reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:purchase_order_reviewer), policy_id: self.policy_id)
+      end
+    when 'InvoiceProvider', :InvoiceProvider
+      if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).blank?
+        reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:invoice_reviewer), policy_id: self.policy_id)
+      end
+    when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
+      if reviewer.policy_user_roles.with_policy_id(self.policy_id).with_role_id(UserRole.id_for(:bank_payment_request_reviewer)).blank?
+        reviewer.policy_user_roles.create(user_role_id: UserRole.id_for(:bank_payment_request_reviewer), policy_id: self.policy_id)
+      end
+    end
+  end
+
   private
 
   def reassign_level_numbers

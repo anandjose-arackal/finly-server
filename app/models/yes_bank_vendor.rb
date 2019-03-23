@@ -25,6 +25,7 @@
 #  payment_term_id   :integer
 #  currency_id       :integer
 #  tds_rates_list_id :integer
+#  vendor_code       :string(255)
 #  vendor_id         :string(255)
 #  disabled          :boolean          default(FALSE)
 #  deleted_at        :datetime
