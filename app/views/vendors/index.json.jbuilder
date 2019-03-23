@@ -1,9 +1,9 @@
 json.result do
 
   json.array!(@result.paginated_vendors) do |vendor|
-    json.label vendor.name
-    json.value vendor.id
+    json.extract! vendor, :id, :name, :business_name, :description, :vendor_id
     json.vendor_id vendor&.vendor_id
+    json.vendor_type vendor.vendor_type.as_json
 
     json.extract! vendor, :id, :name, :email, :mobile_number
     json.policy vendor.policy.as_json
@@ -12,6 +12,7 @@ json.result do
 
     json.description vendor.description
     json.created_by vendor.created_by&.name
+    json.created_at vendor.created_at.strftime "%d %b %y"
 
     json.bank_accounts do
       json.array!(vendor.bank_accounts.non_deleted) do |bank_account|

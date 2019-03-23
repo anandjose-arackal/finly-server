@@ -63,7 +63,9 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
 
     # Will be abstracted to helper method
     jarow = ::FuzzyStringMatch::JaroWinkler.create( :native )
-    self.match_percentile = (jarow.getDistance( response_business_name, request_business_name ) * 100).to_i
+    if request_business_name.present? && response_business_name.present?
+      self.match_percentile = (jarow.getDistance( response_business_name, request_business_name ) * 100).to_i
+    end
   end
 
   def success

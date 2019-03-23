@@ -117,7 +117,7 @@ class YesBankVendor < ApplicationRecord
   }
 
   scope :include_details, -> {
-    includes(:status, :created_by, :bank_accounts)
+    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy)
   }
 
   scope :includes_for_show, -> {

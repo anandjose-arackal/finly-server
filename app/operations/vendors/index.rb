@@ -7,6 +7,14 @@ class Vendors::Index < Vendors::Base
     attr_accessor :vendors, :count, :paginated_vendors
 
     has_scope :filter_name_search
+    has_scope :filter_vendor_type_id
+    has_scope :filter_status_id
+    has_scope :filter_policy_id
+    has_scope :filter_created_by_id
+    has_scope :filter_account_number
+    has_scope :filter_business_name
+    has_scope :filter_vendor_id
+
 
     has_scope :sort_vendor_id
 
