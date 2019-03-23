@@ -76,7 +76,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     ############# Reviewer logic start #########################
     if purchase_order.is_reviewing_user? || user.vendor_payments_admin?
       if purchase_order.processing?
-        last_trail = purchase_order.trails.last rescue nil
+        last_trail = purchase_order.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
         if (purchase_order.get_reviewers.include?(user))
           if purchase_order.action_users(:approve).include?(user)
             if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
