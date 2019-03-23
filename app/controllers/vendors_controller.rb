@@ -72,4 +72,9 @@ class VendorsController < ApplicationController
     @result = Vendors::Support::ValidateGstin.(current_user, params)
     respond
   end
+
+  def actions_config_show
+    @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
 end
