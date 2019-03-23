@@ -10,6 +10,13 @@ unless Rails.env.production?
   end
 end
 
+# Todo untested
+WHITELISTED_IPS = Finly::SecureStorage::Connector.read('core/api_ip_list')
+Rack::Attack.safelist('allow API requests from known IPs') do
+  WHITELISTED_IPS.include?(req.ip)
+end
+# Todo untested
+
 # Request Throttling Start
 # 120rpm
 # 500request per 5minutes
