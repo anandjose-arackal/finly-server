@@ -86,6 +86,7 @@ class YesBankVendor < ApplicationRecord
   # accepts_nested_attributes_for :cancelled_cheque_attachment, allow_destroy: true
 
   scope :with_ids, -> (ids) {where id: ids}
+  scope :with_id, -> (ids) {where id: ids}
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> {where deleted_at: nil}
@@ -117,6 +118,10 @@ class YesBankVendor < ApplicationRecord
 
   scope :include_details, -> {
     includes(:status, :created_by, :bank_accounts)
+  }
+
+  scope :includes_for_show, -> {
+    includes(:status, :created_by, :bank_accounts, gstin_locations: [:gstin_master, :location])
   }
 
   # Scopes for ordering

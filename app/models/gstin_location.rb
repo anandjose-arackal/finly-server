@@ -18,7 +18,7 @@
 #
 
 class GstinLocation < ApplicationRecord
-  belongs_to :gstin
+  belongs_to :gstin_master, foreign_key: :gstin_id
   belongs_to :state
 
   belongs_to :location, class_name: "BranchLocation"

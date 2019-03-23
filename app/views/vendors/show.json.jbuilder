@@ -32,6 +32,12 @@ json.bank_accounts do
     json.default bank_account.default_account
   end
 end
+
+json.gstin_locations do 
+  json.array!(@result.vendor.gstin_locations) do |gstin_location|
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation
+  end
+end
 json.transactions do
   json.array!(@result.receiving_transactions) do |payment|
     json.extract! payment, :id, :note
