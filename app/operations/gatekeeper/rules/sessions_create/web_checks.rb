@@ -77,7 +77,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
         require_otp true
 
-        #todo send mailer
+        # todo send mailer
       end
     end
 
@@ -92,7 +92,8 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         next unless RequestStoreUtil.current_session&.user_agent_client.status_id == UserIpStatus.id_for(:unverified)
         require_otp true
 
-        #todo send mailer
+        # todo send mailer
+
       end
     end
 
