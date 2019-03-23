@@ -9,6 +9,8 @@
 #
 
 class UserRole < ApplicationRecord
+  include Seedable
+
   has_many :users, through: :user_role_mappings
 
   scope :admin, -> { where(id: UserRole.id_for(:admin)) }

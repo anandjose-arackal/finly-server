@@ -64,24 +64,32 @@ Gatekeeper::Checker.new 'On Web Authentication' do
           fail
         end
       end
-
     end
 
-    section 'Ip Check' do
-
-      rule 'UserIP has to be created for every session' do
+    section 'User IP' do
+      rule 'has to be created for every session' do
         next unless RequestStoreUtil.current_session&.user_ip.nil?
         response_code 401
         fail
       end
 
-      # # todo enable this once frontend is sending the X-Finly-RP headers
-      # rule 'Unverified IPs need to be verified before proceeding' do
-      #   next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
-      #   require_otp true
-      # end
-      # # todo enable this once frontend is sending the X-Finly-RP headers
+      rule 'Unverified IPs need to be verified before proceeding' do
+        next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
+        require_otp true
+      end
+    end
 
+    section 'UserAgentClient' do
+      rule 'has to be created for every session' do
+        next unless RequestStoreUtil.current_session&.user_agent_client.nil?
+        response_code 401
+        fail
+      end
+
+      rule 'Unverified UserAgent Clients need to be verified before proceeding' do
+        next unless RequestStoreUtil.current_session&.user_agent_client.status_id == UserIpStatus.id_for(:unverified)
+        require_otp true
+      end
     end
 
     section 'Expire' do

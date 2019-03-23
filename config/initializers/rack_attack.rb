@@ -3,12 +3,12 @@ redis_client = Redis.new({url: redis_config['url'], password: redis_config['pass
 rack_attack_logger = LogStashLogger.new(type: :file, path: 'log/rack_attack_block.log', sync: true)
 Rack::Attack.cache.store = Rack::Attack::StoreProxy::RedisStoreProxy.new(redis_client)
 
-# unless Rails.env.production?
-#   Rack::Attack.safelist('allow from localhost') do |req|
-#     # Requests are allowed if the return value is truthy
-#     '127.0.0.1' == req.ip || '::1' == req.ip
-#   end
-# end
+unless Rails.env.production?
+  Rack::Attack.safelist('allow from localhost') do |req|
+    # Requests are allowed if the return value is truthy
+    '127.0.0.1' == req.ip || '::1' == req.ip
+  end
+end
 
 # Request Throttling Start
 # 120rpm
