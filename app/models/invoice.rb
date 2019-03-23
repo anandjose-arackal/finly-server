@@ -69,8 +69,10 @@
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
-#
-
+#  po_advance                   :integer,
+#  po_prev_adjusted_advance     :integer,
+#  po_adjusted_advance          :integer
+# 
 #  gst_type_id: 1 - IGST
 #              2 - CGST + SGST
 
@@ -93,6 +95,11 @@ class Invoice < ApplicationRecord
   belongs_to :freight_amount, optional: true, class_name: "Amount"
   belongs_to :balance_due, optional: true, class_name: "Amount"
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
+
+  # Captures PO advance if any and how much is adjusted in the tax invoice
+  # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
+  belongs_to :po_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_adjusted_advance
+
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
@@ -155,6 +162,8 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :advance_amount
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
+  # accepts_nested_attributes_for :po_prev_adjusted_advance
+  accepts_nested_attributes_for :po_adjusted_advance
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -429,7 +438,7 @@ class Invoice < ApplicationRecord
   def item_amounts_total
     if self.invoice_items.present?
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount.value}.sum
+      return self.invoice_items.map {|p| p.amount&.value}.sum
     else
       return 0
     end

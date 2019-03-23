@@ -43,7 +43,7 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
     if purchase_order.valid?
       purchase_order.save
-
+      purchase_order.process_line_item_calculation
       purchase_order.save
 
       # Create Trail for it

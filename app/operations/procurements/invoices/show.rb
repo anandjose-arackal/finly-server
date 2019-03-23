@@ -25,7 +25,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       self.departments = user.company.departments.roots
 
       self.locations = user.company.locations
-      if invoice.created_by.departments.present?
+      if invoice.created_by&.departments.present?
         self.sub_departments = invoice.created_by.departments.only_sub_departments
       else
         self.sub_departments = invoice.created_by.company.departments.only_sub_departments
