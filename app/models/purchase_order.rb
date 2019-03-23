@@ -418,7 +418,8 @@ class PurchaseOrder < ApplicationRecord
     {
       original_amount: precision_value(self.total_after_tax&.value),
       advance_amount: precision_value(self.advance_amount&.value),
-      balance_due: precision_value(self.balance_amount&.value)
+      balance_due: precision_value(self.balance_amount&.value),
+      procurement_id: self.procurement_id
       # balance_due: {
       #   value: precision_value(self.balance_amount&.value),
       #   id: self.balance_amount&.id,

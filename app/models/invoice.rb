@@ -523,6 +523,7 @@ class Invoice < ApplicationRecord
     {
       id: self.id,
       invoice_type: self.invoice_type&.name,
+      procurement_id: self.procurement_id,
       advance: self.advance,
       advance_amount: self.advance_amount&.value,
       tax_amount: precision_value(self.tax_amount&.value),
