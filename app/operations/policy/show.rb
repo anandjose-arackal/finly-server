@@ -76,10 +76,16 @@ class Policy::Show < Policy::Base
 
   def init
     id = (params[:policy_id] or params[:id])
-    self.policy = Policy::Index.(user, params).policies.with_id(id)&.first
-    self.mappings = []
 
-    user_ids = self.policy.user_mapping.exclude_deleted.pluck(:user_id)
+    self.mappings = []
+    # Seperating api temporarily until policy user role is setup in all systems
+    if vendor_payments?
+      self.policy = Policy::VendorPayments::Index.(current_user, params[:filter_role_id]).policies.with_id(id)&.first
+      user_ids = self.policy.policy_user_roles.pluck(:user_id)
+    else
+      self.policy = Policy::Index.(user, params).policies.with_id(id)&.first
+      user_ids = self.policy.user_mapping.exclude_deleted.pluck(:user_id)
+    end
     self.policy_users = user.company.users.with_subscription(current_app).with_id(user_ids)
   end
 

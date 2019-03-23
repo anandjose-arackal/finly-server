@@ -90,6 +90,9 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
   # IF PO HAS ANY ADVANCE AMOUNT, WE ADD IT HERE
   belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_tds_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_tds_slab, optional: true, class_name: 'TdsRatesList'
+
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
@@ -296,7 +299,7 @@ class PurchaseOrder < ApplicationRecord
     where('created_at >= ? && created_at <= ?', from, to)
   }
 
-  before_save :calculate_line_items
+  # before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -559,6 +562,17 @@ class PurchaseOrder < ApplicationRecord
 
     if self.advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
+
+      if self.advance_tds_slab.present?
+        tds = self.advance_tds_slab&.tds
+        new_advance_amount = TaxCalculationUtils.tds_amount(self.advance_amount.value, tds)
+        tds_amount = self.advance_amount.value - new_advance_amount
+        self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
+        final_advance_amount = self.advance_amount.value - tds_amount
+        self.advance_amount.value = final_advance_amount
+      end
+
+
     else
       self.advance_amount  = Amount.new(value: 0, currency_id: 1)
     end

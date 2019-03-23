@@ -8,7 +8,7 @@ class PolicyUserRoles::Index < PolicyUserRoles::Base
   end
 
   def process
-    self.policy_user_roles = self.policy.policy_user_roles
+    self.policy_user_roles = self.policy.policy_user_roles.includes(:user, :policy, :user_role)
     self.user_roles = UserRole.all 
   end
 

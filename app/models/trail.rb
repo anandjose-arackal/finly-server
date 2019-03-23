@@ -85,6 +85,10 @@ class Trail < ApplicationRecord
     where created_at: (date.beginning_of_day..date.end_of_day)
   }
 
+  scope :filter_date_range, -> (from, to) {
+    where created_at: (from.beginning_of_day..to.end_of_day)
+  }
+
   def as_json(user)
     {
         action_type: self.action&.name,
