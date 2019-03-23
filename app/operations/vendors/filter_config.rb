@@ -25,7 +25,7 @@ class Vendors::FilterConfig < Vendors::Base
   end
 
   class Vendors::FilterConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :vendor_types, :policies, :vendor_empanelment_workflow_enabled
+    attr_accessor :vendor_types, :policies, :vendor_empanelment_workflow_enabled, :vendor_statuses
 
     def init
       self.policies = Policy.none

@@ -4,10 +4,11 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     :match_percentile, :valid_response, :gstin_master
 
   class Vendors::Support::ValidateGstin::ValidatePresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :api_response, :match_percentile, :response_body, :match_percentile, :valid_response
+    attr_accessor :api_response, :match_percentile, :response_body, :match_percentile, :valid_response,
+                  :gstin_master
 
     def init
-      self.api_response = params[:api_response]
+      self.gstin_master = params[:gstin_master]
       self.response_body = params[:response_body]
       self.match_percentile = params[:match_percentile]
       self.valid_response = params[:valid_response]
@@ -32,32 +33,40 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     # First find in GSTIN Master
     self.gstin_master = Gstin.with_gstin(gstin_params[:gstin]).first
 
-    if gstin_master.present?
-      
-
-    else
+    unless gstin_master.present?
       # self.api_response = self.connection.get, { :gstin => gstin_params[:gstin] }
       self.api_response = self.connection.get
 
       if self.api_response.status && self.api_response.status == 200
         self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
-        unless self.response_body[:error]
+        if self.response_body[:error]
+          return
+        else
+          # Save information to gstin master
+
+          self.gstin_master = Gstin.create(gstin_master_params(response_body))
+
           self.valid_response = true
 
-          response_business_name = self.response_body[:data][:lgnm]
-          request_business_name = gstin_params[:business_name] || ""
-
-
-          # Will be abstracted to helper method
-          jarow = FuzzyStringMatch::JaroWinkler.create( :native )
-          self.match_percentile = (jarow.getDistance( response_business_name, request_business_name ) * 100).to_i
-
         end
+      else
+        add_message :error, "Something went wrong. Please try again later"
+        return
       end
     end
+
+    self.response_body = self.gstin_master.api_response
+    self.valid_response = true
+    request_business_name = gstin_params[:business_name]
+    response_business_name = gstin_master.legal_name_of_business
+
+    # Will be abstracted to helper method
+    jarow = FuzzyStringMatch::JaroWinkler.create( :native )
+    self.match_percentile = (jarow.getDistance( response_business_name, request_business_name ) * 100).to_i
   end
 
   def success
+    params[:gstin_master] = self.gstin_master
     params[:valid_response] = self.valid_response
     params[:api_response] = self.api_response
     params[:response_body] = self.response_body
@@ -70,6 +79,21 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
 
   def generate_params
     params.require(:gstin_location).permit(:gstin, :business_name)
+  end
+
+  def gstin_master_params(response_body)
+    data = {
+      gstin: response_body[:data][:gstin],
+      api_response: response_body,
+      legal_name_of_business: response_body[:data][:lgnm],
+      state: response_body[:data][:stj],
+      date_of_registration: response_body[:data][:rgdt],
+      constitution_of_business: response_body[:data][:ctb],
+      status: response_body[:data][:sts],
+      api_provider: response_body[:data][:masters_india]
+    }
+
+    data
   end
 
   def setup_connection

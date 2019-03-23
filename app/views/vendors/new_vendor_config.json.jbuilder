@@ -29,6 +29,12 @@ json.policies do
   end
 end
 
+json.locations do
+  json.array! @result.locations do |location|
+    json.extract! location, :id, :name
+  end
+end
+
 
 json.reviewal_chains do
   json.array! @result.reviewal_chains do |chain|

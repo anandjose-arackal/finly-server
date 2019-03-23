@@ -1,6 +1,6 @@
 class Vendors::NewVendorConfig < Vendors::Base
   attr_accessor :states, :vendor_types, :payment_terms, :currencies, :tds_rates,
-                :field_configurations, :policies
+                :field_configurations, :policies, :locations
   def init
     self.states = GstStateCode.all
     self.vendor_types = user.company.vendor_types
@@ -8,6 +8,7 @@ class Vendors::NewVendorConfig < Vendors::Base
     self.payment_terms = user.company.payment_terms
     self.tds_rates = user.company.tds_slabs
     self.field_configurations = current_company.field_configurations.with_parent_type(FieldParentType.id_for(:vendor))
+    self.locations = user.company.locations
 
     if user.company.vendor_empanelment_workflow_enabled?
       self.policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
@@ -24,6 +25,7 @@ class Vendors::NewVendorConfig < Vendors::Base
     params[:currencies] = self.currencies
     params[:tds_rates] = self.tds_rates
     params[:field_configurations] = self.field_configurations
+    params[:locations] = self.locations
     if user.company.vendor_empanelment_workflow_enabled?
       params[:policies] = self.policies
     end
@@ -31,7 +33,7 @@ class Vendors::NewVendorConfig < Vendors::Base
   end
 
   class Vendors::NewVendorConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :states, :vendor_types, :currencies, :payment_terms, :tds_rates, :field_configurations, :policies, :actions, :reviewal_chains
+    attr_accessor :states, :vendor_types, :currencies, :payment_terms, :tds_rates, :field_configurations, :policies, :actions, :reviewal_chains, :locations
 
     def init
       self.actions = {
@@ -43,6 +45,7 @@ class Vendors::NewVendorConfig < Vendors::Base
       self.currencies = params[:currencies]
       self.payment_terms = params[:payment_terms]
       self.tds_rates = params[:tds_rates]
+      self.locations = params[:locations]
       self.field_configurations = params[:field_configurations]
       if user.company.vendor_empanelment_workflow_enabled?
         self.actions[:primary] = {name: "Submit for Approval", url: "vendors/submit", method: "POST", type: "submit"}
