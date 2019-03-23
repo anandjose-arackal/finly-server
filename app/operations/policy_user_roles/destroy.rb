@@ -57,7 +57,7 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
     reviewer_level_ids = policy.levels.exclude_deleted.where(associated_entity_type: provider).pluck(:id)
     reviewer_ids = LevelReviewerMapping.non_deleted.with_level_id(reviewer_level_ids).pluck(:reviewer_id)
     # lurm reviewers
-    level_ids = ReviewalLevel.where(id: policy.level_user_reviewer_mappings&.pluck(:level_id), associated_entity_type: provider)
+    level_ids = ReviewalLevel.where(id: policy.level_user_reviewer_mappings&.pluck(:level_id), associated_entity_type: provider)&.pluck(:id)&.uniq
     reviewer_ids += policy.level_user_reviewer_mappings.where(level_id: level_ids).pluck(:reviewer_id)
     return reviewer_ids&.uniq&.flatten&.compact
   end
