@@ -104,13 +104,10 @@ end
 
 json.departments do
   json.array! @result.departments do |department|
-    if department.parent.blank?
-      json.merge! department.as_json3
-    else
-      json.merge! department.as_json2
-    end
+    json.merge! department.as_json3
   end
 end
+
 
 json.sub_departments do
   json.array! @result.sub_departments do |dept|
