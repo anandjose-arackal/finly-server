@@ -15,7 +15,7 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
     end
     # Do not destroy if user is set as reviewer in approval workflow
     # Destroy user from approval flow first
-    validate_reviewer_in_approval_flow
+      validate_reviewer_in_approval_flow if %w(purchase_order_reviewer invoice_reviewer bank_payment_request_reviewer).include?(reviewer_type)
   end
 
   def process

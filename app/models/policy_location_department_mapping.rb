@@ -1,0 +1,2 @@
+class PolicyLocationDepartmentMapping < ApplicationRecord
+end

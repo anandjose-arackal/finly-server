@@ -118,15 +118,14 @@ class Procurement < ApplicationRecord
     where id: filtered_ids
   }
 
-  scope :filter_submission_date, -> (submission_date) {
-    date = Date.parse(submission_date) rescue nil
-
-    if date
-      purchase_order_ids = Trail.with_parent_type('PurchaseOrder').with_action_id(TrailAction.id_for(:submit)).filter_date(date).pluck(:parent_id)
-      filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
-
-      where id: filtered_ids
-    end
+  scope :filter_submission_date, -> (date_from, date_to) {
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date.strftime("%d-%m-%Y") if date_to.blank?
+    date_from = DateTime.parse(date_from).beginning_of_day unless date_from.is_a?(Date)
+    date_to = DateTime.parse(date_to).end_of_day unless date_to.is_a?(Date)
+    purchase_order_ids = Trail.with_parent_type('PurchaseOrder').with_action_id(TrailAction.id_for(:submit)).filter_date_range(date_from, date_to).pluck(:parent_id)
+    filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
+    where id: filtered_ids
   }
 
   scope :filter_creation_date_from, -> (creation_date){
@@ -338,6 +337,27 @@ class Procurement < ApplicationRecord
         :status_tags, :procurement_status_taggables, :user
     )
   }
+
+  scope :filter_location_id, -> (location_id) {
+    filtered_ids = PurchaseOrder.where(location_id: location_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_cost_center_id, -> (cost_center_id) {
+    filtered_ids = PurchaseOrder.where(cost_center_id: cost_center_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_department_id, -> (department_id) {
+    filtered_ids = PurchaseOrder.where(department_id: department_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_sub_department_id, -> (sub_department_id) {
+    filtered_ids = PurchaseOrder.where(sub_department_id: sub_department_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
 
   def awaiting_action?(user)
     # Ideal method:
