@@ -73,7 +73,7 @@ class VendorsController < ApplicationController
     respond
   end
 
-  def actions_config_show
+  def actions_config
     @result = ActionsManager::Processor.(current_user, params)
     respond
   end

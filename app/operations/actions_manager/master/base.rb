@@ -29,7 +29,8 @@ class ActionsManager::Master::Base
     users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
     users_show: '::ActionsManager::Master::BankTransfer::Users::Show',
     vp_role_config: '::ActionsManager::Master::PolicyUserRoles::RoleConfig',
-    vendor_show: '::ActionsManager::Master::Vendors::Show'
+    vendor_show: '::ActionsManager::Master::Vendors::Show',
+    vendors_index: '::ActionsManager::Master::Vendors::Index'
 
   }.with_indifferent_access
 

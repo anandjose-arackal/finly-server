@@ -16,10 +16,15 @@ json.vendor do
     json.state_code_name @result.vendor.state_code&.full_name
     json.created_by @result.vendor.created_by&.name
     json.vendor_id @result.vendor.vendor_id
+    json.tds_rates do
+      json.array! @result.vendor.tds_rates do |tds_rate|
+        json.extract! tds_rate, :id, :name, :tds
+      end
+    end
   else
     json.editable_details false
   end
-  json.created_at @result.vendor.created_at.strftime "%b %d %yy"
+  json.created_at @result.vendor.created_at.strftime "%b %d %y"
 end
 json.status do
   json.merge! @result.vendor.status&.as_json

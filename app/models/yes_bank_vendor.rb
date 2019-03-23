@@ -108,6 +108,17 @@ class YesBankVendor < ApplicationRecord
     where(id: vendor_ids)
   }
 
+  scope :filter_vendor_type_id, -> (type_id) {where vendor_type_id: type_id}
+  scope :filter_status_id, -> (status_id) {where status_id: status_id}
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+  scope :filter_created_by_id, -> (user_id) {where created_by_id: user_id}
+  scope :filter_business_name, -> (term) {where("business_name like ?", "%#{term}%")}
+  scope :filter_vendor_id, -> (vendor_id) {where(vendor_id: vendor_id)}
+  scope :filter_account_details, -> (term) {
+    bank_account_ids = BankAccount.where(account_owner_type: "YesBankVendor").where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:account_owner_id)
+    where id: bank_account_ids
+  }
+
   scope :includes_bank_accounts, -> {
     includes(:bank_accounts)
   }
@@ -121,15 +132,14 @@ class YesBankVendor < ApplicationRecord
   }
 
   scope :includes_for_show, -> {
-    includes(:status, :created_by, :bank_accounts, gstin_locations: [:gstin_master, :location])
+    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy, :tds_rates, gstin_locations: [:gstin_master, :location])
   }
 
   # Scopes for ordering
-  scope :sort_business_name, -> (type) { ['asc', 'desc'].include?(type) ? reorder(business_name: type.to_sym) : reorder(business_name: :asc) }
   scope :sort_vendor_id, -> (type) { ['asc', 'desc'].include?(type) ? reorder(vendor_id: type.to_sym) : reorder(vendor_id: :asc) }
   scope :sort_business_name, -> (type) { ['asc', 'desc'].include?(type) ? reorder(business_name: type.to_sym) : reorder(business_name: :asc) }
-  scope :sort_business_name, -> (type) { ['asc', 'desc'].include?(type) ? reorder(business_name: type.to_sym) : reorder(business_name: :asc) }
-  scope :sort_business_name, -> (type) { ['asc', 'desc'].include?(type) ? reorder(business_name: type.to_sym) : reorder(business_name: :asc) }
+  scope :sort_created_at, -> (type) { ['asc', 'desc'].include?(type) ? reorder(created_at: type.to_sym) : reorder(created_at: :asc) }
+  scope :sort_updated_at, -> (type) { ['asc', 'desc'].include?(type) ? reorder(updated_at: type.to_sym) : reorder(updated_at: :asc) }
 
 
   # Scopes for ordering ends
