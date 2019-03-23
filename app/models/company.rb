@@ -391,6 +391,15 @@ class Company < ApplicationRecord
     Policy.with_id(policy_ids)
   end
 
+  def dep_subdept_mapping
+    result = {}
+    departments = user.company.departments
+    sub_departments = user.company.departments.only_sub_departments
+    departments.each do |department|
+      
+    end
+  end
+
   private
 
   def init_config_present

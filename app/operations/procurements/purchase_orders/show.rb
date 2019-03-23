@@ -32,7 +32,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.purchase_order = params[:purchase_order]
       self.procurement = self.purchase_order.procurement
       self.actions = get_actions
-      self.departments = user.company.departments.roots
+      self.departments = user.company.departments.only_sub_departments
       self.locations = user.company.locations.includes(:state)
 
       if purchase_order.user.departments.present?
