@@ -22,7 +22,7 @@ class Vendors::Show < Vendors::Base
   class Vendors::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :receiving_transactions, :bank_accounts, :vendor, :actions, :procurement_data,
-                  :custom_fields, :edit_config
+                  :custom_fields, :edit_config, :reviewal_chain
 
     def init
       self.receiving_transactions = params[:receiving_transactions]

@@ -26,6 +26,8 @@ json.vendor do
   end
   json.created_at @result.vendor.created_at.strftime "%b %d %y"
 end
+
+json.reviewal_chain @result.vendor.get_reviewal_chain
 json.status do
   json.merge! @result.vendor.status&.as_json
 end
