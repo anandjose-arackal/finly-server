@@ -522,6 +522,7 @@ class Invoice < ApplicationRecord
   def as_json
     {
       id: self.id,
+      invoice_type: self.invoice_type&.name,
       advance: self.advance,
       advance_amount: self.advance_amount&.value,
       tax_amount: precision_value(self.tax_amount&.value),

@@ -161,12 +161,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
          # if last_invoice.po_prev_adjusted_advance == last_invoice.po_advance
         self.last_invoice = self.previous_invoices.last
         total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.po_adjusted_advance&.value&.to_i
-        self.po_prev_adjusted_advance = Amount.new(value: total_adjusted_advance, currency_id: self.advance.currency_id)
+        self.po_prev_adjusted_advance = total_adjusted_advance
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
         current_adjustment = self.po_advance - total_adjusted_advance
         self.po_adjusted_advance = Amount.new(value: current_adjustment, currency_id: 1)
       else
-        self.po_prev_adjusted_advance = Amount.new(value: 0, currency_id: self.advance.currency_id)
+        self.po_prev_adjusted_advance = 0
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
         self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
       end
