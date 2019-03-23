@@ -943,6 +943,7 @@ ActiveRecord::Schema.define(version: 2019_03_23_135355) do
     t.string "location_code"
     t.string "ancestry"
     t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
+    t.string "nature_of_office"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
   end
@@ -6164,6 +6165,7 @@ ActiveRecord::Schema.define(version: 2019_03_23_135355) do
     t.string "vendor_id"
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
+    t.string "vedor_code"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"
