@@ -189,6 +189,9 @@ gem 'aws-sdk-sqs', '~> 1.10.0'
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '~> 1.8.0'
 
+# Fuzzy String Match
+gem 'fuzzy-string-match', '1.0.1'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
@@ -219,9 +222,6 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'factory_bot'
   gem 'database_cleaner'
-
-  # Fuzzy String Match
-  gem 'fuzzy-string-match', '1.0.1'
 
 end
 
