@@ -2,10 +2,11 @@ class Vendors::PennyTest < Vendors::Base
   attr_accessor :bank_account_params, :account_name
 
   class Vendors::PennyTest::TestPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :account_name
+    attr_accessor :account_name, :match_percentile
 
     def init
-      params[:account_name] = params[:account_name]
+      self.account_name = params[:account_name]
+      self.match_percentile = params[:match_percentile]
     end
   end
 
@@ -34,6 +35,7 @@ class Vendors::PennyTest < Vendors::Base
 
   def success
     params[:account_name] = self.account_name
+    params[:match_percentile] = self.match_percentile
     Vendors::PennyTest::TestPresenter.new(user, params, messages)
   end
 

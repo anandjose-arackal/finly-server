@@ -2,6 +2,14 @@
 
 class Vendors::Submit < Vendors::Base
 
+  class Vendors::Submit::SubmitPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :vendor
+
+    def init
+      self.vendor = params[:vendor]
+    end
+  end
+
   def init
     # Create Vendor
     op_create = Vendors::Create.(user, params)
@@ -30,5 +38,10 @@ class Vendors::Submit < Vendors::Base
 
   def post_process
     add_message :success, "Submitted vendor for approval"
+  end
+
+  def success
+    params[:vendor] = self.vendor
+    Vendors::Submit::SubmitPresenter.new(user, params, messages)
   end
 end
