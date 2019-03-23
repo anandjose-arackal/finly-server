@@ -104,7 +104,11 @@ end
 
 json.departments do
   json.array! @result.departments do |department|
-    json.extract! department, :id, :name, :cost_center_id
+    if department.parent.blank?
+      json.merge! department.as_json3
+    else
+      json.merge! department.as_json2
+    end
   end
 end
 

@@ -62,4 +62,12 @@ class Department < ApplicationRecord
     }
   end
 
+  def as_json3
+    {
+      id: self.id,
+      name: self.name,
+      cost_center: self.cost_center
+    }
+  end
+
 end
