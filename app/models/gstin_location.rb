@@ -18,8 +18,9 @@
 #
 
 class GstinLocation < ApplicationRecord
+  belongs_to :vendor, class_name: "YesBankVendor"
   belongs_to :gstin_master, foreign_key: :gstin_id, optional: true
   belongs_to :state, optional: true
 
-  belongs_to :location, class_name: "BranchLocation"
+  belongs_to :location, class_name: "BranchLocation", optional: true
 end
