@@ -38,7 +38,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     else
       self.inward_invoice_params[:advance_amount_required] = false
-      self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice.po_adjusted_advance.value || 0
+      if self.inward_invoice.po_adjusted_advance.present?
+        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice&.po_adjusted_advance&.value || 0
+      end
     end
 
   end
