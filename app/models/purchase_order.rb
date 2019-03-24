@@ -599,8 +599,8 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.role_based_associated_status_ids(user)
-    # self.status_ids(self.role_based_statuses(user))
-    PurchaseOrderStatus.ids_for(self.role_based_statuses(user))
+    self.status_ids(*self.role_based_statuses(user))
+    # PurchaseOrderStatus.ids_for(*self.role_based_statuses(user))
   end
 
   def self.role_based_statuses(user)
