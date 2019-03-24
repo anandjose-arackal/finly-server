@@ -2,7 +2,9 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
   attr_accessor :procurements
 
   def init
-    self.procurements = Procurements::Index.(user, params).procurements
+    params[:filter_procurement_type] = "purchase_order"
+    params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
+    self.procurements = Procurements::Grn::Pending::Index.(user, params).procurements
   end
 
   def success
