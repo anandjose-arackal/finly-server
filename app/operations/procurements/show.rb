@@ -51,6 +51,8 @@ class Procurements::Show < Procurements::Base
         self.policies = policies_op.policies
       end
 
+      # self.grn_items = self.inward_documents.last.all_items_accepted?
+
     end
 
     def get_actions
@@ -60,7 +62,7 @@ class Procurements::Show < Procurements::Base
           actions[:add_document] = true
         end
       elsif purchase_order.present?
-        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && (user_in_level? || document_owner?)
+        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.all_items_accepted?) && (user_in_level? || document_owner?)
           actions[:add_document] = true
         end
       end

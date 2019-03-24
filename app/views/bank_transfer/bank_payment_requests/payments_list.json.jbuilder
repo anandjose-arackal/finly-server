@@ -45,6 +45,7 @@ json.payments do
       json.invoice do
         json.id invoice.id
         json.invoice_type invoice.invoice_type&.name
+        json.procurement_id invoice.procurement_id
         json.advance invoice.advance
         json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
