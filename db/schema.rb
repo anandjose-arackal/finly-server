@@ -942,8 +942,8 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.datetime "deleted_at"
     t.string "location_code"
     t.string "ancestry"
-    t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
     t.string "nature_of_office"
+    t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
   end
@@ -5339,6 +5339,56 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.index ["purpose_id"], name: "index_unique_identifiers_on_purpose_id"
   end
 
+  create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_agent_client_statuses_on_name"
+  end
+
+  create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "user_agent", null: false
+    t.integer "user_id", null: false
+    t.integer "status_id", null: false
+    t.string "verification_mode"
+    t.string "verification_key"
+    t.datetime "verification_code_sent_at"
+    t.datetime "verified_at"
+    t.integer "verification_code_count"
+    t.integer "verification_code_failed_attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["status_id"], name: "index_user_agent_clients_on_status_id"
+    t.index ["user_agent"], name: "index_user_agent_clients_on_user_agent"
+    t.index ["user_id"], name: "index_user_agent_clients_on_user_id"
+    t.index ["verification_mode"], name: "index_user_agent_clients_on_verification_mode"
+  end
+
+  create_table "user_agent_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_agent_statuses_on_name"
+  end
+
+  create_table "user_agents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "user_agent", null: false
+    t.integer "user_id", null: false
+    t.integer "status_id", null: false
+    t.string "verification_mode"
+    t.string "verification_key"
+    t.datetime "verification_code_sent_at"
+    t.datetime "verified_at"
+    t.integer "verification_code_count"
+    t.integer "verification_code_failed_attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["status_id"], name: "index_user_agents_on_status_id"
+    t.index ["user_agent"], name: "index_user_agents_on_user_agent"
+    t.index ["user_id"], name: "index_user_agents_on_user_id"
+    t.index ["verification_mode"], name: "index_user_agents_on_verification_mode"
+  end
+
   create_table "user_balance_histories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.date "date"
     t.integer "user_id"
@@ -5764,6 +5814,8 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.string "client_type"
     t.text "user_agent"
     t.integer "user_ip_id"
+    t.integer "user_agent_id"
+    t.integer "user_agent_client_id"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"
