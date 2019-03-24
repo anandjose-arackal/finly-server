@@ -92,6 +92,8 @@ class YesBankVendor < ApplicationRecord
   scope :non_deleted, -> {where deleted_at: nil}
   scope :authorized, -> { where authorized: true}
 
+  scope :non_draft, -> {where.not(status_id: VendorStatus.id_for(:draft))}
+
   scope :filter_search, -> (term) do
     ids = self.pluck(:id)
     vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%").pluck(:id)

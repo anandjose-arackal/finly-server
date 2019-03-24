@@ -1,5 +1,4 @@
 require 'fuzzystringmatch'
-
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
   attr_accessor :gstin_params, :connection, :api_response, :response_body,
     :match_percentile, :valid_response, :gstin_master
@@ -41,6 +40,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
       if self.api_response.status && self.api_response.status == 200
         self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
         if self.response_body[:error]
+          add_message :error, "Something went wrong. Please try again later"
           return
         else
           # Save information to gstin master

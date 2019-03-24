@@ -1,6 +1,6 @@
 class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
   register_handle :vendor_show
-  register_actions %i( submit approve reject delete_vendor add_bank_account edit_bank_account delete_bank_account edit_vendor_details edit_attachment )
+  register_actions %i( submit approve reject delete add_bank_account edit_bank_account delete_bank_account edit_vendor_details edit_attachment )
 
   def initialize(user=nil, params={})
     super
@@ -25,7 +25,7 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
     vendor.get_reviewers(user) && YesBankVendor.status_ids(:awaiting_approval).include?(vendor.status_id)
   end
 
-  def delete_vendor
+  def delete
     user.is_vendor_manger?
   end
 

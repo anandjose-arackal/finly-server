@@ -16,7 +16,7 @@
 
 class VendorAttachment < ApplicationRecord
 
-  # Attachment Types: [:pan, gstin, cancelled_cheque]
+  # Attachment Types: [pan, gstin, cancelled_cheque, tax_exemption, lower_exemption, msme_certificate, others]
 
   belongs_to :yes_bank_vendor, optional: true
 

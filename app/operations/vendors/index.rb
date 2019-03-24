@@ -40,6 +40,21 @@ class Vendors::Index < Vendors::Base
     #
   end
 
+  def process
+    if user.vendor_payments_admin?
+      self.vendors = ::YesBankVendor.role_based_admin_associated_items(user, UserRole.id_for(:admin)).non_draft.or(user.vendors)
+      return
+    end
+
+    if user.policy_user_roles.pluck(:use_role_id).uniq.blank?
+      self.vendors = user.company.yes_bank_vendors.or(user.vendors)
+    else
+      role_based_data = ::YesBankVendor.associated_items(user, ::YesBankVendor.roles)
+      self.vendors = user.company.yes_bank_vendors.approved.or(role_based_data)
+    end
+
+  end
+
   def success
     params[:vendors] = self.vendors
     Vendors::Index::VendorsPresenter.new(user, params, messages)
