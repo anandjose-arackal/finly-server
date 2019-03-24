@@ -2,7 +2,7 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
   attr_accessor :procurements
 
   def init
-    self.procurements = Procurements::Index.(user, params).procurements
+    self.procurements = Procurements::Grn::Pending::Index.(user, params).procurements
   end
 
   def success
