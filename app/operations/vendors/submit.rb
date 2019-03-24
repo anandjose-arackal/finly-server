@@ -37,7 +37,11 @@ class Vendors::Submit < Vendors::Base
   end
 
   def post_process
-    add_message :success, "Submitted vendor for approval"
+    if vendor.status_id == VendorStatus.id_for(:auto_approved)
+      add_message :success, "Vendor Added & Approved"
+    else
+      add_message :success, "Vendor Submitted for Approval"
+    end
   end
 
   def success

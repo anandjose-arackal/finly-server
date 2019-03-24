@@ -77,6 +77,9 @@ class YesBankVendor < ApplicationRecord
 
   has_many :budget_trails, as: :vendor
 
+
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, to: :status
+
   accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
   accepts_nested_attributes_for :vendor_tds_rates, allow_destroy: true

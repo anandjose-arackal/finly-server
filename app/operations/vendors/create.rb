@@ -130,5 +130,4 @@ class Vendors::Create < Vendors::Base
     params[:vendor] = self.vendor
     BankTransfer::Vendors::Create::SuccessPresenter.new(user, params, messages)
   end
-
 end
