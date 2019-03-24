@@ -32,7 +32,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def submit
-    if invoice.is_initiating_user?
+    if user.is_invoice_initiator?
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
@@ -59,7 +59,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def retract
-    if invoice.is_initiating_user?
+    if user.is_invoice_initiator?
       invoice.processing? && document_owner?
     end
   end
@@ -92,11 +92,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::TaxInvoiceShow < Act
   end
 
   def delete
-    document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
+    if user.is_invoice_initiator?
+      document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
+    end
   end
 
   def save_and_submit
-    if invoice.is_initiating_user?
+    if user.is_invoice_initiator?
       ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
     end
   end

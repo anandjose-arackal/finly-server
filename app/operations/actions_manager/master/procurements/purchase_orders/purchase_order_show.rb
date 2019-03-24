@@ -20,7 +20,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def submit
-    if purchase_order.is_initiating_user?
+    if user.is_purchase_order_initiator?
       document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
     end
   end
@@ -49,7 +49,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def retract
-    if purchase_order.is_initiating_user?
+    if user.is_purchase_order_initiator?
       purchase_order.processing? &&
       document_owner?
     end
@@ -82,13 +82,13 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def delete
-    if purchase_order.is_initiating_user?
+    if user.is_purchase_order_initiator?
       document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
     end
   end
 
   def save_and_submit
-    if purchase_order.is_initiating_user?
+    if user.is_purchase_order_initiator?
       (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
     end
   end
