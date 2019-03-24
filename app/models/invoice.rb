@@ -469,6 +469,15 @@ class Invoice < ApplicationRecord
     nil
   end
 
+  def awaiting_action(user)
+    awaiting_action = false
+      if self.level&.reviewers&.include? user
+        awaiting_action = true
+        return awaiting_action
+      end
+    awaiting_action
+  end
+
   # this method updates the invoice status based on the associated
   # payments made against this particular invoice
   def update_invoice_status
