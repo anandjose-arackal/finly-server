@@ -26,7 +26,8 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       return
     end
 
-    if params[:advance_amount_required]
+    if StringUtils.to_bool(params[:invoice][:advance_amount_required])
+      self.inward_invoice_params[:advance_amount_required] = true
       if self.inward_invoice_params[:po_adjusted_advance_attributes][:value].blank?
         add_message :error, "Please add the advance amount to be adjusted for this Invoice."
         return
@@ -35,7 +36,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         add_message :error, "Error: Adjusted advance entered is more than the required Purchase Order advance."
         return
       end
+    else
+      self.inward_invoice_params[:advance_amount_required] = false
+      self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice&.po_adjusted_advance&.value || 0
     end
+
   end
 
   def pre_process

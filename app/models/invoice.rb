@@ -411,7 +411,7 @@ class Invoice < ApplicationRecord
   end
 
   def policy
-    self.payment&.payment_order&.bank_payment_request&.policy
+    self.payments&.first&.payment_order&.bank_payment_request&.policy
   end
 
   # the 'user' will default to the initiating user of the payment
@@ -522,6 +522,8 @@ class Invoice < ApplicationRecord
   def as_json
     {
       id: self.id,
+      invoice_type: self.invoice_type&.name,
+      procurement_id: self.procurement_id,
       advance: self.advance,
       advance_amount: self.advance_amount&.value,
       tax_amount: precision_value(self.tax_amount&.value),

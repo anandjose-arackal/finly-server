@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_23_075842) do
+ActiveRecord::Schema.define(version: 2019_03_23_164151) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -941,6 +941,9 @@ ActiveRecord::Schema.define(version: 2019_03_23_075842) do
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
     t.string "location_code"
+    t.string "ancestry"
+    t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
+    t.string "nature_of_office"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
   end
@@ -4122,6 +4125,8 @@ ActiveRecord::Schema.define(version: 2019_03_23_075842) do
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.integer "creator_id"
   end
 
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6162,6 +6167,7 @@ ActiveRecord::Schema.define(version: 2019_03_23_075842) do
     t.string "vendor_id"
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
+    t.string "vedor_code"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"
