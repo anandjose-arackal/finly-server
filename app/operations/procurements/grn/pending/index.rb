@@ -9,20 +9,30 @@ class Procurements::Grn::Pending::Index < Procurements::Base
   def validate
     unless user.vp_admin_or_auditor? || user.is_goods_receiver?
       add_message :error, 'Role not found'
+      return
     end
+
+    if (params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')) || (params[:document_type] == 'grn_count')
+      return
+    end
+    add_message :error, 'No documents found at this state'
   end
 
   def process
     if user.vp_admin_or_auditor? || user.is_goods_receiver?
-      if params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')
-        self.procurements = user.company.procurements.joins(:inward_documents)
+      if (params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')) || (params[:document_type] == 'grn_count')
+        received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
+        pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
+        st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
+        proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)
+        self.procurements = Procurement.where(id: proc_ids)
       end
     end
   end
 
   def success
     params[:procurements] = self.procurements
-    Procurements::Index::IndexPresenter.new(user, params, messages)
+    Procurements::Grn::Pending::IndexPresenter.new(user, params, messages)
   end
 
   class Procurements::Grn::Pending::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -55,8 +65,7 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     def init
       self.procurements = params[:procurements]
       apply_filter
-
-      self.procurements = self.procurements.order_by_controlling_level(user.id)
+      self.procurements = procurements.order_by_controlling_level(user.id)
       page = params[:page] || 1
       per_page = params[:per_page] || 30
       self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).include_details
@@ -77,12 +86,13 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     end
 
     def get_status_counts
-      st_ids = StatusTag.all.pluck(:id)
-      pr_ids = self.procurements.filter_procurement_type("purchase_order").pluck(:id)
+      received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
+      st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
+      pr_ids = self.procurements.pluck(:id)
       # ProcurementStatusTaggable.group(:status_tag_id).where(status_tag_id: st_ids).with_procurement_ids(pr_ids).size
       raw_count = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).group(:status_tag_id).count
       h = {}
-      StatusTag.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = raw_count[ps.id] else h[ps.name] = 0 end}
+      StatusTag.where(id: received_pending_ids).each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = raw_count[ps.id] else h[ps.name] = 0 end}
       return h
     end
 
