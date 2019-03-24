@@ -121,7 +121,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
 
     ############# Initiator logic start ####################
-    if bank_payment_request.is_initiating_user?
+    if user.is_bank_payment_request_initiator? 
       (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
     end
     ############# Initiator logic end ####################
@@ -137,7 +137,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Admin logic end #######################
 
     ############# Initiator logic start #######################
-    if bank_payment_request.is_initiating_user?
+    if user.is_bank_payment_request_initiator?
       (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
     end
     ############# Initiator logic end #######################
@@ -358,7 +358,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
   def edit_order_summary
     ############# Initiator logic start ####################
-    if bank_payment_request.is_initiating_user?
+    if user.is_bank_payment_request_initiator?
       if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
         return true
       end
@@ -749,7 +749,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Creditor logic end ######################
     
     ############# Initiator logic start ######################
-    if bank_payment_request.is_initiating_user?
+    if user.is_bank_payment_request_initiator?
       if (bank_payment_request.owner_id == user.id)
         if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
           return true
@@ -798,7 +798,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     ############# Creditor logic end ######################
 
     ############# Initiator logic start ######################
-    if bank_payment_request.is_initiating_user?
+    if user.is_bank_payment_request_initiator?
       if bank_payment_request.owner_id == user.id
         if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
           return true
