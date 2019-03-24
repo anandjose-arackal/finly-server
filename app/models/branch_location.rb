@@ -56,4 +56,15 @@ class BranchLocation < ApplicationRecord
     end
     address
   end
+
+  def as_json2
+    {
+      id: self.id,
+      name: location_name,
+    }
+  end
+
+  def location_name
+    self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
+  end
 end
