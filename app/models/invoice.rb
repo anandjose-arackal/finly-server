@@ -411,7 +411,7 @@ class Invoice < ApplicationRecord
   end
 
   def policy
-    self.payment&.payment_order&.bank_payment_request&.policy
+    self.payments&.first&.payment_order&.bank_payment_request&.policy
   end
 
   # the 'user' will default to the initiating user of the payment
