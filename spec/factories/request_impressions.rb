@@ -23,6 +23,7 @@
 #  zip              :string(255)
 #  latitude         :decimal(20, 10)
 #  longitude        :decimal(20, 10)
+#  accuracy_radius  :integer
 #  utm_source       :string(255)
 #  utm_medium       :string(255)
 #  utm_term         :string(255)
@@ -45,8 +46,6 @@
 #  user_ip_id       :integer
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  accuracy_radius  :integer
-#  blocked_by       :string(255)
 #
 
 FactoryBot.define do

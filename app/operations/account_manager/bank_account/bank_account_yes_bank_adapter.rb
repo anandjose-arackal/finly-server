@@ -126,7 +126,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def on_failure(options)
-    # trigger the webhook callback for failed payments
+    # trigger the web hook callback for failed payments
     payment = options[:payment]
     if payment&.failed?
       execute_callback(payment)

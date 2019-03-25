@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_19_125253) do
+ActiveRecord::Schema.define(version: 2019_03_23_102826) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -574,6 +574,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.datetime "deleted_at"
     t.integer "controlling_level_id"
     t.datetime "approved_at"
+    t.integer "company_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
@@ -3022,6 +3023,10 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.datetime "deleted_at"
     t.datetime "submitted_at"
     t.datetime "approved_at"
+    t.integer "po_adjusted_advance"
+    t.integer "po_advance"
+    t.integer "po_prev_adjusted_advance"
+    t.boolean "advance_amount_required", default: false
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
@@ -3103,8 +3108,10 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.string "account"
     t.integer "supply_item_type_id"
     t.datetime "deleted_at"
+    t.integer "product_type_id", default: 1
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id"], name: "index_items_on_company_id"
+    t.index ["product_type_id"], name: "index_items_on_product_type_id"
     t.index ["supply_item_type_id"], name: "index_items_on_supply_item_type_id"
     t.index ["tax_rate_id"], name: "index_items_on_tax_rate_id"
   end
@@ -3618,6 +3625,15 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
+  create_table "old_passwords", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "encrypted_password", null: false
+    t.string "password_archivable_type", null: false
+    t.integer "password_archivable_id", null: false
+    t.string "password_salt"
+    t.datetime "created_at"
+    t.index ["password_archivable_type", "password_archivable_id"], name: "index_password_archivable"
+  end
+
   create_table "opro_auth_grants", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "code"
     t.string "access_token"
@@ -4078,6 +4094,14 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.index ["policy_id"], name: "index_policy_field_mappings_on_policy_id"
   end
 
+  create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "location_id"
+    t.integer "department_id"
+    t.integer "policy_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "policy_id", null: false
@@ -4249,6 +4273,12 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.string "prepaid_cards"
   end
 
+  create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "purchase_order_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "purchase_order_id"
     t.integer "inventory_line_item_id"
@@ -4347,6 +4377,9 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.integer "revision_of_id"
     t.integer "revision_number", default: 0
     t.text "note"
+    t.integer "advance_tds_slab_id"
+    t.integer "advance_tds_amount_id"
+    t.boolean "advance_amount_required", default: false
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -4515,6 +4548,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.integer "renewal_alert_number"
     t.integer "renewal_alert_period_id"
     t.string "note"
+    t.integer "company_id"
   end
 
   create_table "rate_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4827,6 +4861,71 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.index ["report_processor_group_mapping_id"], name: "index_reports_on_report_processor_group_mapping_id"
     t.index ["report_status_id"], name: "index_reports_on_report_status_id"
     t.index ["user_id"], name: "index_reports_on_user_id"
+  end
+
+  create_table "request_impressions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "ip", null: false
+    t.string "ip_type"
+    t.string "user_agent"
+    t.string "username"
+    t.integer "user_id"
+    t.integer "company_id"
+    t.text "referrer"
+    t.string "referring_domain"
+    t.text "landing_page"
+    t.string "app_version"
+    t.string "continent_name"
+    t.string "continent_code"
+    t.string "country_name"
+    t.string "country_code"
+    t.string "region_code"
+    t.string "region_name"
+    t.string "city"
+    t.string "zip"
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.integer "accuracy_radius"
+    t.string "utm_source"
+    t.string "utm_medium"
+    t.string "utm_term"
+    t.string "utm_content"
+    t.string "utm_campaign"
+    t.string "http_method", null: false
+    t.string "app"
+    t.string "path", null: false
+    t.string "controller"
+    t.string "action"
+    t.string "view"
+    t.boolean "blocked"
+    t.string "block_by"
+    t.string "block_reason"
+    t.decimal "response_code", precision: 10
+    t.decimal "response_time", precision: 10
+    t.integer "user_session_id"
+    t.integer "access_token_id"
+    t.integer "user_device_id"
+    t.integer "user_ip_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["access_token_id"], name: "index_request_impressions_on_access_token_id"
+    t.index ["action"], name: "index_request_impressions_on_action"
+    t.index ["app"], name: "index_request_impressions_on_app"
+    t.index ["block_by"], name: "index_request_impressions_on_block_by"
+    t.index ["block_reason"], name: "index_request_impressions_on_block_reason"
+    t.index ["blocked"], name: "index_request_impressions_on_blocked"
+    t.index ["company_id"], name: "index_request_impressions_on_company_id"
+    t.index ["controller"], name: "index_request_impressions_on_controller"
+    t.index ["country_name"], name: "index_request_impressions_on_country_name"
+    t.index ["ip"], name: "index_request_impressions_on_ip"
+    t.index ["path"], name: "index_request_impressions_on_path"
+    t.index ["response_code"], name: "index_request_impressions_on_response_code"
+    t.index ["response_time"], name: "index_request_impressions_on_response_time"
+    t.index ["user_agent"], name: "index_request_impressions_on_user_agent"
+    t.index ["user_device_id"], name: "index_request_impressions_on_user_device_id"
+    t.index ["user_id"], name: "index_request_impressions_on_user_id"
+    t.index ["user_ip_id"], name: "index_request_impressions_on_user_ip_id"
+    t.index ["user_session_id"], name: "index_request_impressions_on_user_session_id"
+    t.index ["username"], name: "index_request_impressions_on_username"
   end
 
   create_table "resource_requests", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5234,6 +5333,31 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.index ["purpose_id"], name: "index_unique_identifiers_on_purpose_id"
   end
 
+  create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_user_agent_client_statuses_on_name"
+  end
+
+  create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "user_agent", null: false
+    t.integer "user_id", null: false
+    t.integer "status_id", null: false
+    t.string "verification_mode"
+    t.string "verification_key"
+    t.datetime "verification_code_sent_at"
+    t.datetime "verified_at"
+    t.integer "verification_code_count"
+    t.integer "verification_code_failed_attempts"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["status_id"], name: "index_user_agent_clients_on_status_id"
+    t.index ["user_agent"], name: "index_user_agent_clients_on_user_agent"
+    t.index ["user_id"], name: "index_user_agent_clients_on_user_id"
+    t.index ["verification_mode"], name: "index_user_agent_clients_on_verification_mode"
+  end
+
   create_table "user_balance_histories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.date "date"
     t.integer "user_id"
@@ -5588,6 +5712,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.integer "current_resolution_width"
     t.integer "mouse_pos_x"
     t.integer "mouse_pos_y"
+    t.string "ip"
     t.index ["action"], name: "index_user_session_events_on_action"
     t.index ["app"], name: "index_user_session_events_on_app"
     t.index ["controller"], name: "index_user_session_events_on_controller"
@@ -5658,6 +5783,7 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.string "client_type"
     t.text "user_agent"
     t.integer "user_ip_id"
+    t.integer "user_agent_client_id"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"
@@ -5774,6 +5900,9 @@ ActiveRecord::Schema.define(version: 2019_03_19_125253) do
     t.boolean "delegation_enabled"
     t.text "gl_config"
     t.boolean "vacation_delegate_enabled"
+    t.datetime "password_changed_at"
+    t.datetime "last_activity_at"
+    t.datetime "expired_at"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

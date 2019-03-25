@@ -39,6 +39,9 @@ class IciciBankApi::Balance < IciciBankApi::Base
     end
 
     unless ["ICICI"].include?(self.company&.feature_subscription&.bank_service_provider&.upcase)
+      add_message :error, "This corporate has not been configured with ICICI bank"
+      return
+    end
   end
 
   def raw_api_params
@@ -55,10 +58,6 @@ class IciciBankApi::Balance < IciciBankApi::Base
     encrypt_params(
         raw_api_params
     )
-  end
-
-  def parse
-
   end
 
   def post_process

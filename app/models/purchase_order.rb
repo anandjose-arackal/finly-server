@@ -58,6 +58,9 @@
 #  revision_of_id               :integer
 #  revision_number              :integer          default(0)
 #  note                         :text(65535)
+#  advance_tds_slab_id          :integer
+#  advance_tds_amount_id        :integer
+#  advance_amount_required      :boolean          default(FALSE)
 #
 
 class PurchaseOrder < ApplicationRecord

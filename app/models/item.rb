@@ -20,7 +20,7 @@
 #  account             :string(255)
 #  supply_item_type_id :integer
 #  deleted_at          :datetime
-#  product_type        :integer          default(1)
+#  product_type_id     :integer          default(1)
 #
 
 class Item < ApplicationRecord

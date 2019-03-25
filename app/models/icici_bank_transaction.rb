@@ -24,6 +24,7 @@
 #  utr                   :string(255)
 #  transfer_status_id    :integer
 #  company_id            :integer
+#  request_id            :string(255)
 #
 
 class IciciBankTransaction < ApplicationRecord
