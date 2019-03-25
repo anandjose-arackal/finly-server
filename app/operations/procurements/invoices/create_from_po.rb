@@ -131,9 +131,11 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         end
       else
         real_q = item.accepted.to_i
+        if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+          real_q = item.quantity
+        end
       end
 
-     
       invoice_items_attributes << {
           tax: item.tax,
           discount: item.discount,
