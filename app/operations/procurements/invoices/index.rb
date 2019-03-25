@@ -19,7 +19,7 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
     end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.invoices = ::Invoice.associated_items(user, ::Invoice.roles)
+      self.invoices = ::Invoice.associated_items(user, ::Invoice.roles) || Invoice.none
     else
       self.invoices = user.inward_invoices
     end
