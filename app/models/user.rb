@@ -221,6 +221,8 @@ class User < ApplicationRecord
 
   has_many :rate_contracts, foreign_key: :creator_id
 
+  has_many :vendors, class_name: "YesBankVendor", foreign_key: :created_by_id
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
@@ -1120,7 +1122,7 @@ class User < ApplicationRecord
 
   # ********** User Roles for Vendor Payments ******************
 
-  def is_vendor_manger?
+  def is_vendor_manager?
     self.has_policy_role?(UserRole.id_for(:vendor_manager))
   end
 

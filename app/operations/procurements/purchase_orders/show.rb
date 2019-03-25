@@ -206,7 +206,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   def validate_document_access
     # Validate of current user is owner of PO
     return if purchase_order.validate_if_owner(user)
-    return if purchase_order.validate_if_admin(user) && (!purchase_order.open? || purchase_order.user_id == user.id)
+    return if purchase_order.validate_if_admin(user) && (!purchase_order.open? || (purchase_order.user_id == user.id) || purchase_order.user_id.blank?)
     return if purchase_order.validate_if_reviewer(user)
     raise_unauthorized_exception
   end

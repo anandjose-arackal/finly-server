@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: rate_contract_line_items
+#
+#  id               :bigint(8)        not null, primary key
+#  location_id      :integer
+#  item_id          :integer
+#  start_date       :datetime
+#  end_date         :datetime
+#  rate_contract_id :integer
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  amount_id        :integer
+#
+
 class RateContractLineItem < ApplicationRecord
 
   belongs_to :rate_contract, optional: true

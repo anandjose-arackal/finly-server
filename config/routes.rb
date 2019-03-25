@@ -2575,6 +2575,7 @@ Rails.application.routes.draw do
         resources :bank_accounts
       end
       scope :vendors do
+        #todo vendor Emp
         post '', to: 'vendors#create'
       end
     end
@@ -3471,6 +3472,22 @@ Rails.application.routes.draw do
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end
   ######## Dashbaord Ends ##############
+
+  ######### New Vendor Empanelment ########
+  get 'vendors/new_vendor_config', to: "vendors#new_vendor_config"
+  get 'vendors/filter_config', to: "vendors#filter_config"
+  post 'vendors/submit', to: "vendors#submit"
+  post 'vendors/penny_test', to: 'vendors#penny_test'
+  post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
+  get 'vendors/actions_config', to: 'vendors#actions_config'
+  resources :vendors do
+    put 'approve', to: "vendors#approve"
+    put 'reject', to: "vendors#reject"
+    put 'retract', to: "vendors#retract"
+    put 'take_control', to: "vendors#take_control"
+    put 'return_control', to: "vendors#return_control"
+  end
+  ######### New Vendor Empanelment Ends ##
 
 
   ######### Rate Contract API start #############

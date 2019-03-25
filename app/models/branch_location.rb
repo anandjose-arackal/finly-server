@@ -20,6 +20,7 @@
 #  is_deleted            :boolean          default(FALSE), not null
 #  nature_of_office      :string(255)
 #  deleted_at            :datetime
+#  location_code         :string(255)
 #
 
 class BranchLocation < ApplicationRecord

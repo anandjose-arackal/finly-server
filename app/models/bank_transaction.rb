@@ -17,6 +17,8 @@
 #  refunded                    :boolean
 #  error_sub_code              :string(255)
 #  bank_transaction_type_id    :integer
+#  account_name_check          :boolean          default(FALSE)
+#  beneficiary_full_name       :string(255)
 #
 
 class BankTransaction < ApplicationRecord
@@ -30,7 +32,7 @@ class BankTransaction < ApplicationRecord
 
   validates :bank_reference_number, presence: true, if: :successful?
   validates :unique_request_number, presence: true, if: :through_finly?
-  validates :beneficiary_bank_account_id, presence: true
+  validates :beneficiary_bank_account_id, presence: true, if: :not_account_check?
   validates :transfer_status_id, presence: true
   validates :amount, presence: true
   validates :company, presence: true
@@ -56,6 +58,10 @@ class BankTransaction < ApplicationRecord
 
   def through_finly?
     self.bank_transaction_type_id == BankTransactionType.id_for(:yes_bank)
+  end
+
+  def not_account_check?
+    !account_name_check
   end
 
 end

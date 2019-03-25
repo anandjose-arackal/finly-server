@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_23_164151) do
+ActiveRecord::Schema.define(version: 2019_03_23_113728) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -368,20 +368,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "creator_id"
-  end
-
-  create_table "attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "resource_id"
-    t.string "resource_type"
-    t.string "file_file_name"
-    t.decimal "file_file_size", precision: 64, scale: 12
-    t.string "file_content_type"
-    t.datetime "file_updated_at"
-    t.integer "company_id"
-    t.integer "creator_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.text "description"
   end
 
   create_table "authentications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -957,9 +943,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
     t.string "location_code"
-    t.string "ancestry"
-    t.string "nature_of_office"
-    t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
   end
@@ -2515,6 +2498,7 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.boolean "em_tax_tracking", default: false
     t.boolean "procurement", default: false
     t.boolean "custom_currency_conversion", default: false
+    t.boolean "vendor_empanelment_workflow", default: false
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end
@@ -2731,6 +2715,37 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_gst_types_on_name"
+  end
+
+  create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "gstin_id"
+    t.string "gstin"
+    t.integer "location_id"
+    t.integer "state_id"
+    t.string "poc_name"
+    t.string "poc_mobile_number"
+    t.string "poc_email"
+    t.string "poc_fax"
+    t.string "poc_designation"
+    t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
+  end
+
+  create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "gstin"
+    t.string "legal_name_of_business"
+    t.string "state"
+    t.date "date_of_registration"
+    t.string "constitution_of_business"
+    t.string "taxpayer_type"
+    t.string "status"
+    t.text "api_response"
+    t.string "api_provider"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "address"
   end
 
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -2992,10 +3007,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.datetime "deleted_at"
     t.datetime "submitted_at"
     t.datetime "approved_at"
-    t.integer "po_adjusted_advance"
-    t.integer "po_advance"
-    t.integer "po_prev_adjusted_advance"
-    t.boolean "advance_amount_required", default: false
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
@@ -3077,10 +3088,8 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.string "account"
     t.integer "supply_item_type_id"
     t.datetime "deleted_at"
-    t.integer "product_type_id", default: 1
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id"], name: "index_items_on_company_id"
-    t.index ["product_type_id"], name: "index_items_on_product_type_id"
     t.index ["supply_item_type_id"], name: "index_items_on_supply_item_type_id"
     t.index ["tax_rate_id"], name: "index_items_on_tax_rate_id"
   end
@@ -4051,16 +4060,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.index ["policy_id"], name: "index_policy_field_mappings_on_policy_id"
   end
 
-  create_table "policy_location_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "location_id"
-    t.integer "department_id"
-    t.integer "policy_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "company_id"
-    t.integer "creator_id"
-  end
-
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "policy_id", null: false
@@ -4232,12 +4231,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.string "prepaid_cards"
   end
 
-  create_table "product_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "purchase_order_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "purchase_order_id"
     t.integer "inventory_line_item_id"
@@ -4336,9 +4329,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.integer "revision_of_id"
     t.integer "revision_number", default: 0
     t.text "note"
-    t.integer "advance_tds_slab_id"
-    t.integer "advance_tds_amount_id"
-    t.boolean "advance_amount_required", default: false
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -4363,52 +4353,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.index ["transaction_amount_id"], name: "index_purchase_orders_on_transaction_amount_id"
     t.index ["user_id"], name: "index_purchase_orders_on_user_id"
     t.index ["vendor_id"], name: "index_purchase_orders_on_vendor_id"
-  end
-
-  create_table "purchase_request_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "purchase_request_id"
-    t.integer "item_id"
-    t.integer "vendor_id"
-    t.integer "delivery_location_id"
-    t.text "purpose"
-    t.decimal "quantity", precision: 20, scale: 5
-    t.integer "per_unit_estimated_amount_id"
-    t.integer "estimated_amount_id"
-    t.date "required_by_date"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "approved"
-    t.integer "status_id"
-    t.integer "purchase_order_id"
-    t.index ["approved"], name: "index_purchase_request_items_on_approved"
-    t.index ["delivery_location_id"], name: "index_purchase_request_items_on_delivery_location_id"
-    t.index ["estimated_amount_id"], name: "index_purchase_request_items_on_estimated_amount_id"
-    t.index ["item_id"], name: "index_purchase_request_items_on_item_id"
-    t.index ["per_unit_estimated_amount_id"], name: "index_purchase_request_items_on_per_unit_estimated_amount_id"
-    t.index ["purchase_request_id"], name: "index_purchase_request_items_on_purchase_request_id"
-    t.index ["required_by_date"], name: "index_purchase_request_items_on_required_by_date"
-    t.index ["vendor_id"], name: "index_purchase_request_items_on_vendor_id"
-  end
-
-  create_table "purchase_request_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "purchase_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "location_id"
-    t.integer "department_id"
-    t.integer "policy_id"
-    t.integer "controlling_level_id"
-    t.integer "company_id"
-    t.integer "purchase_request_status_id"
-    t.text "note"
-    t.integer "creator_id"
-    t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
   end
 
   create_table "purposes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5331,56 +5275,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.index ["purpose_id"], name: "index_unique_identifiers_on_purpose_id"
   end
 
-  create_table "user_agent_client_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_user_agent_client_statuses_on_name"
-  end
-
-  create_table "user_agent_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "user_agent", null: false
-    t.integer "user_id", null: false
-    t.integer "status_id", null: false
-    t.string "verification_mode"
-    t.string "verification_key"
-    t.datetime "verification_code_sent_at"
-    t.datetime "verified_at"
-    t.integer "verification_code_count"
-    t.integer "verification_code_failed_attempts"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["status_id"], name: "index_user_agent_clients_on_status_id"
-    t.index ["user_agent"], name: "index_user_agent_clients_on_user_agent"
-    t.index ["user_id"], name: "index_user_agent_clients_on_user_id"
-    t.index ["verification_mode"], name: "index_user_agent_clients_on_verification_mode"
-  end
-
-  create_table "user_agent_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_user_agent_statuses_on_name"
-  end
-
-  create_table "user_agents", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "user_agent", null: false
-    t.integer "user_id", null: false
-    t.integer "status_id", null: false
-    t.string "verification_mode"
-    t.string "verification_key"
-    t.datetime "verification_code_sent_at"
-    t.datetime "verified_at"
-    t.integer "verification_code_count"
-    t.integer "verification_code_failed_attempts"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["status_id"], name: "index_user_agents_on_status_id"
-    t.index ["user_agent"], name: "index_user_agents_on_user_agent"
-    t.index ["user_id"], name: "index_user_agents_on_user_id"
-    t.index ["verification_mode"], name: "index_user_agents_on_verification_mode"
-  end
-
   create_table "user_balance_histories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.date "date"
     t.integer "user_id"
@@ -5623,104 +5517,6 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "user_session_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "user_session_id", null: false
-    t.string "http_method"
-    t.string "app"
-    t.string "path"
-    t.string "controller", null: false
-    t.string "action", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "view"
-    t.integer "status_id"
-    t.string "message"
-    t.integer "response_code"
-    t.integer "current_resolution_height"
-    t.integer "current_resolution_width"
-    t.integer "mouse_pos_x"
-    t.integer "mouse_pos_y"
-    t.string "ip"
-    t.index ["action"], name: "index_user_session_events_on_action"
-    t.index ["app"], name: "index_user_session_events_on_app"
-    t.index ["controller"], name: "index_user_session_events_on_controller"
-    t.index ["path"], name: "index_user_session_events_on_path"
-    t.index ["user_session_id"], name: "index_user_session_events_on_user_session_id"
-  end
-
-  create_table "user_session_notifications", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "company_id", null: false
-    t.string "app"
-    t.string "device"
-    t.string "view"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "status_id"
-    t.string "message"
-    t.index ["app"], name: "index_user_session_notifications_on_app"
-    t.index ["company_id"], name: "index_user_session_notifications_on_company_id"
-    t.index ["device"], name: "index_user_session_notifications_on_device"
-    t.index ["user_id"], name: "index_user_session_notifications_on_user_id"
-    t.index ["view"], name: "index_user_session_notifications_on_view"
-  end
-
-  create_table "user_session_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_user_session_statuses_on_name"
-  end
-
-  create_table "user_sessions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "company_id"
-    t.string "ip", null: false
-    t.string "ip_type"
-    t.text "referrer"
-    t.string "referring_domain"
-    t.text "landing_page"
-    t.string "app_version"
-    t.string "continent_name"
-    t.string "continent_code"
-    t.string "country_name"
-    t.string "country_code"
-    t.string "region_code"
-    t.string "region_name"
-    t.string "city"
-    t.string "zip"
-    t.decimal "latitude", precision: 20, scale: 10
-    t.decimal "longitude", precision: 20, scale: 10
-    t.string "utm_source"
-    t.string "utm_medium"
-    t.string "utm_term"
-    t.string "utm_content"
-    t.string "utm_campaign"
-    t.datetime "started_at", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "access_token_id"
-    t.datetime "last_request_at"
-    t.bigint "duration"
-    t.integer "status_id"
-    t.string "message"
-    t.string "login_username"
-    t.integer "accuracy_radius"
-    t.string "username"
-    t.integer "user_device_id"
-    t.string "client_type"
-    t.text "user_agent"
-    t.integer "user_ip_id"
-    t.integer "user_agent_id"
-    t.integer "user_agent_client_id"
-    t.index ["company_id"], name: "index_user_sessions_on_company_id"
-    t.index ["ip"], name: "index_user_sessions_on_ip"
-    t.index ["latitude"], name: "index_user_sessions_on_latitude"
-    t.index ["longitude"], name: "index_user_sessions_on_longitude"
-    t.index ["started_at"], name: "index_user_sessions_on_started_at"
-    t.index ["user_id"], name: "index_user_sessions_on_user_id"
-  end
-
   create_table "user_tags", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "user_id"
     t.string "name", null: false
@@ -5896,6 +5692,20 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.index ["user_id"], name: "index_vendor_payment_wallets_on_user_id"
   end
 
+  create_table "vendor_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "tds_rates_list_id"
+    t.index ["vendor_id"], name: "index_vendor_tds_rates_on_vendor_id"
+  end
+
   create_table "vendor_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -5913,7 +5723,7 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
 
-  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
@@ -6113,7 +5923,13 @@ ActiveRecord::Schema.define(version: 2019_03_23_164151) do
     t.string "vendor_id"
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
-    t.string "vedor_code"
+    t.boolean "msme_registered", default: false
+    t.string "msme_registration_number"
+    t.integer "status_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"

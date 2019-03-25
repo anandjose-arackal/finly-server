@@ -50,6 +50,14 @@
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
+#  advance_amount_id            :integer
+#  due_date                     :date
+#  advance_amount_status_id     :integer
+#  bank_account_id              :integer
+#  revised_po_id                :integer
+#  revision_of_id               :integer
+#  revision_number              :integer          default(0)
+#  note                         :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -637,8 +645,8 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.role_based_associated_status_ids(user)
-    # self.status_ids(self.role_based_statuses(user))
-    PurchaseOrderStatus.ids_for(self.role_based_statuses(user))
+    self.status_ids(*self.role_based_statuses(user))
+    # PurchaseOrderStatus.ids_for(*self.role_based_statuses(user))
   end
 
   def self.role_based_statuses(user)

@@ -259,7 +259,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def validate_association
     return if purchase_order.update_if_owner(user) if PurchaseOrderStatus.status_ids_for_owner.include?(purchase_order.purchase_order_status_id)
-    return if purchase_order.update_if_admin(user) unless PurchaseOrderStatus.status_ids_for_owner.include?(purchase_order.purchase_order_status_id)
+    return if purchase_order.update_if_admin(user) if !PurchaseOrderStatus.status_ids_for_owner.include?(purchase_order.purchase_order_status_id) || purchase_order.user_id.blank?
     return if purchase_order.update_if_reviewer(user) if PurchaseOrderStatus.status_ids_for_reviewer.include?(purchase_order.purchase_order_status_id)
     add_message :error, 'Unable to update'
   end

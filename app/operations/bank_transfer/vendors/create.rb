@@ -27,6 +27,22 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
   end
 
   def validate
+    # Policy Selection
+    policies = user.company.policies
+
+    parameters = {
+      filter_associated_entity_type: "YesBankVendorProvider",
+      filter_policy_ids: policies.pluck(:id)
+    }
+
+    levels = ReviewalLevels::Index.(user, parameters).levels
+
+    if levels.present?
+      unless self.vendor_parameters[:policy_id].present?
+        add_message :error, "Please select a policy"
+      end
+    end
+
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list
     if self.vendor_parameters[:bank_accounts_attributes].present?

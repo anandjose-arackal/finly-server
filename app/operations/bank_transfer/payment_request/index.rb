@@ -172,8 +172,8 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       #     self.payment_requests = self.payment_requests.order_by(:submitted_at)#.order_by(:manager_controlling_user, user.id)
       #   end
       # end
-      self.payment_requests.order_by(:submitted_at)
-      self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page)
+      self.payment_requests&.order_by(:submitted_at)
+      self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page) rescue ::PaymentRequest.none
     end
 
     def status_count
@@ -183,18 +183,18 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
                   BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited) ]
       po_ids = [ PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
 
-      awaiting_ids = self.payment_requests.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
-      awaiting_approval = self.payment_requests.with_id(awaiting_ids).count
+      awaiting_ids = self.payment_requests&.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      awaiting_approval = self.payment_requests&.with_id(awaiting_ids)&.count
 
       # get raw count and then replace the id with its status name
-      bpr = self.payment_requests.where(status_id: bpr_ids).group(:status_id).count
+      bpr = self.payment_requests&.where(status_id: bpr_ids)&.group(:status_id)&.count
       bpr_name = {}
-      BankPaymentRequestStatus.all.each {|ps| if bpr.keys.include? ps.id then bpr_name[ps.name] = bpr[ps.id] end}
+      BankPaymentRequestStatus.all.each {|ps| if bpr&.keys&.include? ps.id then bpr_name[ps.name] = bpr[ps.id] end}
 
       # get raw count and then replace the id with its status name
-      po = self.payment_requests.joins(:payment_order).where('payment_orders.payment_order_status_id': po_ids).group(:payment_order_status_id).count      
+      po = self.payment_requests&.joins(:payment_order)&.where('payment_orders.payment_order_status_id': po_ids)&.group(:payment_order_status_id)&.count      
       po_name = {}
-      PaymentOrderStatus.all.each {|ps| if po.keys.include? ps.id then po_name[ps.name] = po[ps.id] end}
+      PaymentOrderStatus.all.each {|ps| if po&.keys&.include? ps.id then po_name[ps.name] = po[ps.id] end}
       po_name[:awaiting_approval] = awaiting_approval || 0
 
       # merge
