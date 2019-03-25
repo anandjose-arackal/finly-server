@@ -442,7 +442,9 @@ class PurchaseOrder < ApplicationRecord
       tds_slab_name: self.advance_tds_slab&.name,
       department: self.department.as_json,
       cost_center: self.cost_center.as_json,
-      policy: self.policy.as_json
+      po_number: self.po_number,
+      delivery_location: self.delivery_location.as_json,
+      requested_advance_amount: self.requested_advance_amount&.value
       # balance_due: {
       #   value: precision_value(self.balance_amount&.value),
       #   id: self.balance_amount&.id,

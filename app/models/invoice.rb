@@ -180,6 +180,7 @@ class Invoice < ApplicationRecord
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
   # validates :amount, presence: true
+  validates :invoice_number, :format => { with: /\A[a-zA-Z0-9]*\Z/ , :message => ' should only have letters and numbers, and no special characters' }
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) { where.not(id: id) }
@@ -585,7 +586,8 @@ class Invoice < ApplicationRecord
       # paid_amount: self.payments.successful.joins(:amount).sum(:value),
       # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
       paid_amount: payment_amounts_total, 
-      remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total)
+      remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
+      po_adjusted_advance: precision_value(self.po_adjusted_advance&.value)
     }
   end
 
