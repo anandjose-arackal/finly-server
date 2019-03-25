@@ -96,6 +96,7 @@ class Company < ApplicationRecord
 
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
+  has_many :bank_payment_requests
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -392,6 +393,15 @@ class Company < ApplicationRecord
     policy_ids = self.policies.default.pluck(:id)
     policy_ids += self.policies.with_application(RequestStore[:current_app]).pluck(:id)
     Policy.with_id(policy_ids)
+  end
+
+  def dep_subdept_mapping
+    result = {}
+    departments = user.company.departments
+    sub_departments = user.company.departments.only_sub_departments
+    departments.each do |department|
+      
+    end
   end
 
   private

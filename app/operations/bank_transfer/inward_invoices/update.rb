@@ -16,15 +16,35 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       return
     end
 
+    
     # checking for duplicates within this particular company
     current_company_invoices = current_company.inward_invoices
     invoice_number = self.inward_invoice_params[:invoice_number]
     vendor_id = self.inward_invoice.vendor_id || params[:vendor_id]
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)
     if invoice_number.present? && duplicate_invoices.present?
-      add_message :error, "This invoice seems like a duplicate: Check invoice numbers: #{duplicate_invoices.pluck(:invoice_number).to_sentence}"
+      # add_message :error, "This invoice seems like a duplicate: Check invoice numbers: #{duplicate_invoices.pluck(:invoice_number).to_sentence}"
+      add_message :error, "There is a similar invoice added with the same invoice number in our records. Please re-check your invoice details."
       return
     end
+
+    if StringUtils.to_bool(params[:invoice][:advance_amount_required])
+      self.inward_invoice_params[:advance_amount_required] = true
+      if self.inward_invoice_params[:po_adjusted_advance_attributes][:value].blank?
+        add_message :error, "Please add the advance amount to be adjusted for this Invoice."
+        return
+      end
+      if self.inward_invoice_params[:po_adjusted_advance_attributes][:value].to_i > self.inward_invoice.po_advance
+        add_message :error, "Error: Adjusted advance entered is more than the required Purchase Order advance."
+        return
+      end
+    else
+      if self.inward_invoice_params[:advance_amount_required].present?
+        self.inward_invoice_params[:advance_amount_required] = false
+        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice&.po_adjusted_advance&.value || 0
+      end
+    end
+
   end
 
   def pre_process

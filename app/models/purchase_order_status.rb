@@ -11,7 +11,7 @@
 class PurchaseOrderStatus < ApplicationRecord
   include Seedable
   def self.values
-    %w( open retracted processing approved rejected auto_approved sent_to_vendor closed voided )
+    %w( open retracted processing approved rejected auto_approved sent_to_vendor closed voided po_revised)
   end
 
   def open?
@@ -50,12 +50,30 @@ class PurchaseOrderStatus < ApplicationRecord
     self.id == PurchaseOrderStatus.id_for(:voided)
   end
 
+  def po_revised?
+    self.id == PurchaseOrderStatus.id_for(:po_revised)
+  end
+
   def self.status_ids_for_voidable
     [
         PurchaseOrderStatus.id_for(:approved),
         PurchaseOrderStatus.id_for(:auto_approved),
         PurchaseOrderStatus.id_for(:sent_to_vendor),
         PurchaseOrderStatus.id_for(:closed)
+    ]
+  end
+
+  def self.status_ids_for_owner
+    [
+      PurchaseOrderStatus.id_for(:open),
+      PurchaseOrderStatus.id_for(:rejected),
+      PurchaseOrderStatus.id_for(:retracted)
+    ]
+  end
+
+  def self.status_ids_for_reviewer
+    [
+      PurchaseOrderStatus.id_for(:processing)
     ]
   end
 end

@@ -5,11 +5,10 @@ class Company::Departments::Index < Company::Departments::Base
   class Company::Locations::Index::DepartmentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :departments
 
-    has_scope :filter_only_roots
 
     def init
       self.departments = params[:departments]
-      self.departments = apply_scopes(self.departments, params)
+      self.departments = self.departments.filter_only_roots
     end
   end
 

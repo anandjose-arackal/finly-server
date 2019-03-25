@@ -22,7 +22,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     # Check of bank_payment_request exists
     return if record_not_present
     # Validate if user is associated with the bank_payment_request
-    validate_association
+    validate_document_access
   end
 
   def process
@@ -696,13 +696,13 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     !validate_presence
   end
 
-  def validate_association
+  def validate_document_access
     # Owner of document is allowed to access the bank_payment_request, no further validation required
     return if bank_payment_request.validate_if_owner(user)
-    return if bank_payment_request.validate_if_admin(user)
-    return if  bank_payment_request.validate_if_reviewer(user)
-    add_message :error, 'Payment ticket not found!'
-    # raise_unauthorized_exception
+    return if bank_payment_request.validate_if_admin(user) && (!bank_payment_request.open? || (bank_payment_request.owner_id == user.id) || bank_payment_request.owner_id.blank?)
+    return if bank_payment_request.validate_if_reviewer(user)
+    return if bank_payment_request.validate_if_creditor(user)
+    raise_unauthorized_exception
   end
 
   # def validate_ownership

@@ -46,8 +46,11 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     payment_order_custom_fields.each do |field|
       headers << field.field_name.gsub(" ", "_").underscore
     end
-    self.parsed_data = ImportUtil.load_spreadsheet(file, headers,
-                                                   {skip_empty_lines: true})
+    begin
+      self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
+    rescue Ole::Storage::FormatError => e
+      add_message :error, "File Format error. Please re-save your Excel sheet in 2003 format or greater."
+    end
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
     Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"

@@ -90,6 +90,9 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
   # IF PO HAS ANY ADVANCE AMOUNT, WE ADD IT HERE
   belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_tds_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_tds_slab, optional: true, class_name: 'TdsRatesList'
+
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
@@ -143,6 +146,11 @@ class PurchaseOrder < ApplicationRecord
   scope :with_budgetable_location_ids, -> (location_ids) {
     if location_ids.present?
       where location_id: location_ids
+    end
+  }
+  scope :filter_delivery_location, -> (name) {
+    if name.present?
+      joins(:delivery_location).where('name LIKE ?',"%#{name}%")
     end
   }
   scope :with_budgetable_user_ids, -> (user_ids) {
@@ -291,7 +299,7 @@ class PurchaseOrder < ApplicationRecord
     where('created_at >= ? && created_at <= ?', from, to)
   }
 
-  before_save :calculate_line_items
+  # before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -329,6 +337,17 @@ class PurchaseOrder < ApplicationRecord
     shipped = true
     self.items.each do |item|
       unless item.quantity == item.delivered
+        shipped = false
+        break
+      end
+    end
+    shipped
+  end
+
+  def all_items_accepted?
+    shipped = true
+    self.items.each do |item|
+      unless item.quantity == item.accepted
         shipped = false
         break
       end
@@ -402,12 +421,26 @@ class PurchaseOrder < ApplicationRecord
     self.user_id.eql?(user.id)
   end
 
+  def total_adv_amount
+    (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+  end
+
   # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
   def as_json2
     {
       original_amount: precision_value(self.total_after_tax&.value),
+      total_advance_amount: total_adv_amount,
       advance_amount: precision_value(self.advance_amount&.value),
-      balance_due: precision_value(self.balance_amount&.value)
+      payable_advance_amount: precision_value(self.advance_amount&.value),
+      balance_due: precision_value(self.balance_amount&.value),
+      procurement_id: self.procurement_id,
+      tds_amount: self.advance_tds_amount&.value,
+      tds: self.advance_tds_slab&.tds,
+      tds_slab_id: self.advance_tds_slab_id,
+      tds_slab_name: self.advance_tds_slab&.name,
+      department: self.department.as_json,
+      cost_center: self.cost_center.as_json,
+      policy: self.policy.as_json
       # balance_due: {
       #   value: precision_value(self.balance_amount&.value),
       #   id: self.balance_amount&.id,
@@ -417,8 +450,8 @@ class PurchaseOrder < ApplicationRecord
   end
   # Public Method
 
-  def process_line_item_calculation
-    calculate_line_items
+  def process_line_item_calculation(skip_adv_calculation=false)
+    calculate_line_items(skip_adv_calculation)
   end
 
   # def prepopulate_amounts
@@ -448,7 +481,7 @@ class PurchaseOrder < ApplicationRecord
   #   end
   # end
 
-  def calculate_line_items
+  def calculate_line_items(skip_adv_calculation=false)
     total_before_tax_amount = 0
     total_after_tax_amount = 0
     tax_amount = 0
@@ -543,6 +576,19 @@ class PurchaseOrder < ApplicationRecord
 
     if self.advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
+
+      # if self.advance_tds_slab.present?
+
+      # handles a case when adv amount and tds slab is unchanged, dont recalculate.
+        unless skip_adv_calculation
+          tds = self.advance_tds_slab&.tds
+          new_advance_amount = TaxCalculationUtils.tds_amount(self.advance_amount.value, tds)
+          tds_amount = self.advance_amount.value - new_advance_amount
+          self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
+          final_advance_amount = self.advance_amount.value - tds_amount
+          self.advance_amount.value = final_advance_amount
+        end
+
     else
       self.advance_amount  = Amount.new(value: 0, currency_id: 1)
     end
@@ -612,7 +658,7 @@ class PurchaseOrder < ApplicationRecord
         elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
           statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :closed, :voided]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
+          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
         end
       end
     end

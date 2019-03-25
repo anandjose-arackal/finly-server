@@ -1,5 +1,6 @@
 class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Base
-  attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :inward_document_create_params, :po_revision
+  attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :inward_document_create_params, :po_revision, :inward_document,
+                :rejected_items
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -14,16 +15,50 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
       end
     end
     self.inward_document_create_params = create_inward_document_params
+
+
+    if self.procurement.inward_documents.present?
+      self.inward_document = self.procurement.inward_documents.last
+    end
+
   end
 
   def validate
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
     end
 
     if self.purchase_order.closed?
       add_message :error, "This Purchase Order is closed. No further actions can be taken."
     end
+
+    if self.purchase_order.all_items_accepted?
+      add_message :error, "Cant add new GRN if previous GRN has all items shipped."
+    end
+
+
+    self.rejected_items = []
+
+    # if self.procurement.inward_documents.present?
+    #   inv_items = self.procurement.inward_documents.includes(:items)
+    #   self.inward_document.items.each do |item|
+    #     item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
+    #     if self.inward_document.items.pluck(:accepted).first < item_q.first.quantity
+    #       add_message :error, "Items in GRN cant be lower than items in Invoice"
+    #       break
+    #     end
+    #   end
+    # end
+
+
+    if self.procurement.inward_documents.present?
+      self.inward_document.items.each do |item|
+        if item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected ) )
+          rejected_items << item.purchase_order_item_id
+        end
+      end
+    end
+
   end
 
   def process
@@ -35,6 +70,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
                                   action_id: ::TrailAction.id_for(:create)
 
     for item in purchase_order.items
+      next if self.rejected_items.include?(item.id) || ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
       inward_item_params = inward_document_item_params(item)
       inward_document_item = inward_document.items.build(inward_item_params)
       inward_document_item.save
@@ -82,7 +118,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
         product_id: po_item.product_id,
         description: po_item.description,
         quantity: po_item.quantity,
-        previously_delivered: po_item.delivered,
+        previously_delivered: po_item.accepted,
         delivered: 0,
         accepted: 0,
         rejected: 0

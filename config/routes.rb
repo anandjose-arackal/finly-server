@@ -3366,6 +3366,7 @@ Rails.application.routes.draw do
     # post 'purchase_orders/templates', to: 'purchase_orders#template_create'
     patch 'purchase_orders/templates/:id', to: 'purchase_orders#template_update'
     delete 'purchase_orders/templates/:id', to: 'purchase_orders#template_destroy'
+    delete 'purchase_orders/:id/delete', to: 'purchase_orders#destroy'
 
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
@@ -3423,6 +3424,7 @@ Rails.application.routes.draw do
       put 'close', to: 'inward_invoices#close'
       post 'save_as_template', to: 'inward_invoices#template_create'
       post 'apply_template', to: 'inward_invoices#template_apply'
+      delete 'delete', to: 'inward_invoices#destroy'
     end
 
     resources :delivery_challans

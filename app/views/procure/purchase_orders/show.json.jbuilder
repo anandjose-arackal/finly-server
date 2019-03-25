@@ -21,9 +21,18 @@ json.total_before_tax do
 end
 json.advance_amount do
   json.id @result.purchase_order.advance_amount&.id
+  json.total @result.purchase_order.total_adv_amount
   json.value @result.purchase_order.advance_amount&.value
+  json.tds_amount @result.purchase_order.advance_tds_amount&.value
+  json.tds_slab_id @result.purchase_order.advance_tds_slab_id
+  json.tds_slab_name @result.purchase_order.advance_tds_slab&.name
   json.currency_id @result.purchase_order.advance_amount&.currency&.id
-  json.due_date @result.purchase_order.due_date
+  json.due_date @result.purchase_order.due_date&.strftime("%e-%b-%Y")
+  json.status do
+    json.id @result.purchase_order.advance_amount_status&.id
+    json.name @result.purchase_order.advance_amount_status&.name
+  end
+  json.advance_amount_required @result.purchase_order.advance_amount_required
 end
 json.tax do
   json.value @result.purchase_order.tax_amount&.value
@@ -97,9 +106,10 @@ end
 
 json.departments do
   json.array! @result.departments do |department|
-    json.extract! department, :id, :name, :cost_center_id
+    json.merge! department.as_json3
   end
 end
+
 
 json.sub_departments do
   json.array! @result.sub_departments do |dept|
@@ -165,4 +175,12 @@ json.locations do
     json.extract! location, :id, :name, :gstin, :pan
     json.address location.address
   end
+end
+
+json.tds_slabs do
+    json.array!(@result.tds_slabs.tds_slabs) do |tds_slab|
+      json.id tds_slab.id
+      json.name tds_slab.name
+      json.tds tds_slab.tds
+    end
 end

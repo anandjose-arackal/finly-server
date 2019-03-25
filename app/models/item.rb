@@ -20,6 +20,7 @@
 #  account             :string(255)
 #  supply_item_type_id :integer
 #  deleted_at          :datetime
+#  product_type        :integer
 #
 
 class Item < ApplicationRecord
@@ -28,6 +29,7 @@ class Item < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
+  belongs_to :product_type, optional: true, class_name: 'ProductType', foreign_key: :product_type
 
   has_many :rate_contracts, foreign_key: :item_id
   # LineItem and Branch Location Mapping
@@ -90,7 +92,8 @@ class Item < ApplicationRecord
         account: account,
         item_code: item_code,
         supply_item_type_id: supply_item_type_id,
-        item_type: supply_item_type.as_json
+        item_type: supply_item_type.as_json,
+        product_type: product_type_id
     }
   end
 

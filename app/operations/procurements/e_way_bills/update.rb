@@ -16,7 +16,7 @@ class Procurements::EWayBills::Update < Procurements::EWayBills::Base
       return
     end
     unless self.purchase_order.present?
-      add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
+      add_message :error, 'Purchase Order not found for this procurement, cannot create GRN'
       return
     end
   end

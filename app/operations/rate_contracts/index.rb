@@ -5,7 +5,7 @@ class RateContracts::Index < RateContracts::Base
 
 
   def init
-    if user.has_policy_role?(UserRole.id_for(:item_master_manager))
+    if user.has_policy_role?(UserRole.id_for(:item_master_manager)) || user.vp_admin_or_auditor?
       self.rate_contracts = user.rate_contracts
     end
   end

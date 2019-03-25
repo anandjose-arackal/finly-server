@@ -29,30 +29,31 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def dashboard
-    {name: 'Dashboard', id: 'dashboard', url: 'dashboard'}
+    {name: 'Dashboard', id: 'dashboard', url: 'dashboard/params={}'}
   end
 
   def procure
+    return nil unless user.company.procurement_enabled?
     {name: 'Procure', id: 'procure', url: 'procurements'}
   end
 
   def po_initiator
-    return nil unless user.is_purchase_order_initiator?
-    {name: 'Your POs', id: 'procure', url: 'procurements'}
+    return nil unless user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
+    {name: 'Your POs', id: 'procure', url: "procurements/params={\"search_type\":\"user_details\",\"search_query\":\"#{user.email}\"}"}
   end
 
   def po_awaiting_approval
-    return nil unless user.is_purchase_request_reviewer? || user.vendor_payments_admin?
-    {name: 'POs Awaiting Approval', id: 'procure', url: 'procurements'}
+    return nil unless user.is_purchase_order_reviewer? || user.vp_admin_or_auditor?
+    {name: 'POs Awaiting Approval', id: 'procure', url: 'procurements/params={"filter_procurement_type":"purchase_order", "filter_awaiting_approval":"1"}'}
   end
 
   def po_team
-    return nil unless user.is_purchase_request_reviewer?
+    return nil unless user.is_purchase_order_reviewer? || user.vp_admin_or_auditor?
     {name: 'Team POs', id: 'procure', url: 'procurements'}
   end
 
   def po_company
-    return nil unless user.vendor_payments_admin?
+    return nil unless user.vp_admin_or_auditor?
     {name: 'Company POs', id: 'procure', url: 'procurements'}
   end
 
@@ -80,7 +81,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_advances
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'PO Advances', id: 'payables', url: 'new_payment_po_advances'}
+    {name: 'PO Advances', id: 'payables', url: 'new_payment_po_advances/params={}'}
   end
 
   def po_invoices
@@ -137,12 +138,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_payment_ticket
     return nil unless user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
-    {name: 'New Payment Ticket', id: 'create', url: 'new_payment_ticket'}
+    {name: 'New Payment Ticket', id: 'create', url: 'new_payment_ticket/params={}'}
   end
 
   def attachments
     return nil unless user.is_bank_payment_request_initiator?
-    {name: 'Attachments', id: 'attachments', url: 'attachments'}
+    {name: 'Attachments', id: 'attachments', url: 'attachments/params={}'}
   end
 
 end

@@ -347,25 +347,33 @@ module Transitionable
     end
 
     def validate_if_admin(user)
-      user.admin?
+      # Admin is allowed to modify document only after taking control
+      # Currently implementing only for vendor payments admin
+      user.vendor_payments_admin?
     end
     
     def validate_if_reviewer(user)
-      if self.policy.present?
-        if self.document_level_reviewer_mappings.present?
-          self.document_level_reviewer_mappings.pluck(:reviewer_id).include?(user.id)
-        end
+      if self.policy.present? && self.document_level_reviewer_mappings.present?
+        self.document_level_reviewer_mappings.with_viewable.pluck(:reviewer_id).include?(user.id) rescue false
       end
     end
 
     def validate_if_creditor(user)
-      if self.policy.present?
-        if self.approved? || self.auto_approved?
-          if self.policy.policy_user_roles.present?
-            self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor)).pluck(:user_id).include?(user.id)
-          end
-        end
+      if self.policy.present? && self.policy.policy_user_roles.present? && (self.approved? || self.auto_approved?)
+        self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_creditor), user_id: user.id).present? rescue false
       end
+    end
+
+    def update_if_owner(user)
+      (self.document_owner_id == user.id)
+    end
+
+    def update_if_admin(user)
+      user.vendor_payments_admin?
+    end
+
+    def update_if_reviewer(user)
+      self.controlling_level.reviewers.pluck(:id).include?(user.id) rescue false
     end
 
   end
@@ -579,13 +587,23 @@ module Transitionable
         data
       end
     end
+
     def role_based_admin_associated_items(user, role_id, options={})
+      admin_restricted_status_ids = options[:admin_restricted_status_ids] || []
       if user.instance_of?(User)
         if self.column_names.include? 'company_id'
-          self.where(company_id: user.company.id)
+          if admin_restricted_status_ids.present?
+            self.where(company_id: user.company.id).where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", admin_restricted_status_ids)
+          else
+            self.where(company_id: user.company.id)
+          end
         else
           user_ids = user.company.users.pluck(:id)
-          self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+          if admin_restricted_status_ids.present?
+            self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", admin_restricted_status_ids)
+          else
+            self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+          end
         end
       end
     end
@@ -649,7 +667,7 @@ module Transitionable
     def associated_items(user, document_roles)
       data = nil
       role_ids = UserRole.where(name: document_roles).pluck(:id) rescue []
-      policy_ids = user.policy_user_roles.where(user_role_id: role_ids).pluck(:policy_id)&.uniq rescue nil
+      # policy_ids = user.policy_user_roles.where(user_role_id: role_ids).pluck(:policy_id)&.uniq rescue nil
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         role_name = UserRole.find_by_id(role_id).name
         valid_role = document_roles.include?(role_name.to_sym)

@@ -69,8 +69,10 @@
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
-#
-
+#  po_advance                   :integer,
+#  po_prev_adjusted_advance     :integer,
+#  po_adjusted_advance          :integer
+# 
 #  gst_type_id: 1 - IGST
 #              2 - CGST + SGST
 
@@ -93,6 +95,11 @@ class Invoice < ApplicationRecord
   belongs_to :freight_amount, optional: true, class_name: "Amount"
   belongs_to :balance_due, optional: true, class_name: "Amount"
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
+
+  # Captures PO advance if any and how much is adjusted in the tax invoice
+  # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
+  belongs_to :po_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_adjusted_advance
+
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
@@ -155,6 +162,8 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :advance_amount
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
+  # accepts_nested_attributes_for :po_prev_adjusted_advance
+  accepts_nested_attributes_for :po_adjusted_advance
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -218,6 +227,12 @@ class Invoice < ApplicationRecord
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
       where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid]))
+    end
+  }
+
+  scope :filter_awaiting_approval, -> (enabled) {
+    if StringUtils.to_bool(enabled)
+      where(invoice_status_id: InwardInvoiceStatus.id_for(:processing))
     end
   }
 
@@ -396,7 +411,7 @@ class Invoice < ApplicationRecord
   end
 
   def policy
-    self.payment&.payment_order&.bank_payment_request&.policy
+    self.payments&.first&.payment_order&.bank_payment_request&.policy
   end
 
   # the 'user' will default to the initiating user of the payment
@@ -423,7 +438,7 @@ class Invoice < ApplicationRecord
   def item_amounts_total
     if self.invoice_items.present?
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount.value}.sum
+      return self.invoice_items.map {|p| p.amount&.value}.sum
     else
       return 0
     end
@@ -452,6 +467,15 @@ class Invoice < ApplicationRecord
       return self.receiving_account
     end
     nil
+  end
+
+  def awaiting_action(user)
+    awaiting_action = false
+      if self.level&.reviewers&.include? user
+        awaiting_action = true
+        return awaiting_action
+      end
+    awaiting_action
   end
 
   # this method updates the invoice status based on the associated
@@ -507,6 +531,8 @@ class Invoice < ApplicationRecord
   def as_json
     {
       id: self.id,
+      invoice_type: self.invoice_type&.name,
+      procurement_id: self.procurement_id,
       advance: self.advance,
       advance_amount: self.advance_amount&.value,
       tax_amount: precision_value(self.tax_amount&.value),
