@@ -31,6 +31,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
     # self.purchase_order_params[:policy_id] = 457
+
+    
   end
 
   def validate
@@ -88,15 +90,15 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     end
 
     if StringUtils.to_bool( self.purchase_order_params[:advance_amount_required] ) 
-      unless self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
+      unless self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
         add_message :error, "You selected advance to be added for this PO. Please add advance amount."
         return
       end
     end
 
 
-    if self.purchase_order_params[:advance_amount_attributes][:value].present? && self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
-      if self.purchase_order_params[:advance_amount_attributes][:value].to_i > params[:purchase_order][:total_after_tax_attributes][:value].to_i
+    if self.purchase_order_params[:requested_advance_amount_attributes][:value].present? && self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
+      if self.purchase_order_params[:requested_advance_amount_attributes][:value].to_i > params[:purchase_order][:total_after_tax_attributes][:value].to_i
         add_message :error, "Advance amount can't be more than Total amount"
         return
       end
@@ -129,16 +131,15 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #old attachments
     self.po_old_attachments = self.purchase_order.attachments
 
-
-    if self.purchase_order_params[:advance_amount_attributes][:value].present?
-      purchase_order_params[:advance_amount_attributes][:id] = self.purchase_order&.advance_amount&.id
+    if self.purchase_order_params[:requested_advance_amount_attributes][:value].present?
+      purchase_order_params[:requested_advance_amount_attributes][:id] = self.purchase_order&.requested_advance_amount&.id
       # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
       self.skip_adv_calculation = false
-      if ( purchase_order_params[:advance_amount_attributes][:value].to_i == self.purchase_order.advance_amount&.value ) && ( purchase_order_params[:advance_tds_slab_id].to_i == self.purchase_order.advance_tds_slab_id )
+      if ( purchase_order_params[:requested_advance_amount_attributes][:value].to_i == self.purchase_order.requested_advance_amount&.value ) && ( purchase_order_params[:advance_tds_slab_id].to_i == self.purchase_order.advance_tds_slab_id )
         self.skip_adv_calculation = true
       end
     else
-      self.purchase_order_params[:advance_amount_attributes][:value] = self.purchase_order&.advance_amount&.value || 0
+      self.purchase_order_params[:requested_advance_amount_attributes][:value] = self.purchase_order&.requested_advance_amount&.value || 0
       self.purchase_order_params[:due_date] = self.purchase_order.due_date
       self.skip_adv_calculation = true
     end
@@ -146,9 +147,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def process
 
+    
     purchase_order.assign_attributes(purchase_order_params)
-
     if purchase_order.valid?
+
 
       # purchase_order.save
       purchase_order.process_line_item_calculation(self.skip_adv_calculation)

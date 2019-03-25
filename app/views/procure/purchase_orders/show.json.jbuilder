@@ -33,6 +33,10 @@ json.advance_amount do
     json.name @result.purchase_order.advance_amount_status&.name
   end
   json.advance_amount_required @result.purchase_order.advance_amount_required
+
+  json.requested_advance_amount @result.purchase_order.requested_advance_amount&.value
+  json.advance_amount @result.purchase_order.advance_amount&.value
+  json.tds_amount @result.purchase_order.advance_tds_amount&.value
 end
 json.tax do
   json.value @result.purchase_order.tax_amount&.value

@@ -89,6 +89,7 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :discount_amount, optional: true, class_name: "Amount", autosave: true
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
   # IF PO HAS ANY ADVANCE AMOUNT, WE ADD IT HERE
+  belongs_to :requested_advance_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
   belongs_to :advance_tds_amount, optional: true, class_name: "Amount"
   belongs_to :advance_tds_slab, optional: true, class_name: 'TdsRatesList'
@@ -117,8 +118,9 @@ class PurchaseOrder < ApplicationRecord
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, allow_destroy: true
-  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount
+  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
   accepts_nested_attributes_for :custom_fields
+  # accepts_nested_attributes_for :requested_advance_amount
   # accepts_nested_attributes_for :advance_payments
 
 
@@ -574,7 +576,7 @@ class PurchaseOrder < ApplicationRecord
       self.build_balance_amount(value: total_amount, currency_id: 1)
     end
 
-    if self.advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+    if self.requested_advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
 
       # if self.advance_tds_slab.present?
@@ -582,15 +584,16 @@ class PurchaseOrder < ApplicationRecord
       # handles a case when adv amount and tds slab is unchanged, dont recalculate.
         unless skip_adv_calculation
           tds = self.advance_tds_slab&.tds
-          new_advance_amount = TaxCalculationUtils.tds_amount(self.advance_amount.value, tds)
-          tds_amount = self.advance_amount.value - new_advance_amount
+          new_advance_amount = TaxCalculationUtils.tds_amount(self.requested_advance_amount.value, tds)
+          tds_amount = self.requested_advance_amount.value - new_advance_amount
           self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
-          final_advance_amount = self.advance_amount.value - tds_amount
-          self.advance_amount.value = final_advance_amount
+          final_advance_amount = self.requested_advance_amount.value - tds_amount
+          self.advance_amount.update(value: final_advance_amount)
         end
 
     else
       self.advance_amount  = Amount.new(value: 0, currency_id: 1)
+      self.requested_advance_amount = Amount.new(value: 0, currency_id: 1)
     end
 
     # self.save
