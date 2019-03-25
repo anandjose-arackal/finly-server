@@ -88,7 +88,7 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
 
   def validate_association
     return if payment_request.update_if_owner(user) if BankPaymentRequestStatus.status_ids_for_owner.include?(payment_request.status_id)
-    return if payment_request.update_if_admin(user) unless BankPaymentRequestStatus.status_ids_for_owner.include?(payment_request.status_id)
+    return if payment_request.update_if_admin(user) if !BankPaymentRequestStatus.status_ids_for_owner.include?(payment_request.status_id) || payment_request.owner_id.blank?
     return if payment_request.update_if_reviewer(user) if BankPaymentRequestStatus.status_ids_for_reviewer.include?(payment_request.status_id)
     return if payment_request.status_id
     add_message :error, 'Unable to update'
