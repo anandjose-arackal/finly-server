@@ -69,7 +69,6 @@ when :itzcash_production, :aws_production, :background_production
   # linked_files << "config/sentry.yml"
 when :development_3, :migrated_test, :migrated_test_2, :uat, :development, :development_2
   linked_files << "config/sidekiq.yml"
-  linked_files << "config/gstinve"
 end
 set :linked_files, linked_files
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
