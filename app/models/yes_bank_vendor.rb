@@ -87,6 +87,9 @@ class YesBankVendor < ApplicationRecord
     bank_account_ids = BankAccount.where(account_owner_type: "YesBankVendor").where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:account_owner_id)
     where id: bank_account_ids
   }
+  scope :filter_approved, -> {
+    approved
+  }
 
   scope :includes_bank_accounts, -> {
     includes(:bank_accounts)
