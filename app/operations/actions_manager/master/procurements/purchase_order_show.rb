@@ -96,10 +96,12 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def remind
-    if purchase_order.is_initiating_user?
-      purchase_order.processing? &&
-      document_owner?
-      return true
+    unless procurement.po_revisions.pluck(:revision_of_id).include?(purchase_order.id)
+      if purchase_order.is_initiating_user?
+        purchase_order.processing? &&
+        document_owner?
+        return true
+      end
     end
   end
 
