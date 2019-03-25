@@ -3,7 +3,7 @@ class Categories::Index < Categories::Base
   attr_accessor :purpose
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin, :auditor]
+    [:employee, :manager, :finance_manager, :admin, :auditor, :vendor_payments_admin]
   end
 
   def pre_validate

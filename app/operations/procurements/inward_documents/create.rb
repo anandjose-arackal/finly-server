@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :inward_document_create_params, :po_revision, :inward_document,
-                :rejected_items
+                :rejected_items, :non_service_items
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -57,6 +57,13 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
           rejected_items << item.purchase_order_item_id
         end
       end
+    end
+
+    self.non_service_items = purchase_order.items.map {|item| item if item.inventory_line_item.product_type_id != ProductType.id_for(:service) }.compact
+
+    if self.non_service_items.blank?
+      add_message :error, "GRN can only be added for goods and not for services."
+      return
     end
 
   end

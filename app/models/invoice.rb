@@ -226,7 +226,7 @@ class Invoice < ApplicationRecord
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid]))
+      where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved]))
     end
   }
 
