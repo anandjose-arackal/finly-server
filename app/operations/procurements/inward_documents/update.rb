@@ -161,7 +161,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
     if item.changes.present?
 
-      if item.changes[:delivered].present?
+      if item.changes[:accepted].present?
         # Why the f*k was it like this before?
         # donkey
 
@@ -169,7 +169,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
         accepted = (accepted - item.changes[:accepted][0]) + item.changes[:accepted][1]
       end
 
-      if item.changes[:accepted].present?
+      if item.changes[:delivered].present?
         # delivered = (delivered - item.changes[:accepted][0]) + item.changes[:accepted][1]
         delivered = (delivered - item.changes[:delivered][0]) + item.changes[:delivered][1]
       end
