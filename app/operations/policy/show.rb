@@ -65,7 +65,7 @@ class Policy::Show < Policy::Base
   end
 
   def authorized_user_types
-    [:company_admin, :policy_admin, :employee, :auditor, :admin]
+    [:company_admin, :policy_admin, :employee, :auditor, :vendor_payments_admin]
   end
 
   def pre_validate
