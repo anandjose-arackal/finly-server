@@ -6,7 +6,7 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
-                :vendor, :procurement, :bank_account, :original_purchase_order, :department
+                :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation
 
  def init
     self.purchase_order_params = purchase_order_parameters
@@ -56,6 +56,19 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
+    if self.purchase_order_params[:delivery_date].present?
+      valid_date = Date.parse(self.purchase_order_params[:delivery_date]) rescue false 
+      unless valid_date
+          add_message :error, 'Invalid date provided'
+          return
+      end
+
+      unless Date.parse(self.purchase_order_params[:delivery_date]) && (Date.parse(self.purchase_order_params[:delivery_date]) >= Date.today)
+        add_message :error, 'Delivery Date can only be set to a present or future date.'
+        return
+      end
+    end
+
     if self.department.blank?
       add_message :error, "Please select a department"
     end
@@ -74,13 +87,21 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
+    if StringUtils.to_bool( self.purchase_order_params[:advance_amount_required] ) 
+      unless self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
+        add_message :error, "You selected advance to be added for this PO. Please add advance amount."
+        return
+      end
+    end
+
+
     if self.purchase_order_params[:advance_amount_attributes][:value].present? && self.purchase_order_params[:advance_amount_attributes][:value].to_f > 0
       if self.purchase_order_params[:advance_amount_attributes][:value].to_i > params[:purchase_order][:total_after_tax_attributes][:value].to_i
         add_message :error, "Advance amount can't be more than Total amount"
         return
       end
       if self.purchase_order_params[:due_date].blank?
-        add_message :error, 'Due date for the advance amount has not been set.'
+        add_message :error, 'Scheduled date for the advance amount has not been set.'
         return
       end
       valid_date = Date.parse(self.purchase_order_params[:due_date]) rescue false 
@@ -112,8 +133,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     if self.purchase_order_params[:advance_amount_attributes][:value].present?
       purchase_order_params[:advance_amount_attributes][:id] = self.purchase_order&.advance_amount&.id
       # purchase_order_params[:advance_amount_status_id] = AdvanceAmountStatus.id_for(:to_be_processed)
+      self.skip_adv_calculation = false
+      if ( purchase_order_params[:advance_amount_attributes][:value].to_i == self.purchase_order.advance_amount&.value ) && ( purchase_order_params[:advance_tds_slab_id].to_i == self.purchase_order.advance_tds_slab_id )
+        self.skip_adv_calculation = true
+      end
     else
       self.purchase_order_params[:advance_amount_attributes][:value] = self.purchase_order&.advance_amount&.value || 0
+      self.purchase_order_params[:due_date] = self.purchase_order.due_date
+      self.skip_adv_calculation = true
     end
   end
 
@@ -123,8 +150,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     if purchase_order.valid?
 
-      purchase_order.save
-      purchase_order.process_line_item_calculation
+      # purchase_order.save
+      purchase_order.process_line_item_calculation(self.skip_adv_calculation)
       purchase_order.save
 
       # Directly update the columns because we have callbacks,

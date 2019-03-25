@@ -21,12 +21,13 @@ json.total_before_tax do
 end
 json.advance_amount do
   json.id @result.purchase_order.advance_amount&.id
+  json.total @result.purchase_order.total_adv_amount
   json.value @result.purchase_order.advance_amount&.value
-  json.currency_id @result.purchase_order.advance_amount&.currency&.id
-  json.due_date @result.purchase_order.due_date
+  json.tds_amount @result.purchase_order.advance_tds_amount&.value
   json.tds_slab_id @result.purchase_order.advance_tds_slab_id
   json.tds_slab_name @result.purchase_order.advance_tds_slab&.name
-  json.tds_amount @result.purchase_order.advance_tds_amount&.value
+  json.currency_id @result.purchase_order.advance_amount&.currency&.id
+  json.due_date @result.purchase_order.due_date&.strftime("%e-%b-%Y")
   json.status do
     json.id @result.purchase_order.advance_amount_status&.id
     json.name @result.purchase_order.advance_amount_status&.name
