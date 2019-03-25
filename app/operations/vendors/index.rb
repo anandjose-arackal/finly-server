@@ -14,6 +14,7 @@ class Vendors::Index < Vendors::Base
     has_scope :filter_account_details
     has_scope :filter_business_name
     has_scope :filter_vendor_id
+    has_scope :filter_approved
 
 
     has_scope :sort_vendor_id
