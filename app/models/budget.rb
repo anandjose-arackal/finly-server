@@ -215,7 +215,7 @@ class Budget < ApplicationRecord
   end
 
   def validate_if_admin?(user)
-    user.admin?
+    user.admin? || user.vp_admin_or_auditor?
   end
 
   private

@@ -110,7 +110,7 @@ class Item < ApplicationRecord
   end
 
   def validate_if_admin?(user)
-    user.admin?
+    user.vp_admin_or_auditor?
   end
 
   private
