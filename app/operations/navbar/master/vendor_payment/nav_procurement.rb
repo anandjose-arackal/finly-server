@@ -103,7 +103,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_vendors
-    return nil unless user.is_vendor_manger? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vendor_payments_admin?
+    return nil unless user.is_vendor_manager? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vendor_payments_admin?
     {name: 'Vendors', id: 'manage', url: 'beneficiaries'}
   end
 

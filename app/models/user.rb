@@ -1014,7 +1014,7 @@ class User < ApplicationRecord
 
   # ********** User Roles for Vendor Payments ******************
 
-  def is_vendor_manger?
+  def is_vendor_manager?
     self.has_policy_role?(UserRole.id_for(:vendor_manager))
   end
 

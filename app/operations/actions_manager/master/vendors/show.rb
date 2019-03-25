@@ -31,31 +31,31 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
   end
 
   def delete
-    user.is_vendor_manger?
+    user.is_vendor_manager?
   end
 
   def edit
-    user.is_vendor_manger? || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
+    user.is_vendor_manager? || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
   end
 
   # def add_bank_account
-  #   user.is_vendor_manger? || vendor.get_reviewers.include?(user)
+  #   user.is_vendor_manager? || vendor.get_reviewers.include?(user)
   # end
 
   # def edit_bank_account
-  #   user.is_vendor_manger? || vendor.get_reviewers.include?(user)
+  #   user.is_vendor_manager? || vendor.get_reviewers.include?(user)
   # end
 
   # def delete_bank_account
-  #   user.is_vendor_manger? || vendor.get_reviewers.include?(user)
+  #   user.is_vendor_manager? || vendor.get_reviewers.include?(user)
   # end
 
   # def edit_vendor_details
-  #   user.is_vendor_manger? || vendor.get_reviewers.include?(user)
+  #   user.is_vendor_manager? || vendor.get_reviewers.include?(user)
   # end
 
   # def edit_attachment
-  #   user.is_vendor_manger? || vendor.get_reviewers.include?(user)
+  #   user.is_vendor_manager? || vendor.get_reviewers.include?(user)
   # end
 
   # def create_beneficiaries
