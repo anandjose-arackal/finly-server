@@ -43,9 +43,11 @@ FactoryBot.define do
     first_name {"User"}
     last_name {"Doe"}
     email {generate(:user_email)}
-    password {"password"}
+    password {'FW1g$18j0t!k2'}
     mothers_maiden_name {"XX"}
     mobile_number {generate(:mobile_number)}
+    last_activity_at {DateTime.now}
+    password_changed_at {DateTime.now}
 
     # user_panel_subscription_attributes {{expense_management: true}}
     # role_mapping_attributes { {user_role_id: 4, purpose_id: 1} }

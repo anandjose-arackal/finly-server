@@ -31,10 +31,12 @@ class BankAccount < ApplicationRecord
 
   belongs_to :account_owner, optional: true, polymorphic: true
 
+  belongs_to :purchase_order, optional: true
+
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
 
-  validates :account_number, presence: true #, format: Constants::VALID_BANK_ACCOUNT
+  validates :account_number, presence: true, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
   validates :company_id, presence: true

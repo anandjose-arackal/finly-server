@@ -5,7 +5,9 @@ class Oauth::TokenController < Doorkeeper::TokensController
   include AccessibilityCheckHelper
   include ApplicationHelper
   include Helpers::UserSessionsHelper
+  include Helpers::RequestImpressionHelper
 
+  around_action :save_request_impression
   before_action :load_global_variables
 
   def create
@@ -28,7 +30,12 @@ class Oauth::TokenController < Doorkeeper::TokensController
       if sessions_result.success? and sessions_result.session.status_id == UserSessionStatus.id_for(:authorized)
         result = Gatekeeper::Event.(:after_session_create, params)
         if result.success?
-          @user.otp_verified = !result.require_otp
+          @user.otp_verified = !result.require_otp if @user.otp_verified
+
+          unless @user.expired?
+            @user.update(last_activity_at: DateTime.now)
+          end
+
           on_create_success(response)
           return
         else

@@ -3,7 +3,7 @@
 #
 #   rule 'Request IP Address should match session IP', on: :after_finly_authorize do
 #     current_ip = RequestStoreUtil.current_request.remote_ip
-#     session_ip = RequestStoreUtil.current_session.ip
+#     session_ip = RequestStoreUtil.current_session.remote_ip
 #     if current_ip != session_ip
 #       message 'IP mismatch with session IP'
 #       response_code 401

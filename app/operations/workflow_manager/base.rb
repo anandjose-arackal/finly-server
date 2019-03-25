@@ -1,6 +1,6 @@
 class WorkflowManager::Base < BaseOperation
   attr_accessor :document, :aasm_document, :violations_present,
-                :aasm_event, :document_types, :note, :role_id, :provider_name, :trail
+                :aasm_event, :document_types, :note, :role_id, :provider_name, :trail, :document_class_name
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
@@ -10,9 +10,9 @@ class WorkflowManager::Base < BaseOperation
 
 
     # todo - The below switch case can be reduced to one line since provider name is already present
-    document_class_name = self.document&.class&.name
+    self.document_class_name = self.document&.class&.name
 
-    case document_class_name
+    case self.document_class_name
     when 'PurchaseOrder'
       self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrderProvider.new self.document, violations_present, user
     when 'Invoice'
@@ -64,16 +64,37 @@ class WorkflowManager::Base < BaseOperation
     end
     # If user delegation is allowed
     delegated_action_user_id = actual_current_user.present? ? actual_current_user.id : nil
+    if self.document_class_name == "PurchaseOrder"
+      # if self.document.procurement.po_revisions.present? 
+      if self.document.procurement.po_revisions.pluck(:id).include?(self.document.id)
+        note = "Revised PO # #{self.document.po_number}, #{aasm_event.humanize}"
+      end
+    end
     # Create Trail
     self.trail = document.trails.new action_user: user,
                            action_id: TrailAction.id_for(aasm_event),
                            action_user_role_id: role_id,
                            action_level_id: aasm_document.current_level&.id,
                            modified_level_id: aasm_document.new_level&.id,
-                           delegated_action_user_id: delegated_action_user_id
+                           delegated_action_user_id: delegated_action_user_id,
+                           note: note
+
+    # if self.document_class_name == "PurchaseOrder"
+    #   procurement = self.document.procurement
+    #   original_purchase_order = procurement.purchase_order
+    #   if procurement.po_revisions
+    #       original_purchase_order.trails.create action_user: user,
+    #                                  action_id: TrailAction.id_for(aasm_event),
+    #                                  action_user_role_id: role_id,
+    #                                  action_level_id: aasm_document.current_level&.id,
+    #                                  modified_level_id: aasm_document.new_level&.id,
+    #                                  delegated_action_user_id: delegated_action_user_id,
+    #                                  note: "Revised PO # #{self.document.po_number}, #{aasm_event.humanize}"
+    #     end
+    # end
 
     if self.note.present?
-      self.trail.note = self.note
+      self.trail.note = "\n#{self.note}"
     end
 
     self.trail.save

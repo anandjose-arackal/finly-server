@@ -22,6 +22,11 @@ gem 'daemons', '~> 1.3.1'
 gem 'rollbar', '~> 2.18.2'
 gem 'oj', '~> 3.7.6'
 
+# Firewall
+gem 'rack-attack', '5.4.2'
+# gem 'zxcvbn-ruby', '0.1.2', require: 'zxcvbn'
+gem 'devise_zxcvbn', '4.4.1'
+gem 'devise-security', '0.13.0'
 # gem '-raven', '~> 2.8'
 
 gem 'health-monitor-rails', '~> 8.4.0'
@@ -45,6 +50,9 @@ gem 'omniauth-quickbooks', '~> 0.0.2'
 gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
 gem 'finly-secure_storage-sdk', git: 'git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git'
+# gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_storage-sdk.git'
+
+
 
 gem 'rubyzip', '~> 1.2.2'
 
@@ -137,8 +145,8 @@ gem 'font-awesome-rails', '~> 4.7.0.4'
 gem 'has_scope', '~> 0.7.2'
 
 # gem 'sendgrid-ruby', '~> 5.3.0'
-gem 'griddler', '~> 1.5.2'
-gem 'griddler-sendgrid', '~> 1.1.0'
+# gem 'griddler', '~> 1.5.2'
+# gem 'griddler-sendgrid', '~> 1.1.0'
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
 # gem 'wkhtmltoimage-binary'

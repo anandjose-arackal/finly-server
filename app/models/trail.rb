@@ -85,13 +85,18 @@ class Trail < ApplicationRecord
     where created_at: (date.beginning_of_day..date.end_of_day)
   }
 
+  scope :filter_date_range, -> (from, to) {
+    where created_at: (from.beginning_of_day..to.end_of_day)
+  }
+
   def as_json(user)
     {
-        action_type: self.action.name,
-        action_user: self.action_user&.as_json,
+        action_type: self.action&.name,
+        action_user: self.action_user&.json_for_trail,
         body: generate_trail_body,
         created_at_date: self.created_at.strftime("%d-%b-%Y"),
         created_at_time: self.created_at.strftime("%I:%M%p"),
+        created_at: self.created_at,
         note: self.note
     }
   end
@@ -145,10 +150,16 @@ class Trail < ApplicationRecord
         action = ""
       when TrailAction.id_for(:reimbursement_confirmed)
         action = " confirmed reimbursement"
-      when TrailAction.id_for(:closed)
+      when TrailAction.id_for(:closed), TrailAction.id_for(:close)
         action = " closed"
       when TrailAction.id_for(:void)
         action = " voided"
+      when TrailAction.id_for(:send_to_vendor)
+        action = " has sent to vendor"
+      when TrailAction.id_for(:revision)
+        action = " created a revision for this"
+      when TrailAction.id_for(:reopen)
+        action = " reopened"
       else
         action = ""
     end

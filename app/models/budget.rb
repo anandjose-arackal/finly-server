@@ -206,6 +206,18 @@ class Budget < ApplicationRecord
              ])
   }
 
+  def validate_if_owner?(user)
+    self.user_id == user.id
+  end
+
+  def validate_of_manager?(user)
+    user.is_budget_manager?
+  end
+
+  def validate_if_admin?(user)
+    user.admin?
+  end
+
   private
 
   def recalculate_parent_budget

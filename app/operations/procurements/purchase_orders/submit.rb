@@ -60,7 +60,13 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+    end
 
+    if purchase_order.advance_amount&.present?
+      if purchase_order.advance_amount.value > 0
+        purchase_order.advance_amount_status_id = (purchase_order.auto_approved? ? AdvanceAmountStatus.id_for(:to_be_processed) : AdvanceAmountStatus.id_for(:po_processing))
+        purchase_order.save
+      end
     end
 
     self.workflow_output = op.workflow_output

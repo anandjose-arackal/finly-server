@@ -19,6 +19,7 @@
 #  current_resolution_width  :integer
 #  mouse_pos_x               :integer
 #  mouse_pos_y               :integer
+#  ip                        :string(255)
 #
 
 class UserSessionEvent < ApplicationRecord

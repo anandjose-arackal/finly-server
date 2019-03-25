@@ -1,6 +1,7 @@
 json.success true
 json.otp_verified @user.otp_verified
 json.kyc_required @user.company.kyc_required?
+json.expired @user.expired?
 json.data do
   json.access_token @token.token
   # json.token_type 'bearer'

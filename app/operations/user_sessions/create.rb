@@ -58,6 +58,7 @@ class UserSessions::Create < BaseOperation
     enrich_geo_location args
     enrich_device args
     enrich_ip args
+    enrich_user_agent args
     set_event args
     return if has_errors?
     self.session = UserSession.new args
@@ -113,7 +114,7 @@ class UserSessions::Create < BaseOperation
     geo_ip = Geocoder.search(RequestStoreUtil.current_request.remote_ip)
     # geo_ip = Geocoder.search('106.51.71.232')
     geo_ip = geo_ip.first if geo_ip.respond_to?(:each)
-    data = geo_ip.data
+    data = geo_ip&.data
     args[:continent_name] = data&.dig('continent', 'names', 'en')
     args[:continent_code] = data&.dig('continent', 'code')
     args[:country_name] = data&.dig('country', 'names', 'en')
@@ -176,8 +177,29 @@ class UserSessions::Create < BaseOperation
     end
   end
 
+  def enrich_user_agent(args)
+    return if user.nil?
+
+    result = UserAgentClients::FindOrCreate.(user, params)
+    unless result.success?
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.messages[:error].to_sentence
+      # add_message :error, result.messages[:error].to_sentence
+      return
+    end
+
+    args[:user_agent_client_id] = result.user_agent_client.id
+    unless result.user_agent_client.valid?
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.device.message
+      # add_message :error, result.device.message
+      return
+    end
+  end
+
   def set_event(args)
     args[:events_attributes] = [{}]
+    args[:events_attributes][0][:ip] = RequestStoreUtil.current_request.remote_ip
     args[:events_attributes][0][:http_method] = RequestStoreUtil.current_request.method_symbol
     args[:events_attributes][0][:app] = RequestStoreUtil.current_app
     args[:events_attributes][0][:path] = RequestStoreUtil.current_request.path

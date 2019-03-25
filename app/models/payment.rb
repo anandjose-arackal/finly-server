@@ -568,6 +568,20 @@ class Payment < ApplicationRecord
     }
   end
 
+  def parent_details
+    case self.parent_type
+    when 'BeneficiaryPayment'
+      BeneficiaryPayment.find_by(id: self.parent_id).as_json
+    when 'Invoice'
+      Invoice.find_by(id: self.parent_id).as_json
+    when 'PurchaseOrder'
+      PurchaseOrder.find_by(id: self.parent_id).as_json2 # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
+    end
+  end
+
+
+
+
   private
 
   def initiating_account_presence

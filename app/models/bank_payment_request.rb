@@ -26,6 +26,7 @@
 #  deleted_at                   :datetime
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
+#  company_id                   :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -43,6 +44,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :controlling_for_user, optional: true, class_name: "User"
   belongs_to :controlling_for_user_role, optional: true, class_name: "UserRole"
   belongs_to :policy, optional: true
+  belongs_to :company, optional: true
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
@@ -168,6 +170,21 @@ class BankPaymentRequest < ApplicationRecord
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
+  
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from bank_payment_requests.created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from bank_payment_requests.created_at) = ?', month)
+  }
+
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
 
   # scope :filter_controlling_user, -> (user_id) {
@@ -232,6 +249,8 @@ class BankPaymentRequest < ApplicationRecord
       self.name = generate_name
     end
   end
+
+  before_save :add_company
 
   def can_submit?
     open? || retracted? || rejected?
@@ -344,6 +363,26 @@ class BankPaymentRequest < ApplicationRecord
     self.payment_order.amount_requested&.value
   end
 
+  # For user role as bank payment request initiator 
+  def is_initiating_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), self)
+  end
+
+  def is_reviewing_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), self)
+  end
+
+  def is_crediting_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
+  end
+
+  def add_company
+    self.company_id = self.owner.company_id
+  end
+
   private
 
   def self.status_ids(*statuses)
@@ -374,4 +413,36 @@ class BankPaymentRequest < ApplicationRecord
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
+
+
+  
+  def self.role_based_associated_status_ids(user)
+    BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:bank_payment_request_initiator) == role_id.to_i)
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :credited, :pending]
+        elsif (UserRole.id_for(:bank_payment_request_reviewer) == role_id.to_i)
+          statuses += [:processing, :approved, :pending, :auto_approved, :credited]
+        elsif UserRole.id_for(:bank_payment_request_creditor) == role_id.to_i
+          statuses += [:approved, :pending, :creation_in_progress, :auto_approved, :credited]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:retracted, :processing, :approved, :rejected, :auto_approved, :creation_in_progress, :pending, :credited]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.roles
+    # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
+    [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor]
+  end
+
+
+
 end

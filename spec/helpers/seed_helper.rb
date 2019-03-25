@@ -8,8 +8,8 @@ class SeedHelper
     ActiveRecord::Migration.add_column :oauth_applications, :confidential, :boolean, default: true, null: false unless Doorkeeper::Application.has_attribute? :confidential
 
     seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
-    if seedable_classes.blank?
-      Dir.glob("#{Rails.root}/app/models/**/*.rb") {|f| require f}
+    if seedable_classes.blank? or seedable_classes.size < 15
+      Dir.glob("#{Rails.root}/app/models/**/*.rb") {|f| (load f rescue nil)}
       seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
     end
     seedable_classes.each do |klass|

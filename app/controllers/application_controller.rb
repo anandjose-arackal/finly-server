@@ -7,12 +7,14 @@ class ApplicationController < ActionController::Base
   # include AbstractController::Callbacks
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
+  include Helpers::RequestImpressionHelper
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
   protect_from_forgery with: :null_session
   # before_action :set_paper_trail_whodunnit
 
+  around_action :save_request_impression
   before_action :finly_authorize!
 
   # before_action :load_global_variables
@@ -26,7 +28,7 @@ class ApplicationController < ActionController::Base
   before_action :store_location
 
   after_action :set_queries_counter
-  after_action :track_request
+  # after_action :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found
@@ -440,14 +442,14 @@ class ApplicationController < ActionController::Base
     FILE_LOGGER.info(log)
   end
 
-  def track_request
-    user_id = current_user&.id
-    # Track only if user is present
-    return if user_id.blank? or request.remote_ip.blank?
-    return unless current_user.class.name == User.name
-    # Create new visit in background
-    TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
-  end
+  # def track_request
+  #   user_id = current_user&.id
+  #   # Track only if user is present
+  #   return if user_id.blank? or request.remote_ip.blank?
+  #   return unless current_user.class.name == User.name
+  #   # Create new visit in background
+  #   TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
+  # end
 
   def init_elastic_apm
     return unless Rails.env.production?

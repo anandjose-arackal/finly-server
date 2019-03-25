@@ -55,7 +55,7 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
     self.validation_data = {
       vendor_ids: user.company.yes_bank_vendors.non_deleted.pluck(:id), # todo change to vendor_id
       payment_terms: user.company.payment_terms,
-      inventory_line_item_ids: user.company.inventory_line_items.pluck(:id),
+      inventory_line_item_ids: user.company.items.pluck(:id),
       tax_rates: user.company.tax_rates,
       policies: user.company.policies.with_application(:vp),
       sub_departments: user.company.departments.only_sub_departments,
@@ -255,7 +255,7 @@ class Procurements::Invoices::Import < Procurements::Invoices::Base
   def generate_invoices_params
     invoices_params = []
     self.invoices_data.each do |data|
-      inventory_line_item_op = Invoicing::InventoryLineItem::Index.(user, {filter_item_type: [SupplyItemType.id_for(:non_po_item)]})
+      inventory_line_item_op = ItemMaster::Item::Index.(user, {filter_item_type: [SupplyItemType.id_for(:non_po_item)]})
 
       inventory_line_item = inventory_line_item_op.inventory_line_items.find_by id: data[:inventory_line_item_id]
       vendor = user.company.yes_bank_vendors.non_deleted.find_by(vendor_id: data[:vendor_uid])

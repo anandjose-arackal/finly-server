@@ -4,17 +4,17 @@ class Api::Vp::V1::InventoryLineItemsController < BaseControllers::ApiBase
 
 
   def create
-    @result = Invoicing::InventoryLineItem::Create.(current_user, params)
+    @result = ItemMaster::Item::Create.(current_user, params)
     respond
   end
 
   def index
-    @result = Invoicing::InventoryLineItem::Index.(current_user, params)
+    @result = ItemMaster::Item::Index.(current_user, params)
     respond
   end
 
   def destroy
-    @result = Invoicing::InventoryLineItem::Destroy.(current_user, params)
+    @result = ItemMaster::Item::Destroy.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
     else

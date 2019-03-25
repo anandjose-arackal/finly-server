@@ -16,7 +16,7 @@ RSpec.describe 'UserIps::FindOrCreate' do
       before(:all) do
         RSpec::Mocks.with_temporary_scope do
           @before_ip_count = UserIp.count
-          allow(RequestStoreUtil).to receive(:current_request).and_return(double(ip: @ip, remote_ip: @ip))
+          allow(RequestStoreUtil).to receive(:current_request).and_return(double(remote_ip: @ip))
           @result = UserIps::FindOrCreate.(@user1)
           @result_ip = @result&.ip
         end
@@ -44,7 +44,7 @@ RSpec.describe 'UserIps::FindOrCreate' do
           @user_ip = create :user_ip, user_id: @user1.id, ip: @ip, ip_type: @ip_type
 
           @before_ip_count = UserIp.count
-          allow(RequestStoreUtil).to receive(:current_request).and_return(double(ip: @ip, remote_ip: @ip))
+          allow(RequestStoreUtil).to receive(:current_request).and_return(double(remote_ip: @ip))
           @result_1 = UserIps::FindOrCreate.(@user1)
           @result_1_ip = @result_1&.ip
         end

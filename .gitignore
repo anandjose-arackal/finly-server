@@ -24,6 +24,8 @@ config/redis_config.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
+/doc/*
+erd.pdf
 !/log/.keep
 /tmp
 /public/system/receipts/*
