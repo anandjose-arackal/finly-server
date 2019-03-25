@@ -98,7 +98,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.payment_requests = ::BankPaymentRequest.associated_items(user, ::BankPaymentRequest.roles)
+      self.payment_requests = ::BankPaymentRequest.associated_items(user, ::BankPaymentRequest.roles) || ::BankPaymentRequest.none
     else
       self.payment_requests = BankPaymentRequest.none
     end
