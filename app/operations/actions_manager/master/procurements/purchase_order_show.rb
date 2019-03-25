@@ -52,7 +52,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def submit
-    if user.is_purchase_order_initiator?
+    if user.is_purchase_order_initiator? || user.vendor_payments_admin?
       document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
     end
   end
@@ -99,6 +99,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     if purchase_order.is_initiating_user?
       purchase_order.processing? &&
       document_owner?
+      return true
     end
   end
 
@@ -152,13 +153,13 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     # ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
     # (purchase_order.processing? && user_in_level?) ||
     # (user.vendor_payments_admin? && purchase_order.voided?)
-    if user.is_purchase_order_initiator?
+    if user.is_purchase_order_initiator?  || user.vendor_payments_admin?
       ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )# || user.vendor_payments_admin?
     end
   end
 
   def delete
-    if user.is_purchase_order_initiator?
+    if user.is_purchase_order_initiator? || user.vendor_payments_admin?
       if document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
         return true
       end
