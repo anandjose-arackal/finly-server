@@ -2,9 +2,11 @@ class Categories::Base < BaseOperation
 
   attr_accessor :categories, :purpose, :company, :parent_type_id, :custom_fields
 
-  def authorized_user_types
-    [:employee, :manager, :finance_manager, :company_admin, :auditor]
-  end
+  #Jugaad for swiggy as they do not have access to expense management
+  # and below roles are scoped to expense management
+  # def authorized_user_types
+  #   [:employee, :manager, :finance_manager, :company_admin, :auditor]
+  # end
 
   class Categories::Base::CategoriesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
