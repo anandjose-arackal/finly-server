@@ -154,7 +154,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       end
 
       if user.vendor_payment_admin?
-        unless purchase_order.voided?
+        unless purchase_order.voided? or purchase_order.rejected? or purchase_order.open? or purchase_order.retracted?
           # actions[:policy_editable] = true
           actions[:document_editable] = true
           actions[:save] = {url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),method: "PUT"}
