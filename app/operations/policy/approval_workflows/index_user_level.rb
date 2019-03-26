@@ -74,6 +74,8 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
         PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:invoice_initiator)).pluck(:user_id).uniq rescue []
       when 'BankPaymentRequestProvider' 
         PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id).uniq rescue []
+      when 'MoneyRequestProvider', 'ReportProvider', 'TravelRequestBookingProvider', 'TravelRequestProvider', :MoneyRequestProvider, :ReportProvider, :TravelRequestProvider, :TravelRequestBookingProvider
+        User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id)) rescue []
       end
     end
   end

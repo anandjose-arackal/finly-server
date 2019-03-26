@@ -92,7 +92,9 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     # end
 
     for item in purchase_order.items
-      next if !self.accepted_items.include?(item.id) || ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+      if self.accepted_items.present?
+        next if !self.accepted_items.include?(item.id) || ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+      end
       inward_item_params = inward_document_item_params(item)
       inward_document_item = inward_document.items.build(inward_item_params)
       inward_document_item.save
