@@ -38,17 +38,17 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_initiator
-    return nil unless user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_purchase_order_initiator?
     {name: 'Your POs', id: 'procure', url: "procurements/params={\"search_type\":\"user_details\",\"search_query\":\"#{user.email}\"}"}
   end
 
   def po_awaiting_approval
-    return nil unless user.is_purchase_order_reviewer? || user.vp_admin_or_auditor?
+    return nil unless user.is_purchase_order_reviewer?
     {name: 'POs Awaiting Approval', id: 'procure', url: 'procurements/params={"filter_procurement_type":"purchase_order", "filter_awaiting_approval":"1"}'}
   end
 
   def po_team
-    return nil unless user.is_purchase_order_reviewer? || user.vp_admin_or_auditor?
+    return nil unless user.is_purchase_order_reviewer?
     {name: 'Team POs', id: 'procure', url: 'procurements'}
   end
 
@@ -62,12 +62,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def receive_pending
-    return nil unless user.is_goods_receiver? || user.vp_admin_or_auditor?
+    return nil unless user.is_goods_receiver?
     {name: 'Pending', id: 'receive', url: '#receive/params={"active_tab":"pending-tab"}'}
   end
 
   def receive_history
-    return nil unless user.is_goods_receiver? || user.vp_admin_or_auditor?
+    return nil unless user.is_goods_receiver?
     {name: 'Received', id: 'receive', url: '#receive/params={"active_tab":"receive-tab"}'}
   end
 
@@ -90,7 +90,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def non_po_invoices
-    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor? || user.is_purchase_order_initiator? || user.is_purchase_order_reviewer?
     {name: 'Non PO Invoices', id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"non_po_invoice"}'}
   end
 

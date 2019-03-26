@@ -16,14 +16,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
 
 
   def update_document
-    # e = inward_document.items.map {|i| i.delivered == i.quantity}
-    # unless e.uniq.size == 1 && e.include? true
-    #   true
-    # end
-
-    unless all_accepted?
-      true
-    end
+    editable
   end
 
   def editable
