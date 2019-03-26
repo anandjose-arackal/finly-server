@@ -7,6 +7,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     inward_document_id = params[:id] || params[:inward_document_id]
     self.inward_document = procurement.inward_documents.find_by id: inward_document_id
     self.inward_document_params = inward_document_parameters
+
     self.purchase_order = self.procurement&.purchase_order
 
     if self.procurement.po_revisions.present?
@@ -40,6 +41,12 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
+    # if invoice was added after adding a grn, block modification of current grn
+    if self.procurement.documents&.first&.class&.name == "Invoice"
+      add_message :error, "You have added an Invoice for this GRN. If you want to modify it, delete the invoice."
+      return
+    end
+
     inward_document_params[:items_attributes].each do |item|
       delivered = item[:delivered] || 0
       accepted = item[:accepted] || 0
@@ -68,7 +75,10 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     if self.procurement.invoices.present?
       inv_items = self.procurement.invoices.includes(:items)
       self.inward_document.items.each do |item|
+
         item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
+        # if invoice did not have this item billed previously or this item was not fully deliverd, skip this check
+        next if item_q.blank? || ( item.quantity != ( item.previously_delivered || ( item.accepted + item.rejected )) )
         if self.inward_document.items.pluck(:accepted).first < item_q.first.quantity
           add_message :error, 'Items in GRN cannot be reduced as they have already been invoiced'
           break
@@ -84,6 +94,12 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
     self.inward_document_params.delete(:attachments)
 
     self.id_old_attachments = self.inward_document.attachments
+
+    inward_document_params[:items_attributes].each do |item|
+      item[:delivered] = (item[:delivered].blank?) ? 0 : item[:delivered]
+      item[:accepted] = (item[:accepted].blank?) ? 0 : item[:accepted]
+      item[:rejected] = (item[:rejected].blank?) ? 0 : item[:rejected]
+    end
   end
 
   def process

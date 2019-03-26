@@ -116,7 +116,7 @@ json.invoice do
   json.invoice_status_name invoice.invoice_status&.name&.humanize
 
   # invoice amounts total
-  json.item_amounts_total invoice.item_amounts_total
+  json.item_amounts_total invoice.item_amounts_total&.round(2)
 
   json.net_payable_amount invoice.balance_due&.value
   json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)

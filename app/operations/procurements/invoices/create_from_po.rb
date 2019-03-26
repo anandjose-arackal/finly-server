@@ -122,15 +122,17 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-
+        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
         it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
-        if it_cal == 0
+        if it_cal == 0 && item_in_invoice
           next
         else
-          real_q = item.accepted.to_i - it_cal.to_i          
+          real_q = item.accepted.to_i - it_cal.to_i
+          next if real_q == 0
         end
       else
         real_q = item.accepted.to_i
+        next if real_q == 0        
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           real_q = item.quantity
         end
@@ -166,7 +168,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
         self.po_prev_adjusted_advance = total_adjusted_advance
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
         current_adjustment = self.po_advance - total_adjusted_advance
-        self.po_adjusted_advance = Amount.new(value: current_adjustment, currency_id: 1)
+        self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
       else
         self.po_prev_adjusted_advance = 0
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil

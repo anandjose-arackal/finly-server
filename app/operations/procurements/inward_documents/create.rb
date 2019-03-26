@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :inward_document_create_params, :po_revision, :inward_document,
-                :rejected_items, :non_service_items
+                :rejected_items, :non_service_items, :accepted_items
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
@@ -38,6 +38,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
 
 
     self.rejected_items = []
+    self.accepted_items = []
 
     # if self.procurement.inward_documents.present?
     #   inv_items = self.procurement.inward_documents.includes(:items)
@@ -50,11 +51,18 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     #   end
     # end
 
+    # if self.procurement.inward_documents.present?
+    #   self.inward_document.items.each do |item|
+    #     if item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected ) )
+    #       rejected_items << item.purchase_order_item_id
+    #     end
+    #   end
+    # end
 
     if self.procurement.inward_documents.present?
       self.inward_document.items.each do |item|
-        if item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected ) )
-          rejected_items << item.purchase_order_item_id
+        if item.quantity != ( item.previously_delivered || ( item.accepted + item.rejected ) )
+          accepted_items << item.purchase_order_item_id
         end
       end
     end
@@ -76,8 +84,15 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     inward_document.trails.create action_user_id: user.id,
                                   action_id: ::TrailAction.id_for(:create)
 
+    # for item in purchase_order.items
+    #   next if self.rejected_items.include?(item.id) || ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+    #   inward_item_params = inward_document_item_params(item)
+    #   inward_document_item = inward_document.items.build(inward_item_params)
+    #   inward_document_item.save
+    # end
+
     for item in purchase_order.items
-      next if self.rejected_items.include?(item.id) || ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+      next if !self.accepted_items.include?(item.id) || ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
       inward_item_params = inward_document_item_params(item)
       inward_document_item = inward_document.items.build(inward_item_params)
       inward_document_item.save
