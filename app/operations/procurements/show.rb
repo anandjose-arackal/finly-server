@@ -58,7 +58,7 @@ class Procurements::Show < Procurements::Base
     def get_actions
       actions = {}
       if po_revisions.present?
-        if (po_revisions.last.approved? || po_revisions.last.auto_approved? || po_revisions.last.sent_to_vendor?) && (user_in_level? || document_owner?)
+        if (po_revisions.last.approved? || po_revisions.last.auto_approved? || po_revisions.last.sent_to_vendor? || po_revisions.last.all_items_accepted?) && (user_in_level? || document_owner?)
           actions[:add_document] = true
         end
       elsif purchase_order.present?

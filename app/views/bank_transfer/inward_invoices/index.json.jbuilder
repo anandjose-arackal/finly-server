@@ -106,7 +106,8 @@ json.results do
 
       if invoice.vendor.present?
         json.vendor do
-          json.name invoice.vendor&.name
+          json.name invoice.vendor&.name || invoice.vendor&.business_name
+          json.business_name invoice.vendor&.business_name
           json.email invoice.vendor&.email
           json.id invoice.vendor&.id
           json.gst invoice.vendor&.gst

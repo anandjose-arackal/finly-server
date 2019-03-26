@@ -152,7 +152,7 @@ class PurchaseOrder < ApplicationRecord
   }
   scope :filter_delivery_location, -> (name) {
     if name.present?
-      joins(:delivery_location).where('name LIKE ?',"%#{name}%")
+      joins(:delivery_location).where('name LIKE ?', "%#{name}%")
     end
   }
   scope :with_budgetable_user_ids, -> (user_ids) {
@@ -194,11 +194,11 @@ class PurchaseOrder < ApplicationRecord
     where department_id: ids
   }
 
-  scope :filter_vendor_id, -> (ids){
+  scope :filter_vendor_id, -> (ids) {
     where vendor_id: ids
   }
 
-  scope :filter_user_id, -> (ids){
+  scope :filter_user_id, -> (ids) {
     where user_id: ids
   }
 
@@ -208,14 +208,14 @@ class PurchaseOrder < ApplicationRecord
 
   scope :filter_payable_advances, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      where( purchase_order_status_id: [
-                                          PurchaseOrderStatus.id_for(:approved),
-                                          PurchaseOrderStatus.id_for(:auto_approved)
-                                       ], 
-             advance_amount_status_id: [
-                                          AdvanceAmountStatus.id_for(:to_be_processed),
-                                          AdvanceAmountStatus.id_for(:failed)
-                                       ])
+      where(purchase_order_status_id: [
+          PurchaseOrderStatus.id_for(:approved),
+          PurchaseOrderStatus.id_for(:auto_approved)
+      ],
+            advance_amount_status_id: [
+                AdvanceAmountStatus.id_for(:to_be_processed),
+                AdvanceAmountStatus.id_for(:failed)
+            ])
     end
   }
 
@@ -240,20 +240,20 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :filter_awaiting_approval, -> (user=nil) {
+  scope :filter_awaiting_approval, -> (user = nil) {
     if user.present? && user.instance_of?(User)
       user_id = user.id
     else
       user_id = RequestStore.store[:current_user]&.id
     end
-    
+
     if user_id.present?
       ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
       with_id(ids)
     end
   }
 
-  scope :filter_user, -> (user=nil) {
+  scope :filter_user, -> (user = nil) {
     if user.present? && user.instance_of?(User)
       user_id = user.id
     elsif user.instance_of?(TrueClass)
@@ -308,12 +308,12 @@ class PurchaseOrder < ApplicationRecord
 
   template_config do
     include_association [:policy, :location, :delivery_location, :vendor,
-                          :payment_term, :procurement_term, :department,
-                          :sub_department, :cost_center]
+                         :payment_term, :procurement_term, :department,
+                         :sub_department, :cost_center]
     clone [:extra_charges, :items, :document_level_reviewer_mappings, :total_before_tax,
            :tax_amount, :total_after_tax, :discount_amount, :custom_fields]
 
-    customize(lambda { |po,new_po|
+    customize(lambda {|po, new_po|
       new_po.trails.destroy_all
       new_po.comments.destroy_all
       new_po.attachments.destroy_all
@@ -368,7 +368,7 @@ class PurchaseOrder < ApplicationRecord
     }
   end
 
-  def can_unapprove?(user=nil)
+  def can_unapprove?(user = nil)
     return false if user.blank?
 
     last_approve_trail = self.trails.only_approve.last
@@ -430,29 +430,32 @@ class PurchaseOrder < ApplicationRecord
   # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
   def as_json2
     {
-      original_amount: precision_value(self.total_after_tax&.value),
-      total_advance_amount: total_adv_amount,
-      advance_amount: precision_value(self.advance_amount&.value),
-      payable_advance_amount: precision_value(self.advance_amount&.value),
-      balance_due: precision_value(self.balance_amount&.value),
-      procurement_id: self.procurement_id,
-      tds_amount: self.advance_tds_amount&.value,
-      tds: self.advance_tds_slab&.tds,
-      tds_slab_id: self.advance_tds_slab_id,
-      tds_slab_name: self.advance_tds_slab&.name,
-      department: self.department.as_json,
-      cost_center: self.cost_center.as_json,
-      policy: self.policy.as_json
-      # balance_due: {
-      #   value: precision_value(self.balance_amount&.value),
-      #   id: self.balance_amount&.id,
-      #   currency_id: self.balance_amount&.currency&.id
-      # }
+        original_amount: precision_value(self.total_after_tax&.value),
+        total_advance_amount: total_adv_amount,
+        advance_amount: precision_value(self.advance_amount&.value),
+        payable_advance_amount: precision_value(self.advance_amount&.value),
+        balance_due: precision_value(self.balance_amount&.value),
+        procurement_id: self.procurement_id,
+        tds_amount: self.advance_tds_amount&.value,
+        tds: self.advance_tds_slab&.tds,
+        tds_slab_id: self.advance_tds_slab_id,
+        tds_slab_name: self.advance_tds_slab&.name,
+        department: self.department.as_json,
+        cost_center: self.cost_center.as_json,
+        po_number: self.po_number,
+        delivery_location: self.delivery_location.as_json,
+        requested_advance_amount: self.requested_advance_amount&.value
+        # balance_due: {
+        #   value: precision_value(self.balance_amount&.value),
+        #   id: self.balance_amount&.id,
+        #   currency_id: self.balance_amount&.currency&.id
+        # }
     }
   end
+
   # Public Method
 
-  def process_line_item_calculation(skip_adv_calculation=false)
+  def process_line_item_calculation(skip_adv_calculation = false)
     calculate_line_items(skip_adv_calculation)
   end
 
@@ -461,18 +464,18 @@ class PurchaseOrder < ApplicationRecord
   # end
 
   # For user role as purchase order initiator
-  def is_initiating_user?(user=nil)
+  def is_initiating_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:purchase_order_initiator), self)
   end
 
   # For user role as purchase order reviewer
-  def is_reviewing_user?(user=nil)
+  def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
   end
 
-  
+
   private
 
   # def populate_advance_amount
@@ -483,7 +486,7 @@ class PurchaseOrder < ApplicationRecord
   #   end
   # end
 
-  def calculate_line_items(skip_adv_calculation=false)
+  def calculate_line_items(skip_adv_calculation = false)
     total_before_tax_amount = 0
     total_after_tax_amount = 0
     tax_amount = 0
@@ -576,23 +579,23 @@ class PurchaseOrder < ApplicationRecord
       self.build_balance_amount(value: total_amount, currency_id: 1)
     end
 
-    if self.requested_advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+    if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
 
       # if self.advance_tds_slab.present?
 
       # handles a case when adv amount and tds slab is unchanged, dont recalculate.
-        unless skip_adv_calculation
-          tds = self.advance_tds_slab&.tds
-          new_advance_amount = TaxCalculationUtils.tds_amount(self.requested_advance_amount.value, tds)
-          tds_amount = self.requested_advance_amount.value - new_advance_amount
-          self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
-          final_advance_amount = self.requested_advance_amount.value - tds_amount
-          self.advance_amount.update(value: final_advance_amount)
-        end
+      unless skip_adv_calculation
+        tds = self.advance_tds_slab&.tds
+        new_advance_amount = TaxCalculationUtils.tds_amount(self.requested_advance_amount.value, tds)
+        tds_amount = self.requested_advance_amount.value - new_advance_amount
+        self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
+        final_advance_amount = self.requested_advance_amount.value - tds_amount
+        self.advance_amount.update(value: final_advance_amount)
+      end
 
     else
-      self.advance_amount  = Amount.new(value: 0, currency_id: 1)
+      self.advance_amount = Amount.new(value: 0, currency_id: 1)
       self.requested_advance_amount = Amount.new(value: 0, currency_id: 1)
     end
 
@@ -636,7 +639,7 @@ class PurchaseOrder < ApplicationRecord
       status_ids.push PurchaseOrderStatus.id_for(status)
     end
 
-    status_ids.reject { |status_id| status_id.nil? }
+    status_ids.reject {|status_id| status_id.nil?}
   end
 
   def self.finance_associated_status_ids
@@ -644,7 +647,13 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.roles
-    [:purchase_order_initiator, :purchase_order_reviewer]
+    [
+        :purchase_order_initiator,
+        :purchase_order_reviewer,
+        :bank_payment_request_initiator,
+        :bank_payment_request_reviewer,
+        :bank_payment_request_creditor
+    ]
   end
 
   def self.role_based_associated_status_ids(user)

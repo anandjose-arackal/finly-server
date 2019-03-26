@@ -16,7 +16,7 @@ json.status do
 end
 json.total_before_tax do
   json.id @result.purchase_order.total_before_tax&.id
-  json.value @result.purchase_order.total_before_tax&.value
+  json.value @result.purchase_order.total_before_tax&.value&.round(2)
   json.currency_id @result.purchase_order.total_before_tax&.currency&.id
 end
 json.advance_amount do
@@ -39,22 +39,22 @@ json.advance_amount do
   json.tds_amount @result.purchase_order.advance_tds_amount&.value
 end
 json.tax do
-  json.value @result.purchase_order.tax_amount&.value
+  json.value @result.purchase_order.tax_amount&.value&.round(2)
   json.id @result.purchase_order.tax_amount&.id
   json.currency_id @result.purchase_order.tax_amount&.currency&.id
 end
 json.total_after_tax do
   json.id @result.purchase_order.total_after_tax&.id
-  json.value @result.purchase_order.total_after_tax&.value
+  json.value @result.purchase_order.total_after_tax&.value&.round(2)
   json.currency_id @result.purchase_order.total_after_tax&.currency&.id
 end
 json.discount do
-  json.value @result.purchase_order.discount_amount&.value
+  json.value @result.purchase_order.discount_amount&.value&.round(2)
   json.id @result.purchase_order.discount_amount&.id
   json.currency_id @result.purchase_order.discount_amount&.currency&.id
 end
 json.balance_due do
-  json.value @result.purchase_order.balance_amount&.value
+  json.value @result.purchase_order.balance_amount&.value&.round(2)
   json.id @result.purchase_order.balance_amount&.id
   json.currency_id @result.purchase_order.balance_amount&.currency&.id
 end
@@ -64,17 +64,17 @@ json.items do
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
     json.tax_amount do
-      json.value item.tax_amount&.value
+      json.value item.tax_amount&.value&.round(2)
       json.id item.tax_amount&.id
       json.currency_id item.tax_amount&.currency&.id
     end
     json.discount_amount do
-      json.value item.discount_amount&.value
+      json.value item.discount_amount&.value&.round(2)
       json.id item.discount_amount&.id
       json.currency_id item.discount_amount&.currency&.id
     end
     json.total_amount do
-      json.value item.total_amount&.value
+      json.value item.total_amount&.value&.round(2)
       json.id item.total_amount&.id
       json.currency_id item.total_amount&.currency&.id
     end
