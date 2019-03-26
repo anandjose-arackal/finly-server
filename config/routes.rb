@@ -182,7 +182,6 @@
 #                         api_v1_configuration_categories GET    /api/v1/configuration/categories(.:format)                                                                          api/v1/configuration/category#index
 #                       api_v1_configuration_gcm_register POST   /api/v1/configuration/gcm/register(.:format)                                                                        api/v1/configuration/gcm#create
 #                     api_v1_configuration_gcm_unregister POST   /api/v1/configuration/gcm/unregister(.:format)                                                                      api/v1/configuration/gcm#delete
-#                                         api_v1_balances GET    /api/v1/balances(.:format)                                                                                          api/v1/users#balance
 #                          api_v1_available_expense_types GET    /api/v1/available_expense_types(.:format)                                                                           api/v1/expenses#available_expense_types
 #                                                  api_v1 GET    /api/v1/kyc/:id(.:format)                                                                                           api/v1/kyc/user#show
 #                                                         POST   /api/v1/kyc/:id(.:format)                                                                                           api/v1/kyc/user#update
@@ -368,6 +367,7 @@
 #                                                         DELETE /api/fm/v1/cards/:id(.:format)                                                                                      api/fm/v1/cards#destroy
 #                                  api_fm_v1_funds_credit POST   /api/fm/v1/funds/credit(.:format)                                                                                   api/fm/v1/funds#credit
 #                                   api_fm_v1_funds_debit POST   /api/fm/v1/funds/debit(.:format)                                                                                    api/fm/v1/funds#debit
+#                                      api_fm_v1_balances GET    /api/fm/v1/balances(.:format)                                                                                       api/fm/v1/users#balances
 #                                desktop_v1_desktop_users POST   /desktop/v1/desktop_users(.:format)                                                                                 desktop/v1/desktop_users#create
 #                 transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                                                                              transcriber/receipts#create_expense
 #                 transcriber_transcribed_expenses_update PATCH  /transcriber/expenses/:id/update(.:format)                                                                          transcriber/receipts#update_expense
@@ -1589,8 +1589,6 @@
 #                                        procure_comments POST   /procure/comments(.:format)                                                                                         procure/comments#create
 #                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
 #                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
-#                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
-#                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
 #                       reviewal_levels_download_mappings GET    /reviewal_levels/download_mappings(.:format)                                                                        reviewal_levels#download_mappings
 #                                reviewal_level_reviewers GET    /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#index
 #                                                         POST   /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                                             reviewers#create
@@ -2319,7 +2317,7 @@ Rails.application.routes.draw do
         post 'gcm/register', to: 'gcm#create'
         post 'gcm/unregister', to: 'gcm#delete'
       end
-      get 'balances', to: 'users#balance'
+      # get 'balances', to: 'users#balance'
       get 'available_expense_types', to: 'expenses#available_expense_types'
 
       get 'kyc/:id', to: 'kyc/user#show'
