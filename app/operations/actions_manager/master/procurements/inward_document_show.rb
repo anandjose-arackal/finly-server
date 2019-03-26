@@ -16,7 +16,10 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
 
 
   def update_document
-    editable
+    # editable
+    unless all_accepted?
+      true
+    end
   end
 
   def editable
