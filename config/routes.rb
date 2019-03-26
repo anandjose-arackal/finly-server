@@ -3476,12 +3476,13 @@ Rails.application.routes.draw do
   ######### New Vendor Empanelment ########
   get 'vendors/new_vendor_config', to: "vendors#new_vendor_config"
   get 'vendors/filter_config', to: "vendors#filter_config"
-  post 'vendors/submit', to: "vendors#submit"
+  post 'vendors/create_and_submit', to: "vendors#create_and_submit"
   post 'vendors/penny_test', to: 'vendors#penny_test'
   post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
   get 'vendors/actions_config', to: 'vendors#actions_config'
   resources :vendors do
     put 'approve', to: "vendors#approve"
+    put 'submit', to: "vendors#submit"
     put 'reject', to: "vendors#reject"
     put 'retract', to: "vendors#retract"
     put 'take_control', to: "vendors#take_control"
