@@ -58,7 +58,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.invoices  = ::Invoice.associated_items(user, ::Invoice.roles)
-      self.invoices = invoices.not_open.non_beneficiary.created_at_desc #unless invoices.blank?
+      self.invoices = invoices.not_open.non_beneficiary.created_at_desc rescue ::Invoice.none #unless invoices.blank?
     end
 
     if self.invoices.nil?
