@@ -78,8 +78,8 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
         item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
         # if invoice did not have this item billed previously or this item was not fully deliverd, skip this check
-        next if item_q.blank? || ( item.quantity != ( item.previously_delivered || ( item.accepted + item.rejected )) )
-        if self.inward_document.items.pluck(:accepted).first < item_q.first.quantity
+        next if item_q.blank? || ( item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected )) )
+        if self.inward_document.items.pluck(:previously_delivered).first < item_q.first.quantity
           add_message :error, 'Items in GRN cannot be reduced as they have already been invoiced'
           break
         end

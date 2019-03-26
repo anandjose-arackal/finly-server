@@ -43,12 +43,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       add_message :error, "Procurement or purchase order not present"
     end
 
-    if self.previous_invoices.present?
-      self.last_invoice = self.previous_invoices.last
-      if self.advance.present? && ( last_invoice.po_prev_adjusted_advance == last_invoice.po_advance )
-        add_message :error, "Advance amount for the purchase order has already been cleared in previous invoices."
-      end
-    end
+    # if self.previous_invoices.present?
+    #   self.last_invoice = self.previous_invoices.last
+    #   if self.advance.present? && ( last_invoice.po_prev_adjusted_advance == last_invoice.po_advance )
+    #     add_message :error, "Advance amount for the purchase order has already been cleared in previous invoices."
+    #   end
+    # end
 
   end
 
