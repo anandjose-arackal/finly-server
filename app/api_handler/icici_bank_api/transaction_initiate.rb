@@ -73,6 +73,7 @@ class IciciBankApi::TransactionInitiate < IciciBankApi::Base
 
       when 200
         # mark the transaction as processing.
+        # log the parsed params so that we can get visibility on the transaction
 
     end
   end

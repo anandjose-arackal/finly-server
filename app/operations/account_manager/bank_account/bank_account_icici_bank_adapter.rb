@@ -139,7 +139,6 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
                                                         bank_response: transfer_request.transaction_result,
                                                         remarks: self.payment.note,
                                                         customer_induced: "N",
-
                                                         amount_attributes: {
                                                             value: payment.amount_value,
                                                             currency_id: Currency.first.id
