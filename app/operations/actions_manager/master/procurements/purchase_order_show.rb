@@ -2,9 +2,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   register_handle :proc_purchase_order_show
   validate :input
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove]
 
-  def initialize(user=nil, params={})
+  def initialize(user = nil, params = {})
     super
     result = ::Procurements::PurchaseOrders::Show.(user, params)
     unless result.success?
@@ -33,7 +33,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def reopen
     unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
-      ( (purchase_order.closed?) && (user_in_level? || document_owner? || user.vendor_payment_admin?) ) # || (purchase_order.auto_approved? && user.vendor_payment_admin? )
+      ((purchase_order.closed?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)) # || (purchase_order.auto_approved? && user.vendor_payment_admin? )
     end
   end
 
@@ -56,11 +56,11 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
       document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
     end
   end
-  
+
   def reject
     if purchase_order.is_reviewing_user? || user.vendor_payments_admin?
       purchase_order.processing? &&
-      user_in_level?
+          user_in_level?
     end
   end
 
@@ -99,7 +99,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     unless procurement.po_revisions.pluck(:revision_of_id).include?(purchase_order.id)
       if purchase_order.is_initiating_user?
         purchase_order.processing? &&
-        document_owner?
+            document_owner?
         return true
       end
     end
@@ -128,14 +128,14 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   def remind_approver
     if purchase_order.is_initiating_user?
       purchase_order.processing? &&
-      document_owner?
+          document_owner?
     end
   end
 
   def void
     # only po initiator or the admin can void the po)
     # and if the procurement has any document, they cant void
-    (document_owner? || user.vendor_payments_admin?) && ( PurchaseOrderStatus.status_ids_for_voidable.include?(purchase_order.purchase_order_status_id) && purchase_order.procurement.invoices.blank? && purchase_order.procurement.inward_documents.blank?)
+    (document_owner? || user.vendor_payments_admin?) && (PurchaseOrderStatus.status_ids_for_voidable.include?(purchase_order.purchase_order_status_id) && purchase_order.procurement.invoices.blank? && purchase_order.procurement.inward_documents.blank?)
   end
 
   def save_btn
@@ -143,8 +143,13 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     # document owner can save provided po is open, retracted or rejected
     if po_modifiable?
       unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
-        (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed? && !purchase_order.sent_to_vendor?)) || ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
-        (purchase_order.processing? && user_in_level?)
+        # Admin
+        (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed? && !purchase_order.sent_to_vendor?) &&
+            !((purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))) ||
+        # Doc owner
+            (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) ||
+        # Reviewer
+            (purchase_order.processing? && user_in_level?)
       end
     end
 
@@ -155,8 +160,8 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     # ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) ) ||
     # (purchase_order.processing? && user_in_level?) ||
     # (user.vendor_payments_admin? && purchase_order.voided?)
-    if user.is_purchase_order_initiator?  || user.vendor_payments_admin?
-      ( document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?) )# || user.vendor_payments_admin?
+    if user.is_purchase_order_initiator? #|| user.vendor_payments_admin?
+      (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) # || user.vendor_payments_admin?
     end
   end
 
@@ -171,10 +176,6 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def more_actions
     true
-  end
-
-  def make_payment
-    (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || user.vendor_payments_admin?)
   end
 
   def audit_trail
@@ -196,7 +197,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def update_btn
-    true
+    save_btn
   end
 
   def unapprove
@@ -217,7 +218,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     # end
 
     unless purchase_order.approved?
-      if last_level?        
+      if last_level?
         state = (previous_reviewer.include? user.id) ? true : false
       else
         previous_reviewer.include? user.id
