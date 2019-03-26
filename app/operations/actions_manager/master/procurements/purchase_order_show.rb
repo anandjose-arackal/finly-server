@@ -58,7 +58,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def reject
-    if purchase_order.is_reviewing_user? || user.vendor_payments_admin?
+    if purchase_order.is_reviewing_user?
       purchase_order.processing? &&
           user_in_level?
     end
@@ -74,7 +74,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def approve
     ############# Reviewer logic start #########################
-    if purchase_order.is_reviewing_user? || user.vendor_payments_admin?
+    if purchase_order.is_reviewing_user? #|| user.vendor_payments_admin?
       if purchase_order.processing?
         last_trail = purchase_order.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
         if (purchase_order.get_reviewers.include?(user))
