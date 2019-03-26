@@ -5,11 +5,11 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
 
 
   def new_procurements
-    true
+    user.is_purchase_order_initiator?
   end
 
   def bulk_actions
-    true
+    user.is_purchase_order_reviewer?
   end
 
   def approve_purchase_order
