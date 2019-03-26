@@ -52,9 +52,9 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
       self.purchase_orders = PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles) rescue ::Procurement.none
     end
 
-    if self.purchase_orders.nil?
-      self.purchase_orders = PurchaseOrder.none
-    end
+    # if self.purchase_orders.nil?
+    #   self.purchase_orders = PurchaseOrder.none
+    # end
     
   end
 
