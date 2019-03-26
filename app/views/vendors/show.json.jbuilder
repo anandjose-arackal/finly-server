@@ -134,10 +134,17 @@ json.edit_config do
     end
   end
 
+  # json.tds_rates do
+  #   json.array! @result.edit_config.vendor_tds_rates do |vtr|
+  #     json.vendor_tds_rate_id vtr.id
+  #     json.extract! vtr.tds_rate, :id, :name, :tds
+  #   end
+  # end
+
   json.tds_rates do
-    json.array! @result.edit_config.vendor_tds_rates do |vtr|
-      json.vendor_tds_rate_id vtr.id
-      json.extract! vtr.tds_rate, :id, :name, :tds
+    json.array! @result.edit_config.tds_rates do |tds_rate|
+      # json. vtr.id
+      json.extract! tds_rate, :id, :name, :tds
     end
   end
 

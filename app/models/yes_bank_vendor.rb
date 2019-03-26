@@ -22,7 +22,7 @@ class YesBankVendor < ApplicationRecord
   has_many :vendor_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :vendor_tds_rates, dependent: :destroy, foreign_key: :vendor_id
-  has_many :tds_rates, through: :vendor_tds_rates, foreign_key: :tds_rates_list_id
+  has_many :tds_rates, through: :vendor_tds_rates#, foreign_key: :tds_rates_list_id
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
 
@@ -104,7 +104,7 @@ class YesBankVendor < ApplicationRecord
   }
 
   scope :includes_for_show, -> {
-    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy, vendor_tds_rates: [:tds_rates], gstin_locations: [:gstin_master, :location])
+    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy, :tds_rates, gstin_locations: [:gstin_master, :location])
   }
 
   # Scopes for ordering
