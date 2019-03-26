@@ -90,7 +90,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def non_po_invoices
-    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor? || user.is_purchase_order_initiator? || user.is_purchase_order_reviewer?
     {name: 'Non PO Invoices', id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"non_po_invoice"}'}
   end
 
