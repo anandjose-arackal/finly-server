@@ -104,7 +104,7 @@ class YesBankVendor < ApplicationRecord
   }
 
   scope :includes_for_show, -> {
-    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy, :tds_rates, gstin_locations: [:gstin_master, :location])
+    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy, vendor_tds_rates: [:tds_rates], gstin_locations: [:gstin_master, :location])
   }
 
   # Scopes for ordering

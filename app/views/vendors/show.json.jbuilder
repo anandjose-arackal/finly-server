@@ -68,6 +68,7 @@ if @result.vendor.is_a?(YesBankVendor)
   json.attachments do
     json.array! @result.vendor.vendor_attachments do |attachment|
       json.id attachment.id
+      json.uid attachment.id
       json.url attachment.attached_file&.url
       json.thumb attachment.attached_file&.url(:thumb)
       json.file_type attachment.attached_file_content_type
@@ -134,8 +135,9 @@ json.edit_config do
   end
 
   json.tds_rates do
-    json.array! @result.edit_config.tds_rates do |tds_rate|
-      json.extract! tds_rate, :id, :name, :tds
+    json.array! @result.edit_config.vendor_tds_rates do |vtr|
+      json.vendor_tds_rate_id vtr.id
+      json.extract! vtr.tds_rate, :id, :name, :tds
     end
   end
 
