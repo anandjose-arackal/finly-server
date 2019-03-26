@@ -83,7 +83,7 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
   end
 
   def process
-    self.purchase_orders = purchase_orders.filter_all_advances unless self.purchase_orders.blank?
+    self.purchase_orders = purchase_orders.filter_all_advances #unless self.purchase_orders.blank?
     params[:purchase_order] = self.purchase_orders
   end
 
