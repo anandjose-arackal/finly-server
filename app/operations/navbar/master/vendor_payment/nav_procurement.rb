@@ -133,7 +133,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_non_po_invoice
     return nil unless user.is_invoice_initiator? || user.vp_admin_or_auditor?
-    {name: 'New Non PO Invoice', id: 'create', url: 'new_payment_invoices/params={"action":"new_invoice"}'}
+    {name: 'New Non PO Invoice', id: 'create', url: 'new_payment_invoices/params={"action":"new_invoice","filter_invoice_type":"non_po_invoice"}'}
   end
 
   def create_payment_ticket
