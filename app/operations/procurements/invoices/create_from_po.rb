@@ -112,27 +112,40 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     # 1. every new invoice created would have the line item quantity automatically adjusted to what was previously entered and paid against
     # 2. po advance if it exists, new invoice is given the option to adjust it against the balance due for delivered items.
 
+    # ugly, rewrite this later
     self.purchase_order.items.each do |item|
 
       real_q = 0
 
       if self.previous_invoices.present?
 
+        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
         # This query does not hit the DB.
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
         it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
-        if it_cal == 0 && item_in_invoice
+        # if the item was in previous invoice
+        # but the quantity was zero, that is, it was not billed
+        # and most importantly,
+        # item quantity billed in previous invoices were all delivered and accepted
+        # then skip
+        # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
+        if it_cal == 0 && item_in_invoice && it_cal.to_i == item.accepted.to_i && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           next
         else
+          # i forgot what i did here, but this is important.
           real_q = item.accepted.to_i - it_cal.to_i
-          next if real_q == 0
+          next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+          if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+            real_q = item.quantity - it_cal
+            next if real_q <= 0
+          end
         end
       else
+        # vendor is billed only for what he delivered and what the user accepted
         real_q = item.accepted.to_i
-        next if real_q == 0        
+        next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
         if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
           real_q = item.quantity
         end
