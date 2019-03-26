@@ -20,7 +20,9 @@ json.array!(@result.paginated_payments) do |payment|
   json.api_initiated payment.api_initiated
   json.custom_fields do
     invoice = payment.invoice
-    json.array! invoice.custom_fields
+    if invoice.present?
+      json.array! invoice&.custom_fields
+    end
   end
   json.invoice_date payment.invoice&.date
   json.credited_date payment.reference_resource&.created_at&.strftime("%Y-%m-%d")
