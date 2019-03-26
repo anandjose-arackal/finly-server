@@ -62,8 +62,7 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def void
-    (PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id) && 
-      user.vendor_payments_admin?
+    (PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id) && (user.vendor_payments_admin? or document_owner?)
   end
 
   def save_btn
