@@ -75,7 +75,6 @@ module Sequenced
 
     module InstanceMethods
       def generate_sequential_id?
-        puts "generate_sequential_id?"
         true
       end
 
