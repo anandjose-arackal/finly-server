@@ -26,6 +26,11 @@ class VendorsController < ApplicationController
     respond
   end
 
+  def create_and_submit
+    @result = Vendors::CreateAndSubmit.(current_user, params)
+    respond
+  end
+
   def update
     @result = Vendors::Update.(current_user, params)
     respond
