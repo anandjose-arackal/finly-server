@@ -26,6 +26,7 @@ class YesBankVendor < ApplicationRecord
   has_many :beneficiary_payments, foreign_key: :vendor_id
   has_many :gstin_locations, foreign_key: :vendor_id
 
+
   default_scope { unscope(:where) }
 
   # Requirement first shared by olx
@@ -76,6 +77,8 @@ class YesBankVendor < ApplicationRecord
                                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     where(id: vendor_ids)
   }
+
+  scope :sort_for_index, -> {reorder(created_at: :desc)}
 
   scope :filter_vendor_type_id, -> (type_id) {where vendor_type_id: type_id}
   scope :filter_status_id, -> (status_id) {where status_id: status_id}
