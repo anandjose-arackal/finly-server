@@ -21,6 +21,7 @@ class Vendors::Index < Vendors::Base
     has_scope :sort_created_at
     has_scope :sort_business_name
     has_scope :non_deleted
+    has_scope :non_deleted_autocomplete
 
     def init
       self.vendors = params[:vendors]
