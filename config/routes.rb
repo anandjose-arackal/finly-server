@@ -2771,6 +2771,8 @@ Rails.application.routes.draw do
     get 'duplicates', to: 'expenses#duplicates'
   end
 
+  get 'configs/loc_dept', to: 'configurations#loc_dept'
+
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
   # get 'expenses/all_expense_types', to: 'expenses#all_expense_types'

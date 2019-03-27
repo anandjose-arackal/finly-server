@@ -15,7 +15,7 @@ class AddGrnNumberToInwardDocument < ActiveRecord::Migration[5.2]
     company_ids = Item.all.pluck(:company_id).uniq
     company_ids.each do |id|
       Item.where(company_id: id).reorder(created_at: :asc).all.each do |item|
-        item.touch
+        item.save
       end
     end
 
@@ -23,7 +23,7 @@ class AddGrnNumberToInwardDocument < ActiveRecord::Migration[5.2]
     company_ids = RateContract.all.pluck(:company_id).uniq
     company_ids.each do |id|
       RateContract.where(company_id: id).reorder(created_at: :asc).all.each do |rate_contract|
-        rate_contract.touch
+        rate_contract.save
       end
     end
   end
