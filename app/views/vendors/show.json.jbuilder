@@ -1,4 +1,5 @@
 json.id @result.vendor.id
+json.vendor_approval_workflow @result.vendor_approval_workflow
 json.vendor do
   json.extract! @result.vendor, :id, :name, :email, :mobile_number
   if @result.vendor.is_a?(YesBankVendor)
@@ -118,6 +119,7 @@ if @result.vendor.policy.present?
 end
 
 json.edit_config do
+  json.vendor_approval_workflow @result.edit_config.vendor_approval_workflow
   json.codes do
     json.array! @result.edit_config.states, :id, :name
   end
