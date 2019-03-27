@@ -2,7 +2,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   register_handle :proc_tax_invoice_show
   validate :input
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove]
 
   def initialize(user=nil, params={})
     super
@@ -51,6 +51,10 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
     if user.vendor_payments_admin? || invoice.is_reviewing_user?
       invoice.processing? && user_in_level?
     end
+  end
+
+  def unapprove
+    true
   end
 
   def remind

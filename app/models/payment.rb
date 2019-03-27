@@ -612,5 +612,17 @@ class Payment < ApplicationRecord
 
   def budget_trail_destroy
     BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+    reset_status
+  end
+
+  def reset_status
+    case self.parent_type
+    when 'Invoice'
+      parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
+      parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+    when 'PurchaseOrder'
+      parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+      parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    end
   end
 end

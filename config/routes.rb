@@ -3420,6 +3420,7 @@ Rails.application.routes.draw do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
       put 'approve', to: 'inward_invoices#approve'
+      put 'unapprove', to: 'inward_invoices#unapprove'
       put 'reject', to: 'inward_invoices#reject'
       put 'close', to: 'inward_invoices#close'
       post 'save_as_template', to: 'inward_invoices#template_create'

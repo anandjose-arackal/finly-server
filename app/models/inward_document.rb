@@ -27,7 +27,7 @@ class InwardDocument < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :company, optional: true
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
-  has_many :items, class_name: "InwardDocumentItem"
+  has_many :items, class_name: "InwardDocumentItem", dependent: :destroy
 
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
