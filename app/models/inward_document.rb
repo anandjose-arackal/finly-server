@@ -23,13 +23,18 @@
 class InwardDocument < ApplicationRecord
   include SoftDeletable,
           Transitionable
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :grn_number, purpose: :grn, editable: false, prefix: 'GRN-'
+
   belongs_to :procurement, optional: true
   belongs_to :user, optional: true
   belongs_to :company, optional: true
+
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
   has_many :items, class_name: "InwardDocumentItem", dependent: :destroy
 
-  has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
+  has_many :attachments, class_name: 'ProcurementAttachment', as: :procurement_document
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   has_many :trails, as: :parent
@@ -41,8 +46,8 @@ class InwardDocument < ApplicationRecord
 
   scope :with_doc_number, -> (doc_number) {where doc_number: doc_number}
   scope :filter_doc_number, -> (doc_number) {where('inward_documents.doc_number LIKE ?', "%#{doc_number}%")}
-  scope :filter_delivery_date, -> (delivery_date) { where "delivery_date = ?", delivery_date}
-  scope :filter_received_date, -> (received_date) { where "updated_at = ?", received_date}
+  scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
+  scope :filter_received_date, -> (received_date) { where 'updated_at = ?', received_date}
 
   def items_shipped
     total = 0
