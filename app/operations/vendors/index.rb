@@ -22,6 +22,7 @@ class Vendors::Index < Vendors::Base
     has_scope :sort_created_at
     has_scope :sort_business_name
     has_scope :non_deleted
+    has_scope :non_deleted_autocomplete
 
     def init
       self.vendors = params[:vendors]
@@ -36,12 +37,10 @@ class Vendors::Index < Vendors::Base
 
   end
 
-  # def init
-  #   self.vendors = user.company.yes_bank_vendors.non_deleted
-  # end
+  def init
+  end
 
   def validate
-    #
   end
 
   def process

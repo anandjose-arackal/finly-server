@@ -31,13 +31,13 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
-    unless self.inward_document.id == self.procurement.inward_documents.last.id
-      add_message :error, 'You cannot modify the selected GRN'
-      return
-    end
+    # unless self.inward_document.id == self.procurement.inward_documents.last.id
+    #   add_message :error, 'You cannot modify the selected GRN'
+    #   return
+    # end
 
     unless self.inward_document.id == self.procurement.inward_documents.last.id
-      add_message :error, "Cant update old GRNs"
+      add_message :error, "Cannot update old GRNs"
       return
     end
 
@@ -54,20 +54,21 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
       po_items = self.inward_document.items.find_by(id: item[:id])
 
-
-      if (po_items.quantity.to_f - po_items.previously_delivered.to_f) < delivered.to_f
-        add_message :error, 'You cannot add additional GRN for the follow item'
+      remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f)
+      
+      if  remaining < delivered.to_f
+        add_message :error, "For item - #{po_items.description}, you can enter atmost what is remaining to be delivered, i.e, #{remaining} units"
         break
       end 
 
       if delivered.to_f > po_items.quantity.to_f
-        add_message :error, 'Now Delivering cannot be more than the Requested Quantity'
+        add_message :error, 'For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity'
         break
       end
 
 
       unless delivered.to_f == accepted.to_f + rejected.to_f
-        add_message :error, 'Accepted & Rejected quantity does not match with delivered quantity'
+        add_message :error, 'For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity'
         break
       end
     end
@@ -78,8 +79,10 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
 
         item_q = inv_items.map { |iv| iv.items.where(inventory_line_item_id: item.inventory_line_item_id) }.flatten
         # if invoice did not have this item billed previously or this item was not fully deliverd, skip this check
-        next if item_q.blank? || ( item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected )) )
-        if self.inward_document.items.pluck(:previously_delivered).first < item_q.first.quantity
+        next if item_q.blank? 
+        next if item.quantity == ( item.previously_delivered || ( item.accepted + item.rejected ))
+        # if self.inward_document.items.pluck(:previously_delivered).first < item_q.first.quantity
+        if item.previously_delivered < item_q.first.quantity
           add_message :error, 'Items in GRN cannot be reduced as they have already been invoiced'
           break
         end

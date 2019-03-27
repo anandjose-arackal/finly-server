@@ -61,7 +61,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
 
     if self.procurement.inward_documents.present?
       self.inward_document.items.each do |item|
-        if item.quantity != ( item.previously_delivered || ( item.accepted + item.rejected ) )
+        if item.quantity != ( item.previously_delivered + ( item.accepted + item.rejected ) )
           accepted_items << item.purchase_order_item_id
         end
       end
@@ -92,9 +92,8 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
     # end
 
     for item in purchase_order.items
-      if self.accepted_items.present?
-        next if !self.accepted_items.include?(item.id) || ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
-      end
+      next if self.accepted_items.present? && !self.accepted_items.include?(item.id)       
+      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
       inward_item_params = inward_document_item_params(item)
       inward_document_item = inward_document.items.build(inward_item_params)
       inward_document_item.save
