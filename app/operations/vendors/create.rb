@@ -28,21 +28,35 @@ class Vendors::Create < Vendors::Base
   def validate
     # Policy Selection
     if user.company.vendor_empanelment_workflow_enabled?
-      policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
+      unless user.is_vendor_manager?
+        policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
 
-      parameters = {
-        filter_associated_entity_type: "YesBankVendorProvider",
-        filter_policy_ids: policies.pluck(:id)
-      }
+        parameters = {
+          filter_associated_entity_type: "YesBankVendorProvider",
+          filter_policy_ids: policies.pluck(:id)
+        }
 
-      levels = ReviewalLevels::Index.(user, parameters).levels
+        levels = ReviewalLevels::Index.(user, parameters).levels
 
-      if levels.present?
-        unless self.vendor_parameters[:policy_id].present?
-          add_message :error, "Please select a policy"
+        if levels.present?
+          unless self.vendor_parameters[:policy_id].present?
+            add_message :error, "Please select a policy"
+          end
         end
       end
     end
+
+    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
+      validate_attachment(vendor_parameters, :gstin)
+      validate_gstin
+      validate_business_name
+    end
+
+    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+      validate_attachment(vendor_parameters, :msme_certificate)
+    end
+
+
 
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list

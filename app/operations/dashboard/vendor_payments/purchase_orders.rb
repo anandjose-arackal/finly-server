@@ -109,7 +109,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
         self.counts.push(personal_data)
       end
 
-      if user.vendor_payments_reviewer?
+      if user.is_purchase_order_reviewer?
         reviewer_data = {
           type: "reviewer",
           data: [
