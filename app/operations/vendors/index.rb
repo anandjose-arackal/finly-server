@@ -36,9 +36,8 @@ class Vendors::Index < Vendors::Base
 
   end
 
-  # def init
-  #   self.vendors = user.company.yes_bank_vendors.non_deleted
-  # end
+  def init
+  end
 
   def validate
     #
