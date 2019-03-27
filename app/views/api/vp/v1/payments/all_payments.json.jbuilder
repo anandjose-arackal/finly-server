@@ -21,7 +21,10 @@ json.array!(@result.paginated_payments) do |payment|
   json.custom_fields do
     invoice = payment.invoice
     if invoice.present?
-      json.array! invoice&.custom_fields
+      json.array! invoice&.custom_fields do |field|
+        json.name field.field_configuration&.name
+        json.value field.string_value
+      end
     end
   end
   json.invoice_date payment.invoice&.date
