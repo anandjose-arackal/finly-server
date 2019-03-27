@@ -22,12 +22,13 @@ class Vendors::Show < Vendors::Base
   class Vendors::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :receiving_transactions, :bank_accounts, :vendor, :actions, :procurement_data,
-                  :custom_fields, :edit_config, :reviewal_chain
+                  :custom_fields, :edit_config, :reviewal_chain, :vendor_approval_workflow
 
     def init
       self.receiving_transactions = params[:receiving_transactions]
       self.bank_accounts = params[:bank_accounts]
       self.vendor = params[:vendor]
+      self.vendor_approval_workflow = user.company.vendor_empanelment_workflow_enabled?
 
       self.actions = get_actions
       self.edit_config = Vendors::NewVendorConfig.(self.vendor.created_by, params)
