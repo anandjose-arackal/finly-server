@@ -180,7 +180,7 @@ class Invoice < ApplicationRecord
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
   # validates :amount, presence: true
-  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9]*\Z/, :message => ' should only have letters and numbers, and no special characters'}
+  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9\/-]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not(id: id)}
@@ -231,9 +231,30 @@ class Invoice < ApplicationRecord
     end
   }
 
-  scope :filter_awaiting_approval, -> (enabled) {
-    if StringUtils.to_bool(enabled)
-      where(invoice_status_id: InwardInvoiceStatus.id_for(:processing))
+  # scope :filter_awaiting_approval, -> (enabled) {
+  #   if StringUtils.to_bool(enabled)
+  #     where(invoice_status_id: InwardInvoiceStatus.id_for(:processing))
+  #   end
+  # }
+
+  # scope :filter_awaiting_approval, -> (user) {
+  #   if user.vendor_payments_reviewer?
+  #     # invoice_ids = Invoice.awaiting_action_items(user).pluck(:id).compact
+  #     # where(id: invoice_ids.uniq)
+  #     self.awaiting_action_items(user)
+  #   end
+  # }
+
+  scope :filter_awaiting_approval, -> (user) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+
+    if user_id.present?
+      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      with_id(ids)
     end
   }
 
