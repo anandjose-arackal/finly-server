@@ -12,9 +12,7 @@ json.array!(@result.paginated_payments) do |payment|
   json.status payment.payment_status_name&.downcase
   json.amount payment.amount_value
   json.initiated_by payment.initiating_user&.name
-  if payment.completed? || payment.processing?
-    json.utr payment.reference_resource&.bank_reference_number
-  end
+  json.utr payment.reference_resource&.bank_reference_number
   json.bank_payment_request_id payment.payment_order.bank_payment_request.id
   json.payment_order_id payment.payment_order.bank_payment_request.id
   json.api_initiated payment.api_initiated
