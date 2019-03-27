@@ -40,7 +40,6 @@ class Vendors::Index < Vendors::Base
   end
 
   def validate
-    #
   end
 
   def process

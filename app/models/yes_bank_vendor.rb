@@ -79,7 +79,7 @@ class YesBankVendor < ApplicationRecord
     where(id: vendor_ids)
   }
 
-  scope :sort_for_index, -> {reorder(created_by: :desc)}
+  scope :sort_for_index, -> {reorder(created_at: :desc)}
 
   scope :filter_vendor_type_id, -> (type_id) {where vendor_type_id: type_id}
   scope :filter_status_id, -> (status_id) {where status_id: status_id}
