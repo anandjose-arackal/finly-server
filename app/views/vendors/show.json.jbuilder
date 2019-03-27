@@ -18,8 +18,10 @@ json.vendor do
     json.created_by @result.vendor.created_by&.name
     json.vendor_id @result.vendor.vendor_id
     json.tds_rates do
-      json.array! @result.vendor.tds_rates do |tds_rate|
-        json.extract! tds_rate, :id, :name, :tds
+      json.array! @result.vendor.vendor_tds_rates do |vtr|
+        json.id vtr.id
+        json.tds_rates_list_id vtr.tds_rates.id
+        json.extract! vtr.tds_rates, :name, :tds
       end
     end
   else
