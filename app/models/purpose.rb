@@ -15,7 +15,8 @@ class Purpose < ApplicationRecord
   def self.values
     [
         :expense_management, :vendor_payments, :invoice, :invoice_items, :outward_invoice,
-        :outward_invoice_items, :collect, :travel_request, :report, :money_request, :procurement, :vendor
+        :outward_invoice_items, :collect, :travel_request, :report, :money_request, :procurement, :vendor,
+        :grn, :item_master, :rate_contract
     ]
   end
 
