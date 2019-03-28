@@ -367,7 +367,7 @@ class Procurement < ApplicationRecord
 
   scope :filter_grn_overdue, -> (required) {
     if StringUtils.to_bool(required)
-      filtered_ids = InwardDocument.where("DATE(delivery_date) <= ?", Date.today).pluck(:procurement_id).uniq
+      filtered_ids = InwardDocument.where("DATE(delivery_date) < ?", Date.today).pluck(:procurement_id).uniq
       where(id: filtered_ids)
     end
   }

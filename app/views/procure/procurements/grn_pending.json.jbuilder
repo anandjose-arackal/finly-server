@@ -91,7 +91,7 @@ json.results do
     json.grn_received_date iwd&.updated_at&.strftime("%d-%m-%Y") || nil
 
     json.due_today iwd&.delivery_date == Date.today
-    json.overdue (iwd&.delivery_date.nil?) ? nil : iwd&.delivery_date <= Date.today
+    json.overdue (iwd&.delivery_date.nil?) ? nil : iwd&.delivery_date < Date.today
 
     json.attachments do
       json.array! p.attached_documents do |attachment|
