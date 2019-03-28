@@ -34,6 +34,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    RubyInline (3.12.4)
+      ZenTest (~> 4.3)
+    ZenTest (4.11.2)
     aasm (5.0.1)
       concurrent-ruby (~> 1.0)
     actioncable (5.2.2)
@@ -230,6 +233,8 @@ GEM
       railties (>= 3.2, < 6.0)
     foreman (0.85.0)
       thor (~> 0.19.1)
+    fuzzy-string-match (1.0.1)
+      RubyInline (>= 3.8.6)
     gcm (0.1.1)
       httparty
       json
@@ -572,6 +577,7 @@ DEPENDENCIES
   finly-secure_storage-sdk!
   font-awesome-rails (~> 4.7.0.4)
   foreman (~> 0.85.0)
+  fuzzy-string-match (= 1.0.1)
   gcm (~> 0.1.1)
   geocoder (~> 1.5.0)
   haml (~> 5.0.4)

@@ -16,7 +16,7 @@
 
 class VendorAttachment < ApplicationRecord
 
-  # Attachment Types: [:pan, gstin, cancelled_cheque]
+  # Attachment Types: [pan, gstin, cancelled_cheque, tax_exemption, lower_exemption, msme_certificate, others]
 
   belongs_to :yes_bank_vendor, optional: true
 
@@ -24,7 +24,8 @@ class VendorAttachment < ApplicationRecord
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
 
-  has_attached_file :attached_file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  # has_attached_file :attached_file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  has_attached_file :attached_file, default_url: '/assets/:style/missing.png'
   validates_attachment :attached_file, content_type: CONTENT_TYPES
 
   scope :pan_attachment, -> { where attachment_type: 'pan' }

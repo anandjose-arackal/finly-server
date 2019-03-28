@@ -699,7 +699,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
   def validate_document_access
     # Owner of document is allowed to access the bank_payment_request, no further validation required
     return if bank_payment_request.validate_if_owner(user)
-    return if bank_payment_request.validate_if_admin(user) && (!bank_payment_request.open? || bank_payment_request.owner_id == user.id)
+    return if bank_payment_request.validate_if_admin(user) && (!bank_payment_request.open? || (bank_payment_request.owner_id == user.id) || bank_payment_request.owner_id.blank?)
     return if bank_payment_request.validate_if_reviewer(user)
     return if bank_payment_request.validate_if_creditor(user)
     raise_unauthorized_exception

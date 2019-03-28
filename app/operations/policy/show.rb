@@ -65,7 +65,7 @@ class Policy::Show < Policy::Base
   end
 
   def authorized_user_types
-    [:company_admin, :policy_admin, :employee, :auditor]
+    [:company_admin, :policy_admin, :employee, :auditor, :vendor_payments_admin]
   end
 
   def pre_validate
@@ -81,7 +81,7 @@ class Policy::Show < Policy::Base
     # Seperating api temporarily until policy user role is setup in all systems
     if vendor_payments?
       self.policy = Policy::VendorPayments::Index.(current_user, params[:filter_role_id]).policies.with_id(id)&.first
-      user_ids = self.policy.policy_user_roles.pluck(:user_id)
+      user_ids = self.policy.policy_user_roles.pluck(:user_id) rescue []
     else
       self.policy = Policy::Index.(user, params).policies.with_id(id)&.first
       user_ids = self.policy.user_mapping.exclude_deleted.pluck(:user_id)

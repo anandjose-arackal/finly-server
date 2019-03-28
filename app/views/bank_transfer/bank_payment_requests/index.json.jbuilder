@@ -1,6 +1,6 @@
-json.count @result.payment_requests.count
+json.count @result.payment_requests&.count
 json.results do
-  json.array! @result.paginated_requests.include_for_index.each do |payment_request|
+  json.array! @result.paginated_requests&.include_for_index&.each do |payment_request|
     item = payment_request.payment_order
     json.id payment_request&.id
     scheduled_at = item.scheduled_at
@@ -51,5 +51,5 @@ json.results do
         json.payment_status payment.payment_status_name
       end
     end
-  end
+  end unless @result.paginated_requests.blank?
 end

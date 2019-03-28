@@ -19,6 +19,7 @@ config/aws_config.yml
 config/yes_bank_config.yml
 config/mailer_config.yml
 config/redis_config.yml
+config/gstin_verification_config.yml
 .rubocop.yml
 
 # Ignore all logfiles and tempfiles.

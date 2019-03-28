@@ -99,9 +99,9 @@ class ExpenseTypesConfigurationController < BaseControllers::WebBase
 
     case product
       when 'vp'
-        path = 'orders'
+        path = 'dashboard'
         if company.feature_subscription.procurement
-          path = 'procurements'
+          path = 'dashboard'
         end
       else
         path = ""

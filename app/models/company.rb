@@ -331,6 +331,10 @@ class Company < ApplicationRecord
     self.feature_subscription.budgeting_system
   end
 
+  def vendor_empanelment_workflow_enabled?
+    self.feature_subscription.vendor_empanelment_workflow
+  end
+
   def more_than_one_subscription?
     count = 0
     [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled, :yes_bank_account].each do |feature|
@@ -389,6 +393,15 @@ class Company < ApplicationRecord
     policy_ids = self.policies.default.pluck(:id)
     policy_ids += self.policies.with_application(RequestStore[:current_app]).pluck(:id)
     Policy.with_id(policy_ids)
+  end
+
+  def dep_subdept_mapping
+    result = {}
+    departments = user.company.departments
+    sub_departments = user.company.departments.only_sub_departments
+    departments.each do |department|
+      
+    end
   end
 
   private

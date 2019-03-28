@@ -43,12 +43,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       add_message :error, "Procurement or purchase order not present"
     end
 
-    if self.previous_invoices.present?
-      self.last_invoice = self.previous_invoices.last
-      if self.advance.present? && ( last_invoice.po_prev_adjusted_advance == last_invoice.po_advance )
-        add_message :error, "Advance amount for the purchase order has already been cleared in previous invoices."
-      end
-    end
+    # if self.previous_invoices.present?
+    #   self.last_invoice = self.previous_invoices.last
+    #   if self.advance.present? && ( last_invoice.po_prev_adjusted_advance == last_invoice.po_advance )
+    #     add_message :error, "Advance amount for the purchase order has already been cleared in previous invoices."
+    #   end
+    # end
 
   end
 
@@ -112,31 +112,49 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     # 1. every new invoice created would have the line item quantity automatically adjusted to what was previously entered and paid against
     # 2. po advance if it exists, new invoice is given the option to adjust it against the balance due for delivered items.
 
+    # ugly, rewrite this later
     self.purchase_order.items.each do |item|
 
       real_q = 0
 
       if self.previous_invoices.present?
 
+        item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
         # This query does not hit the DB.
         # we sum previous invoices line item
         # if that turns out to be zero, invoice for this item is not created
         # awesome stuff.
-
         it_cal = self.previous_invoices.map {|p21| p21.invoice_items.map{|ili| ili.quantity if ili.inventory_line_item_id == item.inventory_line_item_id } }.flatten.compact.sum
-        if it_cal == 0
+        # if the item was in previous invoice
+        # but the quantity was zero, that is, it was not billed
+        # and most importantly,
+        # item quantity billed in previous invoices were all delivered and accepted
+        # then skip
+        # we do this coz there is a chance that user would not pay for all the quantity delivered in one invoice
+        if it_cal == 0 && item_in_invoice && it_cal.to_i == item.accepted.to_i && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
           next
         else
-          real_q = item.accepted.to_i - it_cal.to_i          
+          # i forgot what i did here, but this is important.
+          real_q = item.accepted.to_i - it_cal.to_i
+          next if real_q <= 0  && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+          if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+            real_q = item.quantity - it_cal
+            next if real_q <= 0
+          end
         end
       else
+        # vendor is billed only for what he delivered and what the user accepted
         real_q = item.accepted.to_i
+        next if real_q == 0 && ( item.inventory_line_item.product_type_id == ProductType.id_for(:goods) )
+        if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
+          real_q = item.quantity
+        end
       end
 
-     
       invoice_items_attributes << {
           tax: item.tax,
           discount: item.discount,
+          unit_of_measurement: item.unit_of_measurement,
           rate: item.rate,
           # quantity: item.accepted,
           quantity: real_q,
@@ -161,12 +179,12 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
          # if last_invoice.po_prev_adjusted_advance == last_invoice.po_advance
         self.last_invoice = self.previous_invoices.last
         total_adjusted_advance = self.last_invoice.po_prev_adjusted_advance.to_i + self.last_invoice.po_adjusted_advance&.value&.to_i
-        self.po_prev_adjusted_advance = Amount.new(value: total_adjusted_advance, currency_id: self.advance.currency_id)
+        self.po_prev_adjusted_advance = total_adjusted_advance
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
         current_adjustment = self.po_advance - total_adjusted_advance
-        self.po_adjusted_advance = Amount.new(value: current_adjustment, currency_id: 1)
+        self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
       else
-        self.po_prev_adjusted_advance = Amount.new(value: 0, currency_id: self.advance.currency_id)
+        self.po_prev_adjusted_advance = 0
         self.po_advance = ( self.advance.present? ) ? self.advance.value : nil
         self.po_adjusted_advance = Amount.new(value: 0, currency_id: 1)
       end

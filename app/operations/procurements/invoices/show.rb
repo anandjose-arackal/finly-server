@@ -22,7 +22,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
     def init
       self.invoice = params[:invoice]
-      self.departments = user.company.departments.roots
+      # self.departments = user.company.departments.roots
+      self.departments = user.company.departments
 
       self.locations = user.company.locations
       if invoice.created_by&.departments.present?
@@ -195,6 +196,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     return if invoice.validate_if_reviewer(user)
     # Jugaad because invoice show, po show, inward doc show.. all are on procurement show. So if one has access to one document , he will have access to all documents as all documents are being shown
     return if validate_po_access
+    # Need to check dlrms as above conditions are breaking
+    #Quick fix
+    return if user.is_invoice_reviewer?
     raise_unauthorized_exception
   end
 

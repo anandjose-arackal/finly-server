@@ -34,6 +34,11 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
       transitions :from => [:approved, :auto_approved], :to => [:closed]
     end
 
+    event :unapprove do
+      transitions :from => :processing, :to => :processing
+      transitions :from => :approved, :to => :processing
+    end
+
     after_all_events :change_state
     # after_all_transitions :log_status_change
     # success :change_state

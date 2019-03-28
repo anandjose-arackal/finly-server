@@ -2575,6 +2575,7 @@ Rails.application.routes.draw do
         resources :bank_accounts
       end
       scope :vendors do
+        #todo vendor Emp
         post '', to: 'vendors#create'
       end
     end
@@ -2769,6 +2770,8 @@ Rails.application.routes.draw do
     patch 'unmark', to: 'expenses#unmark', as: :unmark
     get 'duplicates', to: 'expenses#duplicates'
   end
+
+  get 'configs/loc_dept', to: 'configurations#loc_dept'
 
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
@@ -3419,6 +3422,7 @@ Rails.application.routes.draw do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
       put 'approve', to: 'inward_invoices#approve'
+      put 'unapprove', to: 'inward_invoices#unapprove'
       put 'reject', to: 'inward_invoices#reject'
       put 'close', to: 'inward_invoices#close'
       post 'save_as_template', to: 'inward_invoices#template_create'
@@ -3471,6 +3475,23 @@ Rails.application.routes.draw do
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end
   ######## Dashbaord Ends ##############
+
+  ######### New Vendor Empanelment ########
+  get 'vendors/new_vendor_config', to: "vendors#new_vendor_config"
+  get 'vendors/filter_config', to: "vendors#filter_config"
+  post 'vendors/create_and_submit', to: "vendors#create_and_submit"
+  post 'vendors/penny_test', to: 'vendors#penny_test'
+  post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
+  get 'vendors/actions_config', to: 'vendors#actions_config'
+  resources :vendors do
+    put 'approve', to: "vendors#approve"
+    put 'submit', to: "vendors#submit"
+    put 'reject', to: "vendors#reject"
+    put 'retract', to: "vendors#retract"
+    put 'take_control', to: "vendors#take_control"
+    put 'return_control', to: "vendors#return_control"
+  end
+  ######### New Vendor Empanelment Ends ##
 
 
   ######### Rate Contract API start #############

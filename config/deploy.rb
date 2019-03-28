@@ -68,13 +68,14 @@ linked_files = %w{
   config/mailer_config.yml
   config/aws_config.yml
   config/yes_bank_config.yml
+  config/gstin_verification_config.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production
   linked_files << 'config/sidekiq.yml'
   linked_files << 'config/elastic_apm.yml'
   # linked_files << "config/sentry.yml"
-when :development_3, :migrated_test, :migrated_test_2
+when :development_3, :migrated_test, :migrated_test_2, :uat, :development, :development_2
   linked_files << "config/sidekiq.yml"
 end
 set :linked_files, linked_files
