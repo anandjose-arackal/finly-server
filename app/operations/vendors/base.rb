@@ -96,7 +96,7 @@ class Vendors::Base < BaseOperation
             add_message :error, "PAN doesn't match with GSTIN for Location #{index+1}"
           end
 
-          match_percentile = fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
+          match_percentile = StringUtils.fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
 
           if match_percentile < 90
             add_message :error, "Business Name Match Percentile is below 90% for Location #{index+1}"

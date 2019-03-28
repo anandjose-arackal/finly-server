@@ -61,7 +61,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     response_business_name = gstin_master.legal_name_of_business
 
     if request_business_name.present? && response_business_name.present?
-      self.match_percentile = fuzzy_string_match(request_business_name, response_business_name)
+      self.match_percentile = StringUtils.fuzzy_string_match(request_business_name, response_business_name)
     end
   end
 
