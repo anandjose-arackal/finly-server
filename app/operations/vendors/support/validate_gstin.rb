@@ -190,7 +190,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)[Rails.env]
     # url = config_data[:base_url] + '/searchgstin'
     url = config_data[:base_url] + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
-    headers = config_data[:headers]
+    headers = config_data[:search][:headers]
     self.connection = Faraday.new(url: url) do |req|
       # req.url = url
       req.adapter Faraday.default_adapter # make requests with Net::HTTP
