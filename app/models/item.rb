@@ -42,7 +42,7 @@ class Item < ApplicationRecord
   has_many :artifacts, as: :resource, dependent: :destroy
 
 
-  validates :rate, presence: true
+  # validates :rate, presence: true
   validates :description, presence: true
 
 

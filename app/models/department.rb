@@ -53,7 +53,7 @@ class Department < ApplicationRecord
   def as_json(options={})
     args = {id: self.id}
     if options&.dig(:tree)
-      args[:name] = dept_name
+      args[:name] = full_dept_name
       args[:cost_center] = self.cost_center
     else
       args[:name] = name
@@ -61,7 +61,7 @@ class Department < ApplicationRecord
     args
   end
 
-  def dept_name
+  def full_dept_name
     # self.parent.blank? ? self.name : "#{self.parent&.name} / #{self.name}"
     self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
   end
