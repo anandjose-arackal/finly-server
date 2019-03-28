@@ -186,6 +186,9 @@ class PurchaseOrder < ApplicationRecord
     with_status_ids(status_ids)
   }
 
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+  scope :filter_location_id, -> (location_id) {where("location_id = ? OR delivery_location_id = ?", location_id, location_id)}
+
   scope :filter_sub_department_id, -> (ids) {
     where sub_department_id: ids
   }
