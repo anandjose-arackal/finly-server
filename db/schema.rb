@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_28_074818) do
+ActiveRecord::Schema.define(version: 2019_03_27_111856) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2913,7 +2913,6 @@ ActiveRecord::Schema.define(version: 2019_03_28_074818) do
     t.string "account"
     t.integer "tax_rate_id"
     t.integer "cost_center_id"
-    t.string "unit_of_measurement"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
     t.index ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id"
@@ -3113,7 +3112,6 @@ ActiveRecord::Schema.define(version: 2019_03_28_074818) do
     t.datetime "deleted_at"
     t.integer "product_type_id", default: 1
     t.string "item_number"
-    t.string "unit_of_measurement"
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id"], name: "index_items_on_company_id"
     t.index ["product_type_id"], name: "index_items_on_product_type_id"
@@ -4078,14 +4076,6 @@ ActiveRecord::Schema.define(version: 2019_03_28_074818) do
     t.index ["technical_contact_id"], name: "index_policy_configurations_on_technical_contact_id"
   end
 
-  create_table "policy_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "policy_id"
-    t.integer "department_id"
-    t.boolean "enabled"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "policy_field_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "field_configuration_id", null: false
     t.integer "policy_id", null: false
@@ -4103,14 +4093,6 @@ ActiveRecord::Schema.define(version: 2019_03_28_074818) do
     t.datetime "updated_at", null: false
     t.integer "company_id"
     t.integer "creator_id"
-  end
-
-  create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "policy_id"
-    t.integer "location_id"
-    t.boolean "enabled"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4318,7 +4300,6 @@ ActiveRecord::Schema.define(version: 2019_03_28_074818) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
-    t.string "unit_of_measurement"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"
