@@ -100,6 +100,21 @@ class Vendors::Create < Vendors::Base
       vendor_parameters[:vendor_attachments_attributes].first&.delete(:remove_file)
     end
 
+    # Remove tds from vendor params if tds_rates_list_id is blank
+    vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
+      unless vtra[:tds_rates_list_id].present?
+        vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+      end
+    end
+
+    # Remove Empty gstin locations
+    vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+      unless gst.keys.present?
+        vendor_parameters[:gstin_locations_attributes].delete_at(index)
+      end
+    end
+
+
     # adding the created by user for this particular vendor
     vendor_parameters[:created_by_id] = user.id
   end
