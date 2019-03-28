@@ -30,7 +30,7 @@ class Vendors::Show < Vendors::Base
       self.vendor = params[:vendor]
       self.vendor_approval_workflow = user.company.vendor_empanelment_workflow_enabled?
 
-      self.actions = get_actions
+      # self.actions = get_actions
       self.edit_config = Vendors::NewVendorConfig.(self.vendor.created_by, params)
 
       if self.vendor.is_a?(YesBankVendor)
