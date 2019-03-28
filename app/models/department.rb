@@ -14,8 +14,10 @@
 #
 
 class Department < ApplicationRecord
-  include SoftDeletable
+  include SoftDeletable, AncestrySupport
+
   has_ancestry
+
   belongs_to :company, optional: true
   belongs_to :cost_center, optional: true
 
@@ -27,6 +29,7 @@ class Department < ApplicationRecord
 
   has_many :cost_center_department_mappings
   has_many :cost_centers, through: :cost_center_department_mappings
+
 
   accepts_nested_attributes_for :user_department_mappings
 
