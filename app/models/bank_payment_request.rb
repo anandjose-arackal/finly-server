@@ -170,7 +170,7 @@ class BankPaymentRequest < ApplicationRecord
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
-  
+
   scope :filter_year, -> (year) {
     if year.blank?
       year = Date.today.year
@@ -186,6 +186,7 @@ class BankPaymentRequest < ApplicationRecord
   }
 
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+  scope :filter_controlling_user, -> (user_id) {self.awaiting_action_items(user_id)}
 
   # scope :filter_controlling_user, -> (user_id) {
   #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
@@ -363,7 +364,7 @@ class BankPaymentRequest < ApplicationRecord
     self.payment_order.amount_requested&.value
   end
 
-  # For user role as bank payment request initiator 
+  # For user role as bank payment request initiator
   def is_initiating_user?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), self)
@@ -415,7 +416,7 @@ class BankPaymentRequest < ApplicationRecord
   end
 
 
-  
+
   def self.role_based_associated_status_ids(user)
     BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
   end
