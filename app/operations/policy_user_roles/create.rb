@@ -33,16 +33,19 @@ class PolicyUserRoles::Create < PolicyUserRoles::Base
     role_created = 0
 
     added_users.each do |added_user|
-      policy_user_role = self.policy.policy_user_roles.new({user_role_id: role_id, user_id: added_user.id})
-      policy_user_role.save
-
-      if added_user.role_mapping.with_role_id(self.role_id).present?
-        user_added += 1
+      # Since using same api and expense management does not have roles
+      if UserRole::VP_ROLES.values.include?(role_id)
+        policy_user_role = self.policy.policy_user_roles.new({user_role_id: role_id, user_id: added_user.id})
+        
+        user_added += 1 if policy_user_role.save
       else
-        if added_user.role_mapping.create(user_role_id: self.role_id, purpose_id: get_purpose_id)
-          role_created += 1
+        if added_user.role_mapping.with_role_id(self.role_id).present?
+          user_added += 1
+        else
+          if added_user.role_mapping.create(user_role_id: self.role_id, purpose_id: get_purpose_id)
+            role_created += 1
+          end
         end
-
       end
     end
 
