@@ -6,3 +6,5 @@ json.array!(@result.departments) do |department|
     end
   end
 end
+
+json.nested_company_departments @result.departments.arrange_serializable(order: :name)
