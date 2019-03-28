@@ -32,7 +32,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                      po_adjusted_advance_attributes: [:value, :currency_id],
                                      attachments: [],
                                      invoice_attachments_attributes: [:attached_file, :description, :remove_file],
-                                     invoice_items_attributes: [:quantity, :rate, :tax, :tax_rate_id, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac, :comment, :_destroy,
+                                     invoice_items_attributes: [:quantity, :unit_of_measurement, :rate, :tax, :tax_rate_id, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac, :comment, :_destroy,
                                      :inventory_line_item_id],
                                      custom_fields: [])
   end

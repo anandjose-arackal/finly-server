@@ -154,6 +154,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       invoice_items_attributes << {
           tax: item.tax,
           discount: item.discount,
+          unit_of_measurement: item.unit_of_measurement,
           rate: item.rate,
           # quantity: item.accepted,
           quantity: real_q,

@@ -62,6 +62,7 @@ end
 json.items do
   json.array! @result.purchase_order.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
+                  :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)

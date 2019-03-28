@@ -84,6 +84,7 @@ class Item < ApplicationRecord
     {
         id: id,
         item_number: item_number,
+        unit_of_measurement: unit_of_measurement,
         hsn_sac: hsn_sac,
         category_name: category&.name,
         category_id: category_id,
