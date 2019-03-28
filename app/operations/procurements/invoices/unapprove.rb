@@ -15,10 +15,10 @@ class Procurements::Invoices::Unapprove < Procurements::Invoices::Base
       return
     end
 
-    # unless invoice.level.present?
-    #   add_message :error, 'Cannot take action against Invoice at this state'
-    #   return
-    # end
+    unless invoice.level.present?
+      add_message :error, 'Cannot take action against Invoice at this state'
+      return
+    end
 
     unless unapprovable?
       add_message :error, 'You cannot unapprove this Invoice at this state'
