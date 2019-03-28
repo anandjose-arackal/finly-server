@@ -140,7 +140,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     path = "#{Rails.root}/config/gstin_verification_config.yml"
     config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)[Rails.env]
     data = {}
-    config_data[:authenticate][:params].each do |p|
+    config_data[:authentication][:params].each do |p|
       data[p.keys.first] = p.values.first
     end
 
