@@ -62,13 +62,13 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       end 
 
       if delivered.to_f > po_items.quantity.to_f
-        add_message :error, 'For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity'
+        add_message :error, "For item - #{po_items.description}, delivered quantity cannot be more than the requested quantity"
         break
       end
 
 
       unless delivered.to_f == accepted.to_f + rejected.to_f
-        add_message :error, 'For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity'
+        add_message :error, "For item - #{po_items.description}, accepted & rejected quantity does not match with delivered quantity"
         break
       end
     end

@@ -193,7 +193,7 @@ end
 
 json.departments do
   json.array! @result.departments do |department|
-    json.merge! department.as_json3
+    json.merge! department.as_json(tree: true)
   end
 end
 

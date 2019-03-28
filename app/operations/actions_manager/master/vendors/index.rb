@@ -1,4 +1,4 @@
-class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
+class  ActionsManager::Master::Vendors::Index < ActionsManager::Master::Base
   register_handle :vendors_index
   register_actions %i( create )
 

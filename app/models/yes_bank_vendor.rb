@@ -3,7 +3,6 @@
 class YesBankVendor < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
-
   include SoftDeletable
 
   acts_as_sequenced column: :vendor_id, purpose: :vendor, editable: false, prefix: 'VNDR-'

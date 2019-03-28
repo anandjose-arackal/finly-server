@@ -1,6 +1,6 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
-  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params
+  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
@@ -8,6 +8,21 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:invoice, :custom_fields)
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
+
+    if self.inward_invoice.procurement.present?
+      self.procurement = self.inward_invoice.procurement
+
+      self.purchase_order = self.procurement.purchase_order
+
+      if self.procurement.po_revisions.present?
+        self.po_revision = self.procurement.po_revisions.last
+        if po_revision.present?
+          self.purchase_order = self.po_revision
+        end
+      end
+    end
+
+
   end
 
   def validate
@@ -43,6 +58,13 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         self.inward_invoice_params[:advance_amount_required] = false
         self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice&.po_adjusted_advance&.value || 0
       end
+    end
+
+    if self.inward_invoice.procurement.present?
+      if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount.value
+        add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
+        return
+      end      
     end
 
   end

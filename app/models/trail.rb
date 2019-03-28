@@ -113,6 +113,21 @@ class Trail < ApplicationRecord
       end
     end
 
+    if self.action_id == TrailAction.id_for(:auto_approve)
+      body = "#{self.parent_type} was auto approved. Initiated by #{user_name}"
+      return body
+    end
+
+    if self.action_id == TrailAction.id_for(:send_to_vendor)
+      body = "#{user_name} has sent the #{self.parent_type} to vendor."
+      return body
+    end
+
+    if self.action_id == TrailAction.id_for(:revision)
+      body = "#{user_name} has created a revision for this #{self.parent_type}."
+      return body
+    end
+
     body += user_name
 
     case self.action_id
@@ -164,7 +179,7 @@ class Trail < ApplicationRecord
         action = ""
     end
 
-    body += action + " the #{self.parent_type}."
+    body += action + " the #{self.parent_type}."    
 
     body
   end
