@@ -109,7 +109,6 @@ class Vendors::Base < BaseOperation
   end
 
   def validate_attachment(vendor_params, type)
-    vendor_params.
     # Checks presence of attachment with passed type
     types = {pan: "PAN", gstin: "GSTIN Certificate", cancelled_cheque: "Cancelled Cheque", tax_exemption: "Tax Exemption Certificate", lower_exemption: "Lower Exemption Certificate", msme_certificate: "MSME Certificate", others: "Others"}
 
