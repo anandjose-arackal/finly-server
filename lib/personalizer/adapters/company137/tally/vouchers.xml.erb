@@ -19,9 +19,9 @@
             <% vouchers.each do |name, details| %>
               <VOUCHER VCHTYPE="<%= name %>" ACTION="Create">
                  <VOUCHERTYPENAME><%= name %></VOUCHERTYPENAME>
-                 <DATE><%= details[:date] %></DATE>
+                 <DATE><%= Date.today.strftime("%d.%m.%Y") %></DATE>
                  <NARRATION><%= details[:narration] %></NARRATION>
-                 <EFFECTIVEDATE><%= details[:date] %></EFFECTIVEDATE>
+                 <EFFECTIVEDATE><%= Date.today.strftime("%d.%m.%Y") %></EFFECTIVEDATE>
               <% details[:transactions].each do |ledger_name, amount| %>
                  <ALLLEDGERENTRIES.LIST>
                     <LEDGERNAME><%= html_escape ledger_name %></LEDGERNAME>

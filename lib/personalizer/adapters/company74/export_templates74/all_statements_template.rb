@@ -30,7 +30,7 @@ class Personalizer::Adapters::Company74::ExportTemplates74::AllStatementsTemplat
     to_date = params&.dig(:filter_date, :to)
     to_date = to_date || (Date.today)
     to_date = Date.parse(to_date) if to_date.class.name == 'String'
-    finly_transactions = FinlyTransaction.where(company_id: 74).with_date_range(from_date, to_date)
+    finly_transactions = FinlyTransaction.where(company_id: 74).with_date_range(from_date, to_date).includes(:status, :transaction_type, {amount: :currency},:payment_purpose, {closing_balance: :currency},:finly_account,payment:[:reimbursed_reports])
 
     finly_transactions.success.sort_date_asc.all.each do |finly_transaction|
       credit_amount = nil
