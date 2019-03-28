@@ -114,6 +114,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     self.api_response = self.connection.get
     self.api_call_count += 1
 
+    # debugger
     if self.api_response.status && self.api_response.status == 200
       self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
       if self.response_body[:error]
@@ -137,8 +138,9 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
 
 
   def authenticate
+    return true
     path = "#{Rails.root}/config/gstin_verification_config.yml"
-    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)[Rails.env]
+    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
     data = {}
     config_data[:authentication][:params].each do |p|
       data[p.keys.first] = p.values.first
@@ -156,7 +158,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     end
 
     Rails.logger.info "Making GSTIN Authentication API Call"
-    auth_response = auth_connection.post, data
+    auth_response = auth_connection.post {|req| req.body = data.to_json }
 
     # {
     #   "access_token": "0d08781040a8568c752a5cdbcdfba391bb10d679",
@@ -176,10 +178,11 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
         end
 
         d = YAML::load_file(path) #Load
-        d['default']['search']['headers']['Authorizations'] = "Bearer #{access_token}"
+
+        d['search']['headers'][1]['Authorization'] = "Bearer #{access_token}"
         File.open(path, 'w') {|f| f.write d.to_yaml }
+        return true
       end
-      return true
     else
       return false
     end
@@ -187,10 +190,12 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
 
   def setup_connection
     path = "#{Rails.root}/config/gstin_verification_config.yml"
-    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)[Rails.env]
+    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
     # url = config_data[:base_url] + '/searchgstin'
     url = config_data[:base_url] + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
     headers = config_data[:search][:headers]
+
+    # debugger
     self.connection = Faraday.new(url: url) do |req|
       # req.url = url
       req.adapter Faraday.default_adapter # make requests with Net::HTTP
