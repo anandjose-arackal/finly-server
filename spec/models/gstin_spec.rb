@@ -14,6 +14,7 @@
 #  api_provider             :string(255)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  address                  :text(65535)
 #
 
 require 'rails_helper'

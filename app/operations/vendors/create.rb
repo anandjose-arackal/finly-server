@@ -70,9 +70,9 @@ class Vendors::Create < Vendors::Base
       self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
         ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], account_owner_type: "YesBankVendor")
         if ba.present?
-          self.vendor = ba.account_owner
-          # removing this particular bank account from the list of bank accounts being created
-          vendor_parameters[:bank_accounts_attributes].delete_at(index)
+          other_vendor = ba.account_number
+          self.similar_vendors.push(other_vendor)
+          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{other_vendor.business_name - other_vendor.vendor_id}"
         end
       end
     end
