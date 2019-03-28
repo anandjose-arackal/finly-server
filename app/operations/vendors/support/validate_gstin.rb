@@ -110,6 +110,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   def make_api_call
     setup_connection
 
+    puts "Making GSTIN Search API Call"
     self.api_response = self.connection.get
     self.api_call_count += 1
 
@@ -154,6 +155,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
       end
     end
 
+    puts "Making GSTIN Authentication API Call"
     auth_response = auth_connection.post data
 
     # {
