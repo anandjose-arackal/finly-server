@@ -2,7 +2,6 @@ class RateContracts::Base < BaseOperation
   attr_accessor :rate_contract, :company
 
   def authorized_user_types
-    [:employee]
   end
 
   def init

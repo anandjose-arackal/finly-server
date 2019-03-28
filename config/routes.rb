@@ -2619,6 +2619,8 @@ Rails.application.routes.draw do
     get 'description', to: 'policies#show_description'
     resources :vehicle_rates, controller: 'vehicle_rates', only: [:create, :destroy]
     resources :policy_user_roles
+    get 'department_mapping', to: 'policies#department_mapping'
+    get 'location_mapping', to: 'policies#location_mapping'
   end
 
   resources :user_permissions do
