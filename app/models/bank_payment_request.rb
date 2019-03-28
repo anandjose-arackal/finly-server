@@ -168,7 +168,7 @@ class BankPaymentRequest < ApplicationRecord
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
-  # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+  scope :filter_controlling_user, -> (user_id) {self.awaiting_action_items(user_id)}
 
   # scope :filter_controlling_user, -> (user_id) {
   #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
