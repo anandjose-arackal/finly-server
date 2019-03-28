@@ -46,17 +46,23 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
-      validate_attachment(vendor_parameters, :gstin)
-      validate_gstin
-      validate_business_name
+    unless vendor_parameters[:pan].present?
+      add_message :error, "Please provide PAN to proceed"
+      return
+    else
+      validate_attachment(vendor_parameters, :pan)
     end
 
     if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
       validate_attachment(vendor_parameters, :msme_certificate)
     end
 
-
+    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
+      validate_attachment(vendor_parameters, :gstin)
+      validate_gstin(vendor_parameters)
+      # validate_business_name(vendor_parameters)
+      # validate_pan(vendor_parameters)
+    end
 
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list

@@ -20,6 +20,10 @@ class Vendors::Update < Vendors::Base
     if vendor.blank?
       add_message :error, "Vendor not found"
     end
+
+    unless user.is_vendor_manager?
+      add_message :error, "You do not have permission for this action"
+    end
   end
 
   def pre_process

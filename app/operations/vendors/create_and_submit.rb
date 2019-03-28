@@ -24,16 +24,20 @@ class Vendors::CreateAndSubmit < Vendors::Base
   end
 
   def process
-    params[:document] = self.vendor
-    params[:aasm_event] = 'submit'
+    if self.vendor.policy_id.present?
+      params[:document] = self.vendor
+      params[:aasm_event] = 'submit'
 
-    op = WorkflowManager::Base.(user, params)
-    unless op.success?
-      add_message :error, op.messages[:error]
-      return
+      op = WorkflowManager::Base.(user, params)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
+
+      self.workflow_output = op.workflow_output
+    else
+      self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
     end
-
-    self.workflow_output = op.workflow_output
   end
 
   def post_process

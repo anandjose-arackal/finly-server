@@ -1,4 +1,3 @@
-require 'fuzzystringmatch'
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
   attr_accessor :gstin_params, :connection, :api_response, :response_body,
     :match_percentile, :valid_response, :gstin_master
@@ -61,10 +60,8 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     request_business_name = gstin_params[:business_name]
     response_business_name = gstin_master.legal_name_of_business
 
-    # Will be abstracted to helper method
-    jarow = ::FuzzyStringMatch::JaroWinkler.create( :native )
     if request_business_name.present? && response_business_name.present?
-      self.match_percentile = (jarow.getDistance( response_business_name, request_business_name ) * 100).to_i
+      self.match_percentile = fuzzy_string_match(request_business_name, response_business_name)
     end
   end
 

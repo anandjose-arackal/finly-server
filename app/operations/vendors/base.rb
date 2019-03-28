@@ -9,7 +9,7 @@ class Vendors::Base < BaseOperation
 
   def init
     self.company = user.company
-    id = params[:vendor_id] || params[:yes_bank_vendor_id] || params[:id] 
+    # id = params[:vendor_id] || params[:yes_bank_vendor_id] || params[:id] 
     self.vendor = Vendors::Show.(user, params).vendor
   end
 
@@ -55,11 +55,57 @@ class Vendors::Base < BaseOperation
     CustomField::SetFields.(self.vendor, FieldParentType.id_for(:vendor), custom_fields)
   end
 
-  def validate_business_name
-  end
+  # def validate_business_name(vendor_params)
+  #   business_name = vendor_params[:business_name]
+  #   vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
+  #     gstin = gstin_location[:gstin]
 
-  def validate_gstin
-    
+  #     unless gstin.present?
+  #       add_message :error, "Please Provide GSTIN for Location #{index+1}"
+  #       next
+  #     end
+
+  #     gstin_master = Gstin.with_gstin(gstin).first
+
+  #     if gstin_master.present?
+  #       match_percentile = fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
+
+  #       if match_percentile < 90
+  #         add_message :error, "Business Name Match Percentile is below 90% for Location #{index+1}"
+  #       end
+  #     end
+  #   end
+  # end
+
+  def validate_gstin(vendor_params)
+    business_name = vendor_params[:business_name]
+    vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
+      gstin = gstin_location[:gstin]
+
+      unless gstin.present?
+        add_message :error, "Please Provide GSTIN for Location #{index+1}"
+        next
+      end
+
+      gstin_master = Gstin.with_gstin(gstin).first
+
+      if gstin_master.present?
+        if gstin_master.status == "Active"
+
+          unless gstin_master.gstin.slice(2, 10) == vendor_params[:pan]
+            add_message :error, "PAN doesn't match with GSTIN for Location #{index+1}"
+          end
+
+          match_percentile = fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
+
+          if match_percentile < 90
+            add_message :error, "Business Name Match Percentile is below 90% for Location #{index+1}"
+          end
+        else
+          add_message :error, "GSTIN Status is not Active for Location #{index+1}"
+        end
+      end
+    end
   end
 
   def validate_attachment(vendor_params, type)
