@@ -110,7 +110,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   def make_api_call
     setup_connection
 
-    puts "Making GSTIN Search API Call"
+    Rails.logger.info "Making GSTIN Search API Call"
     self.api_response = self.connection.get
     self.api_call_count += 1
 
@@ -155,8 +155,8 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
       end
     end
 
-    puts "Making GSTIN Authentication API Call"
-    auth_response = auth_connection.post data
+    Rails.logger.info "Making GSTIN Authentication API Call"
+    auth_response = auth_connection.post, data
 
     # {
     #   "access_token": "0d08781040a8568c752a5cdbcdfba391bb10d679",
