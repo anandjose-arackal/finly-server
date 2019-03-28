@@ -51,26 +51,14 @@ class Department < ApplicationRecord
   }
 
   def as_json(options={})
-    {
-        id: id,
-        name: name
-    }
-  end
-
-  def as_json2
-    {
-      id: self.id,
-      name: "#{self.parent&.name} / #{self.name}",
-      cost_center: self.cost_center
-    }
-  end
-
-  def as_json3
-    {
-      id: self.id,
-      name: dept_name,
-      cost_center: self.cost_center
-    }
+    args = {id: self.id}
+    if options&.dig(:tree)
+      args[:name] = dept_name
+      args[:cost_center] = self.cost_center
+    else
+      args[:name] = name
+    end
+    args
   end
 
   def dept_name
