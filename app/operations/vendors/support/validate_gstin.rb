@@ -11,7 +11,6 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
       self.response_body = params[:response_body]
       self.match_percentile = params[:match_percentile]
       self.valid_response = params[:valid_response]
-      self.api_call_count = 1
 
     end
   end
@@ -19,6 +18,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   def init
     self.gstin_params = generate_params
     self.valid_response = false
+    self.api_call_count = 1
     setup_connection
   end
 
