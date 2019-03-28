@@ -145,7 +145,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     end
 
     url = config_data[:base_url] + "/oauth/access_token"
-    headers  config_data[:authentication][:headers]
+    headers = config_data[:authentication][:headers]
 
     auth_connection = Faraday.new(url: url) do |req|
       req.adapter Faraday.default_adapter
