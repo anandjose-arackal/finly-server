@@ -34,7 +34,6 @@ class Vendors::Index < Vendors::Base
       self.paginated_vendors = self.vendors.paginate(page: page, per_page: per_page).include_details
       self.count = self.vendors.count
     end
-
   end
 
   def init

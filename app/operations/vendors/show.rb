@@ -4,7 +4,7 @@ class Vendors::Show < Vendors::Base
 
   def init
     id = params[:vendor_id] || params[:yes_bank_vendor_id] || params[:id] 
-    self.vendor = user.company.yes_bank_vendors.with_id(id).includes_for_show.first rescue nil
+    self.vendor = user.company.yes_bank_vendors.non_deleted.with_id(id).includes_for_show.first rescue nil
   end
 
   def process
