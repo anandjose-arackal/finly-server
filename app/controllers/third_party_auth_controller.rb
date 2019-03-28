@@ -5,7 +5,7 @@ class ThirdPartyAuthController < ApplicationController
 
   def quickbooks
     # action will save the authentication object to the db based on the callback
-    @result = Integrations::Quickbooks::Authentication::Create.(current_user, {omniauth: env['omniauth.auth']})
+    @result = Integrations::Quickbooks::Authentication::Create.(current_user, {omniauth: request.env['omniauth.auth']})
     respond
   end
 
