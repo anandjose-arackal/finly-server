@@ -74,9 +74,9 @@ class Procurement < ApplicationRecord
   }
 
   scope :filter_policy_id, -> (policy_id) {
-    filtered_id = PurchaseOrder.filter_policy_id(policy_id).pluck(:procurement_id)
+    filtered_ids = PurchaseOrder.filter_policy_id(policy_id).pluck(:procurement_id)
     filtered_ids += Invoice.filter_policy_id(policy_id).pluck(:procurement_id)
-    where(id: filtered_id)
+    where(id: filtered_ids)
   }
 
   scope :filter_location_id, -> (location_id) {
@@ -84,7 +84,7 @@ class Procurement < ApplicationRecord
     filtered_ids += Invoice.filter_location_id(location_id).pluck(:procurement_id)
     where(id: filtered_ids)
   }
-  
+
   scope :filter_po_number, -> (po_number) {
     filtered_ids = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
     where id: filtered_ids
