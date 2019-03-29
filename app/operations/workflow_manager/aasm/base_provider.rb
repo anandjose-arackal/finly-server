@@ -1,7 +1,7 @@
 class WorkflowManager::Aasm::BaseProvider
   include AASM
 
-  attr_accessor :document_state, :document, :user, :violations_present, :policy,
+  attr_accessor :document_state, :document, :user, :violations_present, :policy, :policy_id,
                 :current_level, :next_level, :previous_level,
                 :current_level_reviewers, :reviewers, :new_level, :document_update_params, :provider_name
 
@@ -12,6 +12,8 @@ class WorkflowManager::Aasm::BaseProvider
     self.user = user
     self.policy = Policy.find self.document.policy_id ## Have to take care where status is stored in a different attribute
     self.provider_name = provider_name || self.document.get_default_provider
+
+    self.policy_id = self.document.policy_id
 
     # get reviewers
     self.current_level = document.level
@@ -55,7 +57,7 @@ class WorkflowManager::Aasm::BaseProvider
   def update_dlrms
     if [:submit].include?(aasm.current_event)
       self.document_update_params[:submitted_at] = DateTime.now
-      dlrms = document.document_level_reviewer_mappings.with_level_id(next_level&.id).with_policy_id(policy.id)
+      dlrms = document.document_level_reviewer_mappings.with_level_id(next_level&.id).with_policy_id(self.policy_id)
 
       # Set viewable true for the next level when document is submitted
       if dlrms.present?
@@ -67,7 +69,7 @@ class WorkflowManager::Aasm::BaseProvider
     # Update Document Level Reviewer Mapping
     # find current document_level_reviewer_mappings
     if [:approve, :reject].include?(aasm.current_event)
-      dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(policy.id)
+      dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(self.policy_id)
                  .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
 
       if dlrm.present?
@@ -80,7 +82,7 @@ class WorkflowManager::Aasm::BaseProvider
 
     if [:approve].include?(aasm.current_event)
       if next_level.present?
-        next_dlrms = document.document_level_reviewer_mappings.with_level_id(next_level.id).with_policy_id(policy.id)
+        next_dlrms = document.document_level_reviewer_mappings.with_level_id(next_level.id).with_policy_id(self.policy_id)
 
         next_dlrms.update_all(viewable: true)
       else
@@ -91,7 +93,7 @@ class WorkflowManager::Aasm::BaseProvider
     if [:unapprove].include?(aasm.current_event)
       unapprove_level = previous_level.present? ? previous_level : current_level
       dlrm = document.document_level_reviewer_mappings
-        .where(level_id: unapprove_level&.id, policy_id: document.policy.id).where.not(action_taken_by_id: nil).first
+        .where(level_id: unapprove_level&.id, policy_id: document.policy_id).where.not(action_taken_by_id: nil).first
 
       dlrm.update(
           action_taken_by_id: nil,
@@ -102,7 +104,7 @@ class WorkflowManager::Aasm::BaseProvider
 
     if [:take_control].include?(aasm.current_event)
       dlrm = document.document_level_reviewer_mappings
-          .where(level_id: current_level.id, policy_id: document.policy.id)
+          .where(level_id: current_level.id, policy_id: document.policy_id)
 
       if dlrm.present?
         dlrm.update_all(taken_control_by_id: user.id, taken_control: true, active: false)
@@ -111,7 +113,7 @@ class WorkflowManager::Aasm::BaseProvider
 
     if [:return_control].include?(aasm.current_event)
       dlrm = document.document_level_reviewer_mappings
-          .where(level_id: current_level.id, policy_id: document.policy.id)
+          .where(level_id: current_level.id, policy_id: document.policy_id)
 
       if dlrm.present?
         dlrm.update_all(taken_control_by_id: nil, taken_control: false, active: true)

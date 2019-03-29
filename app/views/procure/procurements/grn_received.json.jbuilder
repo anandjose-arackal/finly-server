@@ -74,10 +74,8 @@ json.results do
 
     if po.present? || invoice.present?
       department = po&.department || invoice&.department
-      sub_department = po&.sub_department || invoice&.sub_department
       cost_center = po&.cost_center || invoice&.cost_center
-      json.department department&.name
-      json.sub_department sub_department&.name
+      json.department department&.full_dept_name
       json.cost_center cost_center&.name
     end
 

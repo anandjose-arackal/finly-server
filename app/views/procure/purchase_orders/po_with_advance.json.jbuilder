@@ -13,6 +13,7 @@ json.results do
     json.po_advance_amount purchase_order.advance_amount
     json.po_total_after_tax purchase_order.total_after_tax
     json.purchase_order_id purchase_order.id
+    json.procurement_id purchase_order.procurement_id
     # json.po_status purchase_order.status&.name&.humanize
     json.po_number purchase_order.po_number
     json.po_vendor_name purchase_order.vendor.name

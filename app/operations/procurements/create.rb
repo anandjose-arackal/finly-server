@@ -12,8 +12,8 @@ class Procurements::Create < Procurements::Base
       return
     end
 
-    unless user.is_purchase_order_initiator?
-      add_message :error, "You do not have permission for this action"
+    unless user.is_purchase_order_initiator? #|| user.vendor_payments_admin?
+      add_message :error, 'You do not have permission for this action'
     end
 
     document_types = %w( purchase_order invoice non_po_invoice )

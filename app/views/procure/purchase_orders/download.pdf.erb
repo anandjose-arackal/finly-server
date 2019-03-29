@@ -2,7 +2,7 @@
   <div class="col col-xs-12 header-container">
     <div class="col col-xs-8 no-padding company-details">
       <div class="col col-xs-12 no-padding logo">
-        <img src="<%= @company.configuration.logo.url(:thumb) %>" width="120" height="auto">
+        <img src="<%="http:"+@company.configuration.logo.url(:thumb) %>" width="120" height="auto">
       </div>
       <div class="col col-xs-12 no-padding address fs-12 mg-top-5">
         <br>
@@ -24,7 +24,7 @@
             <td class="font-dark-gray"><%= @result.purchase_order.po_number %></td>
           </tr>
           <tr>
-            <td class="font-light-gray">Document Date</td>
+            <td class="font-light-gray">PO Date</td>
             <td class="font-dark-gray"><%= @result.purchase_order.created_at.strftime "%b-%d-%Y" %></td>
           </tr>
           <tr>
@@ -179,8 +179,8 @@
       </div>
     </div>
   </div>
-  
 
+  <% unless @result.purchase_order.note.blank? %>
   <div class="col col-xs-12 notes-container mg-top-5">
     <h4 class="section-title">Note to Vendor</h4>
     <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
@@ -191,6 +191,7 @@
       <% end %>
     </div>
   </div>
+  <% end %>
 
 
 
@@ -200,6 +201,7 @@
       <%= simple_format @result.purchase_order.procurement_term_text, {}, wrapper_tag: "div" %>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
+      <% unless @company.id == 137 %>
       <ul>
         <% approved_users = [] %>
         <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
@@ -225,6 +227,7 @@
           </div>
         </li>
       </ul>
+      <% end %>
       <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
     </div>
   </div>

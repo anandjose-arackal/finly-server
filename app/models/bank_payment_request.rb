@@ -78,6 +78,7 @@ class BankPaymentRequest < ApplicationRecord
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not id: id}
   scope :approved, -> {where status_id: BankPaymentRequestStatus.id_for(:approved)}
+  scope :downloadable, -> {where status_id: [BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited), BankPaymentRequestStatus.id_for(:auto_approved)]}
   scope :filter_status_id, -> (status_id) {
     case status_id
     when 1, '1' # i.e. open

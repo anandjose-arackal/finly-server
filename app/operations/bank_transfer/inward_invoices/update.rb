@@ -1,6 +1,6 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
-  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params
+  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
@@ -8,6 +8,21 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:invoice, :custom_fields)
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
+
+    if self.inward_invoice.procurement.present?
+      self.procurement = self.inward_invoice.procurement
+
+      self.purchase_order = self.procurement.purchase_order
+
+      if self.procurement.po_revisions.present?
+        self.po_revision = self.procurement.po_revisions.last
+        if po_revision.present?
+          self.purchase_order = self.po_revision
+        end
+      end
+    end
+
+
   end
 
   def validate
@@ -16,17 +31,20 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       return
     end
 
+    
     # checking for duplicates within this particular company
     current_company_invoices = current_company.inward_invoices
     invoice_number = self.inward_invoice_params[:invoice_number]
     vendor_id = self.inward_invoice.vendor_id || params[:vendor_id]
     duplicate_invoices = current_company_invoices.with_invoice_number(invoice_number).with_vendor_ids(vendor_id).without_id(self.inward_invoice.id)
     if invoice_number.present? && duplicate_invoices.present?
-      add_message :error, "This invoice seems like a duplicate: Check invoice numbers: #{duplicate_invoices.pluck(:invoice_number).to_sentence}"
+      # add_message :error, "This invoice seems like a duplicate: Check invoice numbers: #{duplicate_invoices.pluck(:invoice_number).to_sentence}"
+      add_message :error, "There is a similar invoice added with the same invoice number in our records. Please re-check your invoice details."
       return
     end
 
-    if params[:advance_amount_required]
+    if StringUtils.to_bool(params[:invoice][:advance_amount_required])
+      self.inward_invoice_params[:advance_amount_required] = true
       if self.inward_invoice_params[:po_adjusted_advance_attributes][:value].blank?
         add_message :error, "Please add the advance amount to be adjusted for this Invoice."
         return
@@ -35,7 +53,28 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         add_message :error, "Error: Adjusted advance entered is more than the required Purchase Order advance."
         return
       end
+    else
+      if self.inward_invoice_params[:advance_amount_required].present?
+        self.inward_invoice_params[:advance_amount_required] = false
+        self.inward_invoice_params[:po_adjusted_advance_attributes][:value] = self.inward_invoice&.po_adjusted_advance&.value || 0
+      end
     end
+
+    if self.inward_invoice.procurement.present? && self.purchase_order.present?
+        if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount&.value
+            add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
+          return
+        end 
+
+        self.purchase_order.items.each do |item|
+          if item.accepted < self.inward_invoice_params[:invoice_items_attributes][:quantity].to_i
+            add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
+            break
+          end
+        end
+
+    end
+
   end
 
   def pre_process

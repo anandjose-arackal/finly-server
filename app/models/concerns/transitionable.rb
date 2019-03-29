@@ -588,23 +588,33 @@ module Transitionable
       end
     end
 
-
-
-  def role_based_admin_associated_items(user, role_id, options={})
-    if user.instance_of?(User)
-      if self.column_names.include? 'company_id'
-        self.where(company_id: user.company.id).where.not("#{self.document_status_attribute} in (?)", options[:admin_restricted_status_ids])
-      else
-        user_ids = user.company.users.pluck(:id)
-        self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).where.not("#{self.document_status_attribute} in (?)", options[:admin_restricted_status_ids])
+    def role_based_admin_associated_items(user, role_id, options={})
+      admin_restricted_status_ids = options[:admin_restricted_status_ids] || []
+      if user.instance_of?(User)
+        if self.column_names.include? 'company_id'
+          if admin_restricted_status_ids.present?
+            self.where(company_id: user.company.id).where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", admin_restricted_status_ids)
+          else
+            self.where(company_id: user.company.id)
+          end
+        else
+          user_ids = user.company.users.pluck(:id)
+          if admin_restricted_status_ids.present?
+            self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", admin_restricted_status_ids)
+          else
+            self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids)
+          end
+        end
       end
     end
-  end
 
-  def role_based_initiator_associated_items(user, role_id, options={})
-    document_table_name = options[:document_table_name]
-    document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
-  end
+    def role_based_initiator_associated_items(user, role_id, options={})
+      document_table_name = options[:document_table_name]
+      if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
+        document_table_name = 'inward_invoices'
+      end
+      document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
+    end
 
     def role_based_reviewer_associated_items(user, role_id, options={})
       policy_ids = user.policy_user_roles.where(user_role_id: role_id).pluck(:policy_id).uniq rescue nil
@@ -660,7 +670,7 @@ module Transitionable
     def associated_items(user, document_roles)
       data = nil
       role_ids = UserRole.where(name: document_roles).pluck(:id) rescue []
-      policy_ids = user.policy_user_roles.where(user_role_id: role_ids).pluck(:policy_id)&.uniq rescue nil
+      # policy_ids = user.policy_user_roles.where(user_role_id: role_ids).pluck(:policy_id)&.uniq rescue nil
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         role_name = UserRole.find_by_id(role_id).name
         valid_role = document_roles.include?(role_name.to_sym)

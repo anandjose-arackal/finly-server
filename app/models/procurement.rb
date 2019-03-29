@@ -72,6 +72,19 @@ class Procurement < ApplicationRecord
   scope :filter_procurement_name, -> (name) {
     where "procurements.name LIKE ?", "%#{name}%"
   }
+
+  scope :filter_policy_id, -> (policy_id) {
+    filtered_ids = PurchaseOrder.filter_policy_id(policy_id).pluck(:procurement_id)
+    filtered_ids += Invoice.filter_policy_id(policy_id).pluck(:procurement_id)
+    where(id: filtered_ids)
+  }
+
+  scope :filter_location_id, -> (location_id) {
+    filtered_ids = PurchaseOrder.filter_location_id(location_id).pluck(:procurement_id)
+    filtered_ids += Invoice.filter_location_id(location_id).pluck(:procurement_id)
+    where(id: filtered_ids)
+  }
+
   scope :filter_po_number, -> (po_number) {
     filtered_ids = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
     where id: filtered_ids
@@ -356,6 +369,20 @@ class Procurement < ApplicationRecord
   scope :filter_sub_department_id, -> (sub_department_id) {
     filtered_ids = PurchaseOrder.where(sub_department_id: sub_department_id).pluck(:procurement_id).uniq
     where id: filtered_ids
+  }
+
+  scope :filter_grn_due_today, -> (required) {
+    if StringUtils.to_bool(required)
+      filtered_ids = InwardDocument.where("DATE(delivery_date) = ?", Date.today).pluck(:procurement_id).uniq
+      where(id: filtered_ids)
+    end
+  }
+
+  scope :filter_grn_overdue, -> (required) {
+    if StringUtils.to_bool(required)
+      filtered_ids = InwardDocument.where("DATE(delivery_date) < ?", Date.today).pluck(:procurement_id).uniq
+      where(id: filtered_ids)
+    end
   }
 
 

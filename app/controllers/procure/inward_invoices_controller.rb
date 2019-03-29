@@ -37,6 +37,11 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
     respond
   end
 
+  def unapprove
+    @result = Procurements::Invoices::Unapprove.(current_user, params)
+    respond
+  end
+
   def reject
     @result = Procurements::Invoices::Reject.(current_user, params)
     respond

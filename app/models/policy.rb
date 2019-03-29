@@ -34,6 +34,11 @@ class Policy < ApplicationRecord
   has_many :expense_rules, dependent: :destroy
   has_many :budget_rules, dependent: :destroy
   has_many :policy_user_roles, dependent: :destroy
+  has_many :policy_department_mappings, dependent: :destroy
+  has_many :departments, through: :policy_department_mappings
+  has_many :policy_location_mappings, dependent: :destroy
+  has_many :locations, class_name: 'BranchLocation', through: :policy_location_mappings
+
 
   has_one :distance_expense_config
   has_one :time_expense_config
@@ -43,6 +48,8 @@ class Policy < ApplicationRecord
 
   has_many :per_diems, as: :configurable
   has_many :vehicle_rates
+
+  accepts_nested_attributes_for :policy_department_mappings, :policy_location_mappings
 
   scope :default, -> {where default: true}
   scope :non_default, -> {where default: false}

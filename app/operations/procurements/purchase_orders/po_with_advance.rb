@@ -51,6 +51,10 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.purchase_orders = PurchaseOrder.associated_items(user, resource_roles= ::PurchaseOrder.roles) rescue ::Procurement.none
     end
+
+    # if self.purchase_orders.nil?
+    #   self.purchase_orders = PurchaseOrder.none
+    # end
     
   end
 
@@ -83,7 +87,7 @@ class Procurements::PurchaseOrders::PoWithAdvance < Procurements::PurchaseOrders
   end
 
   def process
-    self.purchase_orders = purchase_orders.filter_all_advances unless self.purchase_orders.blank?
+    self.purchase_orders = purchase_orders.filter_all_advances rescue ::PurchaseOrder.none
     params[:purchase_order] = self.purchase_orders
   end
 

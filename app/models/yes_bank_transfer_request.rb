@@ -6,7 +6,7 @@ class YesBankTransferRequest < NonPersistentModel
   attr_accessor :beneficiary_account_number, :ifsc, :beneficiary_name, :transfer_type,
                 :transfer_currency_code, :transfer_amount, :unique_reference_number,
                 :bank_reference_number, :company_id,
-                :bank_error_message, :transaction_result,
+                :bank_error_message, :transaction_result, :beneficiary_full_name
                 :error_code
 
   belongs_to :company, optional: true

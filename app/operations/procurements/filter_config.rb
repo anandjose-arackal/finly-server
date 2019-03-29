@@ -8,6 +8,7 @@ class Procurements::FilterConfig < Procurements::Base
     self.locations = user.company.locations
     self.departments = user.company.departments.roots
     self.sub_departments = user.company.departments.only_sub_departments
+    # self.sub_departments = user.company.dep_subdept_mapping
     self.cost_centers = user.company.cost_centers.with_application(current_app)
   end
 

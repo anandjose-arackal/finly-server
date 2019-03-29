@@ -8,6 +8,8 @@
 #  policy_id     :integer
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
+#  company_id    :integer
+#  creator_id    :integer
 #
 
 FactoryBot.define do
