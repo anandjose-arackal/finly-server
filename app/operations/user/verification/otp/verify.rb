@@ -23,12 +23,12 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
 
   def validate
     if selected_user.otp_attempts >= 6
-      add_message :error, "You have reached the maximum number of attempts for OTP Verification. Please reset the OTP and try again"
+      add_message :error, 'You have reached the maximum number of attempts for OTP Verification. Please reset the OTP and try again'
       return
     end
 
     unless selected_user.otp == params[:verification_code]
-      add_message :error, "OTP entered does not match. Please enter the OTP sent to your mobile number"
+      add_message :error, 'OTP entered does not match. Please enter the OTP sent to your mobile number'
       selected_user.update_attribute(:otp_attempts, (selected_user.otp_attempts + 1))
       return
     end

@@ -9,17 +9,17 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
     user_present? and params_present?
     return if has_errors?
 
-    unless params[:mobile] or params[:email]
+    unless params[:mobile_otp] or params[:email_otp]
       add_message :error, 'Error in request'
       return
     end
 
-    if params[:email] and user.email.blank?
+    if params[:email_otp] and user.email.blank?
       add_message :error, 'Email has not been configured for your account'
       return
     end
 
-    if params[:mobile] and user.mobile_number.blank?
+    if params[:mobile_otp] and user.mobile_number.blank?
       add_message :error, 'Mobile number has not been configured for your account'
       return
     end
@@ -57,8 +57,8 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
   end
 
   def process
-    send_mobile_otp if self.mobile
-    send_email_otp if self.email
+    send_mobile_otp if self.mobile_otp
+    send_email_otp if self.email_otp
 
     user.update_attributes(otp_count: (user.otp_count + 1), otp_attempts: 0)
 

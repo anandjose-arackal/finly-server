@@ -1171,6 +1171,14 @@ class User < ApplicationRecord
     "XXXXXXX#{mobile_number[(mobile_number.length - 3)..mobile_number.length]}"
   end
 
+  def obfuscated_email
+    return nil if email.nil?
+
+    parts = email.split("@")
+    obfuscated = "X" * (parts.first.length - 2)
+    "#{parts.first[0..2].concat(obfuscated)}@#{parts.second}"
+  end
+
   def status
     "`users`.`active` = 0 AND (NOT ((`users`.`first_name` = '' OR `users`.`first_name` IS NULL))) AND (`users`.`mobile_only_invite` != 1)"
     if self.active and self.invitation_token.blank? and !(self.first_name.blank? || self.last_name.blank?) and !self.mobile_only_invite

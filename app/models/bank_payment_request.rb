@@ -414,8 +414,6 @@ class BankPaymentRequest < ApplicationRecord
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
-
-
   
   def self.role_based_associated_status_ids(user)
     BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
