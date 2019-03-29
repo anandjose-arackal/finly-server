@@ -144,6 +144,9 @@ module Transitionable
         data[:policy_id] = dlrm.policy_id
         data[:awaiting_action] = (self.controlling_level_id == dlrm.level_id)
         data[:action_taken] = data[:action_taken] || (dlrm.action_taken_by_id.present?)
+        if data[:action_taken]
+          data[:action_taken_at] = dlrm.updated_at.strftime "%I:%M %p, %d %b %Y"
+        end
         data[:reviewers] = data[:reviewers] || []
         reviewer = {
             id: dlrm.reviewer_id,
