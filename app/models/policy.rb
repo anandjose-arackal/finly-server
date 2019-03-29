@@ -142,7 +142,7 @@ class Policy < ApplicationRecord
     policy_department_mapping_ids = self.departments.pluck(:id)
     begin
       ActiveRecord::Base.transaction do
-        self.departments.destroy_all
+        self.policy_department_mappings.destroy_all
         params[:policy_department_mappings_attributes].each do |policy_department|
           result = self.policy_department_mappings.create!(department_id: policy_department[:department_id], enabled: policy_department[:enabled])
         end
@@ -153,6 +153,17 @@ class Policy < ApplicationRecord
   end
 
   def update_location_department_mapping(params)
+    # Creating new record on every update as it was required to be like this only
+    begin
+      ActiveRecord::Base.transaction do
+        self.policy_location_mappings.destroy_all
+        params[:policy_location_mappings_attributes].each do |policy_location|
+          result = self.policy_location.create!(location_id: policy_location[:location_id], enabled: policy_location[:enabled])
+        end
+      end
+    rescue
+      add_message :error, 'Unable to perform update'
+    end
   end
 
   private
