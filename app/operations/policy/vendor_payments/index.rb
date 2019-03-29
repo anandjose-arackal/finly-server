@@ -58,7 +58,7 @@ class Policy::VendorPayments::Index < Policy::Base
     include HasScope
     attr_accessor :policies, :policy_user_roles, :admin_policies
 
-    has_scope :filter_role_id, type: :array
+    # has_scope :filter_role_id, type: :array
 
     def init
       self.policy_user_roles = params[:policy_user_roles]
