@@ -27,10 +27,66 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   end
 
   def validate
-    unless receiving_account_adapter.present?
+    if receiving_account_adapter.blank? || initiating_account.blank?
       add_message :error, 'Error loading payment'
       return
     end
+
+    # Below each rule engine operation will validate the payment against certain criteria,
+    # and mark the payment as failed and add error messages according to the criteria
+
+    ################# Source account validations #######################
+    op = PaymentProcessorRules::Event.(:check_source_account_debitable, {payment: self.payment})
+    unless op.success?
+      add_message :error, op.messages
+      return
+    end
+
+    if self.payment.credit?
+      op = PaymentProcessorRules::Event.(:check_source_account_balance, {payment: self.payment})
+      unless op.success?
+        add_message :error, op.messages
+        return
+      end
+    end
+
+    if self.payment.debit?
+      op = PaymentProcessorRules::Event.(:check_source_account_eligibility, {payment: self.payment})
+      unless op.success?
+        add_message :error, op.messages
+        return
+      end
+    end
+
+    ################# Source account validations ########################
+
+    ################# Receiving account validations #####################
+
+    op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment})
+    unless op.success?
+      add_message :error, op.messages
+      return
+    end
+
+    if self.payment.credit?
+      op = PaymentProcessorRules::Event.(:check_receiving_account_eligibility, {payment: self.payment})
+      unless op.success?
+        add_message :error, op.messages
+        return
+      end
+    end
+
+    if self.payment.debit?
+      op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {payment: self.payment})
+      unless op.success?
+        add_message :error, op.messages
+        return
+      end
+    end
+
+
+    ###################################### OLD CODE #####################################
+
     unless receiving_account_adapter.creditable_account?(payment.initiating_account)
       add_message :error, 'You cannot credit from this account'
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
@@ -78,9 +134,24 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
+    ###################################### OLD CODE #####################################
+
+
+    op = PaymentProcessorRules::Event.(:check_payment_status_in_executor, {payment: self.payment})
+    unless op.success?
+      add_message :error, op.messages
+      return
+    end
+
     if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
       add_system_message :error, self.payment, "Payment cannot be processed in this state"
       add_message :error, "Payment cannot be processed in this state"
+      return
+    end
+
+    op = PaymentProcessorRules::Event.(:check_if_receiving_account_is_disabled, {payment: self.payment})
+    unless op.success?
+      add_message :error, op.messages
       return
     end
 
@@ -91,11 +162,23 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
+    op = PaymentProcessorRules::Event.(:check_if_receiving_account_is_on_hold, {payment: self.payment})
+    unless op.success?
+      add_message :error, op.messages
+      return
+    end
+
     # checking if the particular beneficiary is kept on hold
     if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.on_hold?
       add_system_message :error, self.payment, "Transfers to this account have been temporarily put on hold"
       Event::EAlert::Create.(nil, title: 'Payment attempted for on hold account', description: "Payment attempted for on hold account. Details: #{self.payment.as_json}", subject: 'Payment attempted for on hold account')
       add_message :error, "Transfers to this account have been temporarily put on hold"
+      return
+    end
+
+    op = PaymentProcessorRules::Checker.(:ensure_payments_are_pending_before_processing, {payment: self.payment})
+    unless op.success?
+      add_message :error, op.messages
       return
     end
 
@@ -113,7 +196,8 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   end
 
   def pre_process
-
+    # move the payment to "In Progress" before processing
+    payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
   end
 
   def process
@@ -189,6 +273,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   def execute_callbacks(success)
     self.payment.trigger_callbacks(success)
   end
+
 
 
 end

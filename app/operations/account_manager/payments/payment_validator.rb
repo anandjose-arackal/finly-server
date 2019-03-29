@@ -60,7 +60,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     # checking if total order amount is less than the company balance amount
     if payment_order.credit?
       # checking for the balance in the source account
-      PaymentProcessorRules::Event.(:check_balance_of_initiating_account, {payment_order: self.payment_order,
+      PaymentProcessorRules::Event.(:check_source_account_balance, {payment_order: self.payment_order,
                                                                            crediting_payments: self.crediting_payments})
 
 

@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_29_090122) do
+ActiveRecord::Schema.define(version: 2019_03_29_115421) do
+
+  create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "reconciliation_balance_id"
+    t.integer "account_id"
+    t.integer "account_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_account_reconciliation_balances_on_account_id"
+    t.index ["account_type"], name: "index_account_reconciliation_balances_on_account_type"
+  end
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -931,6 +941,9 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
     t.string "location_code"
+    t.string "ancestry"
+    t.string "nature_of_office"
+    t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
   end
@@ -2487,6 +2500,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.boolean "procurement", default: false
     t.boolean "custom_currency_conversion", default: false
     t.string "bank_service_provider"
+    t.boolean "vendor_empanelment_workflow", default: false
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end
@@ -2543,6 +2557,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.string "field_key"
     t.integer "sequence_number"
     t.datetime "deleted_at"
+    t.boolean "printable", default: true
     t.index ["company_id"], name: "index_field_configurations_on_company_id"
     t.index ["configurable_id"], name: "index_field_configurations_on_configurable_id"
     t.index ["configurable_type"], name: "index_field_configurations_on_configurable_type"
@@ -2719,6 +2734,39 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_gst_types_on_name"
+  end
+
+  create_table "gstin_locations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "gstin_id"
+    t.string "gstin"
+    t.integer "state_id"
+    t.string "poc_name"
+    t.string "poc_mobile_number"
+    t.string "poc_email"
+    t.string "poc_fax"
+    t.string "poc_designation"
+    t.string "location"
+    t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
+  end
+
+  create_table "gstins", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "gstin"
+    t.string "legal_name_of_business"
+    t.string "state"
+    t.date "date_of_registration"
+    t.string "constitution_of_business"
+    t.string "taxpayer_type"
+    t.string "status"
+    t.text "api_response"
+    t.string "api_provider"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "address"
+    t.index ["gstin"], name: "index_gstins_on_gstin"
+    t.index ["status"], name: "index_gstins_on_status"
   end
 
   create_table "icici_bank_company_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -2924,6 +2972,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.string "account"
     t.integer "tax_rate_id"
     t.integer "cost_center_id"
+    t.string "unit_of_measurement"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
     t.index ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id"
@@ -3084,6 +3133,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.boolean "is_deleted", default: false, null: false
     t.integer "user_id"
     t.datetime "deleted_at"
+    t.string "grn_number"
     t.index ["company_id"], name: "index_inward_documents_on_company_id"
     t.index ["procurement_id"], name: "index_inward_documents_on_procurement_id"
     t.index ["user_id"], name: "index_inward_documents_on_user_id"
@@ -3121,6 +3171,8 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.integer "supply_item_type_id"
     t.datetime "deleted_at"
     t.integer "product_type_id", default: 1
+    t.string "item_number"
+    t.string "unit_of_measurement"
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id"], name: "index_items_on_company_id"
     t.index ["product_type_id"], name: "index_items_on_product_type_id"
@@ -4118,6 +4170,16 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.integer "creator_id"
+  end
+
+  create_table "policy_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "policy_id"
+    t.integer "location_id"
+    t.boolean "enabled"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "policy_user_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4325,6 +4387,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
+    t.string "unit_of_measurement"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"
@@ -4398,6 +4461,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.integer "advance_tds_slab_id"
     t.integer "advance_tds_amount_id"
     t.boolean "advance_amount_required", default: false
+    t.integer "requested_advance_amount_id"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -4567,6 +4631,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.integer "renewal_alert_period_id"
     t.string "note"
     t.integer "company_id"
+    t.string "rate_contract_number"
   end
 
   create_table "rate_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5988,6 +6053,20 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.index ["user_id"], name: "index_vendor_payment_wallets_on_user_id"
   end
 
+  create_table "vendor_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "vendor_tds_rates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "vendor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "tds_rates_list_id"
+    t.index ["vendor_id"], name: "index_vendor_tds_rates_on_vendor_id"
+  end
+
   create_table "vendor_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -6228,6 +6307,14 @@ ActiveRecord::Schema.define(version: 2019_03_29_090122) do
     t.string "vendor_id"
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
+    t.boolean "msme_registered", default: false
+    t.string "msme_registration_number"
+    t.integer "status_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
+    t.string "vedor_code"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
