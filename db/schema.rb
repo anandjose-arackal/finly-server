@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_26_060952) do
+ActiveRecord::Schema.define(version: 2019_03_29_090122) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -470,6 +470,12 @@ ActiveRecord::Schema.define(version: 2019_03_26_060952) do
     t.index ["finly_database_balance_id"], name: "index_balance_tally_ledgers_on_finly_database_balance_id"
   end
 
+  create_table "bank_account_providers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "bank_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "yes_bank_vendor_id"
     t.string "account_number"
@@ -491,6 +497,10 @@ ActiveRecord::Schema.define(version: 2019_03_26_060952) do
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
+    t.index ["account_number"], name: "index_bank_accounts_on_account_number"
+    t.index ["company_id"], name: "index_bank_accounts_on_company_id"
+    t.index ["ifsc"], name: "index_bank_accounts_on_ifsc"
+    t.index ["name"], name: "index_bank_accounts_on_name"
     t.index ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id"
   end
 
@@ -575,6 +585,7 @@ ActiveRecord::Schema.define(version: 2019_03_26_060952) do
     t.integer "controlling_level_id"
     t.datetime "approved_at"
     t.integer "company_id"
+    t.integer "bank_account_provider_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
@@ -3848,6 +3859,7 @@ ActiveRecord::Schema.define(version: 2019_03_26_060952) do
     t.text "post_operation"
     t.text "post_operation_payload"
     t.boolean "api_initiated", default: false
+    t.integer "bank_account_provider_id"
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
@@ -3983,14 +3995,19 @@ ActiveRecord::Schema.define(version: 2019_03_26_060952) do
     t.integer "location_id"
     t.datetime "deleted_at"
     t.integer "beneficiary_payment_id"
+    t.integer "bank_account_provider_id"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
+    t.index ["company_id"], name: "index_payments_on_company_id"
+    t.index ["external_reference_id"], name: "index_payments_on_external_reference_id"
     t.index ["initiating_user_id"], name: "index_payments_on_initiating_user_id"
+    t.index ["payment_order_id"], name: "index_payments_on_payment_order_id"
     t.index ["payment_type_id"], name: "index_payments_on_payment_type_id"
     t.index ["procurement_id"], name: "fk_rails_b1fc8a9b0f"
     t.index ["purchase_order_id"], name: "fk_rails_65acc3c87d"
     t.index ["receiving_user_id"], name: "index_payments_on_receiving_user_id"
+    t.index ["reference_id"], name: "index_payments_on_reference_id"
   end
 
   create_table "per_diem_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6212,6 +6229,7 @@ ActiveRecord::Schema.define(version: 2019_03_26_060952) do
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
+    t.index ["name"], name: "index_yes_bank_vendors_on_name"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"
   end

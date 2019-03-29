@@ -2,7 +2,7 @@ class PaymentProcessorRules::Checker < RuleBook::Chapter
 
   class PaymentProcessorRules::Checker::Verdict < RuleBook::Verdict
 
-    define_property :instance, :response_code, :message
+    define_property :instance, :response_code, :messages
 
   end
 

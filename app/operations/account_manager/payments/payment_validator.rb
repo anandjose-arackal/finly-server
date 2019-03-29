@@ -26,23 +26,27 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
       add_message :error, payment_order.errors.full_messages
       return
     end
-    # this validation is irrespective of the source and destination of the payment
-    # i.e. checking for consistency of initiating and receiving account types etc.
-    unless validate_account_consistency(payment_order, self.crediting_payments)
-      add_message :error, "Receiving and initiating accounts must be homogenous"
-      return
-    end
   end
 
   def init
     # at this point the payments are all homogenous, so adapters can be initiated with the first payment's details
     self.source_account_adapter = retrieve_adapter(payment_order.payments.first.initiating_account)
     self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
-    # self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
+    if self.crediting_payments.blank?
+      self.crediting_payments = self.payment_order.payments
+    end
   end
 
   def validate
+    # this validation is irrespective of the source and destination of the payment
+    # i.e. checking for consistency of initiating and receiving account types etc.
+    PaymentProcessorRules::Event.(:validate_account_consistency, {payments: self.crediting_payments})
 
+    # the below has been moved to the PaymentProcessor Rule engine
+    unless validate_account_consistency(payment_order, self.crediting_payments)
+      add_message :error, "Receiving and initiating accounts must be homogenous"
+      return
+    end
   end
 
   # here all the validations required for the respective payment order will happen
@@ -55,6 +59,17 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
     # checking if total order amount is less than the company balance amount
     if payment_order.credit?
+      # checking for the balance in the source account
+      PaymentProcessorRules::Event.(:check_balance_of_initiating_account, {payment_order: self.payment_order,
+                                                                           crediting_payments: self.crediting_payments})
+
+
+      # checking for the eligibility of the receiving account
+      # this will also incorporate any checks with respect to the eligibility of the
+      # receiving account - i.e. limits on maximum for a vendor, or maximum for a bank acocunt etc.
+      PaymentProcessorRules::Event.(:check_eligibility_of_each_payment, {payment_order: self.payment_order,
+                                                                           crediting_payments: self.crediting_payments})
+
       order_total = payment_order.request_total
       unless source_account_adapter.balance(payment_order: payment_order, payment_process: self.options[:payment_process])
         add_message :error, "Error retrieving the source account's balance. Try again later"
@@ -87,6 +102,10 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     end
 
     if payment_order.debit?
+      # checking the balance of the receiving account for a debit
+      PaymentProcessorRules::Event.(:check_balance_of_receiving_account, {payment_order: self.payment_order,
+                                                                           crediting_payments: self.crediting_payments})
+
       valid = true
       payment_order.payments.each do |payment|
         receiving_account_adapter = retrieve_adapter payment.receiving_account

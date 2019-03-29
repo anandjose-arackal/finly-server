@@ -46,6 +46,7 @@
 #  location_id                    :integer
 #  deleted_at                     :datetime
 #  beneficiary_payment_id         :integer
+#  bank_account_provider_id       :integer
 #
 
 class Payment < ApplicationRecord

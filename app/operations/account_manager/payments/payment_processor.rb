@@ -3,6 +3,8 @@
 # this operation is only called for payment specific operations in the system - other card and wallet related
 # operations are performed through other operations inside account manager
 
+# TODO - slightly changing the payment processor to handle all payments as crediting payments even if the entire
+# order is being processed together
 class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
   attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options,
@@ -40,38 +42,37 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     if user.is_a?(User)
       self.company_id = user.company_id
       self.company = user.company
-    else
+    elsif user.is_a?(AdminUser)
       self.company_id = payment_request.company_id
       self.company = Company.find_by(id: self.company_id)
     end
 
-    # in case there is not payment request, use the payment order that is passed
-    # creating the payment order first to check for violations and shit - if it already exists
-    # just use the existing payment order object - which would have been approved and
-    # checked appropriately
-    if params[:payment_order].present?
-      self.payment_order = params[:payment_order]
-      self.options = {}
-      self.options[:bank_transfer_type] = payment_order.bank_transfer_type
-      self.background = true # because transfers that happen through the approval flow are always bank transfers (which are in the background, always)
-    end
-
-    # building the payment order if it wasn't already passed from the payment request
+    # if it's not a payment request and is a PaymentOrder or a bunch of payments that are to be credited,
+    # set crediting_payments as that list of payments
     if payment_order.blank? and payment_request.present?
       self.payment_order = payment_request.build_payment_order
+      unless self.payment_order.save
+        add_message :error, self.payment_order.errors.full_messages
+      end
+      self.crediting_payments = self.payment_order.payments
+      self.options = {}
+      self.options[:bank_transfer_type] = payment_order.bank_transfer_type
+      self.background = true
     end
 
-    unless payment_order.valid?
-      add_message :error, payment_order.errors.full_messages
-      return
-    end
-
-    # initializing the crediting payments if they are present
+    # if none of the above, i.e. payment request or payment order both are not present,
+    # the only remaining thing to check is crediting payments
     self.crediting_payments = params[:crediting_payments]
   end
 
   def validate
+    # by this time the payment order will exist for sure
     # Call the payment validator class that validates the payment order
+    result = PaymentProcessorRules::Event.(:payment_passes_standard_violations, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
+    unless result.success?
+      add_message :error, result.messages
+    end
+
     op = AccountManager::Payments::PaymentValidator.(payment_order, self.crediting_payments, {payment_process: true})
     unless op.success?
       add_message :error, op.messages[:error]

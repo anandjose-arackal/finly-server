@@ -27,6 +27,7 @@
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
 #  company_id                   :integer
+#  bank_account_provider_id     :integer
 #
 
 class BankPaymentRequest < ApplicationRecord
