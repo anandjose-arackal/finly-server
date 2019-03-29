@@ -1,7 +1,6 @@
-require 'fuzzystringmatch'
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
   attr_accessor :gstin_params, :connection, :api_response, :response_body,
-    :match_percentile, :valid_response, :gstin_master
+    :match_percentile, :valid_response, :gstin_master, :api_call_count
 
   class Vendors::Support::ValidateGstin::ValidatePresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :api_response, :match_percentile, :response_body, :match_percentile, :valid_response,
@@ -19,6 +18,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   def init
     self.gstin_params = generate_params
     self.valid_response = false
+    self.api_call_count = 1
     setup_connection
   end
 
@@ -28,44 +28,48 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     end
   end
 
-
   def process
+    # Steps
+    # 1. First search for GSTIN
+
     # First find in GSTIN Master
     self.gstin_master = Gstin.with_gstin(gstin_params[:gstin]).first
 
     unless gstin_master.present?
-      # self.api_response = self.connection.get, { :gstin => gstin_params[:gstin] }
-      self.api_response = self.connection.get
+      if make_api_call
+        self.response_body = self.gstin_master.api_response
+        self.valid_response = true
+        request_business_name = gstin_params[:business_name]
+        response_business_name = gstin_master.legal_name_of_business
 
-      if self.api_response.status && self.api_response.status == 200
-        self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
-        if self.response_body[:error]
-          add_message :error, "Something went wrong. Please try again later"
-          return
-        else
-          # Save information to gstin master
-
-          self.gstin_master = Gstin.create(gstin_master_params(response_body))
-
-          self.valid_response = true
-
+        if request_business_name.present? && response_business_name.present?
+          self.match_percentile = StringUtils.fuzzy_string_match(request_business_name, response_business_name)
         end
       else
         add_message :error, "Something went wrong. Please try again later"
-        return
       end
     end
+    #   # self.api_response = self.connection.get, { :gstin => gstin_params[:gstin] }
+    #   self.api_response = self.connection.get
 
-    self.response_body = self.gstin_master.api_response
-    self.valid_response = true
-    request_business_name = gstin_params[:business_name]
-    response_business_name = gstin_master.legal_name_of_business
+    #   if self.api_response.status && self.api_response.status == 200
+    #     self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
+    #     if self.response_body[:error]
+    #       add_message :error, "Something went wrong. Please try again later"
+    #       return
+    #     else
+    #       # Save information to gstin master
 
-    # Will be abstracted to helper method
-    jarow = ::FuzzyStringMatch::JaroWinkler.create( :native )
-    if request_business_name.present? && response_business_name.present?
-      self.match_percentile = (jarow.getDistance( response_business_name, request_business_name ) * 100).to_i
-    end
+    #       self.gstin_master = Gstin.create(gstin_master_params(response_body))
+
+    #       self.valid_response = true
+
+    #     end
+    #   else
+    #     add_message :error, "Something went wrong. Please try again later"
+    #     return
+    #   end
+    # end   
   end
 
   def success
@@ -103,12 +107,95 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     data
   end
 
+  def make_api_call
+    setup_connection
+
+    Rails.logger.info "Making GSTIN Search API Call"
+    self.api_response = self.connection.get
+    self.api_call_count += 1
+
+    # debugger
+    if self.api_response.status && self.api_response.status == 200
+      self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
+      if self.response_body[:error]
+        if (self.response_body[:error] == 'invalid_grant') && (self.api_call_count < 4) && authenticate
+          make_api_call
+        else       
+          add_message :error, "Something went wrong. Please try again later"
+          return
+        end
+      else
+        # Save information to gstin master
+        self.gstin_master = Gstin.create(gstin_master_params(response_body))
+        self.valid_response = true
+        return true
+      end
+    else
+      add_message :error, "Something went wrong. Please try again later"
+      return
+    end
+  end
+
+
+  def authenticate
+    return true
+    path = "#{Rails.root}/config/gstin_verification_config.yml"
+    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
+    data = {}
+    config_data[:authentication][:params].each do |p|
+      data[p.keys.first] = p.values.first
+    end
+
+    url = config_data[:base_url] + "/oauth/access_token"
+    headers = config_data[:authentication][:headers]
+
+    auth_connection = Faraday.new(url: url) do |req|
+      req.adapter Faraday.default_adapter
+
+      headers.each do |header|
+        req.headers[header.keys.first] = header.values.first
+      end
+    end
+
+    Rails.logger.info "Making GSTIN Authentication API Call"
+    auth_response = auth_connection.post {|req| req.body = data.to_json }
+
+    # {
+    #   "access_token": "0d08781040a8568c752a5cdbcdfba391bb10d679",
+    #   "expires_in": 14400,
+    #   "token_type": "bearer"
+    # }
+
+    if auth_response.status.present? && auth_response.status == 200
+      auth_response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(auth_response.body)
+      if auth_response_body.keys.include?("error")
+        return false
+      else
+        access_token = auth_response_body[:access_token]
+
+        if Rails.env.production? || Rails.env.staging?
+          path = '/home/centos/app/shared/config/gstin_verification_config.yml'
+        end
+
+        d = YAML::load_file(path) #Load
+
+        d['search']['headers'][1]['Authorization'] = "Bearer #{access_token}"
+        File.open(path, 'w') {|f| f.write d.to_yaml }
+        return true
+      end
+    else
+      return false
+    end
+  end
+
   def setup_connection
     path = "#{Rails.root}/config/gstin_verification_config.yml"
-    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)[Rails.env]
+    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
     # url = config_data[:base_url] + '/searchgstin'
-    url = config_data[:base_url] + "/searchgstin?gstin=#{gstin_params[:gstin]}"
-    headers = config_data[:headers]
+    url = config_data[:base_url] + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
+    headers = config_data[:search][:headers]
+
+    # debugger
     self.connection = Faraday.new(url: url) do |req|
       # req.url = url
       req.adapter Faraday.default_adapter # make requests with Net::HTTP
@@ -174,7 +261,7 @@ end
 #     "data": "The GSTIN passed in the request is invalid."
 # }
 
-# {"error":false,"data":"{"rgdt":"01/07/2017","ctb":"Public Limited
-# Company","sts":"Active","lgnm":"Masters TN TaxPayer 2
-# Ltd","stj":"ADYAR","ctj":"ALLAHABAD-
-# I","dty":"Regular","cxdt":"","gstin":"12GSPTN0507G1Z3"}"}
+# {
+#     "error": "invalid_grant",
+#     "message": "The access token provided is invalid"
+# }

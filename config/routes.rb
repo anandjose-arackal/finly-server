@@ -3490,6 +3490,8 @@ Rails.application.routes.draw do
     put 'retract', to: "vendors#retract"
     put 'take_control', to: "vendors#take_control"
     put 'return_control', to: "vendors#return_control"
+    get 'procurements', to: "vendor#procurements"
+    get 'transactions', to: "vendor#transactions"
   end
   ######### New Vendor Empanelment Ends ##
 

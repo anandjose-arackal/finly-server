@@ -33,7 +33,8 @@ class Vendors::NewVendorConfig < Vendors::Base
   end
 
   class Vendors::NewVendorConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :states, :vendor_types, :currencies, :payment_terms, :tds_rates, :field_configurations, :policies, :actions, :reviewal_chains, :locations
+    attr_accessor :states, :vendor_types, :currencies, :payment_terms, :tds_rates, :field_configurations, :policies, :actions, :reviewal_chains, :locations,
+                  :vendor_approval_workflow
 
     def init
       self.actions = {
@@ -48,10 +49,11 @@ class Vendors::NewVendorConfig < Vendors::Base
       self.locations = params[:locations]
       self.field_configurations = params[:field_configurations]
       if user.company.vendor_empanelment_workflow_enabled?
-        self.actions[:primary] = {name: "Submit for Approval", url: "vendors/submit", method: "POST", type: "submit"}
+        self.vendor_approval_workflow = true
+        self.actions[:primary] = {name: "Submit for Approval", url: "vendors/create_and_submit", method: "POST", type: "create_and_submit"}
         self.reviewal_chains = []
         self.policies = params[:policies]
-
+ 
         params[:provider_name] = "YesBankVendorProvider"
         policies.each do |policy|
           params[:policy_id] = policy.id
@@ -61,6 +63,8 @@ class Vendors::NewVendorConfig < Vendors::Base
           }
           self.reviewal_chains.push(chain)
         end
+      else
+        self.vendor_approval_workflow = false
       end
     end
 

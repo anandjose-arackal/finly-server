@@ -27,8 +27,8 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
     def init
       general_filter_params = {
         filter_policy_id: params[:filter_policy],
-        filter_department_id: params[:filter_department],
-        filter_sub_department_id: params[:filter_sub_department],
+        # filter_department_id: params[:filter_department],
+        # filter_sub_department_id: params[:filter_sub_department],
         filter_month: params[:filter_month],
         filter_year: params[:filter_year]
       }

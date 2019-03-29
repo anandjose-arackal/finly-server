@@ -38,6 +38,7 @@ class Procurements::Invoices::Index < Procurements::Invoices::Base
     has_scope :filter_month
     has_scope :filter_year
     has_scope :filter_user
+    has_scope :filter_vendor_id
 
     def init
       self.invoices = params[:invoices]

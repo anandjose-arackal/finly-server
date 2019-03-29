@@ -35,6 +35,7 @@
 #  controlling_level_id     :integer
 #  submitted_at             :datetime
 #  approved_at              :datetime
+#  vedor_code               :string(255)
 #
 
 require 'test_helper'

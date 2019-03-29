@@ -69,6 +69,10 @@
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
+#  po_adjusted_advance          :integer
+#  po_advance                   :integer
+#  po_prev_adjusted_advance     :integer
+#  advance_amount_required      :boolean          default(FALSE)
 #
 
 require 'test_helper'

@@ -58,6 +58,10 @@
 #  revision_of_id               :integer
 #  revision_number              :integer          default(0)
 #  note                         :text(65535)
+#  advance_tds_slab_id          :integer
+#  advance_tds_amount_id        :integer
+#  advance_amount_required      :boolean          default(FALSE)
+#  requested_advance_amount_id  :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -185,6 +189,9 @@ class PurchaseOrder < ApplicationRecord
   scope :filter_status_id, -> (status_ids) {
     with_status_ids(status_ids)
   }
+
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+  scope :filter_location_id, -> (location_id) {where("location_id = ? OR delivery_location_id = ?", location_id, location_id)}
 
   scope :filter_sub_department_id, -> (ids) {
     where sub_department_id: ids
