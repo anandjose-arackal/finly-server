@@ -10,7 +10,7 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
     return if has_errors?
 
     unless params[:mobile] or params[:email]
-      add_message :error, 'Please select the verification mode'
+      add_message :error, 'Error in request'
       return
     end
 
@@ -19,7 +19,7 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
       return
     end
 
-    if params[:mobile_number] and user.mobile_number.blank?
+    if params[:mobile] and user.mobile_number.blank?
       add_message :error, 'Mobile number has not been configured for your account'
       return
     end
@@ -47,7 +47,7 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
 
   def pre_process
     # generating the random 6 digit OTP for a particular user and storing it in the message
-    # if the last OTP was sent less than 30 minutes ago, send the same OTP back
+    # if the last OTP was sent less than 15 minutes ago, send the same OTP back
 
     if user.otp && user.otp_request_type_id == otp_request_type_id && user.otp_sent_at > 15.minutes.ago
       self.otp = user.otp
@@ -57,25 +57,29 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
   end
 
   def process
-    send_mobile_otp
-    send_email_otp
-  end
+    send_mobile_otp if self.mobile
+    send_email_otp if self.email
 
-  def send_mobile_otp
-    response = Sms::UserOtp.(user, otp: self.otp)
-    if response.success?
-      user.update_attributes(otp_count: (user.otp_count + 1), otp_attempts: 0)
-      # further update the otp and sent_at only if a new type of otp has been requested
-      if user.otp != otp
-        user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id, otp_attempts: 0)
-      end
-    else
-      # messages[:error] = response.messages[:error]
+    user.update_attributes(otp_count: (user.otp_count + 1), otp_attempts: 0)
+
+    # further update the otp and sent_at only if a new type of otp has been requested
+    if user.otp != otp
+      user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id, otp_attempts: 0)
     end
   end
 
+  def send_mobile_otp
+    Sms::UserOtp.(user, otp: self.otp)
+  end
+
   def send_email_otp
-    
+    Event::EUserOtp::Verification.(user, {
+        user_id: user.id,
+        otp: self.otp,
+        user_agent: RequestStoreUtil.current_request.user_agent,
+        ip: RequestStoreUtil.current_request.remote_ip,
+        timestamp: DateTime.now.strftime("%I:%M %p, %d %b %Y")
+    })
   end
 
 end
