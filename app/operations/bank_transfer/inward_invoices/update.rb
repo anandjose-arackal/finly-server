@@ -65,6 +65,14 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
             add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
           return
         end 
+
+        self.purchase_order.items.each do |item|
+          if item.accepted < self.inward_invoice_params[:invoice_items_attributes][:quantity].to_i
+            add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
+            break
+          end
+        end
+
     end
 
   end

@@ -53,6 +53,11 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       rejected = item[:rejected] || 0
 
       po_items = self.inward_document.items.find_by(id: item[:id])
+      if (delivered or accepted or rejected) < 0
+        add_message :error, "Negative quantity entered for #{po_items.description}"
+        break
+      end
+
 
       remaining = (po_items.quantity.to_f - po_items.previously_delivered.to_f)
       
