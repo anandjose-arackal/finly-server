@@ -3401,7 +3401,7 @@ Rails.application.routes.draw do
     get 'procurements/filter_config', to: "procurements#filter_config"
     get 'procurements/count', to: 'procurements#count'
     resources :procurements do
-      get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
+      # get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
     end
 
     get 'grn_pending', to: 'procurements#grn_pending'
@@ -3445,6 +3445,14 @@ Rails.application.routes.draw do
 
     end
 
+    # adding routes for purchase requests
+    resources :purchase_requests do
+      get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
+      collection do
+        get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
+      end
+    end
+
     post 'payments/create_bulk_advance', to: 'payments#bulk_create_advance', as: :bulk_create_advance
     resources :payments, only: [:show]
 
@@ -3486,11 +3494,6 @@ Rails.application.routes.draw do
     end
 
     resources :comments, only: [:create]
-
-    # adding routes for purchase requests
-    resources :purchase_requests do
-      get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
-    end
   end
 
   ## Procurement APIs end   ##########################################
