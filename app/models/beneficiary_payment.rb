@@ -51,6 +51,10 @@
     #      :net_amount_id => :integer,
     #    :gross_amount_id => :integer,
     #    :roundoff_amount => :decimal
+    #     :invoice_number => :text,
+    #       :invoice_date => :date,
+    #   :invoice_due_date => :date
+
 
 
 

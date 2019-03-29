@@ -41,6 +41,8 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
       beneficiary_payment = retrieve_beneficiary_payment(payment, bank_account)
+      payment[:date] = payment[:invoice_date] || payment[:date]
+      payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
       self.payment_params << {
           payment_type_id: PaymentType.id_for(:credit),
           application: "vp",
@@ -77,11 +79,11 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
               gst_type_id: payment[:gst_type_id],
               tds_slab_id: payment[:tds_slab_id],
               # 
-              # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
+              # BENEFICIARY PAYMENTS WOULD NOW REQUIRE INVOICES
               # 
-              # invoice_number: payment[:invoice_number],
-              # date: payment[:invoice_date],
-              # due_date: payment[:due_date],
+              invoice_number: payment[:invoice_number],
+              date: payment[:date],
+              due_date: payment[:due_date],
               tax: payment[:tax],
               invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
               invoice_type_id: InwardInvoiceType.id_for(:beneficiary),
@@ -90,8 +92,8 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
                   value: payment[:original_amount],
                   currency_id: 1
               }
-          }
-          # custom_fields: payment[:custom_fields]
+          },
+          custom_fields: payment[:custom_fields]
       }
     end
 
@@ -170,6 +172,8 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
   end
 
   def beneficiary_payment_params(payment, vendor_id, bank_account_id)
+    payment[:date] = payment[:invoice_date] || payment[:date]
+    payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
     {
       name: payment[:name],
       vendor_id: vendor_id,
@@ -187,7 +191,10 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       original_amount_attributes: {
               value: payment[:original_amount],
               currency_id: Currency.first.id
-      }
+      },
+      invoice_number: payment[:invoice_number],
+      invoice_date: payment[:date],
+      invoice_due_date: payment[:due_date]
     }
   end
 end
