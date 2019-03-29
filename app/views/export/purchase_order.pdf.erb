@@ -6,6 +6,7 @@
       </div>
       <div class="col col-xs-12 no-padding address fs-12 mg-top-5">
         <br>
+        <div class="mg-botm-8"><b><%= @company.name %></b></div>
         <div class="font-light-gray mg-botm-8">Business Office :</div>
         <div class="font-light-gray">
           <%= simple_format @company.configuration.address, {}, wrapper_tag: "div" %>
