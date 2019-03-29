@@ -137,6 +137,12 @@ class Policy < ApplicationRecord
     }
   end
 
+  def update_policy_department_mapping(params)
+  end
+
+  def update_location_department_mapping(params)
+  end
+
   private
 
   def one_default_per_company
