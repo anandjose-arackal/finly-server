@@ -1,3 +1,4 @@
+# This operation is required until we have user roles implemented for expense management
 class Policy::VendorPayments::Index < Policy::Base
   attr_accessor :policies, :policy_user_roles
 
@@ -10,11 +11,23 @@ class Policy::VendorPayments::Index < Policy::Base
 
   def process
     # If enfore_policy is enabled, do not consider default policies
+    # Same API is being used by document create/edit page
+    # Admin can see all policies on organisational account -> policy index
+    # Admin can only see policies in which he is document initiator on any VP document's --> create/edit page
+    #Hence segregating on the basis of api params
     if user.vendor_payments_admin? || user.vendor_payments_auditor?
       if user&.enforce_policy_enabled?
-        ids = user.company.policies.joins(:policy_user_roles).where("policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?", UserRole::VP_ROLES.values, user.id)
+        # if params.dig(:menu, :main) == 'policies'
+          # ids = user.company&.policies.with_application(current_app).exclude_deleted.where&.not(default: true)&.pluck(:id)
+        # else
+          ids = user.company&.policies&.joins(:policy_user_roles)&.where&.not(default: true)&.where("policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?", UserRole::VP_ROLES.values, user.id)&.pluck(:id)
+        # end
       else
-        ids = user.company.policies.joins(:policy_user_roles).where("policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?", UserRole::VP_ROLES.values, user.id)&.pluck(:id)
+        # if params.dig(:menu, :main) == 'policies'
+          # ids = user.company.policies&.pluck(:id)
+        # else
+          ids = user.company.policies.joins(:policy_user_roles).where("policy_user_roles.user_role_id IN (?) AND policy_user_roles.user_id = ?", UserRole::VP_ROLES.values, user.id)&.pluck(:id)
+        # end
       end
     else
       if user&.enforce_policy_enabled?
@@ -23,15 +36,21 @@ class Policy::VendorPayments::Index < Policy::Base
         ids = user&.policy_user_roles.pluck(:policy_id)&.uniq
       end
     end
-    self.policy_user_roles = ::PolicyUserRole.where(policy_id: ids)
+    self.policy_user_roles = ::PolicyUserRole.with_policy_id(ids).with_user_id(user.id)
   end
 
   def post_process
-    self.policy_user_roles = self.policy_user_roles
+    self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.uniq
+    self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.with_application(current_app)&.exclude_deleted if policy_user_roles.present?
+    # d'uh
+    if user.vp_admin_or_auditor?
+      self.policies = user.company&.policies.with_application(current_app)&.exclude_deleted
+    end
   end
 
   def success
     params[:policy_user_roles] = self.policy_user_roles
+    params[:policies] = self.policies
     Policy::VendorPayments::Index::IndexPresenter.new(user, params, messages)
   end
 
@@ -39,13 +58,12 @@ class Policy::VendorPayments::Index < Policy::Base
     include HasScope
     attr_accessor :policies, :policy_user_roles, :admin_policies
 
-    has_scope :filter_role_id, type: :array
+    # has_scope :filter_role_id, type: :array
 
     def init
       self.policy_user_roles = params[:policy_user_roles]
+      self.policies = params[:policies]
       self.policy_user_roles = apply_scopes(policy_user_roles)
-      self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.uniq
-      self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.with_application(current_app)&.exclude_deleted
       # Jugaad as we do not have policy admin in place
       # It's the company admin
       self.admin_policies = user.company.policies.with_application(current_app)&.exclude_deleted

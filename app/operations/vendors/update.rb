@@ -13,12 +13,38 @@ class Vendors::Update < Vendors::Base
   def init
     # id = params[:id] || params[:yes_bank_vendor_id] || params[:vendor_id]
     self.vendor_parameters = vendor_attributes
+
+    # Remove policy id from vendor params if present, as updating a vendor doesn't go through approval again
+    self.vendor_parameters.delete(:policy_id)
     self.vendor = Vendors::Show.(user, params).vendor rescue nil
   end
 
   def validate
     if vendor.blank?
       add_message :error, "Vendor not found"
+      return
+    end
+
+    unless user.is_vendor_manager?
+      add_message :error, "You do not have permission for this action"
+    end
+
+    unless vendor_parameters[:pan].present?
+      add_message :error, "Please provide PAN to proceed"
+      return
+    else
+      validate_attachment(vendor_parameters, :pan)
+    end
+
+    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+      validate_attachment(vendor_parameters, :msme_certificate)
+    end
+
+    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
+      validate_attachment(vendor_parameters, :gstin)
+      validate_gstin(vendor_parameters)
+      # validate_business_name(vendor_parameters)
+      # validate_pan(vendor_parameters)
     end
   end
 
@@ -33,24 +59,28 @@ class Vendors::Update < Vendors::Base
     end
 
     # checking for attachments and adding the id
+    # if self.vendor_parameters&.dig(:vendor_attachments_attributes)
+    #   # only if the actual attached file is present, do you even make it save
+    #   if self.vendor_parameters[:vendor_attachments_attributes].first[:attached_file].present?
+    #     if self.vendor.vendor_attachments.present?
+    #       self.vendor_parameters[:vendor_attachments_attributes].first[:id] = self.vendor.vendor_attachments.first&.id
+    #     end
+    #     self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
+    #   elsif self.vendor_parameters[:vendor_attachments_attributes].first[:remove_file] == '1'
+    #     self.vendor_parameters[:vendor_attachments_attributes].first[:_destroy] = true
+    #     self.vendor_parameters[:vendor_attachments_attributes].first[:id] = self.vendor.vendor_attachments.first&.id
+    #     self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
+    #   else
+    #     if self.vendor.vendor_attachments.present?
+    #       self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
+    #     else
+    #       self.vendor_parameters.delete(:vendor_attachments_attributes)
+    #     end
+    #   end
+    # end
+
     if self.vendor_parameters&.dig(:vendor_attachments_attributes)
-      # only if the actual attached file is present, do you even make it save
-      if self.vendor_parameters[:vendor_attachments_attributes].first[:attached_file].present?
-        if self.vendor.vendor_attachments.present?
-          self.vendor_parameters[:vendor_attachments_attributes].first[:id] = self.vendor.vendor_attachments.first&.id
-        end
-        self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
-      elsif self.vendor_parameters[:vendor_attachments_attributes].first[:remove_file] == '1'
-        self.vendor_parameters[:vendor_attachments_attributes].first[:_destroy] = true
-        self.vendor_parameters[:vendor_attachments_attributes].first[:id] = self.vendor.vendor_attachments.first&.id
-        self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
-      else
-        if self.vendor.vendor_attachments.present?
-          self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
-        else
-          self.vendor_parameters.delete(:vendor_attachments_attributes)
-        end
-      end
+
     end
   end
 

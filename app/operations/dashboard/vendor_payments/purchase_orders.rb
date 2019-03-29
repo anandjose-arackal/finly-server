@@ -19,6 +19,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
 
     # General Filters from frontend
     has_scope :filter_policy_id
+    has_scope :filter_location_id
     has_scope :filter_department_id
     has_scope :filter_sub_department_id
     has_scope :filter_month
@@ -31,7 +32,8 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
         filter_department_id: params[:filter_department],
         filter_sub_department_id: params[:filter_sub_department],
         filter_month: params[:filter_month],
-        filter_year: params[:filter_year]
+        filter_year: params[:filter_year],
+        filter_location_id: params[:filter_location]
       }
 
       self.purchase_orders = params[:purchase_orders]
@@ -109,7 +111,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
         self.counts.push(personal_data)
       end
 
-      if user.vendor_payments_reviewer?
+      if user.is_purchase_order_reviewer?
         reviewer_data = {
           type: "reviewer",
           data: [

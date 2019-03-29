@@ -69,12 +69,11 @@
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
-#  po_advance                   :integer,
-#  po_prev_adjusted_advance     :integer,
 #  po_adjusted_advance          :integer
-# 
-#  gst_type_id: 1 - IGST
-#              2 - CGST + SGST
+#  po_advance                   :integer
+#  po_prev_adjusted_advance     :integer
+#  advance_amount_required      :boolean          default(FALSE)
+#
 
 class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil
@@ -300,6 +299,9 @@ class Invoice < ApplicationRecord
   scope :filter_po_invoice, -> {
     where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
   }
+
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+  scope :filter_location_id, -> (location_id) {where("location_id = ? OR delivery_location_id = ?", location_id, location_id)}
 
   scope :filter_non_po_invoice, -> {
     where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)

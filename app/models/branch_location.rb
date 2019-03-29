@@ -18,13 +18,16 @@
 #  contact_name          :string(255)
 #  contact_mobile_number :string(255)
 #  is_deleted            :boolean          default(FALSE), not null
-#  nature_of_office      :string(255)
 #  deleted_at            :datetime
 #  location_code         :string(255)
+#  ancestry              :string(255)
+#  nature_of_office      :string(255)
 #
 
 class BranchLocation < ApplicationRecord
   include SoftDeletable
+  has_ancestry
+
   belongs_to :company, optional: true
   belongs_to :state, optional: true
   has_many :company_location_departments
@@ -57,6 +60,23 @@ class BranchLocation < ApplicationRecord
     end
     address
   end
+
+  # def as_json
+  #   {
+  #     id: self.id,
+  #     name: self.name,
+  #     gstin: self.gstin,
+  #     pan: self.pan,
+  #     address_1: self.address_1,
+  #     address_2: self.address_2,
+  #     city: self.city,
+  #     country: self.country,
+  #     pin: self.pin,
+  #     address: self.address,
+  #     location_code: self.location_code,
+  #     parent: [self.parent&.id, self.parent&.name]&.compact
+  #   }
+  # end
 
   def as_json2
     {

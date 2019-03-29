@@ -28,20 +28,40 @@ class Vendors::Create < Vendors::Base
   def validate
     # Policy Selection
     if user.company.vendor_empanelment_workflow_enabled?
-      policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
+      unless user.is_vendor_manager?
+        policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
 
-      parameters = {
-        filter_associated_entity_type: "YesBankVendorProvider",
-        filter_policy_ids: policies.pluck(:id)
-      }
+        parameters = {
+          filter_associated_entity_type: "YesBankVendorProvider",
+          filter_policy_ids: policies.pluck(:id)
+        }
 
-      levels = ReviewalLevels::Index.(user, parameters).levels
+        levels = ReviewalLevels::Index.(user, parameters).levels
 
-      if levels.present?
-        unless self.vendor_parameters[:policy_id].present?
-          add_message :error, "Please select a policy"
+        if levels.present?
+          unless self.vendor_parameters[:policy_id].present?
+            add_message :error, "Please select a policy"
+          end
         end
       end
+    end
+
+    unless vendor_parameters[:pan].present?
+      add_message :error, "Please provide PAN to proceed"
+      return
+    else
+      validate_attachment(vendor_parameters, :pan)
+    end
+
+    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+      validate_attachment(vendor_parameters, :msme_certificate)
+    end
+
+    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
+      validate_attachment(vendor_parameters, :gstin)
+      validate_gstin(vendor_parameters)
+      # validate_business_name(vendor_parameters)
+      # validate_pan(vendor_parameters)
     end
 
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
@@ -50,9 +70,9 @@ class Vendors::Create < Vendors::Base
       self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
         ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], account_owner_type: "YesBankVendor")
         if ba.present?
-          self.vendor = ba.account_owner
-          # removing this particular bank account from the list of bank accounts being created
-          vendor_parameters[:bank_accounts_attributes].delete_at(index)
+          other_vendor = ba.account_number
+          self.similar_vendors.push(other_vendor)
+          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{other_vendor.business_name - other_vendor.vendor_id}"
         end
       end
     end
@@ -79,6 +99,21 @@ class Vendors::Create < Vendors::Base
     if vendor_parameters&.dig(:vendor_attachments_attributes).present?
       vendor_parameters[:vendor_attachments_attributes].first&.delete(:remove_file)
     end
+
+    # Remove tds from vendor params if tds_rates_list_id is blank
+    vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
+      unless vtra[:tds_rates_list_id].present?
+        vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+      end
+    end
+
+    # Remove Empty gstin locations
+    vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+      unless gst.keys.present?
+        vendor_parameters[:gstin_locations_attributes].delete_at(index)
+      end
+    end
+
 
     # adding the created by user for this particular vendor
     vendor_parameters[:created_by_id] = user.id

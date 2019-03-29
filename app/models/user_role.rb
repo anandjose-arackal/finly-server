@@ -51,7 +51,8 @@ class UserRole < ApplicationRecord
       policy_admin: 24,
       vendor_manager: 25,
       bank_payment_request_auditor: 26,
-      budget_manager: 27
+      budget_manager: 27,
+      non_po_initiator: 28
   }
 
   VALUES_EM = {
@@ -92,11 +93,13 @@ class UserRole < ApplicationRecord
       policy_admin: 24,
       vendor_manager: 25,
       bank_payment_request_auditor: 26,
-      budget_manager: 27
+      budget_manager: 27,
+      non_po_initiator: 28
   }
 
 
   # This is used for segregating VP specific policies
+  # Do not put user specific roles like :initiator, :creaditor, :admin, :reviewer here
   VP_ROLES = {
     purchase_request_initiator: 10,
     purchase_request_reviewer: 11,
@@ -115,7 +118,8 @@ class UserRole < ApplicationRecord
     policy_admin: 24,
     vendor_manager: 25,
     bank_payment_request_auditor: 26,
-    budget_manager: 27
+    budget_manager: 27,
+    non_po_initiator: 28
   }
 
   def self.seed_data

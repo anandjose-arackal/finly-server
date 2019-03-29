@@ -4,7 +4,7 @@ class Vendors::Show < Vendors::Base
 
   def init
     id = params[:vendor_id] || params[:yes_bank_vendor_id] || params[:id] 
-    self.vendor = user.company.yes_bank_vendors.with_id(id).includes_for_show.first rescue nil
+    self.vendor = user.company.yes_bank_vendors.non_deleted.with_id(id).includes_for_show.first rescue nil
   end
 
   def process
@@ -21,43 +21,22 @@ class Vendors::Show < Vendors::Base
 
   class Vendors::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receiving_transactions, :bank_accounts, :vendor, :actions, :procurement_data,
-                  :custom_fields, :edit_config, :reviewal_chain
+    attr_accessor :receiving_transactions, :bank_accounts, :vendor, :actions,
+                  :custom_fields, :edit_config, :reviewal_chain, :vendor_approval_workflow
 
     def init
       self.receiving_transactions = params[:receiving_transactions]
       self.bank_accounts = params[:bank_accounts]
       self.vendor = params[:vendor]
+      self.vendor_approval_workflow = user.company.vendor_empanelment_workflow_enabled?
 
-      self.actions = get_actions
+      # self.actions = get_actions
       self.edit_config = Vendors::NewVendorConfig.(self.vendor.created_by, params)
 
       if self.vendor.is_a?(YesBankVendor)
-        self.procurement_data = get_procurement_data
+        # self.procurement_data = get_procurement_data
         self.custom_fields = self.vendor.custom_fields
       end
     end
-
-    def get_actions
-      actions = {}
-
-      if vendor.is_a?(YesBankVendor)
-        actions[:create_beneficiaries] = user.permission.create_beneficiaries
-      end
-
-      actions
-    end
-
-    def get_procurement_data
-      data = {}
-
-      data[:purchase_orders] = PurchaseOrder.where(vendor_id: self.vendor.id)
-      data[:non_po_invoices] = Invoice.filter_inward_invoice_type(:non_po_invoice).with_vendor_ids(self.vendor.id)
-
-      data
-
-    end
-
   end
-
 end
