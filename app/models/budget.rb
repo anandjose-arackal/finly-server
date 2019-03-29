@@ -24,7 +24,7 @@
 #
 
 class Budget < ApplicationRecord
-  include SoftDeletable
+  include SoftDeletable, AncestrySupport
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'

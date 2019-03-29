@@ -52,6 +52,10 @@ module Seedable
       as_hash
     end
 
+    def reload_to_simple_config
+
+    end
+
     # Generates a hash out of all the values in {name: id} format
     def as_hash
       values = HashInsensitive.new

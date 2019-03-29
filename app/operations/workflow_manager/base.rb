@@ -72,6 +72,7 @@ class WorkflowManager::Base < BaseOperation
         note = "Revised PO # #{self.document.po_number}, #{aasm_event.humanize}"
       end
     end
+ 
     # Create Trail
     self.trail = document.trails.new action_user: user,
                            action_id: TrailAction.id_for(aasm_event),
@@ -81,26 +82,23 @@ class WorkflowManager::Base < BaseOperation
                            delegated_action_user_id: delegated_action_user_id,
                            note: note
 
-    # if self.document_class_name == "PurchaseOrder"
-    #   procurement = self.document.procurement
-    #   original_purchase_order = procurement.purchase_order
-    #   if procurement.po_revisions
-    #       original_purchase_order.trails.create action_user: user,
-    #                                  action_id: TrailAction.id_for(aasm_event),
-    #                                  action_user_role_id: role_id,
-    #                                  action_level_id: aasm_document.current_level&.id,
-    #                                  modified_level_id: aasm_document.new_level&.id,
-    #                                  delegated_action_user_id: delegated_action_user_id,
-    #                                  note: "Revised PO # #{self.document.po_number}, #{aasm_event.humanize}"
-    #     end
-    # end
-
     if self.note.present?
       self.trail.note = "\n#{self.note}"
     end
 
     self.trail.save
     # Return Data to referrer
+
+    if self.document_class_name == "PurchaseOrder" && self.document.status.name == "auto_approved"
+        document.trails.create action_user: user,
+                         action_id: TrailAction.id_for('auto_approve'),
+                         action_user_role_id: role_id,
+                         action_level_id: aasm_document.current_level&.id,
+                         modified_level_id: aasm_document.new_level&.id,
+                         delegated_action_user_id: delegated_action_user_id,
+                         note: note
+    end
+
   end
 
   def success

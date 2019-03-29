@@ -176,7 +176,7 @@ class User::Team::Index < User::Team::Base
   private
   def admin_team
     clear_messages
-    if user.company_admin? || user.auditor?
+    if user.company_admin? || user.auditor? || user.vendor_payments_admin?
       return user.company.users
     elsif user.policy_admin?
       users = user.company.users

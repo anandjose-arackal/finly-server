@@ -15,13 +15,12 @@ class Vendors::Index < Vendors::Base
     has_scope :filter_account_details
     has_scope :filter_business_name
     has_scope :filter_vendor_id
-    has_scope :filter_approved
+    has_scope :filter_approved, type: :boolean
+    has_scope :non_deleted, type: :boolean
 
     has_scope :sort_vendor_id
     has_scope :sort_created_at
     has_scope :sort_business_name
-    has_scope :non_deleted
-    has_scope :non_deleted_autocomplete
 
     def init
       self.vendors = params[:vendors]

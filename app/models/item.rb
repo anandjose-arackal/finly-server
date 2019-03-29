@@ -25,6 +25,10 @@
 
 class Item < ApplicationRecord
   include SoftDeletable
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :item_number, purpose: :item_master, editable: false, prefix: 'ITEM-'
+
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
@@ -38,7 +42,7 @@ class Item < ApplicationRecord
   has_many :artifacts, as: :resource, dependent: :destroy
 
 
-  validates :rate, presence: true
+  # validates :rate, presence: true
   validates :description, presence: true
 
 
@@ -79,6 +83,8 @@ class Item < ApplicationRecord
   def as_json
     {
         id: id,
+        item_number: item_number,
+        unit_of_measurement: unit_of_measurement,
         hsn_sac: hsn_sac,
         category_name: category&.name,
         category_id: category_id,

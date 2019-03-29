@@ -32,14 +32,15 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.purchase_order = params[:purchase_order]
       self.procurement = self.purchase_order.procurement
       self.actions = get_actions
-      self.departments = user.company.departments
+      self.departments = user.company.departments.leaves
       self.locations = user.company.locations.includes(:state)
 
       if purchase_order.user.departments.present?
-        self.sub_departments = purchase_order.user.departments.only_sub_departments
+        self.sub_departments = purchase_order.user.departments.leaves
       else
-        self.sub_departments = purchase_order.user.company.departments.only_sub_departments
+        self.sub_departments = purchase_order.user.company.departments.leaves
       end
+
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
       self.tds_slabs = TdsSlabs::Index.(current_user, params)

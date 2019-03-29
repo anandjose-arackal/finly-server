@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager::Master::Base
 
   register_handle :proc_inward_document_show
-  register_actions [:update_document, :editable]
+  register_actions [:update_document, :editable, :delete]
 
   def initialize(user=nil, params={})
     super
@@ -33,6 +33,10 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
         e.include? true
       end
     end
+  end
+
+  def delete
+    true
   end
 
   # # alias_method :invoice, :input

@@ -96,13 +96,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def remind
-    unless procurement.po_revisions.pluck(:revision_of_id).include?(purchase_order.id)
-      if purchase_order.is_initiating_user?
-        purchase_order.processing? &&
-            document_owner?
-        return true
-      end
-    end
+    return false unless procurement.po_revisions.pluck(:revision_of_id).include?(purchase_order.id)
+
+    purchase_order.is_initiating_user? and purchase_order.processing?
   end
 
   def retract
@@ -126,10 +122,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def remind_approver
-    if purchase_order.is_initiating_user?
-      purchase_order.processing? &&
-          document_owner?
-    end
+    purchase_order.is_initiating_user? and purchase_order.processing? and document_owner?
   end
 
   def void
@@ -146,9 +139,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
         # Admin
         (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed? && !purchase_order.sent_to_vendor?) &&
             !((purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))) ||
-        # Doc owner
+            # Doc owner
             (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) ||
-        # Reviewer
+            # Reviewer
             (purchase_order.processing? && user_in_level?)
       end
     end

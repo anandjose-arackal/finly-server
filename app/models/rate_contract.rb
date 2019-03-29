@@ -17,6 +17,9 @@
 #
 
 class RateContract < ApplicationRecord
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :rate_contract_number, purpose: :rate_contract, editable: false, prefix: 'RTCT-'
 
   belongs_to :creator, optional: true, class_name: 'User'
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
@@ -47,7 +50,8 @@ class RateContract < ApplicationRecord
 
   def as_json
     {
-      id: id, 
+      id: id,
+      rate_contract_number: rate_contract_number,
       name: name, 
       vendor_id: vendor_id,
       vendor_name: vendor&.name,

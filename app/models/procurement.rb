@@ -371,6 +371,20 @@ class Procurement < ApplicationRecord
     where id: filtered_ids
   }
 
+  scope :filter_grn_due_today, -> (required) {
+    if StringUtils.to_bool(required)
+      filtered_ids = InwardDocument.where("DATE(delivery_date) = ?", Date.today).pluck(:procurement_id).uniq
+      where(id: filtered_ids)
+    end
+  }
+
+  scope :filter_grn_overdue, -> (required) {
+    if StringUtils.to_bool(required)
+      filtered_ids = InwardDocument.where("DATE(delivery_date) < ?", Date.today).pluck(:procurement_id).uniq
+      where(id: filtered_ids)
+    end
+  }
+
 
   def awaiting_action?(user)
     # Ideal method:
