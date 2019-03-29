@@ -9,7 +9,7 @@ class Vendors::Base < BaseOperation
 
   def init
     self.company = user.company
-    id = params[:vendor_id] || params[:yes_bank_vendor_id] || params[:id] 
+    # id = params[:vendor_id] || params[:yes_bank_vendor_id] || params[:id] 
     self.vendor = Vendors::Show.(user, params).vendor
   end
 
@@ -25,10 +25,10 @@ class Vendors::Base < BaseOperation
   def vendor_attributes
     params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description, :pan, :tin, :gst, :state, :state_code_id, :gst_registered, :vendor_type_id,
                                    :business_name, :address, :payment_term_id, :currency_id, :tds_rates_list_id, :policy_id,
-                                   vendor_tds_rates_attributes: [:tds_rates_list_id],
-                                   bank_accounts_attributes: [:account_number, :ifsc, :name, :default_account, :address_1, :address_2, :address_3, :pin_code, :country],
-                                   vendor_attachments_attributes: [:attached_file, :attachment_type, :remove_file],
-                                   gstin_locations_attributes: [:gstin_id, :gstin, :location_id, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation]
+                                   vendor_tds_rates_attributes: [:id, :tds_rates_list_id],
+                                   bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :address_1, :address_2, :address_3, :pin_code, :country],
+                                   vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :remove_file],
+                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location_id, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation]
     ) 
   end
 
@@ -53,5 +53,87 @@ class Vendors::Base < BaseOperation
     custom_fields[:reset_fields] = reset_fields
     custom_fields[:save] = save
     CustomField::SetFields.(self.vendor, FieldParentType.id_for(:vendor), custom_fields)
+  end
+
+  # def validate_business_name(vendor_params)
+  #   business_name = vendor_params[:business_name]
+  #   vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
+  #     gstin = gstin_location[:gstin]
+
+  #     unless gstin.present?
+  #       add_message :error, "Please Provide GSTIN for Location #{index+1}"
+  #       next
+  #     end
+
+  #     gstin_master = Gstin.with_gstin(gstin).first
+
+  #     if gstin_master.present?
+  #       match_percentile = fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
+
+  #       if match_percentile < 90
+  #         add_message :error, "Business Name Match Percentile is below 90% for Location #{index+1}"
+  #       end
+  #     end
+  #   end
+  # end
+
+  def validate_gstin(vendor_params)
+    business_name = vendor_params[:business_name]
+    vendor_params[:gstin_locations_attributes].each_with_index do |gstin_location, index|
+      gstin = gstin_location[:gstin]
+
+      unless gstin.present?
+        add_message :error, "Please Provide GSTIN for Location #{index+1}"
+        next
+      end
+
+      gstin_master = Gstin.with_gstin(gstin).first
+
+      if gstin_master.present?
+        if gstin_master.status == "Active"
+
+          unless gstin_master.gstin.slice(2, 10) == vendor_params[:pan]
+            add_message :error, "PAN doesn't match with GSTIN for Location #{index+1}"
+          end
+
+          match_percentile = StringUtils.fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
+
+          if match_percentile < 90
+            add_message :error, "Business Name Match Percentile is below 90% for Location #{index+1}"
+          end
+        else
+          add_message :error, "GSTIN Status is not Active for Location #{index+1}"
+        end
+      end
+    end
+  end
+
+  def validate_attachment(vendor_params, type)
+    # Checks presence of attachment with passed type
+    types = {pan: "PAN", gstin: "GSTIN Certificate", cancelled_cheque: "Cancelled Cheque", tax_exemption: "Tax Exemption Certificate", lower_exemption: "Lower Exemption Certificate", msme_certificate: "MSME Certificate", others: "Others"}
+
+    # attachment_name = 
+
+    if vendor_params.present? && vendor_params[:vendor_attachments_attributes].present?    
+      unless find_attachment(vendor_params[:vendor_attachments_attributes], type)
+        add_message :error, "Please upload #{types[type]}"
+      end
+    elsif self.vendor.present? && self.vendors.vendor_attachments.with_type(type).present?
+      # do nothing
+    else
+      add_message :error, "Please upload #{types[type]}"
+    end
+  end
+
+  def find_attachment(attachment_params, type)
+    found = false
+    attachment_params.each do |attachment|
+      if attachment[:attachment_type] == type.to_s && !(attachment[:_destroy].present?)
+        found = true
+        break
+      end
+    end
+
+    found
   end
 end

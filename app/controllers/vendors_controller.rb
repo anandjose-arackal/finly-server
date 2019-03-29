@@ -7,12 +7,24 @@ class VendorsController < ApplicationController
   end
 
   def index
+    params[:non_deleted] = true
     @result = Vendors::Index.(current_user, params)
     respond
   end
 
   def show
+    params[:non_deleted] = true
     @result = Vendors::Show.(current_user, params)
+    respond
+  end
+
+  def procurements
+    @result = Vendors::Procurements.(current_user, params)
+    respond
+  end
+
+  def transactions
+    @result = Vendors::Transactions.(current_user, params)
     respond
   end
 
@@ -23,6 +35,11 @@ class VendorsController < ApplicationController
 
   def create
     @result = Vendors::Create.(current_user, params)
+    respond
+  end
+
+  def create_and_submit
+    @result = Vendors::CreateAndSubmit.(current_user, params)
     respond
   end
 
@@ -58,6 +75,11 @@ class VendorsController < ApplicationController
 
   def return_control
     @result = Vendors::ReturnControl.(current_user, params)
+    respond
+  end
+
+  def destroy
+    @result = Vendors::Destroy.(current_user, params)
     respond
   end
 

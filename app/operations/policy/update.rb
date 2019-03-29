@@ -40,7 +40,7 @@ class Policy::Update < Policy::Base
 
   protected
   def strong_params
-    params.require(:policy).permit(:description, :name, :base_currency_id, :settlement_currency_id)
+    params.require(:policy).permit(:description, :name, :base_currency_id, :settlement_currency_id, policy_department_mappings_attributes: [:id, :policy_id, :department_id, :enabled, :_destroy], policy_location_mappings_attributes: [:id, :policy_id, :location_id, :enabled, :_destroy])
   end
 
 end

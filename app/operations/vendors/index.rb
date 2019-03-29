@@ -7,6 +7,7 @@ class Vendors::Index < Vendors::Base
     attr_accessor :vendors, :count, :paginated_vendors
 
     has_scope :filter_name_search
+    has_scope :filter_search
     has_scope :filter_vendor_type_id
     has_scope :filter_status_id
     has_scope :filter_policy_id
@@ -16,7 +17,6 @@ class Vendors::Index < Vendors::Base
     has_scope :filter_vendor_id
     has_scope :filter_approved, type: :boolean
     has_scope :non_deleted, type: :boolean
-
 
     has_scope :sort_vendor_id
     has_scope :sort_created_at
@@ -32,7 +32,6 @@ class Vendors::Index < Vendors::Base
       self.paginated_vendors = self.vendors.paginate(page: page, per_page: per_page).include_details
       self.count = self.vendors.count
     end
-
   end
 
   def init

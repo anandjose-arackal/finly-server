@@ -1,4 +1,5 @@
 json.id @result.vendor.id
+json.vendor_approval_workflow @result.vendor_approval_workflow
 json.vendor do
   json.extract! @result.vendor, :id, :name, :email, :mobile_number
   if @result.vendor.is_a?(YesBankVendor)
@@ -17,8 +18,10 @@ json.vendor do
     json.created_by @result.vendor.created_by&.name
     json.vendor_id @result.vendor.vendor_id
     json.tds_rates do
-      json.array! @result.vendor.tds_rates do |tds_rate|
-        json.extract! tds_rate, :id, :name, :tds
+      json.array! @result.vendor.vendor_tds_rates do |vtr|
+        json.id vtr.id
+        json.tds_rates_list_id vtr.tds_rates.id
+        json.extract! vtr.tds_rates, :name, :tds
       end
     end
   else
@@ -34,6 +37,7 @@ end
 json.bank_accounts do
   json.array!(@result.bank_accounts) do |bank_account|
     json.account_number bank_account.account_number
+    json.confirm_account_number bank_account.account_number
     json.ifsc bank_account.ifsc
     json.id bank_account.id
     json.name bank_account.name
@@ -50,20 +54,7 @@ json.gstin_locations do
     end
   end
 end
-json.transactions do
-  json.array!(@result.receiving_transactions) do |payment|
-    json.extract! payment, :id, :note
-    json.reference_id payment.reference_resource&.bank_reference_number
-    json.amount payment.amount.value
-    json.date payment.date
-    json.bank_payment_request_id payment.payment_order&.bank_payment_request&.id
-    json.payment_mode payment.payment_mode&.upcase
-    json.account_number payment.receiving_account&.account_number
-    json.ifsc payment.receiving_account&.ifsc
-    json.initiating_user_name payment.initiating_user&.name
-    json.payment_status payment.payment_status_name
-  end
-end
+
 if @result.vendor.is_a?(YesBankVendor)
   json.attachments do
     json.array! @result.vendor.vendor_attachments do |attachment|
@@ -80,28 +71,6 @@ if @result.vendor.is_a?(YesBankVendor)
     json.id @result.vendor.vendor_type&.id
     json.name @result.vendor.vendor_type&.name
   end
-
-
-  json.procurement_data do
-    json.purchase_orders do
-      json.array! @result.procurement_data[:purchase_orders] do |po|
-        json.extract! po, :id, :po_number, :procurement_id
-        json.created_by po.user&.name
-        json.created_at po.created_at&.strftime("%d-%b-%Y")
-        json.amount po.balance_amount&.value
-      end
-    end
-
-    json.non_po_invoices do
-      json.array! @result.procurement_data[:non_po_invoices] do |invoice|
-        json.extract! invoice, :id, :invoice_id, :invoice_number, :procurement_id
-        json.created_by invoice.created_by&.name
-        json.created_at invoice.created_at&.strftime("%d-%b-%Y")
-        json.amount invoice.net_amount&.value
-      end
-    end
-
- end
 end
 
 json.actions @result.actions
@@ -117,6 +86,7 @@ if @result.vendor.policy.present?
 end
 
 json.edit_config do
+  json.vendor_approval_workflow @result.edit_config.vendor_approval_workflow
   json.codes do
     json.array! @result.edit_config.states, :id, :name
   end
@@ -187,6 +157,5 @@ json.edit_config do
       end
     end
   end
-
 end
 
