@@ -17,7 +17,6 @@ class Vendors::Index < Vendors::Base
     has_scope :filter_vendor_id
     has_scope :filter_approved
 
-
     has_scope :sort_vendor_id
     has_scope :sort_created_at
     has_scope :sort_business_name

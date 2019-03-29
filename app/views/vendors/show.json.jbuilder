@@ -157,6 +157,5 @@ json.edit_config do
       end
     end
   end
-
 end
 
