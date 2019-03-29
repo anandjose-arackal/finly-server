@@ -76,6 +76,7 @@ json.invoice do
   # invoice items
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
+      json.unit_of_measurement item.unit_of_measurement
       json.rate item.rate
       json.quantity item.quantity
       json.tax item.tax
