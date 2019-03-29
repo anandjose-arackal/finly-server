@@ -63,12 +63,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def receive_pending
     return nil unless user.is_goods_receiver?
-    {name: 'Pending', id: 'receive', url: '#receive/params={"active_tab":"pending-tab"}'}
+    {name: 'Pending', id: 'receive', url: 'receive/params={"active_tab":"pending-tab"}'}
   end
 
   def receive_history
     return nil unless user.is_goods_receiver?
-    {name: 'Received', id: 'receive', url: '#receive/params={"active_tab":"receive-tab"}'}
+    {name: 'Received', id: 'receive', url: 'receive/params={"active_tab":"receive-tab"}'}
   end
 
   def payables

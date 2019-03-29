@@ -28,7 +28,7 @@ class Vendors::Base < BaseOperation
                                    vendor_tds_rates_attributes: [:id, :tds_rates_list_id],
                                    bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :address_1, :address_2, :address_3, :pin_code, :country],
                                    vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :remove_file],
-                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location_id, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation]
+                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation]
     ) 
   end
 
