@@ -44,7 +44,13 @@ class Policy::ApprovalWorkflows::ShowUserLevel < Policy::ApprovalWorkflows::Base
       add_message :error, "Policy not found"
     end
 
-    self.target_user = User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id)).with_id(params[:user_id]).first rescue nil
+    if vendor_payments?
+      user_id = self.policy.policy_user_roles.pluck(:user_id).with_id(params[:user_id]).first rescue nil
+      user_id = params[:user_id] if User.with_id(params[:user_id])&.first&.vp_admin_or_auditor?
+      self.target_user = User.with_id(user_id).first rescue nil
+    else
+      self.target_user = User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id)).with_id(params[:user_id]).first rescue nil
+    end
     self.reviewal_levels = ReviewalLevel.with_policy_ids(self.policy.id)
   end
 
