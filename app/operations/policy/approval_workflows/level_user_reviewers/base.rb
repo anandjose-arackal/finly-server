@@ -2,7 +2,7 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Base < BaseOperation
   attr_accessor :level_user_reviewer_params
 
   def authorized_user_types
-    [:admin]
+    [:admin, :vendor_payments_admin]
   end
 
   def init
