@@ -26,7 +26,7 @@ class Event::EUserOtp::Verification < Event::EUserOtp::Base
   def send_mailer(user)
     return if user.blank?
     params[:subject] = mailer_subject user
-    .delay.send_mail(Event::EUserOtp::Verification::MailerPresenter.new(user, params))
+    UserOtpMailer.delay.send_mail(Event::EUserOtp::Verification::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)

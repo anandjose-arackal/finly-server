@@ -11,10 +11,10 @@ unless Rails.env.production?
 end
 
 # Todo untested
-WHITELISTED_IPS = Finly::SecureStorage::Connector.read('core/whitelisted_ip_list')
-Rack::Attack.safelist('allow API requests from known IPs') do
-  WHITELISTED_IPS.include?(req.ip)
-end
+# WHITELISTED_IPS = Finly::SecureStorage::Connector.read('core/whitelisted_ip_list')
+# Rack::Attack.safelist('allow API requests from known IPs') do |req|
+#   WHITELISTED_IPS.include?(req.ip)
+# end
 # Todo untested
 
 # Request Throttling Start
