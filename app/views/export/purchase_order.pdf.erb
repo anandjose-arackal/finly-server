@@ -44,6 +44,23 @@
         </table>
       </div>
     </div>
+    <% field_configurations = FieldConfiguration.with_id(@result.purchase_order.custom_fields.pluck(:field_configuration_id)) %>
+    <% if field_configurations.present? && field_configurations.pluck(:printable).include?(true) %>
+      <div class="col col-xs-12 no-padding">
+        <% @result.purchase_order.custom_fields.each do |custom_field| %>
+        <div class="col col-xs-3 no-padding mg-botm-8">
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-2"><%= custom_fields.field_configuration.field_name %></div>
+          <div class="col col-xs-12 no-padding font-dark-gray">
+            <% if custom_field.value_type == 'FieldDropDownSelection' %>
+              <%= custom_field.value.value.name %>
+            <% else %>
+              <%= custom_field.value&.value || '--' %>
+            <% end %>
+          </div>
+        </div>
+        <% end %>
+      </div>
+    <% end %>
     <div class="col col-xs-12 no-padding">
       <p class="text-center"><%= @result.purchase_order&.procurement&.note %></p>
     </div>
