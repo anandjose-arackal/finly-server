@@ -610,9 +610,9 @@ module Transitionable
 
     def role_based_initiator_associated_items(user, role_id, options={})
       document_table_name = options[:document_table_name]
-      if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
-        document_table_name = 'inward_invoices'
-      end
+      # if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
+      #   document_table_name = 'inward_invoices'
+      # end
       document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
     end
 

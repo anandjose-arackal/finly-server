@@ -32,7 +32,7 @@ class Policy::ApprovalWorkflows::ShowUserLevel < Policy::ApprovalWorkflows::Base
   end
 
   def authorized_user_types
-    [:admin]
+    [:admin, :vendor_payments_admin]
   end
 
   def init

@@ -92,7 +92,6 @@ class WorkflowManager::Aasm::BaseProvider
 
     if [:unapprove].include?(aasm.current_event)
       unapprove_level = previous_level.present? ? previous_level : current_level
-      # binding.pry
       dlrm = document.document_level_reviewer_mappings
         .where(level_id: unapprove_level&.id, policy_id: document.policy_id).where.not(action_taken_by_id: nil).first
 

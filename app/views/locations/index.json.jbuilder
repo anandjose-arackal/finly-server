@@ -1,3 +1,5 @@
-json.array!(@result.locations) do |location|
-  json.extract! location, :id, :name, :gstin, :pan, :address_1, :address_2, :city, :country, :pin, :address, :location_code
+json.locations do
+  json.array!(@result.locations) do |location|
+    json.merge! location.as_json
+  end
 end
