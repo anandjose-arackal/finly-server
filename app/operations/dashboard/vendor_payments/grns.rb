@@ -22,6 +22,7 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
     # General Filters from frontend
     has_scope :filter_policy_id
     has_scope :filter_department_id
+    has_scope :filter_location_id
     has_scope :filter_sub_department_id
     has_scope :filter_month
     has_scope :filter_year
@@ -33,7 +34,8 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
         filter_sub_department_id: params[:filter_sub_department],
         filter_month: params[:filter_month],
         filter_year: params[:filter_year],
-        filter_procurement_type: 'purchase_order'
+        filter_procurement_type: 'purchase_order',
+        filter_location_id: params[:filter_location]
       }
 
       self.procurements = params[:procurements]

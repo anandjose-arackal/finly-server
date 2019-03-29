@@ -1,3 +1,4 @@
+json.vendor_approval_workflow @result.vendor_approval_workflow
 json.codes do
   json.array! @result.states, :id, :name
 end

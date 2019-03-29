@@ -20,7 +20,7 @@
 #  account             :string(255)
 #  supply_item_type_id :integer
 #  deleted_at          :datetime
-#  product_type        :integer
+#  product_type_id     :integer          default(1)
 #
 
 class Item < ApplicationRecord
@@ -42,7 +42,7 @@ class Item < ApplicationRecord
   has_many :artifacts, as: :resource, dependent: :destroy
 
 
-  validates :rate, presence: true
+  # validates :rate, presence: true
   validates :description, presence: true
 
 

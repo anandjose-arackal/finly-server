@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: policy_location_department_mappings
+#
+#  id            :bigint(8)        not null, primary key
+#  location_id   :integer
+#  department_id :integer
+#  policy_id     :integer
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  company_id    :integer
+#  creator_id    :integer
+#
+
 class PolicyLocationDepartmentMapping < ApplicationRecord
 
   belongs_to :policy, optional: true

@@ -40,6 +40,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_month
     has_scope :filter_year
     has_scope :filter_user
+    has_scope :filter_vendor_id
 
     def init
       self.purchase_orders = params[:purchase_orders]

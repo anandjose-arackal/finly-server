@@ -28,6 +28,8 @@ class VendorAttachment < ApplicationRecord
   has_attached_file :attached_file, default_url: '/assets/:style/missing.png'
   validates_attachment :attached_file, content_type: CONTENT_TYPES
 
+  scope :with_type, -> (type) {where attachment_type: type}
+
   scope :pan_attachment, -> { where attachment_type: 'pan' }
   scope :gstin_attachment, -> { where attachment_type: 'gstin' }
   scope :cancelled_cheque_attachment, -> { where attachment_type: 'cancelled_cheque' }
