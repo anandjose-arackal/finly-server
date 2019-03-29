@@ -69,6 +69,7 @@ linked_files = %w{
   config/aws_config.yml
   config/yes_bank_config.yml
   config/gstin_verification_config.yml
+  config/redis_config.yml
 }
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production
