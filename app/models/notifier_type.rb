@@ -105,20 +105,19 @@ class NotifierType < ApplicationRecord
               configurable_push_notification: true, configurable_mailer: true},
              {key: :bank_payment_request_credit_confirm, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
-             {key: :system_alert, has_push_notification: false, has_mailer: true,
-              configurable_push_notification: false, configurable_mailer: false},
+
              {key: :payment_order_bulk_download, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
              {key: :outward_invoice_payment, has_push_notification: true, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
              {key: :travel_request_submit, has_push_notification: false, has_mailer: true,
-                configurable_push_notification: false, configurable_mailer: false},
+              configurable_push_notification: false, configurable_mailer: false},
              {key: :travel_request_retract, has_push_notification: false, has_mailer: true,
-                configurable_push_notification: false, configurable_mailer: false},
+              configurable_push_notification: false, configurable_mailer: false},
              {key: :travel_request_request_selection, has_push_notification: false, has_mailer: true,
-                configurable_push_notification: false, configurable_mailer: false},
+              configurable_push_notification: false, configurable_mailer: false},
              {key: :travel_request_reject_selection, has_push_notification: false, has_mailer: true,
-                configurable_push_notification: false, configurable_mailer: false},
+              configurable_push_notification: false, configurable_mailer: false},
              {key: :travel_request_confirm_booking, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
              {key: :travel_request_confirm_selection, has_push_notification: false, has_mailer: true,
@@ -161,10 +160,14 @@ class NotifierType < ApplicationRecord
              {key: :invoice_retract, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
              {key: :invoice_comment, has_push_notification: true, has_mailer: true,
-              configurable_push_notification: true, configurable_mailer: true}
+              configurable_push_notification: true, configurable_mailer: true},
 
-
-            ]
+             # Others
+             {key: :system_alert, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: false},
+             {key: :user_otp, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: false},
+  ]
 
   scope :with_name, ->(name) {where name: name}
 
