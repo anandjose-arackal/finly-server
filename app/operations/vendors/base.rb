@@ -118,7 +118,7 @@ class Vendors::Base < BaseOperation
       unless find_attachment(vendor_params[:vendor_attachments_attributes], type)
         add_message :error, "Please upload #{types[type]}"
       end
-    elsif self.vendor.present? && self.vendors.vendor_attachments.with_type(type).present?
+    elsif self.vendor.present? && self.vendor.vendor_attachments.with_type(type).present?
       # do nothing
     else
       add_message :error, "Please upload #{types[type]}"
