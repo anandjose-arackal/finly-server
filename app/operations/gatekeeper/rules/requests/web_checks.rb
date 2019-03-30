@@ -186,7 +186,7 @@ Gatekeeper::Checker.new 'On New Request' do
     section 'New UserAgent' do
       section 'Unverified' do
         before do
-          skip unless RequestStoreUtil.current_session.user_agent.status_id == UserAgentStatus.id_for(:unverified)
+          skip unless RequestStoreUtil.current_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:unverified)
         end
         rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
           pass = false
@@ -206,7 +206,7 @@ Gatekeeper::Checker.new 'On New Request' do
 
       section 'Blocked' do
         before do
-          skip unless RequestStoreUtil.current_session.user_agent.status_id == UserAgentStatus.id_for(:blocked)
+          skip unless RequestStoreUtil.current_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:blocked)
         end
         rule 'do not allow access to blocked IPs' do
           message 'User IP is blocked'

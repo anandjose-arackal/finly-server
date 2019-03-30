@@ -11,13 +11,13 @@ class PasswordsController < Devise::PasswordsController
     yield resource if block_given?
 
     # if successfully_sent?(resource)
-      @result = {
-          success: true,
-          messages: {
-              success: ["Password reset intructions sent. Check you mail!"]
-          }
-      }
-      render json: @result.as_json
+    @result = {
+        success: true,
+        messages: {
+            success: ["Password reset intructions sent. Check you mail!"]
+        }
+    }
+    render json: @result.as_json
     # else
     #   # flash[:error] = resource.errors.full_messages.to_sentence
     #   respond_with(resource)
@@ -39,7 +39,23 @@ class PasswordsController < Devise::PasswordsController
         if resource.errors.empty?
           # set the default password flag to be false
           resource.update(verified: true, default_password: false)
-          respond response: :success, message: "Password reset successfully"
+          respond response: :success, message: 'Password reset successfully'
+          # todo send mailer/SMS on password change
+          if resource.email.present?
+            # Send Email
+            PasswordMailer.delay.notify_password_change(
+                {
+                    to: resource.email,
+                    user_agent: request.user_agent,
+                    ip: request.remote_ip,
+                    timestamp: DateTime.now.strftime("%I:%M %p, %d %b %Y")
+                }
+            )
+          end
+          if resource.respond_to?(:mobile_number) and resource.mobile_number.present?
+            # Send SMS
+            Sms::UserPasswordChange.(resource, {})
+          end
         else
           respond response: :failure, message: resource.errors.full_messages.to_sentence
         end
