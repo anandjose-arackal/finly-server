@@ -8,6 +8,13 @@ class Policy::VendorPayments::Index < Policy::Base
   def authorize
   end
 
+  def authorized_user_types
+    [:vendor_payments_admin, :vendor_payments_creditor, :vendor_payments_reviewer, :vendor_payments_initiator]
+  end
+
+  def validate
+  end
+
 
   def process
     # If enfore_policy is enabled, do not consider default policies
@@ -40,7 +47,7 @@ class Policy::VendorPayments::Index < Policy::Base
   end
 
   def post_process
-    self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.uniq
+    self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.distinct
     self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.with_application(current_app)&.exclude_deleted if policy_user_roles.present?
     # d'uh
     if user.vp_admin_or_auditor?
@@ -58,12 +65,15 @@ class Policy::VendorPayments::Index < Policy::Base
     include HasScope
     attr_accessor :policies, :policy_user_roles, :admin_policies
 
-    # has_scope :filter_role_id, type: :array
+    has_scope :filter_role_id, type: :array
 
     def init
       self.policy_user_roles = params[:policy_user_roles]
       self.policies = params[:policies]
       self.policy_user_roles = apply_scopes(policy_user_roles)
+      # for admin on policies index, filter_role_id will not be present
+      # On document show , show only those policies to which user has initiator role even if user is admin
+      self.policies = policies.where(id: policy_user_roles&.pluck(:policy_id)) if params.present? && params.has_key?(:filter_role_id)
       # Jugaad as we do not have policy admin in place
       # It's the company admin
       self.admin_policies = user.company.policies.with_application(current_app)&.exclude_deleted

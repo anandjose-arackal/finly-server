@@ -74,7 +74,7 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
       add_message :error, "GRN can only be added for goods and not for services."
       return
     end
-
+    validate_role
   end
 
   def process
@@ -156,6 +156,13 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
         user: user
     }
 
+  end
+
+  def validate_role
+    unless user.is_goods_receiver? || user.vendor_payments_admin?
+      add_message :error, 'You are not allowed to create this document'
+      return
+    end
   end
 end
 
