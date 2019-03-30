@@ -76,6 +76,19 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
     if self.duplicate_po.save
       # self.original_purchase_order.trails.create action_user: user, action_id: TrailAction.id_for(:revision), note: "Revised PO generated, ##{self.duplicate_po.po_number}"
       self.duplicate_po.trails.create action_user: user, action_id: TrailAction.id_for(:create), note: "Revised PO created from, ##{self.purchase_order.po_number}"
+
+      # Update procurement po approved status tags
+      old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
+      status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
+      self.procurement.status_tags.delete(old_status_tag)
+      self.procurement.status_tags << status_tag
+
+      # Update procurement send status
+      status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_sent))
+      if self.procurement.status_tags.include? status_tag
+        self.procurement.status_tags.delete(status_tag)
+      end
+
     else
       add_message :error, self.duplicate_po.errors.full_messages
     end
