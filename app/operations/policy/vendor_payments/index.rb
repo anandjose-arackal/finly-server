@@ -8,6 +8,10 @@ class Policy::VendorPayments::Index < Policy::Base
   def authorize
   end
 
+  def authorized_user_types
+    [:vendor_payments_admin, :auditor]
+  end
+
 
   def process
     # If enfore_policy is enabled, do not consider default policies

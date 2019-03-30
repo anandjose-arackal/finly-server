@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_29_071949) do
+ActiveRecord::Schema.define(version: 2019_03_29_120211) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -660,12 +660,18 @@ ActiveRecord::Schema.define(version: 2019_03_29_071949) do
     t.integer "gross_amount_id"
     t.decimal "roundoff_amount", precision: 10
     t.integer "cost_center_id"
+    t.text "invoice_number"
+    t.date "invoice_date"
+    t.date "invoice_due_date"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
     t.index ["category_id"], name: "index_beneficiary_payments_on_category_id"
     t.index ["company_id"], name: "index_beneficiary_payments_on_company_id"
     t.index ["cost_center_id"], name: "index_beneficiary_payments_on_cost_center_id"
     t.index ["department_id"], name: "index_beneficiary_payments_on_department_id"
     t.index ["gst_type_id"], name: "index_beneficiary_payments_on_gst_type_id"
+    t.index ["invoice_date"], name: "index_beneficiary_payments_on_invoice_date"
+    t.index ["invoice_due_date"], name: "index_beneficiary_payments_on_invoice_due_date"
+    t.index ["invoice_number"], name: "index_beneficiary_payments_on_invoice_number", length: 20
     t.index ["original_amount_id"], name: "index_beneficiary_payments_on_original_amount_id"
     t.index ["payable_amount_id"], name: "index_beneficiary_payments_on_payable_amount_id"
     t.index ["status_id"], name: "index_beneficiary_payments_on_status_id"
