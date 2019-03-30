@@ -61,3 +61,5 @@ json.tds_slabs do
       json.tds tds_slab.tds
     end
 end
+
+json.invoice_custom_fields_config @result.custom_fields_config[:invoice]

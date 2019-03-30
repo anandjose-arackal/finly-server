@@ -62,9 +62,9 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       category_id = item[:category_id]
       cost_center_id = item[:cost_center_id]
       department_id = item[:department_id]
-      # invoice_number = item[:invoice_number]
-      # invoice_date = item[:invoice_date]
-      # due_date = item[:due_date]
+      invoice_number = item[:invoice_number]
+      invoice_date = item[:invoice_date] || item[:date]
+      invoice_due_date = item[:invoice_due_date] || item[:due_date]
       note = item[:note]
 
       # generating custom field data
@@ -151,17 +151,25 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       # 
       # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
       # 
-      # unless validate_date invoice_date
-      #   self.valid = false
-      #   self.error_messages << "Invalid invoice date"
-      #   self.issue_item[:invoice_date] = 'Invalid invoice date'
-      # end
+      unless invoice_date.blank? || validate_date(invoice_date)
+        self.valid = false
+        self.error_messages << "Invalid invoice date"
+        self.issue_item[:invoice_date] = 'Invalid invoice date'
+      end
 
-      # unless validate_date due_date
-      #   self.valid = false
-      #   self.error_messages << "Invalid due date"
-      #   self.issue_item[:due_date] = 'Invalid due date'
-      # end
+      unless invoice_due_date.blank? || validate_date(invoice_due_date)
+        self.valid = false
+        self.error_messages << "Invalid due date"
+        self.issue_item[:invoice_due_date] = 'Invalid due date'
+      end
+
+      
+
+      unless invoice_number.blank? || validate_invoice_number(invoice_number)
+        self.valid = false
+        self.error_messages << "Invoice number can only have letters, numbers, dashes and forward slash and no other special characters"
+        self.issue_item[:invoice_number] = "Invoice number can only have letters, numbers, dashes and forward slash and no other special characters"
+      end
 
       unless validate_rate tax, 1, amount
         self.valid = false
@@ -241,6 +249,10 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       return false
     end
     true
+  end
+
+  def validate_invoice_number(invoice_number)
+    ( /\A[a-zA-Z0-9\/-]*\Z/.match(invoice_number) ) ? true : false
   end
 
   # def validate_amount(amount)
