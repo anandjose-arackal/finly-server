@@ -10,7 +10,7 @@ class Policy::Users::AddUser < Policy::Base
   attr_accessor :added_users, :admin
 
   def authorized_user_types
-    [:policy_admin, :admin]
+    [:policy_admin, :admin, :vendor_payments_admin]
   end
 
   def init
