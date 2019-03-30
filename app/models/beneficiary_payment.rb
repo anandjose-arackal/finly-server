@@ -51,6 +51,10 @@
     #      :net_amount_id => :integer,
     #    :gross_amount_id => :integer,
     #    :roundoff_amount => :decimal
+    #     :invoice_number => :text,
+    #       :invoice_date => :date,
+    #   :invoice_due_date => :date
+
 
 
 
@@ -126,7 +130,8 @@ class BeneficiaryPayment < ApplicationRecord
       tds_slab_name: self.tds_slab&.name,
       # tds_rate: self.tds,
       paid_amount: self.payments.successful.joins(:amount).sum(:value),
-      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
+      original_amount: precision_value(self.original_amount&.value)
   	}
   end
 

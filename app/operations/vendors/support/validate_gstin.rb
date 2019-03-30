@@ -35,19 +35,25 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     # First find in GSTIN Master
     self.gstin_master = Gstin.with_gstin(gstin_params[:gstin]).first
 
-    unless gstin_master.present?
+    if self.gstin_master.present?
+      self.valid_response = true
+    else
       if make_api_call
-        self.response_body = self.gstin_master.api_response
-        self.valid_response = true
-        request_business_name = gstin_params[:business_name]
-        response_business_name = gstin_master.legal_name_of_business
-
-        if request_business_name.present? && response_business_name.present?
-          self.match_percentile = StringUtils.fuzzy_string_match(request_business_name, response_business_name)
+        unless self.valid_response
+          return
         end
       else
         add_message :error, "Something went wrong. Please try again later"
+        return
       end
+    end
+
+    self.response_body = JSON.parse(self.gstin_master.api_response.to_json)
+    request_business_name = gstin_params[:business_name]
+    response_business_name = gstin_master.legal_name_of_business
+
+    if request_business_name.present? && response_business_name.present?
+      self.match_percentile = StringUtils.fuzzy_string_match(request_business_name, response_business_name)
     end
     #   # self.api_response = self.connection.get, { :gstin => gstin_params[:gstin] }
     #   self.api_response = self.connection.get
@@ -114,13 +120,15 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     self.api_response = self.connection.get
     self.api_call_count += 1
 
-    # debugger
     if self.api_response.status && self.api_response.status == 200
       self.response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(self.api_response.body)
       if self.response_body[:error]
         if (self.response_body[:error] == 'invalid_grant') && (self.api_call_count < 4) && authenticate
           make_api_call
-        else       
+        elsif self.response_body[:error].present? && self.response_body[:error].instance_of?(TrueClass)
+          # Do nothing as response body will be sent to frontend
+          return true
+        else
           add_message :error, "Something went wrong. Please try again later"
           return
         end
@@ -138,7 +146,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
 
 
   def authenticate
-    return true
+    # return true
     path = "#{Rails.root}/config/gstin_verification_config.yml"
     config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
     data = {}
@@ -195,7 +203,6 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     url = config_data[:base_url] + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
     headers = config_data[:search][:headers]
 
-    # debugger
     self.connection = Faraday.new(url: url) do |req|
       # req.url = url
       req.adapter Faraday.default_adapter # make requests with Net::HTTP

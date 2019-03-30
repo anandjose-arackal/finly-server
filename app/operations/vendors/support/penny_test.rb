@@ -14,7 +14,7 @@ class Vendors::Support::PennyTest < Vendors::Base
   end
 
   def validate
-    if bank_account_params[:account_number].blank? || !validate_ifsc(bank_account_params[:account_number])
+    if bank_account_params[:account_number].blank? || !valid_bank_account(bank_account_params[:account_number])
       add_message :error, "Please provide a valid bank account number"
     end
 

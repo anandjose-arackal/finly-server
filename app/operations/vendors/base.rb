@@ -28,7 +28,7 @@ class Vendors::Base < BaseOperation
                                    vendor_tds_rates_attributes: [:id, :tds_rates_list_id],
                                    bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :address_1, :address_2, :address_3, :pin_code, :country],
                                    vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :remove_file],
-                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location_id, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation]
+                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation]
     ) 
   end
 
@@ -118,7 +118,7 @@ class Vendors::Base < BaseOperation
       unless find_attachment(vendor_params[:vendor_attachments_attributes], type)
         add_message :error, "Please upload #{types[type]}"
       end
-    elsif self.vendor.present? && self.vendors.vendor_attachments.with_type(type).present?
+    elsif self.vendor.present? && self.vendor.vendor_attachments.with_type(type).present?
       # do nothing
     else
       add_message :error, "Please upload #{types[type]}"
