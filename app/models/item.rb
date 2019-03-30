@@ -46,6 +46,7 @@ class Item < ApplicationRecord
 
   # validates :rate, presence: true
   validates :description, presence: true
+  validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, :allow_blank => true
 
 
   accepts_nested_attributes_for :artifacts, allow_destroy: true

@@ -8,7 +8,12 @@ json.data do
   # json.refresh_token @token.refresh_token
   # json.expires_in @token.expires_in
   json.user do
-    json.extract! @user, :id, :name, :email, :mobile_number
+    json.extract! @user, :id, :name
+    if @user.otp_verified
+      json.extract! @user, :email, :mobile_number
+    else
+      json.extract! @user, :obfuscated_email, :obfuscated_mobile_number
+    end
     json.roles @user.user_roles, :id, :name
   end
   json.company do

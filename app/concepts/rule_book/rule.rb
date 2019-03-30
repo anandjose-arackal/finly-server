@@ -23,4 +23,8 @@ class RuleBook::Rule
     "#{self.page_tree} > #{self.description}"
   end
 
+  def to_s
+    full_description
+  end
+
 end

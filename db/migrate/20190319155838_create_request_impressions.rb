@@ -34,7 +34,7 @@ class CreateRequestImpressions < ActiveRecord::Migration[5.2]
       t.string :action, index: true
       t.string :view
       t.boolean :blocked, index: true
-      t.string :block_by, index: true
+      t.string :blocked_by, index: true
       t.string :block_reason, index: true
       t.decimal :response_code, index: true
       t.decimal :response_time, index: true

@@ -1,0 +1,17 @@
+Hi,<br><br>
+
+We detected an attempt to access your account, (<%= @email %>), from an unrecognized IP address/Device:<br>
+------------------------------------------<br>
+Time: <%= @timestamp %><br>
+IP Address: <%= @ip %><br>
+Browser: <%= @user_agent %><br>
+------------------------------------------<br>
+<br>
+To protect your Finly account, we have blocked the login attempt. If this was an authorized login, please provide the below token on the challenge page:<br>
+<%= @otp %><br><br>
+
+If this was not an authorized login, please change your password immediately.<br><br>
+
+If you have any questions or concerns, please contact Finly support at support@finly.io<br><br>
+
+The Finly Team

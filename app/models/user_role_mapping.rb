@@ -38,6 +38,8 @@ class UserRoleMapping < ApplicationRecord
   scope :reviewer_mappings_only, -> { where user_role_id: [UserRole.id_for(:manager), UserRole.id_for(:finance_manager), UserRole.id_for(:reviewer), UserRole.id_for(:creditor)] }
   scope :with_role_id, -> (role_id) { role(role_id) }
 
+  scope :only_admin_and_auditor, -> {where(user_role_id: [UserRole.id_for(:admin), UserRole.id_for(:auditor)])}
+
   before_destroy do
     employee_role_presence
   end

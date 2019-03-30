@@ -49,7 +49,6 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
       params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
       self.policies = Policy::VendorPayments::Index.(purchase_order.user, params).policies rescue Policy.none
-
       # Show taxes as applicable in the pdf based on this
       self.taxes_applicable_flag = taxes_applicable_flag?
 

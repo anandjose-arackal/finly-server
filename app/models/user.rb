@@ -233,6 +233,9 @@ class User < ApplicationRecord
 
   has_many :vendors, class_name: "YesBankVendor", foreign_key: :created_by_id
 
+  has_many :document_message_receipts
+  has_many :document_messages
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
@@ -1168,6 +1171,14 @@ class User < ApplicationRecord
     return nil if mobile_number.nil?
 
     "XXXXXXX#{mobile_number[(mobile_number.length - 3)..mobile_number.length]}"
+  end
+
+  def obfuscated_email
+    return nil if email.nil?
+
+    parts = email.split("@")
+    obfuscated = "X" * (parts.first.length - 2)
+    "#{parts.first[0..2].concat(obfuscated)}@#{parts.second}"
   end
 
   def status
