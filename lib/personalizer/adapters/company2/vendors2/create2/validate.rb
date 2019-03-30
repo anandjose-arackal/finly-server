@@ -27,10 +27,10 @@ class Personalizer::Adapters::Company2::Vendors2::Create2::Validate < Personaliz
       end
     end
 
-    if self.vendor_params[:state_code_id].blank?
-      add_message :error, "State cannot be blank"
-      return
-    end
+    # if self.vendor_params[:state_code_id].blank?
+    #   add_message :error, "State cannot be blank"
+    #   return
+    # end
 
   end
 end
