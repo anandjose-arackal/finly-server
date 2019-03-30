@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_29_115421) do
+ActiveRecord::Schema.define(version: 2019_03_29_143152) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -4048,6 +4048,8 @@ ActiveRecord::Schema.define(version: 2019_03_29_115421) do
     t.datetime "deleted_at"
     t.integer "beneficiary_payment_id"
     t.integer "bank_account_provider_id"
+    t.string "otp"
+    t.integer "opt_attempts"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"

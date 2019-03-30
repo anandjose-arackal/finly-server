@@ -85,7 +85,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     end
 
 
-    ###################################### OLD CODE #####################################
+    ###################################### START OLD CODE #####################################
 
     unless receiving_account_adapter.creditable_account?(payment.initiating_account)
       add_message :error, 'You cannot credit from this account'
@@ -134,7 +134,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
-    ###################################### OLD CODE #####################################
+    ###################################### END OLD CODE #####################################
 
 
     op = PaymentProcessorRules::Event.(:check_payment_status_in_executor, {payment: self.payment})

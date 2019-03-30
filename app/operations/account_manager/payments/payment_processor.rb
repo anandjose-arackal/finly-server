@@ -85,6 +85,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       add_message :error, payment_order.errors.full_messages
       return
     end
+
+    PaymentProcessorRules::Event.(:payment_order_status_is_pending, {payment: self.payment})
     # also set the payment order's status id as either scheduled or as pending
     if self.crediting_payments.present? && self.crediting_payments.pluck(:scheduled_at).uniq&.compact.blank?
       self.payment_order&.with_lock do
