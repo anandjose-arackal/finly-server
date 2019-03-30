@@ -69,7 +69,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         self.inward_invoice_params[:invoice_items_attributes].each do |item|
           po_item = self.purchase_order.items.find_by(inventory_line_item_id: item[:inventory_line_item_id])
 
-          item_q = (po_item.inventory_line_item.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
+          item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
 
           if item_q < item[:quantity].to_i
             add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
