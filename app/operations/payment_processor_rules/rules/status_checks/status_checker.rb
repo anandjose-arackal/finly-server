@@ -22,6 +22,10 @@ PaymentProcessorRules::Checker.new 'StatusChecker' do
         end
       end
     end
+
+    premise :payment_passes_standard_validations do
+
+    end
   end
 
   section 'on credit initiate' do

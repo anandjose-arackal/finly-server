@@ -72,6 +72,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     result = PaymentProcessorRules::Event.(:payment_passes_standard_validations, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
     unless result.success?
       add_message :error, result.messages
+      return
     end
 
     # op = AccountManager::Payments::PaymentValidator.(payment_order, self.crediting_payments, {payment_process: true})
