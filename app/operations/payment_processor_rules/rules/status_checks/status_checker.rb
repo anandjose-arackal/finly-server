@@ -6,7 +6,7 @@ PaymentProcessorRules::Checker.new 'StatusChecker' do
 
     end
 
-    premise :check_payment_status_is_pending do
+    premise :check_order_status_is_pending do
       rule 'Payment can only be in Pending State' do
         payment_order = params[:payment_order]
         crediting_payments = params[:crediting_payments]
