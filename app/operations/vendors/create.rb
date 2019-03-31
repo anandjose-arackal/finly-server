@@ -73,7 +73,7 @@ class Vendors::Create < Vendors::Base
         if ba.present?
           other_vendor = ba.account_owner
           self.similar_vendors.push(other_vendor)
-          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{other_vendor.business_name - other_vendor.vendor_id}"
+          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{other_vendor.business_name} - #{other_vendor.vendor_id}"
         end
       end
     end
