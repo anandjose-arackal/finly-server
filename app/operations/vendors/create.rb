@@ -1,4 +1,5 @@
 class Vendors::Create < Vendors::Base
+  attr_accessor :similar_vendors
 
   class Vendors::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :vendor
