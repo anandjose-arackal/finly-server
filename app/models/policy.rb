@@ -148,7 +148,7 @@ class Policy < ApplicationRecord
         end
       end
     rescue
-      add_message :error, 'Unable to perform update'
+      false
     end
   end
 
@@ -158,11 +158,11 @@ class Policy < ApplicationRecord
       ActiveRecord::Base.transaction do
         self.policy_location_mappings.destroy_all
         params[:policy_location_mappings_attributes].each do |policy_location|
-          result = self.policy_location.create!(location_id: policy_location[:location_id], enabled: policy_location[:enabled])
+          result = self.policy_location_mappings.create!(location_id: policy_location[:location_id], enabled: policy_location[:enabled])
         end
       end
     rescue
-      add_message :error, 'Unable to perform update'
+      false
     end
   end
 
