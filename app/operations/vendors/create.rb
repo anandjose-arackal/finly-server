@@ -1,5 +1,5 @@
 class Vendors::Create < Vendors::Base
-  attr_accessor :similar_vendors
+  attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors
 
   class Vendors::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :vendor
@@ -10,7 +10,6 @@ class Vendors::Create < Vendors::Base
 
   end
 
-  attr_accessor :vendor_parameters, :vendor, :account_owner_type
 
   def personalizer
     {
@@ -23,6 +22,7 @@ class Vendors::Create < Vendors::Base
   def init
     # super()
     self.vendor_parameters = vendor_attributes
+    self.similar_vendors = []
     # setting account owner type as vendor
   end
 
