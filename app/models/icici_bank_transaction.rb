@@ -39,4 +39,6 @@ class IciciBankTransaction < ApplicationRecord
   validates :amount_id, presence: true
 
   accepts_nested_attributes_for :amount
+
+  alias_method :bank_reference_number, :utr
 end

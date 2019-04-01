@@ -2,6 +2,7 @@
 require 'support/database_cleaner'
 require 'support/factory_bot'
 require 'support/shared_examples'
+require 'support/shared_payment_examples'
 
 # Dir[Rails.root.join("spec/support/*.rb")].each { |f| require f }
 

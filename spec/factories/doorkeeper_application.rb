@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :doorkeeper_application, class: Doorkeeper::Application do
+  factory :doorkeeper_application, class: ::Doorkeeper::Application do
     name {Faker::Company.name}
     uid {SecureRandom.hex(32)}
     secret {SecureRandom.hex(32)}

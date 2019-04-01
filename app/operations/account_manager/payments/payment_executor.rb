@@ -27,15 +27,19 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   end
 
   def validate
-    if receiving_account_adapter.blank? || initiating_account.blank?
+    if receiving_account_adapter.blank? || source_account_adapter.blank?
       add_message :error, 'Error loading payment'
       return
     end
 
+    # unless the payment is outside Finly, the receiving account and initiating account needs to be present
+
+
     # Below each rule engine operation will validate the payment against certain criteria,
     # and mark the payment as failed and add error messages according to the criteria
 
-    ################# Source account validations #######################
+    ################# Start Source account validations #######################
+
     op = PaymentProcessorRules::Event.(:check_source_account_debitable, {payment: self.payment})
     unless op.success?
       add_message :error, op.messages
@@ -58,9 +62,10 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
-    ################# Source account validations ########################
+    ################# End Source account validations ########################
 
-    ################# Receiving account validations #####################
+
+    ####################### Start Receiving account validations #####################
 
     op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment})
     unless op.success?
@@ -84,97 +89,95 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
+    ####################### End Receiving account validations ######################
+
+
 
     ###################################### START OLD CODE #####################################
 
-    unless receiving_account_adapter.creditable_account?(payment.initiating_account)
-      add_message :error, 'You cannot credit from this account'
-      payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "You cannot credit from #{source_account_name} to #{receiving_account_name}").save
-      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      return
-    end
-
-    unless receiving_account_adapter.eligibility(payment.amount_value)
-      add_message :error, 'Insufficient eligibility to transfer the funds'
-      payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value} due to lack of eligibility",
-                                        system_message_type_id: SystemMessageType.id_for(:error)).save
-      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      return
-    end
-
-    if source_account_adapter.present?
-      unless source_account_adapter.debitable_account?(payment.receiving_account)
-        add_message :error, "You cannot debit to this account"
-        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "You cannot debit from #{receiving_account_name} to #{source_account_name}").save
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-        return
-      end
-
-
-      if payment.credit?
-        balance = source_account_adapter.balance(payment_order: payment.payment_order, payment_process: true)
-        unless balance and balance >= payment.amount_value
-          add_message :error, "The source account does not have enough balance for this transaction"
-          payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                        content: "Not enough funds in #{payment.initiating_account_type.to_s} to initiate the transfer").save
-          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-          return
-        end
-      else
-        balance = receiving_account_adapter.balance(payment_order: payment.payment_order, payment_process: true)
-        unless balance and balance >= payment.amount_value
-          add_message :error, "The source account does not have enough balance for this transaction"
-          payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                        content: "Not enough funds in #{payment.receiving_account_type.to_s} to initiate the transfer").save
-          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-          return
-        end
-      end
-    end
+    # unless receiving_account_adapter.creditable_account?(payment.initiating_account)
+    #   add_message :error, 'You cannot credit from this account'
+    #   payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+    #                                 content: "You cannot credit from #{source_account_name} to #{receiving_account_name}").save
+    #   payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+    #   return
+    # end
+    #
+    # unless receiving_account_adapter.eligibility(payment.amount_value)
+    #   add_message :error, 'Insufficient eligibility to transfer the funds'
+    #   payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value} due to lack of eligibility",
+    #                                     system_message_type_id: SystemMessageType.id_for(:error)).save
+    #   payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+    #   return
+    # end
+    #
+    # if source_account_adapter.present?
+    #   unless source_account_adapter.debitable_account?(payment.receiving_account)
+    #     add_message :error, "You cannot debit to this account"
+    #     payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+    #                                   content: "You cannot debit from #{receiving_account_name} to #{source_account_name}").save
+    #     payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+    #     return
+    #   end
+    #
+    #
+    #   if payment.credit?
+    #     balance = source_account_adapter.balance(payment_order: payment.payment_order, payment_process: true)
+    #     unless balance and balance >= payment.amount_value
+    #       add_message :error, "The source account does not have enough balance for this transaction"
+    #       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+    #                                     content: "Not enough funds in #{payment.initiating_account_type.to_s} to initiate the transfer").save
+    #       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+    #       return
+    #     end
+    #   else
+    #     balance = receiving_account_adapter.balance(payment_order: payment.payment_order, payment_process: true)
+    #     unless balance and balance >= payment.amount_value
+    #       add_message :error, "The source account does not have enough balance for this transaction"
+    #       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+    #                                     content: "Not enough funds in #{payment.receiving_account_type.to_s} to initiate the transfer").save
+    #       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+    #       return
+    #     end
+    #   end
+    # end
 
     ###################################### END OLD CODE #####################################
 
 
-    op = PaymentProcessorRules::Event.(:check_payment_status_in_executor, {payment: self.payment})
+    # op = PaymentProcessorRules::Event.(:check_for_invalid_payment_statuses, {payment: self.payment})
+    # unless op.success?
+    #   add_message :error, op.messages
+    #   return
+    # end
+
+    # redundant because pending check is happening anyway
+    # if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
+    #   add_system_message :error, self.payment, "Payment cannot be processed in this state"
+    #   add_message :error, "Payment cannot be processed in this state"
+    #   return
+    # end
+
+    op = PaymentProcessorRules::Event.(:check_receiving_account_is_creditable, {payment: self.payment})
     unless op.success?
       add_message :error, op.messages
       return
     end
 
-    if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
-      add_system_message :error, self.payment, "Payment cannot be processed in this state"
-      add_message :error, "Payment cannot be processed in this state"
-      return
-    end
+    # # checking to see if the receiving account is a bank account if it has been disabled by any chance
+    # if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.disabled?
+    #   add_system_message :error, self.payment, "You cannot make transfers to this bank account as it has been blacklisted"
+    #   add_message :error, "You cannot make transfers to this bank account as it has been blacklisted"
+    #   return
+    # end
 
-    op = PaymentProcessorRules::Event.(:check_if_receiving_account_is_disabled, {payment: self.payment})
-    unless op.success?
-      add_message :error, op.messages
-      return
-    end
-
-    # checking to see if the receiving account is a bank account if it has been disabled by any chance
-    if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.disabled?
-      add_system_message :error, self.payment, "You cannot make transfers to this bank account as it has been blacklisted"
-      add_message :error, "You cannot make transfers to this bank account as it has been blacklisted"
-      return
-    end
-
-    op = PaymentProcessorRules::Event.(:check_if_receiving_account_is_on_hold, {payment: self.payment})
-    unless op.success?
-      add_message :error, op.messages
-      return
-    end
-
-    # checking if the particular beneficiary is kept on hold
-    if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.on_hold?
-      add_system_message :error, self.payment, "Transfers to this account have been temporarily put on hold"
-      Event::EAlert::Create.(nil, title: 'Payment attempted for on hold account', description: "Payment attempted for on hold account. Details: #{self.payment.as_json}", subject: 'Payment attempted for on hold account')
-      add_message :error, "Transfers to this account have been temporarily put on hold"
-      return
-    end
+    # # checking if the particular beneficiary is kept on hold
+    # if self.payment.receiving_account.is_a?(BankAccount) && self.payment.receiving_account.on_hold?
+    #   add_system_message :error, self.payment, "Transfers to this account have been temporarily put on hold"
+    #   Event::EAlert::Create.(nil, title: 'Payment attempted for on hold account', description: "Payment attempted for on hold account. Details: #{self.payment.as_json}", subject: 'Payment attempted for on hold account')
+    #   add_message :error, "Transfers to this account have been temporarily put on hold"
+    #   return
+    # end
 
     op = PaymentProcessorRules::Checker.(:ensure_payments_are_pending_before_processing, {payment: self.payment})
     unless op.success?
@@ -182,16 +185,16 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
-    self.payment.with_lock do
-      self.payment.reload
-      unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
-        add_system_message :error, self.payment, "Payment cannot be processed in this state"
-        add_message :error, "Payment cannot be processed in this state"
-        return
-      end
-      # update payment to in progress
-      payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
-    end
+    # self.payment.with_lock do
+    #   self.payment.reload
+    #   unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
+    #     add_system_message :error, self.payment, "Payment cannot be processed in this state"
+    #     add_message :error, "Payment cannot be processed in this state"
+    #     return
+    #   end
+    #   # update payment to in progress
+    #   payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
+    # end
 
   end
 

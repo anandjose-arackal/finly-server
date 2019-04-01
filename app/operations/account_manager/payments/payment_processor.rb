@@ -69,24 +69,23 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   def validate
     # by this time the payment order will exist for sure
     # Call the payment validator class that validates the payment order
-    result = PaymentProcessorRules::Event.(:payment_passes_standard_validations, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
-    unless result.success?
-      add_message :error, result.messages
+
+    op = AccountManager::Payments::PaymentValidator.(payment_order, self.crediting_payments, {payment_process: true})
+    unless op.success?
+      add_message :error, op.messages[:error]
       return
     end
-
-    # op = AccountManager::Payments::PaymentValidator.(payment_order, self.crediting_payments, {payment_process: true})
-    # unless op.success?
-    #   add_message :error, op.messages[:error]
-    # end
   end
 
   def pre_process
 
     # also set the payment order's status id as either scheduled or as pending
     if self.crediting_payments.present? && self.crediting_payments.pluck(:scheduled_at).uniq&.compact.blank?
-      PaymentProcessorRules::Event.(:payments_being_credited_immediately, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
-
+      op = PaymentProcessorRules::Event.(:payments_being_credited_immediately, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
+      unless op.success?
+        add_message :error, op.message
+        return
+      end
       # self.payment_order&.with_lock do
       #   self.payment_order.reload # kinda redundant since with_lock already reloads the data
       #   if self.payment_order.pending? || self.payment_order.in_progress?
@@ -99,8 +98,11 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       # end
     else
       if payment_order.scheduled_at.present? && payment_order.scheduled_at > DateUtils.local_date
-        PaymentProcessorRules::Event.(:payments_being_scheduled_for_later, {payment_ordeR: self.payment_order, crediting_payments: self.crediting_payments})
-
+        op = PaymentProcessorRules::Event.(:payments_being_scheduled_for_later, {payment_ordeR: self.payment_order, crediting_payments: self.crediting_payments})
+        unless op.success?
+          add_message :error, op.message
+          return
+        end
         # payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
         # if self.crediting_payments.present?
         #   self.crediting_payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
@@ -108,7 +110,11 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         #   self.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
         # end
       else
-        PaymentProcessorRules::Event.(:payments_being_credited_immediately, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
+        op = PaymentProcessorRules::Event.(:payments_being_credited_immediately, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
+        unless op.success?
+          add_message :error, op.message
+          return
+        end
         # self.payment_order.with_lock do
         #   self.payment_order.reload # kinda redundant since with_lock already reloads the data
         #   if self.payment_order.pending? || self.payment_order.in_progress?

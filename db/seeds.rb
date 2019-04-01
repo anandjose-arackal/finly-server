@@ -775,3 +775,7 @@ seedable_classes.each do |seedable_class|
     seedable_class.seed_data
   end
 end
+
+############## Seeding payment processor related classes ##############
+PaymentStatus.seed_data
+BankTransferStatus.seed_data
