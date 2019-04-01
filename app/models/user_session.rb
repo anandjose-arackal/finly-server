@@ -68,7 +68,7 @@ class UserSession < ApplicationRecord
 
   def verify(verification_mode)
     self.user_ip.update_attributes(status_id: UserIpStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
-    self.user_agent&.update_attributes(status_id: UserAgentClientStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
+    self.user_agent_client&.update_attributes(status_id: UserAgentClientStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
     self.user_device&.update_attributes(status_id: UserDeviceStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
   end
 
