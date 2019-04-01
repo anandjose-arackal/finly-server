@@ -38,7 +38,7 @@ class PasswordsController < Devise::PasswordsController
       format.json {
         if resource.errors.empty?
           # set the default password flag to be false
-          resource.update(verified: true, default_password: false)
+          resource.update(verified: true, default_password: false, expired_at: nil, last_activity_at: DateTime.now, password_changed_at: DateTime.now)
           respond response: :success, message: 'Password reset successfully'
           # todo send mailer/SMS on password change
           if resource.email.present?
