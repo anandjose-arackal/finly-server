@@ -4,7 +4,7 @@ class BalanceTallyLedgerProcess < ActiveJob::Base
 
   def perform
     # this will update the balance for today's date on the two balances
-    relevant_companies = Company.all.joins(:feature_subscription).where('feature_subscriptions.current_account_connected IN (?)', [false, nil])
+    relevant_companies = Company.all.joins(:feature_subscription).where('feature_subscriptions.current_account_connected = ? OR feature_subscriptions.current_account_connected IS ?', false, nil)
     company_balance = YesBankCompanyAccount.with_company_id(relevant_companies.pluck(:id)).joins(:balance).sum(:value)
     users = User.with_company_id(relevant_companies.pluck(:id))
     wallet_balance = VendorPaymentWallet.with_user_id(users.pluck(:id)).joins(:balance).sum(:value)
