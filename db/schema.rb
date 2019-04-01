@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_30_065418) do
+ActiveRecord::Schema.define(version: 2019_03_30_132445) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -130,6 +130,7 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.string "last_name"
     t.string "mobile_number", null: false
     t.string "encrypted_master_password"
+    t.string "authorized_ip"
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -665,12 +666,18 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.integer "gross_amount_id"
     t.decimal "roundoff_amount", precision: 10
     t.integer "cost_center_id"
+    t.text "invoice_number"
+    t.date "invoice_date"
+    t.date "invoice_due_date"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
     t.index ["category_id"], name: "index_beneficiary_payments_on_category_id"
     t.index ["company_id"], name: "index_beneficiary_payments_on_company_id"
     t.index ["cost_center_id"], name: "index_beneficiary_payments_on_cost_center_id"
     t.index ["department_id"], name: "index_beneficiary_payments_on_department_id"
     t.index ["gst_type_id"], name: "index_beneficiary_payments_on_gst_type_id"
+    t.index ["invoice_date"], name: "index_beneficiary_payments_on_invoice_date"
+    t.index ["invoice_due_date"], name: "index_beneficiary_payments_on_invoice_due_date"
+    t.index ["invoice_number"], name: "index_beneficiary_payments_on_invoice_number", length: 20
     t.index ["original_amount_id"], name: "index_beneficiary_payments_on_original_amount_id"
     t.index ["payable_amount_id"], name: "index_beneficiary_payments_on_payable_amount_id"
     t.index ["status_id"], name: "index_beneficiary_payments_on_status_id"
@@ -3752,6 +3759,7 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.string "previous_refresh_token", default: "", null: false
     t.integer "status_id", default: 1
     t.text "message"
+    t.integer "admin_user_id"
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
@@ -5955,6 +5963,7 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.integer "user_ip_id"
     t.integer "user_agent_id"
     t.integer "user_agent_client_id"
+    t.integer "admin_user_id"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"

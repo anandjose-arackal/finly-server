@@ -12,68 +12,101 @@ Doorkeeper.configure do
   end
 
   resource_owner_from_credentials do |routes|
-    u = nil
-    scopes = params.dig(:scope)&.split(' ')
-    if params[:username].blank? || params[:password].blank? # && !(params[:sso_skip_password]))
-      u = nil
-      if params[:username].blank?
-        Gatekeeper::Event.(:user_login_blank_username)
-        params[:user] = u
-        params[:message] = 'Blank Password'
-        UserSessions::Create.(:failed, params)
-      elsif params[:password].blank?
-        Gatekeeper::Event.(:user_login_blank_password)
-        params[:user] = u
-        params[:message] = 'Blank Password'
-        UserSessions::Create.(:failed, params)
-      end
-    else
-      if scopes.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes.first)
-        u = User.find_for_database_authentication(:username => params[:username])
-      elsif (scopes.size == 1 and scopes.include?("admin")) or (scopes.include?("admin_bypass") and scopes.include?("web") and scopes.size == 2)
-        u = AdminUser.find_for_database_authentication(:username => params[:username])
-      end
-      if u
-        result = Gatekeeper::Event.(:user_login_attempt, user: u)
-        if not result.success?
-          # Do not attempt login as the user account is locked
-          u = nil
-          params[:user] = u
-          params[:message] = result.message
-          UserSessions::Create.(:blocked, params)
-        elsif u.valid_password?(params[:password])
-          if scopes.include?("admin_bypass")
-            BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join("config/data/bypass_authorized_users.yml"))&.dig("authorized_users")
-            if params[:for_user_id].present? and BYPASS_AUTHORIZED_USERS&.include?(u.email) and u.valid_master_password?(params[:master_password])
-              u = User.find_by_id(params[:for_user_id])
-              u = nil if u.company_id == 40
-            else
-              u = nil
-            end
-          else
-            result = Gatekeeper::Event.(:user_login_success, user: u)
-            unless result.success?
-              params[:user] = u
-              params[:message] = result.message
-              UserSessions::Create.(:blocked, params)
-              u = nil
-            end
-          end
-        else
-          Gatekeeper::Event.(:user_login_invalid_password, user: u)
-          params[:user] = u
-          params[:message] = 'Invalid Password'
-          UserSessions::Create.(:failed, params)
-          u = nil
-        end
-      else
-        Gatekeeper::Event.(:user_login_invalid_username)
-        params[:user] = u
-        params[:message] = 'Invalid Username'
-        UserSessions::Create.(:failed, params)
-      end
-    end
-    u
+    Authenticator.new(params).authenticate
+    # u = nil
+    # scopes = params.dig(:scope)&.split(' ')
+    # if params[:username].blank? || params[:password].blank? # && !(params[:sso_skip_password]))
+    #   u = nil
+    #   if params[:username].blank?
+    #     Gatekeeper::Event.(:user_login_blank_username)
+    #     params[:user] = u
+    #     params[:message] = 'Blank Password'
+    #     UserSessions::Create.(:failed, params)
+    #   elsif params[:password].blank?
+    #     Gatekeeper::Event.(:user_login_blank_password)
+    #     params[:user] = u
+    #     params[:message] = 'Blank Password'
+    #     UserSessions::Create.(:failed, params)
+    #   end
+    # else
+    #   if scopes.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes.first)
+    #     u = User.find_for_database_authentication(:username => params[:username])
+    #   elsif (scopes.size == 1 and scopes.include?("admin")) or (scopes.include?("admin_bypass") and scopes.include?("web") and scopes.size == 2)
+    #     u = AdminUser.find_for_database_authentication(:username => params[:username])
+    #   end
+    #   if scopes.include?("admin_bypass")
+    #     if u
+    #       result = Gatekeeper::Event.(:user_login_attempt, user: u)
+    #       if not result.success?
+    #         # Do not attempt login as the user account is locked
+    #         u = nil
+    #         params[:user] = u
+    #         params[:message] = result.message
+    #         UserSessions::Create.(:blocked, params)
+    #       elsif u.valid_password?(params[:password])
+    #         if scopes.include?("admin_bypass")
+    #           BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join("config/data/bypass_authorized_users.yml"))&.dig("authorized_users")
+    #           if params[:for_user_id].present? and BYPASS_AUTHORIZED_USERS&.include?(u.email) and u.valid_master_password?(params[:master_password])
+    #             u = User.find_by_id(params[:for_user_id])
+    #             u = nil if u.company_id == 40
+    #           else
+    #             u = nil
+    #           end
+    #         else
+    #           result = Gatekeeper::Event.(:user_login_success, user: u)
+    #           unless result.success?
+    #             params[:user] = u
+    #             params[:message] = result.message
+    #             UserSessions::Create.(:blocked, params)
+    #             u = nil
+    #           end
+    #         end
+    #       else
+    #         Gatekeeper::Event.(:user_login_invalid_password, user: u)
+    #         params[:user] = u
+    #         params[:message] = 'Invalid Password'
+    #         UserSessions::Create.(:failed, params)
+    #         u = nil
+    #       end
+    #     else
+    #       Gatekeeper::Event.(:user_login_invalid_username)
+    #       params[:user] = u
+    #       params[:message] = 'Invalid Username'
+    #       UserSessions::Create.(:failed, params)
+    #     end
+    #   else
+    #     if u
+    #       result = Gatekeeper::Event.(:user_login_attempt, user: u)
+    #       if not result.success?
+    #         # Do not attempt login as the user account is locked
+    #         u = nil
+    #         params[:user] = u
+    #         params[:message] = result.message
+    #         UserSessions::Create.(:blocked, params)
+    #       elsif u.valid_password?(params[:password])
+    #         result = Gatekeeper::Event.(:user_login_success, user: u)
+    #         unless result.success?
+    #           params[:user] = u
+    #           params[:message] = result.message
+    #           UserSessions::Create.(:blocked, params)
+    #           u = nil
+    #         end
+    #       else
+    #         Gatekeeper::Event.(:user_login_invalid_password, user: u)
+    #         params[:user] = u
+    #         params[:message] = 'Invalid Password'
+    #         UserSessions::Create.(:failed, params)
+    #         u = nil
+    #       end
+    #     else
+    #       Gatekeeper::Event.(:user_login_invalid_username)
+    #       params[:user] = u
+    #       params[:message] = 'Invalid Username'
+    #       UserSessions::Create.(:failed, params)
+    #     end
+    #   end
+    # end
+    # u
   end
 
   grant_flows %w[password]

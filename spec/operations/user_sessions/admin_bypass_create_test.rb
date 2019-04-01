@@ -135,7 +135,7 @@ class UserSessionCreateHelper
   end
 end
 
-RSpec.describe 'UserSessions::Create' do
+RSpec.describe 'UserSessions::AdminBypassCreate' do
 
   describe '> Browser' do
     # Setup users
