@@ -1,12 +1,14 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
-  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement
+  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement,
+                :gstin_locations
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:invoice, :custom_fields)
+    self.gstin_location = self.inward_invoice&.vendor&.gstin_locations.find_by(id: purchase_order_params[:gstin_location_id]) || self.purchase_order.vendor&.gstin_locations.first
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
 
     if self.inward_invoice.procurement.present?
@@ -82,6 +84,12 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def pre_process
+    # update gstin location id
+    if self.gstin_location.present?
+      self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+    end
+
+
     # adding id for original_amount and freight_amount so that new copies aren't created every time
     if inward_invoice_params&.dig(:original_amount_attributes).present?
       inward_invoice_params[:original_amount_attributes][:id] = self.inward_invoice&.original_amount&.id
