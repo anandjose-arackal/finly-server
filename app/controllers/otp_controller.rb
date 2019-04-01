@@ -29,7 +29,7 @@ class OtpController < BaseControllers::WebBase
     @result = User::Verification::Otp::Verify.(current_user, params)
     if @result.success?
       flash[:success] = @result.messages[:success].first rescue nil
-      respond response: :success, set_password_token: @result.set_password_token
+      respond
     else
       flash[:failure] = @result.messages[:error].first rescue nil
       respond response: :failure
