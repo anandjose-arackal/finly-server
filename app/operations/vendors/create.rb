@@ -134,6 +134,7 @@ class Vendors::Create < Vendors::Base
       self.vendor.update(authorized: true)
     else
       self.vendor = user.company.yes_bank_vendors.build(vendor_parameters)
+      self.vendor.authorized = true
       validate_custom_fields(true)
       return if has_errors?
       if self.vendor.save
