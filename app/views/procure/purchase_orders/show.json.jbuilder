@@ -182,6 +182,12 @@ json.locations do
   end
 end
 
+json.gstin_locations do
+  json.array! @result.gstin_locations do |gstin_location|
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number
+  end
+end
+
 json.tds_slabs do
     json.array!(@result.tds_slabs.tds_slabs) do |tds_slab|
       json.id tds_slab.id
