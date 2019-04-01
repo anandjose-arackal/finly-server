@@ -56,10 +56,12 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
   end
 
   def post_process
-    raw, enc = Devise.token_generator.generate(User, :reset_password_token)
-    self.set_password_token = raw
-    selected_user.update_attribute(:reset_password_token, enc)
-    selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
+    if selected_user.expired?
+      raw, enc = Devise.token_generator.generate(User, :reset_password_token)
+      self.set_password_token = raw
+      selected_user.update_attribute(:reset_password_token, enc)
+      selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
+    end
   end
 
   def success
