@@ -8,16 +8,6 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
     User
   end
 
-  def on_attempt(message)
-    result = Gatekeeper::Event.(:user_login_attempt, user: self.unauthenticated_user)
-    unless result.success?
-      params[:user] = self.unauthenticated_user
-      params[:message] = result.message
-      UserSessions::Create.(:blocked, params)
-      block
-    end
-  end
-
   def on_blank_username(message)
     Gatekeeper::Event.(:user_login_blank_username)
     params[:user] = self.unauthenticated_user
@@ -37,6 +27,16 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
     params[:user] = self.unauthenticated_user
     params[:message] = message || 'Invalid Username'
     UserSessions::Create.(:failed, params)
+  end
+
+  def on_attempt(message)
+    result = Gatekeeper::Event.(:user_login_attempt, user: self.unauthenticated_user)
+    unless result.success?
+      params[:user] = self.unauthenticated_user
+      params[:message] = result.message
+      UserSessions::Create.(:blocked, params)
+      block
+    end
   end
 
   def on_invalid_password(message)
