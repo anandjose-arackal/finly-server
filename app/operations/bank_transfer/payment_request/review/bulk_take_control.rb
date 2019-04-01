@@ -34,10 +34,10 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
         valid = false
       end
 
-      if bank_payment_request.controlling_for_user.present?
-        # add_message :error, "Payment requets already in control for #{bank_payment_request.id}"
-        valid = false
-      end
+      # if bank_payment_request.controlling_for_user.present?
+      #   # add_message :error, "Payment requets already in control for #{bank_payment_request.id}"
+      #   valid = false
+      # end
 
       unless valid
         reject_bpr << bank_payment_request
