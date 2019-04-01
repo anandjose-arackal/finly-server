@@ -28,13 +28,14 @@ class Vendors::Create < Vendors::Base
 
   def validate
     # Policy Selection
+    policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
     if user.company.vendor_empanelment_workflow_enabled?
       unless user.is_vendor_manager?
-        policies = Policy::VendorPayments::Index.(user, {filter_role_id: [UserRole.id_for(:vendor_creator)]}).policies
 
+        policy_ids = policies.pluck(:id)
         parameters = {
           filter_associated_entity_type: "YesBankVendorProvider",
-          filter_policy_ids: policies.pluck(:id)
+          filter_policy_ids: policy_ids
         }
 
         levels = ReviewalLevels::Index.(user, parameters).levels
@@ -43,9 +44,18 @@ class Vendors::Create < Vendors::Base
           unless self.vendor_parameters[:policy_id].present?
             add_message :error, "Please select a policy"
           end
+
+          unless policies.include?(vendor_parameters[:policy_id].to_i)
+            add_message "Unknown policy"
+          end
         end
       end
     end
+
+    # validate policy
+
+
+
 
     unless vendor_parameters[:pan].present?
       add_message :error, "Please provide PAN to proceed"
