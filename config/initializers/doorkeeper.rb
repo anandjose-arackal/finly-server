@@ -31,7 +31,7 @@ Doorkeeper.configure do
       if scopes.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes.first)
         u = User.find_for_database_authentication(:username => params[:username])
       elsif (scopes.size == 1 and scopes.include?("admin")) or (scopes.include?("admin_bypass") and scopes.include?("web") and scopes.size == 2)
-        u = AdminUser.find_for_database_authentication(:username => paramseval[:username])
+        u = AdminUser.find_for_database_authentication(:username => params[:username])
       end
       if u
         result = Gatekeeper::Event.(:user_login_attempt, user: u)

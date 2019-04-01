@@ -45,6 +45,10 @@ class RequestStoreUtil
     RequestStore.store[:request_impression] = request_impression
   end
 
+  def self.set_current_admin_user(admin_user)
+    RequestStore.store[:current_admin_user] = admin_user
+  end
+
   def self.to_hash
     {
         current_app: RequestStore.store[:current_app],
@@ -57,6 +61,7 @@ class RequestStoreUtil
         current_token_id: RequestStore.store[:current_token]&.id,
         authorized_scopes: RequestStore.store[:authorized_scopes],
         request_impression_id: RequestStore.store[:request_impression]&.id,
+        current_admin_user_id: RequestStore.store[:current_admin_user]&.id,
         params: RequestStore.store[:params]
     }
   end
@@ -73,6 +78,8 @@ class RequestStoreUtil
     RequestStore.store[:current_session_event] = UserSessionEvent.find_by_id(request_store_data[:current_session_event_id])
     RequestStore.store[:current_token] = Doorkeeper::AccessToken.find_by_id(request_store_data[:current_token_id])
     RequestStore.store[:request_impression] = RequestImpression.find_by_id(request_store_data[:request_impression_id])
+    RequestStore.store[:current_admin_user] = AdminUser.find_by_id(request_store_data[:current_admin_user_id])
+
     case request_store_data[:current_user_type]
       when User.name
         RequestStore.store[:current_user] = User.with_id(request_store_data[:current_user_id])&.first
@@ -123,6 +130,10 @@ class RequestStoreUtil
 
   def self.request_impression
     RequestStore.store[:request_impression]
+  end
+
+  def self.current_admin_user
+    RequestStore.store[:current_admin_user]
   end
 
 end

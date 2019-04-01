@@ -2,6 +2,10 @@ json.extract! @result.procurement, :id, :name, :note, :procurement_type
 
 if @result.vendor.present?
   json.vendor @result.vendor.as_json
+else
+  # For non PO procurements
+  invoice = @result.invoices&.last&.vendor
+  json.vendor invoice.as_json rescue nil
 end
 
 json.procurement_status do

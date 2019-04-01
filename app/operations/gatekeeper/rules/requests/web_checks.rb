@@ -17,6 +17,7 @@ Gatekeeper::Checker.new 'On New Request' do
       message 'Browser IP mismatch'
       session_status_id UserSessionStatus.id_for(:blocked)
       response_code 401
+      level 3
       fail
     end
 
@@ -25,6 +26,7 @@ Gatekeeper::Checker.new 'On New Request' do
         message 'User agent is blank in the request'
         session_status_id UserSessionStatus.id_for(:blocked)
         response_code 401
+        level 3
         fail
       end
     end
@@ -37,6 +39,7 @@ Gatekeeper::Checker.new 'On New Request' do
       message 'UserAgent mismatch'
       session_status_id UserSessionStatus.id_for(:blocked)
       response_code 401
+      level 3
       fail
 
     end
@@ -48,6 +51,7 @@ Gatekeeper::Checker.new 'On New Request' do
         message 'Session timeout'
         session_status_id UserSessionStatus.id_for(:revoked)
         response_code 401
+        level 3
         fail
       end
     end
@@ -69,6 +73,7 @@ Gatekeeper::Checker.new 'On New Request' do
         message 'User is expired'
         session_status_id UserSessionStatus.id_for(:blocked)
         response_code 401
+        level 5
         fail
       end
 
@@ -106,6 +111,7 @@ Gatekeeper::Checker.new 'On New Request' do
         message 'User OTP is not verified'
         session_status_id UserSessionStatus.id_for(:blocked)
         response_code 401
+        level 5
         fail
       end
     end
@@ -158,6 +164,7 @@ Gatekeeper::Checker.new 'On New Request' do
           message 'User IP is not OTP verified'
           session_status_id UserSessionStatus.id_for(:blocked)
           response_code 401
+          level 5
           fail
         end
       end
@@ -170,6 +177,7 @@ Gatekeeper::Checker.new 'On New Request' do
           message 'User IP is blocked'
           session_status_id UserSessionStatus.id_for(:blocked)
           response_code 401
+          level 5
           fail
         end
       end
@@ -178,7 +186,7 @@ Gatekeeper::Checker.new 'On New Request' do
     section 'New UserAgent' do
       section 'Unverified' do
         before do
-          skip unless RequestStoreUtil.current_session.user_agent.status_id == UserAgentStatus.id_for(:unverified)
+          skip unless RequestStoreUtil.current_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:unverified)
         end
         rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
           pass = false
@@ -191,18 +199,20 @@ Gatekeeper::Checker.new 'On New Request' do
           message 'User IP is not OTP verified'
           session_status_id UserSessionStatus.id_for(:blocked)
           response_code 401
+          level 5
           fail
         end
       end
 
       section 'Blocked' do
         before do
-          skip unless RequestStoreUtil.current_session.user_agent.status_id == UserAgentStatus.id_for(:blocked)
+          skip unless RequestStoreUtil.current_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:blocked)
         end
         rule 'do not allow access to blocked IPs' do
           message 'User IP is blocked'
           session_status_id UserSessionStatus.id_for(:blocked)
           response_code 401
+          level 5
           fail
         end
       end

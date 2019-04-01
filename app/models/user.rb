@@ -690,6 +690,24 @@ class User < ApplicationRecord
     end
   }
 
+  scope :filter_unassigned_non_po_initiator_for_policy, -> (policy_id){
+    # policy = Policy.find_by_id policy_id
+    # if policy.present?
+    #   user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_initiator)).pluck(:user_id)
+    #   without_id(user_ids)
+    # end
+    role_ids = [UserRole.id_for(:non_po_initiator)]
+    filter_unassigned_roles_for_policy(policy_id, role_ids)    
+  }
+
+  scope :filter_unassigned_roles_for_policy, -> (policy_id, role_ids){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id([role_ids]).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
   before_save :strip_whitespace
 
   after_create do

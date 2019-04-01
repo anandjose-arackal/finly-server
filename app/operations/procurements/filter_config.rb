@@ -5,7 +5,7 @@ class Procurements::FilterConfig < Procurements::Base
     self.status_tags = StatusTag.all
     self.po_statuses = PurchaseOrderStatus.all
     self.invoice_statuses = InwardInvoiceStatus.all
-    self.locations = user.company.locations
+    self.locations = user.company.locations if user.vp_admin_or_auditor?
     self.departments = user.company.departments.roots
     self.sub_departments = user.company.departments.only_sub_departments
     # self.sub_departments = user.company.dep_subdept_mapping
@@ -17,7 +17,8 @@ class Procurements::FilterConfig < Procurements::Base
     status_tags.each do |tag|
       self.config[tag.name] = tag.id
     end
-
+    location_ids = user.company.policies&.joins(:policy_location_mappings).with_application(current_app)&.exclude_deleted&.pluck('policy_location_mappings.location_id')
+    self.locations = user.company&.locations&.where(id: location_ids) if self.locations.blank?
   end
 
   def success

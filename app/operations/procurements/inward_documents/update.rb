@@ -53,7 +53,8 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       rejected = item[:rejected] || 0
 
       po_items = self.inward_document.items.find_by(id: item[:id])
-      if (delivered.to_f or accepted.to_f or rejected.to_f) < 0
+      
+      if (delivered.to_f < 0 || accepted.to_f < 0 || rejected.to_f < 0)
         add_message :error, "Negative quantity entered for #{po_items.description}"
         break
       end
