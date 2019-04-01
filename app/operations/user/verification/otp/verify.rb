@@ -1,6 +1,6 @@
 class User::Verification::Otp::Verify < User::Verification::Otp::Base
 
-  attr_accessor :selected_user
+  attr_accessor :selected_user, :set_password_token
 
   def pre_validate
     if user.blank?
@@ -44,6 +44,13 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
     selected_user.assign_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
     selected_user.save(validate: false)
     RequestStoreUtil.current_session.verify(:otp)
+  end
+
+  def post_process
+    raw, enc = Devise.token_generator.generate(User, :reset_password_token)
+    self.set_password_token = raw
+    selected_user.update_attribute(:reset_password_token, enc)
+    selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
   end
 
 end
