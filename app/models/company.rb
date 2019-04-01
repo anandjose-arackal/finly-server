@@ -442,6 +442,12 @@ class Company < ApplicationRecord
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
 
+    # Seed Default list of vendor types
+    default_vendor_types = %w( Contractors Vendors )
+    default_vendor_types.each do |vendor_type|
+      self.vendor_types.build({name: vendor_type}).save
+    end
+
     # creating budget configurations
     self.build_enforce_budget_configuration(enforce_purchase_order_budget: false, enforce_payment_budget: false,
                                                enforce_expense_budget: false, enforce_invoice_budget: false).save

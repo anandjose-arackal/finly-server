@@ -115,7 +115,6 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-
     # adding the created by user for this particular vendor
     vendor_parameters[:created_by_id] = user.id
   end

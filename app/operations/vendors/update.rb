@@ -29,12 +29,27 @@ class Vendors::Update < Vendors::Base
       add_message :error, "You do not have permission for this action"
     end
 
+    # Remove tds from vendor params if tds_rates_list_id is blank
+    vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
+      unless vtra[:tds_rates_list_id].present?
+        vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+      end
+    end
+
     unless vendor_parameters[:pan].present?
       add_message :error, "Please provide PAN to proceed"
       return
     else
       validate_attachment(vendor_parameters, :pan)
     end
+
+    # Remove Empty gstin locations
+    vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+      unless gst.keys.present?
+        vendor_parameters[:gstin_locations_attributes].delete_at(index)
+      end
+    end
+
 
     if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
       validate_attachment(vendor_parameters, :msme_certificate)
