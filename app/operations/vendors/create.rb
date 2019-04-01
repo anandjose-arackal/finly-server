@@ -1,4 +1,5 @@
 class Vendors::Create < Vendors::Base
+  attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors
 
   class Vendors::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :vendor
@@ -9,7 +10,6 @@ class Vendors::Create < Vendors::Base
 
   end
 
-  attr_accessor :vendor_parameters, :vendor, :account_owner_type
 
   def personalizer
     {
@@ -22,6 +22,7 @@ class Vendors::Create < Vendors::Base
   def init
     # super()
     self.vendor_parameters = vendor_attributes
+    self.similar_vendors = []
     # setting account owner type as vendor
   end
 
@@ -70,9 +71,9 @@ class Vendors::Create < Vendors::Base
       self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
         ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], account_owner_type: "YesBankVendor")
         if ba.present?
-          other_vendor = ba.account_number
+          other_vendor = ba.account_owner
           self.similar_vendors.push(other_vendor)
-          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{other_vendor.business_name - other_vendor.vendor_id}"
+          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{other_vendor.business_name} - #{other_vendor.vendor_id}"
         end
       end
     end
@@ -133,6 +134,7 @@ class Vendors::Create < Vendors::Base
       self.vendor.update(authorized: true)
     else
       self.vendor = user.company.yes_bank_vendors.build(vendor_parameters)
+      self.vendor.authorized = true
       validate_custom_fields(true)
       return if has_errors?
       if self.vendor.save

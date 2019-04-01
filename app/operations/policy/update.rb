@@ -16,7 +16,11 @@ class Policy::Update < Policy::Base
   end
 
   def init
-    self.policy = Policy::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
+    if vendor_payments?
+      self.policy = Policy::VendorPayments::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
+    else
+      self.policy = Policy::Index.(user, view: params[:view]).policies.with_id((params[:policy_id] or params[:id])).first rescue nil
+    end
     self.update_resource_type = params[:update_resource_type]
   end
 
@@ -34,10 +38,14 @@ class Policy::Update < Policy::Base
     if update_resource_type.present?
       case update_resource_type
       when 'policy_department_mapping'
-        policy.update_policy_department_mapping(params)
+        unless policy.update_policy_department_mapping(params)
+          add_message :error, 'Unable to update!'
+        end
         return
       when 'policy_location_mapping'
-        policy.update_location_department_mapping(params)
+        unless policy.update_location_department_mapping(params)
+          add_message :error, 'Unable to update'
+        end
         return
       end
     end
@@ -53,7 +61,6 @@ class Policy::Update < Policy::Base
 
   protected
   def strong_params
-    params.require(:policy).permit(:description, :name, :base_currency_id, :settlement_currency_id)
+    params.require(:policy).permit(:description, :name, :base_currency_id, :settlement_currency_id, policy_department_mappings_attributes: [:id, :policy_id, :department_id, :enabled], policy_location_mappings_attributes: [:id, :policy_id, :location_id, :enabled])
   end
-
 end
