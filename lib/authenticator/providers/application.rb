@@ -1,7 +1,7 @@
 class Authenticator::Providers::Application < Authenticator::Providers::Base
 
   def self.accept?(params)
-    params[:scopes]&.size == 1 and ["web", "mobile", "chrome", "api"].include?(self.scopes.first)
+    params[:scope]&.size == 1 and ["web", "mobile", "chrome", "api"].include?(params[:scope]&.first)
   end
 
   def model
@@ -9,11 +9,9 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
   end
 
   def on_attempt(message)
-    result = Gatekeeper::Event.(:user_login_attempt, user: u)
+    result = Gatekeeper::Event.(:user_login_attempt, user: self.unauthenticated_user)
     unless result.success?
-      # Do not attempt login as the user account is locked
-      u = nil
-      params[:user] = u
+      params[:user] = self.unauthenticated_user
       params[:message] = result.message
       UserSessions::Create.(:blocked, params)
       block
@@ -42,14 +40,14 @@ class Authenticator::Providers::Application < Authenticator::Providers::Base
   end
 
   def on_invalid_password(message)
-    Gatekeeper::Event.(:user_login_invalid_password, user: u)
+    Gatekeeper::Event.(:user_login_invalid_password, user: self.unauthenticated_user)
     params[:user] = self.unauthenticated_user
     params[:message] = message || 'Invalid Password'
     UserSessions::Create.(:failed, params)
   end
 
   def on_success(message)
-    result = Gatekeeper::Event.(:user_login_success, user: u)
+    result = Gatekeeper::Event.(:user_login_success, user: self.unauthenticated_user)
     unless result.success?
       params[:user] = u
       params[:message] = result.message
