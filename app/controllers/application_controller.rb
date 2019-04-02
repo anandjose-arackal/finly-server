@@ -335,6 +335,10 @@ class ApplicationController < ActionController::Base
       RequestStoreUtil.set_authorized_scopes scopes
     end
 
+    verify_user_session(doorkeeper_token)
+  end
+
+  def verify_user_session(doorkeeper_token)
     user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
     if user_session.nil?
       # todo better handle how existing logins are associated i.e mobile, API etc
@@ -342,9 +346,8 @@ class ApplicationController < ActionController::Base
       params[:message] = 'User Session not found'
       UserSessions::Create.(:blocked, params)
       head 401
-      return
+      return false
     end
-
     RequestStoreUtil.set_current_session user_session
 
     result = UserSessions::Events::Create.(current_user, params)
@@ -359,9 +362,11 @@ class ApplicationController < ActionController::Base
     unless result.success?
       session_status = result.session_status_id || UserSessionStatus.id_for(:blocked)
       invalidate_session session_status, result.message
+      return false
     end
 
     user_session.update(last_request_at: DateTime.now)
+    true
   end
 
   def invalidate_session(status_id, reason)

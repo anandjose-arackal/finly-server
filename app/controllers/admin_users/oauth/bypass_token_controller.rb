@@ -46,7 +46,8 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
     if params[:admin_user].nil?
       raise 'Admin user load issue'
     end
-    UserSessions::AdminBypassCreate.(:authorized, params)
+    sessions_result = UserSessions::AdminBypassCreate.(:authorized, params)
+    sessions_result.success? and sessions_result.session.status_id == UserSessionStatus.id_for(:authorized)
   end
 
 end
