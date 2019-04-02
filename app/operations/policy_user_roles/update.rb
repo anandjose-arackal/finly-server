@@ -13,6 +13,8 @@ class PolicyUserRoles::Update < PolicyUserRoles::Base
     self.policy_user_role = ::PolicyUserRoles::Index.(user, params).policy_user_roles.with_id(id).first rescue nil
 
     self.policy_user_role_params = policy_user_role_parameters
+
+    debugger
   end
 
   def validate
@@ -24,7 +26,7 @@ class PolicyUserRoles::Update < PolicyUserRoles::Base
       add_message :error, 'Policy not found'
     end
 
-    unless self.policy_user_role.policy_id == self.policy.id
+    unless self.policy_user_role&.policy_id == self.policy.id
       add_message :error, "Invalid configuration"
     end
   end
@@ -33,6 +35,10 @@ class PolicyUserRoles::Update < PolicyUserRoles::Base
     unless self.policy_user_role.update(policy_user_role_params)
       add_message :error, self.policy_user_role.errors.full_messages
     end
+  end
+
+  def post_process
+    add_message :success, "Successfully updated threshold limits"
   end
 
   private

@@ -17,6 +17,10 @@ class PolicyUserRole < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :user_role, optional: true
 
+  scope :with_id, -> (ids) {
+    where(id: ids)
+  }
+
   scope :with_user_id, -> (user_id) {
     where user_id: user_id
   }

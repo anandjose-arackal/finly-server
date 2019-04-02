@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_01_102409) do
+ActiveRecord::Schema.define(version: 2019_04_01_114205) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -575,6 +575,7 @@ ActiveRecord::Schema.define(version: 2019_04_01_102409) do
     t.integer "controlling_level_id"
     t.datetime "approved_at"
     t.integer "company_id"
+    t.decimal "max_payment_amount", precision: 20, scale: 5
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
