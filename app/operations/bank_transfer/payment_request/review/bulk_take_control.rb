@@ -34,10 +34,10 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
         valid = false
       end
 
-      if bank_payment_request.controlling_for_user.present?
-        # add_message :error, "Payment requets already in control for #{bank_payment_request.id}"
-        valid = false
-      end
+      # if bank_payment_request.controlling_for_user.present?
+      #   # add_message :error, "Payment requets already in control for #{bank_payment_request.id}"
+      #   valid = false
+      # end
 
       unless valid
         reject_bpr << bank_payment_request
@@ -53,6 +53,7 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
 
   def process
     # self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:processing))
+    self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
     # ids = self.bank_payment_requests.pluck(:id)
     ids = self.bank_payment_requests.map { |h| h[:id] }
     BankTransfer::PaymentRequest::Review::BulkTakeControlBackground.call_async(ids, {initiating_user_id: current_user.id, bulk_take_control_ids: params["bulk_take_control_ids"]})

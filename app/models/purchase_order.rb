@@ -227,7 +227,12 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_all_advances, -> {
-    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil)
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil,
+              purchase_order_status_id: [ PurchaseOrderStatus.id_for(:closed), PurchaseOrderStatus.id_for(:po_revised), 
+                                          PurchaseOrderStatus.id_for(:processing), PurchaseOrderStatus.id_for(:voided),
+                                          PurchaseOrderStatus.id_for(:rejected), PurchaseOrderStatus.id_for(:retracted),
+                                          PurchaseOrderStatus.id_for(:open)
+                                        ])
   }
 
   scope :filter_by_due_date, -> (due_date) {

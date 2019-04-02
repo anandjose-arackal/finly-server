@@ -100,12 +100,12 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
         # payment.invoice.update(invoice_status_id: invoices_status[inv_id])
         
         # will get back later
-        # invoice = self.invoices.find(payment_param[:invoice_id])
+        # invoice = self.invoices.find(params[:invoice_id])
         # invoice.update(invoice_status_id: invoices_status[inv_id.to_s])
         InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
         payment.save
         # now save the custom fields to the invoice
-        # set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
+        set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
       else
         puts "ERROR", payment.errors.full_messages
         flag = false

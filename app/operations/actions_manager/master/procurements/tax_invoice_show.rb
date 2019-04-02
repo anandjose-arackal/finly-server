@@ -111,9 +111,10 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def user_in_level?
-    level = invoice.level
-    amount = invoice.net_amount.value rescue 0
-    level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+    # level = invoice.level
+    # amount = invoice.net_amount.value rescue 0
+    # allowed = level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+    invoice.get_reviewers.include?(user)
   end
 
   def document_owner?
