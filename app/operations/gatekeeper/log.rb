@@ -43,12 +43,18 @@ class Gatekeeper::Log < BaseOperation
         }
     )
 
+    # Store in model
     blocker = GatekeeperBlock.new model_param
     unless blocker.valid?
       puts blocker.errors.full_messages
     end
     blocker.save
+
+    # Logstash logger
     logger.info(logstash_params)
+
+    # Slack
+
   end
 
   def base_params

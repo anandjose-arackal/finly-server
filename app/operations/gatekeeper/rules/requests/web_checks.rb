@@ -51,7 +51,7 @@ Gatekeeper::Checker.new 'On New Request' do
         message 'Session timeout'
         session_status_id UserSessionStatus.id_for(:revoked)
         response_code 401
-        level 3
+        level 1
         fail
       end
     end

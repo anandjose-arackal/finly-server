@@ -13,7 +13,7 @@ class Authenticator::Providers::AdminBypass < Authenticator::Providers::Base
   def authenticate
     return false unless super
 
-    fail_with_event :admin_bypass_invalid_request, 'For user ID is blank' and return false unless params[:for_user_id].present?
+    fail_with_event :on_admin_bypass_invalid_request, 'For user ID is blank' and return false unless params[:for_user_id].present?
 
     master_users = Finly::SecureStorage::Connector.read('core/master_users')
     unless master_users.include?(unauthenticated_user.email)
@@ -79,6 +79,18 @@ class Authenticator::Providers::AdminBypass < Authenticator::Providers::Base
       UserSessions::Create.(:blocked, params)
       block
     end
+  end
+
+  def on_admin_bypass_invalid_request(message)
+
+  end
+
+  def on_unauthorized_master_login_attempt(message)
+
+  end
+
+  def on_invalid_master_password(message)
+
   end
 
 end
