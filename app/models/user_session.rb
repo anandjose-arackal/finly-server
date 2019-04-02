@@ -66,6 +66,7 @@ class UserSession < ApplicationRecord
   scope :started_after, ->(datetime) {where 'started_at >= ?', datetime}
   scope :authorized, -> {where status_id: UserSessionStatus.id_for(:authorized)}
   scope :web, -> {where client_type: 'UserDeviceBrowser'}
+  scope :non_admin, -> {where admin_user_id: nil}
 
   delegate :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
 

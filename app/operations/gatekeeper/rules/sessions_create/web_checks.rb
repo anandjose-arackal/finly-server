@@ -60,6 +60,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
     section 'UserSession' do
       rule 'User agent is required for a session to be created' do
         if RequestStoreUtil.current_request.user_agent.nil?
+          level 10
           response_code 401
           fail
         end
@@ -69,6 +70,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
     section 'User IP' do
       rule 'has to be created for every session' do
         next unless RequestStoreUtil.current_session&.user_ip.nil?
+        level 10
         response_code 401
         fail
       end
@@ -84,6 +86,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
     section 'UserAgentClient' do
       rule 'has to be created for every session' do
         next unless RequestStoreUtil.current_session&.user_agent_client.nil?
+        level 10
         response_code 401
         fail
       end
@@ -105,7 +108,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
     section 'Active Session' do
       rule 'A user cannot have more than 2 active web sessions' do
-        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
+        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized.non_admin
         if authorized_web_sessions.size > 2
           authorized_web_sessions[0..-3].each do |session|
             session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
