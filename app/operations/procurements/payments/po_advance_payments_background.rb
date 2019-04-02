@@ -83,7 +83,6 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
   end
 
   def process
-    max_payment_amount = 0
     self.payment_params.each do |payment_param|
       custom_fields = params[:custom_fields]
       params.delete(:custom_fields)
@@ -91,9 +90,6 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
       payment = ::Payment.new(params)
       payment = self.bank_payment_request.payment_order.payments.build(params)
       if payment.save
-        if payment.amount.value > max_payment_amount
-          max_payment_amount = payment.amount.value
-        end 
         purchase_order = self.purchase_orders.find(params[:purchase_order_id])
         purchase_order.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:initiated))
         payment.save
@@ -103,6 +99,8 @@ class Procurements::Payments::PoAdvancePaymentsBackground < BackgroundOperation
     end
 
     # now once the payment request has been created and the payments saved, we can mark it as open
+    max_payment_amount = self.bank_payment_request.payment_order.payments.reload.joins(:amount).pluck(:value).max || 0
+    
     self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open), max_payment_amount: max_payment_amount)
     self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
 

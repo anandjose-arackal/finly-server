@@ -83,7 +83,6 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
 
   def process
     flag = true
-    max_payment_amount = 0
     self.payment_params.each do |payment_param|
       custom_fields = payment_param[:custom_fields]
       payment_param.delete(:custom_fields)
@@ -91,10 +90,6 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
       # payment = ::Payment.new(payment_param)
       payment = self.bank_payment_request.payment_order.payments.build(payment_param)
       if payment.save
-        if payment.amount.value > max_payment_amount
-          max_payment_amount = payment.amount.value
-        end
-
         puts "invoice SUCCESSFULS", payment.id
         inv_id = payment.invoice.id
         # payment.invoice.update(invoice_status_id: invoices_status[inv_id])
@@ -114,6 +109,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
 
     # if flag
       # now once the payment request has been created and the payments saved, we can mark it as open
+      max_payment_amount = self.bank_payment_request.payment_order.payments.reload.joins(:amount).pluck(:value).max || 0
       self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open), max_payment_amount: max_payment_amount)
       self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
 
