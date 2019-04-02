@@ -62,7 +62,7 @@ class BankTransfer::PaymentRequest::AddPaymentsBackground < BackgroundOperation
           department_id: payment[:department_id],
           category_id: payment[:category_id],
           company_id: user.company_id,
-          api_initiated: true,
+          api_initiated: false,
           invoice_attributes: {
               category_id: payment[:category_id],
               cost_center_id: payment[:cost_center_id],
