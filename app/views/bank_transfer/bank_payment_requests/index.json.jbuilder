@@ -1,6 +1,11 @@
 json.count @result.payment_requests&.count
 json.results do
   json.array! @result.paginated_requests&.include_for_index&.each do |payment_request|
+    
+    json.can_approve payment_request.can_approve?
+    json.can_reject payment_request.can_reject?
+    json.can_take_control payment_request.can_take_real_control?
+
     item = payment_request.payment_order
     json.id payment_request&.id
     scheduled_at = item.scheduled_at

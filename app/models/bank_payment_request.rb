@@ -277,6 +277,13 @@ class BankPaymentRequest < ApplicationRecord
     processing?
   end
 
+  def can_take_real_control?(user=nil)
+    # work with this method, dont want to modify the older method since, 
+    # it is used other places and dont want to modify unless sure if this check works in other ppls work.
+    user = user.present? ? user : RequestStore.store[:current_user]
+    processing? && user.vendor_payment_admin?
+  end
+
   # def can_return_control?
   #   processing?
   # end
