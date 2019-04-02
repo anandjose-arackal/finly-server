@@ -12,12 +12,28 @@ RSpec.describe 'Payment Initiation via YesBank' do
 
   before :each do
     @company = create :company
+    @initiating_user = create :vp_admin_user, company_id: @company.id
     @yes_bank_vendor = create :yes_bank_vendor
+    @yes_bank_company_account = create :yes_bank_company_account
     @bank_account = create :bank_account, account_owner: @yes_bank_vendor, company_id: @company.id
-    @yes_bank_transaction = create :yes_bank_transaction
-    @payment = create :yes_bank_payment, company_id: @company.id, receiving_account_id: @bank_account.id, reference_resource_id: @yes_bank_transaction.id
-    @initiating_account = @payment.initiating_account
-    @original_balance = @initiating_account.balance.value
+    @yes_bank_transaction = create :yes_bank_transaction, company_id: @company.id, beneficiary_bank_account_id: @bank_account.id
+    @payment_order = create :yes_bank_payment_order, initiating_user_id: @initiating_user.id,
+                                            payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
+                                            company_id: @company.id
+
+    @payment = create :yes_bank_payment, company_id: @company.id,
+                                         receiving_account_id: @bank_account.id,
+                                         receiving_account_type: "BankAccount",
+                                         reference_resource_id: @yes_bank_transaction.id,
+                                         payment_order_id: @payment_order.id,
+                                         initiating_account_id: @yes_bank_company_account.id,
+                                         initiating_account_type: "YesBankCompanyAccount",
+                                         initiating_user_id: @initiating_user.id,
+                                         receiving_user_id: @yes_bank_vendor.id,
+                                         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+                                         payment_status_id: PaymentStatus.id_for(:pending_approval)
+
+    @original_balance = @yes_bank_company_account.balance.value
   end
 
   describe '--- Payment Executor Yes Bank Success Test ---' do
@@ -41,7 +57,7 @@ RSpec.describe 'Payment Initiation via YesBank' do
     end
 
     it 'should reduce the balance of the company account' do
-      new_balance = @initiating_account.balance.value
+      new_balance = @yes_bank_company_account.balance.value
       difference = @original_balance - new_balance
       expect(difference).to eq(@payment.amount_value)
     end
@@ -67,7 +83,7 @@ RSpec.describe 'Payment Initiation via YesBank' do
       end
 
       it 'should not reduce the company account' do
-        new_balance = @initiating_account.balance.value
+        new_balance = @yes_bank_company_account.balance.value
         difference = @original_balance - new_balance
         expect(difference).to eq(0)
       end

@@ -3,7 +3,7 @@
 # Yes Bank in the name suggests that the credit to this account will happen from
 # the Yes Bank current account
 
-class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::BankAccount::BankAccountAdapter
+class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::BaseAdapter
 
   PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
   FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]

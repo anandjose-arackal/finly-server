@@ -7,32 +7,25 @@ class AccountManager::Base < BackgroundOperation
 
   protected
 
-  def retrieve_adapter(account)
+  def retrieve_adapter(account, payment = nil)
     acc_type = account&.class&.to_s
     case acc_type
       when 'Card'
-        return AccountManager::Cards::CardAdapter.new(account)
+        return AccountManager::Cards::CardAdapter.new(account, payment)
       when 'UserWallet'
-        return AccountManager::Wallet::WalletAdapter.new(account)
+        return AccountManager::Wallet::WalletAdapter.new(account, payment)
       when 'YesBankCompanyAccount'
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account)
+        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account, payment)
       when 'CashOnHand'
-        return AccountManager::CashOnHand::CashOnHandAdapter.new(account)
+        return AccountManager::CashOnHand::CashOnHandAdapter.new(account, payment)
       when 'ItzCashCompanyAccount'
-        return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account)
+        return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account, payment)
       when 'BankAccount'
-        return AccountManager::BankAccount::BankAccountYesBankAdapter.new(account)
+        return AccountManager::BankAccount::BankAccountAdapter.new(account, payment)
       when 'VendorPaymentWallet'
-        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(account)
+        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(account, payment)
       when 'UserPocket'
-        case account.user_pocket_type_id
-          when UserPocketType.id_for(:cash)
-            return AccountManager::CashPockets::CashPocketsAdapter.new(account)
-          when UserPocketType.id_for(:credit_card)
-            return AccountManager::CreditCardPockets::CreditCardPocketsAdapter.new(account)
-          else
-            # do nothing?
-        end
+        return AccountManager::CashPockets::UserPocketsAdapter.new(account, payment)
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end

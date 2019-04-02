@@ -20,8 +20,8 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   end
 
   def init
-    self.receiving_account_adapter = retrieve_adapter(payment.receiving_account)
-    self.source_account_adapter = retrieve_adapter(payment.initiating_account)
+    self.receiving_account_adapter = retrieve_adapter(payment.receiving_account, self.payment)
+    self.source_account_adapter = retrieve_adapter(payment.initiating_account, self.payment)
     self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
     self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
   end

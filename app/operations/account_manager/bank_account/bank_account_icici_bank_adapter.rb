@@ -1,7 +1,7 @@
 # this adapter will handle all transactions that hit the ICICI bank server and accordingly
 # update a particular payment status
 
-class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager::BankAccount::BankAccountAdapter
+class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager::BaseAdapter
 
   attr_accessor :errors, :company
 

@@ -1,6 +1,6 @@
 class AccountManager::UserPockets::UserPocketsAdapter < AccountManager::BaseAdapter
 
-  def initialize(account = nil)
+  def initialize(account = nil, payment = nil)
     super(account)
     case self.account.user_pocket_type_id
       when UserPocketType.id_for(:cash)
