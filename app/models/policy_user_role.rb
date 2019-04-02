@@ -32,4 +32,8 @@ class PolicyUserRole < ApplicationRecord
   scope :with_policy_id, -> (policy_id){
     where policy_id: policy_id
   }
+
+  scope :includes_for_index, -> {
+    includes(:user, :policy, :user_role)
+  }
 end
