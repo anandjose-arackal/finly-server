@@ -12,7 +12,7 @@ Doorkeeper.configure do
   end
 
   resource_owner_from_credentials do |routes|
-    Authenticator.new(request).authenticate
+    Authenticator::Processor.new(request).authenticate
     # u = nil
     # scopes = params.dig(:scope)&.split(' ')
     # if params[:username].blank? || params[:password].blank? # && !(params[:sso_skip_password]))

@@ -1,7 +1,9 @@
 class Authenticator::Providers::AdminBypass < Authenticator::Providers::Base
 
   def self.accept?(params)
-    params[:scope]&.size == 2 and params[:scope]&.include?('admin_bypass') and params[:scope]&.include?("web")
+    scopes = params[:scope]
+    scopes = [scopes] unless scopes.respond_to?(:each)
+    scopes&.size == 2 and scopes&.include?('admin_bypass') and scopes&.include?("web")
   end
 
   def model

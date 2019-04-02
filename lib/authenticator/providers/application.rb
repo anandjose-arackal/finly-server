@@ -1,7 +1,9 @@
 class Authenticator::Providers::Application < Authenticator::Providers::Base
 
   def self.accept?(params)
-    params[:scope]&.size == 1 and ["web", "mobile", "chrome", "api"].include?(params[:scope]&.first)
+    scopes = params[:scope]
+    scopes = [scopes] unless scopes.respond_to?(:each)
+    scopes&.size == 1 and ["web", "mobile", "chrome", "api"].include?(scopes&.first)
   end
 
   def model
