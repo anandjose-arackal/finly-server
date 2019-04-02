@@ -626,6 +626,10 @@ class Invoice < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
   end
 
+  def can_take_control?
+    processing?
+  end
+
   private
 
   def set_defaults

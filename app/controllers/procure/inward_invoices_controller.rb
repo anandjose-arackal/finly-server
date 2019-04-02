@@ -99,6 +99,16 @@ class Procure::InwardInvoicesController < ApplicationController
     respond
   end
 
+  def bulk_approve
+    @result = Procurements::Invoices::BulkReject.(current_user, params)
+    respond
+  end
+
+  def bulk_approve
+    @result = Procurements::Invoices::BulkTakeControl.(current_user, params)
+    respond
+  end
+
   # Template for bulk creation of NON PO invoices
   def import_template
     @result = Procurements::Invoices::ImportTemplate.(current_user, params)
