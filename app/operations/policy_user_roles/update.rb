@@ -13,8 +13,6 @@ class PolicyUserRoles::Update < PolicyUserRoles::Base
     self.policy_user_role = ::PolicyUserRoles::Index.(user, params).policy_user_roles.with_id(id).first rescue nil
 
     self.policy_user_role_params = policy_user_role_parameters
-
-    debugger
   end
 
   def validate
