@@ -16,6 +16,7 @@ class UserSessions::AdminBypassCreate < UserSessions::Create
     enrich_admin_user args
     enrich_request args
     enrich_access args
+    enrich_reason args
     set_event args
     return if has_errors?
     self.session = UserSession.new args
@@ -50,6 +51,15 @@ class UserSessions::AdminBypassCreate < UserSessions::Create
 
   def enrich_device(args)
     args[:client_type] = params[:temporary_client_type]
+  end
+
+  def enrich_reason(args)
+    args[:admin_access_reason] = params[:reason]
+    args[:admin_access_reason_details] = params[:reason_details]
+    unless params[:reason].present? and params[:reason_details].present?
+      args[:status_id] = UserSessionStatus.id_for(:blocked)
+      args[:message] = 'Reason has not been provided'
+    end
   end
 
 end
