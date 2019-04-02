@@ -13,9 +13,10 @@ RSpec.describe 'Authenticator::Processor::Application' do
       it 'should not return user' do
         allow(Gatekeeper::Event).to receive(:call).and_return(double(success?: true))
         allow(UserSessions::Create).to receive(:call).and_return(double(success?: true))
-
         params = {password: @password, scope: ['web']}
-        user = Authenticator::Processor.new(params).authenticate
+        request = double({params: params})
+
+        user = Authenticator::Processor.new(request).authenticate
 
         expect(user).to be_nil
       end
@@ -27,7 +28,9 @@ RSpec.describe 'Authenticator::Processor::Application' do
         allow(UserSessions::Create).to receive(:call).and_return(double(success?: true))
 
         params = {username: @user.email, scope: ['web']}
-        user = Authenticator::Processor.new(params).authenticate
+        request = double({params: params})
+
+        user = Authenticator::Processor.new(request).authenticate
 
         expect(user).to be_nil
       end
@@ -36,8 +39,9 @@ RSpec.describe 'Authenticator::Processor::Application' do
     describe '> No scope' do
       it 'should raise an error' do
         params = {username: @user.email, password: @password}
+        request = double({params: params})
         expect {
-          user = Authenticator::Processor.new(params).authenticate
+          user = Authenticator::Processor.new(request).authenticate
         }.to raise_error
       end
     end
@@ -50,7 +54,8 @@ RSpec.describe 'Authenticator::Processor::Application' do
         allow(UserSessions::Create).to receive(:call).and_return(double(success?: true))
 
         params = {username: 'dummy@email.com', password: 'testpassword@123!', scope: ['web']}
-        user = Authenticator::Processor.new(params).authenticate
+        request = double({params: params})
+        user = Authenticator::Processor.new(request).authenticate
 
         expect(user).to be_nil
       end
@@ -62,7 +67,8 @@ RSpec.describe 'Authenticator::Processor::Application' do
         allow(UserSessions::Create).to receive(:call).and_return(double(success?: true))
 
         params = {username: @user.email, password: 'testpassword@123!', scope: ['web']}
-        user = Authenticator::Processor.new(params).authenticate
+        request = double({params: params})
+        user = Authenticator::Processor.new(request).authenticate
 
         expect(user).to be_nil
       end
@@ -74,7 +80,8 @@ RSpec.describe 'Authenticator::Processor::Application' do
         allow(UserSessions::Create).to receive(:call).and_return(double(success?: true))
 
         params = {username: @user.email, password: @password, scope: ['web']}
-        user = Authenticator::Processor.new(params).authenticate
+        request = double({params: params})
+        user = Authenticator::Processor.new(request).authenticate
 
         expect(user).to eq(@user)
       end

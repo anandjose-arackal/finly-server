@@ -52,7 +52,7 @@ class Gatekeeper::Log < BaseOperation
   end
 
   def base_params
-    level = (self.verdict.level.to_s[/\d+/] || 1)
+    level = (self.verdict.level.to_s[/\d+/].to_i || 1)
     level = 1 if level < 1
     {
         params: RequestStoreUtil.request_params,

@@ -1,6 +1,7 @@
 class  Mobile::V1::UsersController < Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
+  skip_authentication_actions :lookup, :send_verification_otp, :verify_user_otp
 
   respond_to :json
 

@@ -1,5 +1,5 @@
 class Authenticator::Processor
-  attr_accessor :params, :user, :provider
+  attr_accessor :params, :user, :provider, :request
 
   PROVIDERS = [
       Authenticator::Providers::Application,
@@ -7,13 +7,14 @@ class Authenticator::Processor
       Authenticator::Providers::AdminBypass
   ]
 
-  def initialize(params)
-    self.params = params
+  def initialize(request)
+    self.request = request
+    self.params = request.params
   end
 
   def authenticate
     self.provider = fetch_provider
-    raise "Auth Provider not found" if self.provider.nil?
+    raise "AuthProvider not found" if self.provider.nil?
 
     self.provider.authenticate
   end
