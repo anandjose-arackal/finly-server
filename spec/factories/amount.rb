@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :amount do
-    currency_id {1}
+    currency
     value {100}
-    INR {1}
   end
 end

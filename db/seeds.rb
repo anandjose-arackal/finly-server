@@ -779,3 +779,4 @@ end
 ############## Seeding payment processor related classes ##############
 PaymentStatus.seed_data
 BankTransferStatus.seed_data
+Purpose.seed_data

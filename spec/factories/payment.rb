@@ -4,7 +4,7 @@ FactoryBot.define do
     amount
     initiating_user_id {1}
     receiving_user_id {1}
-    association :receiving_account, factory: :bank_account
+    # association :receiving_account, factory: :bank_account
     payment_order_id {1}
     date {Date.today}
     application {"vp"}

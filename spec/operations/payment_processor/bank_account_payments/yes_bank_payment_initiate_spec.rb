@@ -11,8 +11,11 @@ RSpec.describe 'Payment Initiation via YesBank' do
   end
 
   before :each do
-    @payment = create :yes_bank_payment
+    @company = create :company
+    @yes_bank_vendor = create :yes_bank_vendor
+    @bank_account = create :bank_account, account_owner: @yes_bank_vendor, company_id: @company.id
     @yes_bank_transaction = create :yes_bank_transaction
+    @payment = create :yes_bank_payment, company_id: @company.id, receiving_account_id: @bank_account.id, reference_resource_id: @yes_bank_transaction.id
     @initiating_account = @payment.initiating_account
     @original_balance = @initiating_account.balance.value
   end
