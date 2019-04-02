@@ -12,7 +12,7 @@ class Procure::ProcurementsController < ApplicationController
 
   def grn_pending
     params[:filter_procurement_type] = "purchase_order"
-    params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
+    params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
     @result = Procurements::Grn::Pending::Index.(current_user, params)
     respond
     # if @result.success?

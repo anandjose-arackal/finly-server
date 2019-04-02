@@ -1,5 +1,5 @@
 inward_document = @result.inward_document
-json.extract! @result.inward_document, :id, :doc_number, :delivery_date, :grn_number
+json.extract! @result.inward_document, :id, :doc_number, :delivery_date, :grn_number, :user
 
 if @result.inward_document.vendor.present?
   json.vendor do

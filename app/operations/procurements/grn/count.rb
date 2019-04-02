@@ -12,6 +12,8 @@ class Procurements::Grn::Count < Procurements::Base
   end
 
   def process
+    params[:filter_procurement_type] = "purchase_order"
+    params[:filter_status_tags] = [7, 2, 3] # [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
     result = Procurements::Grn::Pending::Index.(user, params)
     if result.success?
       self.count = result.procurements.size
