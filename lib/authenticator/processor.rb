@@ -15,7 +15,6 @@ class Authenticator::Processor
   def authenticate
     self.provider = fetch_provider
     raise "AuthProvider not found" if self.provider.nil?
-
     self.provider.authenticate
   end
 

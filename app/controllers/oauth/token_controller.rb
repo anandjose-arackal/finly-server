@@ -26,7 +26,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
       # Jugaad as frontend is not developed for capturing device_type
       params[:temporary_client_type] = 'UserDeviceBrowser'
       # Jugaad end as frontend is not developed for capturing device_type
-      sessions_result = UserSessions::Create.(:authorized, params)
+      sessions_result = create_user_sessions
       if sessions_result.success? and sessions_result.session.status_id == UserSessionStatus.id_for(:authorized)
         result = Gatekeeper::Event.(:after_session_create, params)
         if result.success?
@@ -152,5 +152,9 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def load_global_variables
     RequestStoreUtil.set_current_request request
+  end
+
+  def create_user_sessions
+    UserSessions::Create.(:authorized, params)
   end
 end

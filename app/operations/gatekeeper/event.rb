@@ -17,7 +17,7 @@ class Gatekeeper::Event
     Gatekeeper::Registry.subscribers(event)&.each do |rule|
       result = rule.verdict(self.params)
       unless result.success?
-        Gatekeeper::Log.(result, params)
+        Gatekeeper::Log.(result, RequestStoreUtil.request_params)
         return result
       end
       require_otp ||= result.require_otp

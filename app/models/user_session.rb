@@ -49,6 +49,7 @@
 
 class UserSession < ApplicationRecord
   belongs_to :user, optional: true
+  belongs_to :admin_user, optional: true
   belongs_to :company, optional: true
   belongs_to :access_token, class_name: 'Doorkeeper::AccessToken', optional: true
   belongs_to :status, class_name: 'UserSessionStatus'
@@ -66,7 +67,8 @@ class UserSession < ApplicationRecord
   scope :started_after, ->(datetime) {where 'started_at >= ?', datetime}
   scope :authorized, -> {where status_id: UserSessionStatus.id_for(:authorized)}
   scope :web, -> {where client_type: 'UserDeviceBrowser'}
-  scope :non_admin, -> {where admin_user_id: nil}
+  scope :non_admins, -> {where admin_user_id: nil}
+  scope :admins, -> {where.not admin_user_id: nil}
 
   delegate :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
 

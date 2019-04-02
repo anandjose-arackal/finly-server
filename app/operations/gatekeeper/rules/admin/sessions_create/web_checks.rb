@@ -1,4 +1,4 @@
-Gatekeeper::Checker.new 'On Web Authentication' do
+Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
 
   premise :admin_bypass_login_attempt do
     section 'Domain check' do
@@ -6,17 +6,18 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         next if RequestStoreUtil.current_request.domain == 'admin.finly.io'
 
         level 10
-        response 401
+        response_code 401
         fail
       end
     end
 
     section 'IP check' do
       rule 'Only authorized IP can be used for accessing admin panel' do
-        next if RequestStoreUtil.current_request.remote_ip == RequestStoreUtil.current_admin_user.authorized_ip
+        admin_user = params[:admin_user]
+        next if RequestStoreUtil.current_request.remote_ip == admin_user&.authorized_ip
 
-        level 8
-        response 401
+        level 10
+        response_code 401
         fail
       end
     end
@@ -87,49 +88,20 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
     section 'User IP' do
       rule 'has to be created for every session' do
-        next unless RequestStoreUtil.current_session&.user_ip.nil?
+        next unless RequestStoreUtil.current_session&.ip.nil?
         level 5
         response_code 401
         fail
-      end
-
-      rule 'Unverified IPs need to be verified before proceeding' do
-        next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
-        require_otp true
-
-        # todo send mailer
-      end
-    end
-
-    section 'UserAgentClient' do
-      rule 'has to be created for every session' do
-        next unless RequestStoreUtil.current_session&.user_agent_client.nil?
-        response_code 401
-        fail
-      end
-
-      rule 'Unverified UserAgent Clients need to be verified before proceeding' do
-        next unless RequestStoreUtil.current_session&.user_agent_client.status_id == UserIpStatus.id_for(:unverified)
-        require_otp true
-
-        # todo send mailer
-
-      end
-    end
-
-    section 'Expire' do
-      rule 'expires user if password is weak, old passwords and inactivity' do
-        RequestStoreUtil.current_user.verify_expiration!(params[:password])
       end
     end
 
     section 'Active Session' do
       rule 'A user cannot have more than 2 active web sessions' do
-        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
+        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized.admins
         if authorized_web_sessions.size > 2
           authorized_web_sessions[0..-3].each do |session|
-            session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
-            session.access_token.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
+            session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active admin user bypasses')
+            session.access_token.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active admin user bypasses')
           end
         end
       end

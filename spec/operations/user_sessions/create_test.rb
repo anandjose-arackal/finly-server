@@ -21,7 +21,7 @@ class UserSessionCreateHelper
         allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
 
         response = double({token: @token})
-        @result = UserSessions::Create.(@status, {user: @user1, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
+        @result = UserSessions::Create.(@status, {user: @user1, admin_user: @admin_user, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
       end
     end
   end
@@ -48,7 +48,7 @@ class UserSessionCreateHelper
 
         response = double({token: @token})
         block.call if block_given?
-        @result = UserSessions::Create.(@status, {user: nil, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
+        @result = UserSessions::Create.(@status, {user: nil, admin_user: @admin_user, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
       end
     end
   end
@@ -287,6 +287,25 @@ RSpec.describe 'UserSessions::Create' do
 
         it 'should not create UserSessionEvent' do
           expect(@before_session_event_count).to eq(UserSessionEvent.count)
+        end
+      end
+    end
+
+    describe '> Admin' do
+      before :all do
+        @status = :authorized
+        @doorkeeper_application = create :doorkeeper_application
+        @token = create(:doorkeeper_token, application_id: @doorkeeper_application.id)
+        @admin_user = create :admin_user
+      end
+
+      describe '> with user and admin' do
+        UserSessionCreateHelper.init_with_user(self)
+        UserSessionCreateHelper.user_session_property_check(self)
+        UserSessionCreateHelper.user_presence_check(self)
+
+        it 'should assign admin_user to the user session' do
+          expect(@result.session.admin_user).to eq(@admin_user)
         end
       end
     end

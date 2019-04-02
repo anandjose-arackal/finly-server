@@ -2,6 +2,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
   before do
     skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
+    skip if RequestStoreUtil.current_session&.admin_user_id.present?
   end
 
   premise :after_session_create do
@@ -108,7 +109,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
     section 'Active Session' do
       rule 'A user cannot have more than 2 active web sessions' do
-        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized.non_admin
+        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized.non_admins
         if authorized_web_sessions.size > 2
           authorized_web_sessions[0..-3].each do |session|
             session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
