@@ -655,6 +655,7 @@ module Transitionable
       self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
     end
 
+    # Method overridden in bank_payment_request model
     def role_based_creditor_associated_items(user, role_id, options={})
       policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq
       if policy_ids.present?

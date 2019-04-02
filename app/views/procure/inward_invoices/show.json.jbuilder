@@ -52,7 +52,7 @@ end
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
-                :billing_address, :shipping_address, :invoice_id
+                :billing_address, :shipping_address, :invoice_id, :gstin_location_id
 
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
@@ -217,6 +217,12 @@ json.attachments do
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
     json.url attachment.file.url(:original, timestamp: false)
+  end
+end
+
+json.gstin_locations do
+  json.array! @result.gstin_locations do |gstin_location|
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
   end
 end
 

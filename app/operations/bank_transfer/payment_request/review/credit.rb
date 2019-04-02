@@ -61,9 +61,11 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     if self.user.vendor_payments_creditor? && !self.user.vendor_payments_admin?
       minimum = self.bank_payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.min_amount
       maximum = self.bank_payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.max_amount || 999999999999999999999999
-      if self.bank_payment_request.payments.joins(:amount).sum(:value) > maximum
+
+      max_payment_value = self.bank_payment_request.payments.joins(:amount).pluck(:value).max || 0
+      if max_payment_value > maximum
         add_message :error, "You are not eligible to credit the payment order, you are eligible to credit only upto #{maximum}"
-      elsif self.bank_payment_request.payments.joins(:amount).sum(:value) < minimum
+      elsif max_payment_value < minimum
         add_message :error, "You are not eligible to credit the payment order, you are eligible to credit only greater than #{minimum}"
       end
     end

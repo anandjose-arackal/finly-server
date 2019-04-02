@@ -451,6 +451,21 @@ class BankPaymentRequest < ApplicationRecord
     [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor]
   end
 
+  ####################### Overridden Methods ########################
+  def self.role_based_creditor_associated_items(user, role_id, options={})
+    purs = user.policy_user_roles.with_role_id(role_id)
 
+    bank_payment_requests = BankPaymentRequest.none
 
+    purs.each do |pur|
+      pur_bank_payment_requests = BankPaymentRequest.all.
+        where(policy_id: pur.policy_id).
+        where("max_payment_amount > ? AND max_payment_amount <= ?", pur.min_amount, pur.max_amount)
+
+      bank_payment_requests = bank_payment_requests.or(pur_bank_payment_requests)
+    end
+
+    bank_payment_requests = bank_payment_requests.where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
+  end
+  ####################### Overridden Methods ends ###################
 end

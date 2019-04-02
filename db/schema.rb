@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_01_054959) do
+ActiveRecord::Schema.define(version: 2019_04_01_114205) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -575,6 +575,7 @@ ActiveRecord::Schema.define(version: 2019_04_01_054959) do
     t.integer "controlling_level_id"
     t.datetime "approved_at"
     t.integer "company_id"
+    t.decimal "max_payment_amount", precision: 20, scale: 5
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
@@ -3022,8 +3023,10 @@ ActiveRecord::Schema.define(version: 2019_04_01_054959) do
     t.integer "po_advance"
     t.integer "po_prev_adjusted_advance"
     t.boolean "advance_amount_required", default: false
+    t.bigint "gstin_location_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
+    t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
     t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
     t.index ["invoice_type_id"], name: "index_invoices_on_invoice_type_id"
     t.index ["payment_term_id"], name: "index_invoices_on_payment_term_id"
@@ -6171,6 +6174,7 @@ ActiveRecord::Schema.define(version: 2019_04_01_054959) do
   add_foreign_key "invoice_number_configs", "invoice_number_config_types"
   add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
+  add_foreign_key "invoices", "gstin_locations"
   add_foreign_key "invoices", "payment_terms"
   add_foreign_key "inward_document_items", "inward_documents"
   add_foreign_key "inward_document_items", "items", column: "inventory_line_item_id"

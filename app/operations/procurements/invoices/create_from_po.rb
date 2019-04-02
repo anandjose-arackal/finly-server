@@ -207,7 +207,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       sub_department_id: self.purchase_order.sub_department_id,
       cost_center_id: self.purchase_order.cost_center_id,
       invoice_items_attributes: invoice_items_attributes,
-      policy_id: self.purchase_order.policy_id
+      policy_id: self.purchase_order.policy_id,
+      gstin_location_id: self.purchase_order.gstin_location_id
     }
     if self.advance.present?
         invoice_params[:po_advance] = self.po_advance

@@ -83,24 +83,24 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
 
   def process
     flag = true
-    self.payment_params.each do |params|
-      custom_fields = params[:custom_fields]
-      params.delete(:custom_fields)
-      params[:payment_order_id] = self.bank_payment_request.payment_order.id
-      # payment = ::Payment.new(params)
-      payment = self.bank_payment_request.payment_order.payments.build(params)
+    self.payment_params.each do |payment_param|
+      custom_fields = payment_param[:custom_fields]
+      payment_param.delete(:custom_fields)
+      payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
+      # payment = ::Payment.new(payment_param)
+      payment = self.bank_payment_request.payment_order.payments.build(payment_param)
       if payment.save
-          puts "invoice SUCCESSFULS", payment.id
-          inv_id = payment.invoice.id
-          # payment.invoice.update(invoice_status_id: invoices_status[inv_id])
-          
-          # will get back later
-          # invoice = self.invoices.find(params[:invoice_id])
-          # invoice.update(invoice_status_id: invoices_status[inv_id.to_s])
-          InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
-          payment.save
-          # now save the custom fields to the invoice
-          set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
+        puts "invoice SUCCESSFULS", payment.id
+        inv_id = payment.invoice.id
+        # payment.invoice.update(invoice_status_id: invoices_status[inv_id])
+        
+        # will get back later
+        # invoice = self.invoices.find(params[:invoice_id])
+        # invoice.update(invoice_status_id: invoices_status[inv_id.to_s])
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+        payment.save
+        # now save the custom fields to the invoice
+        set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
       else
         puts "ERROR", payment.errors.full_messages
         flag = false
@@ -109,7 +109,8 @@ class BankTransfer::PaymentRequest::InwardInvoice::InvoicePaymentsBackground < B
 
     # if flag
       # now once the payment request has been created and the payments saved, we can mark it as open
-      self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
+      max_payment_amount = self.bank_payment_request.payment_order.payments.reload.joins(:amount).pluck(:value).max || 0
+      self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open), max_payment_amount: max_payment_amount)
       self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
 
       puts 'SUCCESSFUL!'
