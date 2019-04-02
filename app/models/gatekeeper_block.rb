@@ -13,12 +13,13 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  rule       :string(255)
-#  score      :integer          default(1), not null
+#  level      :integer          default(1), not null
 #
 
 class GatekeeperBlock < ApplicationRecord
-  belongs_to :user
-  belongs_to :company
+  belongs_to :user, optional: true
+  belongs_to :company, optional: true
+  belongs_to :admin_user, optional: true
 
   validates :act, presence: true
   validates :premise, presence: true

@@ -2,11 +2,17 @@ require 'resolv'
 class UserSessions::AdminBypassCreate < UserSessions::Create
   attr_accessor :admin_user
 
+  def initialize(status, params)
+    super(status, params)
+    self.admin_user = params[:admin_user]
+  end
+
   def process
     args = {}
     args[:status_id] = UserSessionStatus.id_for(self.status)
     args[:message] = params[:message]
     enrich_user args
+    enrich_device args
     enrich_admin_user args
     enrich_request args
     enrich_access args
@@ -40,6 +46,10 @@ class UserSessions::AdminBypassCreate < UserSessions::Create
     end
 
     args[:admin_user_id] = admin_user.id
+  end
+
+  def enrich_device(args)
+    args[:client_type] = params[:temporary_client_type]
   end
 
 end

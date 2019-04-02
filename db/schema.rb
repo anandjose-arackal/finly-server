@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_30_065418) do
+ActiveRecord::Schema.define(version: 2019_04_02_110206) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -130,6 +130,7 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.string "last_name"
     t.string "mobile_number", null: false
     t.string "encrypted_master_password"
+    t.string "authorized_ip"
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -499,7 +500,11 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
+    t.index ["account_number"], name: "index_bank_accounts_on_account_number"
     t.index ["account_owner_id", "account_owner_type"], name: "index_bank_accounts_on_account_owner_id_and_account_owner_type"
+    t.index ["company_id"], name: "index_bank_accounts_on_company_id"
+    t.index ["ifsc"], name: "index_bank_accounts_on_ifsc"
+    t.index ["name"], name: "index_bank_accounts_on_name"
     t.index ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id"
   end
 
@@ -665,12 +670,18 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.integer "gross_amount_id"
     t.decimal "roundoff_amount", precision: 10
     t.integer "cost_center_id"
+    t.text "invoice_number"
+    t.date "invoice_date"
+    t.date "invoice_due_date"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
     t.index ["category_id"], name: "index_beneficiary_payments_on_category_id"
     t.index ["company_id"], name: "index_beneficiary_payments_on_company_id"
     t.index ["cost_center_id"], name: "index_beneficiary_payments_on_cost_center_id"
     t.index ["department_id"], name: "index_beneficiary_payments_on_department_id"
     t.index ["gst_type_id"], name: "index_beneficiary_payments_on_gst_type_id"
+    t.index ["invoice_date"], name: "index_beneficiary_payments_on_invoice_date"
+    t.index ["invoice_due_date"], name: "index_beneficiary_payments_on_invoice_due_date"
+    t.index ["invoice_number"], name: "index_beneficiary_payments_on_invoice_number", length: 20
     t.index ["original_amount_id"], name: "index_beneficiary_payments_on_original_amount_id"
     t.index ["payable_amount_id"], name: "index_beneficiary_payments_on_payable_amount_id"
     t.index ["status_id"], name: "index_beneficiary_payments_on_status_id"
@@ -2856,6 +2867,7 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.datetime "updated_at", null: false
     t.string "rule"
     t.integer "level", default: 1, null: false
+    t.integer "admin_user_id"
     t.index ["company_id"], name: "index_gatekeeper_blocks_on_company_id"
     t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
@@ -3752,6 +3764,7 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.string "previous_refresh_token", default: "", null: false
     t.integer "status_id", default: 1
     t.text "message"
+    t.integer "admin_user_id"
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
@@ -4130,11 +4143,15 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
+    t.index ["company_id"], name: "index_payments_on_company_id"
+    t.index ["external_reference_id"], name: "index_payments_on_external_reference_id"
     t.index ["initiating_user_id"], name: "index_payments_on_initiating_user_id"
+    t.index ["payment_order_id"], name: "index_payments_on_payment_order_id"
     t.index ["payment_type_id"], name: "index_payments_on_payment_type_id"
     t.index ["procurement_id"], name: "fk_rails_b1fc8a9b0f"
     t.index ["purchase_order_id"], name: "fk_rails_65acc3c87d"
     t.index ["receiving_user_id"], name: "index_payments_on_receiving_user_id"
+    t.index ["reference_id"], name: "index_payments_on_reference_id"
   end
 
   create_table "per_diem_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5955,6 +5972,7 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.integer "user_ip_id"
     t.integer "user_agent_id"
     t.integer "user_agent_client_id"
+    t.integer "admin_user_id"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"
@@ -6381,6 +6399,7 @@ ActiveRecord::Schema.define(version: 2019_03_30_065418) do
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
+    t.index ["name"], name: "index_yes_bank_vendors_on_name"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"
   end

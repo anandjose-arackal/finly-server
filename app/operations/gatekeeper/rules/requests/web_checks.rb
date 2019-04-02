@@ -2,7 +2,7 @@ Gatekeeper::Checker.new 'On New Request' do
 
   before do
     skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
-    # skip if RequestStoreUtil.current_request.remote_ip == '::1' and not Rails.env.production?
+    skip if RequestStoreUtil.current_session&.admin_user_id.present?
   end
 
   premise :on_authenticated_request do
@@ -51,7 +51,7 @@ Gatekeeper::Checker.new 'On New Request' do
         message 'Session timeout'
         session_status_id UserSessionStatus.id_for(:revoked)
         response_code 401
-        level 3
+        level 1
         fail
       end
     end

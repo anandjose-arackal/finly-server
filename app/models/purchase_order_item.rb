@@ -30,6 +30,7 @@
 #  account                :string(255)
 #  tax_rate_id            :integer
 #  deleted_at             :datetime
+#  unit_of_measurement    :string(255)
 #
 
 class PurchaseOrderItem < ApplicationRecord

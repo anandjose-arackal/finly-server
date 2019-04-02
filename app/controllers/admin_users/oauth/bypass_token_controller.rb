@@ -41,4 +41,12 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
     end
   end
 
+  def create_user_sessions
+    params[:admin_user] = AdminUser.find_for_database_authentication(username: params[:username])
+    if params[:admin_user].nil?
+      raise 'Admin user load issue'
+    end
+    UserSessions::AdminBypassCreate.(:authorized, params)
+  end
+
 end

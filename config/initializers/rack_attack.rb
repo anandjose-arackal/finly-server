@@ -4,10 +4,8 @@ rack_attack_logger = LogStashLogger.new(type: :file, path: 'log/rack_attack_bloc
 Rack::Attack.cache.store = Rack::Attack::StoreProxy::RedisStoreProxy.new(redis_client)
 
 unless Rails.env.production?
-  Rack::Attack.safelist('allow from localhost') do |req|
-    # Requests are allowed if the return value is truthy
-    '127.0.0.1' == req.ip || '::1' == req.ip
-  end
+  Rack::Attack.safelist_ip('127.0.0.1')
+  Rack::Attack.safelist_ip('::1')
 end
 
 # Todo untested
