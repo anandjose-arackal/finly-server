@@ -5,7 +5,7 @@
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
 
   attr_accessor :initiating_account, :initiating_account_adapter, :view_role,
-                :crediting_payments, :bank_transfer_type
+                :crediting_payments, :bank_transfer_type, :otp
 
   def personalizer
     {
@@ -38,11 +38,20 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     end
     self.crediting_payments = self.bank_payment_request.payments.creditable.with_id(payment_ids) # this ensures only failed or pending approval payments can be processed
     self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
+
   end
 
   def validate
     if self.bank_payment_request.blank?
       add_message :error, "Payment order not found"
+      return
+    end
+
+    # checking for the right OTP for this particular bank payment request
+    #todo - have to move this to the Payment Processor Rules branch
+    self.otp = params[:otp]
+    unless self.otp == self.bank_payment_request.otp
+      add_message :error, "Invalid OTP. Please enter the right OTP and try again"
       return
     end
 

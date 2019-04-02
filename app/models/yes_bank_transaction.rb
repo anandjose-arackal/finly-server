@@ -49,7 +49,9 @@ class YesBankTransaction < ApplicationRecord
     self.transfer_status_id == BankTransferStatus.id_for(:failed)
   end
 
-  alias_method :utr, :bank_reference_number
+  def utr
+    self.bank_reference_number
+  end
 
   private
 

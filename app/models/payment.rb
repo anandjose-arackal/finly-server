@@ -47,6 +47,8 @@
 #  deleted_at                     :datetime
 #  beneficiary_payment_id         :integer
 #  bank_account_provider_id       :integer
+#  otp                            :string(255)
+#  opt_attempts                   :integer
 #
 
 class Payment < ApplicationRecord

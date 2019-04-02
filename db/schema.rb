@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_03_29_143152) do
+ActiveRecord::Schema.define(version: 2019_04_01_145100) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -138,6 +138,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_143152) do
     t.string "last_name"
     t.string "mobile_number", null: false
     t.string "encrypted_master_password"
+    t.string "authorized_ip"
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
@@ -596,6 +597,10 @@ ActiveRecord::Schema.define(version: 2019_03_29_143152) do
     t.datetime "approved_at"
     t.integer "company_id"
     t.integer "bank_account_provider_id"
+    t.string "otp"
+    t.datetime "otp_sent_at"
+    t.integer "otp_attempts"
+    t.integer "otp_count"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["owner_id"], name: "index_bank_payment_requests_on_owner_id"
     t.index ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id"
@@ -644,12 +649,18 @@ ActiveRecord::Schema.define(version: 2019_03_29_143152) do
     t.integer "gross_amount_id"
     t.decimal "roundoff_amount", precision: 10
     t.integer "cost_center_id"
+    t.text "invoice_number"
+    t.date "invoice_date"
+    t.date "invoice_due_date"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
     t.index ["category_id"], name: "index_beneficiary_payments_on_category_id"
     t.index ["company_id"], name: "index_beneficiary_payments_on_company_id"
     t.index ["cost_center_id"], name: "index_beneficiary_payments_on_cost_center_id"
     t.index ["department_id"], name: "index_beneficiary_payments_on_department_id"
     t.index ["gst_type_id"], name: "index_beneficiary_payments_on_gst_type_id"
+    t.index ["invoice_date"], name: "index_beneficiary_payments_on_invoice_date"
+    t.index ["invoice_due_date"], name: "index_beneficiary_payments_on_invoice_due_date"
+    t.index ["invoice_number"], name: "index_beneficiary_payments_on_invoice_number", length: 20
     t.index ["original_amount_id"], name: "index_beneficiary_payments_on_original_amount_id"
     t.index ["payable_amount_id"], name: "index_beneficiary_payments_on_payable_amount_id"
     t.index ["status_id"], name: "index_beneficiary_payments_on_status_id"
@@ -2195,6 +2206,62 @@ ActiveRecord::Schema.define(version: 2019_03_29_143152) do
     t.index ["reviewer_id"], name: "index_document_level_reviewer_mappings_on_reviewer_id"
   end
 
+  create_table "document_message_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "receiptable_document_id", null: false
+    t.string "receiptable_document_type", null: false
+    t.integer "document_message_id", null: false
+    t.datetime "browser_push_sent_at"
+    t.datetime "app_push_sent_at"
+    t.datetime "email_sent_at"
+    t.datetime "read_at"
+    t.datetime "trashed_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_push_sent_at"], name: "index_document_message_receipts_on_app_push_sent_at"
+    t.index ["browser_push_sent_at"], name: "index_document_message_receipts_on_browser_push_sent_at"
+    t.index ["deleted_at"], name: "index_document_message_receipts_on_deleted_at"
+    t.index ["document_message_id"], name: "index_document_message_receipts_on_document_message_id"
+    t.index ["email_sent_at"], name: "index_document_message_receipts_on_email_sent_at"
+    t.index ["read_at"], name: "index_document_message_receipts_on_read_at"
+    t.index ["receiptable_document_id"], name: "index_document_message_receipts_on_receiptable_document_id"
+    t.index ["receiptable_document_type"], name: "index_document_message_receipts_on_receiptable_document_type"
+    t.index ["trashed_at"], name: "index_document_message_receipts_on_trashed_at"
+    t.index ["user_id"], name: "index_document_message_receipts_on_user_id"
+  end
+
+  create_table "document_message_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_document_message_types_on_name"
+  end
+
+  create_table "document_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "order"
+    t.integer "user_id"
+    t.integer "type_id"
+    t.text "body"
+    t.string "attachment_file_name"
+    t.string "attachment_content_type"
+    t.bigint "attachment_file_size"
+    t.datetime "attachment_updated_at"
+    t.datetime "deleted_at"
+    t.datetime "trashed_at"
+    t.integer "messageable_document_id", null: false
+    t.string "messageable_document_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_document_messages_on_deleted_at"
+    t.index ["messageable_document_id"], name: "index_document_messages_on_messageable_document_id"
+    t.index ["messageable_document_type"], name: "index_document_messages_on_messageable_document_type"
+    t.index ["order"], name: "index_document_messages_on_order"
+    t.index ["trashed_at"], name: "index_document_messages_on_trashed_at"
+    t.index ["type_id"], name: "index_document_messages_on_type_id"
+    t.index ["user_id"], name: "index_document_messages_on_user_id"
+  end
+
   create_table "document_number_config_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -2717,7 +2784,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_143152) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "rule"
-    t.integer "score", default: 1, null: false
+    t.integer "level", default: 1, null: false
     t.index ["company_id"], name: "index_gatekeeper_blocks_on_company_id"
     t.index ["user_id"], name: "index_gatekeeper_blocks_on_user_id"
   end
@@ -3671,6 +3738,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_143152) do
     t.string "previous_refresh_token", default: "", null: false
     t.integer "status_id", default: 1
     t.text "message"
+    t.integer "admin_user_id"
     t.index ["application_id"], name: "fk_rails_732cb83ab7"
     t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
     t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
@@ -5869,6 +5937,7 @@ ActiveRecord::Schema.define(version: 2019_03_29_143152) do
     t.text "user_agent"
     t.integer "user_ip_id"
     t.integer "user_agent_client_id"
+    t.integer "admin_user_id"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"

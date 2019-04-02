@@ -424,6 +424,11 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     end
   end
 
+  def generate_otp
+    @result = BankTransfer::PaymentRequest::GenerateOtpForCredit.(current_user, params)
+    respond
+  end
+
   def create_bulk_beneficiary_ticket(current_user, params)
     @result = BankTransfer::PaymentRequest::BulkCreateFromFile.(current_user, params)
     if @result.success?

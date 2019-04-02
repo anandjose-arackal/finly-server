@@ -43,6 +43,7 @@
 #  user_agent           :text(65535)
 #  user_ip_id           :integer
 #  user_agent_client_id :integer
+#  admin_user_id        :integer
 #
 
 class UserSession < ApplicationRecord

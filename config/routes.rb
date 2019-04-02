@@ -592,6 +592,8 @@
 #                                                         PATCH  /policies/:policy_id/policy_user_roles/:id(.:format)                                                                policy_user_roles#update
 #                                                         PUT    /policies/:policy_id/policy_user_roles/:id(.:format)                                                                policy_user_roles#update
 #                                                         DELETE /policies/:policy_id/policy_user_roles/:id(.:format)                                                                policy_user_roles#destroy
+#                               policy_department_mapping GET    /policies/:policy_id/department_mapping(.:format)                                                                   policies#department_mapping
+#                                 policy_location_mapping GET    /policies/:policy_id/location_mapping(.:format)                                                                     policies#location_mapping
 #                                                         GET    /policies(.:format)                                                                                                 policies#index
 #                                                         POST   /policies(.:format)                                                                                                 policies#create
 #                                              new_policy GET    /policies/new(.:format)                                                                                             policies#new
@@ -678,7 +680,6 @@
 #                                     delete_export_field DELETE /remove_export_field(.:format)                                                                                      organization_account#remove_export_column
 #                                                  people GET    /people(.:format)                                                                                                   people#people
 #                                           verify_mobile GET    /users/verify(.:format)                                                                                             otp#edit
-#                                    update_mobile_number POST   /otp/update(.:format)                                                                                               otp#update
 #                                              verify_otp POST   /otp/verify(.:format)                                                                                               otp#verify
 #                                              resend_otp POST   /otp/resend(.:format)                                                                                               otp#resend
 #                                            card_details POST   /cards/details(.:format)                                                                                            cards#details
@@ -802,6 +803,7 @@
 #                                                         PATCH  /expenses/:id(.:format)                                                                                             expenses#update
 #                                                         PUT    /expenses/:id(.:format)                                                                                             expenses#update
 #                                                         DELETE /expenses/:id(.:format)                                                                                             expenses#destroy
+#                                        configs_loc_dept GET    /configs/loc_dept(.:format)                                                                                         configurations#loc_dept
 #                                     expenses_unreported POST   /expenses/unreported(.:format)                                                                                      expenses#unreported
 #                                         receipts_export GET    /receipts/export(.:format)                                                                                          receipts#export
 #                                        receipt_add_note POST   /receipts/:receipt_id/add_note(.:format)                                                                            receipts#add_note
@@ -1215,6 +1217,7 @@
 #                      bank_transfer_bulk_credit_validate PATCH  /bank_transfer/bulk_credit_validate(.:format)                                                                       bank_transfer/bank_payment_requests#bulk_credit_validate
 #                               bank_transfer_bulk_credit PATCH  /bank_transfer/bulk_credit(.:format)                                                                                bank_transfer/bank_payment_requests#bulk_credit
 #                        bank_transfer_sample_import_file GET    /bank_transfer/sample_import_format(.:format)                                                                       bank_transfer/bank_payment_requests#sample_import_file
+#                              bank_transfer_generate_otp POST   /bank_transfer/generate_otp(.:format)                                                                               bank_transfer/bank_payment_requests#generate_otp
 #          bank_transfer_bank_payment_request_edit_config GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/edit_config(.:format)                                 bank_transfer/bank_payment_requests#edit_config
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)                                     bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)                                      bank_transfer/bank_payment_requests#review
@@ -1562,6 +1565,7 @@
 #                           procure_inward_invoice_submit PUT    /procure/inward_invoices/:inward_invoice_id/submit(.:format)                                                        procure/inward_invoices#submit
 #                          procure_inward_invoice_retract PUT    /procure/inward_invoices/:inward_invoice_id/retract(.:format)                                                       procure/inward_invoices#retract
 #                          procure_inward_invoice_approve PUT    /procure/inward_invoices/:inward_invoice_id/approve(.:format)                                                       procure/inward_invoices#approve
+#                        procure_inward_invoice_unapprove PUT    /procure/inward_invoices/:inward_invoice_id/unapprove(.:format)                                                     procure/inward_invoices#unapprove
 #                           procure_inward_invoice_reject PUT    /procure/inward_invoices/:inward_invoice_id/reject(.:format)                                                        procure/inward_invoices#reject
 #                            procure_inward_invoice_close PUT    /procure/inward_invoices/:inward_invoice_id/close(.:format)                                                         procure/inward_invoices#close
 #                 procure_inward_invoice_save_as_template POST   /procure/inward_invoices/:inward_invoice_id/save_as_template(.:format)                                              procure/inward_invoices#template_create
@@ -1648,6 +1652,28 @@
 #                               dashboards_vp_po_advances GET    /dashboards/vp/po_advances(.:format)                                                                                dashboards/vendor_payments#po_advances
 #                                      dashboards_vp_grns GET    /dashboards/vp/grns(.:format)                                                                                       dashboards/vendor_payments#grns
 #                                   dashboards_vp_budgets GET    /dashboards/vp/budgets(.:format)                                                                                    dashboards/vendor_payments#budgets
+#                               vendors_new_vendor_config GET    /vendors/new_vendor_config(.:format)                                                                                vendors#new_vendor_config
+#                                   vendors_filter_config GET    /vendors/filter_config(.:format)                                                                                    vendors#filter_config
+#                               vendors_create_and_submit POST   /vendors/create_and_submit(.:format)                                                                                vendors#create_and_submit
+#                                      vendors_penny_test POST   /vendors/penny_test(.:format)                                                                                       vendors#penny_test
+#                                  vendors_validate_gstin POST   /vendors/validate_gstin(.:format)                                                                                   vendors#validate_gstin
+#                                  vendors_actions_config GET    /vendors/actions_config(.:format)                                                                                   vendors#actions_config
+#                                          vendor_approve PUT    /vendors/:vendor_id/approve(.:format)                                                                               vendors#approve
+#                                           vendor_submit PUT    /vendors/:vendor_id/submit(.:format)                                                                                vendors#submit
+#                                           vendor_reject PUT    /vendors/:vendor_id/reject(.:format)                                                                                vendors#reject
+#                                          vendor_retract PUT    /vendors/:vendor_id/retract(.:format)                                                                               vendors#retract
+#                                     vendor_take_control PUT    /vendors/:vendor_id/take_control(.:format)                                                                          vendors#take_control
+#                                   vendor_return_control PUT    /vendors/:vendor_id/return_control(.:format)                                                                        vendors#return_control
+#                                     vendor_procurements GET    /vendors/:vendor_id/procurements(.:format)                                                                          vendor#procurements
+#                                     vendor_transactions GET    /vendors/:vendor_id/transactions(.:format)                                                                          vendor#transactions
+#                                                 vendors GET    /vendors(.:format)                                                                                                  vendors#index
+#                                                         POST   /vendors(.:format)                                                                                                  vendors#create
+#                                              new_vendor GET    /vendors/new(.:format)                                                                                              vendors#new
+#                                             edit_vendor GET    /vendors/:id/edit(.:format)                                                                                         vendors#edit
+#                                                  vendor GET    /vendors/:id(.:format)                                                                                              vendors#show
+#                                                         PATCH  /vendors/:id(.:format)                                                                                              vendors#update
+#                                                         PUT    /vendors/:id(.:format)                                                                                              vendors#update
+#                                                         DELETE /vendors/:id(.:format)                                                                                              vendors#destroy
 #                            configuration_rate_contracts GET    /rate_contracts/configuration(.:format)                                                                             rate_contracts#configuration
 #                                          rate_contracts GET    /rate_contracts(.:format)                                                                                           rate_contracts#index
 #                                                         POST   /rate_contracts(.:format)                                                                                           rate_contracts#create
@@ -3227,6 +3253,7 @@ Rails.application.routes.draw do
     get 'sample_import_format', to: 'bank_payment_requests#sample_import_file', as: :sample_import_file
     # patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_credit_validate
 
+    post 'generate_otp', to: 'bank_payment_requests#generate_otp', as: :generate_otp
     resources :bank_payment_requests do
       get 'edit_config', to: 'bank_payment_requests#edit_config', as: :edit_config
       post 'comment', to: 'bank_payment_requests#comment', as: :comment

@@ -1,7 +1,7 @@
 # require './company'
 FactoryBot.define do
 
-  sequence :user_email do |n|
+  sequence :finly_user_email do |n|
     "user#{n}@example.com"
   end
 
@@ -27,7 +27,7 @@ FactoryBot.define do
 
 
 
-  sequence :mobile_number do |n|
+  sequence :user_mobile_number do |n|
     if n > 9
       number = "98765432#{n}"
     elsif n > 99
@@ -42,10 +42,10 @@ FactoryBot.define do
   factory :user do
     first_name {"User"}
     last_name {"Doe"}
-    email {generate(:user_email)}
+    email {generate(:finly_user_email)}
     password {'FW1g$18j0t!k2'}
     mothers_maiden_name {"XX"}
-    mobile_number {generate(:mobile_number)}
+    mobile_number {generate(:user_mobile_number)}
     last_activity_at {DateTime.now}
     password_changed_at {DateTime.now}
 

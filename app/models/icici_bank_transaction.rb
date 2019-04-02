@@ -40,5 +40,7 @@ class IciciBankTransaction < ApplicationRecord
 
   accepts_nested_attributes_for :amount
 
-  alias_method :bank_reference_number, :utr
+  def bank_reference_number
+    self.utr
+  end
 end

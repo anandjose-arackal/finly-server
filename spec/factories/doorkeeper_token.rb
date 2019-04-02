@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :doorkeeper_token, class: Doorkeeper::AccessToken do
+  factory :doorkeeper_token, class: 'Doorkeeper::AccessToken' do
     application_id {1}
     token {SecureRandom.hex(32)}
     refresh_token {SecureRandom.hex(32)}
