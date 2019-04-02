@@ -29,10 +29,10 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
         self.budgets = op.budget_data
       end
     end
-    # if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.budgets.empty?
-    #   add_message :error, "You cannot submit this PO because there are not budgets associated with it"
-    #   return
-    # end
+    if current_company.enforce_budget_configuration.enforce_purchase_order_budget? && self.budgets.empty?
+      add_message :error, "You cannot submit this PO because there are not budgets associated with it"
+      return
+    end
 
 
     # Set validation of DLRMs
