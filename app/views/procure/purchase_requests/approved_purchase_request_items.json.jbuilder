@@ -1,6 +1,6 @@
 json.result do
   json.approved_purchase_request_items do
-    json.array!((1..20).to_a) do |i|
+    json.array!((1..35).to_a) do |i|
       json.order_number "ASDF123"
       json.item_id "12"
       json.quantity i
