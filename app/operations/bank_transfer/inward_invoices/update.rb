@@ -91,7 +91,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       split_date = self.inward_invoice_params[:transaction_service_period_from].split("/") # frontend sends in the format, mm/yyyy
       formatted_month = split_date.first
       formatted_year = split_date.last
-
       unless is_valid_year?(formatted_year) && is_valid_month?(formatted_month)
         add_message :error, "Invalid Date."
         return
@@ -246,7 +245,8 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   end
 
   def is_valid_month? month
-    return false if month.to_i.to_s != month #invalidate characters
+    # return false if month.to_i.to_s != month #invalidate characters
+    return false unless Date.strptime(month, "%m").gregorian? rescue false
     month.strip.to_i.between?(1, 12)
   end
 

@@ -20,7 +20,8 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
   end
 
   def init
-    ids = params["bulk_take_control_ids"]
+    # ids = params["bulk_take_control_ids"]
+    ids = params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
     unless ids.is_a?(Array)
       ids = ids.split(',')
     end
