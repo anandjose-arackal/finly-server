@@ -44,9 +44,6 @@ class Policy::Users::AddUser < Policy::Base
         messages[:error] << "Policy not found"
       end
     end
-    unless user.policy_admin?(policy) or user.admin?
-      raise_unauthorized_exception
-    end
   end
 
   def process
