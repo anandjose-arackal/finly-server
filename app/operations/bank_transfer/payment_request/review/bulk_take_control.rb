@@ -5,6 +5,20 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
 
   attr_accessor :bank_payment_requests
 
+
+  def pre_validate
+    super
+    return if has_errors?
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate this action'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
+  end
+
   def init
     ids = params["bulk_take_control_ids"]
     unless ids.is_a?(Array)
@@ -39,6 +53,10 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
       #   valid = false
       # end
 
+      if user_already_in_control?
+        valid = false
+      end
+
       unless valid
         reject_bpr << bank_payment_request
       end
@@ -49,6 +67,11 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
             all_bpr.id == bpr.id
         end
     end
+
+    if self.bank_payment_requests.blank?
+      add_message :error, "None of the payment tickets are in a state to be in administrative control."
+      return
+    end
   end
 
   def process
@@ -58,6 +81,15 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
     ids = self.bank_payment_requests.map { |h| h[:id] }
     BankTransfer::PaymentRequest::Review::BulkTakeControlBackground.call_async(ids, {initiating_user_id: current_user.id, bulk_take_control_ids: params["bulk_take_control_ids"]})
     # BankTransfer::PaymentRequest::Review::BulkTakeControlBackground.call(ids, {initiating_user_id: user.id, params: params[:bulk_take_control_ids]})
+  end
+
+  private
+
+  def user_already_in_control?
+    # check for the current level if it isn't taken control
+    # check if the same user is not taking control twice
+    # check if for the same level if any other user has also taken control
+    (self.bank_payment_request.dlrms&.find_by(level_id: self.bank_payment_request.level&.id).taken_control_by_id == user.id)
   end
 
 end

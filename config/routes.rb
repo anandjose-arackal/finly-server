@@ -3149,6 +3149,7 @@ Rails.application.routes.draw do
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
     patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
+    patch 'bulk_reject' => 'bank_payment_requests#bulk_reject', as: :bulk_reject
 
     post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
     post 'unified_payment_ticket' => 'bank_payment_requests#unified_payment_ticket', as: :unified_payment_ticket
@@ -3383,6 +3384,8 @@ Rails.application.routes.draw do
       put 'unapprove', to: 'purchase_orders#unapprove'
       put 'reject', to: 'purchase_orders#reject'
       put 'close', to: 'purchase_orders#close'
+      put 'take_control', to: 'purchase_orders#take_control'
+      put 'return_control', to: 'purchase_orders#return_control'
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
       put 'void', to: 'purchase_orders#void'
@@ -3430,6 +3433,8 @@ Rails.application.routes.draw do
       put 'approve', to: 'inward_invoices#approve'
       put 'unapprove', to: 'inward_invoices#unapprove'
       put 'reject', to: 'inward_invoices#reject'
+      put 'return_control', to: 'inward_invoices#return_control'
+      put 'take_control', to: 'inward_invoices#take_control'
       put 'close', to: 'inward_invoices#close'
       post 'save_as_template', to: 'inward_invoices#template_create'
       post 'apply_template', to: 'inward_invoices#template_apply'
