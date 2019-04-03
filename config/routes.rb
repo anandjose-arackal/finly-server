@@ -3364,6 +3364,8 @@ Rails.application.routes.draw do
     get 'grn_received', to: 'procurements#grn_received'
 
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
+    put 'purchase_orders/bulk_reject', to: 'purchase_orders#bulk_reject'
+    put 'purchase_orders/bulk_take_control', to: 'purchase_orders#bulk_take_control'
 
     get 'purchase_orders/templates', to: 'purchase_orders#template_index'
     get 'purchase_orders/templates/:id', to: 'purchase_orders#template_show'
@@ -3420,6 +3422,8 @@ Rails.application.routes.draw do
     post '/inward_invoices/import', to: 'inward_invoices#import'
 
     put 'inward_invoices/bulk_approve', to: 'inward_invoices#bulk_approve'
+    put 'inward_invoices/bulk_reject', to: 'inward_invoices#bulk_reject'
+    put 'inward_invoices/bulk_take_control', to: 'inward_invoices#bulk_take_control'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
@@ -3485,6 +3489,11 @@ Rails.application.routes.draw do
   post 'vendors/penny_test', to: 'vendors#penny_test'
   post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
   get 'vendors/actions_config', to: 'vendors#actions_config'
+
+  put 'vendors/bulk_approve', to: 'vendors#bulk_approve'
+  put 'vendors/bulk_reject', to: 'vendors#bulk_reject'
+  put 'vendors/bulk_take_control', to: 'vendors#bulk_take_control'
+  
   resources :vendors do
     put 'approve', to: "vendors#approve"
     put 'submit', to: "vendors#submit"
