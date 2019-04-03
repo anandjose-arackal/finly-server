@@ -68,12 +68,13 @@ json.result do
     end
     if @result.purchase_request.attachments.present?
       json.attachments_attributes do
-        json.array!(@result.purchase_request.attachments.attachments) do |attachment|
+        json.array!(@result.purchase_request.attachments) do |attachment|
           json.uid attachment.id
           json.name attachment&.file_file_name
-          json.url attachment&.attachment&.url
+          json.url attachment&.file&.url
           # As required by frontend
           json.status 'done'
+        end
       end
     end
   end

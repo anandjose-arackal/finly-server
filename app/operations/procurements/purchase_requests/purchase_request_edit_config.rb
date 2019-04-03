@@ -20,8 +20,8 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       self.policies.each do |policy|
         params = {
             policy_id: policy.id,
-            # provider_name: "PurchaseRequestProvider",
-            provider_name: "BankPaymentRequestProvider",
+            provider_name: "PurchaseRequestProvider",
+            # provider_name: "BankPaymentRequestProvider",
             document: self.purchase_request
         }
         op = ::ReviewalManager::ReviewalChain.(user, params)
