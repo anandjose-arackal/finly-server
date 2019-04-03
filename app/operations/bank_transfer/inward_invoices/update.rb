@@ -8,7 +8,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
     self.custom_fields = params&.dig(:invoice, :custom_fields)
-    self.gstin_location = self.inward_invoice&.vendor&.gstin_locations.find_by(id: purchase_order_params[:gstin_location_id]) || self.purchase_order.vendor&.gstin_locations.first
+    self.gstin_location = self.inward_invoice&.vendor&.gstin_locations.find_by(id: inward_invoice_params[:gstin_location_id]) || self.inward_invoice.vendor&.gstin_locations.first
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
 
     if self.inward_invoice.procurement.present?
