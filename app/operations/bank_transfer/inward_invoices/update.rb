@@ -1,7 +1,7 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement,
-                :gstin_locations
+                :gstin_location
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
