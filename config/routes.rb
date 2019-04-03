@@ -3450,6 +3450,7 @@ Rails.application.routes.draw do
       get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
       collection do
         get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
+        get 'approved_purchase_request_items', to: 'purchase_requests#approved_purchase_request_items'
       end
     end
 

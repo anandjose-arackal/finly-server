@@ -37,4 +37,10 @@ class Procure::PurchaseRequestsController < ApplicationController
     respond
   end
 
+  def approved_purchase_request_items
+    respond_to do |format|
+      format.json
+    end
+  end
+
 end
