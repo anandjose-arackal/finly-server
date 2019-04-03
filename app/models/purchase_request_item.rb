@@ -20,7 +20,8 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :per_unit_estimated_amount, optional: true, class_name: "Amount", dependent: :destroy
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
+  has_many :attachments, as: :resource, dependent: :destroy
 
-  accepts_nested_attributes_for :per_unit_estimated_amount, allow_destroy: true
+  accepts_nested_attributes_for :per_unit_estimated_amount, :attachments, allow_destroy: true
 
 end

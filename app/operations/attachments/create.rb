@@ -10,6 +10,8 @@ class Attachments::Create < Attachments::Base
     self.attachment.file = params[:attachment]
     self.attachment.creator_id = user.id
     self.attachment.company = user.company
+    self.attachment.resource_type = params[:resource_type] if params[:resource_type].present?
+    self.attachment.resource_id = params[:resource_id] if params[:resource_id].present?
 
     if self.attachment.save
       add_message :success, 'Upload Successful'

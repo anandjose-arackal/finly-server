@@ -24,13 +24,14 @@ class PurchaseRequest < ApplicationRecord
   belongs_to :creator, optional: true, class_name: 'User'
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :purchase_order, optional: true
+  has_many :attachments, as: :resource, dependent: :destroy
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
 
   before_save :add_company
 
-  accepts_nested_attributes_for :purchase_request_items
+  accepts_nested_attributes_for :purchase_request_items, :attachments, allow_destroy: true
 
   def add_company
     self.company_id = self.creator.company_id
