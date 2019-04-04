@@ -27,6 +27,41 @@ class Procure::PurchaseRequestsController < ApplicationController
     respond
   end
 
+  def create_and_submit
+    @result = Procurements::PurchaseRequests::CreateAndSubmit.(current_user, params)
+    respond
+  end
+
+  def submit
+    @result = Procurements::PurchaseRequests::Submit.(current_user, params)
+    respond
+  end
+
+  def retract
+    @result = Procurements::PurchaseRequests::Retract.(current_user, params)
+    respond
+  end
+
+  def reject
+    @result = Procurements::PurchaseRequests::Reject.(current_user, params)
+    respond
+  end
+
+  def approve
+    @result = Procurements::PurchaseRequests::Approve.(current_user, params)
+    respond
+  end
+
+  def take_control
+    @result = Procurements::PurchaseRequests::TakeControl.(current_user, params)
+    respond
+  end
+
+  def return_control
+    @result = Procurements::PurchaseRequests::ReturnControl.(current_user, params)
+    respond
+  end
+
   def edit_config
     @result = Procurements::PurchaseRequests::PurchaseRequestEditConfig.(current_user, params)
     respond
