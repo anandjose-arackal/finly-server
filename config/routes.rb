@@ -3459,6 +3459,13 @@ Rails.application.routes.draw do
     # adding routes for purchase requests
     resources :purchase_requests do
       get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
+      post 'create_and_submit', to: "purchase_requests#create_and_submit", as: :create_and_submit
+      put 'submit', to: "purchase_requests#submit", as: :submit
+      put 'retract', to: "purchase_requests#retract", as: :retract
+      put 'reject', to: "purchase_requests#reject", as: :reject
+      put 'approve', to: "purchase_requests#approve", as: :approve
+      put 'take_control', to: "purchase_requests#take_control", as: :take_control
+      put 'return_control', to: "purchase_requests#return_control", as: :return_control
       collection do
         get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
         get 'approved_purchase_request_items', to: 'purchase_requests#approved_purchase_request_items'
