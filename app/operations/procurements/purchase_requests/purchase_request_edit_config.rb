@@ -15,7 +15,7 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       # self.departments = user.departments
       self.departments = user.company.departments
       # todo - change the above before deploy. Or should we? :thinking face:
-      self.policies = user.policies
+      self.policies = Policy::VendorPayments::Index.(user, params).policies
       self.reviewal_chains = []
       self.policies.each do |policy|
         params = {
