@@ -42,5 +42,5 @@ json.results do
       end
     end
   end
-  json.approved_pr_items_count 35
+  json.count 35
 end
