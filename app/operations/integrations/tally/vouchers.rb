@@ -1,5 +1,14 @@
 class Integrations::Tally::Vouchers < Integrations::Tally::Base
-  attr_accessor :expenses, :reports
+  attr_accessor :expenses, :reports, :file_url
+
+  class Integrations::Tally::Vouchers::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :file_url
+
+    def init
+      self.file_url = params[:file_url]
+    end
+
+  end
 
   def pre_validate
     unless user.present?
@@ -32,13 +41,23 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     end
     report_ids = reports.pluck(:id)
     self.expenses = Expense.with_report_id(report_ids)
-    if user.company.tally_configuration.custom_voucher
-      template = "#{Rails.root}/lib/personalizer/adapters/company#{user.company_id}/tally/vouchers.xml"
+    if user.company.tally_configuration.excel_export
+      params[:type] = :tally_expense_voucher_xls
+      result = ExportManager::RequestHandler.(user, params)
+      unless result.success?
+        add_message :error, result.messages[:error]
+        return
+      end
+      self.file_url = result.file_url
     else
-      current_class_path = self.method(:success).source_location.first.gsub('/vouchers.rb', '')
-      template = "#{current_class_path}/vouchers.xml"
+      if user.company.tally_configuration.custom_voucher
+        template = "#{Rails.root}/lib/personalizer/adapters/company#{user.company_id}/tally/vouchers.xml"
+      else
+        current_class_path = self.method(:success).source_location.first.gsub('/vouchers.rb', '')
+        template = "#{current_class_path}/vouchers.xml"
+      end
+      self.file_url = Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, configuration: current_company.tally_configuration}}}, messages).generate_xml
     end
-    self.response = Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, configuration: current_company.tally_configuration}}}, messages)
   end
 
   def post_process
@@ -46,7 +65,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
   end
 
   def success
-    self.response
+    Integrations::Tally::Vouchers::SuccessPresenter.new(user, {file_url: self.file_url}, messages)
   end
 
   # class Personalizer::Adapters::Company2::ExportTemplates2::Tally::Presenter < Exporter
