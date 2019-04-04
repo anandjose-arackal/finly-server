@@ -43,6 +43,10 @@ class WorkflowManager::Aasm::InvoiceProvider < WorkflowManager::Aasm::BaseProvid
       transitions :from => :processing, :to => :processing
     end
 
+    event :return_control do
+      transitions :from => :processing, :to => :processing
+    end
+
     after_all_events :change_state
     # after_all_transitions :log_status_change
     # success :change_state

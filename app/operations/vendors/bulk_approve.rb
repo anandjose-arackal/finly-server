@@ -1,4 +1,4 @@
-class Vendors::BulkTakeControl < Vendors::Base
+class Vendors::BulkApprove < Vendors::Base
   attr_accessor :vendors
 
   def init

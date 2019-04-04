@@ -83,6 +83,21 @@ class VendorsController < ApplicationController
     respond
   end
 
+  def bulk_reject
+    @result = Vendors::BulkReject.(current_user, params)
+    respond
+  end
+
+  def bulk_approve
+    @result = Vendors::BulkApprove.(current_user, params)
+    respond
+  end
+
+  def bulk_take_control
+    @result = Vendors::BulkTakeControl.(current_user, params)
+    respond
+  end
+
   # Support
 
   def penny_test

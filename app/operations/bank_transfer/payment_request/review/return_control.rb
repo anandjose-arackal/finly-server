@@ -11,6 +11,11 @@ class BankTransfer::PaymentRequest::Review::ReturnControl < BankTransfer::Paymen
   end
 
   def validate
+    if self.bank_payment_request.blank?
+      add_message :error, "Payment Ticket not found"
+      return
+    end
+
     unless user.vendor_payment_admin?
       add_message :error, "Only admins can return control of a payment order"
       return

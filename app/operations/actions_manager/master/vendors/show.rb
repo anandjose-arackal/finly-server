@@ -38,6 +38,31 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
     user.is_vendor_manager? || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
   end
 
+  def take_control
+    if user.vendor_payment_admin? && (YesBankVendor.status_ids(:awaiting_approval).include?(vendor.status_id)) && user_can_take_control?
+      true
+    end
+  end
+
+  def return_control
+    if user.vendor_payment_admin? && (YesBankVendor.status_ids(:awaiting_approval).include?(vendor.status_id)) && user_can_return_control?
+      true
+    end
+  end
+
+  def user_can_take_control?
+    # check for the current level if it isn't taken control
+    # check if the same user is not taking control twice
+    # check if for the same level if any other user has also taken control
+    (vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id != user.id)
+  end
+
+  def user_can_return_control?
+    vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control &&
+    vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id == user.id
+  end
+
+
   # def add_bank_account
   #   user.is_vendor_manager? || vendor.get_reviewers.include?(user)
   # end
