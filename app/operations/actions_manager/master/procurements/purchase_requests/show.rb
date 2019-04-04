@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsManager::Master::Base
 
   register_handle :purchase_request_show
-  register_actions [ :save_btn, :create_and_submit, :submit, :retract, :reject, :approve, :take_control, :delete_pr_line_item ]
+  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :take_control, :delete_pr_line_item, :return_control ]
 
   def initialize(user=nil, params=nil)
     super
@@ -34,6 +34,10 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def take_control
+    true
+  end
+
+  def return_control
     true
   end
 
