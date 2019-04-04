@@ -129,13 +129,14 @@ class Card::Transaction::Create < BaseOperation
               transaction.card_expense = @result.expense.card_expense
               transaction.expensed = true
               transaction.save
-            elsif params[:type_of_details] == 'T'
+            elsif params[:type_of_details] == 'T' || params[:type_of_details] == 'S'
               # i.e. it's the actual amount withdrawn to cash on hand, so add it accordingly
               self.transaction = CardTransaction.new(params)
               unless transaction.save
                 add_message :error, transaction.errors.full_messages
                 return false
               end
+              return true if params[:type_of_details] == 'S' && params[:product_code] != 'HDFFRG'
 
               # add to cash on hand only if it's an expense card
               return true unless card.card_program.create_expense
