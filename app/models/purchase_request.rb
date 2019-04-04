@@ -16,7 +16,7 @@
 
 class PurchaseRequest < ApplicationRecord
 
-  belongs_to :status, optional: true, class_name: "PurchaseRequestStatus", foreign_key: :purchase_request_status_id
+  belongs_to :purchase_request_status, optional: true
   belongs_to :department, optional: true
   belongs_to :location, optional: true, class_name: "BranchLocation"
   belongs_to :policy, optional: true
@@ -35,6 +35,21 @@ class PurchaseRequest < ApplicationRecord
 
   def add_company
     self.company_id = self.creator.company_id
+  end
+
+  def as_json
+    {
+      description: self.description,
+      location_id: self.location&.name,
+      department_id: self.department_id,
+      department_name: self.department&.name,
+      policy_id: self.policy_id,
+      policy_name: self.policy&.name,
+      purchase_request_status_id: self.purchase_request_status_id,
+      purchase_request_status_name: self.purchase_request_status&.name,
+      creator_id: self.creator_id,
+      creator_name: self.creator&.name
+    }
   end
 
 end
