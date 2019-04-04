@@ -183,7 +183,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     #   return
     # end
 
-    op = PaymentProcessorRules::Checker.(:ensure_payments_are_pending_before_processing, {payment: self.payment, options: self.options})
+    op = PaymentProcessorRules::Event.(:ensure_payments_are_pending_before_processing, {payment: self.payment, options: self.options})
     unless op.success?
       add_message :error, op.message
       return

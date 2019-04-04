@@ -39,6 +39,9 @@ PaymentProcessorRules::Checker.new 'AccountChecker' do
       rule 'Source account balance should be more than or equal to order total' do
         payment_order = params[:payment_order]
         crediting_payments = params[:crediting_payments]
+        payment = params[:payment]
+        crediting_payments = Payment.with_id(payment&.id) if crediting_payments.blank?
+
         source_account_adapter = params[:source_account_adapter]
         options = params[:options]
         order_total = crediting_payments.joins(:amount).sum(:value)
@@ -84,10 +87,11 @@ PaymentProcessorRules::Checker.new 'AccountChecker' do
 
     premise :check_receiving_account_creditable do
 
-      rule 'Receiving account should not be blacklisted' do
+      rule 'Receiving account should not be blacklisted / disabled' do
         payment = params[:payment]
         # checking to see if the receiving account is a bank account if it has been disabled by any chance
         if payment.receiving_account.is_a?(BankAccount) && payment.receiving_account.disabled?
+          payment.update(disabled: true, payment_status_id: PaymentStatus.id_for(:failed))
           add_system_message :error, payment, "You cannot make transfers to this bank account as it has been blacklisted"
           message "You cannot make transfers to this bank account as it has been blacklisted"
           fail
@@ -98,7 +102,8 @@ PaymentProcessorRules::Checker.new 'AccountChecker' do
         payment = params[:payment]
         if payment.receiving_account.is_a?(BankAccount) && payment.receiving_account.on_hold?
           add_system_message :error, payment, "Transfers to this account have been temporarily put on hold"
-          Event::EAlert::Create.(nil, title: 'Payment attempted for on hold account', description: "Payment attempted for on hold account. Details: #{payment.as_json}", subject: 'Payment attempted for on hold account')
+          payment.update(on_hold: true, payment_status_id: PaymentStatus.id_for(:failed))
+          # Event::EAlert::Create.(nil, title: 'Payment attempted for on hold account', description: "Payment attempted for on hold account. Details: #{payment.as_json}", subject: 'Payment attempted for on hold account')
           message "Transfers to this account have been temporarily put on hold"
           fail
         end
