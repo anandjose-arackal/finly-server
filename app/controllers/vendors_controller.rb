@@ -19,12 +19,12 @@ class VendorsController < ApplicationController
   end
 
   def procurements
-    @result = Vendors::Procurements.(current_user, params)
+    @result = Vendors::Support::Procurements.(current_user, params)
     respond
   end
 
   def transactions
-    @result = Vendors::Transactions.(current_user, params)
+    @result = Vendors::Support::Transactions.(current_user, params)
     respond
   end
 
