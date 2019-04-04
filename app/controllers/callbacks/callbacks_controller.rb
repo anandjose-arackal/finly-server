@@ -1,4 +1,4 @@
-class Api::CallbacksController < ApplicationController
+class Callbacks::CallbacksController < ApplicationController
 
   protect_from_forgery with: :null_session
 
