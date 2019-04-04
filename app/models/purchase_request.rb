@@ -40,14 +40,13 @@ class PurchaseRequest < ApplicationRecord
   def as_json
     {
       id: self.id,
+      purchase_request_number: self.id,
       description: self.description,
       location_attributes: {id: self.location_id, name: self.location&.name},
       department_attributes: {id: self.department_id, name: self.department&.name},
       policy_attributes: {id: self.policy_id, name: self.policy&.name},
       status_attributes: {status_id: self.purchase_request_status_id, status_name: self.purchase_request_status&.name, display_name: self.purchase_request_status&.name},      
-      creator_id: self.creator_id,
-      creator_name: self.creator&.name,
-      created_at: self.created_at.to_date
+      creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date}
     }
   end
 
