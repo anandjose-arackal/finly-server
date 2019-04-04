@@ -46,8 +46,20 @@ json.trail do
         end
       end
     end
+ 
+    if item.is_a?(Invoice) && (item.invoice_type_id == InwardInvoiceType.id_for(:proforma_invoice) rescue false )
+      json.invoice_type item.invoice_type&.name
+      json.invoice_details do
+        json.proforma_advance item.proforma_advance&.value
+        json.amount item.balance_due&.value
+        json.status do
+          json.id item.invoice_status&.id
+          json.name item.invoice_status&.name
+        end
+        json.due_date item.due_date&.strftime("%b %d, %Y")
+      end
 
-    if item.is_a?(Invoice)
+    elsif item.is_a?(Invoice)
       json.invoice_details do
         json.amount item.balance_due&.value
         json.status do

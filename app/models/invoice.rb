@@ -98,7 +98,7 @@ class Invoice < ApplicationRecord
   # Captures PO advance if any and how much is adjusted in the tax invoice
   # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
   belongs_to :po_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_adjusted_advance
-  # belongs_to :proforma_advance, optional: true, class_name: "Amount", foreign_key: :proforma_advance
+  belongs_to :proforma_advance, optional: true, class_name: "Amount", foreign_key: :proforma_advance
 
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
@@ -165,6 +165,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
   # accepts_nested_attributes_for :po_prev_adjusted_advance
   accepts_nested_attributes_for :po_adjusted_advance
+  accepts_nested_attributes_for :proforma_advance
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount

@@ -78,14 +78,14 @@ json.results do
       json.invoice_amount invoice.net_amount
     end
 
-    # invoice = p.proforma_invoices.last
-    # if invoice.present?
-    #   json.invoice_number invoice.invoice_number
-    #   json.invoice_id invoice.invoice_id
-    #   json.invoice_status invoice.invoice_status&.name
-    #   json.invoice_amount invoice.net_amount
-    #   json.invoice_advance invoice.proforma_advance&.value
-    # end
+    invoice = p.proforma_invoices.last
+    if invoice.present?
+      json.invoice_number invoice.invoice_number
+      json.invoice_id invoice.invoice_id
+      json.invoice_status invoice.invoice_status&.name
+      json.invoice_amount invoice.net_amount
+      json.invoice_advance invoice.proforma_advance&.value
+    end
 
     vendor = po.present? ? po.vendor : invoice&.vendor
     if vendor.present?
