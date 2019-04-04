@@ -48,7 +48,8 @@ class PurchaseRequest < ApplicationRecord
       purchase_request_status_id: self.purchase_request_status_id,
       purchase_request_status_name: self.purchase_request_status&.name,
       creator_id: self.creator_id,
-      creator_name: self.creator&.name
+      creator_name: self.creator&.name,
+      created_at: self.created_at.to_date
     }
   end
 
