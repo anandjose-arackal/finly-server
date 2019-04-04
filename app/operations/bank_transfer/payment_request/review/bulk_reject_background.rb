@@ -35,8 +35,6 @@ class BankTransfer::PaymentRequest::Review::BulkRejectBackground < BackgroundOpe
 
     self.bank_payment_requests.each do |bank_payment_request|    
 
-        self.workflow_output = op.workflow_output
-
         parameters = {
             document: bank_payment_request,
             aasm_event: 'reject'

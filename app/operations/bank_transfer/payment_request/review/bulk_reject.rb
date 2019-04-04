@@ -32,24 +32,35 @@ class BankTransfer::PaymentRequest::Review::BulkReject < BankTransfer::PaymentRe
       add_message :error, "Payment orders not found"
     end
 
-    reject_bpr = []
+    # reject_bpr = []
+    # self.bank_payment_requests.each do |bank_payment_request|
+    #   valid = true
+    #   unless bank_payment_request.can_reject?
+    #     # add_message :error, "Payment requets cannot be rejected at this stage"
+    #     valid = false
+    #   end
+
+    #   unless valid
+    #     reject_bpr << bank_payment_request
+    #   end
+    # end
+
+    # self.bank_payment_requests = self.bank_payment_requests.reject do |all_bpr|
+    #     reject_bpr.any? do |bpr|
+    #         all_bpr.id == bpr.id
+    #     end
+    # end
+
+    accept_bpr = []
     self.bank_payment_requests.each do |bank_payment_request|
-      valid = true
-      unless bank_payment_request.can_reject?
-        # add_message :error, "Payment requets cannot be rejected at this stage"
-        valid = false
-      end
+      valid = (bank_payment_request.can_reject?) ? true : false
 
-      unless valid
-        reject_bpr << bank_payment_request
+      if valid
+        accept_bpr << bank_payment_request.id
       end
     end
-
-    self.bank_payment_requests = self.bank_payment_requests.reject do |all_bpr|
-        reject_bpr.any? do |bpr|
-            all_bpr.id == bpr.id
-        end
-    end
+ 
+    self.bank_payment_requests = self.bank_payment_requests.where(id: accept_bpr)
 
     if self.bank_payment_requests.blank?
       add_message :error, "None of the payment tickets are in a state to be rejected"

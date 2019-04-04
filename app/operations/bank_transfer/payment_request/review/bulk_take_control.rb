@@ -41,33 +41,47 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
       return
     end
 
-    reject_bpr = []
+    # reject_bpr = []
+    # self.bank_payment_requests.each do |bank_payment_request|
+    #   valid = true
+    #   unless bank_payment_request.can_take_control?
+    #     # add_message :error, "Payment requets cannot be taken control of at this stage"
+    #     valid = false
+    #   end
+
+    #   # if bank_payment_request.controlling_for_user.present?
+    #   #   # add_message :error, "Payment requets already in control for #{bank_payment_request.id}"
+    #   #   valid = false
+    #   # end
+
+    #   if user_already_in_control?(bank_payment_request)
+    #     valid = false
+    #   end
+
+    #   unless valid
+    #     reject_bpr << bank_payment_request
+    #   end
+    # end
+
+    accept_bpr = []
     self.bank_payment_requests.each do |bank_payment_request|
-      valid = true
-      unless bank_payment_request.can_take_control?
-        # add_message :error, "Payment requets cannot be taken control of at this stage"
-        valid = false
-      end
+      valid = (bank_payment_request.can_take_control?) ? true : false
+      valid = (user_already_in_control?(bank_payment_request)) ? false : true
 
-      # if bank_payment_request.controlling_for_user.present?
-      #   # add_message :error, "Payment requets already in control for #{bank_payment_request.id}"
-      #   valid = false
-      # end
-
-      if user_already_in_control?
-        valid = false
-      end
-
-      unless valid
-        reject_bpr << bank_payment_request
+      if valid
+        accept_bpr << bank_payment_request.id
       end
     end
+ 
 
-    self.bank_payment_requests = self.bank_payment_requests.reject do |all_bpr|
-        reject_bpr.any? do |bpr|
-            all_bpr.id == bpr.id
-        end
-    end
+    # self.bank_payment_requests = self.bank_payment_requests.reject do |all_bpr|
+    #     reject_bpr.any? do |bpr|
+    #         all_bpr.id == bpr.id
+    #     end
+    # end
+
+    self.bank_payment_requests = self.bank_payment_requests.where(id: accept_bpr)
+
 
     if self.bank_payment_requests.blank?
       add_message :error, "None of the payment tickets are in a state to be in administrative control."
@@ -86,11 +100,11 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
 
   private
 
-  def user_already_in_control?
+  def user_already_in_control?(bank_payment_request)
     # check for the current level if it isn't taken control
     # check if the same user is not taking control twice
     # check if for the same level if any other user has also taken control
-    (self.bank_payment_request.dlrms&.find_by(level_id: self.bank_payment_request.level&.id).taken_control_by_id == user.id)
+    (bank_payment_request.dlrms&.find_by(level_id: bank_payment_request.level&.id).taken_control_by_id == user.id)
   end
 
 end

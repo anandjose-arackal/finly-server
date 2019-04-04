@@ -98,6 +98,7 @@ class Invoice < ApplicationRecord
   # Captures PO advance if any and how much is adjusted in the tax invoice
   # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
   belongs_to :po_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_adjusted_advance
+  # belongs_to :proforma_advance, optional: true, class_name: "Amount", foreign_key: :proforma_advance
 
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
@@ -627,8 +628,21 @@ class Invoice < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
   end
 
-  def can_take_control?
+  # def can_take_control?
+  #   processing?
+  # end
+
+  def can_approve?
     processing?
+  end
+
+  def can_reject?
+    processing?
+  end
+
+  def can_take_control?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    processing? && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id).taken_control_by_id != user.id
   end
 
   private

@@ -42,8 +42,6 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControlBackground < Backgrou
       # 
       # end
 
-        self.workflow_output = op.workflow_output
-
         parameters = {
             document: bank_payment_request,
             aasm_event: 'take_control'
