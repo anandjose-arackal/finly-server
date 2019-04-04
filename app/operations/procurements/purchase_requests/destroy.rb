@@ -1,4 +1,4 @@
-class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::Base
+class Procurements::PurchaseRequests::Destroy < Procurements::PurchaseRequests::Base
 
   attr_accessor :purchase_request
 
