@@ -13,4 +13,4 @@ json.result do
   end
 end
 
-json.count @result.receiving_transactions.count
+json.count @result.transactions.count
