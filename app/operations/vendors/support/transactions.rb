@@ -2,7 +2,7 @@ class Vendors::Support::Transactions < Vendors::Support::Base
   attr_accessor :procurements, :vendor
 
   class Vendors::Support::Transactions::TransactionsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :transactions, :paginated_transactions, :count
+    attr_accessor :transactions, :paginated_transactions, :count, :vendor
 
     def init
       self.vendor = params[:vendor]
@@ -16,7 +16,7 @@ class Vendors::Support::Transactions < Vendors::Support::Base
   end
 
   def init
-    self.vendor = Vendors::Show.(user, params).vendor
+    self.vendor = Vendors::Show.(user, params).vendor rescue nil
   end
 
   def validate
