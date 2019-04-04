@@ -7,15 +7,15 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
   # Voucher type	Report name	Invoice date	Reference number	Employee Name	Expense Merchant	Expense Date	Expense Category Name	GL code	Expense Currency	Expense Amount	Department	Purpose
   register_fields [
                       report_name: {spreadsheet: true},
-                      reference_number: {spreadsheet: false},
-                      employee_name: {spreadsheet: false},
-                      merchant: {spreadsheet: false},
-                      date: {spreadsheet: false},
-                      category: {spreadsheet: false},
-                      gl_code: {spreadsheet: false},
-                      currency: {spreadsheet: false},
-                      amount: {spreadsheet: false},
-                      purpose: {spreadsheet: false}
+                      reference_number: {spreadsheet: true},
+                      employee_name: {spreadsheet: true},
+                      merchant: {spreadsheet: true},
+                      date: {spreadsheet: true},
+                      category: {spreadsheet: true},
+                      gl_code: {spreadsheet: true},
+                      currency: {spreadsheet: true},
+                      amount: {spreadsheet: true},
+                      purpose: {spreadsheet: true}
                   ]
 
   def input
@@ -24,7 +24,7 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
       add_message :error, result.messages[:error]
       return
     end
-    Expense.with_report_id(result.reports.pluck(:id))
+    Expense.with_report_id(result.reports.pluck(:id)).include_details
   end
 
 

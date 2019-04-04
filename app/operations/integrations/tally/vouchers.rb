@@ -56,7 +56,11 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
         current_class_path = self.method(:success).source_location.first.gsub('/vouchers.rb', '')
         template = "#{current_class_path}/vouchers.xml"
       end
-      self.file_url = Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, configuration: current_company.tally_configuration}}}, messages).generate_xml
+      data = Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, configuration: current_company.tally_configuration}}}, messages).xml_exporter.generate_xml
+      file = Paperclip::Tempfile.new(['export', '.xml'])
+      open(file.path, 'wb') { |f| f.write data }
+      temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
+      self.file_url = temp_file.file.url
     end
   end
 
