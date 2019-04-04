@@ -111,22 +111,24 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
       else
         # do nothing?
     end
-    # create the bank transaction right here
-    self.company = Company.find_by(id: self.transfer_request.company_id)
-    if self.payment&.reference_resource&.is_a?(BankTransaction) || self.bank_transaction.present?
-      # just update the bank transaction with the latest details
-      self.bank_transaction = self.bank_transaction || payment.reference_resource
-      self.bank_transaction.update(
-                          bank_reference_number: self.transfer_request.bank_reference_number,
-                          transfer_status_id: self.transfer_status_id,
-                          bank_response: self.transfer_request.transaction_result,
-                          beneficiary_full_name: self.transfer_request.beneficiary_full_name
-      )
-      self.payment&.update(retry_count: self.payment.retry_count.to_f + 1)
-    else
-      # this is an anomaly, so send email and flag it
-      Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
-    end
+
+
+    # # create the bank transaction right here
+    # self.company = Company.find_by(id: self.transfer_request.company_id)
+    # if self.payment&.reference_resource&.is_a?(BankTransaction) || self.bank_transaction.present?
+    #   # just update the bank transaction with the latest details
+    #   self.bank_transaction = self.bank_transaction || payment.reference_resource
+    #   self.bank_transaction.update(
+    #                       bank_reference_number: self.transfer_request.bank_reference_number,
+    #                       transfer_status_id: self.transfer_status_id,
+    #                       bank_response: self.transfer_request.transaction_result,
+    #                       beneficiary_full_name: self.transfer_request.beneficiary_full_name
+    #   )
+    #   self.payment&.update(retry_count: self.payment.retry_count.to_f + 1)
+    # else
+    #   # this is an anomaly, so send email and flag it
+    #   Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+    # end
   end
 
   def success?
@@ -198,10 +200,6 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         'BENEFICIARY_EMAIL' => (self.beneficiary_email.present? ? (self.beneficiary_email) : ("noreply@finly.io")),
         'BENEFICIARY_MOBILE_NUMBER' => (self.beneficiary_mobile_number.present? ? (self.beneficiary_mobile_number) : ("7975520468"))
     )
-  end
-
-  def generated_reference_number
-    transfer_request.unique_reference_number
   end
 
   def set_response_parameters

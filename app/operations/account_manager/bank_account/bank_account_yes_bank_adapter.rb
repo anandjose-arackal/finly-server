@@ -59,8 +59,25 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         payment: payment
     })
 
-    # bank_transaction = op.bank_transaction
     bank_transaction = op.bank_transaction
+    transfer_request = op.transfer_request
+    # setting the values of the bank transaction here instead of inside the API Handler
+    # create the bank transaction right here
+    if payment&.reference_resource&.is_a?(YesBankTransaction) || bank_transaction.present?
+      # just update the bank transaction with the latest details
+      bank_transaction = bank_transaction || payment.reference_resource
+      bank_transaction.update(
+          bank_reference_number: transfer_request.bank_reference_number,
+          transfer_status_id: transfer_status_id,
+          bank_response: transfer_request.transaction_result,
+          beneficiary_full_name: transfer_request.beneficiary_full_name
+      )
+      payment&.update(retry_count: payment.retry_count.to_f + 1)
+    else
+      # this is an anomaly, so send email and flag it
+      Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+    end
+
     if op.success?
       if bank_transaction.completed?
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))

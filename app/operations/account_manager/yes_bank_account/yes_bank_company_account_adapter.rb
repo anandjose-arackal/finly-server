@@ -63,9 +63,11 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     # can either be an operation or a specific call with
     # a model call
     self.company = self.account.company
+    debugger
     # jugaad here to enable transferring to the current account for companies whose current account is connected -
     # if the viewing application is Finly Collect, the pool balance is always shown (even if the company has their current account connected)
     if (self.company.yes_bank_account_enabled? && !self.company.current_account_connected?) || ["fc", :fc].include?(RequestStore.store[:current_app])
+      debugger
       payment_order = options[:payment_order]
       balance = self.account.balance_value
       blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)

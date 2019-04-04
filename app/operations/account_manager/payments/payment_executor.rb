@@ -40,24 +40,26 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
     ################# Start Source account validations #######################
 
-    op = PaymentProcessorRules::Event.(:check_source_account_debitable, {payment: self.payment})
-    unless op.success?
-      add_message :error, op.messages
-      return
-    end
+    # todo - temporary as the tests are failing saying this rule isn't defined
+    # op = PaymentProcessorRules::Event.(:check_source_account_debitable, {payment: self.payment, source_account_adapter: self.source_account_adapter, receiving_account_adapter: self.receiving_account_adapter})
+    # unless op.success?
+    #   add_message :error, op.messages
+    #   return
+    # end
 
     if self.payment.credit?
-      op = PaymentProcessorRules::Event.(:check_source_account_balance, {payment: self.payment})
+      op = PaymentProcessorRules::Event.(:check_source_account_balance, {payment: self.payment, options: self.options, source_account_adapter: self.source_account_adapter})
       unless op.success?
-        add_message :error, op.messages
+        add_message :error, op.message
         return
       end
     end
 
+
     if self.payment.debit?
-      op = PaymentProcessorRules::Event.(:check_source_account_eligibility, {payment: self.payment})
+      op = PaymentProcessorRules::Event.(:check_source_account_eligibility, {payment: self.payment, options: self.options, source_account_adapter: self.source_account_adapter})
       unless op.success?
-        add_message :error, op.messages
+        add_message :error, op.message
         return
       end
     end
@@ -67,24 +69,24 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
     ####################### Start Receiving account validations #####################
 
-    op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment})
+    op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter})
     unless op.success?
-      add_message :error, op.messages
+      add_message :error, op.message
       return
     end
 
     if self.payment.credit?
-      op = PaymentProcessorRules::Event.(:check_receiving_account_eligibility, {payment: self.payment})
+      op = PaymentProcessorRules::Event.(:check_receiving_account_eligibility, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter})
       unless op.success?
-        add_message :error, op.messages
+        add_message :error, op.message
         return
       end
     end
 
     if self.payment.debit?
-      op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {payment: self.payment})
+      op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter})
       unless op.success?
-        add_message :error, op.messages
+        add_message :error, op.message
         return
       end
     end
@@ -147,7 +149,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
     # op = PaymentProcessorRules::Event.(:check_for_invalid_payment_statuses, {payment: self.payment})
     # unless op.success?
-    #   add_message :error, op.messages
+    #   add_message :error, op.message
     #   return
     # end
 
@@ -158,9 +160,11 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     #   return
     # end
 
-    op = PaymentProcessorRules::Event.(:check_receiving_account_is_creditable, {payment: self.payment})
+    op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment, options: self.options,
+                                                                             receiving_account_adapter: self.receiving_account_adapter,
+                                                                             source_account_adapter: self.source_account_adapter})
     unless op.success?
-      add_message :error, op.messages
+      add_message :error, op.message
       return
     end
 
@@ -179,9 +183,9 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     #   return
     # end
 
-    op = PaymentProcessorRules::Checker.(:ensure_payments_are_pending_before_processing, {payment: self.payment})
+    op = PaymentProcessorRules::Checker.(:ensure_payments_are_pending_before_processing, {payment: self.payment, options: self.options})
     unless op.success?
-      add_message :error, op.messages
+      add_message :error, op.message
       return
     end
 

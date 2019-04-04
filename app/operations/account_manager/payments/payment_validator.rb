@@ -108,7 +108,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     if payment_order.debit?
       # checking the balance of the receiving account for a debit
       self.receiving_account_adapter = retrieve_adapter payment.receiving_account
-      op = PaymentProcessorRules::Event.(:check_balance_of_receiving_account, {receiving_account_adapter: self.receiving_account_adapter,
+      op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {receiving_account_adapter: self.receiving_account_adapter,
                                                                                crediting_payments: self.crediting_payments})
 
       unless op.success?

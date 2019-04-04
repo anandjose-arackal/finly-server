@@ -60,12 +60,13 @@ PaymentProcessorRules::Checker.new 'StatusChecker' do
         payment.with_lock do
           payment.reload
           unless [PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
-            add_system_message :error, payment, "Payment cannot be processed in this state"
+            payment.system_messages.create(content: "Payment cannot be processed in this state",
+                                           system_message_type_id: SystemMessageType.id_for(:error))
             message "Payment cannot be processed in this state"
             fail
           end
           # update payment to in progress
-          payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         end
       end
     end
