@@ -1,6 +1,8 @@
 json.results do
   json.array!(@result.paginated_invoices.include_for_index) do |invoice|
     json.id invoice.id
+    json.controlling_user invoice.get_reviewers.first&.name
+    json.awaiting_action invoice.awaiting_action(@result.user)
     json.invoice do
       json.id invoice.id
       json.controlling_user invoice.get_reviewers.first&.name
@@ -104,7 +106,8 @@ json.results do
 
       if invoice.vendor.present?
         json.vendor do
-          json.name invoice.vendor&.name
+          json.name invoice.vendor&.name || invoice.vendor&.business_name
+          json.business_name invoice.vendor&.business_name
           json.email invoice.vendor&.email
           json.id invoice.vendor&.id
           json.gst invoice.vendor&.gst

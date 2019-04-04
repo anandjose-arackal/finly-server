@@ -20,6 +20,7 @@
 #
 
 class Category < ApplicationRecord
+  include AncestrySupport
   has_ancestry
 
   belongs_to :company, optional: true

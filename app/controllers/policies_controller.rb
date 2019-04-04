@@ -23,7 +23,7 @@ class PoliciesController < ApplicationController
   # Temporary action as exepense management is not currently using policy user roles and vendor payment is using policy based user roles
   # This action filters policy on the basis of user roles
   def index_vp
-    @result = Policy::VendorPayments::Index.(current_user, params[:filter_role_id])
+    @result = Policy::VendorPayments::Index.(current_user, params)
     respond
   end
 
@@ -150,5 +150,19 @@ class PoliciesController < ApplicationController
     end
     respond
   end
+
+
+  def department_mapping
+    @result = Policy::Mappings::DepartmentMapping::Index.(current_user, params)
+    respond
+  end
+
+  def location_mapping
+    @result = Policy::Mappings::LocationMapping::Index.(current_user, params)
+    respond
+  end
+
+  # def update_department_mapping
+  # end
 
 end

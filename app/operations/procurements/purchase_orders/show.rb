@@ -26,28 +26,30 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations
 
     def init
       self.purchase_order = params[:purchase_order]
       self.procurement = self.purchase_order.procurement
       self.actions = get_actions
-      self.departments = user.company.departments.roots
+      self.departments = user.company.departments.leaves
       self.locations = user.company.locations.includes(:state)
+      self.gstin_locations = self.purchase_order.vendor&.gstin_locations
 
       if purchase_order.user.departments.present?
-        self.sub_departments = purchase_order.user.departments.only_sub_departments
+        self.sub_departments = purchase_order.user.departments.leaves
       else
-        self.sub_departments = purchase_order.user.company.departments.only_sub_departments
+        self.sub_departments = purchase_order.user.company.departments.leaves
       end
+
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
+      self.tds_slabs = TdsSlabs::Index.(current_user, params)
 
       # policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
       params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
       self.policies = Policy::VendorPayments::Index.(purchase_order.user, params).policies rescue Policy.none
-
       # Show taxes as applicable in the pdf based on this
       self.taxes_applicable_flag = taxes_applicable_flag?
 
@@ -153,7 +155,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       end
 
       if user.vendor_payment_admin?
-        unless purchase_order.voided?
+        unless purchase_order.voided? or purchase_order.rejected? or purchase_order.open? or purchase_order.retracted?
           # actions[:policy_editable] = true
           actions[:document_editable] = true
           actions[:save] = {url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),method: "PUT"}
@@ -205,8 +207,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   def validate_document_access
     # Validate of current user is owner of PO
     return if purchase_order.validate_if_owner(user)
-    return if purchase_order.validate_if_admin(user) && (!purchase_order.open? || purchase_order.user_id == user.id)
+    return if purchase_order.validate_if_admin(user) && (!purchase_order.open? || (purchase_order.user_id == user.id) || purchase_order.user_id.blank?)
     return if purchase_order.validate_if_reviewer(user)
+    # Since page lands on PO, check for invoice reviewer too. Else if user is invoice reviewer and not PO reviewer, page will break
+    return if purchase_order&.procurement&.invoices&.joins(:document_level_reviewer_mappings)&.pluck('document_level_reviewer_mappings.reviewer_id').include?(user.id) rescue false
     raise_unauthorized_exception
   end
 end

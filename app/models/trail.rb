@@ -85,6 +85,10 @@ class Trail < ApplicationRecord
     where created_at: (date.beginning_of_day..date.end_of_day)
   }
 
+  scope :filter_date_range, -> (from, to) {
+    where created_at: (from.beginning_of_day..to.end_of_day)
+  }
+
   def as_json(user)
     {
         action_type: self.action&.name,
@@ -107,6 +111,21 @@ class Trail < ApplicationRecord
       if user_name.nil? && action_id == TrailAction.id_for(:auto_approve)
         user_name = "Your"
       end
+    end
+
+    if self.action_id == TrailAction.id_for(:auto_approve)
+      body = "#{self.parent_type} was auto approved. Initiated by #{user_name}"
+      return body
+    end
+
+    if self.action_id == TrailAction.id_for(:send_to_vendor)
+      body = "#{user_name} has sent the #{self.parent_type} to vendor."
+      return body
+    end
+
+    if self.action_id == TrailAction.id_for(:revision)
+      body = "#{user_name} has created a revision for this #{self.parent_type}."
+      return body
     end
 
     body += user_name
@@ -160,7 +179,7 @@ class Trail < ApplicationRecord
         action = ""
     end
 
-    body += action + " the #{self.parent_type}."
+    body += action + " the #{self.parent_type}."    
 
     body
   end

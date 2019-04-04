@@ -115,6 +115,10 @@ class BankTransfer::PaymentRequest::InwardInvoice::CreateInvoiceTicket2 < BankTr
       if remaining_amount.blank?
         next
       end
+      if invoice.vendor.blank?
+        add_message :error, "This invoice, with id #{invoice.id}, does not have a vendor associated with it. Please add them before creating a payment ticket for it."
+        return
+      end
       if payable_amount > remaining_amount
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
       end

@@ -58,23 +58,25 @@ class Navbar::Master::Base
     RequestStoreUtil.current_user
   end
 
+  # Checking for vendor payments only for uat
+
   def users
-    return nil unless RequestStoreUtil.current_user.company_admin?
+    return nil unless RequestStoreUtil.current_user.vendor_payment_admin?
     {name: 'Users', id: 'users', url: '#users'}
   end
 
   def load_company_balance
-    return nil unless RequestStoreUtil.current_user.company_admin?
+    return nil unless RequestStoreUtil.current_user.vendor_payment_admin?
     {name: 'Load Company Balance', id: 'load-company-balance', url: '#load-company-balance'}
   end
 
   def statements
-    return nil unless RequestStoreUtil.current_user.company_admin?
+    return nil unless RequestStoreUtil.current_user.vendor_payment_admin?
     {name: 'Statements', id: 'statements', url: '#statements'}
   end
 
   def organization_account
-    return nil unless RequestStoreUtil.current_user.company_admin?
+    return nil unless RequestStoreUtil.current_user.vendor_payment_admin?
     {name: 'Organization Account', id: 'organization_account', url: '#organization_account'}
   end
 

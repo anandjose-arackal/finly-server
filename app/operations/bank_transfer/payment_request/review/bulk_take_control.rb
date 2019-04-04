@@ -5,8 +5,23 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
 
   attr_accessor :bank_payment_requests
 
+
+  def pre_validate
+    super
+    return if has_errors?
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate this action'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
+  end
+
   def init
-    ids = params["bulk_take_control_ids"]
+    # ids = params["bulk_take_control_ids"]
+    ids = params[:ids] || params[:bank_payment_request_ids] || params[:payment_request_ids]
     unless ids.is_a?(Array)
       ids = ids.split(',')
     end
@@ -34,8 +49,12 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
         valid = false
       end
 
-      if bank_payment_request.controlling_for_user.present?
-        # add_message :error, "Payment requets already in control for #{bank_payment_request.id}"
+      # if bank_payment_request.controlling_for_user.present?
+      #   # add_message :error, "Payment requets already in control for #{bank_payment_request.id}"
+      #   valid = false
+      # end
+
+      if user_already_in_control?
         valid = false
       end
 
@@ -49,14 +68,29 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
             all_bpr.id == bpr.id
         end
     end
+
+    if self.bank_payment_requests.blank?
+      add_message :error, "None of the payment tickets are in a state to be in administrative control."
+      return
+    end
   end
 
   def process
     # self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:processing))
+    self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
     # ids = self.bank_payment_requests.pluck(:id)
     ids = self.bank_payment_requests.map { |h| h[:id] }
     BankTransfer::PaymentRequest::Review::BulkTakeControlBackground.call_async(ids, {initiating_user_id: current_user.id, bulk_take_control_ids: params["bulk_take_control_ids"]})
     # BankTransfer::PaymentRequest::Review::BulkTakeControlBackground.call(ids, {initiating_user_id: user.id, params: params[:bulk_take_control_ids]})
+  end
+
+  private
+
+  def user_already_in_control?
+    # check for the current level if it isn't taken control
+    # check if the same user is not taking control twice
+    # check if for the same level if any other user has also taken control
+    (self.bank_payment_request.dlrms&.find_by(level_id: self.bank_payment_request.level&.id).taken_control_by_id == user.id)
   end
 
 end

@@ -50,6 +50,18 @@
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
+#  advance_amount_id            :integer
+#  due_date                     :date
+#  advance_amount_status_id     :integer
+#  bank_account_id              :integer
+#  revised_po_id                :integer
+#  revision_of_id               :integer
+#  revision_number              :integer          default(0)
+#  note                         :text(65535)
+#  advance_tds_slab_id          :integer
+#  advance_tds_amount_id        :integer
+#  advance_amount_required      :boolean          default(FALSE)
+#  requested_advance_amount_id  :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -81,9 +93,15 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :discount_amount, optional: true, class_name: "Amount", autosave: true
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
   # IF PO HAS ANY ADVANCE AMOUNT, WE ADD IT HERE
+  belongs_to :requested_advance_amount, optional: true, class_name: "Amount"
   belongs_to :advance_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_tds_amount, optional: true, class_name: "Amount"
+  belongs_to :advance_tds_slab, optional: true, class_name: 'TdsRatesList'
+
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+
+  belongs_to :gstin_location, class_name: "GstinLocation", optional: true
 
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
@@ -107,9 +125,10 @@ class PurchaseOrder < ApplicationRecord
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, allow_destroy: true
-  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount
+  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :purchase_request_items
+  # accepts_nested_attributes_for :requested_advance_amount
   # accepts_nested_attributes_for :advance_payments
 
 
@@ -137,6 +156,11 @@ class PurchaseOrder < ApplicationRecord
   scope :with_budgetable_location_ids, -> (location_ids) {
     if location_ids.present?
       where location_id: location_ids
+    end
+  }
+  scope :filter_delivery_location, -> (name) {
+    if name.present?
+      joins(:delivery_location).where('name LIKE ?', "%#{name}%")
     end
   }
   scope :with_budgetable_user_ids, -> (user_ids) {
@@ -170,6 +194,9 @@ class PurchaseOrder < ApplicationRecord
     with_status_ids(status_ids)
   }
 
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+  scope :filter_location_id, -> (location_id) {where("location_id = ? OR delivery_location_id = ?", location_id, location_id)}
+
   scope :filter_sub_department_id, -> (ids) {
     where sub_department_id: ids
   }
@@ -178,11 +205,11 @@ class PurchaseOrder < ApplicationRecord
     where department_id: ids
   }
 
-  scope :filter_vendor_id, -> (ids){
+  scope :filter_vendor_id, -> (ids) {
     where vendor_id: ids
   }
 
-  scope :filter_user_id, -> (ids){
+  scope :filter_user_id, -> (ids) {
     where user_id: ids
   }
 
@@ -192,19 +219,24 @@ class PurchaseOrder < ApplicationRecord
 
   scope :filter_payable_advances, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      where( purchase_order_status_id: [
-                                          PurchaseOrderStatus.id_for(:approved),
-                                          PurchaseOrderStatus.id_for(:auto_approved)
-                                       ], 
-             advance_amount_status_id: [
-                                          AdvanceAmountStatus.id_for(:to_be_processed),
-                                          AdvanceAmountStatus.id_for(:failed)
-                                       ])
+      where(purchase_order_status_id: [
+          PurchaseOrderStatus.id_for(:approved),
+          PurchaseOrderStatus.id_for(:auto_approved)
+      ],
+            advance_amount_status_id: [
+                AdvanceAmountStatus.id_for(:to_be_processed),
+                AdvanceAmountStatus.id_for(:failed)
+            ])
     end
   }
 
   scope :filter_all_advances, -> {
-    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil)
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil,
+              purchase_order_status_id: [ PurchaseOrderStatus.id_for(:closed), PurchaseOrderStatus.id_for(:po_revised), 
+                                          PurchaseOrderStatus.id_for(:processing), PurchaseOrderStatus.id_for(:voided),
+                                          PurchaseOrderStatus.id_for(:rejected), PurchaseOrderStatus.id_for(:retracted),
+                                          PurchaseOrderStatus.id_for(:open)
+                                        ])
   }
 
   scope :filter_by_due_date, -> (due_date) {
@@ -224,20 +256,20 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :filter_awaiting_approval, -> (user=nil) {
+  scope :filter_awaiting_approval, -> (user = nil) {
     if user.present? && user.instance_of?(User)
       user_id = user.id
     else
       user_id = RequestStore.store[:current_user]&.id
     end
-    
+
     if user_id.present?
       ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
       with_id(ids)
     end
   }
 
-  scope :filter_user, -> (user=nil) {
+  scope :filter_user, -> (user = nil) {
     if user.present? && user.instance_of?(User)
       user_id = user.id
     elsif user.instance_of?(TrueClass)
@@ -285,19 +317,19 @@ class PurchaseOrder < ApplicationRecord
     where('created_at >= ? && created_at <= ?', from, to)
   }
 
-  before_save :calculate_line_items
+  # before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
 
   template_config do
     include_association [:policy, :location, :delivery_location, :vendor,
-                          :payment_term, :procurement_term, :department,
-                          :sub_department, :cost_center]
+                         :payment_term, :procurement_term, :department,
+                         :sub_department, :cost_center]
     clone [:extra_charges, :items, :document_level_reviewer_mappings, :total_before_tax,
            :tax_amount, :total_after_tax, :discount_amount, :custom_fields]
 
-    customize(lambda { |po,new_po|
+    customize(lambda {|po, new_po|
       new_po.trails.destroy_all
       new_po.comments.destroy_all
       new_po.attachments.destroy_all
@@ -333,6 +365,7 @@ class PurchaseOrder < ApplicationRecord
   def all_items_accepted?
     shipped = true
     self.items.each do |item|
+      next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
       unless item.quantity == item.accepted
         shipped = false
         break
@@ -352,7 +385,7 @@ class PurchaseOrder < ApplicationRecord
     }
   end
 
-  def can_unapprove?(user=nil)
+  def can_unapprove?(user = nil)
     return false if user.blank?
 
     last_approve_trail = self.trails.only_approve.last
@@ -407,23 +440,41 @@ class PurchaseOrder < ApplicationRecord
     self.user_id.eql?(user.id)
   end
 
+  def total_adv_amount
+    (self.advance_amount&.value + self.advance_tds_amount&.value) rescue nil
+  end
+
   # because somewhere we got 'as_json' for PO already. running on deadline. dont have time to remodify.
   def as_json2
     {
-      original_amount: precision_value(self.total_after_tax&.value),
-      advance_amount: precision_value(self.advance_amount&.value),
-      balance_due: precision_value(self.balance_amount&.value)
-      # balance_due: {
-      #   value: precision_value(self.balance_amount&.value),
-      #   id: self.balance_amount&.id,
-      #   currency_id: self.balance_amount&.currency&.id
-      # }
+        original_amount: precision_value(self.total_after_tax&.value),
+        total_advance_amount: total_adv_amount,
+        advance_amount: precision_value(self.advance_amount&.value),
+        payable_advance_amount: precision_value(self.advance_amount&.value),
+        balance_due: precision_value(self.balance_amount&.value),
+        procurement_id: self.procurement_id,
+        tds_amount: self.advance_tds_amount&.value,
+        tds: self.advance_tds_slab&.tds,
+        tds_slab_id: self.advance_tds_slab_id,
+        tds_slab_name: self.advance_tds_slab&.name,
+        department: self.department.as_json,
+        cost_center: self.cost_center.as_json,
+        po_number: self.po_number,
+        delivery_location: self.delivery_location.as_json,
+        requested_advance_amount: self.requested_advance_amount&.value,
+        purchase_order_total: precision_value(self.balance_amount&.value)
+        # balance_due: {
+        #   value: precision_value(self.balance_amount&.value),
+        #   id: self.balance_amount&.id,
+        #   currency_id: self.balance_amount&.currency&.id
+        # }
     }
   end
+
   # Public Method
 
-  def process_line_item_calculation
-    calculate_line_items
+  def process_line_item_calculation(skip_adv_calculation = false)
+    calculate_line_items(skip_adv_calculation)
   end
 
   # def prepopulate_amounts
@@ -431,18 +482,18 @@ class PurchaseOrder < ApplicationRecord
   # end
 
   # For user role as purchase order initiator
-  def is_initiating_user?(user=nil)
+  def is_initiating_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:purchase_order_initiator), self)
   end
 
   # For user role as purchase order reviewer
-  def is_reviewing_user?(user=nil)
+  def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
   end
 
-  
+
   private
 
   # def populate_advance_amount
@@ -453,7 +504,7 @@ class PurchaseOrder < ApplicationRecord
   #   end
   # end
 
-  def calculate_line_items
+  def calculate_line_items(skip_adv_calculation = false)
     total_before_tax_amount = 0
     total_after_tax_amount = 0
     tax_amount = 0
@@ -546,10 +597,24 @@ class PurchaseOrder < ApplicationRecord
       self.build_balance_amount(value: total_amount, currency_id: 1)
     end
 
-    if self.advance_amount.present?  #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
+    if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
+
+      # if self.advance_tds_slab.present?
+
+      # handles a case when adv amount and tds slab is unchanged, dont recalculate.
+      unless skip_adv_calculation
+        tds = self.advance_tds_slab&.tds
+        new_advance_amount = TaxCalculationUtils.tds_amount(self.requested_advance_amount.value, tds)
+        tds_amount = self.requested_advance_amount.value - new_advance_amount
+        self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
+        final_advance_amount = self.requested_advance_amount.value - tds_amount
+        self.advance_amount.update(value: final_advance_amount)
+      end
+
     else
-      self.advance_amount  = Amount.new(value: 0, currency_id: 1)
+      self.advance_amount = Amount.new(value: 0, currency_id: 1)
+      self.requested_advance_amount = Amount.new(value: 0, currency_id: 1)
     end
 
     # self.save
@@ -592,7 +657,7 @@ class PurchaseOrder < ApplicationRecord
       status_ids.push PurchaseOrderStatus.id_for(status)
     end
 
-    status_ids.reject { |status_id| status_id.nil? }
+    status_ids.reject {|status_id| status_id.nil?}
   end
 
   def self.finance_associated_status_ids
@@ -600,12 +665,18 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.roles
-    [:purchase_order_initiator, :purchase_order_reviewer]
+    [
+        :purchase_order_initiator,
+        :purchase_order_reviewer,
+        :bank_payment_request_initiator,
+        :bank_payment_request_reviewer,
+        :bank_payment_request_creditor
+    ]
   end
 
   def self.role_based_associated_status_ids(user)
-    # self.status_ids(self.role_based_statuses(user))
-    PurchaseOrderStatus.ids_for(self.role_based_statuses(user))
+    self.status_ids(*self.role_based_statuses(user))
+    # PurchaseOrderStatus.ids_for(*self.role_based_statuses(user))
   end
 
   def self.role_based_statuses(user)

@@ -29,7 +29,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       self.paginated_invoices = self.invoices.paginate(page: params[:page], per_page: (params[:per_page] || 30))
     end
 
-    def po_invoice_status_count    
+    def po_invoice_status_count
       get_count(InwardInvoiceType.id_for(:tax_invoice))
     end
 
@@ -41,6 +41,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       raw_count = self.invoices.where(invoice_type_id: id).group( :invoice_status_id).count
       h = {}
       InwardInvoiceStatus.all.each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = sprintf '%02d', raw_count[ps.id] else h[ps.name] = sprintf '%02d', 0 end}
+      h[:awaiting_approval] = sprintf '%02d', self.invoices&.where(invoice_type_id: id).awaiting_action_items(user)&.count || 0
       return h
     end
 
@@ -58,7 +59,11 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.invoices  = ::Invoice.associated_items(user, ::Invoice.roles)
-      self.invoices = invoices.not_open.non_beneficiary.created_at_desc unless invoices.blank?
+      self.invoices = invoices.not_open.non_beneficiary.created_at_desc rescue ::Invoice.none #unless invoices.blank?
+    end
+
+    if self.invoices.nil?
+      self.invoices = ::Invoice.none
     end
   end
 

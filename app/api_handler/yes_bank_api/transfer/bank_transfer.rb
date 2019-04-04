@@ -46,13 +46,13 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def init
-    self.company_id = self.payment.payment_order.company_id
+    self.company_id = self.payment&.payment_order&.company_id || self.bank_transaction.company_id
     super()
-    self.account = payment.receiving_account
+    self.account = payment&.receiving_account
     # extracting contact email and mobile number
-    unless self.account.account_owner.is_a?(Company)
-      self.beneficiary_email = self.account.account_owner.email
-      self.beneficiary_mobile_number = self.account.account_owner.mobile_number
+    unless self.account&.account_owner&.is_a?(Company)
+      self.beneficiary_email = self.account&.account_owner&.email
+      self.beneficiary_mobile_number = self.account&.account_owner&.mobile_number
     end
     set_xml_params
   end
@@ -122,7 +122,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
                           bank_response: self.transfer_request.transaction_result,
                           beneficiary_full_name: self.transfer_request.beneficiary_full_name
       )
-      self.payment.update(retry_count: self.payment.retry_count.to_f + 1)
+      self.payment&.update(retry_count: self.payment.retry_count.to_f + 1)
     else
       # this is an anomaly, so send email and flag it
       Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')

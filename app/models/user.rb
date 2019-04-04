@@ -222,6 +222,8 @@ class User < ApplicationRecord
 
   has_many :rate_contracts, foreign_key: :creator_id
 
+  has_many :vendors, class_name: "YesBankVendor", foreign_key: :created_by_id
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
@@ -260,12 +262,11 @@ class User < ApplicationRecord
   scope :only_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
-  # scope :filter_vendor_payments_reviewers, -> (flag) {
-  #   # passed argument is only for has scope, no effect here
-  #   with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
-  # }
 
-  scope :filter_vendor_payments_reviewers, -> (flag) { }
+  scope :filter_vendor_payments_reviewers, -> (flag) {
+    # passed argument is only for has scope, no effect here
+    with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
+  }
 
   # Use only for has_scope filter, scope to policy_user_roles
   scope :policy_id, -> (policy_id) {
@@ -674,6 +675,24 @@ class User < ApplicationRecord
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:budget_manager)).pluck(:user_id)
       without_id(user_ids)
     end     
+  }
+
+  scope :filter_unassigned_non_po_initiator_for_policy, -> (policy_id){
+    # policy = Policy.find_by_id policy_id
+    # if policy.present?
+    #   user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_initiator)).pluck(:user_id)
+    #   without_id(user_ids)
+    # end
+    role_ids = [UserRole.id_for(:non_po_initiator)]
+    filter_unassigned_roles_for_policy(policy_id, role_ids)    
+  }
+
+  scope :filter_unassigned_roles_for_policy, -> (policy_id, role_ids){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id([role_ids]).pluck(:user_id)
+      without_id(user_ids)
+    end
   }
 
   before_save :strip_whitespace
@@ -1122,64 +1141,64 @@ class User < ApplicationRecord
 
   # ********** User Roles for Vendor Payments ******************
 
-  def is_vendor_manger?
-    self.has_policy_role?(UserRole.id_for(:vendor_manager))
+  def is_vendor_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_manager), document)
   end
 
-  def is_vendor_initiator?
-    self.has_policy_role?(UserRole.id_for(:vendor_creator))
+  def is_vendor_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_creator), document)
   end
 
-  def is_vendor_creator?
-    self.has_policy_role?(UserRole.id_for(:vendor_creator))
+  def is_vendor_creator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_creator), document)
   end
 
-  def is_vendor_reviewer?
-    self.has_policy_role?(UserRole.id_for(:vendor_reviewer))
+  def is_vendor_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_reviewer), document)
   end
 
-  def is_item_master_manager?
-    self.has_policy_role?(UserRole.id_for(:item_master_manager))
+  def is_item_master_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:item_master_manager), document)
   end
 
-  def is_purchase_order_initiator?
-    self.has_policy_role?(UserRole.id_for(:purchase_order_initiator))
+  def is_purchase_order_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_order_initiator), document)
   end
 
-  def is_purchase_order_reviewer?
-    self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer))
+  def is_purchase_order_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
   end
 
-  def is_purchase_request_reviewer?
-    self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer))
+  def is_purchase_request_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
   end
 
-  def is_bank_payment_request_initiator?
-    self.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator))
+  def is_bank_payment_request_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), document)
   end
 
-  def is_bank_payment_request_reviewer?
-    self.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer))
+  def is_bank_payment_request_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), document)
   end
 
-  def is_bank_payment_request_creditor?
-    self.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor))
+  def is_bank_payment_request_creditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), document)
   end
 
-  def is_invoice_initiator?
-    self.has_policy_role?(UserRole.id_for(:invoice_initiator))
+  def is_invoice_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:invoice_initiator), document)
   end
 
-  def is_invoice_reviewer?
-    self.has_policy_role?(UserRole.id_for(:invoice_reviewer))
+  def is_invoice_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:invoice_reviewer), document)
   end
 
-  def is_budget_manager?
-    self.has_policy_role?(UserRole.id_for(:budget_manager))
+  def is_budget_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:budget_manager), document)
   end
 
-  def is_goods_receiver?
-    self.has_policy_role?(UserRole.id_for(:goods_receiver))
+  def is_goods_receiver?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:goods_receiver), document)
   end
 
   # ************ User Role for vendor payments ******************

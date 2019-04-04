@@ -1,4 +1,25 @@
+# == Schema Information
+#
+# Table name: rate_contracts
+#
+#  id                      :bigint(8)        not null, primary key
+#  name                    :string(255)
+#  vendor_id               :integer
+#  renewable               :boolean
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  item_id                 :integer
+#  creator_id              :integer
+#  renewal_alert_number    :integer
+#  renewal_alert_period_id :integer
+#  note                    :string(255)
+#  company_id              :integer
+#
+
 class RateContract < ApplicationRecord
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :rate_contract_number, purpose: :rate_contract, editable: false, prefix: 'RTCT-'
 
   belongs_to :creator, optional: true, class_name: 'User'
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
@@ -29,7 +50,8 @@ class RateContract < ApplicationRecord
 
   def as_json
     {
-      id: id, 
+      id: id,
+      rate_contract_number: rate_contract_number,
       name: name, 
       vendor_id: vendor_id,
       vendor_name: vendor&.name,
@@ -52,7 +74,7 @@ class RateContract < ApplicationRecord
   end
 
   def validate_if_admin?(user)
-    user.admin?
+    user.vp_admin_or_auditor?
   end
 
   def add_company

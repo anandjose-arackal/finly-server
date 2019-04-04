@@ -45,6 +45,7 @@
 #  department_id                  :integer
 #  location_id                    :integer
 #  deleted_at                     :datetime
+#  beneficiary_payment_id         :integer
 #
 
 class Payment < ApplicationRecord
@@ -548,6 +549,7 @@ class Payment < ApplicationRecord
     when 'Invoice'
       Invoice.find_by(id: self.parent_id).as_json
     when 'PurchaseOrder'
+      # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
       PurchaseOrder.find_by(id: self.parent_id).as_json2 # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
     end
   end
@@ -611,5 +613,17 @@ class Payment < ApplicationRecord
 
   def budget_trail_destroy
     BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+    reset_status
+  end
+
+  def reset_status
+    case self.parent_type
+    when 'Invoice'
+      parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
+      parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+    when 'PurchaseOrder'
+      parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+      parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    end
   end
 end

@@ -27,6 +27,7 @@ class TaxRate < ApplicationRecord
         name: self.name,
         rate: self.rate,
         internal_id: self.internal_id,
+        display_name: "#{self.name} - #{self.rate}"
     }
   end
 end

@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager::Master::Base
 
   register_handle :proc_inward_document_show
-  register_actions [:update_document, :editable]
+  register_actions [:update_document, :editable, :delete]
 
   def initialize(user=nil, params={})
     super
@@ -16,12 +16,8 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
 
 
   def update_document
-    # e = inward_document.items.map {|i| i.delivered == i.quantity}
-    # unless e.uniq.size == 1 && e.include? true
-    #   true
-    # end
-
-    unless all_delivered?
+    # editable
+    unless all_accepted?
       true
     end
   end
@@ -30,13 +26,17 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
     # edit button only appears after we have updated it with some items 
     # do not show edit button while the doc has just been created
     # after doc has been updated with some delivered items, show the edit button
-    unless all_delivered?
+    unless all_accepted?
       e = inward_document.items.map {|i| i.delivered == 0}
       unless e.include? true
         e = inward_document.items.map {|i| i.quantity >= i.accepted}
         e.include? true
       end
     end
+  end
+
+  def delete
+    true
   end
 
   # # alias_method :invoice, :input
@@ -140,6 +140,11 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
 
   def all_delivered?
     e = inward_document.items.map {|i| i.delivered == i.quantity}
+    (e.uniq.size == 1) && e.include?(true)
+  end
+
+  def all_accepted?
+    e = inward_document.items.map {|i| i.accepted == i.quantity}
     (e.uniq.size == 1) && e.include?(true)
   end
 

@@ -93,11 +93,13 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
         if self.user.vendor_payments_creditor? && !self.user.vendor_payments_admin?
           minimum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.min_amount
           maximum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.max_amount || 999999999999999999999999
-          if payment_request.payments.joins(:amount).sum(:value) > maximum
+
+          max_payment_value = payment_request.payments.joins(:amount).pluck(:amount).max || 0
+          if  max_payment_value > maximum
             hash[:selectable] = false
             self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
             errors << "You are not eligible to credit the payment order, you are eligible to credit only upto #{maximum}"
-          elsif payment_request.payments.joins(:amount).sum(:value) < minimum
+          elsif max_payment_value < minimum
             hash[:selectable] = false
             self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
             errors << "You are not eligible to credit the payment order, you are eligible to credit only greater than #{minimum}"

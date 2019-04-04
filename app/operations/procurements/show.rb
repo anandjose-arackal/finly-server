@@ -45,22 +45,25 @@ class Procurements::Show < Procurements::Base
       self.procurement_terms = user.company.procurement_terms
       self.status_tags = self.procurement.status_tags.reverse
       self.actions = get_actions
-      params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:invoice_initiator), UserRole.id_for(:goods_receiver)]
+      # params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:invoice_initiator), UserRole.id_for(:goods_receiver)]
+      params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
       policies_op = Policy::VendorPayments::Index.(user, params)
       if policies_op.success?
         self.policies = policies_op.policies
       end
+
+      # self.grn_items = self.inward_documents.last.all_items_accepted?
 
     end
 
     def get_actions
       actions = {}
       if po_revisions.present?
-        if (po_revisions.last.approved? || po_revisions.last.auto_approved? || po_revisions.last.sent_to_vendor?) && (user_in_level? || document_owner?)
+        if (po_revisions.last.approved? || po_revisions.last.auto_approved? || po_revisions.last.sent_to_vendor? || po_revisions.last.all_items_accepted?) && (user_in_level? || document_owner?)
           actions[:add_document] = true
         end
       elsif purchase_order.present?
-        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor?) && (user_in_level? || document_owner?)
+        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.all_items_accepted?) && (user_in_level? || document_owner?)
           actions[:add_document] = true
         end
       end

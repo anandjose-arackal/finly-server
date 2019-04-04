@@ -2,9 +2,13 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   register_handle :proc_tax_invoice_show
   validate :input
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn]
 
-  def initialize(user=nil, params={})
+  # register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove]
+
+  register_actions [:more_details_button, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove, :take_control, :return_control]
+
+
+  def initialize(user = nil, params = {})
     super
     result = ::Procurements::Invoices::Show.(user, params)
     unless result.success?
@@ -20,12 +24,6 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
     true
   end
 
-  def send_mail
-    if (invoice.approved? || invoice.auto_approved?)
-      (user.vendor_payments_admin? || (document_owner? && invoice.is_initiating_user?))
-    end
-  end
-
   def export_items
     #No Conditions
     true
@@ -36,9 +34,9 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
       document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)
     end
   end
-  
+
   def reject
-    if (user.vendor_payments_admin? || invoice.is_reviewing_user?)
+    if invoice.is_reviewing_user?
       invoice.processing? && user_in_level?
     end
   end
@@ -48,45 +46,82 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def approve
-    if user.vendor_payments_admin? || invoice.is_reviewing_user?
+    if invoice.is_reviewing_user?
       invoice.processing? && user_in_level?
     end
   end
 
-  def remind
-    if invoice.is_initiating_user?
-      invoice.processing? &&
-      document_owner?
+  def unapprove
+    unless invoice.approved?
+      if last_level?
+        state = (previous_reviewer.include? user.id) ? true : false
+      else
+        previous_reviewer.include? user.id
+      end
     end
+  end
+
+
+  # def take_control
+  #   if user.vendor_payment_admin? && purchase_order.processing? && user_can_take_control?
+  #     true
+  #   end
+  # end
+
+  # def return_control
+  #   if user.vendor_payment_admin? && purchase_order.processing? && user_can_return_control?
+  #     true
+  #   end
+  # end
+
+  def take_control
+    ############# Admin logic start ####################
+    if user.vendor_payments_admin?
+      if (invoice.processing? && invoice.get_reviewers.exclude?(user))
+        return true
+      end
+      if invoice.processing? && !invoice.action_users(:return_control).include?(user) && invoice.action_users(:approve).include?(user)
+        return true
+      end
+    end
+    ############# Admin logic end ####################    
+  end
+
+  def return_control
+    ############# Admin logic start ####################
+    if user.vendor_payments_admin?
+      if invoice.processing?
+        return true if invoice.action_users(:return_control).include?(user)
+      end
+    end
+    ############# Admin logic end ####################
+  end
+
+
+
+  def remind
+    invoice.is_initiating_user? and invoice.processing? and document_owner?
   end
 
   def retract
-    if invoice.is_initiating_user?
-      invoice.processing? && document_owner?
-    end
+    invoice.is_initiating_user? and invoice.processing? and document_owner?
   end
 
   def remind_approver
-    invoice.processing? &&
-    document_owner?
-  end
-
-  def void
-    true 
+    invoice.processing? && document_owner?
   end
 
   def save_btn
     # (user.vendor_payments_admin?) || ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
     # (invoice.processing? && user_in_level?)
-    # 
-    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) || user.vendor_payments_admin?
+    (document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)) || user.vendor_payments_admin?
   end
 
   def save_and_submit
     # ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) ) ||
     # (invoice.processing? && user_in_level?) ||
     # (user.vendor_payments_admin?)
-    ( document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?) )
+    (document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?))
   end
 
   def delete
@@ -95,11 +130,6 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def more_actions
     true
-  end
-
-  def make_payment
-    (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?) &&
-    ((user_in_level? && user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice)) || user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice))
   end
 
   def audit_trail
@@ -121,13 +151,36 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def update_btn
     (document_owner? && (invoice.open? || invoice.retracted? || invoice.rejected?)) ||
-    (invoice.processing? && user_in_level?)
+        (invoice.processing? && user_in_level?)
+  end
+
+  def last_level?
+    if invoice.processing?
+      invoice.get_reviewal_chain&.last[:level_number] == invoice.level&.level_number
+    end
+  end
+
+  def previous_reviewer
+    invoice.get_reviewers('previous').pluck(:id)
+  end
+
+  def user_can_take_control?
+    # check for the current level if it isn't taken control
+    # check if the same user is not taking control twice
+    # check if for the same level if any other user has also taken control
+    (purchase_order.dlrms&.find_by(level_id: purchase_order.level&.id).taken_control_by_id != user.id)
+  end
+
+  def user_can_return_control?
+    invoice.dlrms&.find_by(level_id: invoice.level&.id).taken_control &&
+    invoice.dlrms&.find_by(level_id: invoice.level&.id).taken_control_by_id == user.id
   end
 
   def user_in_level?
-    level = invoice.level
-    amount = invoice.net_amount.value rescue 0
-    level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+    # level = invoice.level
+    # amount = invoice.net_amount.value rescue 0
+    # allowed = level.present? ? level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include?(user.id) : false
+    invoice.get_reviewers.include?(user)
   end
 
   def document_owner?

@@ -3,7 +3,7 @@ json.array!(@result.vendors) do |vendor|
   json.vendor_name vendor.name || ""
   json.business_name  vendor.business_name || ""
   json.value vendor.id
-  json.label vendor.name || ""
+  json.label vendor.name || vendor.business_name || ""
   json.id vendor.id
   json.vendor_code vendor.vendor_id
 end

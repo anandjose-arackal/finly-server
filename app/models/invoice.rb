@@ -69,10 +69,11 @@
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
+#  po_adjusted_advance          :integer
+#  po_advance                   :integer
+#  po_prev_adjusted_advance     :integer
+#  advance_amount_required      :boolean          default(FALSE)
 #
-
-#  gst_type_id: 1 - IGST
-#              2 - CGST + SGST
 
 class Invoice < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil
@@ -93,6 +94,11 @@ class Invoice < ApplicationRecord
   belongs_to :freight_amount, optional: true, class_name: "Amount"
   belongs_to :balance_due, optional: true, class_name: "Amount"
   belongs_to :taxable_amount, optional: true, class_name: "Amount"
+
+  # Captures PO advance if any and how much is adjusted in the tax invoice
+  # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
+  belongs_to :po_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_adjusted_advance
+
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
   belongs_to :created_by, optional: true, class_name: "User", foreign_key: :created_by_user_id
@@ -121,6 +127,7 @@ class Invoice < ApplicationRecord
 
   # belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+  belongs_to :gstin_location, class_name: "GstinLocation", optional: true
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
@@ -155,6 +162,8 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :advance_amount
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
+  # accepts_nested_attributes_for :po_prev_adjusted_advance
+  accepts_nested_attributes_for :po_adjusted_advance
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -171,9 +180,10 @@ class Invoice < ApplicationRecord
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
   # validates :amount, presence: true
+  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9\/-]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}
 
   scope :with_id, -> (id) {where id: id}
-  scope :without_id, -> (id) { where.not(id: id) }
+  scope :without_id, -> (id) {where.not(id: id)}
   scope :with_cost_center_id, -> (id) {where cost_center_id: id}
   scope :not_open, -> {where.not invoice_status_id: InwardInvoiceStatus.id_for(:open)}
   scope :with_controlling_level_ids, -> (level_ids) {where controlling_level_id: level_ids}
@@ -217,13 +227,34 @@ class Invoice < ApplicationRecord
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid]))
+      where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid, :approved, :auto_approved]))
     end
   }
 
-  scope :filter_awaiting_approval, -> (enabled) {
-    if StringUtils.to_bool(enabled)
-      where(invoice_status_id: InwardInvoiceStatus.id_for(:processing))
+  # scope :filter_awaiting_approval, -> (enabled) {
+  #   if StringUtils.to_bool(enabled)
+  #     where(invoice_status_id: InwardInvoiceStatus.id_for(:processing))
+  #   end
+  # }
+
+  # scope :filter_awaiting_approval, -> (user) {
+  #   if user.vendor_payments_reviewer?
+  #     # invoice_ids = Invoice.awaiting_action_items(user).pluck(:id).compact
+  #     # where(id: invoice_ids.uniq)
+  #     self.awaiting_action_items(user)
+  #   end
+  # }
+
+  scope :filter_awaiting_approval, -> (user) {
+    if user.present? && user.instance_of?(User)
+      user_id = user.id
+    else
+      user_id = RequestStore.store[:current_user]&.id
+    end
+
+    if user_id.present?
+      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      with_id(ids)
     end
   }
 
@@ -261,14 +292,17 @@ class Invoice < ApplicationRecord
 
   # this scope checks for an approximate match - used in searches etc.
   scope :filter_invoice_number, -> (invoice_number) {where 'invoices.invoice_number LIKE ?', "%#{invoice_number}%"}
-  scope :filter_invoice_id, -> (invoice_id) { where 'invoices.invoice_id like ?', "%#{invoice_id}%" }
-  scope :filter_inward_invoice_type, -> (invoice_type){
+  scope :filter_invoice_id, -> (invoice_id) {where 'invoices.invoice_id like ?', "%#{invoice_id}%"}
+  scope :filter_inward_invoice_type, -> (invoice_type) {
     where invoice_type_id: InwardInvoiceType.id_for(invoice_type)
   }
 
   scope :filter_po_invoice, -> {
     where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
   }
+
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+  scope :filter_location_id, -> (location_id) {where("location_id = ? OR delivery_location_id = ?", location_id, location_id)}
 
   scope :filter_non_po_invoice, -> {
     where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
@@ -278,11 +312,11 @@ class Invoice < ApplicationRecord
     case type
     when 'po_invoice'
       where invoice_type_id: InwardInvoiceType.id_for(:tax_invoice)
-    when 'non_po_invoice'        
+    when 'non_po_invoice'
       where invoice_type_id: InwardInvoiceType.id_for(:non_po_invoice)
     else
       return nil
-    end      
+    end
   }
 
   scope :filter_status, -> (status_name) {
@@ -296,7 +330,7 @@ class Invoice < ApplicationRecord
     with_status_id(ids)
   }
 
-  scope :non_beneficiary, ->  {
+  scope :non_beneficiary, -> {
     where(invoice_type_id: [InwardInvoiceType.id_for(:tax_invoice),
                             InwardInvoiceType.id_for(:advance),
                             InwardInvoiceType.id_for(:non_po_invoice),
@@ -309,7 +343,7 @@ class Invoice < ApplicationRecord
     where("DATE(created_at) >= ?", created_at)
   }
 
-  scope :filter_vendor_id, -> (ids){
+  scope :filter_vendor_id, -> (ids) {
     where vendor_id: ids
   }
 
@@ -325,12 +359,12 @@ class Invoice < ApplicationRecord
   }
 
   scope :include_for_index, -> {
-        includes( :amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
-           :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
-           :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount])#.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
+    includes(:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount, :invoice_status, :tds_slab, :category,
+             :original_amount, :freight_amount, :taxable_amount, :advance_amount, :balance_due, :cost_center, :gst_type, :receiving_account,
+             :invoice_items, :invoice_attachments, :attachments, :custom_fields, invoice_items: [:amount, :discount_amount, :tax_amount, :net_amount, :taxable_amount, :tax_rate], vendor: [:bank_accounts], procurement: [:purchase_order], payments: [:amount]) #.where(payments: {payment_status_id: PaymentStatus.id_for(:completed)})
   }
 
-  scope :filter_user, -> (user=nil) {
+  scope :filter_user, -> (user = nil) {
     if user.present? && user.instance_of?(User)
       user_id = user.id
     elsif user.instance_of?(TrueClass)
@@ -367,15 +401,15 @@ class Invoice < ApplicationRecord
   template_merge :procurement_id
   template_config do
     include_association [:address, :category, :cost_center, :company, :receiving_account, :vendor, :location,
-                          :delivery_location, :remaining_amount, :invoice_type, :gst_type,
-                          :tds_slab, :payment_term, :department, :sub_department, :policy]
+                         :delivery_location, :remaining_amount, :invoice_type, :gst_type,
+                         :tds_slab, :payment_term, :department, :sub_department, :policy]
 
     clone [:amount, :gross_amount, :net_amount, :tds_amount, :tax_amount, :discount_amount,
            :original_amount, :freight_amount, :taxable_amount,
            :invoice_items, :invoice_attachments, :attachments, :custom_fields,
            :document_level_reviewer_mappings]
 
-    customize(lambda { |invoice,new_invoice|
+    customize(lambda {|invoice, new_invoice|
       new_invoice.trails.destroy_all
       new_invoice.comments.destroy_all
       new_invoice.attachments.destroy_all
@@ -402,7 +436,7 @@ class Invoice < ApplicationRecord
   end
 
   def policy
-    self.payment&.payment_order&.bank_payment_request&.policy
+    self.payments&.first&.payment_order&.bank_payment_request&.policy
   end
 
   # the 'user' will default to the initiating user of the payment
@@ -429,7 +463,7 @@ class Invoice < ApplicationRecord
   def item_amounts_total
     if self.invoice_items.present?
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount.value}.sum
+      return self.invoice_items.map {|p| p.amount&.value}.sum
     else
       return 0
     end
@@ -458,6 +492,15 @@ class Invoice < ApplicationRecord
       return self.receiving_account
     end
     nil
+  end
+
+  def awaiting_action(user)
+    awaiting_action = false
+    if self.level&.reviewers&.include? user
+      awaiting_action = true
+      return awaiting_action
+    end
+    awaiting_action
   end
 
   # this method updates the invoice status based on the associated
@@ -512,73 +555,80 @@ class Invoice < ApplicationRecord
 
   def as_json
     {
-      id: self.id,
-      advance: self.advance,
-      advance_amount: self.advance_amount&.value,
-      tax_amount: precision_value(self.tax_amount&.value),
-      tds_amount: precision_value(self.tds_amount&.value),
-      tax: precision_value(self.tax),
-      tds: precision_value(self.tds),      
-      gst_type_id: self.gst_type_id,
-      tax_type_id: self.tax_type_id,
-      tds_type_id: self.tds_type_id,
-      discount_amount: precision_value(self.discount_amount&.value),
-      discount: precision_value(self.discount),
-      date: self.date,
-      discount_type_id: self.discount_type_id,
-      due_date: self.due_date,
-      invoice_number: self.invoice_number,
-      inclusive_of_taxes: self.inclusive_of_taxes,
-      freight_amount: self.freight_amount&.value,
-      roundoff_amount: self.roundoff_amount,
-      net_payable_amount: self.balance_due&.value,
-      balance_due: self.balance_due&.value,
-      taxable_amount: precision_value(self.gross_amount&.value),
-      editable: self.unpaid? || self.initiated?,
-      tax_rate: precision_value(self.tax_rate),
-      tds_rate: precision_value(self.tds_rate),
-      discount_rate: precision_value(self.discount_rate),
-      advance_rate: precision_value(self.advance_rate),
-      invoice_attachment: {
-        url: self.invoice_attachments.first&.attached_file&.url,
-        thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
-        content_type: self.invoice_attachments.first&.attached_file&.content_type,
-        file_name: self.invoice_attachments.first&.attached_file&.original_filename
-      },
-      net_amount: precision_value(self.net_amount&.value),
-      gross_amount: precision_value(self.gross_amount&.value),
-      custom_fields: self.custom_fields,
-      category_id: self.category_id,
-      category_name: self.category&.name,
+        id: self.id,
+        invoice_type: self.invoice_type&.name,
+        procurement_id: self.procurement_id,
+        advance: self.advance,
+        advance_amount: self.advance_amount&.value,
+        tax_amount: precision_value(self.tax_amount&.value),
+        tds_amount: precision_value(self.tds_amount&.value),
+        tax: precision_value(self.tax),
+        tds: precision_value(self.tds),
+        gst_type_id: self.gst_type_id,
+        tax_type_id: self.tax_type_id,
+        tds_type_id: self.tds_type_id,
+        discount_amount: precision_value(self.discount_amount&.value),
+        discount: precision_value(self.discount),
+        date: self.date,
+        discount_type_id: self.discount_type_id,
+        due_date: self.due_date,
+        invoice_number: self.invoice_number,
+        inclusive_of_taxes: self.inclusive_of_taxes,
+        freight_amount: self.freight_amount&.value,
+        roundoff_amount: self.roundoff_amount,
+        net_payable_amount: self.balance_due&.value,
+        balance_due: self.balance_due&.value,
+        taxable_amount: precision_value(self.gross_amount&.value),
+        editable: self.unpaid? || self.initiated?,
+        tax_rate: precision_value(self.tax_rate),
+        tds_rate: precision_value(self.tds_rate),
+        discount_rate: precision_value(self.discount_rate),
+        advance_rate: precision_value(self.advance_rate),
+        invoice_attachment: {
+            url: self.invoice_attachments.first&.attached_file&.url,
+            thumb: self.invoice_attachments.first&.attached_file&.url(:thumb),
+            content_type: self.invoice_attachments.first&.attached_file&.content_type,
+            file_name: self.invoice_attachments.first&.attached_file&.original_filename
+        },
+        net_amount: precision_value(self.net_amount&.value),
+        gross_amount: precision_value(self.gross_amount&.value),
+        custom_fields: self.custom_fields,
+        category_id: self.category_id,
+        category_name: self.category&.name,
 
-      cost_center_id: self.cost_center_id,
-      cost_center_name: self.cost_center&.name,
+        cost_center_id: self.cost_center_id,
+        cost_center_name: self.cost_center&.name,
 
-      tds_slab_id: self.tds_slab_id,
-      tds_slab_name: self.tds_slab&.name,
-      tds_rate: self.tds,
+        tds_slab_id: self.tds_slab_id,
+        tds_slab_name: self.tds_slab&.name,
+        tds_rate: self.tds,
 
-      # invoice amounts total
-      item_amounts_total: self.item_amounts_total,
+        # invoice amounts total
+        item_amounts_total: self.item_amounts_total,
 
-      # paid amount for this invoice
-      # paid_amount: self.payments.successful.joins(:amount).sum(:value),
-      # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
-      paid_amount: payment_amounts_total, 
-      remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total)
+        # paid amount for this invoice
+        # paid_amount: self.payments.successful.joins(:amount).sum(:value),
+        # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+        paid_amount: payment_amounts_total,
+        remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
+        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value)
     }
   end
 
   # For user role as invoice initiator
-  def is_initiating_user?(user=nil)
+  def is_initiating_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:invoice_initiator), self)
   end
 
   # For user role as invoice reviewer
-  def is_reviewing_user?(user=nil)
+  def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
+  end
+
+  def can_take_control?
+    processing?
   end
 
   private
@@ -615,7 +665,7 @@ class Invoice < ApplicationRecord
       status_ids.push InwardInvoiceStatus.id_for(status)
     end
 
-    status_ids.reject { |status_id| status_id.nil? }
+    status_ids.reject {|status_id| status_id.nil?}
   end
 
   def self.document_owner_attribute
@@ -656,7 +706,13 @@ class Invoice < ApplicationRecord
 
   def self.roles
     # [:admin, :purchase_order_initiator, :purchase_order_reviewer, :invoice_initiator, :invoice_reviewer, :goods_receiver]
-    [:invoice_initiator, :invoice_reviewer]
+    [
+        :invoice_initiator,
+        :invoice_reviewer,
+        :bank_payment_request_initiator,
+        :bank_payment_request_reviewer,
+        :bank_payment_request_creditor
+    ]
   end
 
 end

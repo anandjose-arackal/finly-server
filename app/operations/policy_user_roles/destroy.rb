@@ -15,7 +15,7 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
     end
     # Do not destroy if user is set as reviewer in approval workflow
     # Destroy user from approval flow first
-    validate_reviewer_in_approval_flow
+      validate_reviewer_in_approval_flow if %w(purchase_order_reviewer invoice_reviewer bank_payment_request_reviewer).include?(reviewer_type)
   end
 
   def process
@@ -48,9 +48,18 @@ class PolicyUserRoles::Destroy < PolicyUserRoles::Base
     end
   end
 
+  def validate_reviewer_in_lurm
+    self.policy = policy_user_role.policy_id if self.policy.blank?
+
+  end
+
   def associated_entity_type_reviewers(provider)
     reviewer_level_ids = policy.levels.exclude_deleted.where(associated_entity_type: provider).pluck(:id)
-    reviewer_ids = LevelReviewerMapping.where(level_id: reviewer_level_ids).pluck(:reviewer_id)
+    reviewer_ids = LevelReviewerMapping.non_deleted.with_level_id(reviewer_level_ids).pluck(:reviewer_id)
+    # lurm reviewers
+    level_ids = ReviewalLevel.where(id: policy.level_user_reviewer_mappings&.pluck(:level_id), associated_entity_type: provider)&.pluck(:id)&.uniq
+    reviewer_ids += policy.level_user_reviewer_mappings.where(level_id: level_ids).pluck(:reviewer_id)
+    return reviewer_ids&.uniq&.flatten&.compact
   end
 
 end

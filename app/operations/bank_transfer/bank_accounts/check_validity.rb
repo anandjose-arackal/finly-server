@@ -28,9 +28,10 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
     self.transfer_request = create_transfer_request("IMPS", nil)
     self.bank_transaction = self.company.bank_transactions.create(
        unique_request_number: self.transfer_request.generate_unique_reference,
-       transfer_rype: "IMPS",
+       transfer_type: "IMPS",
        bank_reference_number: self.transfer_request.bank_reference_number,
        transfer_status_id: BankTransferStatus.id_for(:open),
+       account_name_check: true,
        amount_attributes: {
            value: 0.1,
            currency_id: Currency.first.id
@@ -41,6 +42,11 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
   def validate
     if self.account_number.blank?
       add_message :error, "No account number to check"
+      return
+    end
+
+    if self.ifsc.blank?
+      add_message :error, "IFSC cannot be empty"
       return
     end
   end

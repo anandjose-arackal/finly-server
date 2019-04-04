@@ -1,3 +1,33 @@
+# == Schema Information
+#
+# Table name: beneficiary_payments
+#
+#  id                 :bigint(8)        not null, primary key
+#  name               :string(255)
+#  vendor_id          :integer
+#  bank_account_id    :integer
+#  category_id        :integer
+#  department_id      :integer
+#  original_amount_id :integer
+#  tax_amount_id      :integer
+#  payable_amount_id  :integer
+#  inclusive_of_taxes :boolean
+#  gst_type_id        :integer
+#  tax                :decimal(10, )
+#  tds_slab_id        :integer
+#  company_id         :integer
+#  sub_department_id  :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  status_id          :integer
+#  tds_amount_id      :integer
+#  balance_due_id     :integer
+#  net_amount_id      :integer
+#  gross_amount_id    :integer
+#  roundoff_amount    :decimal(10, )
+#  cost_center_id     :integer
+#
+
     #                 :id => :integer,
     #               :name => :string,
     #          :vendor_id => :integer,
@@ -21,6 +51,10 @@
     #      :net_amount_id => :integer,
     #    :gross_amount_id => :integer,
     #    :roundoff_amount => :decimal
+    #     :invoice_number => :text,
+    #       :invoice_date => :date,
+    #   :invoice_due_date => :date
+
 
 
 
@@ -96,7 +130,8 @@ class BeneficiaryPayment < ApplicationRecord
       tds_slab_name: self.tds_slab&.name,
       # tds_rate: self.tds,
       paid_amount: self.payments.successful.joins(:amount).sum(:value),
-      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
+      remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
+      original_amount: precision_value(self.original_amount&.value)
   	}
   end
 

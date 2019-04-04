@@ -8,8 +8,12 @@ class Procurements::Grn::Received::Index < Procurements::Base
 
   def process
     if user.vp_admin_or_auditor? || user.is_goods_receiver?
-      if params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')
-        self.procurements = user.company.procurements.joins(:inward_documents)
+      if (params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')) || (params[:document_type] == 'grn_count')
+        received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
+        pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
+        st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
+        proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)
+        self.procurements = Procurement.where(id: proc_ids)
       end
     end
   end
@@ -23,7 +27,7 @@ class Procurements::Grn::Received::Index < Procurements::Base
     attr_accessor :procurements, :paginated_procurements, :count
 
     has_scope :filter_status_tags, type: :array
-    has_scope :filter_vendor_name, :filter_po_number, :filter_invoice_number, :filter_doc_number
+    has_scope :filter_po_number, :filter_invoice_number, :filter_doc_number
     has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
     has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
     has_scope :filter_user, using: [:user_details, :user_id], type: :hash
@@ -33,6 +37,8 @@ class Procurements::Grn::Received::Index < Procurements::Base
     has_scope :filter_invoice_status
     has_scope :filter_submission_date
     has_scope :filter_delivery_date
+    has_scope :filter_received_date
+    has_scope :filter_location, using: [:location_name, :user_id], type: :hash
     has_scope :filter_procurement_name
     has_scope :filter_procurement_type
     has_scope :filter_invoice_serial
@@ -68,6 +74,7 @@ class Procurements::Grn::Received::Index < Procurements::Base
 
     end
 
+    # It's of no use here
     def get_status_counts
       st_ids = StatusTag.all.pluck(:id)
       pr_ids = self.procurements.filter_procurement_type("purchase_order").pluck(:id)

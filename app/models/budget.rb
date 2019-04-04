@@ -24,7 +24,7 @@
 #
 
 class Budget < ApplicationRecord
-  include SoftDeletable
+  include SoftDeletable, AncestrySupport
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
@@ -215,7 +215,7 @@ class Budget < ApplicationRecord
   end
 
   def validate_if_admin?(user)
-    user.admin?
+    user.admin? || user.vp_admin_or_auditor?
   end
 
   private

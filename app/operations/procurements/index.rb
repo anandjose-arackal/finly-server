@@ -123,8 +123,10 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_category, using: [:category_name, :user_id], type: :hash
     has_scope :filter_po_status
     has_scope :filter_invoice_status
-    has_scope :filter_submission_date
+    has_scope :filter_submission_date, using: [:from, :to], type: :hash
     has_scope :filter_delivery_date
+    has_scope :filter_received_date
+    has_scope :filter_location, using: [:location_name, :user_id], type: :hash
     has_scope :filter_procurement_name
     has_scope :filter_procurement_type
     has_scope :filter_invoice_serial
@@ -134,7 +136,10 @@ class Procurements::Index < Procurements::Base
     has_scope :filter_creation_date_to
     has_scope :filter_month
     has_scope :filter_year
-
+    has_scope :filter_cost_center_id
+    has_scope :filter_location_id
+    has_scope :filter_department_id
+    has_scope :filter_sub_department_id
 
     def init
       self.procurements = params[:procurements]

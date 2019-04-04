@@ -1,7 +1,7 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
               :payment_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
-              :billing_address, :shipping_address, :note
+              :billing_address, :shipping_address, :note, :gstin_location_id
 json.vendor @result.purchase_order.vendor.as_json
 
 json.actions @result.actions
@@ -16,32 +16,45 @@ json.status do
 end
 json.total_before_tax do
   json.id @result.purchase_order.total_before_tax&.id
-  json.value @result.purchase_order.total_before_tax&.value
+  json.value @result.purchase_order.total_before_tax&.value&.round(2)
   json.currency_id @result.purchase_order.total_before_tax&.currency&.id
 end
 json.advance_amount do
   json.id @result.purchase_order.advance_amount&.id
+  json.total @result.purchase_order.total_adv_amount
   json.value @result.purchase_order.advance_amount&.value
+  json.tds_amount @result.purchase_order.advance_tds_amount&.value
+  json.tds_slab_id @result.purchase_order.advance_tds_slab_id
+  json.tds_slab_name @result.purchase_order.advance_tds_slab&.name
   json.currency_id @result.purchase_order.advance_amount&.currency&.id
-  json.due_date @result.purchase_order.due_date
+  json.due_date @result.purchase_order.due_date&.strftime("%e-%b-%Y")
+  json.status do
+    json.id @result.purchase_order.advance_amount_status&.id
+    json.name @result.purchase_order.advance_amount_status&.name
+  end
+  json.advance_amount_required @result.purchase_order.advance_amount_required
+
+  json.requested_advance_amount @result.purchase_order.requested_advance_amount&.value
+  json.advance_amount @result.purchase_order.advance_amount&.value
+  json.tds_amount @result.purchase_order.advance_tds_amount&.value
 end
 json.tax do
-  json.value @result.purchase_order.tax_amount&.value
+  json.value @result.purchase_order.tax_amount&.value&.round(2)
   json.id @result.purchase_order.tax_amount&.id
   json.currency_id @result.purchase_order.tax_amount&.currency&.id
 end
 json.total_after_tax do
   json.id @result.purchase_order.total_after_tax&.id
-  json.value @result.purchase_order.total_after_tax&.value
+  json.value @result.purchase_order.total_after_tax&.value&.round(2)
   json.currency_id @result.purchase_order.total_after_tax&.currency&.id
 end
 json.discount do
-  json.value @result.purchase_order.discount_amount&.value
+  json.value @result.purchase_order.discount_amount&.value&.round(2)
   json.id @result.purchase_order.discount_amount&.id
   json.currency_id @result.purchase_order.discount_amount&.currency&.id
 end
 json.balance_due do
-  json.value @result.purchase_order.balance_amount&.value
+  json.value @result.purchase_order.balance_amount&.value&.round(2)
   json.id @result.purchase_order.balance_amount&.id
   json.currency_id @result.purchase_order.balance_amount&.currency&.id
 end
@@ -49,19 +62,20 @@ end
 json.items do
   json.array! @result.purchase_order.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
+                  :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
     json.tax_amount do
-      json.value item.tax_amount&.value
+      json.value item.tax_amount&.value&.round(2)
       json.id item.tax_amount&.id
       json.currency_id item.tax_amount&.currency&.id
     end
     json.discount_amount do
-      json.value item.discount_amount&.value
+      json.value item.discount_amount&.value&.round(2)
       json.id item.discount_amount&.id
       json.currency_id item.discount_amount&.currency&.id
     end
     json.total_amount do
-      json.value item.total_amount&.value
+      json.value item.total_amount&.value&.round(2)
       json.id item.total_amount&.id
       json.currency_id item.total_amount&.currency&.id
     end
@@ -97,9 +111,10 @@ end
 
 json.departments do
   json.array! @result.departments do |department|
-    json.extract! department, :id, :name, :cost_center_id
+    json.merge! department.as_json(tree: true)
   end
 end
+
 
 json.sub_departments do
   json.array! @result.sub_departments do |dept|
@@ -165,4 +180,18 @@ json.locations do
     json.extract! location, :id, :name, :gstin, :pan
     json.address location.address
   end
+end
+
+json.gstin_locations do
+  json.array! @result.gstin_locations do |gstin_location|
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
+  end
+end
+
+json.tds_slabs do
+    json.array!(@result.tds_slabs.tds_slabs) do |tds_slab|
+      json.id tds_slab.id
+      json.name tds_slab.name
+      json.tds tds_slab.tds
+    end
 end

@@ -22,7 +22,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     end
 
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
-      self.purchase_orders = ::PurchaseOrder.associated_items(user, ::PurchaseOrder.roles)
+      self.purchase_orders = ::PurchaseOrder.associated_items(user, ::PurchaseOrder.roles) || PurchaseOrder.none
     else
       self.purchase_orders = user.purchase_orders
     end
@@ -40,6 +40,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_month
     has_scope :filter_year
     has_scope :filter_user
+    has_scope :filter_vendor_id
 
     def init
       self.purchase_orders = params[:purchase_orders]

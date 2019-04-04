@@ -11,6 +11,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.violations_present = !!params[:violations_present]
     self.chain = []
     self.provider_names = Constants::PROVIDER_NAMES
+
     policy_id = params[:policy_id]
 
     # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
@@ -38,7 +39,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
 
     levels.each do |level|
       if level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).present?
-        mappings = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).includes(:reveiwer)
+        mappings = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).includes(:reviewer)
       else
         mappings = level.level_reviewer_mappings.with_exception(violations_present).non_deleted.includes(:reviewer)
       end

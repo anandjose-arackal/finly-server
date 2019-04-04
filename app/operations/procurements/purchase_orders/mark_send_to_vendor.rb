@@ -4,6 +4,7 @@ class Procurements::PurchaseOrders::MarkSendToVendor < Procurements::PurchaseOrd
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
+    self.procurement = self.purchase_order.procurement
   end
 
   def validate
@@ -24,6 +25,12 @@ class Procurements::PurchaseOrders::MarkSendToVendor < Procurements::PurchaseOrd
       add_message :error, op.messages[:error]
     end
     self.workflow_output = op.workflow_output
+
+    # Update procurement send status
+    status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_sent))
+    unless procurement.status_tags.include? status_tag
+      procurement.status_tags << status_tag
+    end
 
     # todo release all the budgets #todo-sreeram
   end

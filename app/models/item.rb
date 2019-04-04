@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: inventory_line_items
+# Table name: items
 #
 #  id                  :integer          not null, primary key
 #  tax                 :decimal(20, 10)
@@ -20,16 +20,20 @@
 #  account             :string(255)
 #  supply_item_type_id :integer
 #  deleted_at          :datetime
-#  product_type        :integer
+#  product_type_id     :integer          default(1)
 #
 
 class Item < ApplicationRecord
   include SoftDeletable
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :item_number, purpose: :item_master, editable: false, prefix: 'ITEM-'
+
   belongs_to :company, optional: true
   belongs_to :category, optional: true
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
-  belongs_to :product_type, optional: true
+  belongs_to :product_type, optional: true, class_name: 'ProductType', foreign_key: :product_type
 
   has_many :rate_contracts, foreign_key: :item_id
   # LineItem and Branch Location Mapping
@@ -38,8 +42,9 @@ class Item < ApplicationRecord
   has_many :artifacts, as: :resource, dependent: :destroy
 
 
-  validates :rate, presence: true
+  # validates :rate, presence: true
   validates :description, presence: true
+  validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, :allow_blank => true
 
 
   accepts_nested_attributes_for :artifacts, allow_destroy: true
@@ -79,6 +84,8 @@ class Item < ApplicationRecord
   def as_json
     {
         id: id,
+        item_number: item_number,
+        unit_of_measurement: unit_of_measurement,
         hsn_sac: hsn_sac,
         category_name: category&.name,
         category_id: category_id,
@@ -93,7 +100,7 @@ class Item < ApplicationRecord
         item_code: item_code,
         supply_item_type_id: supply_item_type_id,
         item_type: supply_item_type.as_json,
-        product_type: product_type
+        product_type: product_type_id
     }
   end
 
@@ -110,7 +117,7 @@ class Item < ApplicationRecord
   end
 
   def validate_if_admin?(user)
-    user.admin?
+    user.vp_admin_or_auditor?
   end
 
   private

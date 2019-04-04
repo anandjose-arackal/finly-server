@@ -332,6 +332,10 @@ class Company < ApplicationRecord
     self.feature_subscription.budgeting_system
   end
 
+  def vendor_empanelment_workflow_enabled?
+    self.feature_subscription.vendor_empanelment_workflow
+  end
+
   def more_than_one_subscription?
     count = 0
     [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled, :yes_bank_account].each do |feature|
@@ -392,6 +396,15 @@ class Company < ApplicationRecord
     Policy.with_id(policy_ids)
   end
 
+  def dep_subdept_mapping
+    result = {}
+    departments = user.company.departments
+    sub_departments = user.company.departments.only_sub_departments
+    departments.each do |department|
+      
+    end
+  end
+
   private
 
   def init_config_present
@@ -429,6 +442,12 @@ class Company < ApplicationRecord
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+
+    # Seed Default list of vendor types
+    default_vendor_types = %w( Contractors Vendors )
+    default_vendor_types.each do |vendor_type|
+      self.vendor_types.build({name: vendor_type}).save
+    end
 
     # creating budget configurations
     self.build_enforce_budget_configuration(enforce_purchase_order_budget: false, enforce_payment_budget: false,

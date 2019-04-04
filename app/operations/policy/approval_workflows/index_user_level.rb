@@ -38,7 +38,7 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
   end
 
   def authorized_user_types
-    [:admin]
+    [:admin, :vendor_payments_admin]
   end
 
   def init
@@ -68,13 +68,19 @@ class Policy::ApprovalWorkflows::IndexUserLevel < Policy::ApprovalWorkflows::Bas
   def scope_users_by_role
     if provider.present?
       case provider
-      when 'PurchaseOrderProvider'
-        PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:purchase_order_initiator)).pluck(:user_id).uniq rescue []
-      when 'InvoiceProvider'
-        PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:invoice_initiator)).pluck(:user_id).uniq rescue []
-      when 'BankPaymentRequestProvider' 
-        PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id).uniq rescue []
+      when 'PurchaseOrderProvider', :PurchaseOrderProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:purchase_order_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+      when 'InvoiceProvider', :InvoiceProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:invoice_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+      when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
+        user_ids = PolicyUserRole.where(policy_id: policy.id, user_role_id: UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id).uniq rescue []
+        user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
+      when 'MoneyRequestProvider', 'ReportProvider', 'TravelRequestBookingProvider', 'TravelRequestProvider', :MoneyRequestProvider, :ReportProvider, :TravelRequestProvider, :TravelRequestBookingProvider
+        user_ids = User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id)) rescue []
       end
+      return user_ids
     end
   end
 end

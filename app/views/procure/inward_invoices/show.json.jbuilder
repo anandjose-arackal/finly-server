@@ -52,7 +52,14 @@ end
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
-                :billing_address, :shipping_address, :invoice_id
+                :billing_address, :shipping_address, :invoice_id, :gstin_location_id
+
+  json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%m-%Y')
+
+  json.po_advance invoice.po_advance
+  json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
+  json.po_adjusted_advance invoice.po_adjusted_advance
+  json.advance_amount_required invoice.advance_amount_required
 
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
@@ -111,7 +118,7 @@ json.invoice do
   json.invoice_status_name invoice.invoice_status&.name&.humanize
 
   # invoice amounts total
-  json.item_amounts_total invoice.item_amounts_total
+  json.item_amounts_total invoice.item_amounts_total&.round(2)
 
   json.net_payable_amount invoice.balance_due&.value
   json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
@@ -121,7 +128,7 @@ json.invoice do
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
-                    :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id
+                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
@@ -180,9 +187,15 @@ json.cost_centers do
   end
 end
 
+# json.departments do
+#   json.array! @result.departments do |dept|
+#     json.extract! dept, :id, :name, :cost_center_id
+#   end
+# end
+
 json.departments do
-  json.array! @result.departments do |dept|
-    json.extract! dept, :id, :name, :cost_center_id
+  json.array! @result.departments do |department|
+    json.merge! department.as_json(tree: true)
   end
 end
 
@@ -206,6 +219,12 @@ json.attachments do
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
     json.url attachment.file.url(:original, timestamp: false)
+  end
+end
+
+json.gstin_locations do
+  json.array! @result.gstin_locations do |gstin_location|
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
   end
 end
 

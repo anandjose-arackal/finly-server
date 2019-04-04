@@ -18,20 +18,22 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
-                  :tax_rates, :locations, :budgets
+                  :tax_rates, :locations, :budgets, :gstin_locations
 
     def init
       self.invoice = params[:invoice]
-      self.departments = user.company.departments.roots
+      # self.departments = user.company.departments.roots
+      self.departments = user.company.departments
 
       self.locations = user.company.locations
-      if invoice.created_by.departments.present?
+      if invoice.created_by&.departments.present?
         self.sub_departments = invoice.created_by.departments.only_sub_departments
       else
         self.sub_departments = invoice.created_by.company.departments.only_sub_departments
       end
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
+      self.gstin_locations = self.invoice.vendor&.gstin_locations
 
       # policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
@@ -195,6 +197,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     return if invoice.validate_if_reviewer(user)
     # Jugaad because invoice show, po show, inward doc show.. all are on procurement show. So if one has access to one document , he will have access to all documents as all documents are being shown
     return if validate_po_access
+    # Need to check dlrms as above conditions are breaking
+    #Quick fix
+    return if user.is_invoice_reviewer?
     raise_unauthorized_exception
   end
 
