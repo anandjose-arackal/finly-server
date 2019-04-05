@@ -21,8 +21,9 @@ class Procurements::Grn::Pending::Index < Procurements::Base
   def process
     if user.vp_admin_or_auditor? || user.is_goods_receiver?
       if (params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')) || (params[:document_type] == 'grn_count')
-        received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
-        pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
+        received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
+        # pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
+        pr_ids = user.company.procurements.pluck(:id)
         st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
         proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)
         self.procurements = Procurement.where(id: proc_ids)
@@ -88,13 +89,17 @@ class Procurements::Grn::Pending::Index < Procurements::Base
     end
 
     def get_status_counts
-      received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
+      # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
+      received_pending_ids = [StatusTag.id_for(:shipment_received)]
       st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
       pr_ids = self.procurements.pluck(:id)
       # ProcurementStatusTaggable.group(:status_tag_id).where(status_tag_id: st_ids).with_procurement_ids(pr_ids).size
       raw_count = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).group(:status_tag_id).count
       h = {}
+      
       StatusTag.where(id: received_pending_ids).each {|ps| if raw_count.keys.include? ps.id then h[ps.name] = raw_count[ps.id] else h[ps.name] = 0 end}
+    
+      h["receiving_shipment"] = self.count 
       return h
     end
 

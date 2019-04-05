@@ -20,6 +20,11 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       add_message :error, 'Invoice not found'
     end
 
+    if self.invoice.attachments.blank?
+      add_message :error, "Please attach an invoice document before submitting."
+      return
+    end
+
     # checking for configuration on whether this particular company
     # has budgeting enforced or not
     # this will apply only if this invoice is part of a non-PO

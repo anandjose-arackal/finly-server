@@ -26,7 +26,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations
 
     def init
       self.purchase_order = params[:purchase_order]
@@ -34,6 +34,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.actions = get_actions
       self.departments = user.company.departments.leaves
       self.locations = user.company.locations.includes(:state)
+      self.gstin_locations = self.purchase_order.vendor&.gstin_locations
 
       if purchase_order.user.departments.present?
         self.sub_departments = purchase_order.user.departments.leaves
@@ -208,6 +209,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if purchase_order.validate_if_owner(user)
     return if purchase_order.validate_if_admin(user) && (!purchase_order.open? || (purchase_order.user_id == user.id) || purchase_order.user_id.blank?)
     return if purchase_order.validate_if_reviewer(user)
+    # Since page lands on PO, check for invoice reviewer too. Else if user is invoice reviewer and not PO reviewer, page will break
+    return if purchase_order&.procurement&.invoices&.joins(:document_level_reviewer_mappings)&.pluck('document_level_reviewer_mappings.reviewer_id').include?(user.id) rescue false
     raise_unauthorized_exception
   end
 end

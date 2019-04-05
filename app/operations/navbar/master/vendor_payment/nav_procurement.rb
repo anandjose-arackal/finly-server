@@ -104,12 +104,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage_vendors
-    return nil unless user.is_vendor_manager? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vp_admin_or_auditor?
+    # return nil unless user.is_vendor_manager? || user.is_vendor_initiator? || user.is_vendor_reviewer? || user.vp_admin_or_auditor?
     {name: 'Vendors', id: 'manage', url: 'vendor'}
   end
 
   def manage_item_master
-    return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
+    # return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
     {name: 'Item Master', id: 'manage', url: 'catalogue/params={"tabName": "item_master"}'}
   end
 

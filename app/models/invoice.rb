@@ -98,6 +98,7 @@ class Invoice < ApplicationRecord
   # Captures PO advance if any and how much is adjusted in the tax invoice
   # belongs_to :po_prev_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_prev_adjusted_advance
   belongs_to :po_adjusted_advance, optional: true, class_name: "Amount", foreign_key: :po_adjusted_advance
+  belongs_to :proforma_advance, optional: true, class_name: "Amount", foreign_key: :proforma_advance
 
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
@@ -127,6 +128,7 @@ class Invoice < ApplicationRecord
 
   # belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
+  belongs_to :gstin_location, class_name: "GstinLocation", optional: true
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
@@ -163,6 +165,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
   # accepts_nested_attributes_for :po_prev_adjusted_advance
   accepts_nested_attributes_for :po_adjusted_advance
+  accepts_nested_attributes_for :proforma_advance
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -179,7 +182,7 @@ class Invoice < ApplicationRecord
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
   # validates :amount, presence: true
-  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9\/-]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}
+  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9\/-]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:16}, :allow_blank => true
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not(id: id)}
@@ -624,6 +627,23 @@ class Invoice < ApplicationRecord
   def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
+  end
+
+  # def can_take_control?
+  #   processing?
+  # end
+
+  def can_approve?
+    processing?
+  end
+
+  def can_reject?
+    processing?
+  end
+
+  def can_take_control?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    processing? && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id).taken_control_by_id != user.id
   end
 
   private

@@ -161,6 +161,11 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     respond
   end
 
+  def bulk_reject
+    @result = BankTransfer::PaymentRequest::Review::BulkReject.(current_user, params)
+    respond
+  end
+
   def mark_all_pending
     @result = BankTransfer::PaymentRequest::Review::ApproveAllPending.(current_user, params)
     respond

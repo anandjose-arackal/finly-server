@@ -38,7 +38,7 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     end
 
     event :take_control do
-      transitions :from => :processing, :to => :processing
+      transitions :from => [:pending,:processing], :to => :processing
     end
 
     event :return_control do

@@ -18,5 +18,14 @@ json.results do
     json.po_number purchase_order.po_number
     json.po_vendor_name purchase_order.vendor.name
     json.po_advance_status purchase_order.advance_amount_status&.name&.humanize || ""
-  end
+
+    if purchase_order.dlrms.present?
+        json.po_approved_on purchase_order.get_reviewal_chain&.last[:action_taken_at] rescue nil
+    else
+        json.po_approved_on purchase_order.trails&.reverse_each&.detect {|tr| tr.action.name == "auto_approve"}&.updated_at
+    end
+    
+    json.po_status purchase_order.status&.name&.humanize || ""
+   
+   end
 end

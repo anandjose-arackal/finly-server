@@ -151,6 +151,7 @@ module Transitionable
         reviewer = {
             id: dlrm.reviewer_id,
             name: dlrm.reviewer&.name,
+            email: dlrm.reviewer&.email,
             active: dlrm.active,
             threshold: dlrm.threshold,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
@@ -161,7 +162,8 @@ module Transitionable
         if dlrm.taken_control_by_id.present?
           data[:taken_control_by] = {
               id: dlrm.taken_control_by_id,
-              name: dlrm.taken_control_by.name,
+              name: dlrm.taken_control_by&.name,
+              email: dlrm.taken_control_by&.email,
               action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id),
               action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
 
@@ -655,6 +657,7 @@ module Transitionable
       self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
     end
 
+    # Method overridden in bank_payment_request model
     def role_based_creditor_associated_items(user, role_id, options={})
       policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq
       if policy_ids.present?

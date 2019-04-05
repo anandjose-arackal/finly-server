@@ -6,9 +6,10 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
-                :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation
+                :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation,
+                :gstin_location
 
- def init
+  def init
     self.purchase_order_params = purchase_order_parameters
     # self.procurement = user.company.procurements.find_by params[:procurement_id]
     purchase_order_id = params[:id] || params[:purchase_order_id]
@@ -17,6 +18,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     if purchase_order_params[:bank_account_id]
       self.bank_account = self.purchase_order&.vendor&.bank_accounts&.find_by(id: purchase_order_params[:bank_account_id]) rescue nil
     end
+
+    # if purchase_order_params[:gstin_location_id].present?
+    self.gstin_location = self.purchase_order&.vendor&.gstin_locations.find_by(id: purchase_order_params[:gstin_location_id]) || self.purchase_order.vendor&.gstin_locations.first
+    # end
 
     self.procurement = self.purchase_order.procurement
     self.original_purchase_order = self.procurement.purchase_order
@@ -31,8 +36,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
     # self.purchase_order_params[:policy_id] = 457
-
-    
   end
 
   def validate
@@ -41,7 +44,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, "Cant update purchase order marked as 'sent to vendor'"
       return
     end
-
 
     if (purchase_order.approved? || purchase_order.auto_approved?) && !user.vp_admin_or_auditor?
       add_message :error, "Cant update Purchase Orders which are already approved or marked as 'sent to vendor'"
@@ -124,6 +126,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   end
 
   def pre_process
+    # update gstin location id
+    if self.gstin_location.present?
+      self.purchase_order_params[:gstin_location_id] = self.gstin_location&.id
+    end
+
     self.po_current_attachments = user.company.procurement_attachments.with_id(purchase_order_params[:attachments])
 
     self.purchase_order_params.delete(:attachments)

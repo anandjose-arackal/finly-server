@@ -9,7 +9,7 @@ class ActionsManager::Master::Procurements::Index < ActionsManager::Master::Base
   end
 
   def bulk_actions
-    user.is_purchase_order_reviewer?
+    user.vendor_payments_admin? || user.is_purchase_order_reviewer?
   end
 
   def approve_purchase_order

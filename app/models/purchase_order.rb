@@ -101,6 +101,8 @@ class PurchaseOrder < ApplicationRecord
   belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
+  belongs_to :gstin_location, class_name: "GstinLocation", optional: true
+
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
@@ -227,7 +229,12 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_all_advances, -> {
-    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil)
+    where.not(advance_amount_status_id: [nil, AdvanceAmountStatus.id_for(:po_processing)], advance_amount_id: nil,
+              purchase_order_status_id: [ PurchaseOrderStatus.id_for(:closed), PurchaseOrderStatus.id_for(:po_revised), 
+                                          PurchaseOrderStatus.id_for(:processing), PurchaseOrderStatus.id_for(:voided),
+                                          PurchaseOrderStatus.id_for(:rejected), PurchaseOrderStatus.id_for(:retracted),
+                                          PurchaseOrderStatus.id_for(:open)
+                                        ])
   }
 
   scope :filter_by_due_date, -> (due_date) {
@@ -389,6 +396,19 @@ class PurchaseOrder < ApplicationRecord
     else
       return false
     end
+  end
+
+  def can_approve?
+    processing?
+  end
+
+  def can_reject?
+    processing?
+  end
+
+  def can_take_control?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    processing? && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id).taken_control_by_id != user.id
   end
 
   def advance_to_be_processed?

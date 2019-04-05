@@ -277,6 +277,13 @@ class BankPaymentRequest < ApplicationRecord
     processing?
   end
 
+  def can_take_real_control?(user=nil)
+    # work with this method, dont want to modify the older method since, 
+    # it is used other places and dont want to modify unless sure if this check works in other ppls work.
+    user = user.present? ? user : RequestStore.store[:current_user]
+    processing? && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id # todo, add dlrm logic
+  end
+
   # def can_return_control?
   #   processing?
   # end
@@ -442,6 +449,21 @@ class BankPaymentRequest < ApplicationRecord
     [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor]
   end
 
+  ####################### Overridden Methods ########################
+  def self.role_based_creditor_associated_items(user, role_id, options={})
+    purs = user.policy_user_roles.with_role_id(role_id)
 
+    bank_payment_requests = BankPaymentRequest.none
 
+    purs.each do |pur|
+      pur_bank_payment_requests = BankPaymentRequest.all.
+        where(policy_id: pur.policy_id).
+        where("max_payment_amount > ? AND max_payment_amount <= ?", pur.min_amount, pur.max_amount)
+
+      bank_payment_requests = bank_payment_requests.or(pur_bank_payment_requests)
+    end
+
+    bank_payment_requests = bank_payment_requests.where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
+  end
+  ####################### Overridden Methods ends ###################
 end
