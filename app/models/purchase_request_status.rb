@@ -25,4 +25,44 @@ class PurchaseRequestStatus < ApplicationRecord
         :cancelled
     ]
   end
+
+  def open?
+    self.id == PurchaseRequestStatus.id_for(:open)
+  end
+
+  def retracted?
+    self.id == PurchaseRequestStatus.id_for(:retracted)
+  end
+
+  def rejected?
+    self.id == PurchaseRequestStatus.id_for(:rejected)
+  end
+
+  def processing?
+    self.id == PurchaseRequestStatus.id_for(:processing)
+  end
+
+  def approved?
+    self.id == PurchaseRequestStatus.id_for(:approved)
+  end
+
+  def auto_approved?
+    self.id == PurchaseRequestStatus.id_for(:auto_approved)
+  end
+
+  def order_initiated?
+    self.id == PurchaseRequestStatus.id_for(:order_initiated)
+  end
+
+  def cancelled?
+    self.id == PurchaseRequestStatus.id_for(:cancelled)
+  end
+
+  def closed?
+    self.id == PurchaseRequestStatus.id_for(:closed)
+  end
+
+  def draft?
+    self.id == PurchaseRequestStatus.id_for(:draft)
+  end
 end

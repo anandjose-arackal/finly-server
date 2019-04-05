@@ -18,7 +18,7 @@ class PurchaseRequest < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
 
-  belongs_to :purchase_request_status, optional: true
+  # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
   belongs_to :department, optional: true
   belongs_to :location, optional: true, class_name: "BranchLocation"
@@ -31,6 +31,9 @@ class PurchaseRequest < ApplicationRecord
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
+
+
+  delegate :open? , :draft?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
 
   before_save :add_company
 
@@ -48,7 +51,7 @@ class PurchaseRequest < ApplicationRecord
       location_attributes: {id: self.location_id, name: self.location&.name},
       department_attributes: {id: self.department_id, name: self.department&.name},
       policy_attributes: {id: self.policy_id, name: self.policy&.name},
-      status_attributes: {status_id: self.purchase_request_status_id, status_name: self.purchase_request_status&.name, display_name: self.purchase_request_status&.name},      
+      status_attributes: {status_id: self.purchase_request_status_id, status_name: self.status&.name, display_name: self.status&.name},
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date}
     }
   end

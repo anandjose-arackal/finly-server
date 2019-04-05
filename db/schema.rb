@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_05_060622) do
+ActiveRecord::Schema.define(version: 2019_04_05_103721) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -4484,6 +4484,8 @@ ActiveRecord::Schema.define(version: 2019_04_05_060622) do
     t.integer "purchase_request_status_id"
     t.text "note"
     t.integer "creator_id"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
   end
 

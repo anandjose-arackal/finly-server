@@ -15,7 +15,7 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
   # end
 
   def process
-    self.purchase_request.assign_attributes(self.purchase_request_params)
+    self.purchase_request.assign_attributes(purchase_request_parameters)
 
     unless self.purchase_request.save
       # self.purchase_request.update(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))

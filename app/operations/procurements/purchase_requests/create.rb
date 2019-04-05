@@ -12,8 +12,8 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   def process
     self.purchase_request = PurchaseRequest.new(purchase_request_params)
     self.purchase_request.creator_id = user.id
+    self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
     unless self.purchase_request.save
-      # self.purchase_request.update(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))
       add_message :error, purchase_request.errors.full_messages
       return
     end

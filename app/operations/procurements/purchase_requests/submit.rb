@@ -8,15 +8,14 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
     end
   end
 
-  def init
-    id = params[:id] || params[:purchase_request_id]
-    self.purchase_request = Procurements::PurchaseRequests::Show.(user, params).purchase_request.with_id(id).first rescue nil
-  end
+  # def init
+  #   id = params[:id] || params[:purchase_request_id]
+  #   self.purchase_request = Procurements::PurchaseRequests::Show.(user, params).purchase_request.with_id(id).first rescue nil
+  # end
 
   def process
     params[:document] = self.purchase_request
     params[:aasm_event] = 'submit'
-
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
@@ -27,7 +26,7 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   end
 
   def post_process
-    if purchase_request.status_id == PurchaseRequestStatus.id_for(:auto_approved)
+    if purchase_request.purchase_request_status_id == PurchaseRequestStatus.id_for(:auto_approved)
       add_message :success, "Purchase Request Auto Approved"
     else
       add_message :success, "Purchase Request Submitted for Approval"
