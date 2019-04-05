@@ -52,6 +52,11 @@ class Procure::PurchaseRequestsController < ApplicationController
     respond
   end
 
+  def unapprove
+    @result = Procurements::PurchaseRequests::Unapprove.(current_user, params)
+    respond
+  end
+
   def take_control
     @result = Procurements::PurchaseRequests::TakeControl.(current_user, params)
     respond
