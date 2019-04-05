@@ -3469,7 +3469,7 @@ Rails.application.routes.draw do
       patch 'return_control', to: "purchase_requests#return_control", as: :return_control
       collection do
         get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
-        get 'approved_purchase_request_items', to: 'purchase_requests#approved_purchase_request_items'
+        get 'approved_items', to: 'purchase_requests#approved_items'
       end
     end
 

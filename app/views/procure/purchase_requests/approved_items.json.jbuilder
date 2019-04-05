@@ -1,6 +1,7 @@
 json.results do
   json.approved_purchase_request_items do
     json.array!((1..35).to_a) do |i|
+      json.id 22
       json.order_number "ASDF123"
       json.required_by_date Date.today
       json.delivery_location_id 1

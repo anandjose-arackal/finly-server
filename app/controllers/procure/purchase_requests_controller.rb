@@ -77,10 +77,12 @@ class Procure::PurchaseRequestsController < ApplicationController
     respond
   end
 
-  def approved_purchase_request_items
-    respond_to do |format|
-      format.json
-    end
+  def approved_items
+    @result = Procurements::PurchaseRequests::ApprovedItems.(current_user, params)
+    respond
+    # respond_to do |format|
+    #   format.json
+    # end
   end
 
 end
