@@ -32,7 +32,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     end
     op = BankTransfer::PaymentRequest::Index.(user, params)
     if op.success?
-      self.payment_requests = op.payment_requests.with_id(ids)
+      self.payment_requests = op.payment_requests.with_id(ids).includes_details
     else
       add_message :error, op.messages[:error]
     end
