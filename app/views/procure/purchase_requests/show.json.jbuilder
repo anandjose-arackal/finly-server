@@ -7,7 +7,7 @@ json.result do
       json.name @result.purchase_request.creator&.name
       json.created_at @result.purchase_request&.created_at&.to_date
     end
-    json.status @result.purchase_request&.purchase_request_status_id
+    json.status @result.purchase_request&.status&.name
     json.location do
       json.name @result.purchase_request&.location&.name
       json.id @result.purchase_request&.location_id
