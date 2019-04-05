@@ -45,8 +45,8 @@ class Vendors::Create < Vendors::Base
             add_message :error, "Please select a policy"
           end
 
-          unless policies.include?(vendor_parameters[:policy_id].to_i)
-            add_message "Unknown policy"
+          unless policy_ids.include?(vendor_parameters[:policy_id].to_i)
+            add_message :error, "Unknown policy"
           end
         end
       end
