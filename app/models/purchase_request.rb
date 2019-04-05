@@ -17,8 +17,9 @@
 class PurchaseRequest < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
-  
+
   belongs_to :purchase_request_status, optional: true
+  belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
   belongs_to :department, optional: true
   belongs_to :location, optional: true, class_name: "BranchLocation"
   belongs_to :policy, optional: true
