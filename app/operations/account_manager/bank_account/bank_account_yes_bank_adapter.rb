@@ -7,7 +7,11 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
   FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
-  SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  if Rails.env.production?
+    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  else
+    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED", "SENT_TO_BENEFICIARY"]
+  end
   TEMPORARY_ERRORS_FROM_BANK = [
       "Acquiring Bank CBS or node offline",
       "Rejected/Failed at downstream system"

@@ -5207,6 +5207,7 @@ ActiveRecord::Schema.define(version: 2019_04_04_101936) do
     t.datetime "updated_at", null: false
     t.string "voucher_expense_date"
     t.boolean "custom_voucher", default: false
+    t.boolean "excel_export", default: false
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
 
