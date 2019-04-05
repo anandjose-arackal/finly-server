@@ -13,4 +13,18 @@ class Attachment < ApplicationRecord
   scope :orphans, -> {
     where(resource_id: nil)
   }
+
+
+  def as_json
+    {
+      id: self.id,
+      name: self.file_file_name,
+      # url: self.file&.url,
+      created_at: self.created_at.to_date,
+      resource_type: self.resource_type,
+      resource_id: self.resource_id
+      # created_by: self.creator&.name,
+      # description: self.description
+    }
+  end
 end
