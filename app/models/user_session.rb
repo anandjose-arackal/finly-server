@@ -70,6 +70,8 @@ class UserSession < ApplicationRecord
   scope :non_admins, -> {where admin_user_id: nil}
   scope :admins, -> {where.not admin_user_id: nil}
 
+  validates :ip, presence: true
+
   delegate :authorized?, :revoked?, :blocked?, :failed?, :expired?, :logged_out?, to: :status
 
   def verify(verification_mode)
