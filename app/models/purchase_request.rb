@@ -15,7 +15,9 @@
 #
 
 class PurchaseRequest < ApplicationRecord
-
+  include Transitionable
+  include Sequenced::ActsAsSequenced
+  
   belongs_to :purchase_request_status, optional: true
   belongs_to :department, optional: true
   belongs_to :location, optional: true, class_name: "BranchLocation"
@@ -48,6 +50,22 @@ class PurchaseRequest < ApplicationRecord
       status_attributes: {status_id: self.purchase_request_status_id, status_name: self.purchase_request_status&.name, display_name: self.purchase_request_status&.name},      
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date}
     }
+  end
+
+  def get_default_provider
+    'PurchaseRequestProvider'
+  end
+
+  def self.document_owner_attribute
+    'creator_id'
+  end
+
+  def self.document_status_attribute
+    'purchase_request_status_id'
+  end
+
+  def self.document_status_class_name
+    'PurchaseRequestStatus'
   end
 
 end

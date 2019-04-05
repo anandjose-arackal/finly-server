@@ -2,10 +2,10 @@ class Procurements::PurchaseRequests::Destroy < Procurements::PurchaseRequests::
 
   attr_accessor :purchase_request
 
-  def init
-    id = params[:id] || params[:purchase_request_id]
-    self.purchase_request = user.company.purchase_requests.find_by_id id
-  end
+  # def init
+  #   id = params[:id] || params[:purchase_request_id]
+  #   self.purchase_request = user.company.purchase_requests.find_by_id id
+  # end
 
   def authorize
     unless purchase_request.present? && (purchase_request.company_id == user.company_id)

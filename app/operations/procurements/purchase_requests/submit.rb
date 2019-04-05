@@ -9,7 +9,7 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   end
 
   def init
-    id = params[:id] || params[:purchase_request]
+    id = params[:id] || params[:purchase_request_id]
     self.purchase_request = Procurements::PurchaseRequests::Show.(user, params).purchase_request.with_id(id).first rescue nil
   end
 

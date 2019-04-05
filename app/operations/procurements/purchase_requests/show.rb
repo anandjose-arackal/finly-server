@@ -1,7 +1,6 @@
 class Procurements::PurchaseRequests::Show < Procurements::PurchaseRequests::Base
   attr_accessor :purchase_request, :policies
   def init
-
     pr_id = params[:id] || params[:purchase_request_id]
     self.purchase_request = user.company.purchase_requests.find_by(id: pr_id)
 

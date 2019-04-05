@@ -15,6 +15,8 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
+  include Transitionable
+
   belongs_to :purchase_request, optional: true
   belongs_to :item, optional: true
   belongs_to :per_unit_estimated_amount, optional: true, class_name: "Amount", dependent: :destroy

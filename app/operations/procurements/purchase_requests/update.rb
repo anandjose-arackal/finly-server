@@ -1,17 +1,18 @@
 class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::Base
   attr_accessor :purchase_request, :policies, :purchase_request_params
-  def init
-    self.purchase_request_params = purchase_request_parameters
-    pr_id = params[:id] || params[:purchase_request_id]
-    self.purchase_request = user.company.purchase_requests.find_by(id: pr_id)
 
-  end
+  # def init
+  #   self.purchase_request_params = purchase_request_parameters
+  #   pr_id = params[:id] || params[:purchase_request_id]
+  #   self.purchase_request = user.company.purchase_requests.find_by(id: pr_id)
 
-  def validate
-    if self.purchase_request.blank?
-      add_message :error, "Purchase Request not found for this user."
-    end
-  end
+  # end
+
+  # def validate
+  #   if self.purchase_request.blank?
+  #     add_message :error, "Purchase Request not found for this user."
+  #   end
+  # end
 
   def process
     self.purchase_request.assign_attributes(self.purchase_request_params)

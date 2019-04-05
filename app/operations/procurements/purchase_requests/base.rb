@@ -1,9 +1,22 @@
 class Procurements::PurchaseRequests::Base < BaseOperation
-  attr_accessor :workflow_output
+  attr_accessor :workflow_output, :company, :purchase_request
+
+
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
       return
+    end
+  end
+
+  def init
+    self.company = user.company
+    self.purchase_request = Procurements::PurchaseRequests::Show.(current_user, params).purchase_request
+  end
+
+  def validate
+    if purchase_request.blank?
+      add_message :error, 'Purchase request not found'
     end
   end
 
