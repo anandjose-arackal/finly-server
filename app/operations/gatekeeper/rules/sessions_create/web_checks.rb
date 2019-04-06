@@ -79,8 +79,6 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       rule 'Unverified IPs need to be verified before proceeding' do
         next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
         require_otp true
-
-        # todo send mailer
       end
     end
 
@@ -95,9 +93,6 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       rule 'Unverified UserAgent Clients need to be verified before proceeding' do
         next unless RequestStoreUtil.current_session&.user_agent_client.status_id == UserIpStatus.id_for(:unverified)
         require_otp true
-
-        # todo send mailer
-
       end
     end
 
