@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_06_155545) do
+ActiveRecord::Schema.define(version: 2019_04_06_161420) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -5559,6 +5559,15 @@ ActiveRecord::Schema.define(version: 2019_04_06_155545) do
     t.index ["verification_mode"], name: "index_user_agents_on_verification_mode"
   end
 
+  create_table "user_auth_failures", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.boolean "locked"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["locked"], name: "index_user_auth_failures_on_locked"
+    t.index ["user_id"], name: "index_user_auth_failures_on_user_id"
+  end
+
   create_table "user_balance_histories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.date "date"
     t.integer "user_id"
@@ -5981,7 +5990,6 @@ ActiveRecord::Schema.define(version: 2019_04_06_155545) do
     t.integer "accuracy_radius"
     t.string "username"
     t.integer "user_device_id"
-    t.string "client_type"
     t.text "user_agent"
     t.integer "user_ip_id"
     t.integer "user_agent_id"

@@ -154,6 +154,7 @@ class User < ApplicationRecord
   has_many :expense_data_extracts, as: :sourcable
   has_many :receipt_email_parse_failures
   has_many :user_login_tracks, dependent: :destroy
+  has_many :user_auth_failures
   has_many :login_agreement_mappings
   has_many :agreements, through: :login_agreement_mappings
   has_many :card_assign_requests, foreign_key: :card_owner_id

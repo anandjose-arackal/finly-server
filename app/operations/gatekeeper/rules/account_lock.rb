@@ -7,16 +7,17 @@ Gatekeeper::Checker.new 'AccountLock' do
     premise :user_login_invalid_password do
       rule 'More than 5 failed attempts should lock the account' do
         user = params[:user]
-        user.failed_attempts ||= 0
-        user.failed_attempts += 1
-        if user.failed_attempts >= 5 && !user.locked_at.present?
-          user.locked_at = DateTime.now
+        auth_failure = user.user_auth_failures.build locked: false
+        if user.user_auth_failures.within_time(Time.now - LOCKING_PERIOD).size >= 4 && !user.locked_at.present?
+          user.update(locked_at: DateTime.now)
+          auth_failure.locked = true
+
           message 'Too many failed password attempts. Locking the account'
           response_code 401
           level 5
           fail
         end
-        user.save
+        auth_failure.save
       end
     end
 
@@ -24,6 +25,7 @@ Gatekeeper::Checker.new 'AccountLock' do
       rule 'Do not allow locked accounts to login' do
         user = params[:user]
         if user.locked_at.present? && (Time.now - user.locked_at) < LOCKING_PERIOD
+          # user.user_auth_failures.create locked: true
           message 'Account has been temporarily locked. Please try after sometime'
           level 5
           response_code 401
@@ -37,7 +39,6 @@ Gatekeeper::Checker.new 'AccountLock' do
         user = params[:user]
         if user.locked_at.present? || user.failed_attempts
           user.locked_at = nil
-          user.failed_attempts = 0
           user.save
         end
       end

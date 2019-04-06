@@ -62,6 +62,7 @@
 #  advance_tds_amount_id        :integer
 #  advance_amount_required      :boolean          default(FALSE)
 #  requested_advance_amount_id  :integer
+#  gstin_location_id            :bigint(8)
 #
 
 class PurchaseOrder < ApplicationRecord

@@ -88,7 +88,7 @@ class UserSessions::Create < BaseOperation
     args[:company_id] = user&.company_id
     args[:user_id] = user&.id
     args[:access_token] = self.token
-    args[:scopes] = self.token.scopes.to_s
+    args[:scopes] = self.token&.scopes&.to_s
     args[:username] = params[:username]
   end
 
