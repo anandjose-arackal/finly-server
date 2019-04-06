@@ -5,6 +5,7 @@ json.result do
     json.vendor_id vendor&.vendor_id
     json.vendor_type vendor.vendor_type.as_json
 
+    json.controlling_user vendor.get_reviewers.first&.name
     json.extract! vendor, :id, :name, :email, :mobile_number
     json.policy vendor.policy.as_json
 

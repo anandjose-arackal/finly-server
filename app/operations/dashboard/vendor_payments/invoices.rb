@@ -123,7 +123,7 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
         self.counts.push(personal_data)
       end
 
-      if user.is_invoice_reviewer? && user.is_bank_payment_request_creditor?
+      if user.is_invoice_reviewer? || user.vendor_payments_admin?
         awaiting_invoices = Invoice.awaiting_action_items(user)
         data = {
           type: "reviewer",

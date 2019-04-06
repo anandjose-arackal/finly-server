@@ -1,6 +1,13 @@
 class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params
 
+  def pre_validate
+    if params[:note].blank?
+      add_message :error, "Please input a reason for rejection."
+      return
+    end
+  end
+
   def init
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
