@@ -124,10 +124,9 @@ class PurchaseOrder < ApplicationRecord
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
-  accepts_nested_attributes_for :items, allow_destroy: true
+  accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
   accepts_nested_attributes_for :custom_fields
-  accepts_nested_attributes_for :purchase_request_items
   # accepts_nested_attributes_for :requested_advance_amount
   # accepts_nested_attributes_for :advance_payments
 
