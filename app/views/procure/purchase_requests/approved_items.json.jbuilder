@@ -1,11 +1,11 @@
 json.results do
   json.approved_purchase_request_items do
     json.array!((1..35).to_a) do |i|
-      json.id 22
+      json.id rand(35).to_i
       json.order_number "ASDF123"
       json.required_by_date Date.today
-      json.delivery_location_id 1
-      json.vendor_id 1
+      json.delivery_location_id rand(5).to_i
+      json.vendor_id rand(5).to_i
       json.vendor_name "Apple Tech"
       json.per_unit_estimated_amount 1000.50
       json.rate_contract "no"
@@ -22,23 +22,23 @@ json.results do
       # end
 
       json.per_unit_estimated_amount_attributes do
-        json.currency_id 1
+        json.currency_id rand(5).to_i
         json.value 300
         json.id 222
       end
 
       json.estimated_amount_attributes do
-        json.currency_id 1
+        json.currency_id rand(5).to_i
         json.value 2223
         json.id 22
       end
       json.item_attributes do
-        json.id 1
+        json.id rand(5).to_i
         json.name 'Pencil'
-        json.quantity 5
+        json.quantity rand(5).to_i
       end
       json.location_attributes do
-        json.id 1
+        json.id rand(5).to_i
         json.name 'Delhi'
       end
     end
