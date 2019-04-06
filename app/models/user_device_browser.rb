@@ -105,7 +105,7 @@ class UserDeviceBrowser < ApplicationRecord
         :is_local_storage, :is_session_storage, :is_cookie,
         :plugins, :is_mobile
     ].each do |attr|
-      differences << attr unless self.send(attr)&.to_s == attrs[attr]&.to_s
+      differences << attr unless self.send(attr).to_s == attrs[attr].to_s
     end
     differences
   end
