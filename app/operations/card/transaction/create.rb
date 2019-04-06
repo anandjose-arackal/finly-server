@@ -24,7 +24,6 @@ class Card::Transaction::Create < BaseOperation
     self.user = self.card.user rescue nil
     self.type = params[:transaction_type].upcase rescue nil
     self.mode = params[:transaction_mode].upcase rescue nil
-    self.transaction_status = params[:transaction_status].upcase rescue nil
     params[:user_id] = user.id if user
     params[:card_id] = card.id if card
   end
@@ -175,10 +174,10 @@ class Card::Transaction::Create < BaseOperation
             end
         end
       when 'CREDIT'
-        case transaction_status
-          when 'REVERSED'
+        case type
+          when 'ATM'
             # handling the case of ATM reversals here, where the type of details will be 'R'
-            if CardTransaction.find_by(reference_id: params[:reference_id]) && %w(R BR).include?(params[:type_of_details])
+            if CardTransaction.find_by(reference_id: params[:reference_id]) && params[:type_of_details] == 'R'
               # i.e. it's a reversal of a particular ATM withdrawal
               self.transaction = CardTransaction.new(params)
               unless transaction.save
