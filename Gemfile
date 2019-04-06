@@ -43,7 +43,7 @@ gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'mas
 
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
-
+gem 'slack-notifier', '~> 2.3'
 # gems for quickbooks integration
 gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'

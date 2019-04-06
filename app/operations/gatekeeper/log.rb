@@ -63,7 +63,7 @@ class Gatekeeper::Log < BaseOperation
     logger.info(logstash_params)
 
     # Slack
-
+    notify_slack(base_params)
   end
 
   def base_params
@@ -87,6 +87,71 @@ class Gatekeeper::Log < BaseOperation
     if type == :error
       self.error_logger.info message
     end
+  end
+
+  def notify_slack(params)
+    level = params[:level]
+    return if level < 2
+
+    color = level > 3 ? 'red' : 'yellow'
+
+    fields = []
+    fields << {
+        "title": "Premise",
+        "value": params[:premise],
+        "short": false
+    }
+
+    fields << {
+        "title": "Rule",
+        "value": params[:rule],
+        "short": false
+    }
+
+    if user.present?
+      fields << {
+          "title": "User",
+          "value": "#{user&.id} - #{user.name}",
+          "short": false
+      }
+    end
+
+    if user&.company.present?
+      fields << {
+          "title": "Company",
+          "value": "#{user&.company&.id} - #{user&.company&.name}",
+          "short": false
+      }
+    end
+
+    if admin_user.present?
+      fields << {
+          "title": "Custom Success",
+          "value": admin_user.name,
+          "short": false
+      }
+    end
+
+    if params[:username].present?
+      fields << {
+          "title": "Authentication username",
+          "value": params[:username],
+          "short": false
+      }
+    end
+
+    attachment = {
+        # "fallback": "Required plain-text summary of the attachment.",
+        "color": color,
+        # "pretext": "Level #{level} violation",
+        "author_name": "Gatekeeper",
+        "title": "Level #{level} violation",
+        "text": params[:verdict],
+        "fields": fields,
+        "ts": Time.now.to_i
+    }
+
+    SLACK_NOTIFIER.ping nil, attachments: [attachment]
   end
 
 end

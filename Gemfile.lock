@@ -466,6 +466,7 @@ GEM
       logstash-event (~> 1.2)
       sidekiq (>= 3.0, < 6)
     simpleconfig (2.0.1)
+    slack-notifier (2.3.2)
     snowplow-tracker (0.6.1)
       contracts (~> 0.7, <= 0.11)
     spreadsheet (1.2.0)
@@ -631,6 +632,7 @@ DEPENDENCIES
   sidekiq-logstash (~> 1.0.1)
   simpleconfig (~> 2.0.1)
   sinatra (~> 2.0.5)!
+  slack-notifier (~> 2.3)
   snowplow-tracker (~> 0.6.1)
   spring (~> 2.0.0)
   spring-commands-rspec (~> 1.0.4)
