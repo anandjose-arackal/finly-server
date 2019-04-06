@@ -69,9 +69,11 @@ class Gatekeeper::Log < BaseOperation
   def base_params
     level = (self.verdict.level.to_s[/\d+/].to_i || 1)
     level = 1 if level < 1
+    x_finly_rp = RequestStoreUtil.current_request.headers['X-Finly-RP'] || ''
+    headers = Base64.decode64(x_finly_rp)
     {
         params: RequestStoreUtil.request_params,
-        headers: RequestStoreUtil.current_request.headers['X-Finly-RP'],
+        headers: headers,
         act: self.verdict.act.to_s,
         premise: self.verdict.premise.to_s,
         rule: self.verdict.rule.to_s,
