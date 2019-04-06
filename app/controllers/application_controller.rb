@@ -365,7 +365,22 @@ class ApplicationController < ActionController::Base
       return false
     end
 
+    return false unless last_request_at_changed?(user_session)
     user_session.update(last_request_at: DateTime.now)
+    true
+  end
+
+  def last_request_at_changed?(user_session)
+    return true if user_session.admin_user_id.present?
+
+    return false unless user_session.authorized?
+    ['otp/resend', 'otp/verify', 'users/password', 'notifications/unread'].each {|path| return false if request.path.include?(path)}
+    return false if current_user.expired?
+    return false unless current_user.otp_verified
+    return false unless user_session.user_device.status_id == UserDeviceStatus.id_for(:verified)
+    return false unless user_session.user_ip.status_id == UserIpStatus.id_for(:verified)
+    return false unless user_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:verified)
+
     true
   end
 

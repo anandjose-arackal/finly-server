@@ -139,20 +139,16 @@ class UserSessions::Create < BaseOperation
 
     result = UserDevices::FindOrCreate.(user, params)
     unless result.success?
-      # todo enable this once frontend is sending the X-Finly-RP headers
-      # args[:status_id] = UserSessionStatus.id_for(:failed)
-      # args[:message] = result.messages[:error].to_sentence
-      # todo enable this once frontend is sending the X-Finly-RP headers
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.messages[:error].to_sentence
       return
     end
 
     args[:user_device_id] = result.device.id
     args[:client_type] = result.device.client_type
     unless result.device.valid? and UserDeviceStatus.ids_for(:unverified, :verified).include?(result.device.status_id)
-      # todo enable this once frontend is sending the X-Finly-RP headers
-      # args[:status_id] = UserSessionStatus.id_for(:failed)
-      # args[:message] = result.device.message
-      # todo enable this once frontend is sending the X-Finly-RP headers
+      args[:status_id] = UserSessionStatus.id_for(:failed)
+      args[:message] = result.device.message
       return
     end
   end

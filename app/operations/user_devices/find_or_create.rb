@@ -41,6 +41,7 @@ class UserDevices::FindOrCreate < BaseOperation
       request_properties = {}
     end
     request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
+    timestamp = '11'
     UserDevice::DEVICES.each do |device|
       if params[:scope].include?(device.authentication_scope.to_s)
         client = client_for(device, request_properties[device.client_id.to_s])

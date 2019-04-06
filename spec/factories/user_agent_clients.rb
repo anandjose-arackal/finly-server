@@ -27,12 +27,12 @@ FactoryBot.define do
     verification_code_failed_attempts {0}
     status_id {UserAgentClientStatus.id_for(:unverified)}
 
-    factory :user_agent_verified do
+    factory :user_agent_client_verified do
       status_id {UserAgentClientStatus.id_for(:verified)}
       verified_at {DateTime.now}
     end
 
-    factory :user_agent_unverified do
+    factory :user_agent_client_unverified do
       status_id {UserAgentClientStatus.id_for(:unverified)}
     end
   end

@@ -6,57 +6,55 @@ Gatekeeper::Checker.new 'On Web Authentication' do
   end
 
   premise :after_session_create do
-    # todo enable this once frontend is sending the X-Finly-RP headers
-    # section 'X-Finly-RP' do
-    #   # Web specific checks
-    #   rule 'X-Finly-RP is required for all web requests' do
-    #     headers = RequestStoreUtil.current_request.headers
-    #     next if headers['X-Finly-RP'].present?
-    #     response_code 401
-    #     fail
-    #   end
-    #
-    #   rule 'Associated device is required for all requests' do
-    #     if RequestStoreUtil.current_device.blank?
-    #       response_code 401
-    #       fail
-    #     end
-    #   end
-    #
-    #   section 'If device is available' do
-    #     before do
-    #       skip if RequestStoreUtil.current_device.nil?
-    #     end
-    #
-    #     [:timestamp, :user_agent, :timezone, :fingerprint,
-    #      :language, :browser, :browser_version,
-    #      :browser_engine, :browser_engine_version,
-    #      :os_name, :os_version].each do |property|
-    #       rule "#{property} is required for all web requests" do
-    #         web = RequestStoreUtil.current_device.client
-    #         next unless web.send(property).blank?
-    #         response_code 401
-    #         fail
-    #       end
-    #     end
-    #
-    #     rule 'Unverified devices need to be verified before proceeding' do
-    #       next unless RequestStoreUtil.current_device.status_id == UserDeviceStatus.id_for(:unverified)
-    #       require_otp true
-    #     end
-    #
-    #     [:incomplete, :attribute_mismatch, :complete].each do |status_name|
-    #       rule "Do not allow login from devices with status #{status_name}" do
-    #         web = RequestStoreUtil.current_device
-    #         next unless web.status_id == UserDeviceStatus.id_for(status_name)
-    #         response_code 401
-    #         fail
-    #       end
-    #     end
-    #   end
-    #
-    # end
-    # # todo enable this once frontend is sending the X-Finly-RP headers
+    section 'X-Finly-RP' do
+      # Web specific checks
+      rule 'X-Finly-RP is required for all web requests' do
+        headers = RequestStoreUtil.current_request.headers
+        next if headers['X-Finly-RP'].present?
+        response_code 401
+        fail
+      end
+
+      rule 'Associated device is required for all requests' do
+        if RequestStoreUtil.current_device.blank?
+          response_code 401
+          fail
+        end
+      end
+
+      section 'If device is available' do
+        before do
+          skip if RequestStoreUtil.current_device.nil?
+        end
+
+        [:timestamp, :user_agent, :timezone, :fingerprint,
+         :language, :browser, :browser_version,
+         :browser_engine, :browser_engine_version,
+         :os_name, :os_version].each do |property|
+          rule "#{property} is required for all web requests" do
+            web = RequestStoreUtil.current_device.client
+            next unless web.send(property).blank?
+            response_code 401
+            fail
+          end
+        end
+
+        rule 'Unverified devices need to be verified before proceeding' do
+          next unless RequestStoreUtil.current_device.status_id == UserDeviceStatus.id_for(:unverified)
+          require_otp true
+        end
+
+        [:incomplete, :attribute_mismatch, :complete].each do |status_name|
+          rule "Do not allow login from devices with status #{status_name}" do
+            web = RequestStoreUtil.current_device
+            next unless web.status_id == UserDeviceStatus.id_for(status_name)
+            response_code 401
+            fail
+          end
+        end
+      end
+
+    end
 
     section 'UserSession' do
       rule 'User agent is required for a session to be created' do

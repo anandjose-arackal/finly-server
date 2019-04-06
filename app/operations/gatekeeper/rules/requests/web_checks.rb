@@ -116,37 +116,37 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
-    # section 'New Devices' do
-    #   section 'Unverified' do
-    #     before do
-    #       skip unless RequestStoreUtil.current_session.user_device.status_id == UserDeviceStatus.id_for(:unverified)
-    #     end
-    #     rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
-    #       pass = false
-    #       [
-    #           'otp/resend',
-    #           'otp/verify',
-    #       ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
-    #       next if pass
-    #
-    #       message 'New device is not OTP verified'
-    #       session_status_id UserSessionStatus.id_for(:blocked)
-    #       response_code 401
-    #       fail
-    #     end
-    #   end
-    #   section 'block :incomplete, :attribute_mismatch' do
-    #     before do
-    #       skip unless UserIpStatus.ids_for(:incomplete, :attribute_mismatch).include?(RequestStoreUtil.current_session.user_ip.status_id)
-    #     end
-    #     rule 'do not allow access' do
-    #       message "User Device is #{RequestStoreUtil.current_session.user_ip.status.name}"
-    #       session_status_id UserSessionStatus.id_for(:blocked)
-    #       response_code 401
-    #       fail
-    #     end
-    #   end
-    # end
+    section 'New Devices' do
+      section 'Unverified' do
+        before do
+          skip unless RequestStoreUtil.current_session.user_device.status_id == UserDeviceStatus.id_for(:unverified)
+        end
+        rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
+          pass = false
+          [
+              'otp/resend',
+              'otp/verify',
+          ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+          next if pass
+
+          message 'New device is not OTP verified'
+          session_status_id UserSessionStatus.id_for(:blocked)
+          response_code 401
+          fail
+        end
+      end
+      section 'block :incomplete, :attribute_mismatch' do
+        before do
+          skip unless UserIpStatus.ids_for(:incomplete, :attribute_mismatch).include?(RequestStoreUtil.current_session.user_ip.status_id)
+        end
+        rule 'do not allow access' do
+          message "User Device is #{RequestStoreUtil.current_session.user_ip.status.name}"
+          session_status_id UserSessionStatus.id_for(:blocked)
+          response_code 401
+          fail
+        end
+      end
+    end
 
     section 'New IP' do
       section 'Unverified' do

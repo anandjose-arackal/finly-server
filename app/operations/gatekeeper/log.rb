@@ -93,7 +93,9 @@ class Gatekeeper::Log < BaseOperation
     level = params[:level]
     return if level < 2
 
-    color = level > 3 ? 'red' : 'yellow'
+    yellow = '#BDB76B'
+    red = '#FF0000'
+    color = level > 3 ? red : yellow
 
     fields = []
     fields << {

@@ -155,7 +155,7 @@ class UserDeviceBrowser < ApplicationRecord
   end
 
   def set_timestamp
-    self.timestamp = DateTime.strptime(self.timestamp_s, '%Q') if timestamp_s.present? and self.timestamp.blank?
+    self.timestamp = DateTime.strptime(self.timestamp_s.to_s, '%Q') if timestamp_s.present? and self.timestamp.blank?
   end
 
   def set_incomplete
@@ -167,7 +167,7 @@ class UserDeviceBrowser < ApplicationRecord
         :os_name, :os_version,
         :screen_width, :screen_height, :color_depth, :is_mobile
     ].each do |attr|
-      if self.send(attr).blank?
+      if self.send(attr).nil?
         incomplete_list << attr
       end
     end
