@@ -1,5 +1,5 @@
 class Card::Transaction::Create < BaseOperation
-  attr_accessor :card, :card_owner, :type, :mode, :transaction
+  attr_accessor :card, :card_owner, :type, :mode, :transaction, :transaction_status
 
   class Card::Transaction::TransactionPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :transaction
@@ -174,7 +174,7 @@ class Card::Transaction::Create < BaseOperation
             end
         end
       when 'CREDIT'
-        case mode
+        case type
           when 'ATM'
             # handling the case of ATM reversals here, where the type of details will be 'R'
             if CardTransaction.find_by(reference_id: params[:reference_id]) && params[:type_of_details] == 'R'
