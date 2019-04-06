@@ -1,19 +1,27 @@
 class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::Base
-  attr_accessor :purchase_request, :policies, :purchase_request_params
+  attr_accessor :purchase_request, :purchase_request_params
   def init
     self.purchase_request_params = purchase_request_parameters
-
   end
 
   def validate
-
+    
   end
 
   def process
     self.purchase_request = PurchaseRequest.new(purchase_request_params)
     self.purchase_request.creator_id = user.id
     self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
-    unless self.purchase_request.save
+    if self.purchase_request.save
+      # Create document level reviewer mapping
+      # For setting level  specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.purchase_request
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+      end
+      return     
+    else
       add_message :error, purchase_request.errors.full_messages
       return
     end

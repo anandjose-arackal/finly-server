@@ -43,3 +43,4 @@ json.reviewal_chains do
     end
   end
 end
+json.reviewal_chain @result.purchase_request.get_reviewal_chain

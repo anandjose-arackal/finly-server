@@ -17,12 +17,13 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       # todo - change the above before deploy. Or should we? :thinking face:
       self.policies = Policy::VendorPayments::Index.(user, params).policies
       self.reviewal_chains = []
+      params[:reviewal_document] = purchase_request
+
       self.policies.each do |policy|
         params = {
             policy_id: policy.id,
             provider_name: "PurchaseRequestProvider",
-            # provider_name: "BankPaymentRequestProvider",
-            document: self.purchase_request
+            reviewal_document: self.purchase_request
         }
         op = ::ReviewalManager::ReviewalChain.(user, params)
         if op.success?
@@ -37,12 +38,17 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
         self.reviewal_chains.push(chain)
       end
     end
+
+    def get_reviewal_chain
+      op = ::ReviewalManager::ReviewalChain.(user, params)
+      op.chain
+    end
   end
 
   def init
     id = params[:id] || params[:purchase_request_id]
-    # self.purchase_request = Procurements::PurchaseRequests::Index.(user, params).purchase_requests.find_by(id: id) rescue nil
-    self.purchase_request = nil
+    self.purchase_request = Procurements::PurchaseRequests::Show.(user, params).purchase_request rescue nil
+    # self.purchase_request = nil
   end
 
   def validate

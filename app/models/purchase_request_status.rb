@@ -65,4 +65,8 @@ class PurchaseRequestStatus < ApplicationRecord
   def draft?
     self.id == PurchaseRequestStatus.id_for(:draft)
   end
+
+  def awaiting_approval?
+    self.id == PurchaseRequestStatus.id_for(:awaiting_approval)
+  end
 end

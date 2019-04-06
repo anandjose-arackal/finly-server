@@ -1,5 +1,5 @@
 class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::Base
-  attr_accessor :purchase_request, :policies, :purchase_request_params
+  attr_accessor :purchase_request, :purchase_request_params
 
   # def init
   #   self.purchase_request_params = purchase_request_parameters
@@ -17,8 +17,16 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
   def process
     self.purchase_request.assign_attributes(purchase_request_parameters)
 
-    unless self.purchase_request.save
-      # self.purchase_request.update(purchase_request_status_id: PurchaseRequestStatus.id_for(:draft))
+    if self.purchase_request.save
+      # Create document level reviewer mapping
+      # For setting level  specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.purchase_request
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+      end
+      return
+    else
       add_message :error, purchase_request.errors.full_messages
       return
     end

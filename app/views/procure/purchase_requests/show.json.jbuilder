@@ -77,5 +77,6 @@ json.result do
         end
       end
     end
+    json.reviewal_chain @result.purchase_request.get_reviewal_chain
   end
 end

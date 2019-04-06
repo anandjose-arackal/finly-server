@@ -32,6 +32,11 @@ class Procure::PurchaseRequestsController < ApplicationController
   #   respond
   # end
 
+  def save_and_submit
+    @result = Procurements::PurchaseRequests::SaveAndSubmit.(current_user, params)
+    respond
+  end
+
   def submit
     @result = Procurements::PurchaseRequests::Submit.(current_user, params)
     respond

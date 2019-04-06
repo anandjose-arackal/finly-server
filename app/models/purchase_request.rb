@@ -72,4 +72,12 @@ class PurchaseRequest < ApplicationRecord
     'PurchaseRequestStatus'
   end
 
+  def self.status_ids(*statuses)
+    status_ids = []
+    statuses.each do |status|
+      status_ids.push PurchaseRequestStatus.id_for(status)
+    end
+    status_ids&.flatten&.compact
+  end
+
 end

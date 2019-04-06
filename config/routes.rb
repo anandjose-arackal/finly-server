@@ -3467,6 +3467,7 @@ Rails.application.routes.draw do
       patch 'unapprove', to: "purchase_requests#unapprove", as: :unapprove
       patch 'take_control', to: "purchase_requests#take_control", as: :take_control
       patch 'return_control', to: "purchase_requests#return_control", as: :return_control
+      patch 'save_and_submit', to: "purchase_requests#save_and_submit", as: :save_and_submit
       collection do
         get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
         get 'approved_items', to: 'purchase_requests#approved_items'

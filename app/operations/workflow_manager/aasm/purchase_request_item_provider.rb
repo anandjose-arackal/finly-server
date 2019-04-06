@@ -13,7 +13,7 @@ class WorkflowManager::Aasm::PurchaseRequestItemProvider < WorkflowManager::Aasm
 
     event :submit do
       transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:open, :retracted, :rejected], to: :awiating_approval
+      transitions from: [:open, :retracted, :rejected], to: :awaiting_approval
     end
 
     event :approve do
