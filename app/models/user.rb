@@ -810,7 +810,7 @@ class User < ApplicationRecord
   end
 
   def weak_words
-    ['finly.io', 'finly', self.first_name, self.last_name, self.email, self.company&.name]
+    ['finly.io', 'finly', self.first_name, self.last_name, self.email, self.company&.name, self.company&.name&.split(/\W+/)]
   end
 
   def payments

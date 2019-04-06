@@ -64,6 +64,7 @@ RSpec.describe User, type: :model do
     @user = create(:em_user, company: @company)
     @user2 = create(:em_user, company: @company)
     @user_emp = create(:em_employee_user, company: @company)
+    @user_reviewer = create(:em_reviewer_user, company: @company)
     @user_admin = create(:em_admin_user, company: @company)
   end
 
@@ -77,9 +78,14 @@ RSpec.describe User, type: :model do
     expect(@user.valid?).to be_truthy
   end
 
-  it 'should have a minimum password complexity of 2 for non-admins/non-creditors' do
+  it 'should have a minimum password complexity of 1 for employees' do
     # @user.role_mapping.first.update(user_role_id: UserRole.id_for(:admin))
-    expect(@user_emp.min_password_score).to eq(2)
+    expect(@user_emp.min_password_score).to eq(1)
+  end
+
+  it 'should have a minimum password complexity of 2 for reviewers' do
+    # @user.role_mapping.first.update(user_role_id: UserRole.id_for(:admin))
+    expect(@user_reviewer.min_password_score).to eq(2)
   end
 
   it 'should have a minimum password complexity of 3 for admins/creditors' do
@@ -101,29 +107,29 @@ RSpec.describe User, type: :model do
     @error_message = 'Password Complexity requirement not met. Please use: 1 uppercase, 1 lowercase, 1 digit and 1 special character'
 
     # No uppercase
-    @user.assign_attributes(password: 'FW1g$18j0t!k19T'.downcase, password_confirmation: 'FW1g$18j0t!k19T'.downcase)
-    expect(@user.valid?).to_not be_truthy
-    expect(@user.errors.full_messages.include?(@error_message)).to be_truthy
+    @user_admin.assign_attributes(password: 'FW1g$18j0t!k19T'.downcase, password_confirmation: 'FW1g$18j0t!k19T'.downcase)
+    expect(@user_admin.valid?).to_not be_truthy
+    expect(@user_admin.errors.full_messages.include?(@error_message)).to be_truthy
 
     # No lowercase
-    @user.assign_attributes(password: 'FW1g$18j0t!k19T'.upcase, password_confirmation: 'FW1g$18j0t!k19T'.upcase)
-    expect(@user.valid?).to_not be_truthy
-    expect(@user.errors.full_messages.include?(@error_message)).to be_truthy
+    @user_admin.assign_attributes(password: 'FW1g$18j0t!k19T'.upcase, password_confirmation: 'FW1g$18j0t!k19T'.upcase)
+    expect(@user_admin.valid?).to_not be_truthy
+    expect(@user_admin.errors.full_messages.include?(@error_message)).to be_truthy
 
     # No digits
-    @user.assign_attributes(password: 'FWg$aLjrt!klOT', password_confirmation: 'FWg$aLjrt!klOT')
-    expect(@user.valid?).to_not be_truthy
-    expect(@user.errors.full_messages.include?(@error_message)).to be_truthy
+    @user_admin.assign_attributes(password: 'FWg$aLjrt!klOT', password_confirmation: 'FWg$aLjrt!klOT')
+    expect(@user_admin.valid?).to_not be_truthy
+    expect(@user_admin.errors.full_messages.include?(@error_message)).to be_truthy
 
     # No special characters
-    @user.assign_attributes(password: 'FW1gSaLjrtEklOR', password_confirmation: 'FW1gSaLjrtEklOR')
-    expect(@user.valid?).to_not be_truthy
-    expect(@user.errors.full_messages.include?(@error_message)).to be_truthy
+    @user_admin.assign_attributes(password: 'FW1gSaLjrtEklOR', password_confirmation: 'FW1gSaLjrtEklOR')
+    expect(@user_admin.valid?).to_not be_truthy
+    expect(@user_admin.errors.full_messages.include?(@error_message)).to be_truthy
 
     # Valid
-    @user.assign_attributes(password: 'FW1g$18j0t!k19T', password_confirmation: 'FW1g$18j0t!k19T')
-    expect(@user.valid?).to be_truthy
-    expect(@user.errors.full_messages.include?(@error_message)).to_not be_truthy
+    @user_admin.assign_attributes(password: 'FW1g$18j0t!k19T', password_confirmation: 'FW1g$18j0t!k19T')
+    expect(@user_admin.valid?).to be_truthy
+    expect(@user_admin.errors.full_messages.include?(@error_message)).to_not be_truthy
   end
 
   it 'should not allow user to reuse last 10 passwords' do
