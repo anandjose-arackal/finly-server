@@ -750,24 +750,27 @@ class User < ApplicationRecord
   def password_complexity
     # Regexp extracted from https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
     return if password.blank? || password =~ /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/
+    return if min_password_score < 2
 
     errors.add :password, 'Complexity requirement not met. Please use: 1 uppercase, 1 lowercase, 1 digit and 1 special character'
   end
 
   def min_password_score
-    strict_password_requirements = UserRole.ids_for(
+    level_3_req = UserRole.ids_for(
         :admin,
         :finance_manager,
+        :creditor,
+        :bank_payment_request_creditor
+    )
+
+    level_2_req = UserRole.ids_for(
+        :auditor,
         :manager,
         :reviewer,
-        :auditor,
-        :purchaser,
-        :creditor,
         :purchase_request_reviewer,
         :purchase_order_reviewer,
         :invoice_reviewer,
         :bank_payment_request_reviewer,
-        :bank_payment_request_creditor,
         :item_master_manager,
         :inventory_manager,
         :vendor_reviewer,
@@ -777,8 +780,9 @@ class User < ApplicationRecord
         :budget_manager
     )
 
-    return 3 if role_mapping.role(strict_password_requirements).present?
-    2
+    return 3 if role_mapping.role(level_3_req).present?
+    return 2 if role_mapping.role(level_2_req).present?
+    1
   end
 
   # Expires user if password is weak, old passwords and inactivity
