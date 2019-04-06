@@ -22,7 +22,7 @@ RSpec.describe 'AdminBypass Event' do
             @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id
             @session = create :user_session, access_token: @token, ip: @authorized_ip, admin_user: @admin_user,
                               user_agent: @user_agent,
-                              started_at: 5.minutes.ago, last_request_at: 4.minutes.ago, client_type: 'UserDeviceBrowser'
+                              started_at: 5.minutes.ago, last_request_at: 4.minutes.ago, scopes: 'admin_bypass web'
             @headers = {'Authorization': "Bearer #{@token.token}"}
 
             @before_session_event_count = UserSessionEvent.count

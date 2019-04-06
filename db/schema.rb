@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_04_182935) do
+ActiveRecord::Schema.define(version: 2019_04_06_155545) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -5989,6 +5989,7 @@ ActiveRecord::Schema.define(version: 2019_04_04_182935) do
     t.integer "admin_user_id"
     t.text "admin_access_reason"
     t.text "admin_access_reason_details"
+    t.string "scopes"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"

@@ -49,9 +49,9 @@ class UserSessions::AdminBypassCreate < UserSessions::Create
     args[:admin_user_id] = admin_user.id
   end
 
-  def enrich_device(args)
-    args[:client_type] = params[:temporary_client_type]
-  end
+  # def enrich_device(args)
+  #   args[:client_type] = params[:client_type]
+  # end
 
   def enrich_reason(args)
     args[:admin_access_reason] = params[:reason]

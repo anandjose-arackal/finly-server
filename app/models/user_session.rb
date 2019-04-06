@@ -66,9 +66,11 @@ class UserSession < ApplicationRecord
   scope :with_ip, ->(ip) {where ip: ip}
   scope :started_after, ->(datetime) {where 'started_at >= ?', datetime}
   scope :authorized, -> {where status_id: UserSessionStatus.id_for(:authorized)}
-  scope :web, -> {where client_type: 'UserDeviceBrowser'}
-  scope :non_admins, -> {where admin_user_id: nil}
-  scope :admins, -> {where.not admin_user_id: nil}
+  scope :web, -> {where(scopes: 'web')}
+  scope :mobile, -> {where(scopes: 'mobile')}
+  scope :admin, -> {where(scopes: 'admin')}
+  scope :api, -> {where(scopes: 'api')}
+  scope :admin_bypass, -> {where(scopes: 'admin_bypass web')}
 
   validates :ip, presence: true
 
@@ -79,5 +81,29 @@ class UserSession < ApplicationRecord
     self.user_agent_client&.update_attributes(status_id: UserAgentClientStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
     self.user_device&.update_attributes(status_id: UserDeviceStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
   end
+
+  # def scopes
+  #   access_token&.scopes.to_s.split(/\W+/)
+  # end
+
+  def web?
+    scopes == 'web'
+  end
+
+  def mobile_app?
+    scopes == 'mobile'
+  end
+
+  def api?
+    scopes == 'api'
+  end
+
+  def admin_bypass?
+    scopes == 'admin_bypass web'
+  end
+
+  # def admin?
+  #   scopes == 'admin'
+  # end
 
 end

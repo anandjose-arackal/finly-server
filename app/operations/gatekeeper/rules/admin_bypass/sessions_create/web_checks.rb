@@ -24,6 +24,10 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
   end
 
   premise :after_session_create do
+    before do
+      skip unless RequestStoreUtil.current_session.admin_user_id.present?
+    end
+
     section 'X-Finly-RP' do
       # Web specific checks
       rule 'X-Finly-RP is required for all web requests' do
@@ -95,7 +99,7 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
 
     section 'Active Session' do
       rule 'A user cannot have more than 2 active web sessions' do
-        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized.admins
+        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.admin_bypass.authorized
         if authorized_web_sessions.size > 2
           authorized_web_sessions[0..-3].each do |session|
             session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active admin user bypasses')

@@ -23,9 +23,6 @@ class Oauth::TokenController < Doorkeeper::TokensController
       @user = current_user(response&.token)
       params[:user] = @user
       params[:response] = response
-      # Jugaad as frontend is not developed for capturing device_type
-      params[:temporary_client_type] = 'UserDeviceBrowser'
-      # Jugaad end as frontend is not developed for capturing device_type
 
       if create_user_sessions and on_session_create
         on_create_success(response)

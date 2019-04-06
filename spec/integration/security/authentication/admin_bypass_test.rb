@@ -264,7 +264,7 @@ RSpec.describe 'UserAuthentication > Password' do
       expect(session.ip).to eq(@ip)
       expect(session.user_ip).to be_nil
       expect(session.user_device).to be_nil
-      expect(session.client_type).to eq('UserDeviceBrowser')
+      expect(session.scopes).to eq('admin_bypass web')
 
       body = JSON.parse(response.body)
       expect(body&.dig('success')).to eq(true)

@@ -37,8 +37,8 @@ class RequestStoreUtil
     RequestStore.store[:current_session_event] = session
   end
 
-  def self.set_current_token(session)
-    RequestStore.store[:current_token] = session
+  def self.set_current_token(token)
+    RequestStore.store[:current_token] = token
   end
 
   def self.set_request_impression(request_impression)

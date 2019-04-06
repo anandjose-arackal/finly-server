@@ -1,7 +1,7 @@
 Gatekeeper::Checker.new 'AdminBypass > Request' do
 
   before do
-    skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
+    skip unless RequestStoreUtil.current_session&.web?
     skip unless RequestStoreUtil.current_session&.admin_user_id.present?
   end
 

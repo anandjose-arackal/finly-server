@@ -70,10 +70,10 @@ FactoryBot.define do
     login_username {'asd'}
     accuracy_radius {'50'}
     username {'asd'}
-    client_type {'UserDeviceBrowser'}
+    scopes {'web'}
 
     factory :user_session_browser do
-      client_type {'UserDeviceBrowser'}
+      scopes {'web'}
     end
   end
 end

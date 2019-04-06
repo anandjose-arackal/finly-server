@@ -1,16 +1,18 @@
 Gatekeeper::Checker.new 'On Web Authentication' do
 
   before do
-    skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
+    skip unless RequestStoreUtil.current_session&.web?
     skip if RequestStoreUtil.current_session&.admin_user_id.present?
   end
 
   premise :after_session_create do
+
     section 'X-Finly-RP' do
       # Web specific checks
       rule 'X-Finly-RP is required for all web requests' do
         headers = RequestStoreUtil.current_request.headers
         next if headers['X-Finly-RP'].present?
+        level 5
         response_code 401
         fail
       end
@@ -18,6 +20,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       rule 'Associated device is required for all requests' do
         if RequestStoreUtil.current_device.blank?
           response_code 401
+          level 5
           fail
         end
       end
@@ -34,6 +37,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
           rule "#{property} is required for all web requests" do
             web = RequestStoreUtil.current_device.client
             next unless web.send(property).blank?
+            level 5
             response_code 401
             fail
           end
@@ -48,6 +52,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
           rule "Do not allow login from devices with status #{status_name}" do
             web = RequestStoreUtil.current_device
             next unless web.status_id == UserDeviceStatus.id_for(status_name)
+            level 5
             response_code 401
             fail
           end
@@ -102,7 +107,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
     section 'Active Session' do
       rule 'A user cannot have more than 2 active web sessions' do
-        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized.non_admins
+        authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
         if authorized_web_sessions.size > 2
           authorized_web_sessions[0..-3].each do |session|
             session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
