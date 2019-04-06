@@ -58,7 +58,7 @@ class UserSessions::AdminBypassCreate < UserSessions::Create
     args[:admin_access_reason_details] = params[:reason_details]
     unless params[:reason].present? and params[:reason_details].present?
       args[:status_id] = UserSessionStatus.id_for(:blocked)
-      args[:message] = 'Reason has not been provided'
+      args[:message] = 'Bypass access reason has not been provided'
     end
   end
 

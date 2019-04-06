@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_02_121211) do
+ActiveRecord::Schema.define(version: 2019_04_04_182935) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -592,6 +592,7 @@ ActiveRecord::Schema.define(version: 2019_04_02_121211) do
     t.integer "controlling_level_id"
     t.datetime "approved_at"
     t.integer "company_id"
+    t.decimal "max_payment_amount", precision: 20, scale: 5
     t.index ["controlling_for_user_id"], name: "index_bank_payment_requests_on_controlling_for_user_id"
     t.index ["controlling_for_user_role_id"], name: "index_bank_payment_requests_on_controlling_for_user_role_id"
     t.index ["controlling_level_id"], name: "index_bank_payment_requests_on_controlling_level_id"
@@ -3181,12 +3182,22 @@ ActiveRecord::Schema.define(version: 2019_04_02_121211) do
     t.integer "po_advance"
     t.integer "po_prev_adjusted_advance"
     t.boolean "advance_amount_required", default: false
+    t.bigint "gstin_location_id"
+    t.date "transaction_service_period_from"
+    t.date "transaction_service_period_to"
+    t.integer "proforma_invoice_id"
+    t.integer "proforma_advance"
+    t.decimal "total_proforma_advance", precision: 20, scale: 2
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
+    t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
     t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
     t.index ["invoice_type_id"], name: "index_invoices_on_invoice_type_id"
     t.index ["payment_term_id"], name: "index_invoices_on_payment_term_id"
+    t.index ["proforma_invoice_id"], name: "index_invoices_on_proforma_invoice_id"
     t.index ["tax_type_id"], name: "index_invoices_on_tax_type_id"
+    t.index ["transaction_service_period_from"], name: "index_invoices_on_transaction_service_period_from"
+    t.index ["transaction_service_period_to"], name: "index_invoices_on_transaction_service_period_to"
   end
 
   create_table "inward_document_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -4562,6 +4573,7 @@ ActiveRecord::Schema.define(version: 2019_04_02_121211) do
     t.integer "advance_tds_amount_id"
     t.boolean "advance_amount_required", default: false
     t.integer "requested_advance_amount_id"
+    t.bigint "gstin_location_id"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -4571,6 +4583,7 @@ ActiveRecord::Schema.define(version: 2019_04_02_121211) do
     t.index ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id"
     t.index ["due_date", "created_at"], name: "index_purchase_orders_on_due_date_and_created_at"
     t.index ["gst_type_id"], name: "fk_rails_a50fbe2826"
+    t.index ["gstin_location_id"], name: "index_purchase_orders_on_gstin_location_id"
     t.index ["location_id"], name: "index_purchase_orders_on_location_id"
     t.index ["payment_term_id"], name: "index_purchase_orders_on_payment_term_id"
     t.index ["policy_id"], name: "index_purchase_orders_on_policy_id"
@@ -5214,6 +5227,7 @@ ActiveRecord::Schema.define(version: 2019_04_02_121211) do
     t.datetime "updated_at", null: false
     t.string "voucher_expense_date"
     t.boolean "custom_voucher", default: false
+    t.boolean "excel_export", default: false
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
 
@@ -6581,6 +6595,7 @@ ActiveRecord::Schema.define(version: 2019_04_02_121211) do
   add_foreign_key "invoice_number_configs", "invoice_number_config_types"
   add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
+  add_foreign_key "invoices", "gstin_locations"
   add_foreign_key "invoices", "payment_terms"
   add_foreign_key "inward_document_items", "inward_documents"
   add_foreign_key "inward_document_items", "items", column: "inventory_line_item_id"
@@ -6682,6 +6697,7 @@ ActiveRecord::Schema.define(version: 2019_04_02_121211) do
   add_foreign_key "purchase_order_items", "purchase_orders"
   add_foreign_key "purchase_orders", "companies"
   add_foreign_key "purchase_orders", "gst_types"
+  add_foreign_key "purchase_orders", "gstin_locations"
   add_foreign_key "purchase_orders", "payment_terms"
   add_foreign_key "purchase_orders", "policies"
   add_foreign_key "purchase_orders", "procurement_terms"

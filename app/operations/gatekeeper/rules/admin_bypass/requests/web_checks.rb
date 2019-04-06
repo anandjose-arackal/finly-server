@@ -1,4 +1,4 @@
-Gatekeeper::Checker.new 'On New Request' do
+Gatekeeper::Checker.new 'AdminBypass > Request' do
 
   before do
     skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
