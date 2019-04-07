@@ -3471,7 +3471,7 @@ Rails.application.routes.draw do
       collection do
         get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
         get 'approved_items', to: 'purchase_requests#approved_items'
-        patch 'bulk_reject_approved_items', to: "purchase_requests#bulk_reject_approved_items", as: :bulk_reject_approved_items
+        patch 'reject_approved_items', to: "purchase_requests#reject_approved_items", as: :reject_approved_items
       end
     end
 

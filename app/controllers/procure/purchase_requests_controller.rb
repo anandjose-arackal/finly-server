@@ -90,7 +90,8 @@ class Procure::PurchaseRequestsController < ApplicationController
     # end
   end
 
-  def bulk_reject_approved_items
+  # Bulk rejection of approved items
+  def reject_approved_items
     @result = Procurements::PurchaseRequests::RejectApprovedItems.(current_user, params)
     respond
   end

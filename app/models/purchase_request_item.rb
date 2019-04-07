@@ -28,4 +28,7 @@ class PurchaseRequestItem < ApplicationRecord
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachments, allow_destroy: true
 
+  scope :with_ids, -> (ids) { where id: ids}
+  scope :with_id, -> (id) { where id: id }
+
 end
