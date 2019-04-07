@@ -1,5 +1,5 @@
 json.purchase_orders do
-  json.array! @result.procurement_data[:purchase_orders] do |po|
+  json.array! @result.data[:purchase_orders] do |po|
     json.extract! po, :id, :po_number, :procurement_id
     json.created_by po.user&.name
     json.created_at po.created_at&.strftime("%d-%b-%Y")
@@ -8,7 +8,7 @@ json.purchase_orders do
 end
 
 json.non_po_invoices do
-  json.array! @result.procurement_data[:non_po_invoices] do |invoice|
+  json.array! @result.data[:non_po_invoices] do |invoice|
     json.extract! invoice, :id, :invoice_id, :invoice_number, :procurement_id
     json.created_by invoice.created_by&.name
     json.created_at invoice.created_at&.strftime("%d-%b-%Y")
@@ -17,7 +17,7 @@ json.non_po_invoices do
 end
 
 json.po_invoices do
-  json.array! @result.procurement_data[:po_invoices] do |invoice|
+  json.array! @result.data[:po_invoices] do |invoice|
     json.extract! invoice, :id, :invoice_id, :invoice_number, :procurement_id
     json.created_by invoice.created_by&.name
     json.created_at invoice.created_at&.strftime("%d-%b-%Y")
