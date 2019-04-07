@@ -12,7 +12,8 @@ class PurchaseRequestItemStatus < ApplicationRecord
         :rejected,
         :closed,
         :order_initiated,
-        :cancelled
+        :cancelled,
+        :issued_from_inventory
     ]
   end
 end

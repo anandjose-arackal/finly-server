@@ -1,4 +1,4 @@
-class Procurements::PurchaseRequests::PurchaseRequestItem::Base < BaseOperation
+class Procurements::PurchaseRequests::PurchaseRequestItems::Base < BaseOperation
   attr_accessor :workflow_output, :company, :purchase_request, :purchase_request_item
 
 

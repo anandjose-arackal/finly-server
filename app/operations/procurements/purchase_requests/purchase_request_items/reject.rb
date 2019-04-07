@@ -1,4 +1,4 @@
-class Procurements::PurchaseRequests::PurchaseRequestItems::Reject < Procurements::PurchaseRequests::PurchaseRequestItem::Base
+class Procurements::PurchaseRequests::PurchaseRequestItems::Reject < Procurements::PurchaseRequests::PurchaseRequestItems::Base
 
   def process
     params[:document] = self.purchase_request_item
