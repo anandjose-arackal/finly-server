@@ -43,9 +43,9 @@ json.result do
           json.quantity line_item.quantity
           json.unit_type "each"
           json.estimated_cost do
-            json.currency_id 1
-            json.value 70002.0
-            json.id  8838784
+            json.currency_id line_item&.estimated_amount&.currency_id
+            json.value line_item&.estimated_amount&.value
+            json.id  line_item&.estimated_amount_id
           end
           json.unit_cost do
             json.currency_id line_item&.per_unit_estimated_amount&.currency_id
@@ -66,6 +66,31 @@ json.result do
         []
       end
     end
+    json.reviewal_chains do
+      json.array! @result.reviewal_chains do |chain|
+        json.policy_id chain[:policy_id]
+        json.reviewal_chain do
+          json.array! chain[:reviewal_chain] do |item|
+            json.level_number item[:level_number]
+            json.level_name item[:level_name]
+            json.level_id item[:level_id]
+            if item[:selected_reviewer].present?
+              json.selected_reviewer do
+                json.reviewer_details item[:selected_reviewer].as_json
+                json.threshold item[:selected_reviewer_threshold]
+              end
+            end
+            json.reviewers do
+              json.array! item[:reviewers] do |reviewer|
+                json.extract! reviewer, :id, :exception, :threshold
+                json.reviewer_details reviewer.reviewer.as_json
+              end
+            end
+          end
+        end
+      end
+    end
+
     if @result.purchase_request.attachments.present?
       json.attachments_attributes do
         json.array!(@result.purchase_request.attachments) do |attachment|
