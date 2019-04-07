@@ -31,29 +31,29 @@ class Procurements::PurchaseRequests::Show < Procurements::PurchaseRequests::Bas
       self.line_items_count = purchase_request&.purchase_request_items&.count
       self.line_items  = purchase_request&.purchase_request_items
 
-      self.policies = Policy::VendorPayments::Index.(user, params).policies
-      self.reviewal_chains = []
-      params[:reviewal_document] = purchase_request
+      # self.policies = Policy::VendorPayments::Index.(user, params).policies
+      # self.reviewal_chains = []
+      # params[:reviewal_document] = purchase_request
 
-      self.policies.each do |policy|
-        params = {
-            policy_id: policy.id,
+      # self.policies.each do |policy|
+      #   params = {
+      #       policy_id: policy.id,
 
-            provider_name: "PurchaseRequestProvider",
-            reviewal_document: self.purchase_request
-        }
-        op = ::ReviewalManager::ReviewalChain.(user, params)
-        if op.success?
-          policy_chain = op.chain
-        else
-          policy_chain = nil
-        end
-        chain = {
-            policy_id: policy.id,
-            reviewal_chain: policy_chain
-        }
-        self.reviewal_chains.push(chain)
-      end
+      #       provider_name: "PurchaseRequestProvider",
+      #       reviewal_document: self.purchase_request
+      #   }
+      #   op = ::ReviewalManager::ReviewalChain.(user, params)
+      #   if op.success?
+      #     policy_chain = op.chain
+      #   else
+      #     policy_chain = nil
+      #   end
+      #   chain = {
+      #       policy_id: policy.id,
+      #       reviewal_chain: policy_chain
+      #   }
+      #   self.reviewal_chains.push(chain)
+      # end
     end
 
   end
