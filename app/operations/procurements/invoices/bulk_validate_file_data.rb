@@ -41,6 +41,19 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
     Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
 
     self.company_items = user.company.items
+    
+    
+  end
+
+  def validate
+    if self.company_items.blank?
+      add_message :error, "Your inventory list is empty."
+      return
+    end
+
+  end
+
+  def pre_process
     self.items_in_sheet = self.item_details.pluck(:item_number)
 
     self.list_of_items = self.company_items.where(item_number: self.items_in_sheet)
@@ -48,11 +61,6 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
     self.items_found = self.list_of_items.pluck(:item_number)
 
     self.items_not_found = (self.items_in_sheet - self.items_found)
-    
-  end
-
-  def validate
-
   end
 
   def process
