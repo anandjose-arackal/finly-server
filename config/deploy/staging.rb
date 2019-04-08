@@ -12,7 +12,7 @@ server 'staging.finly.io', user: 'centos', roles: %w{web app db}, port: 22
 set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user
-set :rbenv_ruby, '2.3.1' # Edit this if you are using MRI Ruby
+set :rbenv_ruby, '2.6.0' # Edit this if you are using MRI Ruby
 
 # role-based syntax
 # ==================

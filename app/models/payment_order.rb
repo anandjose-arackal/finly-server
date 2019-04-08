@@ -236,7 +236,7 @@ class PaymentOrder < ApplicationRecord
 
   # again, for convenience, and only applies to bank transfer poyments
   def bank_transfer_type
-    self.payments.first.payment_mode
+    payment_mode
   end
 
   def update_order_status
