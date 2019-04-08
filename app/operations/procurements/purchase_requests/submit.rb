@@ -17,7 +17,14 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
     params[:document] = self.purchase_request
     params[:aasm_event] = 'submit'
     op = WorkflowManager::Base.(user, params)
-    unless op.success?
+    if op.success?
+      # Submit the line items too
+      self.purchase_request.purchase_request_items.each do |item|
+        params[:document] = item
+        params[:aasm_event] = 'submit'
+        op = WorkflowManager::Base.(user, params)
+      end if self.purchase_request.purchase_request_items.present?
+    else
       add_message :error, op.messages[:error]
       return
     end

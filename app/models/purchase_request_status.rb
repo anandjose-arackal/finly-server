@@ -26,10 +26,6 @@ class PurchaseRequestStatus < ApplicationRecord
     ]
   end
 
-  def open?
-    self.id == PurchaseRequestStatus.id_for(:open)
-  end
-
   def retracted?
     self.id == PurchaseRequestStatus.id_for(:retracted)
   end

@@ -1,14 +1,14 @@
 json.results do
   json.approved_purchase_request_items do
-    json.array!((1..35).to_a) do |i|
-      json.id rand(35).to_i
-      json.order_number "ASDF123"
-      json.required_by_date Date.today
-      json.delivery_location_id rand(5).to_i
-      json.vendor_id rand(5).to_i
-      json.vendor_name "Apple Tech"
-      json.per_unit_estimated_amount 1000.50
-      json.rate_contract "no"
+    json.array!(@result.paginated_items) do |item|
+      json.id item.id
+      json.order_number "A"+ rand(1234).to_s
+      json.required_by_date item&.required_by_date&.to_date
+      json.delivery_location_id item&.delivery_location&.name
+      json.vendor_id item&.vendor_id
+      json.vendor_name item&.vendor&.name
+      json.per_unit_estimated_amount item&.per_unit_estimated_amount&.value
+      json.rate_contract 
       # json.per_unit_estimated_amount_attributes do
       #   json.currency_id line_item&.per_unit_estimated_amount&.currency_id
       #   json.value line_item&.per_unit_estimated_amount&.value
@@ -22,26 +22,26 @@ json.results do
       # end
 
       json.per_unit_estimated_amount_attributes do
-        json.currency_id rand(5).to_i
-        json.value 300
-        json.id 222
+        json.currency_id item&.per_unit_estimated_amount&.currency_id
+        json.value item&.per_unit_estimated_amount&.value
+        json.id item&.per_unit_estimated_amount_id
       end
 
       json.estimated_amount_attributes do
-        json.currency_id rand(5).to_i
-        json.value 2223
-        json.id 22
+        json.currency_id item&.estimated_amount&.currency_id
+        json.value item&.estimated_amount&.value
+        json.id item&.estimated_amount_id
       end
       json.item_attributes do
-        json.id rand(5).to_i
-        json.name 'Pencil'
-        json.quantity rand(5).to_i
+        json.id item&.item&.id
+        json.name item&.item&.description
+        json.quantity item.quantity
       end
       json.location_attributes do
-        json.id rand(5).to_i
-        json.name 'Delhi'
+        json.id item.delivery_location_id
+        json.name item.delivery_location&.name
       end
     end
   end
-  json.count 35
+  json.count @result.count
 end
