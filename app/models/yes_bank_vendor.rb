@@ -274,6 +274,6 @@ class YesBankVendor < ApplicationRecord
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
-    (awaiting_approval? rescue nil) && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id).taken_control_by_id != user.id
+    (awaiting_approval? rescue nil) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 end
