@@ -87,6 +87,28 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def bulk_upload_items
+    @result = Procurements::PurchaseOrders::BulkUploadLineItems.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_failure'
+        }
+      end
+    end
+  end
+
+  def template_bulk_import_items
+    @result = Procurements::PurchaseOrders::GenerateImportSample.(current_user, params)
+    respond
+  end
+
   def reject
     @result = Procurements::PurchaseOrders::Reject.(current_user, params)
     respond
