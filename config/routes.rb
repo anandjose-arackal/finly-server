@@ -3472,6 +3472,7 @@ Rails.application.routes.draw do
         get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
         get 'approved_items', to: 'purchase_requests#approved_items'
         patch 'reject_approved_items', to: "purchase_requests#reject_approved_items", as: :reject_approved_items
+        patch 'issue_from_inventory', to: "purchase_requests#issue_from_inventory", as: :issue_from_inventory
       end
     end
 

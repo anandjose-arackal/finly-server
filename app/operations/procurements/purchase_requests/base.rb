@@ -1,5 +1,5 @@
 class Procurements::PurchaseRequests::Base < BaseOperation
-  attr_accessor :workflow_output, :company, :purchase_request
+  attr_accessor :workflow_output, :company, :purchase_request, :purchase_request_item
 
 
   def pre_validate

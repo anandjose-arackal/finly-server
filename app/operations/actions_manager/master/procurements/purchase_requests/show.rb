@@ -27,8 +27,9 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
 
   def submit
     if user.is_purchase_request_initiator? || user.vendor_payments_admin?
-      document_owner? && (purchase_request.draft? || purchase_request.retracted? || purchase_request.rejected?)
-      return true
+      if document_owner? && (purchase_request.draft? || purchase_request.retracted? || purchase_request.rejected?)
+        return true
+      end
     end
   end
 
@@ -41,16 +42,16 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def reject
-    if purchase_request.is_reviewing_user?
-      purchase_request.awaiting_approval? &&
-          user_in_level?
-          return true
+    if purchase_request.is_reviewing_user? || user.vendor_payments_admin?
+      if purchase_request.awaiting_approval? && user_in_level?
+        return true
+      end
     end
   end
 
   def approve
     ############# Reviewer logic start #########################
-    if purchase_request.is_reviewing_user? #|| user.vendor_payments_admin?
+    if purchase_request.is_reviewing_user? || user.vendor_payments_admin?
       if purchase_request.awaiting_approval?
         last_trail = purchase_request.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
         if (purchase_request.get_reviewers.include?(user))
@@ -61,7 +62,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
             if last_trail.action_id == TrailAction.id_for(:approve)
               return true
             end
-            if last_trail.action_id == TrailAction.id_for(:submit)
+            if last_trail.action_id == TrailAction.id_for(:take_control)
               return true
             end
           end
@@ -105,8 +106,16 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def delete_pr_line_item
-    if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
+    if purchase_request.purchase_request_status_id.blank? || purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
       return true
+    end
+  end
+
+  def reject_pr_line_item
+    if purchase_request.is_reviewing_user? || user.vendor_payments_admin?
+      if user_in_level?
+        return true
+      end
     end
   end
 

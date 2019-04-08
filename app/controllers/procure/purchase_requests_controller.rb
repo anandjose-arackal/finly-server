@@ -96,4 +96,9 @@ class Procure::PurchaseRequestsController < ApplicationController
     respond
   end
 
+  def issue_from_inventory
+    @result = Procurements::PurchaseRequests::IssueFromInventory.(current_user, params)
+    respond
+  end
+
 end
