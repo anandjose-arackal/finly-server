@@ -5,6 +5,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
+          {requests: [:pr_initiator, :pr_company, :pr_team, :pr_awaiting_approval, :pr_approved_items]},
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :po_invoices, :non_po_invoices, :payment_tickets]},
@@ -144,6 +145,28 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   def attachments
     return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
     {name: 'Attachments', id: 'attachments', url: 'attachments/params={}'}
+  end
+
+  def requests
+    {name: 'Requests', id: 'requests', url: 'requests'}
+  end
+
+  def pr_initiator
+  end
+
+  def pr_team
+  end
+
+  def pr_awaiting_approval
+  end
+
+  def pr_company
+    return nil unless user.vp_admin_or_auditor?
+    { name: 'Company PRs', id: 'requests', url: 'purchase_requests' }
+  end
+
+  def pr_approved_items
+    { name: 'Approved Items', id: 'requests', url: 'po_approval_items/params={}'}
   end
 
 end
