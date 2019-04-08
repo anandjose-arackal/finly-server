@@ -33,7 +33,7 @@ class PurchaseRequest < ApplicationRecord
   has_many :purchase_request_items, dependent: :destroy
 
 
-  delegate :open? , :draft?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
 
   before_save :add_company
 
@@ -81,6 +81,18 @@ class PurchaseRequest < ApplicationRecord
       status_ids.push PurchaseRequestStatus.id_for(status)
     end
     status_ids&.flatten&.compact
+  end
+
+  # For user role as purchase request initiator
+  def is_initiating_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:purchase_request_initiator), self)
+  end
+
+  # For user role as purchase request reviewer
+  def is_reviewing_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), self)
   end
 
 end

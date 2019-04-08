@@ -5,7 +5,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
 
   def initialize(user=nil, params=nil)
     super
-    result = Procurements::PurchaseRequests::Show.(user, params)
+    result = ::Procurements::PurchaseRequests::Show.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
@@ -19,7 +19,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     end
 
     if user.is_purchase_request_initiator?
-      if purchase_request.open? || purchase_request.rejected? || purchase_request.retracted?
+      if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
         return true
       end 
     end
@@ -27,7 +27,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
 
   def submit
     if user.is_purchase_request_initiator? || user.vendor_payments_admin?
-      document_owner? && (purchase_request.open? || purchase_request.retracted? || purchase_request.rejected?)
+      document_owner? && (purchase_request.draft? || purchase_request.retracted? || purchase_request.rejected?)
       return true
     end
   end
@@ -97,7 +97,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   def return_control
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      if purchase_request.processing?
+      if purchase_request.awaiting_approval?
         return true if purchase_request.action_users(:return_control).include?(user)
       end
     end
@@ -105,7 +105,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def delete_pr_line_item
-    if purchase_request.open? || purchase_request.rejected? || purchase_request.retracted?
+    if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
       return true
     end
   end
@@ -114,11 +114,21 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def document_owner?
-    purchase_request.user_id.eql?(user.id)
+    purchase_request.creator_id.eql?(user.id)
   end
 
   def user_in_level?
     purchase_request.get_reviewers.include?(user)
+  end
+
+  def final_reviewers
+    r_ids = purchase_request.get_reviewal_chain.last[:reviewers].pluck(:id)
+  end
+
+  def last_level?
+    if purchase_request.awaiting_approval?
+      purchase_request.get_reviewal_chain&.last[:level_number] == purchase_request.level&.level_number
+    end
   end
 
   def previous_reviewer
