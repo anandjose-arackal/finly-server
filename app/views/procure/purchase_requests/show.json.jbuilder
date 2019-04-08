@@ -20,7 +20,7 @@ json.result do
       json.name @result.purchase_request.policy&.name
       json.id @result.purchase_request&.policy_id
     end
-    json.total_cost @result.purchase_request.purchase_request_items.join(:estimated_amount).pluck('value')&.flatten&.compact&.sum
+    json.total_cost @result.purchase_request.purchase_request_items.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum
     json.total_items @result.line_items_count
     json.line_items do
       if @result.line_items.present?
