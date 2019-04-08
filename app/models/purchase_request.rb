@@ -39,6 +39,9 @@ class PurchaseRequest < ApplicationRecord
 
   accepts_nested_attributes_for :purchase_request_items, :attachments, allow_destroy: true
 
+
+  scope :filter_by_status_id,  -> (status_id) { where purchase_request_status_id: status_id}
+
   def add_company
     self.company_id = self.creator.company_id
   end

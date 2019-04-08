@@ -20,10 +20,13 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
   class Procurements::PurchaseRequests::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_requests, :paginated_purchase_requests, :count
 
+    has_scope :filter_by_status_id
+
     def init
       # self.purchase_requests = params[:purchase_requests]
       # To be used for dummy api
       self.purchase_requests = user.company.purchase_requests
+      self.purchase_requests = apply_scopes(purchase_requests)
       self.paginated_purchase_requests = purchase_requests.paginate(page: params[:page], per_page: 30) rescue nil
       self.count = purchase_requests.count
     end
