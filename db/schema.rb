@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_01_114205) do
+ActiveRecord::Schema.define(version: 2019_04_08_093415) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2198,6 +2198,9 @@ ActiveRecord::Schema.define(version: 2019_04_01_114205) do
     t.decimal "threshold", precision: 20, scale: 5
     t.boolean "active", default: true
     t.boolean "wo_exception", default: true
+    t.boolean "forwarded", default: false
+    t.integer "forwarded_by_id"
+    t.integer "forwarded_to_id"
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
@@ -3024,13 +3027,21 @@ ActiveRecord::Schema.define(version: 2019_04_01_114205) do
     t.integer "po_prev_adjusted_advance"
     t.boolean "advance_amount_required", default: false
     t.bigint "gstin_location_id"
+    t.date "transaction_service_period_from"
+    t.date "transaction_service_period_to"
+    t.integer "proforma_invoice_id"
+    t.integer "proforma_advance"
+    t.decimal "total_proforma_advance", precision: 20, scale: 2
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
     t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
     t.index ["invoice_type_id"], name: "index_invoices_on_invoice_type_id"
     t.index ["payment_term_id"], name: "index_invoices_on_payment_term_id"
+    t.index ["proforma_invoice_id"], name: "index_invoices_on_proforma_invoice_id"
     t.index ["tax_type_id"], name: "index_invoices_on_tax_type_id"
+    t.index ["transaction_service_period_from"], name: "index_invoices_on_transaction_service_period_from"
+    t.index ["transaction_service_period_to"], name: "index_invoices_on_transaction_service_period_to"
   end
 
   create_table "inward_document_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

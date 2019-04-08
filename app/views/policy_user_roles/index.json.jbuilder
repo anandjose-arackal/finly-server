@@ -16,5 +16,5 @@
 json.array! @result.paginated_policy_user_roles do |pur|
   # json.id pur.id, 
   json.extract! pur, :id, :min_amount, :max_amount
-  json.merge pur.user.as_json
+  json.merge! pur.user.as_json
 end
