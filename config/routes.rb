@@ -3081,6 +3081,7 @@ Rails.application.routes.draw do
     scope :tally do
       get 'check', to: 'tally#check'
       get 'vouchers', to: 'tally#vouchers'
+      get 'export', to: 'tally#export'
       get 'reimbursements', to: 'tally#reimbursements'
       post 'configuration', to: 'tally#set_configuration'
     end
