@@ -6,6 +6,7 @@ json.invoice_amount precision_value payment.invoice_amount
 json.net_amount precision_value payment.amount_value
 json.status payment.payment_status_name
 json.id payment.id
+json.external_id payment.external_reference_id
 json.note payment.note
 json.payment_mode payment.payment_mode
 json.system_messages do
