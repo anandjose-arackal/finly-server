@@ -14,44 +14,124 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def save_btn
-    true
+    if user.vendor_payments_admin? && !purchase_request.closed?
+      return true
+    end
+
+    if user.is_purchase_request_initiator?
+      if purchase_request.open? || purchase_request.rejected? || purchase_request.retracted?
+        return true
+      end 
+    end
   end
 
   def submit
-    true
+    if user.is_purchase_request_initiator? || user.vendor_payments_admin?
+      document_owner? && (purchase_request.open? || purchase_request.retracted? || purchase_request.rejected?)
+      return true
+    end
   end
 
   def retract
-    true
+    if document_owner?
+      if (purchase_request.awaiting_approval? || purchase_request.approved?) && !purchase_request.closed?
+        return true
+      end
+    end
   end
 
   def reject
-    true
+    if purchase_request.is_reviewing_user?
+      purchase_request.awaiting_approval? &&
+          user_in_level?
+          return true
+    end
   end
 
   def approve
-    true
+    ############# Reviewer logic start #########################
+    if purchase_request.is_reviewing_user? #|| user.vendor_payments_admin?
+      if purchase_request.awaiting_approval?
+        last_trail = purchase_request.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
+        if (purchase_request.get_reviewers.include?(user))
+          if purchase_request.action_users(:approve).include?(user)
+            if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
+              return true
+            end
+            if last_trail.action_id == TrailAction.id_for(:approve)
+              return true
+            end
+            if last_trail.action_id == TrailAction.id_for(:submit)
+              return true
+            end
+          end
+        end
+      end
+    end
+    ############# Reviewer logic end #########################
   end
 
   def unapprove
-    true
+    unless purchase_request.approved?
+      if last_level?
+        state = (previous_reviewer.include? user.id) ? true : false
+      else
+        previous_reviewer.include? user.id
+      end
+    end
   end
 
   def take_control
-    true
+    ############# Admin logic start ####################
+    if user.vendor_payments_admin?
+      if (purchase_request.awaiting_approval? && purchase_request.get_reviewers.exclude?(user))
+        return true
+      end
+      if purchase_request.awaiting_approval? && !purchase_request.action_users(:return_control).include?(user) && purchase_request.action_users(:approve).include?(user)
+        return true
+      end
+    end
+    ############# Admin logic end #################### 
   end
 
   def return_control
-    true
+    ############# Admin logic start ####################
+    if user.vendor_payments_admin?
+      if purchase_request.processing?
+        return true if purchase_request.action_users(:return_control).include?(user)
+      end
+    end
+    ############# Admin logic end ####################
   end
 
   def delete_pr_line_item
-    true
+    if purchase_request.open? || purchase_request.rejected? || purchase_request.retracted?
+      return true
+    end
   end
 
   def create_and_submit
-    true
   end
 
+  def document_owner?
+    purchase_request.user_id.eql?(user.id)
+  end
+
+  def user_in_level?
+    purchase_request.get_reviewers.include?(user)
+  end
+
+  def previous_reviewer
+    purchase_request.get_reviewers('previous').pluck(:id)
+  end
+
+  def user_can_take_control?
+    (purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control_by_id != user.id)
+  end
+
+  def user_can_return_control?
+    purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control &&
+    purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control_by_id == user.id
+  end
 
 end

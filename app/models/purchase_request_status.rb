@@ -34,9 +34,9 @@ class PurchaseRequestStatus < ApplicationRecord
     self.id == PurchaseRequestStatus.id_for(:rejected)
   end
 
-  def processing?
-    self.id == PurchaseRequestStatus.id_for(:processing)
-  end
+  # def processing?
+  #   self.id == PurchaseRequestStatus.id_for(:processing)
+  # end
 
   def approved?
     self.id == PurchaseRequestStatus.id_for(:approved)
