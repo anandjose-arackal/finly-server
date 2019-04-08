@@ -72,12 +72,12 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
       self.error_messages = []
       self.issue_item = {}
 
-      if items_not_found.include? item_number
+      if items_not_found.include? item_number.strip
         self.valid = false
         self.error_messages << "Unable to find this item number in inventory list"
         self.issue_item[:item_number] = "Unable to find this item number in inventory list"
       else
-        single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
+        single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.strip.downcase}&.compact&.first
         item[:single_item] = single_item
       end
 
