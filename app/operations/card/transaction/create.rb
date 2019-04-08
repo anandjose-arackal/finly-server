@@ -174,7 +174,7 @@ class Card::Transaction::Create < BaseOperation
             end
         end
       when 'CREDIT'
-        case type
+        case mode
           when 'ATM'
             # handling the case of ATM reversals here, where the type of details will be 'R'
             if CardTransaction.find_by(reference_id: params[:reference_id]) && params[:type_of_details] == 'R'
