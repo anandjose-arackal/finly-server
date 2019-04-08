@@ -136,7 +136,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     params[:scheduled_amount] = self.scheduled_amount
     params[:source_account_balance] = self.source_account_balance
     params[:wallet_balance] = self.wallet_adapter.balance
-    params[:company_credits_balance] = self.company_credits_adapter.balance
+    params[:company_credits_balance] = self.company_credits_adapter.balance(payment_process: true)
     BankTransfer::PaymentRequest::Review::BulkCreditValidate::BulkCreditValidationPresenter.new(user, params, messages)
   end
 
