@@ -1,6 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe 'Payment Initiation via YesBank' do
+# todo - concurrent payments test
+RSpec.describe 'Payment Executor Test' do
 
   def initialize_variables
     @company = create :company
