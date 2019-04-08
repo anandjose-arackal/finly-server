@@ -12,9 +12,9 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
     self.purchase_request = PurchaseRequest.new(purchase_request_params)
     self.purchase_request.creator_id = user.id
     self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
-    if self.purchase_request.save
+    if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(satus_id: PurchaseRequestItemStatus.id_for(:draft))
       #Update purchase request line items state to :draft
-      && self.purchase_request.purchase_request_items.update_all(satus_id: PurchaseRequestItemStatus.id_for(:draft))
+
 
       # Create document level reviewer mapping
       # For setting level  specific reviewers from reviewal chain for a document
