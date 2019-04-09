@@ -30,6 +30,8 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
     bank_transaction = payment.reference_resource
 
+
+
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
       return false

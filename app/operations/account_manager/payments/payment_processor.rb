@@ -86,16 +86,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         add_message :error, op.message
         return
       end
-      # self.payment_order&.with_lock do
-      #   self.payment_order.reload # kinda redundant since with_lock already reloads the data
-      #   if self.payment_order.pending? || self.payment_order.in_progress?
-      #     add_message :error, "This payment order is already being processed"
-      #     return
-      #   else
-      #     payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
-      #     self.crediting_payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
-      #   end
-      # end
     else
       if payment_order.scheduled_at.present? && payment_order.scheduled_at > DateUtils.local_date
         op = PaymentProcessorRules::Event.(:payments_being_scheduled_for_later, {payment_ordeR: self.payment_order, crediting_payments: self.crediting_payments})
@@ -103,28 +93,12 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
           add_message :error, op.message
           return
         end
-        # payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
-        # if self.crediting_payments.present?
-        #   self.crediting_payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
-        # else
-        #   self.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
-        # end
       else
         op = PaymentProcessorRules::Event.(:payments_being_credited_immediately, {payment_order: self.payment_order, crediting_payments: self.crediting_payments})
         unless op.success?
           add_message :error, op.message
           return
         end
-        # self.payment_order.with_lock do
-        #   self.payment_order.reload # kinda redundant since with_lock already reloads the data
-        #   if self.payment_order.pending? || self.payment_order.in_progress?
-        #     add_message :error, "This payment order is already being processed"
-        #     return
-        #   else
-        #     payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
-        #     self.payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
-        #   end
-        # end
       end
     end
   end
@@ -155,29 +129,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         end
       end
     end
-    # else
-    #   # if payment order has been scheduled for execution right away, process it right now
-    #   if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
-    #     # if the order is not background, perform it using the regular call method in payment executor
-    #     if self.background
-    #       #   # call the payment executor that runs the payments in the background
-    #       #   # passing the payment id here because async operation can retrieve the object
-    #       result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order.id, options)
-    #       add_message :success, 'Payments have been scheduled, you can check their status from the order screen'
-    #     else
-    #       # Process the order synchronously
-    #       result = AccountManager::Payments::PaymentOrderExecutor.(payment_order, options)
-    #       if result.success?
-    #         add_message :success, 'Payment processed successfully'
-    #       else
-    #         # overriding this for testing
-    #         # payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
-    #         # payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:completed))
-    #         add_message :error, result.messages[:error]
-    #       end
-    #     end
-    #   end
-    # end
   end
 
   def post_process

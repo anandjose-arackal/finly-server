@@ -48,9 +48,6 @@ PaymentProcessorRules::Checker.new 'StatusChecker' do
     end
   end
 
-  section 'Inside Payment Validator' do
-
-  end
 
   section 'Inside Payment Executor' do
 
@@ -85,14 +82,4 @@ PaymentProcessorRules::Checker.new 'StatusChecker' do
 
   end
 
-  # this section will basically check if the payment is stuck in pending, or any other
-  # irregular state and then triggers mailer or something else
-  section 'on completion of payment' do
-
-  end
-
-  section 'Validate Payment with operation' do
-
-
-  end
 end
