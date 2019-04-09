@@ -1,5 +1,5 @@
 class Card::Transaction::Create < BaseOperation
-  attr_accessor :card, :card_owner, :type, :mode, :transaction
+  attr_accessor :card, :card_owner, :type, :mode, :transaction, :transaction_status
 
   class Card::Transaction::TransactionPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :transaction
