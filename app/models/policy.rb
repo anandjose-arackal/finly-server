@@ -77,6 +77,8 @@ class Policy < ApplicationRecord
     where("policy_user_roles.user_role_id", UserRole.id_for(:bank_payment_request_initiator))
   }
 
+
+
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
 

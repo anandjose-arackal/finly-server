@@ -11,10 +11,11 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
     def init
       self.purchase_request = params[:purchase_request]
       # self.locations = user.branch_locations
-      self.locations = user.company.locations
+      # Admin should also be initiator for the policy
+      self.locations = user.initiator_associated_locations(UserRole.id_for(:purchase_request_initiator)).leaves
       # self.departments = user.departments
-      self.departments = user.company.departments
-      # todo - change the above before deploy. Or should we? :thinking face:
+      self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
+      params[:filter_role_id] = UserRole.id_for(UserRole.id_for(purchase_request_initiator))
       self.policies = Policy::VendorPayments::Index.(user, params).policies
       self.reviewal_chains = []
       params[:reviewal_document] = purchase_request

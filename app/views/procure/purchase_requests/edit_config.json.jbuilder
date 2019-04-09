@@ -1,14 +1,16 @@
 json.locations do
   json.array!(@result.locations) do |location|
-    json.id location.id
-    json.name location.name
+    json.merge! location.as_json(tree: true)
+    # json.id location.id
+    # json.name location.name
   end
 end
 
 json.departments do
   json.array!(@result.departments) do |department|
-    json.id department.id
-    json.name department.name
+    json.merge! department.as_json(tree: true)
+    # json.id department.id
+    # json.name department.name
   end
 end
 
