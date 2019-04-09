@@ -108,7 +108,7 @@ class InvoiceCalculationUtils
       calculate_discount_exclusive
       calculate_exclusive_taxes
       calculate_tds
-      self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
+      self.net_amount = (self.gross_amount + self.tax_amount - self.tds_amount) rescue 0
       self.invoice_amount = self.invoice.original_amount&.value
       calculate_advance_paid
       calculate_freight_charges
@@ -242,7 +242,7 @@ class InvoiceCalculationUtils
       tds = invoice.tds
     end
     new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, tds)
-    self.tds_amount = self.gross_amount - new_gross_amount
+    self.tds_amount = (self.gross_amount - new_gross_amount) rescue 0
   end
 
   def calculate_advance_paid
