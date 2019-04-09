@@ -144,7 +144,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_purchase_request
     return nil unless user.is_purchase_request_initiator? || user.vp_admin_or_auditor?
-    {name: 'New Purchase Request', id: 'create', url: 'new_payment_request/params={}'}
+    {name: 'New Purchase Request', id: 'create', url: 'purchase_request/params={}'}
   end
 
   def attachments
