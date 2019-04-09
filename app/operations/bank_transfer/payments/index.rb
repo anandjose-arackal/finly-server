@@ -35,6 +35,12 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
     has_scope :filter_vendor_payments
     has_scope :filter_user_id
     has_scope :filter_search_index, using: [:beneficiary_type, :receiving_user_id], type: :hash
+    has_scope :filter_payment_id
+    has_scope :filter_receiving_user_name
+    has_scope :filter_beneficiary_account_number
+    has_scope :filter_beneficiary_ifsc
+    has_scope :filter_initiating_user_name
+
 
     def init
       self.payments = params[:payments]
