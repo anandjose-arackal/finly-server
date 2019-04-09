@@ -8,7 +8,7 @@
         <br>
         <div class="mg-botm-8"><b><%= @company.name %></b></div>
         <div class="font-light-gray mg-botm-8">Business Office :</div>
-        <div class="font-light-gray">
+        <div class="font-light-gray col-xs-6">
           <%= simple_format @company.configuration.address, {}, wrapper_tag: "div" %>
         </div>
       </div>
@@ -34,7 +34,7 @@
           </tr>
           <tr>
             <td class="font-light-gray">Payment Term</td>
-            <td class="font-dark-gray"><%= @result.purchase_order.payment_term&.name %></td>
+            <td class="font-dark-gray"><%= @result.purchase_order.payment_term&.description %></td>
           </tr>
           <tr>
             <td class="font-light-gray">Sub Department</td>

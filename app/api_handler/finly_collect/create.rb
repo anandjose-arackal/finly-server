@@ -1,7 +1,7 @@
 class FinlyCollect::Create < FinlyCollect::Base
 
   def post_params
-    params&.slice(
+    params&.permit(
         :account_number, :maximum_amount,
         :minimum_transaction_amount,
         :maximum_transaction_amount, :exact_transaction_amount,

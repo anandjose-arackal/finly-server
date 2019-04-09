@@ -52,8 +52,8 @@ class ItzCashCardProgram < ApplicationRecord
       {
           name: "HDFC Chip card",
           bank: "HDFC",
-          product_code: "HDFRGR",
-          charge_code: "HDFRBB"
+          product_code: "HDFFRG",
+          charge_code: "HBFRGD"
       }
   ]
 
