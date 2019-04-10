@@ -622,7 +622,11 @@ class PurchaseOrder < ApplicationRecord
         tds_amount = self.requested_advance_amount.value - new_advance_amount
         self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
         final_advance_amount = self.requested_advance_amount.value - tds_amount
-        self.advance_amount.update(value: final_advance_amount)
+        if self.advance_amount.nil?
+          self.advance_amount = Amount.create(value: final_advance_amount, currency_id: 1)
+        else
+          self.advance_amount.update(value: final_advance_amount)
+        end
       end
 
     else
