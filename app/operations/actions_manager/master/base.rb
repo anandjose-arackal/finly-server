@@ -31,6 +31,7 @@ class ActionsManager::Master::Base
     users_show: '::ActionsManager::Master::BankTransfer::Users::Show',
     vp_role_config: '::ActionsManager::Master::PolicyUserRoles::RoleConfig',
     purchase_request_show: '::ActionsManager::Master::Procurements::PurchaseRequests::Show',
+    purchase_request_create: '::ActionsManager::Master::Procurements::PurchaseRequests::Create',
     purchase_request_index: '::ActionsManager::Master::Procurements::PurchaseRequests::Index',
     vendor_show: '::ActionsManager::Master::Vendors::Show',
     vendors_index: '::ActionsManager::Master::Vendors::Index'

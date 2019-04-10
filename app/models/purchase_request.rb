@@ -57,8 +57,15 @@ class PurchaseRequest < ApplicationRecord
       department_attributes: {id: self.department_id, name: self.department&.name},
       policy_attributes: {id: self.policy_id, name: self.policy&.name},
       status_attributes: {status_id: self.purchase_request_status_id, status_name: self.status&.name, display_name: self.status&.name&.humanize},
-      creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date}
+      creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date},
+      total_cost: calculate_total_amount
     }
+  end
+
+  def calculate_total_amount
+    # amount_ids = self.purchase_request_items&.pluck(:estimated_amount_id)
+    # Amount.where(id: amount_ids)&.pluck(:value).sum
+    self.purchase_request_items.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
   end
 
   def get_default_provider

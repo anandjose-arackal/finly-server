@@ -3,6 +3,7 @@ json.result do
     json.id @result.purchase_request.id
     json.description @result.purchase_request&.description
     json.note @result.purchase_request&.note
+    # json.total_amount @result.purchase_request.calculate_total_amount
     json.created_by do
       json.name @result.purchase_request.creator&.name
       json.created_at @result.purchase_request&.created_at&.to_date
