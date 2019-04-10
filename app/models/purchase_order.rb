@@ -476,8 +476,16 @@ class PurchaseOrder < ApplicationRecord
     calculate_line_items(skip_adv_calculation)
   end
 
-  def associate_purchase_request_items(options)
-    
+  def associate_purchase_request_items(options, user)
+    item_ids = []
+    attributes = options.dig(:purchase_order, :purchase_request_items_attributes)
+    attributes.each do |key, value|
+      item_ids << attributes.dig(key, :id)
+    end
+    item_ids = item_ids.flatten.compact
+    # Verify that item_ids belongs to the  company's PR
+    filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id = (?)", item_ids).pluck("purchase_request_items.id")
+    PurchaseRequestItem.with_ids(filtered_item_ids).update_all(purchase_order_id: self.id) unless filtered_item_ids.blank?
   end
 
   # def prepopulate_amounts

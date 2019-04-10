@@ -41,11 +41,11 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     end
     self.purchase_order.controlling_user_role_id = UserRole.id_for(:initiator)
 
-    # if params[:associated_resource] == "purchase_request_item"
-    #   purchase_order.associate_purchase_request_items(params)
-    # end
     if purchase_order.valid?
       purchase_order.save
+      if params[:associated_resource] == "purchase_request_item"
+        purchase_order.associate_purchase_request_items(params, user)
+      end
       purchase_order.process_line_item_calculation
       purchase_order.save
 

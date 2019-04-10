@@ -544,4 +544,11 @@ class Procurement < ApplicationRecord
     self.procurement_type == 'purchase_order'
   end
 
+  def as_json
+    {
+      id: self.id,
+      purchase_order_id: self.purchase_order&.id
+    }
+  end
+
 end
