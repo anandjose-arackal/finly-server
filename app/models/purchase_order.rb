@@ -119,6 +119,8 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :trails, as: :parent
 
+  has_many :quotations, dependent: :destroy
+
   belongs_to :bank_account, optional: true
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status

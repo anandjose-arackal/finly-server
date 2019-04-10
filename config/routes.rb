@@ -3415,6 +3415,8 @@ Rails.application.routes.draw do
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
 
       get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
+
+      resources :quotations, only: %i[create update destroy]
     end
     get 'po_advances', to: 'purchase_orders#po_advances', as: :po_advances
     post 'po_advance_ticket', to: 'purchase_orders#po_advance_ticket', as: :po_advance_ticket
