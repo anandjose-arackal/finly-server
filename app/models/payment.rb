@@ -578,7 +578,11 @@ class Payment < ApplicationRecord
       # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
       PurchaseOrder.find_by(id: self.parent_id).as_json2 # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
     else
-      self.invoice.as_json
+      if self.invoice.present?
+        self.invoice.as_json
+      else
+        fallback_info
+      end
     end
   end
 
@@ -593,8 +597,24 @@ class Payment < ApplicationRecord
       # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
       precision_value self.parent.advance_amount&.value
     else
-      precision_value self.invoice.balance_due&.value
+      if self.invoice.present?
+        precision_value self.invoice.balance_due&.value
+      else
+        self.amount_value
+      end
     end
+  end
+
+  def fallback_info
+    {
+      raw_amount: precision_value(self.amount_value),
+      original_amount: precision_value(self.amount_value),
+      invoice: {
+        net_amount: precision_value(self.amount&.value),
+        roundoff_amount: 0,
+        balance_due: self.amount&.value
+      }
+    }
   end
       
       
