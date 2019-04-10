@@ -476,6 +476,10 @@ class PurchaseOrder < ApplicationRecord
     calculate_line_items(skip_adv_calculation)
   end
 
+  def associate_purchase_request_items(options)
+    
+  end
+
   # def prepopulate_amounts
   #   populate_advance_amount
   # end

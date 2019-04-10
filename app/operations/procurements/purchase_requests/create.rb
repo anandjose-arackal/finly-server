@@ -14,7 +14,8 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
     self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
     if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft))
       #Update purchase request line items state to :draft
-
+      # Update all estimated amount in the line item
+      purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
 
       # Create document level reviewer mapping
       # For setting level  specific reviewers from reviewal chain for a document

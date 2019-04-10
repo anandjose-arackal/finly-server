@@ -31,4 +31,13 @@ class PurchaseRequestItem < ApplicationRecord
   scope :with_ids, -> (ids) { where id: ids}
   scope :with_id, -> (id) { where id: id }
   scope :non_rejected, -> { where.not rejected: true }
+
+  def update_estimated_amount
+    quantity = self.quantity
+    per_unit_price = self.per_unit_estimated_amount&.value
+    amount = Amount.create(currency_id: 1, value: quantity*per_unit_price) if quantity.present? && per_unit_price.present?
+    self.estimated_amount_id = amount.id
+    self.save
+  end
+
 end
