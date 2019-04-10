@@ -20,10 +20,10 @@ class BankTransfer::Payments::PayoutIndex < BankTransfer::Payments::Base
 
   def success
     params[:payments] = self.payments
-    BankTransfer::Payments::Index::PaymentsPresenter.new(current_user, params)
+    BankTransfer::Payments::PayoutIndex::PaymentsPresenter.new(current_user, params)
   end
 
-  class BankTransfer::Payments::Index::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::Payments::PayoutIndex::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :payments, :paginated_payments
 

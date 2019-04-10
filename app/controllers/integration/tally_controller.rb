@@ -23,4 +23,10 @@ class Integration::TallyController < ApplicationController
     respond
   end
 
+  def export
+    params[:export_format] = :xls
+    @result = Integrations::Tally::Vouchers.(current_user, params)
+    respond
+  end
+
 end

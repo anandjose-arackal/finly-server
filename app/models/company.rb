@@ -405,6 +405,11 @@ class Company < ApplicationRecord
     end
 
     self.build_configuration(bank_type: "HDFC").save if self.configuration.blank?
+    # also setting the default card transaction category here, so even if 'Other' is renamed later, it
+    # will not matter for the same
+    other_category = self.categories.find_by(name: "Other")
+    self.configuration.update(default_card_expense_category_id: other_category&.id)
+
     self.build_account.save if self.account.blank?
 
     if self.feature_subscription.blank?
