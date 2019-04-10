@@ -14,22 +14,29 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
   # end
 
   def process
-    params[:document] = self.purchase_request
-    params[:aasm_event] = 'submit'
-    op = WorkflowManager::Base.(user, params)
-    if op.success?
-      # Submit the line items too
-      self.purchase_request.purchase_request_items.each do |item|
-        params[:document] = item
+    begin
+      ActiveRecord::Base.transaction do
+        params[:document] = self.purchase_request
         params[:aasm_event] = 'submit'
-        item_op = WorkflowManager::Base.(user, params)
-      end if self.purchase_request.purchase_request_items.present?
-    else
-      add_message :error, op.messages[:error]
-      return
+        op = WorkflowManager::Base.(user, params)
+        if op.success?
+          # Submit the line items too
+          unless purchase_request&.status&.name&.to_sym&.present? && purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym))
+            raise
+          end
+          # self.purchase_request.purchase_request_items.each do |item|
+          #   params[:document] = item
+          #   params[:aasm_event] = 'submit'
+          #   item_op = WorkflowManager::Base.(user, params)
+          # end if self.purchase_request.purchase_request_items.present?
+        else
+          raise
+        end
+        self.workflow_output = op.workflow_output
+      end
+    rescue
+      add_message :error, 'Unable to proceed'
     end
-
-    self.workflow_output = op.workflow_output
   end
 
   def post_process

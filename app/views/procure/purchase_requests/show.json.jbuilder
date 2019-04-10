@@ -27,6 +27,7 @@ json.result do
       if @result.line_items.present?
         json.array!(@result.line_items) do |line_item|
           json.id line_item.id
+          json.status line_item&.status&.name
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id

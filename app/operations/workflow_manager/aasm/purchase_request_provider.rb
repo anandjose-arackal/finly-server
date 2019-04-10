@@ -22,8 +22,8 @@ class WorkflowManager::Aasm::PurchaseRequestProvider < WorkflowManager::Aasm::Ba
     end
 
     event :unapprove do
-      transitions :from => :awaiting_approval, :to => :awaiting_approval
-      transitions :from => :approved, :to => :awaiting_approval
+      transitions :from => :awaiting_approval, :to => :awaiting_approval, guard: :user_can_unapprove?
+      transitions :from => :approved, :to => :awaiting_approval, guard: :user_can_unapprove?
     end
 
     event :take_control do
