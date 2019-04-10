@@ -53,4 +53,8 @@ class PurchaseRequestItemStatus < ApplicationRecord
     self.id == PurchaseRequestItemStatus.id_for(:awaiting_approval)
   end
 
+  def issued_from_inventory?
+    self.id == PurchaseRequestItemStatus.id_for(:issued_from_inventory)
+  end
+
 end
