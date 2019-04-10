@@ -581,6 +581,21 @@ class Payment < ApplicationRecord
       self.invoice.as_json
     end
   end
+
+
+  def get_payable_amount
+    case self.parent_type
+    when 'BeneficiaryPayment'
+      precision_value self.parent.balance_due&.value
+    when 'Invoice'
+      precision_value self.parent.balance_due&.value
+    when 'PurchaseOrder'
+      # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
+      precision_value self.parent.advance_amount&.value
+    else
+      precision_value self.invoice.balance_due&.value
+    end
+  end
       
       
       
