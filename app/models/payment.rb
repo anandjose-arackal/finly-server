@@ -49,7 +49,7 @@
 #
 
 class Payment < ApplicationRecord
-  include PostOperationExecution, SoftDeletable
+  include PostOperationExecution, SoftDeletable, MathUtil
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
