@@ -1,4 +1,4 @@
-json.array! @result.receipts do |receipt|
+json.array! @result.paginated_receipts do |receipt|
   json.extract! receipt, :id, :user_id, :note, :created_at
   json.image do
     json.file_format receipt.file_format

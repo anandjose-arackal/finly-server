@@ -107,6 +107,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
   def default_headers
     [
        "Name",
+       "Business Name",
        "Account Number",
        "IFSC",
        "Sub Total",

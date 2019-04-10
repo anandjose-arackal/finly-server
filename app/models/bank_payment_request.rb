@@ -172,7 +172,7 @@ class BankPaymentRequest < ApplicationRecord
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
-  
+
   scope :filter_year, -> (year) {
     if year.blank?
       year = Date.today.year
@@ -188,6 +188,7 @@ class BankPaymentRequest < ApplicationRecord
   }
 
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+  scope :filter_controlling_user, -> (user_id) {self.awaiting_action_items(user_id)}
 
   # scope :filter_controlling_user, -> (user_id) {
   #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
@@ -198,7 +199,9 @@ class BankPaymentRequest < ApplicationRecord
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
-  scope :includes_details, -> {includes(:status, :owner, :requested_amount)}
+  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,:receiving_account,:initiating_user,{amount: :currency},
+  invoice:[ :invoice_items,:category, {custom_fields: :field_configuration}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
+  end
 
   scope :include_attachments, -> {includes(payment_order: [:payment_order_attachments, payments: [invoice: [:invoice_attachments]]])}
 
@@ -279,7 +282,7 @@ class BankPaymentRequest < ApplicationRecord
   end
 
   def can_take_real_control?(user=nil)
-    # work with this method, dont want to modify the older method since, 
+    # work with this method, dont want to modify the older method since,
     # it is used other places and dont want to modify unless sure if this check works in other ppls work.
     user = user.present? ? user : RequestStore.store[:current_user]
     processing? && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id # todo, add dlrm logic
@@ -372,7 +375,7 @@ class BankPaymentRequest < ApplicationRecord
     self.payment_order.amount_requested&.value
   end
 
-  # For user role as bank payment request initiator 
+  # For user role as bank payment request initiator
   def is_initiating_user?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), self)
@@ -422,7 +425,7 @@ class BankPaymentRequest < ApplicationRecord
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
-  
+
   def self.role_based_associated_status_ids(user)
     BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
   end
