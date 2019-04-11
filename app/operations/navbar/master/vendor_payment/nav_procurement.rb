@@ -5,7 +5,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {requests: [:pr_initiator, :pr_company, :pr_team, :pr_awaiting_approval, :pr_approved_items]},
+          {requests: [:pr_initiator, :pr_company, :pr_awaiting_approval, :pr_approved_items]},
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :po_invoices, :non_po_invoices, :payment_tickets]},
@@ -156,9 +156,6 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'Requests', id: 'requests', url: 'requests'}
   end
 
-  def pr_initiator
-  end
-
   def pr_team
   end
 
@@ -173,6 +170,11 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   def pr_approved_items
     return nil unless user.is_purchase_request_initiator? || user.is_purchase_request_reviewer? || user.vp_admin_or_auditor?
     { name: 'Approved Items', id: 'requests', url: 'po_approval_items/params={}'}
+  end
+
+  def pr_initiator
+    return nil unless user.is_purchase_request_initiator?
+    { name: 'Your PRs', id: 'requests', url: "purchase_requests/params={\"search_by_email\":\"#{user.email}\"}"}
   end
 
 end
