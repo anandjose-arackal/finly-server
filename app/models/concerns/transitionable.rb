@@ -236,7 +236,18 @@ module Transitionable
         taken_control_by_ids = []
         taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id)
         taken_control_by_ids.reject! {|user_id| user_id.nil?}
-        user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
+
+        forwarded_to_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
+
+        if taken_control_by_ids.present?
+          user_ids = taken_control_by_ids
+        elsif forwarded_to_ids.present?
+          user_ids = forwarded_to_ids
+        else
+          user_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
+        end
+
+        # user_ids += taken_control_by_ids.present? ? taken_control_by_ids : self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
       end
 
       User.where(id: user_ids)
@@ -474,6 +485,7 @@ module Transitionable
           taken_control_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
         end
 
+        forwarded_document_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids)
         forwarded_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id)
       else
         user_ids = user.company.users.pluck(:id)
@@ -486,6 +498,7 @@ module Transitionable
           taken_control_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
         end
 
+        forwarded_document_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids)
         forwarded_controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id)
       end
 
@@ -501,6 +514,13 @@ module Transitionable
             where(action_taken_by_id: nil).
             with_document_id(taken_control_document_ids).pluck(:document_reviewer_mappable_id)
       end
+
+      ids += DocumentLevelReviewerMapping.with_level_id(forwarded_controlling_level_ids).
+            with_forwarded.
+            with_forwarded_to_id(user.id).
+            with_document_type(self.name).
+            where(action_taken_by_id: nil).
+            with_document_id(forwarded_document_ids)
 
       # Find all awaiting action documents from DLRMs with controlling level id
       ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
