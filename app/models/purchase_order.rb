@@ -246,7 +246,7 @@ class PurchaseOrder < ApplicationRecord
   scope :filter_by_created_at, -> (created_at) {
     created_at = Date.parse(created_at).strftime('%Y-%m-%d')
     # where created_at: created_at
-    where("DATE(created_at) >= ?", created_at)
+    where("DATE(created_at) = ?", created_at)
   }
 
   scope :filter_status, -> (status_name) {
