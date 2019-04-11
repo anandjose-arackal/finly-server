@@ -1,19 +1,21 @@
 class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::Base
   attr_accessor :purchase_request, :purchase_request_params
+
   def init
     self.purchase_request_params = purchase_request_parameters
   end
 
   def validate
-    
   end
 
   def process
     self.purchase_request = PurchaseRequest.new(purchase_request_params)
     self.purchase_request.creator_id = user.id
     self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
+    #Update purchase request line items state to :draft
     if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft))
-      #Update purchase request line items state to :draft
+      attachment_ids = get_attachment_ids(params)
+      Attachment.update_resource({ids: attachment_ids, resource_id: self.purchase_request.id, user: user})
       # Update all estimated amount in the line item
       purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
 
@@ -48,5 +50,13 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
       self.purchase_request = params[:purchase_request]
     end
 
+  end
+
+  protected
+  
+  def get_attachment_ids(params)
+    attachment_ids = []
+    params.dig(:purchase_request, :attachments_attributes).each{ |k, v| attachment_ids << v[:id] }
+    return attachment_ids
   end
 end

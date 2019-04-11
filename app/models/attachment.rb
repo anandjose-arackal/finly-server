@@ -14,6 +14,10 @@ class Attachment < ApplicationRecord
     where(resource_id: nil)
   }
 
+  scope :with_ids, -> (ids) {
+    where id: ids
+  } 
+
 
   def as_json
     {
@@ -28,5 +32,14 @@ class Attachment < ApplicationRecord
       # created_by: self.creator&.name,
       # description: self.description
     }
+  end
+
+  def self.update_resource(options)
+    ids = options[:ids]
+    resource_id = options[:resource_id]
+    user = options[:user]
+    if ids.present? && resource_id.present?
+      attachments = user.attachments.with_ids(ids).update_all(resource_id: resource_id)
+    end
   end
 end
