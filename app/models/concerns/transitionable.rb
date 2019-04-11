@@ -159,6 +159,17 @@ module Transitionable
         }
         data[:reviewers].push(reviewer)
 
+        if dlrm.forwarded && dlrm.forwarded_to_id.present?
+          data[:forwarded_to] = {
+              id: dlrm.forwarded_to_id,
+              name: dlrm.forwarded_to&.name,
+              email: dlrm.forwarded_to&.email,
+              action_taken: (dlrm.forwarded_to_id == dlrm.action_taken_by_id),
+              action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
+
+          }
+        end
+
         if dlrm.taken_control_by_id.present?
           data[:taken_control_by] = {
               id: dlrm.taken_control_by_id,
