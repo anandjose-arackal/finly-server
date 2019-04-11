@@ -58,12 +58,15 @@ class Procurements::PurchaseOrders::CreatePoRevisions < Procurements::PurchaseOr
         # self.duplicate_po.__send__("#{k}=", self.purchase_order.__send__(k))
         obj.each do |po|
           self.duplicate_po.__send__(k) << po.dup
+          
+          if k == :quotations
+            self.duplicate_po.quotations.last.attachments << po.attachments.collect { |attach| attach.dup }
+          end
         end
 
         if k == :document_level_reviewer_mappings
           dlrms_attr = {taken_control:false, taken_control_by_id: nil, viewable: false, action_taken_by_id: nil, action_id: nil}
           self.duplicate_po.document_level_reviewer_mappings.each {|dlrm| dlrm.assign_attributes(dlrms_attr)}
-
         end
 
       end
