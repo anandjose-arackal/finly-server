@@ -15,6 +15,7 @@ class Procurements::PurchaseOrders::BulkTakeControl < Procurements::PurchaseOrde
   def validate
     if self.purchase_orders.empty?
       add_message :error, 'No Purchase Orders found'
+      return
     end
 
     accept_po = []
