@@ -108,7 +108,8 @@ class PurchaseRequest < ApplicationRecord
     item_ids = options[:rejected_purchase_request_items]
     # Filter rejected ids
     filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id = (?)", item_ids).pluck('purchase_request_items.id')
-    return PurchaseRequestItem.with_ids(filtered_item_ids).update_all(rejected: true, status_id: PurchaseRequestItemStatus.id_for(:rejected)) unless filtered_item_ids
+    rejected_items = PurchaseRequestItem.with_ids(filtered_item_ids).update_all(rejected: true, status_id: PurchaseRequestItemStatus.id_for(:rejected)) unless filtered_item_ids.blank?
+    return !rejected_items.zero? if filtered_item_ids.present?
     false
   end
 end

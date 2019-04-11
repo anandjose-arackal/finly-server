@@ -28,6 +28,7 @@ json.result do
         json.array!(@result.line_items) do |line_item|
           json.id line_item.id
           json.status line_item&.status&.name
+          json.rejected line_item.rejected
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id

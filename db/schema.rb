@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_10_080719) do
+ActiveRecord::Schema.define(version: 2019_04_11_013729) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -4360,6 +4360,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_080719) do
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
     t.string "unit_of_measurement"
+    t.integer "purchase_request_item_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"

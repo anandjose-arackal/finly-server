@@ -9,6 +9,9 @@ class Procurements::PurchaseRequests::IssueFromInventory < Procurements::Purchas
   def validate
     # Check item_ids should belong to company
     self.item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id = (?)", item_ids).pluck('purchase_request_items.id')
+    if item_ids.blank?
+      add_message :error, 'No item to issue'
+    end
   end
 
   def process
@@ -38,6 +41,6 @@ class Procurements::PurchaseRequests::IssueFromInventory < Procurements::Purchas
   end
 
   def post_process
-    add_message :success, "Purchase request retracted"
+    add_message :success, "Successfully issued from inventory"
   end
 end
