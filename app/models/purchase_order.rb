@@ -504,7 +504,7 @@ class PurchaseOrder < ApplicationRecord
     end
     item_ids = item_ids.flatten.compact
     # Verify that item_ids belongs to the  company's PR
-    filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id = (?)", item_ids).pluck("purchase_request_items.id")
+    filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", item_ids).pluck("purchase_request_items.id")
     return filtered_item_ids
   end
 

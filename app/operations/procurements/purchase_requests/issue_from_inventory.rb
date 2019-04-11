@@ -8,7 +8,7 @@ class Procurements::PurchaseRequests::IssueFromInventory < Procurements::Purchas
 
   def validate
     # Check item_ids should belong to company
-    self.item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id = (?)", item_ids).pluck('purchase_request_items.id')
+    self.item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", item_ids).pluck('purchase_request_items.id')
     if item_ids.blank?
       add_message :error, 'No item to issue'
     end
