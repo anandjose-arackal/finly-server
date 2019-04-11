@@ -3,7 +3,7 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 
 	def pre_validate
 	    if params[:purchase_order_id].blank?
-	      add_message :error, "Purchase Order not found"
+	      add_message :error, "Purchase Order ID not sent."
 	      return
 	    end
 
@@ -42,6 +42,13 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 			return
 		end	
 
+		if StringUtils.to_bool(self.quotation_params[:selected].strip)
+	      if self.quotation_params[:note].blank? || (self.quotation_params[:note].length < 5)
+	        add_message :error, "Please supply a note as to why you are moving forward with this Quotation (Min 5 characters)."
+	        return
+	      end
+	    end
+
 		unless self.purchase_order.open? || self.purchase_order.retracted? || self.purchase_order.rejected?
 	      add_message :error, "Quotations cannot be updated if Purchase Order is submitted."
 	      return
@@ -61,11 +68,15 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 	def process
 		self.quotation_params[:purchase_order_id] = self.purchase_order.id
 
+		self.quotation_params[:selected] = StringUtils.to_bool(self.quotation_params[:selected].strip)
+
 		quotation.assign_attributes(self.quotation_params)
 		if quotation.valid?
 			quotation.save
-			other_quotations = self.purchase_order.quotations.where.not(id: quotation.id)
-      		other_quotations.update_all(selected: false)
+			if quotation.selected
+				other_quotations = self.purchase_order.quotations.where.not(id: quotation.id)
+      			other_quotations.update_all(selected: false)
+      		end
 
       		self.q_old_attachments&.update_all(procurement_document_id: nil, procurement_document_type: nil)
 

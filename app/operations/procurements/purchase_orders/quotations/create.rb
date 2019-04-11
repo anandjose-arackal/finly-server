@@ -31,6 +31,13 @@ class Procurements::PurchaseOrders::Quotations::Create < Procurements::PurchaseO
       return
     end
 
+    if StringUtils.to_bool(self.quotation_params[:selected].strip)
+      if self.quotation_params[:note].blank? || (self.quotation_params[:note].length < 5)
+        add_message :error, "Please supply a note as to why you are moving forward with this Quotation (Min 5 characters)."
+        return
+      end
+    end
+
   end
 
   def pre_process
@@ -40,14 +47,15 @@ class Procurements::PurchaseOrders::Quotations::Create < Procurements::PurchaseO
 
   def process
     quotation_params[:purchase_order_id] = self.purchase_order.id
+    self.quotation_params[:selected] = StringUtils.to_bool(self.quotation_params[:selected].strip)
     self.quotation = Quotation.new(quotation_params)
 
     if quotation.valid?
       quotation.save
-      other_quotations = self.purchase_order.quotations.where.not(id: quotation.id)
-      other_quotations.update_all(selected: false)
-
-      
+      if quotation.selected
+        other_quotations = self.purchase_order.quotations.where.not(id: quotation.id)
+        other_quotations.update_all(selected: false)
+      end      
 
       self.q_current_attachments.update_all(procurement_document_id: self.quotation.id, procurement_document_type: self.quotation.class.name)
 
