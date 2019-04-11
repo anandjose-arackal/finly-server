@@ -147,6 +147,32 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
+    section 'Verified Device' do
+      section 'X-Finly-RP property mismatch' do
+        [
+            :user_agent, :timezone, :fingerprint, :language, :system_language,
+            :browser, :browser_version, :browser_engine, :browser_engine_version,
+            :os_name, :os_version,
+            :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
+            :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
+            :silver_light_version,
+            :is_mime_types, :mime_types_list,
+            :fonts_list,
+            :is_local_storage, :is_session_storage, :is_cookie,
+            :plugins, :is_mobile
+        ].each do |item|
+          rule "#{item} property mismatch" do
+            next if RequestStoreUtil.x_finly_rp_attributes[item].to_s == RequestStoreUtil.current_session.user_device.client.send(item).to_s
+
+            session_status_id UserSessionStatus.id_for(:blocked)
+            response_code 401
+            fail
+          end
+        end
+
+      end
+    end
+
     section 'New IP' do
       section 'Unverified' do
         before do

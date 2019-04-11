@@ -130,6 +130,14 @@ class RequestStoreUtil
     RequestStore.store[:current_session_event]
   end
 
+  def self.current_user_device
+    current_session&.user_device
+  end
+
+  def self.current_user_client
+    current_user_device&.client
+  end
+
   def self.current_token
     RequestStore.store[:current_token]
   end

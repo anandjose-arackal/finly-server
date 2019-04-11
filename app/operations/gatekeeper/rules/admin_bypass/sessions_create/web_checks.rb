@@ -38,7 +38,7 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
       end
 
       rule 'Associated device is required for all requests' do
-        if RequestStoreUtil.current_device.blank?
+        if RequestStoreUtil.current_user_device.blank?
           response_code 401
           fail
         end
@@ -46,7 +46,7 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
 
       section 'If device is available' do
         before do
-          skip if RequestStoreUtil.current_device.nil?
+          skip if RequestStoreUtil.current_user_device.nil?
         end
 
         [:timestamp, :user_agent, :timezone, :fingerprint,
@@ -54,7 +54,7 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
          :browser_engine, :browser_engine_version,
          :os_name, :os_version].each do |property|
           rule "#{property} is required for all web requests" do
-            web = RequestStoreUtil.current_device.client
+            web = RequestStoreUtil.current_user_device.client
             next unless web.send(property).blank?
             response_code 401
             fail
@@ -62,13 +62,13 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
         end
 
         rule 'Unverified devices need to be verified before proceeding' do
-          next unless RequestStoreUtil.current_device.status_id == UserDeviceStatus.id_for(:unverified)
+          next unless RequestStoreUtil.current_user_device.status_id == UserDeviceStatus.id_for(:unverified)
           require_otp true
         end
 
         [:incomplete, :attribute_mismatch, :complete].each do |status_name|
           rule "Do not allow login from devices with status #{status_name}" do
-            web = RequestStoreUtil.current_device
+            web = RequestStoreUtil.current_user_device
             next unless web.status_id == UserDeviceStatus.id_for(status_name)
             response_code 401
             fail

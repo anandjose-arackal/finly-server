@@ -1,7 +1,7 @@
 class Gatekeeper::Event
   include Supporters::ErrorTracker
 
-  ENABLED = Rails.env.production? || Rails.env.test?
+  ENABLED = true #Rails.env.production? || Rails.env.test?
 
   attr_accessor :event, :params
 
