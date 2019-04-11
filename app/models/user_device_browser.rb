@@ -91,24 +91,24 @@ class UserDeviceBrowser < ApplicationRecord
   # }
 
   # Compares all attributes of current model with the hash provided in arguments. Returns the differences
-  def differences(attrs)
-    differences = []
-    [
-        :user_agent, :timezone, :fingerprint, :language, :system_language,
-        :browser, :browser_version, :browser_engine, :browser_engine_version,
-        :os_name, :os_version,
-        :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
-        :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
-        :silver_light_version,
-        :is_mime_types, :mime_types_list,
-        :fonts_list,
-        :is_local_storage, :is_session_storage, :is_cookie,
-        :plugins, :is_mobile
-    ].each do |attr|
-      differences << attr unless self.send(attr).to_s == attrs[attr].to_s
-    end
-    differences
-  end
+  # def differences(attrs)
+  #   differences = []
+  #   [
+  #       :user_agent, :timezone, :fingerprint, :language, :system_language,
+  #       :browser, :browser_version, :browser_engine, :browser_engine_version,
+  #       :os_name, :os_version,
+  #       :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
+  #       :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
+  #       :silver_light_version,
+  #       :is_mime_types, :mime_types_list,
+  #       :fonts_list,
+  #       :is_local_storage, :is_session_storage, :is_cookie,
+  #       :plugins, :is_mobile
+  #   ].each do |attr|
+  #     differences << attr unless self.send(attr).to_s == attrs[attr].to_s
+  #   end
+  #   differences
+  # end
 
   def self.client_id
     '13'

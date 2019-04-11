@@ -49,6 +49,10 @@ class RequestStoreUtil
     RequestStore.store[:current_admin_user] = admin_user
   end
 
+  def self.set_x_finly_rp_attributes(attrs)
+    RequestStore.store[:x_finly_rp_attributes] = attrs
+  end
+
   def self.to_hash
     {
         current_app: RequestStore.store[:current_app],
@@ -62,6 +66,7 @@ class RequestStoreUtil
         authorized_scopes: RequestStore.store[:authorized_scopes],
         request_impression_id: RequestStore.store[:request_impression]&.id,
         current_admin_user_id: RequestStore.store[:current_admin_user]&.id,
+        x_finly_rp_attributes: RequestStore.store[:x_finly_rp_attributes],
         params: RequestStore.store[:params]
     }
   end
@@ -79,6 +84,7 @@ class RequestStoreUtil
     RequestStore.store[:current_token] = Doorkeeper::AccessToken.find_by_id(request_store_data[:current_token_id])
     RequestStore.store[:request_impression] = RequestImpression.find_by_id(request_store_data[:request_impression_id])
     RequestStore.store[:current_admin_user] = AdminUser.find_by_id(request_store_data[:current_admin_user_id])
+    RequestStore.store[:x_finly_rp_attributes] = request_store_data[:x_finly_rp_attributes]
 
     case request_store_data[:current_user_type]
       when User.name
@@ -134,6 +140,10 @@ class RequestStoreUtil
 
   def self.current_admin_user
     RequestStore.store[:current_admin_user]
+  end
+
+  def self.x_finly_rp_attributes
+    RequestStore.store[:x_finly_rp_attributes]
   end
 
 end

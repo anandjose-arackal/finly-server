@@ -26,25 +26,26 @@ class UserDevices::FindOrCreate < BaseOperation
   protected
 
   def client_from_request
-    request = RequestStoreUtil.current_request
-    headers = request.headers
-    request_properties = headers['X-Finly-RP']
-    if request_properties.nil?
-      add_message :error, 'X-Finly-RP not found'
-      return
-    end
-    if request_properties.present?
-      request_properties = Base64.decode64(request_properties)
-      request_properties = JSON.parse(request_properties) if request_properties.is_a?(String)
-    else
-      # todo fallback to user-agent instead of not creating the properties
-      request_properties = {}
-    end
-    request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
-    timestamp = '11'
+    # request = RequestStoreUtil.current_request
+    # headers = request.headers
+    # request_properties = headers['X-Finly-RP']
+    # if request_properties.nil?
+    #   add_message :error, 'X-Finly-RP not found'
+    #   return
+    # end
+    # if request_properties.present?
+    #   request_properties = Base64.decode64(request_properties)
+    #   request_properties = JSON.parse(request_properties) if request_properties.is_a?(String)
+    # else
+    #   # todo fallback to user-agent instead of not creating the properties
+    #   request_properties = {}
+    # end
+    # request_properties = request_properties.with_indifferent_access if request_properties.is_a?(Hash)
     UserDevice::DEVICES.each do |device|
       if params[:scope].include?(device.authentication_scope.to_s)
-        client = client_for(device, request_properties[device.client_id.to_s])
+        client = client_for(device)
+        return if has_errors?
+
         user_device = user_device_for(client)
         return user_device
       end
@@ -65,31 +66,36 @@ class UserDevices::FindOrCreate < BaseOperation
     user_device
   end
 
-  def client_for(config_class, x_finly_rp)
-    x_finly_rp ||= {}
-    attributes = client_attributes_for config_class, x_finly_rp
-    client = config_class.completed.find_by(fingerprint: attributes[:fingerprint])
-    # If the device with the same fingerprint is found, then check if attributes are matching
-    if client
-      # Verify client matches with the request properties
-      differences = client.differences(attributes)
-      # If there is a mismatch, flag it as attribute mismatch
-      if differences.present?
-        # Mark client status as config mismatch
-        attributes[:status_id] = UserDeviceStatus.id_for(:attribute_mismatch)
-        attributes[:message] = "Attribute mismatch for #{differences.to_sentence}"
-        client = config_class.create(attributes)
-      end
-    else
-      client = config_class.create(attributes)
+  def client_for(config_class)
+    attributes = UserDevices::XFinlyRPProcessor.from_request(params)
+    if attributes.nil?
+      add_message :error, 'X-Finly-RP not sent'
+      return
     end
+
+    client = config_class.completed.find_by(attributes.except(:timestamp_s))
+    client = config_class.create(attributes) unless client
     client
+
+    # unless client
+    #   # Verify client matches with the request properties
+    #   differences = client.differences(attributes)
+    #   # If there is a mismatch, flag it as attribute mismatch
+    #   if differences.present?
+    #     # Mark client status as config mismatch
+    #     attributes[:status_id] = UserDeviceStatus.id_for(:attribute_mismatch)
+    #     attributes[:message] = "Attribute mismatch for #{differences.to_sentence}"
+    #     client = config_class.create(attributes)
+    #   end
+    # else
+    #   client = config_class.create(attributes)
+    # end
   end
 
-  def client_attributes_for(config_class, x_finly_rp)
-    attributes = {}
-    config_class.obfuscation_map.each {|attribute, id| attributes[attribute] = x_finly_rp[id]}
-    attributes
-  end
+  # def client_attributes_for(config_class, x_finly_rp)
+  #   attributes = {}
+  #   config_class.obfuscation_map.each {|attribute, id| attributes[attribute] = x_finly_rp[id]}
+  #   attributes
+  # end
 
 end

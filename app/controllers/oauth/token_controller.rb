@@ -138,6 +138,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def load_global_variables
     RequestStoreUtil.set_current_request request
+    RequestStoreUtil.set_request_params params
   end
 
   def create_user_sessions
