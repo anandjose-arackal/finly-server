@@ -12,7 +12,9 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       po_invoices: false,
       budgets: false,
       po_advances: false,
-      grns: false
+      grns: false,
+      vendors: false
+
     }
 
     user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
@@ -41,10 +43,10 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       when UserRole.id_for(:bank_payment_request_creditor)
         request_types[:payment_tickets] = true
         request_types[:po_advances] = true
+      when UserRole.id_for(:vendor_reviewer) && user.company.vendor_empanelment_workflow_enabled?
+        request_types[:vendors] = true
       end
     end
-
-
   end
 
   def success
