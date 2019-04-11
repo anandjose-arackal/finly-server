@@ -48,7 +48,7 @@ Gatekeeper::Checker.new 'On New Request' do
 
       if Time.now - Time.parse(session.last_request_at.to_s) > 30.minutes
         message 'Session timeout'
-        session_status_id UserSessionStatus.id_for(:revoked)
+        session_status_id UserSessionStatus.id_for(:expired)
         response_code 401
         level 1
         fail
