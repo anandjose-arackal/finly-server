@@ -1,3 +1,5 @@
+# This operation creates a new quotation for a purchase order
+
 class Procurements::PurchaseOrders::Quotations::Create < Procurements::PurchaseOrders::Quotations::Base
   attr_accessor :purchase_order, :procurement, :quotation_params, :quotation, :q_old_attachments, :q_current_attachments
 
@@ -31,12 +33,27 @@ class Procurements::PurchaseOrders::Quotations::Create < Procurements::PurchaseO
       return
     end
 
+    if self.quotation_params[:selected].blank?
+      add_message :error, "Please select, \"Yes\" or \"No\", whether or not if you are moving forward with this Quotation."
+      return
+    end
+
     if StringUtils.to_bool(self.quotation_params[:selected].strip)
       if self.quotation_params[:note].blank? || (self.quotation_params[:note].length < 5)
         add_message :error, "Please supply a note as to why you are moving forward with this Quotation (Min 5 characters)."
         return
-      end
+      end      
     end
+
+    unless validate_amount(self.quotation_params[:total_amount])
+      add_message :error, "Invalid total amount entered."
+      return
+    end 
+
+    unless validate_amount(self.quotation_params[:advance_amount])
+      add_message :error, "Invalid advance amount entered."
+      return
+    end    
 
   end
 
@@ -73,6 +90,15 @@ class Procurements::PurchaseOrders::Quotations::Create < Procurements::PurchaseO
   def success
     params[:quotation] = self.quotation
     Procurements::PurchaseOrders::QuotationsPresenter.new(user, params, messages)
+  end
+
+  private
+
+  def validate_amount(amount)
+    if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer
+      return false
+    end
+    true
   end
 
   class Procurements::PurchaseOrders::QuotationsPresenter < BaseOperation::BasePresenter::SuccessPresenter
