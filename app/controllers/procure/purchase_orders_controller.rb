@@ -57,7 +57,7 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
-  def forward
+  def bulk_forward
     @result = Procurements::PurchaseOrders::BulkForward.(current_user, params)
     respond
   end

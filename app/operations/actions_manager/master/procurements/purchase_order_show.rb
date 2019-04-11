@@ -2,7 +2,11 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   register_handle :proc_purchase_order_show
   validate :input
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove, :take_control, :return_control]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
+    :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
+    :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,
+    :take_control, :return_control, :forward
+  ]
 
   def initialize(user = nil, params = {})
     super
@@ -308,5 +312,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   #   end
   #   ############# Reviewer logic end #########################
   # end
+
+  def forward
+    purchase_order.processing? && purchase_order.get_reviewers.include?(user)
+  end
 
 end
