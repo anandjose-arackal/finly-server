@@ -1,5 +1,5 @@
 class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
-  attr_accessor :policy_user_roles, :user_roles, :document_types, documents
+  attr_accessor :policy_user_roles, :user_roles, :document_types, :documents
 
   def init
 
