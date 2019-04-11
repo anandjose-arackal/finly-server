@@ -13,7 +13,7 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
       add_message :error, "Please select invoices from a single policy"
     end
 
-    policy_id = self.purchaes_orders&.pluck(:policy_id)&.uniq&.compact&.first
+    policy_id = self.purchase_orders&.pluck(:policy_id)&.uniq&.compact&.first
     self.policy = user.company.policies.with_id(policy_id).first
 
     unless self.policy.present?
@@ -44,7 +44,7 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
   def process
     forwarded = 0
     not_forwarded = 0
-    self.purchaes_orders.each do |purchase_order|
+    self.purchase_orders.each do |purchase_order|
       workflow_output = {
         document: purchase_order,
         aasm_event: 'forward',
