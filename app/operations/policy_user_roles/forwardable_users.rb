@@ -63,9 +63,9 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
   private
 
   def get_documents(document_type, document_ids)
-    if type == 'purchase_order_provider'
+    if document_type == 'purchase_order_provider'
       self.documents = Procurements::PurchaseOrders::Index.(user, params).purchase_orders.with_id(document_ids)
-    elsif type == 'invoice_provider'
+    elsif document_type == 'invoice_provider'
       self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
     else
       ## nothing
