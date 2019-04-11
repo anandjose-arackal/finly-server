@@ -9,7 +9,7 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
 
     self.purchase_orders = Procurements::PurchaseOrders::Index.(user, params).purchase_orders.with_id(params[:document_ids])
 
-    if self.purchase_orders&.pluck(:policy_id)&.uniq&.compact&length > 1
+    if self.purchase_orders&.pluck(:policy_id)&.uniq&.compact&.length > 1
       add_message :error, "Please select invoices from a single policy"
     end
 

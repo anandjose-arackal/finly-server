@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_08_093415) do
+ActiveRecord::Schema.define(version: 2019_04_11_122238) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -6005,6 +6005,7 @@ ActiveRecord::Schema.define(version: 2019_04_08_093415) do
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.string "vedor_code"
+    t.boolean "active", default: true
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
     t.index ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id"
