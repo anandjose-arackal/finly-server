@@ -24,7 +24,7 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
     end
 
     unless documents.present?
-      add_message :error, "No documents found"
+      add_message :error, "No forwardable documents found"
     end
 
     unless documents.pluck(:policy_id).uniq.compact.length == 1
@@ -33,7 +33,14 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
   end
 
   def process
-    self.policy_user_roles = self.policy.policy_user_roles
+    case params[:document_type]
+    when 'purchase_order_provider'
+      role_id = UserRole.id_for(:purchase_order_reviewer)
+    when 'invoice_provider'
+      role_id = UserRole.id_for(:invoice_reviewer)
+    end
+
+    self.policy_user_roles = self.policy.policy_user_roles.with_role_id(role_id)
   end
 
   def success
@@ -66,8 +73,10 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
 
   def get_documents(document_type, document_ids)
     if document_type == 'purchase_order_provider'
+      params[:filter_awaiting_approval] = true
       self.documents = Procurements::PurchaseOrders::Index.(user, params).purchase_orders.with_id(document_ids)
     elsif document_type == 'invoice_provider'
+      params[:filter_awaiting_approval] = true
       self.documents = Procurements::Invoices::Index.(user, params).invoices.with_id(document_ids)
     else
       ## nothing
