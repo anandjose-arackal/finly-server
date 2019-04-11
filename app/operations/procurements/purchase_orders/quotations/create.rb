@@ -2,8 +2,9 @@ class Procurements::PurchaseOrders::Quotations::Create < Procurements::PurchaseO
   attr_accessor :purchase_order, :procurement, :quotation_params, :quotation, :q_old_attachments, :q_current_attachments
 
   def pre_validate
+    Rails.logger.fatal "params for quotation, #{params.inspect}"
     if params[:purchase_order_id].blank?
-      add_message :error, "Purchase Order not found"
+      add_message :error, "Purchase Order is blank."
       return
     end
 
