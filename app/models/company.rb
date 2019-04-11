@@ -98,6 +98,8 @@ class Company < ApplicationRecord
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
   has_many :bank_payment_requests
+  has_many :attachments, as: :resource, dependent: :nullify
+
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

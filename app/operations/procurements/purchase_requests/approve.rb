@@ -31,7 +31,7 @@ class Procurements::PurchaseRequests::Approve < Procurements::PurchaseRequests::
           # Break if rejection fails
           raise if params[:rejected_purchase_request_items].present? && !rejected
           # Approve the line items too
-          unless purchase_request&.status&.name&.to_sym&.present? && !purchase_request.purchase_request_items.non_rejected.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym)).zero?
+          unless purchase_request.status.name.to_sym.present? && !purchase_request.purchase_request_items.non_rejected.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request.status.name.to_sym)).zero?
             raise
           end
           # self.purchase_request.purchase_request_items.each do |item|

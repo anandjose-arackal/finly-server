@@ -31,7 +31,7 @@ class PurchaseRequestItem < ApplicationRecord
 
   scope :with_ids, -> (ids) { where id: ids }
   scope :with_id, -> (id) { where id: id }
-  scope :non_rejected, -> { where.not rejected: true }
+  scope :non_rejected, -> { where rejected: [nil, false] }
 
   def update_estimated_amount
     quantity = self.quantity
