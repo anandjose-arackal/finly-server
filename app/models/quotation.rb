@@ -31,11 +31,11 @@ class Quotation < ApplicationRecord
 
 	validates :vendor_name, length: {minimum: 3, maximum: 50}, allow_blank: true
 	validates :vendor_location, length: {minimum: 3, maximum: 100}, allow_blank: true
-	validates_presence_of :estimated_delivery_time, allow_blank: true
+	# validates_presence_of :estimated_delivery_time, allow_blank: true
 	validates_presence_of :total_amount, allow_blank: true
-	validates_presence_of :advance_amount
-	validates_presence_of :credit_period, allow_blank: true
-	validates :note, length:{minimum:5}, allow_blank: true
+	# validates_presence_of :advance_amount
+	# validates_presence_of :credit_period, allow_blank: true
+	# validates :note, length:{minimum:5}, allow_blank: true
 	validates_presence_of :selected, allow_blank: true
 
 	accepts_nested_attributes_for :attachments, allow_destroy: true
