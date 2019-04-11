@@ -56,7 +56,7 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
       per_page = params[:per_page] || 10000 # hardcoded as pagination on frontend is not there
 
       self.paginated_policy_user_roles = self.policy_user_roles.paginate(page: page, per_page: per_page).includes_for_index
-      self.user_roles = params[:user_roles]
+      # self.user_roles = params[:user_roles]
     end
   end
 
