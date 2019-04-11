@@ -38,17 +38,19 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
 
   def success
     params[:policy_user_roles] = self.policy_user_roles
+    params[:documents] = self.documents
     PolicyUserRoles::ForwardableUsers::IndexPresenter.new(user, params, messages)
   end
 
   class PolicyUserRoles::ForwardableUsers::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :policy_user_roles, :paginated_policy_user_roles
+    attr_accessor :policy_user_roles, :paginated_policy_user_roles, :documents
     include HasScope
 
     has_scope :filter_role_id
     has_scope :filter_user
 
     def init
+      self.documents = params[:documents]
       self.policy_user_roles = params[:policy_user_roles]
       self.policy_user_roles = apply_scopes(self.policy_user_roles, params)
 

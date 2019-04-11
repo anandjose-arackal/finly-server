@@ -1,11 +1,11 @@
-json.documents do
-  json.array! @result.documents do |document|
+# json.documents do
+#   json.array! @result.documents do |document|
 
-  end
-end
+#   end
+# end
 
 json.summary do
-  json.count @result.document.count
+  json.count @result.documents.count
 end
 
 json.users do
