@@ -15,6 +15,7 @@ json.results do
 
 
     if p.purchase_order.present?
+      json.purchase_order_id p.purchase_order.id
       json.document 'Purchase Order'
       json.po_number p.purchase_order.po_number
     end
