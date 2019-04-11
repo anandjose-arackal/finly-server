@@ -6,6 +6,7 @@
 
 json.summary do
   json.count @result.documents.count
+  json.document_ids @result.documents.pluck(:id)
 end
 
 json.users do
