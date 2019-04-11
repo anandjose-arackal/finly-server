@@ -1,3 +1,5 @@
+# This operation deletes an existing quotation for a purchase order
+
 class Procurements::PurchaseOrders::Quotations::Destroy < Procurements::PurchaseOrders::Quotations::Base
   attr_accessor :purchase_order, :quotation
 

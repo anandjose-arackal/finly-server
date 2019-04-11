@@ -1,3 +1,5 @@
+# This operation updates an existing quotation for a purchase order
+
 class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseOrders::Quotations::Base
 	attr_accessor :quotation_params, :purchase_order, :quotation, :q_current_attachments, :q_old_attachments
 
@@ -53,6 +55,16 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 	      add_message :error, "Quotations cannot be updated if Purchase Order is submitted."
 	      return
 	    end
+
+	    unless validate_amount(self.quotation_params[:total_amount])
+	      add_message :error, "Invalid amount entered."
+	      return
+	    end 
+
+	    unless validate_amount(self.quotation_params[:advance_amount])
+	      add_message :error, "Invalid advance amount entered."
+	      return
+	    end 
 	
 	end
 
@@ -91,6 +103,15 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 
 	def post_process
 		add_message :success, "Quotation successfully updated."
+	end
+
+	private
+
+	def validate_amount(amount)
+	    if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer
+	      return false
+	    end
+	    true
 	end
 
 end
