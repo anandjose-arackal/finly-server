@@ -475,7 +475,8 @@ class PurchaseOrder < ApplicationRecord
         po_number: self.po_number,
         delivery_location: self.delivery_location.as_json,
         requested_advance_amount: self.requested_advance_amount&.value,
-        purchase_order_total: precision_value(self.balance_amount&.value)
+        purchase_order_total: precision_value(self.balance_amount&.value),
+        editable: false
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
