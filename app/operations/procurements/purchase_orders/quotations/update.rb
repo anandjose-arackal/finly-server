@@ -1,11 +1,29 @@
 class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseOrders::Quotations::Base
-	attr_accessor :quotation_params, :purchase_order, :quotation
+	attr_accessor :quotation_params, :purchase_order, :quotation, :q_current_attachments, :q_old_attachments
+
+	def pre_validate
+	    if params[:purchase_order_id].blank?
+	      add_message :error, "Purchase Order not found"
+	      return
+	    end
+
+	    if params[:id].blank?
+	      add_message :error, "Quotation ID not sent."
+	      return
+	    end
+
+	    if params[:quotation].blank?
+	      add_message :error, "Please supply quotation parameters."
+	      return
+	    end
+	end
 
 	def init
 		self.quotation_params = quotation_parameters
-		po_id = quotation_params[:purchase_order_id]
+		# po_id = quotation_params[:purchase_order_id]
+		po_id = params[:purchase_order_id]
 		self.purchase_order = user.company.purchase_orders.find_by id: po_id
-		self.quotation = self.purchase_order.quotations.find_by(id: self.quotation_params[:id])
+		self.quotation = self.purchase_order.quotations.find_by(id: params[:id])
 	end
 
 	def validate
@@ -24,20 +42,35 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 			return
 		end	
 
-		unless self.purchase_order.open? || self.purchase_order.retracted?
-	      add_message :error, "Quotations can not be updated if Purchase Order is submitted."
+		unless self.purchase_order.open? || self.purchase_order.retracted? || self.purchase_order.rejected?
+	      add_message :error, "Quotations cannot be updated if Purchase Order is submitted."
 	      return
 	    end
 	
 	end
 
+	def pre_process
+	    self.q_current_attachments = user.company.procurement_attachments.with_id(params[:quotation][:attachments])
+
+	    self.quotation_params.delete(:attachments)
+
+	    #old attachments
+	    self.q_old_attachments = self.quotation.attachments
+	end
+
 	def process
+		self.quotation_params[:purchase_order_id] = self.purchase_order.id
 
 		quotation.assign_attributes(self.quotation_params)
 		if quotation.valid?
 			quotation.save
 			other_quotations = self.purchase_order.quotations.where.not(id: quotation.id)
       		other_quotations.update_all(selected: false)
+
+      		self.q_old_attachments&.update_all(procurement_document_id: nil, procurement_document_type: nil)
+
+    		self.q_current_attachments&.update_all(procurement_document_id: self.quotation.id, procurement_document_type: self.quotation.class.name)
+
 		else
 			add_message :error, quotation.errors.full_messages
       		return
@@ -46,7 +79,10 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 	end
 
 	def post_process
-		add_message :sucess, "Quotation successfully updated."
+		add_message :success, "Quotation successfully updated."
 	end
 
 end
+
+
+
