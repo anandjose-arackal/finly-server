@@ -235,9 +235,11 @@ module Transitionable
       if level.present?
         taken_control_by_ids = []
         taken_control_by_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:taken_control_by_id)
-        taken_control_by_ids.reject! {|user_id| user_id.nil?}
+        taken_control_by_ids.compact!
 
-        forwarded_to_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
+        forwarded_to_ids = []
+        forwarded_to_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
+        forwarded_to_ids.compact!
 
         if taken_control_by_ids.present?
           user_ids = taken_control_by_ids
