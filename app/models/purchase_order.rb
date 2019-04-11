@@ -119,6 +119,7 @@ class PurchaseOrder < ApplicationRecord
 
   has_many :trails, as: :parent
   has_many :purchase_request_items
+  has_many :purchase_request_item
 
   belongs_to :bank_account, optional: true
 
@@ -490,6 +491,12 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def associate_purchase_request_items(options, user)
+    filtered_item_ids = filter_purchase_request_item_ids(options, user)
+    PurchaseRequestItem.with_ids(filtered_item_ids).update_all(purchase_order_id: self.id) unless filtered_item_ids.blank?
+    copy_pr_item_to_po_item
+  end
+
+  def filter_purchase_request_item_ids(options, user)
     item_ids = []
     attributes = options.dig(:purchase_order, :purchase_request_items_attributes)
     attributes.each do |key, value|
@@ -498,8 +505,7 @@ class PurchaseOrder < ApplicationRecord
     item_ids = item_ids.flatten.compact
     # Verify that item_ids belongs to the  company's PR
     filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id = (?)", item_ids).pluck("purchase_request_items.id")
-    PurchaseRequestItem.with_ids(filtered_item_ids).update_all(purchase_order_id: self.id) unless filtered_item_ids.blank?
-    copy_pr_item_to_po_item
+    return filtered_item_ids
   end
 
 

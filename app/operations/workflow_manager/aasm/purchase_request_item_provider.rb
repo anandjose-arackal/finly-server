@@ -10,6 +10,7 @@ class WorkflowManager::Aasm::PurchaseRequestItemProvider < WorkflowManager::Aasm
     state :order_initiated
     state :issued_from_inventory
     state :closed
+    state :po_created
 
     event :submit do
       transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
@@ -48,6 +49,10 @@ class WorkflowManager::Aasm::PurchaseRequestItemProvider < WorkflowManager::Aasm
 
     event :issue_from_inventory do
       transitions :from => [:approved, :auto_approved], :to => [:issued_from_inventory]
+    end
+
+    event :po_creation do
+      transitions :from => [:approved, :auto_approved], :to => [:po_created]
     end
 
     after_all_events :change_state

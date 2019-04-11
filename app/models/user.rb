@@ -194,6 +194,7 @@ class User < ApplicationRecord
 
   # P2P Documents
   has_many :purchase_orders
+  has_many :purchase_requests, foreign_key: :creator_id
 
   # Budgets
 

@@ -13,7 +13,8 @@ class PurchaseRequestItemStatus < ApplicationRecord
         :closed,
         :order_initiated,
         :cancelled,
-        :issued_from_inventory
+        :issued_from_inventory,
+        :po_created
     ]
   end
 
@@ -55,6 +56,10 @@ class PurchaseRequestItemStatus < ApplicationRecord
 
   def issued_from_inventory?
     self.id == PurchaseRequestItemStatus.id_for(:issued_from_inventory)
+  end
+
+  def po_created?
+    self.id == PurchaseRequestItemStatus.id_for(:po_created)
   end
 
 end

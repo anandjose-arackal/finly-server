@@ -42,6 +42,7 @@ class PurchaseRequest < ApplicationRecord
 
   scope :filter_by_status_id,  -> (status_id) { where purchase_request_status_id: status_id }
   scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
+  scope :not_draft, -> { where purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
   def add_company
     self.company_id = self.creator.company_id
@@ -59,7 +60,8 @@ class PurchaseRequest < ApplicationRecord
       policy_attributes: {id: self.policy_id, name: self.policy&.name},
       status_attributes: {status_id: self.purchase_request_status_id, status_name: self.status&.name, display_name: self.status&.name&.humanize},
       creator_attributes: {creator_id: self.creator_id, creator_name: self.creator&.name, created_at: self.created_at.to_date },
-      total_cost: calculate_total_amount
+      total_cost: calculate_total_amount,
+      controlling_user: self.get_reviewers&.first&.name
     }
   end
 
@@ -113,4 +115,28 @@ class PurchaseRequest < ApplicationRecord
     return !rejected_items.zero? if filtered_item_ids.present?
     false
   end
+
+  def self.role_based_associated_status_ids(user)
+    PurchaseRequestStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:purchase_request_initiator) == role_id.to_i)
+          statuses += [:open, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :issued_from_inventory]
+        elsif (UserRole.id_for(:purchase_request_reviewer) == role_id.to_i)
+          statuses += [:awaiting_approval, :approved, :auto_approved, :issued_from_inventory]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.roles
+    # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
+    [:admin, :purchase_request_initiator, :purchase_request_reviewer]
+  end
+
 end

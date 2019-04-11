@@ -18,13 +18,13 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
       purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
 
       # Create document level reviewer mapping
-      # For setting level  specific reviewers from reviewal chain for a document
+      # For setting level specific reviewers from reviewal chain for a document
       params[:reviewal_document] = self.purchase_request
       document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
       unless document_reviewer_mappings_op.success?
         add_message :error, document_reviewer_mappings_op.messages[:error]
       end
-      return     
+      return
     else
       add_message :error, purchase_request.errors.full_messages
       return

@@ -24,11 +24,12 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :delivery_location, optional: true, class_name: 'BranchLocation'
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :status, optional: true, class_name: 'PurchaseRequestItemStatus', foreign_key: :status_id
+  belongs_to :purchase_order
   has_many :attachments, as: :resource, dependent: :destroy
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachments, allow_destroy: true
 
-  scope :with_ids, -> (ids) { where id: ids}
+  scope :with_ids, -> (ids) { where id: ids }
   scope :with_id, -> (id) { where id: id }
   scope :non_rejected, -> { where.not rejected: true }
 
