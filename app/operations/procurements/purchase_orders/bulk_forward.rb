@@ -27,7 +27,7 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
       add_message :error, "Invalid User"
     end
 
-    self.forwarded_to_user = user.copmany.users.with_id(params[:forward_to_id].to_i).first
+    self.forwarded_to_user = user.company.users.with_id(params[:forward_to_id].to_i).first
   end
 
   def validate
