@@ -12,7 +12,7 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
       add_message :error, "Invalid Type"
     end
 
-    get_documents
+    get_documents(params[:document_type], params[:document_ids])
 
     policy_id = self.documents&.pluck(:policy_id)&.uniq&.compact&.first
     self.policy = user.company.policies.with_id(policy_id).first
