@@ -3,6 +3,8 @@ json.results do
     json.id invoice.id
     json.controlling_user invoice.get_reviewers.first&.name
     json.awaiting_action invoice.awaiting_action(@result.user)
+    json.invoice_type invoice.invoice_type&.name
+    json.proforma_advance invoice.proforma_advance&.value
     json.invoice do
       json.id invoice.id
       json.controlling_user invoice.get_reviewers.first&.name

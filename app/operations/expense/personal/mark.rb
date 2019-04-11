@@ -20,8 +20,9 @@ class Expense::Personal::Mark < Expense::Base
       add_message :error, "Expense not found"
     end
 
-    unless selected_expense.unreported?
-      add_message :error, "This expense cannot be marked as personal"
+    unless [ExpenseStatus.id_for(:unreported), ExpenseStatus.id_for(:rejected)].include?(selected_expense.expense_status_id)
+      add_message :error, "Only unreported or rejected expenses can be marked as personal"
+      return
     end
 
     if selected_expense.personal

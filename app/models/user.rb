@@ -695,7 +695,6 @@ class User < ApplicationRecord
     end
   }
 
-
   before_save :strip_whitespace
 
   after_create do

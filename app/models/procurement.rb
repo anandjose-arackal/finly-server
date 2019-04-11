@@ -35,6 +35,7 @@ class Procurement < ApplicationRecord
   has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy
+  has_many :proforma_invoices, class_name: 'Invoice', dependent: :destroy, foreign_key: :proforma_invoice_id
   has_many :bill_of_supplies, dependent: :destroy
   has_many :delivery_challans, dependent: :destroy
   has_many :e_way_bills, dependent: :destroy

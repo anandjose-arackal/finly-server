@@ -399,6 +399,19 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
+  def can_approve?
+    processing?
+  end
+
+  def can_reject?
+    processing?
+  end
+
+  def can_take_control?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    processing? && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id).taken_control_by_id != user.id
+  end
+
   def advance_to_be_processed?
     self.advance_amount_status_id == AdvanceAmountStatus.id_for(:to_be_processed)
   end
@@ -622,7 +635,11 @@ class PurchaseOrder < ApplicationRecord
         tds_amount = self.requested_advance_amount.value - new_advance_amount
         self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
         final_advance_amount = self.requested_advance_amount.value - tds_amount
-        self.advance_amount.update(value: final_advance_amount)
+        if self.advance_amount.nil?
+          self.advance_amount = Amount.create(value: final_advance_amount, currency_id: 1)
+        else
+          self.advance_amount.update(value: final_advance_amount)
+        end
       end
 
     else

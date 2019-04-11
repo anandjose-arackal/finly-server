@@ -26,6 +26,7 @@
 
 class BranchLocation < ApplicationRecord
   include SoftDeletable, AncestrySupport
+
   has_ancestry
 
   belongs_to :company, optional: true

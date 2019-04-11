@@ -123,7 +123,24 @@ class YesBankVendor < ApplicationRecord
   scope :sort_for_index, -> {reorder(created_at: :desc)}
 
   scope :filter_vendor_type_id, -> (type_id) {where vendor_type_id: type_id}
-  scope :filter_status_id, -> (status_id) {where status_id: status_id}
+ 
+  scope :filter_status_id, -> (status_id) {
+    if status_id == 'approved'
+      where status_id: [VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved)]
+    elsif status_id == 'processing' 
+      where status_id: [VendorStatus.id_for(:awaiting_approval)]
+    elsif status_id == 'open'
+      where status_id: [VendorStatus.id_for(:draft), VendorStatus.id_for(:retracted), VendorStatus.id_for(:rejected)]
+    elsif status_id == 'awaiting_approval'
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(user_id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      where status_id: status_id
+    end
+  }
   scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
   scope :filter_created_by_id, -> (user_id) {where created_by_id: user_id}
   scope :filter_business_name, -> (term) {where("business_name like ?", "%#{term}%")}

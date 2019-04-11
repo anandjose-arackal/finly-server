@@ -148,8 +148,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def attachments
-    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
-    {name: 'Attachments', id: 'attachments', url: 'attachments/params={}'}
+    # return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
+    {name: 'Attachments', id: 'attachments', url: '#attachments/params={}'}
   end
 
   def requests

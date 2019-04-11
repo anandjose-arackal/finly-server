@@ -62,6 +62,10 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		params[:payments_attributes].each do |pa|
 			if pa[:authorized]
 				# yes = YesBankVendor.find(pa[:vendor_id])
+				if pa[:vendor_id].blank?
+					add_message :error, "You have selected an Authorized vendor payment, but did not provide a vendor."
+					break
+				end
 				yes = user.company.yes_bank_vendors.find(pa[:vendor_id])
 				ba = yes.bank_accounts.where(id: pa[:bank_account_id])
 				pa[:bank_account_number] = ba.pluck(:account_number).first

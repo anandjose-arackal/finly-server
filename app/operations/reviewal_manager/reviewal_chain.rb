@@ -10,7 +10,7 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.provider_name = params[:provider_name] || self.document&.get_default_provider
     self.violations_present = !!params[:violations_present]
     self.chain = []
-    self.provider_names = Constants::PROVIDER_NAMES
+    self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider)
 
     policy_id = params[:policy_id]
 
