@@ -15,7 +15,7 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
     #Update purchase request line items state to :draft
     if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft))
       attachment_ids = get_attachment_ids(params)
-      Attachment.update_resource({ids: attachment_ids, resource_id: self.purchase_request.id, user: user})
+      Attachment.update_resource({ids: attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
       # Update all estimated amount in the line item
       purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
 

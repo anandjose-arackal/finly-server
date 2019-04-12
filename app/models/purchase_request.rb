@@ -32,6 +32,7 @@ class PurchaseRequest < ApplicationRecord
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
 
+  validates :description, :location, :department, :policy, presence: true
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
 

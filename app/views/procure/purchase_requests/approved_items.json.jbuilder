@@ -2,7 +2,7 @@ json.results do
   json.approved_purchase_request_items do
     json.array!(@result.paginated_items) do |item|
       json.id item.id
-      json.order_number "A"+ rand(1234).to_s
+      json.order_number 'A-00'+item.id.to_s
       json.required_by_date item&.required_by_date&.to_date
       json.delivery_location_id item&.delivery_location&.name
       json.vendor_id item&.vendor_id

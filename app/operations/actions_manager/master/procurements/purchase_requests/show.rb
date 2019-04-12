@@ -14,7 +14,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def save_btn
-    if user.vendor_payments_admin? && !purchase_request.closed?
+    if user.vendor_payments_admin? && ( purchase_request.retracted? || purchase_request.rejected? || purchase_request.awaiting_approval? )
       return true
     end
 

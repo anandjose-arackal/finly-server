@@ -27,6 +27,8 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :purchase_order, optional: true
   has_many :attachments, as: :resource, dependent: :destroy
 
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
+
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachments, allow_destroy: true
 
   scope :with_ids, -> (ids) { where id: ids }
