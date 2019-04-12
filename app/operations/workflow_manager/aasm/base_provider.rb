@@ -93,7 +93,7 @@ class WorkflowManager::Aasm::BaseProvider
 
       # Set forwarding user
       if dlrms.present?
-        dlrms.update_all({forwarded: true, forwarded_by_id: user.id, forwarded_to_id: forwarded_to_user.id})
+        dlrms.update_all({forwarded: true, forwarded_by_id: user.id, forwarded_to_id: forwarded_to_user.id, active: false})
       end
     end
 

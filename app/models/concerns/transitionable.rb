@@ -487,7 +487,7 @@ module Transitionable
           taken_control_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(taken_control_level_ids).pluck(:controlling_level_id)
         end
 
-        forwarded_document_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids)
+        forwarded_document_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids).pluck(:id)
         forwarded_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id)
       else
         user_ids = user.company.users.pluck(:id)
@@ -522,7 +522,7 @@ module Transitionable
             with_forwarded_to_id(user.id).
             with_document_type(self.name).
             where(action_taken_by_id: nil).
-            with_document_id(forwarded_document_ids)
+            with_document_id(forwarded_document_ids).pluck(:document_reviewer_mappable_id)
 
       # Find all awaiting action documents from DLRMs with controlling level id
       ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
@@ -693,11 +693,18 @@ module Transitionable
                                                       taken_control_by_id: user.id
       ).pluck(:document_reviewer_mappable_id)
 
+      # Get all the taken control items for admin user
       document_ids += DocumentLevelReviewerMapping.where(
-        forwarded: true,
-        document_reviewer_mappable_type: self.name,
-        forwarded_to_id: user.id
-      )
+                                                      forwarded: true,
+                                                      document_reviewer_mappable_type: self.name,
+                                                      forwarded_to_id: user.id
+      ).pluck(:document_reviewer_mappable_id)
+
+      # document_ids += DocumentLevelReviewerMapping.where(
+      #   forwarded: true,
+      #   document_reviewer_mappable_type: self.name,
+      #   forwarded_to_id: user.id
+      # )
 
       self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
     end
