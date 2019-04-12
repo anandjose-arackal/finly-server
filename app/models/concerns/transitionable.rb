@@ -380,6 +380,12 @@ module Transitionable
       # Currently implementing only for vendor payments admin
       user.vendor_payments_admin?
     end
+
+    def validate_if_forwarded(user)
+      if self.policy.present? && self.document_level_reviewer_mappings.present?
+        self.document_level_reviewer_mappings.with_viewable.pluck(:forwarded_to_id).include?(user.id) rescue false
+      end
+    end
     
     def validate_if_reviewer(user)
       if self.policy.present? && self.document_level_reviewer_mappings.present?
