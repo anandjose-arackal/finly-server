@@ -35,6 +35,28 @@ class PurchaseRequestItem < ApplicationRecord
   scope :with_id, -> (id) { where id: id }
   scope :non_rejected, -> { where rejected: [nil, false] }
 
+  scope :item_id, -> (id) {
+    where item_id: id
+  }
+
+  scope :vendor_id, -> (id) {
+    where vendor_id: id
+  }
+
+  scope :date, -> (date) {
+    date = Date.parse(date) rescue Date.today
+    where('DATE(required_by_date) = ?', date)
+  }
+
+  scope :location_id, -> (id) {
+    where location_id: id
+  }
+
+  scope :order_number, -> (order_number) {
+    where order_number: order_number
+  }
+
+
   def update_estimated_amount
     quantity = self.quantity
     per_unit_price = self.per_unit_estimated_amount&.value
