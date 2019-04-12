@@ -102,7 +102,7 @@ class WorkflowManager::Aasm::BaseProvider
     # find current document_level_reviewer_mappings
     if [:approve, :reject].include?(aasm.current_event)
       dlrm = document.document_level_reviewer_mappings.with_level_id(current_level.id).with_policy_id(self.policy_id)
-                 .where("taken_control_by_id = ? or reviewer_id = ?", user.id, user.id).first
+                 .where("taken_control_by_id = ? or reviewer_id = ? or forwarded_to_id = ?", user.id, user.id, user.id).first
 
       if dlrm.present?
         dlrm.update(
@@ -158,6 +158,9 @@ class WorkflowManager::Aasm::BaseProvider
           taken_control: false,
           taken_control_by_id: nil,
           action_taken_by_id: nil,
+          forwarded: false,
+          forwarded_to_id: nil,
+          forwarded_by_id: nil,
           action_id: nil
       )
     end
@@ -168,6 +171,9 @@ class WorkflowManager::Aasm::BaseProvider
               taken_control: false,
               taken_control_by_id: nil,
               action_taken_by_id: nil,
+              forwarded: false,
+              forwarded_to_id: nil,
+              forwarded_by_id: nil,
               action_id: nil
       )
     end
