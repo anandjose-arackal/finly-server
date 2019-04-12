@@ -17,7 +17,7 @@ class Admin::Expenses::Index < Admin::Expenses::Base
     def init
       self.expenses = params[:expenses]
       self.expenses = apply_scopes(expenses, params)
-      self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)
+      self.paginated_expenses = expenses.paginate(page: params[:page], per_page: params[:per_page])
       self.categories = user.company.categories.active
     end
   end
