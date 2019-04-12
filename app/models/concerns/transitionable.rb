@@ -534,6 +534,7 @@ module Transitionable
       # Find all awaiting action documents from DLRMs with controlling level id
       ids += DocumentLevelReviewerMapping.with_level_id(controlling_level_ids).
           with_reviewer_id(user.id).
+          where(forwarded: false).
           where(taken_control: false, action_taken_by_id: nil).
           with_document_type(self.name).
           with_document_id(document_ids).pluck(:document_reviewer_mappable_id)
