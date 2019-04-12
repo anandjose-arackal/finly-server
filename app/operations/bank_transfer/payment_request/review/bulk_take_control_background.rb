@@ -41,7 +41,6 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControlBackground < Backgrou
       #                                status_id: payment_status
       # 
       # end
-
         parameters = {
             document: bank_payment_request,
             aasm_event: 'take_control'

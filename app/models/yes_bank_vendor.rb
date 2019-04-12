@@ -123,6 +123,7 @@ class YesBankVendor < ApplicationRecord
   scope :sort_for_index, -> {reorder(created_at: :desc)}
 
   scope :filter_vendor_type_id, -> (type_id) {where vendor_type_id: type_id}
+ 
   scope :filter_status_id, -> (status_id) {
     if status_id == 'approved'
       where status_id: [VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved)]
