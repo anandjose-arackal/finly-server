@@ -70,7 +70,7 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
     end
 
     if self.result[:not_forwarded] != 0
-      add_message :success, "Couldn't forward #{self.result[:forwarded]} purchase orders"
+      add_message :success, "Couldn't forward #{self.result[:non_forwarded]} purchase orders"
     end
 
   end
