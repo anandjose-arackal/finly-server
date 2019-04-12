@@ -116,11 +116,15 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
 
   def reject_pr_line_item
     if user.vendor_payments_admin? || user.is_purchase_request_initiator?
-      return true
+      if purchase_request.awaiting_approval?
+        return true
+      end
     end
     if purchase_request.is_reviewing_user?
       if user_in_level?
-        return true
+        if purchase_request.awaiting_approval?
+          return true
+        end
       end
     end
   end
