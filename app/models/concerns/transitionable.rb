@@ -152,6 +152,7 @@ module Transitionable
             id: dlrm.reviewer_id,
             name: dlrm.reviewer&.name,
             email: dlrm.reviewer&.email,
+            mobile_number: dlrm.reviewer&.mobile_number,
             active: dlrm.active,
             threshold: dlrm.threshold,
             action_taken: (dlrm.reviewer_id == dlrm.action_taken_by_id),
@@ -164,6 +165,7 @@ module Transitionable
               id: dlrm.taken_control_by_id,
               name: dlrm.taken_control_by&.name,
               email: dlrm.taken_control_by&.email,
+              mobile_number: dlrm.taken_control_by&.mobile_number,
               action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id),
               action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
 
