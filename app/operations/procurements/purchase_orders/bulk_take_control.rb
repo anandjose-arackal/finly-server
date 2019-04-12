@@ -15,7 +15,25 @@ class Procurements::PurchaseOrders::BulkTakeControl < Procurements::PurchaseOrde
   def validate
     if self.purchase_orders.empty?
       add_message :error, 'No Purchase Orders found'
+      return
     end
+
+    accept_po = []
+    self.purchase_orders.each do |purchase_order|
+      valid = (purchase_order.can_take_control?) ? true : false
+
+      if valid
+        accept_po << purchase_order.id
+      end
+    end
+ 
+    self.purchase_orders = self.purchase_orders.where(id: accept_po)
+
+    if self.purchase_orders.blank?
+      add_message :error, "None of the purchase orders are in a state to be in administrative control"
+      return
+    end
+
   end
 
   def process

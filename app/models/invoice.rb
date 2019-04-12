@@ -182,6 +182,7 @@ class Invoice < ApplicationRecord
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
   # validates :amount, presence: true
+
   validates :invoice_number, :format => {with: /\A[a-zA-Z0-9\/-]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:16}, :allow_blank => true
 
   scope :with_id, -> (id) {where id: id}
@@ -634,16 +635,16 @@ class Invoice < ApplicationRecord
   # end
 
   def can_approve?
-    processing?
+    processing? rescue false
   end
 
   def can_reject?
-    processing?
+    processing? rescue false
   end
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
-    processing? && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id).taken_control_by_id != user.id
+    (processing? rescue false) && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 
   private

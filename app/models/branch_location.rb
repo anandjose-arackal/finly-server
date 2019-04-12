@@ -25,7 +25,8 @@
 #
 
 class BranchLocation < ApplicationRecord
-  include SoftDeletable
+  include SoftDeletable, AncestrySupport
+
   has_ancestry
 
   belongs_to :company, optional: true
@@ -40,6 +41,8 @@ class BranchLocation < ApplicationRecord
 
   has_many :budget_rule_branch_location_mappings
   has_many :budget_rules, through: :budget_rule_branch_location_mappings
+
+  scope :with_ids, -> (ids) { where id: ids }
 
   def address
     address = ""
@@ -83,6 +86,12 @@ class BranchLocation < ApplicationRecord
       id: self.id,
       name: location_name,
     }
+  end
+
+  def as_json(options={})
+    args = {id: self.id}
+    args[:name] = options&.dig(:tree) ? location_name : name
+    args
   end
 
   def location_name

@@ -14,8 +14,15 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
   end
 
   def process
-    if self.procurement.destroy
-      add_message :success, "Successfully Deleted Procurement"
+    if self.procurement.po_revisions.present?
+      if self.purchase_order.destroy
+        add_message :success, "Successfully Deleted Purchase Order."
+        return
+      end
+    else       
+      if self.procurement.destroy
+        add_message :success, "Successfully Deleted Procurement"
+      end
     end
   end
 end

@@ -596,9 +596,9 @@ module Transitionable
         data = nil
         case role_name
         when :purchase_request_initiator, 'purchase_request_initiator'
-          data = []
+          data = role_based_initiator_associated_items(user, role_id)
         when :purchase_request_reviewer, 'purchase_request_reviewer'
-          data = []
+          data = role_based_reviewer_associated_items(user, role_id)
         when :purchase_order_initiator, 'purchase_order_initiator'
           data = PurchaseOrder.initiator_associated_items(user, role_id)
         when :purchase_order_reviewer, 'purchase_order_reviewer'

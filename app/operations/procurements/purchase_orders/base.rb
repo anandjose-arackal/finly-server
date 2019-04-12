@@ -27,10 +27,14 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         # document_reviewer_mappings: [:level_id, :reviewer_id]
         tax_amount_attributes: [:value, :currency_id],
         advance_amount_attributes: [:value, :currency_id],
+        purchase_request_item_attributes: [:id, :purchase_order_id],
         requested_advance_amount_attributes: [:value, :currency_id]
         # advance_payment_attributes: [:advance_amount],
         # document_reviewer_mappings: [:level_id, :reviewer_id]
         # tax_amount_attributes: [:value, :currency_id]
+        # purchase_request_items_attributes: [
+        #     :id, :item_id, :required_by_date, :purpose, :delivery_location_id, :quantity, :vendor_id, :_destroy, per_unit_estimated_amount_attributes: [:id, :value, :currency_id, :_destroy]
+        # ]
     )
   end
 end

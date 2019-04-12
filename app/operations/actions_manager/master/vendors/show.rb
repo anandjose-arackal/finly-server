@@ -1,7 +1,7 @@
 class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
   register_handle :vendor_show
   # register_actions %i( submit retract approve reject delete add_bank_account edit_bank_account delete_bank_account edit_vendor_details edit_attachment )
-  register_actions %i( submit retract approve reject delete edit )
+  register_actions %i( submit retract approve reject delete edit take_control return_control)
 
   def initialize(user=nil, params={})
     super

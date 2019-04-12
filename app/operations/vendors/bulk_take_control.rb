@@ -16,6 +16,23 @@ class Vendors::BulkTakeControl < Vendors::Base
     if self.vendors.empty?
       add_message :error, 'No vendors found'
     end
+
+    accept_vendor = []
+    self.vendors.each do |vendor|
+      valid = (vendor.can_take_control?) ? true : false
+
+      if valid
+        accept_vendor << vendor.id
+      end
+    end
+    self.vendors = self.vendors.where(id: accept_vendor)
+
+
+    if self.vendors.blank?
+      add_message :error, "None of the vendors are in a state to be in administrative control."
+      return
+    end
+
   end
 
   def process
@@ -25,4 +42,5 @@ class Vendors::BulkTakeControl < Vendors::Base
   def post_process
     add_message :success, "Taking control of multiple vendors (#{self.vendors.length})."
   end
+
 end

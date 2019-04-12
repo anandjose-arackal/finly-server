@@ -3,7 +3,7 @@ class BankTransfer::Users::GetManagers < BankTransfer::Users::Base
   attr_accessor :reviewers, :creditors
 
   def authorized_user_types
-    [:vendor_payment_admin, :company_admin]
+    [:vendor_payments_admin, :company_admin]
   end
 
   def pre_validate

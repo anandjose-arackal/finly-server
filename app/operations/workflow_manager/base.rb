@@ -42,6 +42,11 @@ class WorkflowManager::Base < BaseOperation
       end
     when 'BankPaymentRequest'
       self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new user, workflow_input
+      # self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
+    when 'PurchaseRequest'
+      self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestProvider.new user, workflow_input
+    when 'PurchaseRequestItem'
+      self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestItemProvider.new user, workflow_input
     when 'YesBankVendor'
       self.aasm_document = ::WorkflowManager::Aasm::YesBankVendorProvider.new user, workflow_input
     else

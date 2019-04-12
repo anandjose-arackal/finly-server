@@ -77,6 +77,14 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
     params.require(:bank_payment_request).permit(:description, :policy_id, :name)
   end
 
+  def validate_presence
+    if self.payment_request.blank? || (self.payment_request.company_id != user.company_id)
+      add_message :error, "Payment ticket not found!"
+      return false
+    end
+    true
+  end
+
   def record_not_present
     !validate_presence
   end

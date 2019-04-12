@@ -118,12 +118,16 @@ class PurchaseOrder < ApplicationRecord
   has_many :payments, as: :parent
 
   has_many :trails, as: :parent
+  has_many :purchase_request_items
+  has_many :purchase_request_item
+
+  has_many :quotations, dependent: :destroy
 
   belongs_to :bank_account, optional: true
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
 
-  accepts_nested_attributes_for :items, allow_destroy: true
+  accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
   accepts_nested_attributes_for :custom_fields
   # accepts_nested_attributes_for :requested_advance_amount
@@ -244,7 +248,7 @@ class PurchaseOrder < ApplicationRecord
   scope :filter_by_created_at, -> (created_at) {
     created_at = Date.parse(created_at).strftime('%Y-%m-%d')
     # where created_at: created_at
-    where("DATE(created_at) >= ?", created_at)
+    where("DATE(created_at) = ?", created_at)
   }
 
   scope :filter_status, -> (status_name) {
@@ -407,7 +411,7 @@ class PurchaseOrder < ApplicationRecord
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
-    processing? && user.vendor_payment_admin? && self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id
+    processing? && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 
   def advance_to_be_processed?
@@ -472,7 +476,8 @@ class PurchaseOrder < ApplicationRecord
         po_number: self.po_number,
         delivery_location: self.delivery_location.as_json,
         requested_advance_amount: self.requested_advance_amount&.value,
-        purchase_order_total: precision_value(self.balance_amount&.value)
+        purchase_order_total: precision_value(self.balance_amount&.value),
+        editable: false
         # balance_due: {
         #   value: precision_value(self.balance_amount&.value),
         #   id: self.balance_amount&.id,
@@ -486,6 +491,27 @@ class PurchaseOrder < ApplicationRecord
   def process_line_item_calculation(skip_adv_calculation = false)
     calculate_line_items(skip_adv_calculation)
   end
+
+  def associate_purchase_request_items(options, user)
+    filtered_item_ids = filter_purchase_request_item_ids(options, user)
+    PurchaseRequestItem.with_ids(filtered_item_ids).update_all(purchase_order_id: self.id) unless filtered_item_ids.blank?
+    copy_pr_item_to_po_item
+  end
+
+  def filter_purchase_request_item_ids(options, user)
+    item_ids = []
+    attributes = options.dig(:purchase_order, :purchase_request_items_attributes)
+    attributes.each do |key, value|
+      item_ids << attributes.dig(key, :id)
+    end
+    item_ids = item_ids.flatten.compact
+    if item_ids.present?
+      # Verify that item_ids belongs to the  company's PR
+      filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", item_ids).pluck("purchase_request_items.id")
+      return filtered_item_ids
+    end
+  end
+
 
   # def prepopulate_amounts
   #   populate_advance_amount
@@ -619,7 +645,11 @@ class PurchaseOrder < ApplicationRecord
         tds_amount = self.requested_advance_amount.value - new_advance_amount
         self.advance_tds_amount = Amount.create(value: tds_amount, currency_id: 1)
         final_advance_amount = self.requested_advance_amount.value - tds_amount
-        self.advance_amount.update(value: final_advance_amount)
+        if self.advance_amount.nil?
+          self.advance_amount = Amount.create(value: final_advance_amount, currency_id: 1)
+        else
+          self.advance_amount.update(value: final_advance_amount)
+        end
       end
 
     else
@@ -709,4 +739,24 @@ class PurchaseOrder < ApplicationRecord
     PurchaseOrder.where(id: user.procurements&.joins(:purchase_order)&.pluck("purchase_orders.id"))
   end
 
+  def copy_pr_item_to_po_item
+    if self.purchase_request_items.present?
+      self.purchase_request_items.each do |item|
+        po_item_params = build_params_from_pr_item(item)
+        create_purchase_order_item(po_item_params)
+      end
+    end
+  end
+
+  def build_params_from_pr_item(pr_item)
+    {
+      # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
+
+      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, purchase_request_item_id: pr_item.id
+    }
+  end
+
+  def create_purchase_order_item(parameters)
+    PurchaseOrderItem.create(parameters)
+  end
 end

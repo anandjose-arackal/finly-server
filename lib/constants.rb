@@ -13,6 +13,8 @@ module Constants
 
   OTP_RESEND_INTERVAL = 60
 
+  PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
+
   # todo - needs to be edited once we get the account details.
   if Rails.env.production?
     ITZCASH_EMAIL_ID = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'sabhishek@itzcash.com']
@@ -301,7 +303,11 @@ module Constants
   class Constants::YesBank
     PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN-PROCESS","IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
     FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY", "REQUEST NOT FOUND"]
-    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+    if Rails.env.production?
+      SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+    else
+      SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED", "SENT_TO_BENEFICIARY"]
+    end
 
     YES_BANK_RECEIVING_IFSC = "YESB0000022"
     YES_BANK_COLLECT_IFSC = 'YESB0CMSNOC'
