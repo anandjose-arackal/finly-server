@@ -478,7 +478,7 @@ module Transitionable
       forwarded_level_ids = DocumentLevelReviewerMapping.with_document_type(self.name).where(forwarded: true, forwarded_to_id: user.id).pluck(:level_id)
 
       if self.column_names.include? 'company_id'
-        document_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids)
+        document_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:id)
         # Find controlling level of all those documents
         controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
 
@@ -491,7 +491,7 @@ module Transitionable
         forwarded_controlling_level_ids = self.where(company_id: user.company_id).with_controlling_level_id(forwarded_level_ids).pluck(:controlling_level_id)
       else
         user_ids = user.company.users.pluck(:id)
-        document_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids)
+        document_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:id)
         # Find controlling level of all those documents
         controlling_level_ids = self.where("#{self.table_name}.#{self.document_owner_attribute} in (?)", user_ids).with_controlling_level_id(all_level_ids).pluck(:controlling_level_id)
 

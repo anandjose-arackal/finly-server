@@ -276,7 +276,6 @@ class PurchaseOrder < ApplicationRecord
       user_id = RequestStore.store[:current_user]&.id
     end
 
-
     if user_id.present?
       filter_user_id(user_id)
     end

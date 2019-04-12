@@ -188,7 +188,7 @@ class WorkflowManager::Aasm::BaseProvider
     end
 
     # :take_control and :return_control should remain in the same level
-    if [:take_control, :return_control].include?(aasm.current_event)
+    if [:take_control, :return_control, :forward].include?(aasm.current_event)
       self.new_level = self.current_level
     end
 

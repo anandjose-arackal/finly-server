@@ -208,5 +208,4 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     po_params["id"] = invoice.procurement.purchase_order.id rescue nil
     Procurements::PurchaseOrders::Show.(user, po_params).success? if po_params["id"].present?
   end
-
 end
