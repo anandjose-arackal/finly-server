@@ -152,6 +152,7 @@ json.reviewal_chains do
         json.level_number item[:level_number]
         json.level_name item[:level_name]
         json.level_id item[:level_id]
+        json.timestamp item[:timestamp]&.strftime("%Y-%m-%d  %H:%M:%s")
         if item[:selected_reviewer].present?
           json.selected_reviewer do
             json.reviewer_details item[:selected_reviewer].as_json

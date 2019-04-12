@@ -46,13 +46,16 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       if self.document.present?
         selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
         selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
+        timestamp = selected_reviewer_from_dlrm.first&.updated_at
       else
         selected_reviewer = nil
+        timestamp = nil
       end
       level_data = {
           level_number: level.level_number,
           level_id: level.id,
           level_name: level.name,
+          timestamp: timestamp,
           reviewers: mappings
       }
       if selected_reviewer.present?
