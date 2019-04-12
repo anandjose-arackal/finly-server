@@ -38,9 +38,11 @@ class PurchaseRequestItem < ApplicationRecord
   def update_estimated_amount
     quantity = self.quantity
     per_unit_price = self.per_unit_estimated_amount&.value
-    amount = Amount.create(currency_id: 1, value: quantity*per_unit_price) if quantity.present? && per_unit_price.present?
-    self.estimated_amount_id = amount.id
-    self.save
+    if quantity.present? && per_unit_price.present?
+      amount = Amount.create(currency_id: 1, value: quantity*per_unit_price)
+      self.estimated_amount_id = amount.id
+      self.save
+    end
   end
 
 end

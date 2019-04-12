@@ -65,6 +65,9 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
             if last_trail.action_id == TrailAction.id_for(:take_control)
               return true
             end
+            if last_trail.action_id == TrailAction.id_for(:submit)
+              return true
+            end
           end
         end
       end
