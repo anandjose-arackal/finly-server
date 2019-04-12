@@ -30,6 +30,14 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
     unless documents.pluck(:policy_id).uniq.compact.length == 1
       add_message :error, "Please select documents from one policy to see forwardable users"
     end
+
+    # Validate if all documents are awaiting action from current user
+    self.documents.each do |doc|
+      unless doc.get_reviewers.include?(user)
+        add_message :error, "You can only forward documents awaiting approval from you"
+        break
+      end
+    end
   end
 
   def process
