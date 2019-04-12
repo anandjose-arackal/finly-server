@@ -87,6 +87,11 @@ class BankTransfer::PaymentRequest::Review::BulkTakeControl < BankTransfer::Paym
       add_message :error, "None of the payment tickets are in a state to be in administrative control."
       return
     end
+
+    if self.bank_payment_requests.blank?
+      add_message :error, "None of the payment tickets are in a state to be in administrative control."
+      return
+    end
   end
 
   def process

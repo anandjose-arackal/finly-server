@@ -154,11 +154,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_q = item.quantity
         end
       end
-
     else
       real_q = item.quantity
     end
-
       invoice_items_attributes << {
           tax: item.tax,
           discount: item.discount,
@@ -224,6 +222,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       policy_id: self.purchase_order.policy_id,
       gstin_location_id: self.purchase_order.gstin_location_id
     }
+
     if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
         invoice_params[:po_advance] = self.po_advance
         invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
