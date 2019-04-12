@@ -206,6 +206,7 @@ module Transitionable
         if level.present?
           user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: false).pluck(:reviewer_id)
           user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(taken_control: true).pluck(:taken_control_by_id)
+          user_ids += self.document_level_reviewer_mappings.with_level_id(level.id).with_provider_name(provider_name).where(forwarded: true).pluck(:forwarded_to_id)
         end
       when 'unapprove', :unapprove
         user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last&.action_user_id
