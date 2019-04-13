@@ -202,6 +202,7 @@ class User < ApplicationRecord
 
   # P2P Documents
   has_many :purchase_orders
+  has_many :purchase_requests, foreign_key: :creator_id
 
   # Budgets
 
@@ -216,6 +217,7 @@ class User < ApplicationRecord
   has_many :level_user_reviewer_mappings
   alias_method :lurms, :level_user_reviewer_mappings
   has_many :procurement_attachments
+  has_many :attachments, foreign_key: :creator_id
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
@@ -1261,6 +1263,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
   end
 
+  def is_purchase_request_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_request_initiator), document)
+  end
+
   def is_purchase_request_reviewer?(document=nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
   end
@@ -1308,6 +1314,18 @@ class User < ApplicationRecord
 
   def vp_admin_or_auditor?
     self.vendor_payments_admin? || self.vendor_payments_auditor?
+  end
+
+  # locations associated with policies to which users are associated as initiator role
+  def initiator_associated_locations(role_id)
+    location_ids = company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ?', role_id).joins(:policy_location_mappings).pluck('policy_location_mappings.location_id')
+    return company.locations.with_ids(location_ids)
+  end
+
+  # departments associated with policies to which users are associated as initiator role
+  def initiator_associated_departments(role_id)
+    department_ids = company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ?', role_id).joins(:policy_department_mappings).pluck('policy_department_mappings.department_id')
+    return company.departments.with_ids(department_ids)
   end
 
   private

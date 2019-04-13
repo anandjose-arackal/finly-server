@@ -88,6 +88,7 @@ class Company < ApplicationRecord
   has_many :procurement_attachments
   has_many :document_number_configs
   has_many :purchase_orders
+  has_many :purchase_requests
   has_many :inward_documents # purchase order inward documents
   has_many :field_customizations, as: :scopable
 
@@ -97,6 +98,8 @@ class Company < ApplicationRecord
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
   has_many :bank_payment_requests
+  has_many :attachments, as: :resource, dependent: :nullify
+
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

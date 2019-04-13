@@ -18,6 +18,23 @@ class Procurements::Invoices::BulkApprove < Procurements::Invoices::Base
     if self.invoices.empty?
       add_message :error, 'No Invoices found'
     end
+
+    accept_invoice = []
+    self.invoices.each do |invoice|
+      valid = (invoice.can_approve?) ? true : false
+
+      if valid
+        accept_invoice << invoice.id
+      end
+    end
+ 
+    self.invoices = self.invoices.where(id: accept_invoice)
+
+    if self.invoices.blank?
+      add_message :error, "None of the invoices are in a state to be accepted."
+      return
+    end
+
   end
 
   def process

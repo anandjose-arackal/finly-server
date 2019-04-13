@@ -1,6 +1,6 @@
 class ActionsManager::Master::Vendors::Index < ActionsManager::Master::Base
   register_handle :vendors_index
-  register_actions %i( create )
+  register_actions %i( create bulk_actions )
 
 
   def create

@@ -81,6 +81,21 @@ json.items do
     end
   end
 end
+
+json.quotations do
+  json.array! @result.purchase_order.quotations do |quote|
+    json.merge! quote.as_json
+    json.attachments do
+      json.array! quote.attachments do |attachment|
+        json.extract! attachment, :id, :description
+        json.file_name attachment.file_file_name
+        json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
+        json.url attachment.file.url(:original, timestamp: false)
+      end
+    end
+  end
+end
+
 json.attachments do
   json.array! @result.purchase_order.attachments do |attachment|
     json.extract! attachment, :id, :description
@@ -137,6 +152,7 @@ json.reviewal_chains do
         json.level_number item[:level_number]
         json.level_name item[:level_name]
         json.level_id item[:level_id]
+        json.timestamp item[:timestamp]&.strftime("%Y-%m-%d  %H:%M:%s")
         if item[:selected_reviewer].present?
           json.selected_reviewer do
             json.reviewer_details item[:selected_reviewer].as_json
