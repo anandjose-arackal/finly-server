@@ -44,6 +44,11 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 			return
 		end	
 
+		if self.quotation_params[:selected].blank?
+	      add_message :error, "Please select, \"Yes\" or \"No\", whether or not if you are moving forward with this Quotation."
+	      return
+	    end
+
 		if StringUtils.to_bool(self.quotation_params[:selected].strip)
 	      if self.quotation_params[:note].blank? || (self.quotation_params[:note].length < 5)
 	        add_message :error, "Please supply a note as to why you are moving forward with this Quotation (Min 5 characters)."
@@ -56,15 +61,22 @@ class Procurements::PurchaseOrders::Quotations::Update < Procurements::PurchaseO
 	      return
 	    end
 
+	    if self.quotation_params[:total_amount].blank?
+	      add_message :error, "Please enter the total amount for this Quotation."
+	      return
+	    end
+
 	    unless validate_amount(self.quotation_params[:total_amount])
 	      add_message :error, "Invalid amount entered."
 	      return
 	    end 
 
-	    unless validate_amount(self.quotation_params[:advance_amount])
-	      add_message :error, "Invalid advance amount entered."
-	      return
-	    end 
+	    if self.quotation_params[:advance_amount].present?
+	      unless validate_amount(self.quotation_params[:advance_amount])
+	        add_message :error, "Invalid advance amount entered."
+	        return
+	      end
+	    end
 	
 	end
 

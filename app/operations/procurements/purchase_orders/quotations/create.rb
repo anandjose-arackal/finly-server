@@ -45,15 +45,22 @@ class Procurements::PurchaseOrders::Quotations::Create < Procurements::PurchaseO
       end      
     end
 
+    if self.quotation_params[:total_amount].blank?
+      add_message :error, "Please enter the total amount for this Quotation."
+      return
+    end
+
     unless validate_amount(self.quotation_params[:total_amount])
       add_message :error, "Invalid total amount entered."
       return
     end 
 
-    unless validate_amount(self.quotation_params[:advance_amount])
-      add_message :error, "Invalid advance amount entered."
-      return
-    end    
+    if self.quotation_params[:advance_amount].present?
+      unless validate_amount(self.quotation_params[:advance_amount])
+        add_message :error, "Invalid advance amount entered."
+        return
+      end
+    end
 
   end
 
