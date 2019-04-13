@@ -33,10 +33,11 @@ class Procurements::PurchaseOrders::Quotations::Index < Procurements::PurchaseOr
   end
 
   class Procurements::PurchaseOrders::Quotations::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :quotations
+    attr_accessor :quotations, :count
 
     def init
       self.quotations = params[:quotations]
+      self.count = self.quotations.count
     end
 
   end

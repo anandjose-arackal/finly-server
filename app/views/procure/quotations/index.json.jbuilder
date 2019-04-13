@@ -1,3 +1,4 @@
+json.count @result.count
 json.quotations do
   json.array! @result.quotations do |quote|
     json.merge! quote.as_json
