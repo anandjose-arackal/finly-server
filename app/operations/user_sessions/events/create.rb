@@ -33,6 +33,7 @@ class UserSessions::Events::Create < BaseOperation
 
   def process
     self.event.save
+    self.event.user_session.update(duration: Time.now - self.event.user_session.started_at)
   end
 
   def success
