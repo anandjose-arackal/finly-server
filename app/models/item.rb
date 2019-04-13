@@ -99,6 +99,7 @@ class Item < ApplicationRecord
       supply_item_type_id: supply_item_type_id,
       item_type: supply_item_type.as_json,
       product_type: product_type_id,
+      rate_contracts: associated_rate_contracts
     }
   end
 
@@ -129,5 +130,9 @@ class Item < ApplicationRecord
     purchase_order_items.each do |item|
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
     end
+  end
+
+  def associated_rate_contracts
+    rate_contracts.map(&:as_json)
   end
 end
