@@ -38,7 +38,7 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
     def init
       self.purchase_requests = params[:purchase_requests]
       self.purchase_requests = apply_scopes(purchase_requests, params) rescue ::PurchaseRequest.none
-      self.paginated_purchase_requests = purchase_requests.paginate(page: params[:page], per_page: 30) rescue ::PurchaseRequest.none
+      self.paginated_purchase_requests = purchase_requests.order(created_at: :desc).paginate(page: params[:page], per_page: 30) rescue ::PurchaseRequest.none
       self.count = purchase_requests&.count
     end
 

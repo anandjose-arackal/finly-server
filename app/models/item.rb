@@ -99,7 +99,7 @@ class Item < ApplicationRecord
       supply_item_type_id: supply_item_type_id,
       item_type: supply_item_type.as_json,
       product_type: product_type_id,
-      rate_contracts: associated_rate_contracts
+      rate_contract_vendors: rate_contract_vendors
     }
   end
 
@@ -132,7 +132,7 @@ class Item < ApplicationRecord
     end
   end
 
-  def associated_rate_contracts
-    rate_contracts.map(&:as_json)
+  def rate_contract_vendors
+    rate_contracts.joins(:vendor).map{|rate_contract| {vendor_id: rate_contract.vendor.id, vendor_name: rate_contract.vendor.name}}
   end
 end

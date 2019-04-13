@@ -24,7 +24,7 @@ class Procurements::PurchaseRequests::ApprovedItems < Procurements::PurchaseRequ
     def init
       approved_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where('purchase_request_items.status_id IN (?)', [PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved)]).pluck('purchase_request_items.id')
       approved_purchase_request_items = PurchaseRequestItem.with_ids(approved_item_ids)
-      self.paginated_items = approved_purchase_request_items.paginate(page: params[:page], per_page: 30) rescue nil
+      self.paginated_items = approved_purchase_request_items.order(created_at: :desc).paginate(page: params[:page], per_page: 30) rescue nil
       self.count = approved_purchase_request_items.count
     end
 
