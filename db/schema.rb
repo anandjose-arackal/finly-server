@@ -950,7 +950,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["booking_type_id"], name: "index_bookings_on_booking_type_id"
   end
 
-  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.string "gstin"
     t.string "pan"
@@ -1004,7 +1004,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["budget_id"], name: "index_budget_modification_trails_on_budget_id"
   end
 
-  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
@@ -1022,7 +1022,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["category_id"], name: "index_budget_rule_category_mappings_on_category_id"
   end
 
-  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "department_id", null: false
     t.datetime "created_at", null: false
@@ -1031,7 +1031,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["department_id"], name: "index_budget_rule_department_mappings_on_department_id"
   end
 
-  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "budget_rule_expense_type_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "budget_rule_id", null: false
     t.integer "expense_type_id", null: false
     t.datetime "created_at", null: false
@@ -1571,6 +1571,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.boolean "sso_enabled", default: false
     t.text "address"
     t.boolean "cash_money_requests_enabled", default: true
+    t.boolean "auto_retry_payment", default: false
     t.index ["company_id"], name: "index_company_configurations_on_company_id"
     t.index ["contact_id"], name: "index_company_configurations_on_contact_id"
   end
@@ -2103,7 +2104,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["vendor_id"], name: "index_delivery_challans_on_vendor_id"
   end
 
-  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.integer "company_id"
     t.datetime "created_at", null: false
@@ -3267,7 +3268,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id"
   end
 
-  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "level_user_reviewer_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "level_id"
     t.integer "user_id"
     t.integer "reviewer_id"
@@ -4359,6 +4360,8 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.string "account"
     t.integer "tax_rate_id"
     t.datetime "deleted_at"
+    t.datetime "submitted_at"
+    t.datetime "approved_at"
     t.string "unit_of_measurement"
     t.integer "purchase_request_item_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
@@ -4421,8 +4424,6 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.string "template_name"
     t.integer "resource_template_id"
     t.datetime "deleted_at"
-    t.datetime "submitted_at"
-    t.datetime "approved_at"
     t.integer "advance_amount_id"
     t.date "due_date"
     t.integer "advance_amount_status_id"
@@ -4505,16 +4506,16 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "location_id"
-    t.integer "department_id"
-    t.integer "policy_id"
-    t.integer "controlling_level_id"
-    t.integer "company_id"
     t.integer "purchase_request_status_id"
     t.text "note"
     t.integer "creator_id"
     t.datetime "submitted_at"
     t.datetime "approved_at"
+    t.integer "location_id"
+    t.integer "department_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
+    t.integer "company_id"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
   end
 
@@ -5106,6 +5107,23 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
 
+  create_table "tax_per_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "document_type"
+    t.bigint "document_id"
+    t.string "tax_rate_type"
+    t.bigint "tax_rate_id"
+    t.integer "cgst_id"
+    t.integer "sgst_id"
+    t.integer "igst_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cgst_id"], name: "index_tax_per_items_on_cgst_id"
+    t.index ["document_type", "document_id"], name: "index_tax_per_items_on_document_type_and_document_id"
+    t.index ["igst_id"], name: "index_tax_per_items_on_igst_id"
+    t.index ["sgst_id"], name: "index_tax_per_items_on_sgst_id"
+    t.index ["tax_rate_type", "tax_rate_id"], name: "index_tax_per_items_on_tax_rate_type_and_tax_rate_id"
+  end
+
   create_table "tax_rates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.decimal "rate", precision: 20, scale: 5
@@ -5115,6 +5133,9 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.decimal "cgst", precision: 10, scale: 5
+    t.decimal "sgst", precision: 10, scale: 5
+    t.decimal "igst", precision: 10, scale: 5
     t.index ["company_id"], name: "index_tax_rates_on_company_id"
   end
 
@@ -5492,7 +5513,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["user_id"], name: "index_user_balance_histories_on_user_id"
   end
 
-  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "user_branch_location_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "branch_location_id", null: false
     t.datetime "created_at", null: false
@@ -5909,7 +5930,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
 
-  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
@@ -6109,7 +6130,6 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.string "vendor_id"
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
-    t.string "vedor_code"
     t.boolean "msme_registered", default: false
     t.string "msme_registration_number"
     t.integer "status_id"
@@ -6117,6 +6137,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_013729) do
     t.integer "controlling_level_id"
     t.datetime "submitted_at"
     t.datetime "approved_at"
+    t.string "vedor_code"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
