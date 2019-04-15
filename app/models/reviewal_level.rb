@@ -36,7 +36,7 @@ class ReviewalLevel < ApplicationRecord
   scope :with_level_number, -> (number) { where level_number: number }
   scope :with_policy_ids, -> (ids) {where policy_id: ids}
   scope :with_policy_id, -> (ids) {where policy_id: ids}
-  scope :with_associted_entity_type, -> (associated_entity_type) { where associated_entity_type: associated_entity_type}
+  scope :with_associated_entity_type, -> (associated_entity_type) { where associated_entity_type: associated_entity_type}
 
   # alias_method :filter_associated_entity_type, :with_entity_type
   # alias_method :filter_policy, :with_policy_ids
@@ -86,7 +86,7 @@ class ReviewalLevel < ApplicationRecord
   private
 
   def reassign_level_numbers
-    levels = self.class.exclude_deleted.with_policy_ids(self.policy_id).with_associted_entity_type(self.associated_entity_type).where('level_number > ?', self.level_number)
+    levels = self.class.exclude_deleted.with_policy_ids(self.policy_id).with_associated_entity_type(self.associated_entity_type).where('level_number > ?', self.level_number)
     levels.each do |level|
       level.update(level_number: level.level_number - 1)
     end
