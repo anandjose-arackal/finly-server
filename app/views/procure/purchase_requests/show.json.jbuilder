@@ -58,13 +58,12 @@ json.result do
             json.id line_item&.per_unit_estimated_amount_id
           end
           json.attachment_attributes do
-            json.array!(line_item.attachment) do |attachment|
-              json.uid attachment.id
-              json.name attachment&.file_file_name
-              json.url attachment&.attachment&.url
-              # As required by frontend
-              json.status 'done'
-            end unless line_item.attachment.blank?
+            json.uid line_item.attachment.id
+            json.name line_item.attachment&.file_file_name
+            json.url line_item.attachment&.attachment&.url
+            # As required by frontend
+            json.status 'done'
+          end unless line_item.attachment.blank?
           end
         end
       else
