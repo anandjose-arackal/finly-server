@@ -112,7 +112,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:unit_of_measurement)
 
-    if arr.include? nil
+    if arr.collect {|a| a.blank?}.include? true
       add_message :error, "Please mention the Unit of Measurement for the items supplied."
       return
     end
