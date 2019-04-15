@@ -281,7 +281,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def last_level?
     if purchase_order.processing?
-      purchase_order.get_reviewal_chain&.last[:level_number] == purchase_order.level&.level_number
+      purchase_order.get_reviewal_chain&.last&.dig(:level_number) == purchase_order.level&.level_number
     end
   end
 

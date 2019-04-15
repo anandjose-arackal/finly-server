@@ -32,6 +32,8 @@ class Procurements::PurchaseRequests::IssueFromInventory < Procurements::Purchas
           unless purchase_request_item.save
             raise
           end
+          # If all PR items are issued from inventory/rejected, close the PR
+          close_purchase_request(item_id)
         end
       end
     rescue
@@ -42,5 +44,23 @@ class Procurements::PurchaseRequests::IssueFromInventory < Procurements::Purchas
 
   def post_process
     add_message :success, "Successfully issued from inventory"
+  end
+
+  protected
+
+  def close_purchase_request(item_id)
+    purchase_request = PurchaseRequestItem.find_by(id: item_id).purchase_request
+    # Check if all statuses are issued from inventory or approved
+    # if purchase_request.purchase_request_items.pluck(:status_id).uniq.sum == [PurchaseRequestItemStatus.id_for(:issued_from_inventory), PurchaseRequestItemStatus.id_for(:rejected)].sum
+    if purchase_request.purchase_request_items.where.not(status_id: [PurchaseRequestItemStatus.id_for(:issued_from_inventory), PurchaseRequestItemStatus.id_for(:rejected)]).blank?
+      params[:document] = purchase_request
+      params[:aasm_event] = 'close'
+      op = WorkflowManager::Base.(user, params)
+      unless op.success?
+        # Break and rollback if anything fails
+        raise
+      end
+      self.workflow_output = op.workflow_output
+    end
   end
 end
