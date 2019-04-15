@@ -18,7 +18,7 @@
 #
 
 class Gstin < ApplicationRecord
-  serialize :reminders, Hash
+  serialize :api_response, Hash
   scope :with_gstin, -> (gstin) {where gstin: gstin}
 end
 

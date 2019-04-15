@@ -3565,6 +3565,7 @@ Rails.application.routes.draw do
 
   ######## Dashboards ##################
   namespace :dashboards do
+    get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
     get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
     get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'

@@ -141,6 +141,14 @@ class UserRole < ApplicationRecord
     VALUES[role]
   end
 
+  def self.ids_for(*roles)
+    role_ids = []
+    roles.each do |role|
+      role_ids << self.id_for(role)
+    end
+    role_ids.compact
+  end
+
   def self.name_for(role_id)
     case RequestStore.store[:current_app]
       when 'em', :em
