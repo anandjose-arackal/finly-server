@@ -58,12 +58,11 @@ json.result do
             json.id line_item&.per_unit_estimated_amount_id
           end
           json.attachment_attributes do
-            json.uid line_item.attachment.id
+            json.uid line_item.attachment&.id
             json.name line_item.attachment&.file_file_name
             json.url line_item.attachment&.attachment&.url
             # As required by frontend
             json.status 'done'
-          end unless line_item.attachment.blank?
           end
         end
       else
