@@ -21,7 +21,7 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
       pr_attachment_ids = get_attachment_ids(params)
       # line_item_attachment_ids = get_line_item_attachment_ids(params)
 
-      Attachment.update_resource({ids: pr_attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
+      Attachment.update_resource({ids: pr_attachment_ids, resource_id: self.purchase_request.id, user: user}) if pr_attachment_ids.present?
       # Update for line item attachment
       # Attachment.update_resource({ids: line_item_attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
       # Update all estimated amount in the line item
