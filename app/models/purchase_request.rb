@@ -16,7 +16,9 @@
 
 class PurchaseRequest < ApplicationRecord
   include Transitionable
-  # include Sequenced::ActsAsSequenced
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR-'
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
@@ -44,6 +46,33 @@ class PurchaseRequest < ApplicationRecord
   scope :filter_by_status_id,  -> (status_id) { where purchase_request_status_id: status_id }
   scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
   scope :not_draft, -> { where purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
+
+  scope :with_ids, -> (ids) { where id: ids }
+
+
+  scope :filter_by_location_id, -> (id) {
+    where location_id: id
+  }
+
+  scope :filter_by_department_id, -> (id) {
+    where department_id: id
+  }
+
+  scope :filter_by_title, -> (description) {
+    where description: description
+  }
+
+  scope :filter_by_request_id, -> (id) {
+    where id: id
+  }
+
+  scope :filter_by_date_range, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
+  }
 
   def add_company
     self.company_id = self.creator.company_id

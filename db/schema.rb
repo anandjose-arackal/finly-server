@@ -4517,6 +4517,8 @@ ActiveRecord::Schema.define(version: 2019_04_13_102857) do
     t.integer "creator_id"
     t.datetime "submitted_at"
     t.datetime "approved_at"
+    t.string "order_number"
+    t.index ["order_number"], name: "index_purchase_requests_on_order_number"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
   end
 

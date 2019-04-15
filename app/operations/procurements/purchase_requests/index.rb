@@ -34,6 +34,11 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
 
     has_scope :filter_by_status_id
     has_scope :search_by_email
+    has_scope :filter_by_date_range, using: [:from, :to], type: :hash
+    has_scope :filter_by_request_id
+    has_scope :filter_by_title
+    has_scope :filter_by_department_id
+    has_scope :filter_by_location_id
 
     def init
       self.purchase_requests = params[:purchase_requests]
