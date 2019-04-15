@@ -18,8 +18,12 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
     self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
     #Update purchase request line items state to :draft
     if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft))
-      attachment_ids = get_attachment_ids(params)
-      Attachment.update_resource({ids: attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
+      pr_attachment_ids = get_attachment_ids(params)
+      # line_item_attachment_ids = get_line_item_attachment_ids(params)
+
+      Attachment.update_resource({ids: pr_attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
+      # Update for line item attachment
+      # Attachment.update_resource({ids: line_item_attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
       # Update all estimated amount in the line item
       purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
 
@@ -58,10 +62,20 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
 
   protected
   
+
+  # TODO - add dynamic method
   def get_attachment_ids(params)
     if params.dig(:purchase_request, :attachments_attributes).present?
       attachment_ids = []
       params.dig(:purchase_request, :attachments_attributes).each{ |k, v| attachment_ids << v[:id] }
+      return attachment_ids
+    end
+  end
+
+  def get_line_item_attachment_ids(params)
+    if params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).present?
+      attachment_ids = []
+      params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).each{ |k, v| attachment_ids << v[:id] }
       return attachment_ids
     end
   end

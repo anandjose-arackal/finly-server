@@ -26,7 +26,9 @@ class Procurements::PurchaseRequests::Base < BaseOperation
         :policy_id,
         purchase_request_items_attributes: [
             :id, :item_id, :required_by_date, :purpose, :delivery_location_id, :quantity, :vendor_id, :_destroy, per_unit_estimated_amount_attributes: [:id, :value, :currency_id, :_destroy, :rejected]
-        ]
+        ],
+        attachment_attributes: [
+          :id, :resource_id, :resource_type, :file_file_name, :file_file_size, :file_content_type, :file_updated_at, :description]
     )
   end
 
