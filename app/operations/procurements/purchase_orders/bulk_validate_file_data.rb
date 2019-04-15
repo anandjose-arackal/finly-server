@@ -94,6 +94,12 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         self.issue_item[:rate] = "Rate entered has non-numeric characters."
       end
 
+      if unit_of_measurement.blank?
+        self.valid = false
+        self.error_messages << "Unit of Measurement for the item has not been provided."
+        self.issue_item[:unit_of_measurement] = "Unit of Measurement for the item has not been provided."
+      end
+
       if quantity.blank?
         self.valid = false
         self.error_messages << "Please input the quantity."
