@@ -1,6 +1,11 @@
 class Procure::QuotationsController < ApplicationController
   before_action -> {finly_authorize! :web}
 
+  def index
+    @result = Procurements::PurchaseOrders::Quotations::Index.(current_user, params)
+    respond
+  end
+
   def create
     @result = Procurements::PurchaseOrders::Quotations::Create.(current_user, params)
     respond
