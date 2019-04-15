@@ -6,6 +6,7 @@ if @result.valid_response
 
     json.response @result.gstin_master.api_response
     json.match_percentile @result.match_percentile
+    json.trade_name_match_percentile @result.trade_name_match_percentile
   end
 else
   json.result do

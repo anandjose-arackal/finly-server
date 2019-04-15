@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_11_122238) do
+ActiveRecord::Schema.define(version: 2019_04_15_113316) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2778,6 +2778,7 @@ ActiveRecord::Schema.define(version: 2019_04_11_122238) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "address"
+    t.string "trade_name"
   end
 
   create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -6115,7 +6116,6 @@ ActiveRecord::Schema.define(version: 2019_04_11_122238) do
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.string "vedor_code"
-    t.boolean "active", default: true
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"

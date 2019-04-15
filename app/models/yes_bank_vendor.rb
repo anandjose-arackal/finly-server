@@ -84,7 +84,7 @@ class YesBankVendor < ApplicationRecord
   has_many :budget_trails, as: :vendor
 
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :deactivated?, to: :status
 
   accepts_nested_attributes_for :bank_accounts, allow_destroy: true
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
@@ -101,6 +101,7 @@ class YesBankVendor < ApplicationRecord
   scope :non_deleted, -> {where deleted_at: nil}
   scope :authorized, -> { where authorized: true}
   scope :approved, -> {where status_id: [VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved)]}
+  scope :filter_active, -> { where.not(status_id: VendorStatus.id_for(:deactivated))}
 
   scope :non_draft, -> {where.not(status_id: VendorStatus.id_for(:draft))}
 
