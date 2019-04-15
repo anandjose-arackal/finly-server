@@ -27,7 +27,7 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :purchase_order, optional: true
   has_many :attachments, as: :resource, dependent: :destroy
 
-  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachments, allow_destroy: true
 
@@ -49,7 +49,7 @@ class PurchaseRequestItem < ApplicationRecord
   }
 
   scope :location_id, -> (id) {
-    where location_id: id
+    where delivery_location_id: id
   }
 
   scope :order_number, -> (order_number) {

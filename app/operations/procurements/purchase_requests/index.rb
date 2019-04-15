@@ -12,7 +12,7 @@ class Procurements::PurchaseRequests::Index < Procurements::PurchaseRequests::Ba
     if user.vp_admin_or_auditor?
       admin_restricted_status_ids = [PurchaseRequestStatus.id_for(:draft)]
       # self.purchase_requests = user.company.purchase_requests.with_ids(::PurchaseRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids}) )
-      self.purchase_requests = ::PurchaseRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids})&.not_draft
+      self.purchase_requests = ::PurchaseRequest.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids})
       self.purchase_requests = user.purchase_requests.or(purchase_requests)
       return
     end

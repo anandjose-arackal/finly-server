@@ -39,6 +39,9 @@ class PolicyUserRoles::Create < PolicyUserRoles::Base
         
         user_added += 1 if policy_user_role.save
       else
+        policy_user_role = self.policy.policy_user_roles.new({user_role_id: role_id, user_id: added_user.id})
+        policy_user_role.save
+
         if added_user.role_mapping.with_role_id(self.role_id).present?
           user_added += 1
         else

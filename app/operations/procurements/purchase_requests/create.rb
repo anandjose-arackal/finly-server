@@ -6,6 +6,10 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   end
 
   def validate
+    unless user.is_purchase_request_initiator?
+      add_message :error, 'You do not have permission for this action'
+      return
+    end
   end
 
   def process

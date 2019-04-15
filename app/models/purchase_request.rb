@@ -45,7 +45,7 @@ class PurchaseRequest < ApplicationRecord
 
   scope :filter_by_status_id,  -> (status_id) { where purchase_request_status_id: status_id }
   scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
-  scope :not_draft, -> { where purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
+  scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
   scope :with_ids, -> (ids) { where id: ids }
 
@@ -83,7 +83,7 @@ class PurchaseRequest < ApplicationRecord
   def as_json
     {
       id: self.id,
-      purchase_request_number: self.id,
+      purchase_request_number: self.order_number,
       description: self.description,
       location_attributes: {id: self.location_id, name: self.location&.name},
       department_attributes: {id: self.department_id, name: self.department&.name},
@@ -155,7 +155,7 @@ class PurchaseRequest < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if (UserRole.id_for(:purchase_request_initiator) == role_id.to_i)
-          statuses += [:open, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :issued_from_inventory]
+          statuses += [:draft, :retracted, :awaiting_approval, :approved, :rejected, :auto_approved, :issued_from_inventory]
         elsif (UserRole.id_for(:purchase_request_reviewer) == role_id.to_i)
           statuses += [:awaiting_approval, :approved, :auto_approved, :issued_from_inventory]
         end

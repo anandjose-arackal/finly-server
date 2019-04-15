@@ -1,6 +1,7 @@
 json.result do
   json.purchase_request do
     json.id @result.purchase_request.id
+    json.purchase_request_number @result.purchase_request.order_number
     json.description @result.purchase_request&.description
     json.note @result.purchase_request&.note
     # json.total_amount @result.purchase_request.calculate_total_amount
