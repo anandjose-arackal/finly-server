@@ -12,11 +12,12 @@ class Export::MoneyRequest::AsXml < Export::MoneyRequest::Base
 
   def init
     index_presenter = ::MoneyRequests::Index.(user, params)
-    id = (params[:money_request_id] or params[:money_requests_ids]).split(',') rescue nil
+    id = (params[:money_request_id] or params[:money_requests_id]).split(',') rescue nil
     self.money_requests = index_presenter&.money_requests.include_details
     if id.present?
       self.money_requests = self.money_requests&.with_id(id)
     end
+    self.default_column_names = header
   end
 
   def authorize

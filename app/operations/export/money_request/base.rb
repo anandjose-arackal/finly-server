@@ -3,12 +3,12 @@ class Export::MoneyRequest::Base < Export::Base
 
 
   class Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :data, :header, :report_names
+    attr_accessor :data, :header, :money_request_name
 
     def init
       self.data = params[:data]
       self.header = params[:header]
-      self.report_names = params[:report_names]
+      self.money_request_name = params[:money_request_name]
     end
   end
 
@@ -22,9 +22,10 @@ class Export::MoneyRequest::Base < Export::Base
     data_arr = []
     data_arr << money_request.id
     data_arr << money_request.name
+    data_arr << money_request.user.first_name
     data_arr << money_request.status&.name
-    data_arr << money_request.submitted_amount&.currency
-    data_arr << money_request.submitted_amount&.value
+    data_arr << money_request.base_currency&.country_code
+    data_arr << money_request.total_amount
     data_arr << money_request.processed_amount&.currency
     data_arr << money_request.processed_amount&.value
     data_arr << money_request.required_by_date
@@ -35,7 +36,7 @@ class Export::MoneyRequest::Base < Export::Base
   end
 
   def header
-    %w(ID Name User Status Submitted\ Amount\ Currency Submitted Amount Processed \ Amount\ Currency Processed\ Amount Required\ By\ Date Purpose Destination\ Account Payment\ Type)
+    %w(ID Name User Status Requested\ Amount\ Currency Requested\ Amount Processed\ Amount\ Currency Processed\ Amount Required\ By\ Date Purpose Destination\ Account Payment\ Type)
   end
 
 end

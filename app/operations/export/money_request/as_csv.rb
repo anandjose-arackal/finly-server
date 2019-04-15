@@ -12,7 +12,7 @@ class Export::MoneyRequest::AsCsv < Export::MoneyRequest::Base
 
   def init
     index_presenter = ::MoneyRequests::Index.(user, params)
-    id = (params[:money_request_id_id] or params[:money_request_ids]).split(',') rescue nil
+    id = (params[:money_request_id] or params[:money_request_id]).split(',') rescue nil
     self.money_request = index_presenter&.money_requests.include_details
     if id.present?
       self.money_request = self.money_request&.with_id(id)
@@ -44,7 +44,7 @@ class Export::MoneyRequest::AsCsv < Export::MoneyRequest::Base
   end
 
   def success
-    Export::Base::ExportPresenter.new(user, {data: result, money_request_name: money_request_name}, messages)
+    Export::Base::ExportPresenter.new(user, {data: result, money_request_name: self.money_request_name}, messages)
   end
 
 end
