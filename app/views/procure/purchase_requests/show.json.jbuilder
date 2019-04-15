@@ -60,7 +60,7 @@ json.result do
           json.attachment_attributes do
             json.uid line_item.attachment&.id
             json.name line_item.attachment&.file_file_name
-            json.url line_item.attachment&.attachment&.url
+            json.url line_item.attachment&.file&.url
             # As required by frontend
             json.status 'done'
           end
