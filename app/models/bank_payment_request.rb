@@ -141,7 +141,7 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-  scope :include_for_index, -> {includes({payment_order: [:payment_order_status, :initiating_user,
+scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
                                                           {payments: [
                                                               {amount: [:currency]},
                                                               {receiving_account: :account_owner}, :payment_status, :reference_resource,
@@ -284,7 +284,8 @@ class BankPaymentRequest < ApplicationRecord
     # work with this method, dont want to modify the older method since,
     # it is used other places and dont want to modify unless sure if this check works in other ppls work.
     user = user.present? ? user : RequestStore.store[:current_user]
-    processing? && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
+    return false if self.action_users(:approve).include?(user)
+    processing? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
   end
 
   # def can_return_control?

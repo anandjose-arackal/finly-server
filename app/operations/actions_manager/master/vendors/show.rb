@@ -54,7 +54,7 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
     # check for the current level if it isn't taken control
     # check if the same user is not taking control twice
     # check if for the same level if any other user has also taken control
-    (vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id != user.id)
+    (vendor.dlrms&.find_by(level_id: vendor.level&.id).taken_control_by_id != user.id) && !vendor.action_users(:approve).include?(user)
   end
 
   def user_can_return_control?

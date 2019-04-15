@@ -80,7 +80,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
       if (invoice.processing? && invoice.get_reviewers.exclude?(user))
         return true
       end
-      if invoice.processing? && !invoice.action_users(:return_control).include?(user) && invoice.action_users(:approve).include?(user)
+      if invoice.processing? && !invoice.action_users(:return_control).include?(user) && !invoice.action_users(:approve).include?(user)
         return true
       end
     end
