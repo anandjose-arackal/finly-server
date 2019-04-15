@@ -691,6 +691,7 @@
 #                                                         PUT    /reports/:id(.:format)                                                                                              reports#update
 #                                                         DELETE /reports/:id(.:format)                                                                                              reports#destroy
 #                                           export_report GET    /export/report(.:format)                                                                                            export#report
+# #                                           export_request GET    /export/request(.:format)                                                                                            export#report
 #                                  export_templates_index GET    /export/templates/index(.:format)                                                                                   export#index_template
 #                                                         GET    /export/templates/:template_key(.:format)                                                                           export#export_template
 #                                          report_comment POST   /reports/:report_id/comment(.:format)                                                                               reports#comment
@@ -2697,6 +2698,7 @@ Rails.application.routes.draw do
   get 'export/report(.:format)' => 'export#report', as: :export_report
   get 'export/templates/index' => 'export#index_template'
   get 'export/templates/:template_key' => 'export#export_template'
+  get 'export/money_request(.:format)' => 'export#money_request', as: :export_money_request
 
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
