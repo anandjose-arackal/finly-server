@@ -34,7 +34,7 @@ class Vendors::Submit < Vendors::Base
     else
       add_message :success, "Vendor Submitted for Approval"
     end
-    Event::EVendors::Submit.(user, document: document)
+    Event::EVendors::Submit.(user, document: self.vendor)
   end
 
   def success

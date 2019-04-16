@@ -15,6 +15,6 @@ class Vendors::Retract < Vendors::Base
 
   def post_process
     add_message :success, "Submitted vendor for approval"
-    Event::EVendors::Retract.(user, document: document)
+    Event::EVendors::Retract.(user, document: self.vendor)
   end
 end

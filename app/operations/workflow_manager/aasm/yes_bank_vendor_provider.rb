@@ -3,8 +3,9 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     state :draft, initial: true, :before_enter => :set_state
     state :approved
     state :awaiting_approval
-    state :authorized
+    # state :authorized
     state :rejected
+    state :retracted
     state :auto_approved
     state :deactivated
     # todo add unapprove etc
