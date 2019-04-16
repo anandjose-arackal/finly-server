@@ -7,14 +7,14 @@
      end
    end
 
+   def user_model
+     [User, AdminUser]
+   end
+
    def init
      self.company = params[:company_id]
      self.file = params[:file]
      self.result_hash = {}
-     if file.present?
-       self.sheet = ImportUtil.open_spreadsheet(file)
-       self.header = sheet.row(1)
-     end
    end
 
    def validate

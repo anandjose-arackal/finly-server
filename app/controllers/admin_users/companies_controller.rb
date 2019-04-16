@@ -63,6 +63,21 @@ class AdminUsers::CompaniesController < ApplicationController
     @company_types = CompanyType.all
   end
 
+  def import_lrm
+    import_op = Policy::ApprovalWorkflows::Configs::ImportLevels.new(current_user, params)
+    @result = import_op.run
+      @response = {
+          success: true,
+          file_url: @result.file_url,
+          messages: @result.messages
+      }
+      respond_to do |format|
+        format.json {
+          render json: @response.as_json
+        }
+      end
+  end
+
   private
 
 
