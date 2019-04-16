@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_13_102857) do
+ActiveRecord::Schema.define(version: 2019_04_15_132348) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -4487,6 +4487,7 @@ ActiveRecord::Schema.define(version: 2019_04_13_102857) do
     t.integer "purchase_order_id"
     t.boolean "rejected"
     t.string "unit_of_measurement"
+    t.string "reject_note"
     t.index ["approved"], name: "index_purchase_request_items_on_approved"
     t.index ["delivery_location_id"], name: "index_purchase_request_items_on_delivery_location_id"
     t.index ["estimated_amount_id"], name: "index_purchase_request_items_on_estimated_amount_id"
