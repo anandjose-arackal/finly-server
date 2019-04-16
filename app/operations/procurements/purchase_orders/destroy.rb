@@ -6,14 +6,16 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
     self.purchase_order = user.company.purchase_orders.find_by id: purchase_order_id
     self.procurement = self.purchase_order.procurement
 
-    if is_approve?
-      self.po_previous_status = PurchaseOrderStatus.id_for(:approved)
+    if self.procurement.po_revisions.present?
+      if is_approve?
+        self.po_previous_status = PurchaseOrderStatus.id_for(:approved)
 
-    elsif is_auto_approve?
-      self.po_previous_status = PurchaseOrderStatus.id_for(:auto_approved)
+      elsif is_auto_approve?
+        self.po_previous_status = PurchaseOrderStatus.id_for(:auto_approved)
 
-    elsif is_send_to_vendor?
-      self.po_previous_status = PurchaseOrderStatus.id_for(:sent_to_vendor)
+      elsif is_send_to_vendor?
+        self.po_previous_status = PurchaseOrderStatus.id_for(:sent_to_vendor)
+      end
     end
         
         
