@@ -107,7 +107,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
       if purchase_order.processing?
         return true
       end
-      if (!purchase_order.sent_to_vendor? && !purchase_order.closed? && !purchase_order.voided?)
+      if (purchase_order.approved? || purchase_order.auto_approved?) && (!purchase_order.sent_to_vendor? && !purchase_order.closed? && !purchase_order.voided?)
         return true
       end
     end
