@@ -64,6 +64,9 @@ json.items do
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
+    
+    json.item_number item.inventory_line_item&.item_number rescue nil
+
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
       json.id item.tax_amount&.id
