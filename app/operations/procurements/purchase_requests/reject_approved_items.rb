@@ -2,8 +2,8 @@ class Procurements::PurchaseRequests::RejectApprovedItems < Procurements::Purcha
   attr_accessor :purchase_requests, :purchase_request_items
 
   def init
-    item_ids = params[:item_ids] || params[:ids]
 
+    item_ids = params[:item_ids][0].split(',') || params[:ids]
     unless item_ids.is_a?(Array)
       add_message :error, 'Invalid configuration'
       return
