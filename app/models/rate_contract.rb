@@ -48,7 +48,7 @@ class RateContract < ApplicationRecord
     where name: contract_name
   }
 
-  def as_json
+  def as_json(options={})
     {
       id: id,
       rate_contract_number: rate_contract_number,
@@ -80,5 +80,6 @@ class RateContract < ApplicationRecord
   def add_company
     self.company_id = self.creator.company_id
   end
+
 
 end

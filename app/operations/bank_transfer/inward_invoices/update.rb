@@ -88,29 +88,53 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice_params[:transaction_service_period_from].present?
-      split_date = self.inward_invoice_params[:transaction_service_period_from].split("/") # frontend sends in the format, mm/yyyy
-      formatted_month = split_date.first
-      formatted_year = split_date.last
-      unless is_valid_year?(formatted_year) && is_valid_month?(formatted_month)
+      # split_date = self.inward_invoice_params[:transaction_service_period_from].split("/") # frontend sends in the format, mm/yyyy
+      # formatted_month = split_date.first
+      # formatted_year = split_date.last
+      # unless is_valid_year?(formatted_year) && is_valid_month?(formatted_month)
+      #   add_message :error, "Invalid Date."
+      #   return
+      # end
+      # self.inward_invoice_params[:transaction_service_period_from] = Date.new(formatted_year.to_i, formatted_month.to_i)
+
+
+      date = self.inward_invoice_params[:transaction_service_period_from]
+      valid_date = Date.parse(date) rescue false
+
+      unless valid_date
         add_message :error, "Invalid Date."
         return
       end
-      self.inward_invoice_params[:transaction_service_period_from] = Date.new(formatted_year.to_i, formatted_month.to_i)
+
     end
 
     # To be introduced later
-    # if self.inward_invoice_params[:transaction_service_period_to].present?
-    #   split_date = self.inward_invoice_params[:transaction_service_period_to].split("/")
-    #   formatted_month = split_date.first
-    #   formatted_year = split_date.last
-    #   unless is_valid_year?(formatted_year) && is_valid_month?(formatted_month)
-    #     add_message :error, "Invalid Date."
-    #     return
-    #   end
-    #   self.inward_invoice_params[:transaction_service_period_to] = Date.new(formatted_year.to_i, formatted_month.to_i)
-    # end
+    if self.inward_invoice_params[:transaction_service_period_to].present?
+      # split_date = self.inward_invoice_params[:transaction_service_period_to].split("/")
+      # formatted_month = split_date.first
+      # formatted_year = split_date.last
+      # unless is_valid_year?(formatted_year) && is_valid_month?(formatted_month)
+      #   add_message :error, "Invalid Date."
+      #   return
+      # end
+      # self.inward_invoice_params[:transaction_service_period_to] = Date.new(formatted_year.to_i, formatted_month.to_i)
 
+      date = self.inward_invoice_params[:transaction_service_period_to]
+      valid_date = Date.parse(date) rescue false
 
+      unless valid_date
+        add_message :error, "Invalid Date."
+        return
+      end
+
+    end
+
+    arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:unit_of_measurement)
+
+    if arr.collect {|a| a.blank?}.include? true
+      add_message :error, "Please mention the Unit of Measurement for the items supplied."
+      return
+    end
   end
 
   def pre_process

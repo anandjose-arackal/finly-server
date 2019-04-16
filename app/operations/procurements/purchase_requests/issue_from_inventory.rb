@@ -18,15 +18,6 @@ class Procurements::PurchaseRequests::IssueFromInventory < Procurements::Purchas
     begin
       ActiveRecord::Base.transaction do
         item_ids.each do |item_id|
-          # params[:document] = company.purchase_requests.joins(:purchase_request_items).where('purchase_request_items.id = ?', item_id)
-          # params[:document] = PurchaseRequestItem.find_by_id item_id
-          # params[:aasm_event] = 'issue_from_inventory'
-          # op = WorkflowManager::Base.(user, params)
-          # unless op.success?
-          #   # Break and rollback if anything fails
-          #   raise
-          # end
-          # self.workflow_output = op.workflow_output
           purchase_request_item = PurchaseRequestItem.find_by_id item_id
           purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(:issued_from_inventory)
           unless purchase_request_item.save
@@ -51,7 +42,6 @@ class Procurements::PurchaseRequests::IssueFromInventory < Procurements::Purchas
   def close_purchase_request(item_id)
     purchase_request = PurchaseRequestItem.find_by(id: item_id).purchase_request
     # Check if all statuses are issued from inventory or approved
-    # if purchase_request.purchase_request_items.pluck(:status_id).uniq.sum == [PurchaseRequestItemStatus.id_for(:issued_from_inventory), PurchaseRequestItemStatus.id_for(:rejected)].sum
     if purchase_request.purchase_request_items.where.not(status_id: [PurchaseRequestItemStatus.id_for(:issued_from_inventory), PurchaseRequestItemStatus.id_for(:rejected)]).blank?
       params[:document] = purchase_request
       params[:aasm_event] = 'close'

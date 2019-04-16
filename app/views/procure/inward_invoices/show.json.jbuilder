@@ -54,7 +54,8 @@ json.invoice do
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id
 
-  json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%m-%Y')
+  json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%m/%Y')
+  json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%m/%Y')
 
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
@@ -129,6 +130,8 @@ json.invoice do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
                     :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id
+
+      json.item_number item.inventory_line_item&.item_number rescue nil
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
