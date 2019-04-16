@@ -43,7 +43,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
 
   def retract
     if document_owner?
-      if (purchase_request.awaiting_approval? || purchase_request.approved?) && !purchase_request.closed?
+      if purchase_request.awaiting_approval? && !purchase_request.closed?
         return true
       end
     end
