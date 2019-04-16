@@ -87,6 +87,13 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
+    arr = self.purchase_order_params[:items_attributes].pluck(:unit_of_measurement)
+
+    if arr.collect {|a| a.blank?}.include? true
+      add_message :error, "Please mention the Unit of Measurement for the items supplied."
+      return
+    end
+
     if self.department.blank?
       add_message :error, "Please select a department"
     end

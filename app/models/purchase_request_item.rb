@@ -25,15 +25,37 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :status, optional: true, class_name: 'PurchaseRequestItemStatus', foreign_key: :status_id
   belongs_to :purchase_order, optional: true
-  has_many :attachments, as: :resource, dependent: :destroy
+  has_one :attachment, as: :resource, dependent: :destroy
 
-  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, presence: true
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
 
-  accepts_nested_attributes_for :per_unit_estimated_amount, :attachments, allow_destroy: true
+  accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 
   scope :with_ids, -> (ids) { where id: ids }
   scope :with_id, -> (id) { where id: id }
   scope :non_rejected, -> { where rejected: [nil, false] }
+
+  scope :item_id, -> (id) {
+    where item_id: id
+  }
+
+  scope :vendor_id, -> (id) {
+    where vendor_id: id
+  }
+
+  scope :date, -> (date) {
+    date = Date.parse(date) rescue Date.today
+    where('DATE(required_by_date) = ?', date)
+  }
+
+  scope :location_id, -> (id) {
+    where delivery_location_id: id
+  }
+
+  scope :order_number, -> (order_number) {
+    where order_number: order_number
+  }
+
 
   def update_estimated_amount
     quantity = self.quantity

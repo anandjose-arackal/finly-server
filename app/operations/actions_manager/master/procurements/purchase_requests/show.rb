@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsManager::Master::Base
 
   register_handle :purchase_request_show
-  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :take_control, :delete_pr_line_item, :reject_pr_line_item, :return_control ]
+  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :delete_pr_line_item, :reject_pr_line_item, :return_control, :add_new_line_item ]
 
   def initialize(user=nil, params=nil)
     super
@@ -14,11 +14,19 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def save_btn
-    if user.vendor_payments_admin? && ( purchase_request.retracted? || purchase_request.rejected? || purchase_request.awaiting_approval? )
+    # If admin but not initiator, cannot save in draft stage
+    if user.vendor_payments_admin? && !user.is_purchase_request_initiator?  && ( purchase_request.retracted? || purchase_request.rejected? || purchase_request.awaiting_approval? )
       return true
     end
 
-    if user.is_purchase_request_initiator?
+     # If PR initiator OR (admin+ PR initiator)
+    if user.is_purchase_request_initiator? && user.vendor_payments_admin? 
+      if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
+        return true
+      end 
+    end
+
+    if user.is_purchase_request_initiator? 
       if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
         return true
       end 
@@ -132,6 +140,26 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   def create_and_submit
   end
 
+  def add_new_line_item
+    # If admin but not initiator, cannot save in draft stage
+    if user.vendor_payments_admin? && !user.is_purchase_request_initiator?  && ( purchase_request.retracted? || purchase_request.rejected? || purchase_request.awaiting_approval? )
+      return true
+    end
+
+     # If PR initiator OR (admin+ PR initiator)
+    if user.is_purchase_request_initiator? && user.vendor_payments_admin? 
+      if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
+        return true
+      end 
+    end
+
+    if user.is_purchase_request_initiator?
+      if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
+        return true
+      end 
+    end
+  end
+
   def document_owner?
     purchase_request.creator_id.eql?(user.id)
   end
@@ -162,5 +190,6 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control &&
     purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control_by_id == user.id
   end
+
 
 end

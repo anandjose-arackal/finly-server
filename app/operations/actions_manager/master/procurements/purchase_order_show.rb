@@ -116,6 +116,15 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
       end
     end
 
+    # if (procurement.invoices.blank? && procurement.inward_documents.blank?) && document_owner?
+    #   if purchase_order.processing?
+    #     return true
+    #   end
+    #   if (purchase_order.approved? || purchase_order.auto_approved?) && (!purchase_order.sent_to_vendor? && !purchase_order.closed? && !purchase_order.voided?)
+    #     return true
+    #   end
+    # end
+
     # if purchase_order.is_initiating_user? || user.vendor_payments_admin?
     #   if (procurement.invoices.blank? && procurement.inward_documents.blank?) && !purchase_order.sent_to_vendor?
     #     purchase_order.processing? || purchase_order.approved? || purchase_order.auto_approved?
@@ -242,7 +251,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
       if (purchase_order.processing? && purchase_order.get_reviewers.exclude?(user))
         return true
       end
-      if purchase_order.processing? && !purchase_order.action_users(:return_control).include?(user) && purchase_order.action_users(:approve).include?(user)
+      if purchase_order.processing? && !purchase_order.action_users(:return_control).include?(user) && !purchase_order.action_users(:approve).include?(user)
         return true
       end
     end

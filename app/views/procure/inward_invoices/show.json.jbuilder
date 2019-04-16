@@ -130,6 +130,8 @@ json.invoice do
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
                     :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id
 
+      json.item_number item.inventory_line_item&.item_number rescue nil
+
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
       json.amount precision_value item.amount&.value
