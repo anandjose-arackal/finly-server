@@ -69,6 +69,12 @@ class PolicyUserRoles::ForwardableUsers < PolicyUserRoles::Base
       self.policy_user_roles = params[:policy_user_roles]
       self.policy_user_roles = apply_scopes(self.policy_user_roles, params)
 
+      # Hack
+
+      self.policy_user_roles = self.policy_user_roles.where.not(user_id: user.id)
+
+      # Hack ends
+
       page = params[:page] || 1
       per_page = params[:per_page] || 10000 # hardcoded as pagination on frontend is not there
 
