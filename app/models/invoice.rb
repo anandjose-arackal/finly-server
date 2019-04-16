@@ -644,6 +644,7 @@ class Invoice < ApplicationRecord
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if self.action_users(:approve).include?(user)
     (processing? rescue false) && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 
