@@ -246,6 +246,10 @@ class YesBankVendor < ApplicationRecord
     self.status_ids(*self.role_based_statuses(user))
   end
 
+  def self.auditor_associated_status_ids
+    self.status_ids(:awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :deactivated)
+  end
+
   def self.role_based_statuses(user)
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?

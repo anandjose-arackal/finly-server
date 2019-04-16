@@ -422,6 +422,10 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     BankPaymentRequestStatus.ids_for(:approved, :credited, :pending, :creation_in_progress, :auto_approved)
   end
 
+  def self.auditor_associated_status_ids
+    self.status_ids(:processing, :retracted, :rejected, :approved, :credited, :pending, :creation_in_progress, :auto_approved)
+  end
+
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end

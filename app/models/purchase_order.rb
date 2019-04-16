@@ -705,6 +705,10 @@ class PurchaseOrder < ApplicationRecord
     PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
   end
 
+  def self.auditor_associated_status_ids
+    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised)
+  end
+
   def self.roles
     [
         :purchase_order_initiator,

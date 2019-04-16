@@ -602,23 +602,31 @@ module Transitionable
           data = role_based_initiator_associated_items(user, role_id)
         when :purchase_request_reviewer, 'purchase_request_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
+        when :purchase_request_auditor, 'purchase_request_auditor'
+          data = role_based_auditor_associated_items(user, role_id)
         when :purchase_order_initiator, 'purchase_order_initiator'
           data = PurchaseOrder.initiator_associated_items(user, role_id)
         when :purchase_order_reviewer, 'purchase_order_reviewer'
           # Get data for purchase order reviewer
           data = role_based_reviewer_associated_items(user, role_id)
+        when :purchase_order_auditor, 'purchase_order_auditor'
+          data = role_based_auditor_associated_items(user, role_id)
         when :goods_receiver, 'goods_receiver'
           data = []
         when :invoice_initiator, 'invoice_initiator'
           data = user.company.inward_invoices.where(created_by_user_id: user.id)
         when :invoice_reviewer, 'invoice_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
+        when :invoice_auditor, 'invoice_auditor'
+          data = role_based_auditor_associated_items(user, role_id)
         when :bank_payment_request_initiator, 'bank_payment_request_initiator'
           data = role_based_initiator_associated_items(user, role_id)
         when :bank_payment_request_reviewer, 'bank_payment_request_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :bank_payment_request_creditor, 'bank_payment_request_creditor'
           data = role_based_creditor_associated_items(user, role_id)
+        when :bank_payment_request_auditor, 'bank_payment_request_auditor'
+          data = role_based_auditor_associated_items(user, role_id)
         when :item_master_manager, 'item_master_manager'
           data = role_based_manager_associated_items(user, role_id)
         when :inventory_manager, 'inventory_manager'
@@ -627,6 +635,8 @@ module Transitionable
           data = []
         when :vendor_reviewer, 'vendor_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
+        when :vendor_auditor, 'vendor_auditor'
+          data = role_based_auditor_associated_items(user, role_id)
         when :vendor_manager, 'vendor_manager'
           data = []
         when :policy_admin, 'policy_admin'
@@ -725,6 +735,14 @@ module Transitionable
       if policy_ids.present?
         self.where(policy_id: policy_ids)
             .where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
+      end
+    end
+
+    def role_based_auditor_associated_items(user, role_id, options={})
+      policy_ids = user.policy_user_roles.with_role_id(role_id).pluck(:policy_id)&.uniq
+      if policy_ids.present?
+        self.where(policy_id: policy_ids)
+            .where("#{self.document_status_attribute} in (?)", self.auditor_associated_status_ids)
       end
     end
 

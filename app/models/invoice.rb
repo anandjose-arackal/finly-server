@@ -701,6 +701,10 @@ class Invoice < ApplicationRecord
     InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
   end
 
+  def self.auditor_associated_status_ids
+    self.status_ids(:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending, :initiated)
+  end
+
   def self.role_based_associated_status_ids(user)
     InwardInvoiceStatus.ids_for(self.role_based_statuses(user))
   end
