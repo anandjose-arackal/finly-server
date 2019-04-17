@@ -7,13 +7,17 @@ class VendorMigrationPostOp2 < ActiveRecord::Migration[5.2]
     p "Migrating GST to GSTIN"
     total_vendors = vendors.where.not(gst: nil).where("length(gst) = 15").count
     vendors.where.not(gst: nil).where("length(gst) = 15").each_with_index do |vendor, index|
-      next if vendor.gstin_locations.length > 0
+      next if vendor.gstin_locations.count > 0
       # vendor.gst
 
       user = User.find_by id: vendor.created_by_id
 
       unless user.present?
         user = vendor.company.users.only_admins.first
+
+        unless user.present?
+          user = User.find_by email: 'kumarabinash@finly.io'
+        end
       end
 
       # Get gstin details from api
