@@ -75,7 +75,7 @@ class PurchaseRequestItem < ApplicationRecord
     line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes)
     if line_item_attributes.present?
       line_item_attributes.each do |position, line_item|
-        attachment_id = line_item.dig(:attachment_attributes, :id)
+        attachment_id = line_item.dig(:attachment_attributes, :id) rescue nil
         if attachment_id.present?
           attachment = Attachment.find_by_id attachment_id
           attachment.resource_id = self.id
