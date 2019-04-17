@@ -110,12 +110,12 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     #   self.inward_invoice_params[:transaction_service_period_to] = Date.new(formatted_year.to_i, formatted_month.to_i)
     # end
 
-    # arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:unit_of_measurement)
+    arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:unit_of_measurement)
 
-    # if arr.collect {|a| a.blank?}.include? true
-    #   add_message :error, "Please mention the Unit of Measurement for the items supplied."
-    #   return
-    # end
+    if arr.collect {|a| a.blank?}.include? true
+      add_message :error, "Please mention the Unit of Measurement for the items supplied."
+      return
+    end
   end
 
   def pre_process
