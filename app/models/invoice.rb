@@ -256,7 +256,7 @@ class Invoice < ApplicationRecord
     end
 
     if user_id.present?
-      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      ids = self.awaiting_action_items(user_id)&.pluck(:id)
       with_id(ids)
     end
   }

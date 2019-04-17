@@ -32,7 +32,7 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
 
   def validate
     unless self.invoices.present?
-      add_message :error, 'Purchase Order not found'
+      add_message :error, 'Invoices not found'
       return
     end
 
