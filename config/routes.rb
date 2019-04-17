@@ -3517,6 +3517,7 @@ Rails.application.routes.draw do
     put 'inward_invoices/bulk_approve', to: 'inward_invoices#bulk_approve'
     put 'inward_invoices/bulk_reject', to: 'inward_invoices#bulk_reject'
     put 'inward_invoices/bulk_take_control', to: 'inward_invoices#bulk_take_control'
+    put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
