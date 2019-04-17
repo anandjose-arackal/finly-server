@@ -153,6 +153,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def requests
+    return nil unless user.company.purchase_requisition_enabled?
     {name: 'Requests', id: 'requests', url: 'requests'}
   end
 

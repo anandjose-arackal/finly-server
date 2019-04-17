@@ -27,6 +27,7 @@
 #  account                :string(255)
 #  tax_rate_id            :integer
 #  cost_center_id         :integer
+#  unit_of_measurement    :string(255)
 #
 
 class InvoiceLineItem < ApplicationRecord
