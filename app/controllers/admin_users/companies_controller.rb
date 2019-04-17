@@ -63,6 +63,15 @@ class AdminUsers::CompaniesController < ApplicationController
     @company_types = CompanyType.all
   end
 
+  def import_data_configuration
+    if params[:'data-target'].present?
+      case params[:'data-target']
+        when 'locations'
+        when 'departments'
+      end
+    end
+  end
+
   private
 
 

@@ -411,6 +411,7 @@
 #                                                         PUT    /admin_users/companies/:id(.:format)                                                                                admin_users/companies#update
 #                                                         DELETE /admin_users/companies/:id(.:format)                                                                                admin_users/companies#destroy
 #                               admin_users_company_types GET    /admin_users/company_types(.:format)                                                                                admin_users/companies#company_types
+#           admin_users_company_import_data_configuration POST   /admin_users/companies#import_data_configuration
 #                                 admin_users_users_count GET    /admin_users/users/count(.:format)                                                                                  admin_users/users#count
 #                          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)                                                                 admin_users/users#update_status
 #                         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)                                                                admin_users/users#update_mapping
@@ -2096,6 +2097,7 @@
 #                                         PATCH  /admin_users/companies/:id(.:format)                        admin_users/companies#update
 #                                         PUT    /admin_users/companies/:id(.:format)                        admin_users/companies#update
 #                                         DELETE /admin_users/companies/:id(.:format)                        admin_users/companies#destroy
+#
 #          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)         admin_users/users#update_status
 #         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)        admin_users/users#update_mapping
 #        admin_users_user_destroy_mapping DELETE /admin_users/users/:user_id/destroy_mapping(.:format)       admin_users/users#destroy_mapping
@@ -2531,6 +2533,7 @@ Rails.application.routes.draw do
     resources :companies do
       post 'dcode_check', to: 'companies#check_dcode'
       post 'configure_payu', to: 'companies#configure_payu'
+      post 'import_data_configuration', to: 'companies#import_data_configuration'
     end
     get 'company_types', to: 'companies#company_types'
     get 'users/count', to: 'users#count'

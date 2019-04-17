@@ -11,6 +11,10 @@ class Company::Locations::Index < Company::Locations::Base
     end
   end
 
+  def user_model
+    [User, AdminUser]
+  end
+
   def validate
     if self.company.blank?
       add_message :error, "Company not found"
