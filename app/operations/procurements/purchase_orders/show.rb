@@ -33,7 +33,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.procurement = self.purchase_order.procurement
       self.actions = get_actions
       self.departments = user.company.departments.leaves
-      self.locations = user.company.locations.includes(:state)
+      self.locations = user.company.locations.includes(:state).leaves
       self.gstin_locations = self.purchase_order.vendor&.gstin_locations
 
       if purchase_order.user.departments.present?

@@ -74,6 +74,15 @@ class PurchaseRequest < ApplicationRecord
     where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
   }
 
+  scope :filter_awaiting_approval, -> (boolean) {
+    user_id = RequestStore.store[:current_user]&.id
+
+    if user_id.present?
+      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      with_ids(ids)
+    end
+  }
+
   def add_company
     self.company_id = self.creator.company_id
   end

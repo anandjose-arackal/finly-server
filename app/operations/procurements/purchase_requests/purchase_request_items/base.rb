@@ -13,7 +13,9 @@ class Procurements::PurchaseRequests::PurchaseRequestItems::Base < BaseOperation
     self.company = user.company
     id  = params[:id] || params[:purchase_request_item_id]
     # self.purchase_request = Procurements::PurchaseRequests::Show.(current_user, params).purchase_request
-    self.purchase_request_item = user.company.purchase_requests.joins(:purchase_request_items).where('purchase_request_items.id = ?', id)
+    # Check if PR item id is present
+    purchase_request_item_id = user.company.purchase_requests.joins(:purchase_request_items).where('purchase_request_items.id = ?', id).pluck('purchase_request_items.id') rescue nil
+    self.purchase_request_item = PurchaseRequestItem.where(id: purchase_request_item_id).last rescue nil
   end
 
   def validate
