@@ -78,7 +78,7 @@ class PurchaseRequest < ApplicationRecord
     user_id = RequestStore.store[:current_user]&.id
 
     if user_id.present?
-      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      ids = self.awaiting_action_items(user_id)&.pluck(:id)
       with_ids(ids)
     end
   }
