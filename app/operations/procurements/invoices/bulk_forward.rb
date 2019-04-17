@@ -7,7 +7,8 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
       add_message :error, "Invalid Type"
     end
 
-    self.invoices = Procurements::Invoices::Index.(user, params).invoices.with_id(params[:document_ids])
+    # self.invoices = Procurements::Invoices::Index.(user, params).invoices.with_id(params[:document_ids])
+    self.invoices = BankTransfer::InwardInvoices::Index.(user, params).invoices.with_id(params[:document_ids])
 
     if self.invoices&.pluck(:policy_id)&.uniq&.compact&.length > 1
       add_message :error, "Please select invoices from a single policy"
