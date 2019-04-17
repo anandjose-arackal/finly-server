@@ -84,7 +84,11 @@
       </div>
       <div class="col col-xs-12 no-padding">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.gst %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Location</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.location} - #{@result.purchase_order&.gstin_location&.state&.name}" %></div>
       </div>
     </div>
     <div class="col col-xs-4 billing-address">
@@ -218,7 +222,7 @@
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
     <h4 class="section-title">Terms and Conditions</h4>
     <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
-      <%= simple_format @result.purchase_order.procurement_term_text, {}, wrapper_tag: "div" %>
+      <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
       <% unless @company.id == 137 %>

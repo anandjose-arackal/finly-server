@@ -87,13 +87,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    arr = self.purchase_order_params[:items_attributes].pluck(:unit_of_measurement)
-
-    if arr.collect {|a| a.blank?}.include? true
-      add_message :error, "Please mention the Unit of Measurement for the items supplied."
-      return
-    end
-
     if self.department.blank?
       add_message :error, "Please select a department"
     end
@@ -111,6 +104,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, 'Please select the bank account of the vendor.'
       return
     end
+
+    # arr = self.purchase_order_params[:items_attributes].pluck(:unit_of_measurement)
+
+
+    # if arr.collect {|a| a.blank?}.include? true
+    #   add_message :error, "Please mention the Unit of Measurement for the items supplied."
+    #   return
+    # end
 
     if StringUtils.to_bool( self.purchase_order_params[:advance_amount_required] ) 
       unless self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
