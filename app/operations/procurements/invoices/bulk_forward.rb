@@ -21,7 +21,7 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
       return
     end
 
-    forwardable_user_ids = self.policy.policy_user_roles.with_role_id(UserRole.id_for(:purchase_order_reviewer)).pluck(:user_id)
+    forwardable_user_ids = self.policy.policy_user_roles.with_role_id(UserRole.id_for(:invoice_reviewer)).pluck(:user_id)
 
     unless forwardable_user_ids.include?(params[:forward_to_id].to_i)
       add_message :error, "Invalid User"
