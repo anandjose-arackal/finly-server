@@ -136,7 +136,7 @@ class MissingDLRM
 
       # p rest_of_dlrm.pluck(:id)
 
-      policy.levels.with_associted_entity_type('PurchaseOrderProvider').each do |level|
+      policy.levels.with_associated_entity_type('PurchaseOrderProvider').each do |level|
         unless new_dlrms.map(&:level_id).include?(level.id)
           reviewer_ids = level.level_reviewer_mappings.reload.non_deleted.with_threshold(po.balance_amount.value).pluck(:reviewer_id)
 
@@ -256,7 +256,7 @@ class MissingDLRM
 
       # rest_of_dlrm = po.document_level_reviewer_mappings.reload.where.not(id: already_created_dlrm_ids)
 
-      policy.levels.with_associted_entity_type('PurchaseOrderProvider').each do |level|
+      policy.levels.with_associated_entity_type('PurchaseOrderProvider').each do |level|
         amount = document.balance_amount&.value || 0
           reviewer_ids = level.level_reviewer_mappings.reload.non_deleted.with_threshold(amount).pluck(:reviewer_id)
 
@@ -407,7 +407,7 @@ class MissingDLRM
 
       # p rest_of_dlrm.pluck(:id)
 
-      policy.levels.with_associted_entity_type('InvoiceProvider').each do |level|
+      policy.levels.with_associated_entity_type('InvoiceProvider').each do |level|
         unless new_dlrms.map(&:level_id).include?(level.id)
           reviewer_ids = level.level_reviewer_mappings.reload.non_deleted.with_threshold(document.net_amount.value).pluck(:reviewer_id)
 
@@ -496,7 +496,7 @@ class MissingDLRM
 
       new_dlrms = []
 
-      policy.levels.with_associted_entity_type('InvoiceProvider').each do |level|
+      policy.levels.with_associated_entity_type('InvoiceProvider').each do |level|
         amount = document.net_amount&.value || 0
           reviewer_ids = level.level_reviewer_mappings.reload.non_deleted.with_threshold(amount).pluck(:reviewer_id)
 

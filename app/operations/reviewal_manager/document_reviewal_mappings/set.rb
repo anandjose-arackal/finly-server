@@ -30,7 +30,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
         end
 
         # Filter only levels from current provider; In travel request multiple providers are sent & hence has to be filterd
-        filtered_level = ::ReviewalLevel.with_associted_entity_type(provider_name).find_by id: mapping_params[:level_id]
+        filtered_level = ::ReviewalLevel.with_associated_entity_type(provider_name).find_by id: mapping_params[:level_id]
 
         next if filtered_level.blank?
 
@@ -57,7 +57,7 @@ class ReviewalManager::DocumentReviewalMappings::Set < ReviewalManager::Document
       if self.document.policy_id.present?
         policy = user.company.policies.non_deleted.find_by id: document.policy_id
         
-        policy.levels.with_associted_entity_type(provider_name).non_deleted.with_entity_type(self.provider_name).each do |level|
+        policy.levels.with_associated_entity_type(provider_name).non_deleted.with_entity_type(self.provider_name).each do |level|
           data = {
             level_id: level.id,
             level: level
