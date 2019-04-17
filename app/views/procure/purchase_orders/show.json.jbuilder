@@ -66,6 +66,7 @@ json.items do
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
     
     json.item_number item.inventory_line_item&.item_number rescue nil
+    json.item_code item.inventory_line_item&.item_code rescue nil
 
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
