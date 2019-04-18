@@ -19,7 +19,7 @@
 class Attachment < ApplicationRecord
   include Attachable
 
-  belongs_to :resource, optional: true, polymorphic: true
+  belongs_to :resource, optional: true, polymorphic: true, inverse_of: :resource
   belongs_to :creator, optional: true, class_name: "User"
   belongs_to :company, optional: true
 
@@ -37,7 +37,16 @@ class Attachment < ApplicationRecord
   } 
 
 
-  def as_json
+  def as_json(options={})
+    if options[:array]
+      [default_json]
+    else
+      default_json
+    end
+    
+  end
+
+  def default_json
     {
       id: self.id,
       name: self.file_file_name,
@@ -46,7 +55,8 @@ class Attachment < ApplicationRecord
       resource_type: self.resource_type,
       resource_id: self.resource_id,
       file_name: self.file.original_filename,
-      file_size: (self.file_file_size / 1024).round(2).to_s + " KB"
+      file_size: (self.file_file_size / 1024).round(2).to_s + " KB",
+      status: 'done'
       # created_by: self.creator&.name,
       # description: self.description
     }

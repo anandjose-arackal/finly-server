@@ -36,8 +36,8 @@ json.result do
             json.id line_item.item_id
           end
           json.preferred_vendor do        
-            json.name line_item&.vendor&.name
-            json.id line_item.vendor_id
+            json.vendor_name line_item&.vendor&.name
+            json.vendor_id line_item.vendor_id
           end
           json.required_by_date line_item&.required_by_date&.to_date
           json.delivery_location do  
@@ -58,11 +58,12 @@ json.result do
             json.id line_item&.per_unit_estimated_amount_id
           end
           json.attachment_attributes do
-            json.uid line_item.attachment&.id
-            json.name line_item.attachment&.file_file_name
-            json.url line_item.attachment&.file&.url
-            # As required by frontend
-            json.status 'done'
+            # json.uid line_item.attachment&.id
+            # json.name line_item.attachment&.file_file_name
+            # json.url line_item.attachment&.file&.url
+            # # As required by frontend
+            # json.status 'done'
+            json.merge! line_item.attachment.as_json(array: true)
           end
         end
       else

@@ -49,11 +49,13 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :status, optional: true, class_name: 'PurchaseRequestItemStatus', foreign_key: :status_id
   belongs_to :purchase_order, optional: true
-  has_one :attachment, as: :resource, dependent: :destroy
+  has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
 
   validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
+
+  after_create :add_attachment
 
   scope :with_ids, -> (ids) { where id: ids }
   scope :with_id, -> (id) { where id: id }
@@ -88,6 +90,22 @@ class PurchaseRequestItem < ApplicationRecord
       amount = Amount.create(currency_id: 1, value: quantity*per_unit_price)
       self.estimated_amount_id = amount.id
       self.save
+    end
+  end
+
+  def add_attachment
+    # Can be put into AR transaction
+    params = RequestStore[:params]
+    line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes)
+    if line_item_attributes.present?
+      line_item_attributes.each do |position, line_item|
+        attachment_id = line_item.dig(:attachment_attributes, :id) rescue nil
+        if attachment_id.present?
+          attachment = Attachment.find_by_id attachment_id
+          attachment.resource_id = self.id
+          attachment.save
+        end
+      end
     end
   end
 

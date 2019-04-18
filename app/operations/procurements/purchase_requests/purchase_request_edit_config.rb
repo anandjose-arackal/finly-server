@@ -15,7 +15,7 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       # self.locations = user.initiator_associated_locations(UserRole.id_for(:purchase_request_initiator)).leaves
       self.departments = user.company.departments
       # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
-      # params[:filter_role_id] = UserRole.id_for(UserRole.id_for(:purchase_request_initiator))
+      params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
       self.policies = Policy::VendorPayments::Index.(user, params).policies
       self.reviewal_chains = []
       params[:reviewal_document] = purchase_request
