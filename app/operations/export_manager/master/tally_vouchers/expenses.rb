@@ -24,7 +24,19 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
       add_message :error, result.messages[:error]
       return
     end
-    Expense.with_report_id(result.reports.pluck(:id)).include_details
+
+    reports = result.reports
+
+    if params[:filtered]
+      reports = reports.processed
+    else
+      id = params[:id] || params[:report_id]
+      id = id.split(',')
+      reports = reports.with_id(id)
+    end
+    report_ids = reports.pluck(:id)
+
+    Expense.with_report_id(report_ids).include_details
   end
 
 
