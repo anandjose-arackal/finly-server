@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_10_124135) do
+ActiveRecord::Schema.define(version: 2019_04_18_093631) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1705,6 +1705,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_124135) do
     t.integer "user_pocket_type_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "active", default: true
     t.index ["company_id"], name: "index_company_pocket_templates_on_company_id"
     t.index ["user_pocket_type_id"], name: "index_company_pocket_templates_on_user_pocket_type_id"
   end
@@ -5815,6 +5816,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_124135) do
     t.integer "user_id"
     t.integer "base_currency_id"
     t.integer "company_pocket_template_id"
+    t.boolean "active", default: true
     t.index ["balance_id"], name: "index_user_pockets_on_balance_id"
     t.index ["user_pocket_type_id"], name: "index_user_pockets_on_user_pocket_type_id"
   end
