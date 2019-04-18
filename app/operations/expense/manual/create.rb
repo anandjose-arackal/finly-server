@@ -11,6 +11,9 @@ class Expense::Manual::Create < Expense::Manual::Base
         },
         pre_process: {
             before: Personalizer::Process.new([:expense, :manual_create], :pre_process, self)
+        },
+        validate: {
+            before: Personalizer::Process.new([:expense, :manual, :create], :validate, self)
         }
     }
   end
