@@ -107,6 +107,7 @@ json.attachments do
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
     json.url attachment.file.url(:original, timestamp: false)
+    json.content_type attachment.file_content_type
   end
 end
 

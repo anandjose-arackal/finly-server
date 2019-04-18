@@ -94,7 +94,7 @@ class ActionsManager::Master::Base
   # Get allowed actions as hash
   def run
     actions = self.class.set_data_map[:actions]
-    allowed_actions = allowed_actions(actions)
+    allowed_actions(actions)
   end
 
   def input
@@ -102,6 +102,10 @@ class ActionsManager::Master::Base
 
   def clear_messages
     self.messages = {error: [], failure: [], success: [], message: [], notice: []}
+  end
+
+  def has_errors?
+    self.messages.present? and (self.messages[:error].present? or self.messages[:failure].present?)
   end
 
   def add_message(type, message)
@@ -118,7 +122,8 @@ class ActionsManager::Master::Base
     result = {}
     unless actions.blank?
       actions.each do |action|
-        result[action] = self.send(action) if self.send(action)
+        action_result = self.send(action)
+        result[action] = action_result if action_result
       end
     end
     return result

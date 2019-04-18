@@ -1,15 +1,16 @@
 class Vendors::Support::ValidateGstin < Vendors::Support::Base
   attr_accessor :gstin_params, :connection, :api_response, :response_body,
-    :match_percentile, :valid_response, :gstin_master, :api_call_count
+    :match_percentile, :valid_response, :gstin_master, :api_call_count, :trade_name_match_percentile
 
   class Vendors::Support::ValidateGstin::ValidatePresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :api_response, :match_percentile, :response_body, :match_percentile, :valid_response,
-                  :gstin_master
+                  :gstin_master, :trade_name_match_percentile
 
     def init
       self.gstin_master = params[:gstin_master]
       self.response_body = params[:response_body]
       self.match_percentile = params[:match_percentile]
+      self.trade_name_match_percentile = params[:trade_name_match_percentile]
       self.valid_response = params[:valid_response]
 
     end
@@ -51,9 +52,11 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     self.response_body = JSON.parse(self.gstin_master.api_response.to_json)
     request_business_name = gstin_params[:business_name]
     response_business_name = gstin_master.legal_name_of_business
+    response_trade_name = gstin_master.trade_name
 
-    if request_business_name.present? && response_business_name.present?
+    if request_business_name.present? && (response_business_name.present? || response_trade_name.present?)
       self.match_percentile = StringUtils.fuzzy_string_match(request_business_name, response_business_name)
+      self.trade_name_match_percentile = StringUtils.fuzzy_string_match(request_business_name, response_trade_name)
     end
     #   # self.api_response = self.connection.get, { :gstin => gstin_params[:gstin] }
     #   self.api_response = self.connection.get
@@ -84,6 +87,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
     params[:api_response] = self.api_response
     params[:response_body] = self.response_body
     params[:match_percentile] = self.match_percentile || 0
+    params[:trade_name_match_percentile] = self.trade_name_match_percentile || 0
     Vendors::Support::ValidateGstin::ValidatePresenter.new(user, params, messages)
   end
 
@@ -96,7 +100,12 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
 
   def gstin_master_params(response_body)
 
-    addr_array = response_body[:data][:pradr][:addr].values.reject {|i| i.empty?}
+    if response_body.dig(:data, :pradr, :addr).present?
+      addr_array = response_body[:data][:pradr][:addr].values.reject {|i| i.empty?}
+    else
+      addr_array = []
+    end
+    legal_name_of_business = response_body[:data][:lgnm]
 
     data = {
       gstin: response_body[:data][:gstin],
@@ -106,6 +115,7 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
       date_of_registration: response_body[:data][:rgdt],
       constitution_of_business: response_body[:data][:ctb],
       status: response_body[:data][:sts],
+      trade_name: response_body[:data][:tradeNam],
       api_provider: response_body[:data][:masters_india],
       address: addr_array.join(", ")
     }

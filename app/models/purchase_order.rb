@@ -48,8 +48,6 @@
 #  template_name                :string(255)
 #  resource_template_id         :integer
 #  deleted_at                   :datetime
-#  submitted_at                 :datetime
-#  approved_at                  :datetime
 #  advance_amount_id            :integer
 #  due_date                     :date
 #  advance_amount_status_id     :integer
@@ -62,6 +60,8 @@
 #  advance_tds_amount_id        :integer
 #  advance_amount_required      :boolean          default(FALSE)
 #  requested_advance_amount_id  :integer
+#  gstin_location_id            :bigint(8)
+#  submitted_at                 :datetime
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -279,7 +279,6 @@ class PurchaseOrder < ApplicationRecord
     else
       user_id = RequestStore.store[:current_user]&.id
     end
-
 
     if user_id.present?
       filter_user_id(user_id)
@@ -726,6 +725,10 @@ class PurchaseOrder < ApplicationRecord
 
   def self.finance_associated_status_ids
     PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
+  end
+
+  def self.auditor_associated_status_ids
+    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised)
   end
 
   def self.roles

@@ -3443,6 +3443,7 @@ Rails.application.routes.draw do
     delete 'purchase_orders/templates/:id', to: 'purchase_orders#template_destroy'
     delete 'purchase_orders/:id/delete', to: 'purchase_orders#destroy'
 
+    put 'purchase_orders/forward', to: 'purchase_orders#bulk_forward'
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
@@ -3462,7 +3463,6 @@ Rails.application.routes.draw do
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
-
       get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
 
       resources :quotations, only: %i[index create update destroy]
@@ -3517,6 +3517,7 @@ Rails.application.routes.draw do
     put 'inward_invoices/bulk_approve', to: 'inward_invoices#bulk_approve'
     put 'inward_invoices/bulk_reject', to: 'inward_invoices#bulk_reject'
     put 'inward_invoices/bulk_take_control', to: 'inward_invoices#bulk_take_control'
+    put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
@@ -3565,6 +3566,7 @@ Rails.application.routes.draw do
 
   ######## Dashboards ##################
   namespace :dashboards do
+    get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
     get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
     get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
@@ -3615,6 +3617,11 @@ Rails.application.routes.draw do
     put 'import', to: 'rate_contract_line_items#import'
   end
   ########### Rate Contract Line Item API end ###############
+
+  ########### Forwardable Users #############################
+  get 'forwardable_users', to: 'policy_user_roles#forwardable_users'
+
+  ############## Forwardable Users End ######################
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

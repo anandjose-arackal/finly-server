@@ -1223,6 +1223,10 @@ class User < ApplicationRecord
     self.vendor_payments_admin? || self.vendor_payments_auditor?
   end
 
+  def policy_admin_or_auditor?
+    self.has_policy_role?(UserRole.id_for(:policy_admin)) || self.has_policy_role?(UserRole.id_for(:policy_auditor))
+  end
+
   # locations associated with policies to which users are associated as initiator role
   def initiator_associated_locations(role_id)
     location_ids = company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ?', role_id).joins(:policy_location_mappings).pluck('policy_location_mappings.location_id')

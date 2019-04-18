@@ -1,6 +1,6 @@
 class ActionsManager::Processor < BaseOperation
 
-  attr_accessor :master, :type, :actions_configuration
+  attr_accessor :master, :type, :actions_configuration, :result
 
   class ActionsManager::Processor::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :actions_configuration
@@ -35,28 +35,37 @@ class ActionsManager::Processor < BaseOperation
       add_message :error, "Invalid Operation"
       return
     end
-    m = self.master.new(user, params)
-    unless m.valid?
-      add_message :error, m.messages[:error]
-      return
-    end
+    self.result = self.master.new(user, params) rescue nil
 
+    if self.result.present?
+      unless self.result.valid?
+        add_message :error, m.messages[:error]
+        return
+      end
+      if self.result.has_errors?
+        add_message :error, result.messages[:error]
+        return 
+      end
+    else
+      add_message :error, "Invalid Operation"
+    end
 
     # Validate for error
-    obj = self.master.new(user, params) rescue nil
-    if obj.messages.present? && !obj.messages[:error].blank?
-      add_message :error, obj.messages[:error]
-      return
-    end
+    # obj = self.master.new(user, params) rescue nil
+    # if obj.messages.present? && !obj.messages[:error].blank?
+    #   add_message :error, obj.messages[:error]
+    #   return
+    # end
   end
 
   def process
-    result = self.master.new(user, params).run
+    # result = self.master.new(user, params).run
+
     # unless result.present?
     #   add_message :error, 'Some error occurred, please try again later'
     #   return
     # end
-    self.actions_configuration = result
+    self.actions_configuration = self.result.run
   end
 
   def success

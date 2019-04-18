@@ -26,6 +26,10 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
       transitions :from => :approved, :to => :processing
     end
 
+    event :forward do
+      transitions :from => :processing, :to => :processing, guard: :user_can_review?
+    end
+
     event :take_control do
       transitions :from => :processing, :to => :processing
     end

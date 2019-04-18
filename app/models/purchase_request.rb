@@ -2,16 +2,21 @@
 #
 # Table name: purchase_requests
 #
-#  id                   :bigint(8)        not null, primary key
-#  title                :text(65535)
-#  user_id              :integer
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  location_id          :integer
-#  department_id        :integer
-#  policy_id            :integer
-#  controlling_level_id :integer
-#  company_id           :integer
+#  id                         :bigint(8)        not null, primary key
+#  description                :text(65535)
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  purchase_request_status_id :integer
+#  note                       :text(65535)
+#  creator_id                 :integer
+#  submitted_at               :datetime
+#  approved_at                :datetime
+#  location_id                :integer
+#  department_id              :integer
+#  policy_id                  :integer
+#  controlling_level_id       :integer
+#  company_id                 :integer
+#  order_number               :string(255)
 #
 
 class PurchaseRequest < ApplicationRecord
@@ -72,6 +77,15 @@ class PurchaseRequest < ApplicationRecord
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
     where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
+  }
+
+  scope :filter_awaiting_approval, -> (boolean) {
+    user_id = RequestStore.store[:current_user]&.id
+
+    if user_id.present?
+      ids = self.awaiting_action_items(user_id)&.pluck(:id)
+      with_ids(ids)
+    end
   }
 
   def add_company
@@ -148,6 +162,10 @@ class PurchaseRequest < ApplicationRecord
 
   def self.role_based_associated_status_ids(user)
     PurchaseRequestStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.auditor_associated_status_ids
+    self.status_ids(:awaiting_approval, :approved, :auto_approved, :retracted, :rejected, :closed, :order_initiated, :cancelled, :po_created)
   end
 
   def self.role_based_statuses(user)
