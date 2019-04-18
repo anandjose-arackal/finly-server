@@ -112,7 +112,7 @@ class PurchaseRequest < ApplicationRecord
   def calculate_total_amount
     # amount_ids = self.purchase_request_items&.pluck(:estimated_amount_id)
     # Amount.where(id: amount_ids)&.pluck(:value).sum
-    self.purchase_request_items.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
+    self.purchase_request_items.non_rejected.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
   end
 
   def get_default_provider
@@ -152,12 +152,33 @@ class PurchaseRequest < ApplicationRecord
   end
 
   def reject_purchase_request_items(options={}, user)
-    item_ids = options[:rejected_purchase_request_items]
+    rejected_item_ids = options[:rejected_purchase_request_items]
     # Filter rejected ids
-    filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", item_ids).pluck('purchase_request_items.id')
-    rejected_items = PurchaseRequestItem.with_ids(filtered_item_ids).update_all(rejected: true, status_id: PurchaseRequestItemStatus.id_for(:rejected)) unless filtered_item_ids.blank?
-    return !rejected_items.zero? if filtered_item_ids.present?
-    false
+    filtered_rejected_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", rejected_item_ids).pluck('purchase_request_items.id')
+    # rejected_items = PurchaseRequestItem.with_ids(filtered_rejected_item_ids).update_all(rejected: true, status_id: PurchaseRequestItemStatus.id_for(:rejected)) unless filtered_rejected_item_ids.blank?
+    PurchaseRequestItem.with_ids(filtered_rejected_item_ids).each do |item|
+      item.rejected = true
+      item.status_id = PurchaseRequestItemStatus.id_for(:rejected)
+      unless item.save && create_status_change_trail(item, user, action_id=TrailAction.id_for(:reject))
+        return false
+      end
+    end unless filtered_rejected_item_ids.blank?
+    true
+  end
+
+  def reject_purchase_request_items(options={}, user)
+    approved_item_ids = options[:approved_purchase_request_items]
+    # Filter rejected ids
+    filtered_approved_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", approved_item_ids).pluck('purchase_request_items.id')
+
+    PurchaseRequestItem.with_ids(filtered_approved_item_ids).each do |item|
+      item.rejected = false
+      item.status_id = PurchaseRequestItemStatus.id_for(self.reload&.status&.name&.to_sym)
+      unless item.save && create_status_change_trail(item, user, action_id=TrailAction.id_for(self&.status&.name&.to_sym))
+        return false
+      end
+    end unless filtered_approved_item_ids.blank?
+    true
   end
 
   def self.role_based_associated_status_ids(user)
@@ -185,6 +206,19 @@ class PurchaseRequest < ApplicationRecord
   def self.roles
     # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
     [:admin, :purchase_request_initiator, :purchase_request_reviewer]
+  end
+
+  private
+
+  def create_status_change_trail(item, user, action_id)
+    # Since PR line item does not have policy, trail has PR data
+    role_id = self.item.purchase_request.is_reviewing_user? ? UserRole.id_for(:purchase_request_reviewer) : UserRole.id_for(:admin)
+    trail = item.trails.new action_user: user,
+                           action_id: action_id,
+                           action_user_role_id: role_id,
+                           action_level_id: item.purchase_request.current_level&.id,
+                           modified_level_id: item.purchase_request.new_level&.id
+    trail.save
   end
 
 end

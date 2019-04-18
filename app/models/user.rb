@@ -1206,6 +1206,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:goods_receiver), document)
   end
 
+  def is_inventory_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
+  end
+
   # ************ User Role for vendor payments ******************
 
   def relevant
