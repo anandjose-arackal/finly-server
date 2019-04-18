@@ -27,6 +27,7 @@
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
 #  company_id                   :integer
+#  max_payment_amount           :decimal(20, 5)
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -264,8 +265,30 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     processing?
   end
 
+  def can_really_approve?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      processing?
+    elsif self.action_users(:approve).include?(user)
+      processing?
+    else
+      false
+    end
+  end
+
   def can_reject?
     processing?
+  end
+
+  def can_really_reject?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      processing?
+    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+      processing?
+    else
+      false
+    end
   end
 
   def can_retract?
@@ -280,7 +303,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     processing?
   end
 
-  def can_take_real_control?(user=nil)
+  def can_really_take_control?(user=nil)
     # work with this method, dont want to modify the older method since,
     # it is used other places and dont want to modify unless sure if this check works in other ppls work.
     user = user.present? ? user : RequestStore.store[:current_user]
@@ -420,6 +443,10 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   def self.finance_associated_status_ids
     BankPaymentRequestStatus.ids_for(:approved, :credited, :pending, :creation_in_progress, :auto_approved)
+  end
+
+  def self.auditor_associated_status_ids
+    self.status_ids(:processing, :retracted, :rejected, :approved, :credited, :pending, :creation_in_progress, :auto_approved)
   end
 
   def generate_name

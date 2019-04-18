@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 # == Schema Information
 #
 # Table name: items
@@ -23,6 +22,8 @@
 #  supply_item_type_id :integer
 #  deleted_at          :datetime
 #  product_type_id     :integer          default(1)
+#  item_number         :string(255)
+#  unit_of_measurement :string(255)
 #
 
 class Item < ApplicationRecord

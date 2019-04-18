@@ -66,6 +66,7 @@ json.items do
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id
     
     json.item_number item.inventory_line_item&.item_number rescue nil
+    json.gl_code item.inventory_line_item&.item_code rescue nil
 
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
@@ -106,6 +107,7 @@ json.attachments do
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
     json.url attachment.file.url(:original, timestamp: false)
+    json.content_type attachment.file_content_type
   end
 end
 

@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: purchase_request_items
+#
+#  id                           :bigint(8)        not null, primary key
+#  purchase_request_id          :integer
+#  item_id                      :integer
+#  vendor_id                    :integer
+#  delivery_location_id         :integer
+#  purpose                      :text(65535)
+#  quantity                     :decimal(20, 5)
+#  per_unit_estimated_amount_id :integer
+#  estimated_amount_id          :integer
+#  required_by_date             :date
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  approved                     :boolean
+#  status_id                    :integer
+#  purchase_order_id            :integer
+#  rejected                     :boolean
+#  unit_of_measurement          :string(255)
+#  reject_note                  :string(255)
+#
+
     # table_name => purchase_request_items
     # 
     #                     :id => :integer,
@@ -33,6 +57,8 @@ class PurchaseRequestItem < ApplicationRecord
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 
+  after_create :add_attachment
+
   scope :with_ids, -> (ids) { where id: ids }
   scope :with_id, -> (id) { where id: id }
   scope :non_rejected, -> { where rejected: [nil, false] }
@@ -66,6 +92,22 @@ class PurchaseRequestItem < ApplicationRecord
       amount = Amount.create(currency_id: 1, value: quantity*per_unit_price)
       self.estimated_amount_id = amount.id
       self.save
+    end
+  end
+
+  def add_attachment
+    # Can be put into AR transaction
+    params = RequestStore[:params]
+    line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes)
+    if line_item_attributes.present?
+      line_item_attributes.each do |position, line_item|
+        attachment_id = line_item.dig(:attachment_attributes, :id) rescue nil
+        if attachment_id.present?
+          attachment = Attachment.find_by_id attachment_id
+          attachment.resource_id = self.id
+          attachment.save
+        end
+      end
     end
   end
 

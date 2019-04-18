@@ -24,6 +24,7 @@ class PolicyUserRoles::Index < PolicyUserRoles::Base
     include HasScope
 
     has_scope :filter_role_id
+    has_scope :filter_user
 
     def init
       self.policy_user_roles = params[:policy_user_roles]
