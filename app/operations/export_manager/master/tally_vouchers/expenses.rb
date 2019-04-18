@@ -54,41 +54,23 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
 
   # Jugaad for stanza to handle their direct and indirect employee GL Codes
   STANZA_INDIRECT_GL_MAPPING = {
-      '217002': '306003',
-      '202001': '327003',
-      '202002': '327004',
-      '202004': '327002',
-      '204001': nil,
-      '204003': nil,
-      '204005': nil,
-      '204002': nil,
-      '204004': nil,
-      '204006': nil,
-      '205003': nil,
-      '206001': '329001',
-      '206002': '332001',
-      '206003': '332003',
-      '206004': nil,
-      '206005': nil,
-      '216001': '305001',
-      '210002': '336001',
-      '306006': '306006',
-      '211001': nil,
-      '211004': '333006',
-      '211002': '333003',
-      '321001': '321001',
+      '321006': '321006',
       '321002': '321002',
-      '321003': '321003',
+      '321001': '321001',
+      '306003': '306003',
       '321004': '321004',
-      '210003': '321005',
-      '210004': '321006'
+      '321003': '321003',
+      '333006': '333006',
+      '306005': '306005',
+      '305001': '305001',
+      '321005': '321005'
   }
 
   def gl_code(expense)
     gl = expense.category.gl_code
     return gl unless STANZA_INDIRECT_GL_MAPPING.keys.include?(gl)
     return gl unless expense.report.policy.name.downcase.include?('indirect')
-    STANZA_INDIRECT_GL_MAPPING[gl]
+    STANZA_INDIRECT_GL_MAPPING[gl.to_s]
   end
 
   def currency(expense)
