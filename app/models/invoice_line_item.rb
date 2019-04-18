@@ -41,6 +41,8 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :gst_type, optional: true
   belongs_to :tax_rate, optional: true
+  belongs_to :cost_center, optional: true
+  belongs_to :department, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
