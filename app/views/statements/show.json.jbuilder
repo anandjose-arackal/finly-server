@@ -46,6 +46,6 @@ json.finly_transactions do
         json.array! finly_transaction.system_messages
       end
     end
-    json.note transaction_detail.note
+    json.note transaction_detail.get_note
   end
 end
