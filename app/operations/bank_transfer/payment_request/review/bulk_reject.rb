@@ -34,7 +34,7 @@ class BankTransfer::PaymentRequest::Review::BulkReject < BankTransfer::PaymentRe
 
     accept_bpr = []
     self.bank_payment_requests.each do |bank_payment_request|
-      valid = (bank_payment_request.can_reject?) ? true : false
+      valid = (bank_payment_request.can_really_reject?) ? true : false
 
       if valid
         accept_bpr << bank_payment_request.id
