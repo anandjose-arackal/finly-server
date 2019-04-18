@@ -70,7 +70,7 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
     gl = expense.category.gl_code
     return gl unless STANZA_INDIRECT_GL_MAPPING.keys.include?(gl)
     return gl unless expense.report.policy.name.downcase.include?('indirect')
-    STANZA_INDIRECT_GL_MAPPING[gl.to_s]
+    STANZA_INDIRECT_GL_MAPPING[gl]
   end
 
   def currency(expense)
