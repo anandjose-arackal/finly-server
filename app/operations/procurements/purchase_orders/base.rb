@@ -13,7 +13,7 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         :procurement_term_id, :indent_number, :indent_date, :override_po_number, :policy_id, :department_id,
         :billing_address, :shipping_address, 
         :delivery_date, :gst_type_id, :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :procurement_term_text, :due_date, :advance_tds_slab_id, :advance_amount_required, :bank_account_id,
-        :gstin_location_id,
+        :gstin_location_id, :global_setting,
         items_attributes: [
             :id, :department_id, :cost_center_id, :unit_of_measurement, :_destroy, :product_id, :description, :hsn_sac, :quantity, :rate, :tax, :tax_rate_id, :tds, :discount, :delivery_date, :comment,
             :inventory_line_item_id
