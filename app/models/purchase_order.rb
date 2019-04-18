@@ -167,9 +167,10 @@ class PurchaseOrder < ApplicationRecord
   }
   scope :with_budgetable_user_ids, -> (user_ids) {
     if user_ids.present?
-      where created_by_user_id: user_ids
+      where user_id: user_ids
     end
   }
+  
   scope :with_budgetable_vendor_ids, -> (vendor_ids) {
     if vendor_ids.present?
       where vendor_id: vendor_ids
