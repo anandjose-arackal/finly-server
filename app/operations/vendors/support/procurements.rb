@@ -2,6 +2,7 @@ class Vendors::Support::Procurements < Vendors::Support::Base
   attr_accessor :procurements, :vendor
 
   class Vendors::Support::Procurements::ProcurementsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
     attr_accessor :data, :vendor
 
     def init

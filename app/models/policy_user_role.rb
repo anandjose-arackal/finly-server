@@ -40,4 +40,9 @@ class PolicyUserRole < ApplicationRecord
   scope :includes_for_index, -> {
     includes(:user, :policy, :user_role)
   }
+
+  scope :filter_user, -> (term){
+    joins(:user).where("users.first_name like ? or users.last_name like ? or concat(users.first_name, ' ', users.last_name) like ? or concat(users.first_name, ' ', users.last_name) like ? or users.email like ? or users.mobile_number like ?",
+                     "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+  }
 end

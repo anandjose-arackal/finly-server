@@ -49,4 +49,9 @@ class Api::Fm::V1::UsersController < ApiApplicationController
     end
   end
 
+  def balances
+    @result = User::Balances::Show.(current_user, params)
+    respond
+  end
+
 end

@@ -16,13 +16,15 @@ end
 
 json.locations do 
   json.array! @result.locations do |location|
-    json.extract! location, :id, :name
+    # json.extract! location, :id, :name
+    json.merge! location.as_json(tree: true)
   end
 end
 
 json.departments do
   json.array! @result.departments do |department|
-    json.extract! department, :id, :name, :cost_center_id
+    # json.extract! department, :id, :name, :cost_center_id
+    json.merge! department.as_json(tree: true)
   end
 end
 

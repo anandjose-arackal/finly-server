@@ -17,7 +17,8 @@
            note: transaction.payment&.note,
            payment_purpose: transaction.payment_purpose&.name,
            transaction_date: transaction.date,
-           sequence_number: transaction.sequence_number
+           sequence_number: transaction.sequence_number,
+           payment_id: transaction.payment_id
        }
 
        if self.transaction_detail.present?

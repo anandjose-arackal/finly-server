@@ -14,5 +14,6 @@ class Vendors::Approve < Vendors::Base
 
   def post_process
     add_message :success, "Approved Vendor"
+    Event::EVendors::Approve.(user, document: self.vendor)
   end
 end

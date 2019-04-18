@@ -23,6 +23,11 @@ class Procure::InwardInvoicesController < ApplicationController
     respond
   end
 
+  def bulk_forward
+    @result = Procurements::Invoices::BulkForward.(current_user, params)
+    respond
+  end
+
   def show
     @result = Procurements::Invoices::Show.(current_user, params)
     respond

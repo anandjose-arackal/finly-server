@@ -16,6 +16,23 @@ class Vendors::BulkApprove < Vendors::Base
     if self.vendors.empty?
       add_message :error, 'No vendors found'
     end
+
+    accept_vendor = []
+    self.vendors.each do |vendor|
+      valid = (vendor.can_approve?) ? true : false
+
+      if valid
+        accept_vendor << vendor.id
+      end
+    end
+ 
+    self.vendors = self.vendors.where(id: accept_vendor)
+
+    if self.vendors.blank?
+      add_message :error, "None of the vendors are in a state to be approved"
+      return
+    end
+
   end
 
   def process

@@ -7,7 +7,11 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
   FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
-  SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  if Rails.env.production?
+    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  else
+    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED", "SENT_TO_BENEFICIARY"]
+  end
   TEMPORARY_ERRORS_FROM_BANK = [
       "Acquiring Bank CBS or node offline",
       "Rejected/Failed at downstream system"
@@ -79,7 +83,12 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
         # Payment with pending transaction will rerun through CronJobs
-        if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message)
+        if self.account.account_owner.is_a?(Company)
+          self.company = self.account.account_owner
+        else
+          self.company = account.account_owner.company
+        end
+        if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message) && self.company.auto_retry_payment_enabled?
           payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
         else
           payment.update(payment_status_id: PaymentStatus.id_for(:failed))

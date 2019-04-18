@@ -42,7 +42,13 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.purchase_order.controlling_user_role_id = UserRole.id_for(:initiator)
 
     if purchase_order.valid?
-      purchase_order.save
+      if purchase_order.save
+        if params[:associated_resource] == "purchase_request_item"
+          # Status transition of PR
+          perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: params})
+          purchase_order.associate_purchase_request_items(params, user)
+        end
+      end
       purchase_order.process_line_item_calculation
       purchase_order.save
 
@@ -78,5 +84,22 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     end
     self.template = result.template
     self.purchase_order = self.template.resource.amoeba_dup
+  end
+
+  def perform_status_transition(options={})
+    case options[:status_to]
+    when :po_created, 'po_created'
+      item_ids = self.purchase_order.filter_purchase_request_item_ids(params, user)
+      document = ::PurchaseRequestItem.with_ids(item_ids).last.purchase_request rescue nil
+      params[:document] = document
+      params[:aasm_event] = 'po_creation'
+      op = WorkflowManager::Base.(user, params) if document.present?
+      unless op.success? || document.present?
+        add_message :error, op.messages[:error]
+        return
+      end
+      # Update Purchase request item statuses
+      ::PurchaseRequestItem.with_ids(item_ids).update_all(status_id: ::PurchaseRequestItemStatus.id_for(:po_created))
+    end
   end
 end

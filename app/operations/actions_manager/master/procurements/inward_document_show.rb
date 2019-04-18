@@ -30,6 +30,7 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
     # edit button only appears after we have updated it with some items 
     # do not show edit button while the doc has just been created
     # after doc has been updated with some delivered items, show the edit button
+
     if (self.inward_document.id == self.procurement.inward_documents.last.id) && (self.procurement.documents&.first&.class&.name != "Invoice")
       unless all_accepted?
         e = inward_document.items.map {|i| i.delivered == 0}
@@ -47,6 +48,10 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
         true
       end
     end
+  end
+
+  def delete
+    true
   end
 
   # # alias_method :invoice, :input

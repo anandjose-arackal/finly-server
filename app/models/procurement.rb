@@ -396,11 +396,27 @@ class Procurement < ApplicationRecord
       if user
         # Find document level reviewer mappings
         dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
+
+        #new
         if dlrm.present?
-          dlrm.pluck(:reviewer_id).include? user.id
+          if dlrm.first.forwarded
+            dlrm.pluck(:forwarded_to_id).include?(user.id)
+          elsif dlrm.first.taken_control
+            dlrm.pluck(:taken_control_by_id).include?(user.id)
+          else
+            dlrm.pluck(:reviewer_id).include?(user.id)
+          end
         else
-          purchase_order.level&.reviewers&.include? user
+          false
         end
+        #new ..
+
+
+        # if dlrm.present?
+        #   dlrm.pluck(:reviewer_id).include? user.id
+        # else
+        #   purchase_order.level&.reviewers&.include? user
+        # end
       else
         false
       end
@@ -543,6 +559,13 @@ class Procurement < ApplicationRecord
 
   def po_procurement?
     self.procurement_type == 'purchase_order'
+  end
+
+  def as_json
+    {
+      id: self.id,
+      purchase_order_id: self.purchase_order&.id
+    }
   end
 
 end
