@@ -12,7 +12,7 @@ class VendorStatus < ApplicationRecord
   include Seedable
 
   def self.values
-    %w( draft awaiting_approval retracted rejected approved auto_approved )
+    %w( draft awaiting_approval retracted rejected approved auto_approved deactivated )
   end
 
   scope :with_id, -> (ids) {
@@ -37,6 +37,14 @@ class VendorStatus < ApplicationRecord
 
   def rejected?
     self.id == VendorStatus.id_for(:rejected)
+  end
+
+  def auto_approved?
+    self.id == VendorStatus.id_for(:auto_approved)
+  end
+
+  def deactivated?
+    self.id == VendorStatus.id_for(:deactivated)
   end
 
   def as_json

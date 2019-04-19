@@ -2,7 +2,11 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   register_handle :proc_purchase_order_show
   validate :input
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract,
+    :remind_approver, :void, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download,
+    :send_btn, :export_po_items, :update_btn, :mark_send_to_vendor, :po_revision, :close, :reopen, :unapprove,
+    :take_control, :return_control, :forward
+  ]
 
   def initialize(user = nil, params = {})
     super
@@ -26,7 +30,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     # prevent revision if procurement has invoice or grn attached
     if po_modifiable?
       unless procurement.po_revisions.pluck(:revision_of_id).include?(purchase_order.id)
-        (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
+        (purchase_order.sent_to_vendor? || purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner? || user.vendor_payment_admin?)
       end
     end
   end
@@ -103,14 +107,24 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def retract
 
-    if (procurement.invoices.blank? && procurement.inward_documents.blank?) && document_owner?
+    if (procurement.invoices.blank? && procurement.inward_documents.blank?) && document_owner? && purchase_order.is_initiating_user?
       if purchase_order.processing?
         return true
       end
-      if (purchase_order.approved? || purchase_order.auto_approved?) && (!purchase_order.sent_to_vendor? && !purchase_order.closed? && !purchase_order.voided?)
-        return true
-      end
+      #  retract can only happen if po processing
+      # if (!purchase_order.approved? || !purchase_order.auto_approved?) && (!purchase_order.sent_to_vendor? && !purchase_order.closed? && !purchase_order.voided?)
+      #   return true
+      # end
     end
+
+    # if (procurement.invoices.blank? && procurement.inward_documents.blank?) && document_owner?
+    #   if purchase_order.processing?
+    #     return true
+    #   end
+    #   if (purchase_order.approved? || purchase_order.auto_approved?) && (!purchase_order.sent_to_vendor? && !purchase_order.closed? && !purchase_order.voided?)
+    #     return true
+    #   end
+    # end
 
     # if purchase_order.is_initiating_user? || user.vendor_payments_admin?
     #   if (procurement.invoices.blank? && procurement.inward_documents.blank?) && !purchase_order.sent_to_vendor?
@@ -220,6 +234,41 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   end
 
+  # def take_control
+  #   if user.vendor_payment_admin? && purchase_order.processing? && user_can_take_control?
+  #     true
+  #   end
+  # end
+
+  # def return_control
+  #   if user.vendor_payment_admin? && purchase_order.processing? && user_can_return_control?
+  #     true
+  #   end
+  # end
+
+  def take_control
+    ############# Admin logic start ####################
+    if user.vendor_payments_admin?
+      if (purchase_order.processing? && purchase_order.get_reviewers.exclude?(user))
+        return true
+      end
+      if purchase_order.processing? && !purchase_order.action_users(:return_control).include?(user) && !purchase_order.action_users(:approve).include?(user)
+        return true
+      end
+    end
+    ############# Admin logic end ####################    
+  end
+
+  def return_control
+    ############# Admin logic start ####################
+    if user.vendor_payments_admin?
+      if purchase_order.processing?
+        return true if purchase_order.action_users(:return_control).include?(user)
+      end
+    end
+    ############# Admin logic end ####################
+  end
+
   def po_modifiable?
     (procurement.invoices.blank? && procurement.inward_documents.blank?)
   end
@@ -242,12 +291,24 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def last_level?
     if purchase_order.processing?
-      purchase_order.get_reviewal_chain&.last[:level_number] == purchase_order.level&.level_number
+      purchase_order.get_reviewal_chain&.last&.dig(:level_number) == purchase_order.level&.level_number
     end
   end
 
   def previous_reviewer
     purchase_order.get_reviewers('previous').pluck(:id)
+  end
+
+  def user_can_take_control?
+    # check for the current level if it isn't taken control
+    # check if the same user is not taking control twice
+    # check if for the same level if any other user has also taken control
+    (purchase_order.dlrms&.find_by(level_id: purchase_order.level&.id).taken_control_by_id != user.id)
+  end
+
+  def user_can_return_control?
+    purchase_order.dlrms&.find_by(level_id: purchase_order.level&.id).taken_control &&
+    purchase_order.dlrms&.find_by(level_id: purchase_order.level&.id).taken_control_by_id == user.id
   end
 
   # def unapprove
@@ -261,5 +322,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   #   end
   #   ############# Reviewer logic end #########################
   # end
+
+  def forward
+    purchase_order.processing? && purchase_order.get_reviewers.include?(user)
+  end
 
 end

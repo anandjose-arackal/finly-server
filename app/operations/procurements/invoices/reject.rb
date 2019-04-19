@@ -1,6 +1,13 @@
 class Procurements::Invoices::Reject < Procurements::Invoices::Base
   attr_accessor :invoice, :procurement, :invoice_params
 
+  def pre_validate
+    if params[:note].blank?
+      add_message :error, "Please input a reason for rejection."
+      return
+    end
+  end
+
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.find_by id: invoice_id

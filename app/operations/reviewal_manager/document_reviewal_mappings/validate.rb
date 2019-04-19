@@ -12,7 +12,7 @@ class ReviewalManager::DocumentReviewalMappings::Validate < ReviewalManager::Doc
 
     provider_name = self.document.get_default_provider
     if self.policy.present?
-      self.reviewal_levels = self.policy.levels.with_associted_entity_type(provider_name).non_deleted.reorder(:level_number)
+      self.reviewal_levels = self.policy.levels.with_associated_entity_type(provider_name).non_deleted.reorder(:level_number)
     end
   end
 

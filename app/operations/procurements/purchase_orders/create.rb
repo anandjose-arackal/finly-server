@@ -79,4 +79,14 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.template = result.template
     self.purchase_order = self.template.resource.amoeba_dup
   end
+
+
+
+  # def purchase_request_tasks
+  #   if params[:associated_resource] == "purchase_request_item"
+  #     # Status transition of PR
+  #     perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: params})
+  #     purchase_order.associate_purchase_request_items(params, user)
+  #   end
+  # end
 end

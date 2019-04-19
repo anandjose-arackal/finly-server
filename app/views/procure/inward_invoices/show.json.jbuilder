@@ -52,7 +52,11 @@ end
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
-                :billing_address, :shipping_address, :invoice_id
+                :billing_address, :shipping_address, :invoice_id, :gstin_location_id
+
+  json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
+  json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
+  json.po_number invoice.procurement&.purchase_order&.po_number
 
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
@@ -127,6 +131,9 @@ json.invoice do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
                     :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id
+
+      json.item_number item.inventory_line_item&.item_number rescue nil
+      json.gl_code item.inventory_line_item&.item_code rescue nil
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
@@ -217,6 +224,12 @@ json.attachments do
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
     json.url attachment.file.url(:original, timestamp: false)
+  end
+end
+
+json.gstin_locations do
+  json.array! @result.gstin_locations do |gstin_location|
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
   end
 end
 

@@ -53,6 +53,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name] || item["name"]
+      business_name = item[:business_name] || item["business_name"]
+      authorized = item[:authorized] || item["authorized"]
       amount = item[:original_amount]
       gst_type_id = item[:gst_type_id]
       inclusive_of_taxes = item[:inclusive_of_taxes]
@@ -74,7 +76,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         field_name = field.field_name.gsub(" ", "_").underscore
         if item[field_name.to_sym].present?
           if field.field_type_id == FieldType.id_for(:multiselect)
-            custom_fields[field.id] = [item[field_name.to_sym]]
+            custom_fields[field.id] = [item[field_name.to_sym]].flatten
           elsif field.field_type_id == FieldType.id_for(:drop_down)
             custom_fields[field.id] = item[field_name.to_sym]
           end
@@ -102,6 +104,15 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.error_messages << 'Bank account not found'
         self.issue_item[:bank_account_number] = 'No bank account entered'
       end
+
+      unless authorized
+        if business_name.blank?
+          self.valid = false
+          self.error_messages << 'Please specify the business name to be used for the vendor'
+          self.issue_item[:business_name] = 'Please specify the business name to be used for the vendor'
+        end
+      end
+
 
       # For now not making it mandatory to select tax type
       # if gst_type_id.blank?

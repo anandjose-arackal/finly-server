@@ -30,6 +30,7 @@
 #  custom_currency_conversion  :boolean          default(FALSE)
 #  bank_service_provider       :string(255)
 #  vendor_empanelment_workflow :boolean          default(FALSE)
+#  purchase_requisition_system :boolean
 #
 
 class FeatureSubscription < ApplicationRecord

@@ -1,10 +1,15 @@
 json.result do
 
   json.array!(@result.paginated_vendors) do |vendor|
+    # json.can_approve vendor.can_approve?
+    json.can_approve vendor.can_really_approve?
+    # json.can_reject vendor.can_reject?
+    json.can_reject vendor.can_really_reject?
+    json.can_take_control vendor.can_take_control?
     json.extract! vendor, :id, :name, :business_name, :description, :vendor_id
     json.vendor_id vendor&.vendor_id
     json.vendor_type vendor.vendor_type.as_json
-
+    json.controlling_user vendor.get_reviewers.first&.name
     json.extract! vendor, :id, :name, :email, :mobile_number
     json.policy vendor.policy.as_json
 

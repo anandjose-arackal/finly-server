@@ -696,6 +696,7 @@
 #                                                         PUT    /reports/:id(.:format)                                                                                              reports#update
 #                                                         DELETE /reports/:id(.:format)                                                                                              reports#destroy
 #                                           export_report GET    /export/report(.:format)                                                                                            export#report
+# #                                           export_request GET    /export/request(.:format)                                                                                            export#report
 #                                  export_templates_index GET    /export/templates/index(.:format)                                                                                   export#index_template
 #                                                         GET    /export/templates/:template_key(.:format)                                                                           export#export_template
 #                                          report_comment POST   /reports/:report_id/comment(.:format)                                                                               reports#comment
@@ -1616,6 +1617,15 @@
 #                                                         PUT    /procure/configs/doc_number_configs/:id(.:format)                                                                   procure/configs/doc_number_configs#update
 #                               procure_configs_send_mail POST   /procure/configs/send_mail(.:format)                                                                                procure/configs/mailer#send_mail
 #                                        procure_comments POST   /procure/comments(.:format)                                                                                         procure/comments#create
+#                    procure_purchase_request_edit_config GET    /procure/purchase_requests/:purchase_request_id/edit_config(.:format)                                               procure/purchase_requests#edit_config
+#                               procure_purchase_requests GET    /procure/purchase_requests(.:format)                                                                                procure/purchase_requests#index
+#                                                         POST   /procure/purchase_requests(.:format)                                                                                procure/purchase_requests#create
+#                            new_procure_purchase_request GET    /procure/purchase_requests/new(.:format)                                                                            procure/purchase_requests#new
+#                           edit_procure_purchase_request GET    /procure/purchase_requests/:id/edit(.:format)                                                                       procure/purchase_requests#edit
+#                                procure_purchase_request GET    /procure/purchase_requests/:id(.:format)                                                                            procure/purchase_requests#show
+#                                                         PATCH  /procure/purchase_requests/:id(.:format)                                                                            procure/purchase_requests#update
+#                                                         PUT    /procure/purchase_requests/:id(.:format)                                                                            procure/purchase_requests#update
+#                                                         DELETE /procure/purchase_requests/:id(.:format)                                                                            procure/purchase_requests#destroy
 #                        reviewal_levels_index_user_level GET    /reviewal_levels/index_user_level(.:format)                                                                         reviewal_levels#index_user_level
 #                         reviewal_levels_show_user_level GET    /reviewal_levels/show_user_level(.:format)                                                                          reviewal_levels#show_user_level
 #                       reviewal_levels_download_mappings GET    /reviewal_levels/download_mappings(.:format)                                                                        reviewal_levels#download_mappings
@@ -1644,36 +1654,14 @@
 #                                                         PUT    /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#update
 #                                                         DELETE /level_user_reviewers/:id(.:format)                                                                                 level_user_reviewers#destroy
 #                                            audit_trails GET    /audit_trails(.:format)                                                                                             audit_trails#index
-#                                   dashboards_vp_configs GET    /dashboards/vp/configs(.:format)                                                                                    dashboards/vendor_payments#configs
-#                           dashboards_vp_purchase_orders GET    /dashboards/vp/purchase_orders(.:format)                                                                            dashboards/vendor_payments#purchase_orders
-#                           dashboards_vp_payment_tickets GET    /dashboards/vp/payment_tickets(.:format)                                                                            dashboards/vendor_payments#payment_tickets
-#                               dashboards_vp_po_invoices GET    /dashboards/vp/po_invoices(.:format)                                                                                dashboards/vendor_payments#po_invoices
-#                           dashboards_vp_non_po_invoices GET    /dashboards/vp/non_po_invoices(.:format)                                                                            dashboards/vendor_payments#non_po_invoices
-#                               dashboards_vp_po_advances GET    /dashboards/vp/po_advances(.:format)                                                                                dashboards/vendor_payments#po_advances
-#                                      dashboards_vp_grns GET    /dashboards/vp/grns(.:format)                                                                                       dashboards/vendor_payments#grns
-#                                   dashboards_vp_budgets GET    /dashboards/vp/budgets(.:format)                                                                                    dashboards/vendor_payments#budgets
-#                               vendors_new_vendor_config GET    /vendors/new_vendor_config(.:format)                                                                                vendors#new_vendor_config
-#                                   vendors_filter_config GET    /vendors/filter_config(.:format)                                                                                    vendors#filter_config
-#                               vendors_create_and_submit POST   /vendors/create_and_submit(.:format)                                                                                vendors#create_and_submit
-#                                      vendors_penny_test POST   /vendors/penny_test(.:format)                                                                                       vendors#penny_test
-#                                  vendors_validate_gstin POST   /vendors/validate_gstin(.:format)                                                                                   vendors#validate_gstin
-#                                  vendors_actions_config GET    /vendors/actions_config(.:format)                                                                                   vendors#actions_config
-#                                          vendor_approve PUT    /vendors/:vendor_id/approve(.:format)                                                                               vendors#approve
-#                                           vendor_submit PUT    /vendors/:vendor_id/submit(.:format)                                                                                vendors#submit
-#                                           vendor_reject PUT    /vendors/:vendor_id/reject(.:format)                                                                                vendors#reject
-#                                          vendor_retract PUT    /vendors/:vendor_id/retract(.:format)                                                                               vendors#retract
-#                                     vendor_take_control PUT    /vendors/:vendor_id/take_control(.:format)                                                                          vendors#take_control
-#                                   vendor_return_control PUT    /vendors/:vendor_id/return_control(.:format)                                                                        vendors#return_control
-#                                     vendor_procurements GET    /vendors/:vendor_id/procurements(.:format)                                                                          vendor#procurements
-#                                     vendor_transactions GET    /vendors/:vendor_id/transactions(.:format)                                                                          vendor#transactions
-#                                                 vendors GET    /vendors(.:format)                                                                                                  vendors#index
-#                                                         POST   /vendors(.:format)                                                                                                  vendors#create
-#                                              new_vendor GET    /vendors/new(.:format)                                                                                              vendors#new
-#                                             edit_vendor GET    /vendors/:id/edit(.:format)                                                                                         vendors#edit
-#                                                  vendor GET    /vendors/:id(.:format)                                                                                              vendors#show
-#                                                         PATCH  /vendors/:id(.:format)                                                                                              vendors#update
-#                                                         PUT    /vendors/:id(.:format)                                                                                              vendors#update
-#                                                         DELETE /vendors/:id(.:format)                                                                                              vendors#destroy
+#                               policy_user_role_mappings GET    /policy_user_role_mappings(.:format)                                                                                policy_user_role_mappings#index
+#                                                         POST   /policy_user_role_mappings(.:format)                                                                                policy_user_role_mappings#create
+#                            new_policy_user_role_mapping GET    /policy_user_role_mappings/new(.:format)                                                                            policy_user_role_mappings#new
+#                           edit_policy_user_role_mapping GET    /policy_user_role_mappings/:id/edit(.:format)                                                                       policy_user_role_mappings#edit
+#                                policy_user_role_mapping GET    /policy_user_role_mappings/:id(.:format)                                                                            policy_user_role_mappings#show
+#                                                         PATCH  /policy_user_role_mappings/:id(.:format)                                                                            policy_user_role_mappings#update
+#                                                         PUT    /policy_user_role_mappings/:id(.:format)                                                                            policy_user_role_mappings#update
+#                                                         DELETE /policy_user_role_mappings/:id(.:format)                                                                            policy_user_role_mappings#destroy
 #                            configuration_rate_contracts GET    /rate_contracts/configuration(.:format)                                                                             rate_contracts#configuration
 #                                          rate_contracts GET    /rate_contracts(.:format)                                                                                           rate_contracts#index
 #                                                         POST   /rate_contracts(.:format)                                                                                           rate_contracts#create
@@ -2289,6 +2277,10 @@ Rails.application.routes.draw do
   post 'collect/test_transaction', to: 'finly_collect#notify'
   ######### FINLY COLLECT END ###########
 
+  ######### ATTACHMENT START ############
+  resources :attachments
+  ######### ATTACHMENT END ##############
+
   ######### GEMS SPECIFIC START ###########
 
   # mount HealthMonitor::Engine, at: '/health/'
@@ -2771,6 +2763,7 @@ Rails.application.routes.draw do
   get 'export/report(.:format)' => 'export#report', as: :export_report
   get 'export/templates/index' => 'export#index_template'
   get 'export/templates/:template_key' => 'export#export_template'
+  get 'export/money_request(.:format)' => 'export#money_request', as: :export_money_request
 
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
@@ -3237,6 +3230,7 @@ Rails.application.routes.draw do
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
     patch 'bulk_take_control' => 'bank_payment_requests#bulk_take_control', as: :bulk_take_control
+    patch 'bulk_reject' => 'bank_payment_requests#bulk_reject', as: :bulk_reject
 
     post 'new_pr' => 'bank_payment_requests#new_pr', as: :new_pr
     post 'unified_payment_ticket' => 'bank_payment_requests#unified_payment_ticket', as: :unified_payment_ticket
@@ -3447,12 +3441,15 @@ Rails.application.routes.draw do
     get 'procurements/filter_config', to: "procurements#filter_config"
     get 'procurements/count', to: 'procurements#count'
     resources :procurements do
+      # get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
     end
 
     get 'grn_pending', to: 'procurements#grn_pending'
     get 'grn_received', to: 'procurements#grn_received'
 
     put 'purchase_orders/bulk_approve', to: 'purchase_orders#bulk_approve'
+    put 'purchase_orders/bulk_reject', to: 'purchase_orders#bulk_reject'
+    put 'purchase_orders/bulk_take_control', to: 'purchase_orders#bulk_take_control'
 
     get 'purchase_orders/templates', to: 'purchase_orders#template_index'
     get 'purchase_orders/templates/:id', to: 'purchase_orders#template_show'
@@ -3461,6 +3458,7 @@ Rails.application.routes.draw do
     delete 'purchase_orders/templates/:id', to: 'purchase_orders#template_destroy'
     delete 'purchase_orders/:id/delete', to: 'purchase_orders#destroy'
 
+    put 'purchase_orders/forward', to: 'purchase_orders#bulk_forward'
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
@@ -3470,6 +3468,8 @@ Rails.application.routes.draw do
       put 'unapprove', to: 'purchase_orders#unapprove'
       put 'reject', to: 'purchase_orders#reject'
       put 'close', to: 'purchase_orders#close'
+      put 'take_control', to: 'purchase_orders#take_control'
+      put 'return_control', to: 'purchase_orders#return_control'
       get 'download_pdf', to: 'purchase_orders#download', as: :download
       put 'remind', to: 'purchase_orders#remind'
       put 'void', to: 'purchase_orders#void'
@@ -3478,8 +3478,9 @@ Rails.application.routes.draw do
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
-
       get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
+
+      resources :quotations, only: %i[index create update destroy]
     end
     get 'po_advances', to: 'purchase_orders#po_advances', as: :po_advances
     post 'po_advance_ticket', to: 'purchase_orders#po_advance_ticket', as: :po_advance_ticket
@@ -3489,6 +3490,26 @@ Rails.application.routes.draw do
 
     resources :inward_documents do
 
+    end
+
+    # adding routes for purchase requests
+    resources :purchase_requests do
+      get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
+      post 'create_and_submit', to: "purchase_requests#create_and_submit", as: :create_and_submit
+      patch 'submit', to: "purchase_requests#submit", as: :submit
+      patch 'retract', to: "purchase_requests#retract", as: :retract
+      patch 'reject', to: "purchase_requests#reject", as: :reject
+      patch 'approve', to: "purchase_requests#approve", as: :approve
+      patch 'unapprove', to: "purchase_requests#unapprove", as: :unapprove
+      patch 'take_control', to: "purchase_requests#take_control", as: :take_control
+      patch 'return_control', to: "purchase_requests#return_control", as: :return_control
+      patch 'save_and_submit', to: "purchase_requests#save_and_submit", as: :save_and_submit
+      collection do
+        get 'purchase_request_action_config', to: 'purchase_requests#actions_configuration'
+        get 'approved_items', to: 'purchase_requests#approved_items'
+        patch 'bulk_reject_approved_items', to: "purchase_requests#bulk_reject_approved_items", as: :bulk_reject_approved_items
+        patch 'issue_from_inventory', to: "purchase_requests#issue_from_inventory", as: :issue_from_inventory
+      end
     end
 
     post 'payments/create_bulk_advance', to: 'payments#bulk_create_advance', as: :bulk_create_advance
@@ -3509,12 +3530,17 @@ Rails.application.routes.draw do
     post '/inward_invoices/import', to: 'inward_invoices#import'
 
     put 'inward_invoices/bulk_approve', to: 'inward_invoices#bulk_approve'
+    put 'inward_invoices/bulk_reject', to: 'inward_invoices#bulk_reject'
+    put 'inward_invoices/bulk_take_control', to: 'inward_invoices#bulk_take_control'
+    put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
       put 'approve', to: 'inward_invoices#approve'
       put 'unapprove', to: 'inward_invoices#unapprove'
       put 'reject', to: 'inward_invoices#reject'
+      put 'return_control', to: 'inward_invoices#return_control'
+      put 'take_control', to: 'inward_invoices#take_control'
       put 'close', to: 'inward_invoices#close'
       post 'save_as_template', to: 'inward_invoices#template_create'
       post 'apply_template', to: 'inward_invoices#template_apply'
@@ -3555,6 +3581,7 @@ Rails.application.routes.draw do
 
   ######## Dashboards ##################
   namespace :dashboards do
+    get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
     get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
     get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
@@ -3574,6 +3601,11 @@ Rails.application.routes.draw do
   post 'vendors/penny_test', to: 'vendors#penny_test'
   post 'vendors/validate_gstin', to: 'vendors#validate_gstin'
   get 'vendors/actions_config', to: 'vendors#actions_config'
+
+  put 'vendors/bulk_approve', to: 'vendors#bulk_approve'
+  put 'vendors/bulk_reject', to: 'vendors#bulk_reject'
+  put 'vendors/bulk_take_control', to: 'vendors#bulk_take_control'
+
   resources :vendors do
     put 'approve', to: "vendors#approve"
     put 'submit', to: "vendors#submit"
@@ -3581,8 +3613,8 @@ Rails.application.routes.draw do
     put 'retract', to: "vendors#retract"
     put 'take_control', to: "vendors#take_control"
     put 'return_control', to: "vendors#return_control"
-    get 'procurements', to: "vendor#procurements"
-    get 'transactions', to: "vendor#transactions"
+    get 'procurements', to: "vendors#procurements"
+    get 'transactions', to: "vendors#transactions"
   end
   ######### New Vendor Empanelment Ends ##
 
@@ -3600,6 +3632,11 @@ Rails.application.routes.draw do
     put 'import', to: 'rate_contract_line_items#import'
   end
   ########### Rate Contract Line Item API end ###############
+
+  ########### Forwardable Users #############################
+  get 'forwardable_users', to: 'policy_user_roles#forwardable_users'
+
+  ############## Forwardable Users End ######################
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

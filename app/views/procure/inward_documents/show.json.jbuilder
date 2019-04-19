@@ -1,9 +1,9 @@
 inward_document = @result.inward_document
-json.extract! @result.inward_document, :id, :doc_number, :delivery_date, :grn_number
+json.extract! @result.inward_document, :id, :doc_number, :delivery_date, :grn_number, :user
 
 if @result.inward_document.vendor.present?
   json.vendor do
-    json.extract! inward_document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
+    json.extract! inward_document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state, :business_name
   end
 end
 

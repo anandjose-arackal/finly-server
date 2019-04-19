@@ -201,6 +201,7 @@ class User < ApplicationRecord
 
   # P2P Documents
   has_many :purchase_orders
+  has_many :purchase_requests, foreign_key: :creator_id
 
   # Budgets
 
@@ -215,6 +216,7 @@ class User < ApplicationRecord
   has_many :level_user_reviewer_mappings
   alias_method :lurms, :level_user_reviewer_mappings
   has_many :procurement_attachments
+  has_many :attachments, foreign_key: :creator_id
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
@@ -251,8 +253,8 @@ class User < ApplicationRecord
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
-  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
-  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
   validates :user_panel_subscription, presence: true
@@ -1258,6 +1260,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
   end
 
+  def is_purchase_request_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_request_initiator), document)
+  end
+
   def is_purchase_request_reviewer?(document=nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
   end
@@ -1290,6 +1296,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:goods_receiver), document)
   end
 
+  def is_inventory_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
+  end
+
   # ************ User Role for vendor payments ******************
 
   def relevant
@@ -1305,6 +1315,22 @@ class User < ApplicationRecord
 
   def vp_admin_or_auditor?
     self.vendor_payments_admin? || self.vendor_payments_auditor?
+  end
+
+  def policy_admin_or_auditor?
+    self.has_policy_role?(UserRole.id_for(:policy_admin)) || self.has_policy_role?(UserRole.id_for(:policy_auditor))
+  end
+
+  # locations associated with policies to which users are associated as initiator role
+  def initiator_associated_locations(role_id)
+    location_ids = company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ?', role_id).joins(:policy_location_mappings).pluck('policy_location_mappings.location_id')
+    return company.locations.with_ids(location_ids)
+  end
+
+  # departments associated with policies to which users are associated as initiator role
+  def initiator_associated_departments(role_id)
+    department_ids = company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ?', role_id).joins(:policy_department_mappings).pluck('policy_department_mappings.department_id')
+    return company.departments.with_ids(department_ids)
   end
 
   private

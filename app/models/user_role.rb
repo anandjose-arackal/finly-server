@@ -52,7 +52,11 @@ class UserRole < ApplicationRecord
       vendor_manager: 25,
       bank_payment_request_auditor: 26,
       budget_manager: 27,
-      non_po_initiator: 28
+      non_po_initiator: 28,
+      purchase_request_auditor: 29,
+      purchase_order_auditor: 30,
+      invoice_auditor: 31,
+      vendor_auditor: 32
   }
 
   VALUES_EM = {
@@ -94,7 +98,11 @@ class UserRole < ApplicationRecord
       vendor_manager: 25,
       bank_payment_request_auditor: 26,
       budget_manager: 27,
-      non_po_initiator: 28
+      non_po_initiator: 28,
+      purchase_request_auditor: 29,
+      purchase_order_auditor: 30,
+      invoice_auditor: 31,
+      vendor_auditor: 32
   }
 
 

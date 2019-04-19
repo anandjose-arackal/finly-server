@@ -2,35 +2,38 @@
 #
 # Table name: purchase_order_items
 #
-#  id                     :integer          not null, primary key
-#  purchase_order_id      :integer
-#  inventory_line_item_id :integer
-#  product_id             :string(255)
-#  description            :string(255)
-#  hsn_sac                :string(255)
-#  quantity               :integer
-#  rate                   :decimal(20, 5)
-#  tax                    :decimal(20, 5)
-#  tds                    :decimal(20, 5)
-#  discount               :decimal(20, 5)
-#  tax_amount_id          :integer
-#  tds_amount_id          :integer
-#  discount_amount_id     :integer
-#  total_amount_id        :integer
-#  delivery_date          :date
-#  comment                :text(65535)
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  delivered              :integer          default(0)
-#  accepted               :integer          default(0)
-#  rejected               :integer          default(0)
-#  category_id            :integer
-#  cost_center_id         :integer
-#  is_deleted             :boolean          default(FALSE), not null
-#  account                :string(255)
-#  tax_rate_id            :integer
-#  deleted_at             :datetime
-#  unit_of_measurement    :string(255)
+#  id                       :integer          not null, primary key
+#  purchase_order_id        :integer
+#  inventory_line_item_id   :integer
+#  product_id               :string(255)
+#  description              :string(255)
+#  hsn_sac                  :string(255)
+#  quantity                 :integer
+#  rate                     :decimal(20, 5)
+#  tax                      :decimal(20, 5)
+#  tds                      :decimal(20, 5)
+#  discount                 :decimal(20, 5)
+#  tax_amount_id            :integer
+#  tds_amount_id            :integer
+#  discount_amount_id       :integer
+#  total_amount_id          :integer
+#  delivery_date            :date
+#  comment                  :text(65535)
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  delivered                :integer          default(0)
+#  accepted                 :integer          default(0)
+#  rejected                 :integer          default(0)
+#  category_id              :integer
+#  cost_center_id           :integer
+#  is_deleted               :boolean          default(FALSE), not null
+#  account                  :string(255)
+#  tax_rate_id              :integer
+#  deleted_at               :datetime
+#  submitted_at             :datetime
+#  approved_at              :datetime
+#  unit_of_measurement      :string(255)
+#  purchase_request_item_id :integer
 #
 
 class PurchaseOrderItem < ApplicationRecord
@@ -46,9 +49,12 @@ class PurchaseOrderItem < ApplicationRecord
   belongs_to :total_amount, optional: true, class_name: "Amount"
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
+  belongs_to :purchase_request_item, optional: true
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
+
+  validates_presence_of :unit_of_measurement
 
   accepts_nested_attributes_for :tax_amount, :discount_amount,
                                 :total_amount

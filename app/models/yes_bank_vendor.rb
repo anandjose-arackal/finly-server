@@ -84,7 +84,7 @@ class YesBankVendor < ApplicationRecord
   has_many :budget_trails, as: :vendor
 
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :deactivated?, to: :status
 
   accepts_nested_attributes_for :bank_accounts, allow_destroy: true
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
@@ -101,6 +101,7 @@ class YesBankVendor < ApplicationRecord
   scope :non_deleted, -> {where deleted_at: nil}
   scope :authorized, -> { where authorized: true}
   scope :approved, -> {where status_id: [VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved)]}
+  scope :filter_active, -> { where.not(status_id: VendorStatus.id_for(:deactivated))}
 
   scope :non_draft, -> {where.not(status_id: VendorStatus.id_for(:draft))}
 
@@ -123,7 +124,24 @@ class YesBankVendor < ApplicationRecord
   scope :sort_for_index, -> {reorder(created_at: :desc)}
 
   scope :filter_vendor_type_id, -> (type_id) {where vendor_type_id: type_id}
-  scope :filter_status_id, -> (status_id) {where status_id: status_id}
+ 
+  scope :filter_status_id, -> (status_id) {
+    if status_id == 'approved'
+      where status_id: [VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved)]
+    elsif status_id == 'processing' 
+      where status_id: [VendorStatus.id_for(:awaiting_approval)]
+    elsif status_id == 'open'
+      where status_id: [VendorStatus.id_for(:draft), VendorStatus.id_for(:retracted), VendorStatus.id_for(:rejected)]
+    elsif status_id == 'awaiting_approval'
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(user_id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      where status_id: status_id
+    end
+  }
   scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
   scope :filter_created_by_id, -> (user_id) {where created_by_id: user_id}
   scope :filter_business_name, -> (term) {where("business_name like ?", "%#{term}%")}
@@ -228,6 +246,10 @@ class YesBankVendor < ApplicationRecord
     self.status_ids(*self.role_based_statuses(user))
   end
 
+  def self.auditor_associated_status_ids
+    self.status_ids(:awaiting_approval, :retracted, :rejected, :approved, :auto_approved, :deactivated)
+  end
+
   def self.role_based_statuses(user)
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
@@ -246,5 +268,41 @@ class YesBankVendor < ApplicationRecord
 
   def self.initiator_associated_items(user, role_id=nil)
     self.where(id: user.yes_bank_vendors)
+  end
+
+  def can_approve?
+    (awaiting_approval? rescue nil)
+  end
+
+  def can_really_approve?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      awaiting_approval? rescue false
+    elsif self.action_users(:approve).include?(user)
+      awaiting_approval? rescue false
+    else
+      false
+    end
+  end
+
+  def can_reject?
+    (awaiting_approval? rescue nil)
+  end
+
+  def can_really_reject?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      awaiting_approval? rescue false
+    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+      awaiting_approval? rescue false
+    else
+      false
+    end
+  end
+
+  def can_take_control?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if self.action_users(:approve).include?(user)
+    (awaiting_approval? rescue false) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 end

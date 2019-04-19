@@ -99,10 +99,38 @@ class ProcurementMailer < ApplicationMailer
     end
   end
 
+  def purchase_order_bulk_take_control(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_take_control'
+    end
+  end
+
+  def purchase_order_bulk_reject(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_reject'
+    end
+  end
+
   def invoice_bulk_approval(presenter)
     @data = presenter
     if presenter.success?
       mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_approval_invoices'
+    end
+  end
+
+  def invoice_bulk_take_control(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_take_control_invoices'
+    end
+  end
+
+  def invoice_bulk_reject(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_reject_invoices'
     end
   end
 

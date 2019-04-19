@@ -35,6 +35,7 @@ class Procurement < ApplicationRecord
   has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy
+  has_many :proforma_invoices, class_name: 'Invoice', dependent: :destroy, foreign_key: :proforma_invoice_id
   has_many :bill_of_supplies, dependent: :destroy
   has_many :delivery_challans, dependent: :destroy
   has_many :e_way_bills, dependent: :destroy
@@ -291,7 +292,7 @@ class Procurement < ApplicationRecord
   }
 
   scope :filter_awaiting_approval, -> (user) {
-    if user.vendor_payments_reviewer?
+    if user.vendor_payments_reviewer? || user.vendor_payments_admin?
       # level_ids = []
 
       # policy_ids = user.company.policies.with_application(:vp).pluck(:id)
@@ -335,7 +336,9 @@ class Procurement < ApplicationRecord
 
       # where(id: procurement_ids.uniq)
       procurement_ids = PurchaseOrder.awaiting_action_items(user).pluck(:procurement_id).compact
-      procurement_ids += Invoice.awaiting_action_items(user).pluck(:procurement_id).compact
+      # Removed, since procurements is only used for purchase orders
+      # For invoices(PO/NPO) api/bank_transfer/inward_invoices.json is used
+      # procurement_ids += Invoice.awaiting_action_items(user).pluck(:procurement_id).compact
       where(id: procurement_ids.uniq)
     end
   }
@@ -395,11 +398,27 @@ class Procurement < ApplicationRecord
       if user
         # Find document level reviewer mappings
         dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
+
+        #new
         if dlrm.present?
-          dlrm.pluck(:reviewer_id).include? user.id
+          if dlrm.first.forwarded
+            dlrm.pluck(:forwarded_to_id).include?(user.id)
+          elsif dlrm.first.taken_control
+            dlrm.pluck(:taken_control_by_id).include?(user.id)
+          else
+            dlrm.pluck(:reviewer_id).include?(user.id)
+          end
         else
-          purchase_order.level&.reviewers&.include? user
+          false
         end
+        #new ..
+
+
+        # if dlrm.present?
+        #   dlrm.pluck(:reviewer_id).include? user.id
+        # else
+        #   purchase_order.level&.reviewers&.include? user
+        # end
       else
         false
       end
@@ -542,6 +561,13 @@ class Procurement < ApplicationRecord
 
   def po_procurement?
     self.procurement_type == 'purchase_order'
+  end
+
+  def as_json
+    {
+      id: self.id,
+      purchase_order_id: self.purchase_order&.id
+    }
   end
 
 end

@@ -24,11 +24,11 @@ class Vendors::Base < BaseOperation
 
   def vendor_attributes
     params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description, :pan, :tin, :gst, :state, :state_code_id, :gst_registered, :vendor_type_id,
-                                   :business_name, :address, :payment_term_id, :currency_id, :tds_rates_list_id, :policy_id,
-                                   vendor_tds_rates_attributes: [:id, :tds_rates_list_id],
-                                   bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :address_1, :address_2, :address_3, :pin_code, :country],
-                                   vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :remove_file],
-                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation]
+                                   :business_name, :address, :payment_term_id, :currency_id, :policy_id,
+                                   vendor_tds_rates_attributes: [:id, :tds_rates_list_id, :_destroy],
+                                   bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :_destroy],
+                                   vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :_destroy],
+                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation, :_destroy]
     ) 
   end
 
@@ -90,6 +90,7 @@ class Vendors::Base < BaseOperation
       gstin_master = Gstin.with_gstin(gstin).first
 
       if gstin_master.present?
+        gstin_location[:gstin_id] = gstin_master.id
         if gstin_master.status == "Active"
 
           unless gstin_master.gstin.slice(2, 10) == vendor_params[:pan]
@@ -97,9 +98,10 @@ class Vendors::Base < BaseOperation
           end
 
           match_percentile = StringUtils.fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
+          trade_name_match_percentile = StringUtils.fuzzy_string_match(business_name, gstin_master.trade_name)
 
-          if match_percentile < 90
-            add_message :error, "Business Name Match Percentile is below 90% for Location #{index+1}"
+          if match_percentile < 90 || trade_name_match_percentile < 90
+            add_message :error, "Business Name or Trade Name Match Percentile is below 90% for Location #{index+1}"
           end
         else
           add_message :error, "GSTIN Status is not Active for Location #{index+1}"

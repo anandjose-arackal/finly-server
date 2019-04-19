@@ -1,0 +1,66 @@
+<% content_for :body do %>
+  <head>
+    <title>Bulk Take Control of Purchase Orders</title>
+  </head>
+  <body style="background-color: #f3f3f3; height: auto;">
+  <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
+    <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;">Bulk Take Control of Purchase Orders</p>
+  </div>
+  <div style="width: 100%; height: auto; margin: auto; background-color: white;">
+
+    <% if @data.take_control_results[:success].length > 0 %>
+      <div style="text-align: left;">Following POs are in your control:</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>PO #</th>
+          <th>Created By</th>
+          <th>Sub Department</th>
+          <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.take_control_results[:success].each_with_index do |po_details, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= po_details[:po_number] %></td>
+            <td><%= po_details[:user] %></td>
+            <td><%= po_details[:sub_department] %></td>
+            <td>&#8377;<%= po_details[:amount]&.to_d.round(2) rescue 0 %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <% if @data.take_control_results[:error].length > 0 %>
+      <div style="text-align: left;">Following POs could not be taken control:</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>PO #</th>
+          <th>Created By</th>
+          <th>Sub Department</th>
+          <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.take_control_results[:error].each_with_index do |po_details, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= po_details[:po_number] %></td>
+            <td><%= po_details[:user] %></td>
+            <td><%= po_details[:sub_department] %></td>
+            <td>&#8377;<%= po_details[:amount]&.to_d.round(2) rescue 0 %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+  </div>
+  </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>

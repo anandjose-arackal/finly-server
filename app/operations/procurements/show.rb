@@ -24,7 +24,7 @@ class Procurements::Show < Procurements::Base
   class Procurements::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations,
                   :payment_terms, :bill_of_supplies, :delivery_challans, :vendor,
-                  :procurement_terms, :policies, :e_way_bills, :status_tags, :actions, :po_revisions
+                  :procurement_terms, :policies, :e_way_bills, :status_tags, :actions, :po_revisions, :proforma_invoices
 
     def init
       self.procurement = params[:procurement]
@@ -33,6 +33,7 @@ class Procurements::Show < Procurements::Base
       self.purchase_order = self.procurement.purchase_order
       self.vendor = get_vendor
       self.invoices = self.procurement.invoices
+      self.proforma_invoices = self.procurement.proforma_invoices
       self.inward_documents = self.procurement.inward_documents
       self.bill_of_supplies = self.procurement.bill_of_supplies
       self.delivery_challans = self.procurement.delivery_challans
@@ -120,6 +121,7 @@ class Procurements::Show < Procurements::Base
       documents += self.delivery_challans
       documents += self.e_way_bills
       documents += self.po_revisions
+      documents += self.proforma_invoices
 
       documents.sort_by!{ |doc| doc.created_at}.reverse!
       documents

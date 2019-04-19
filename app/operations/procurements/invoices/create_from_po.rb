@@ -1,7 +1,7 @@
 class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision, :previous_invoices, :advance,
-                :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice
+                :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance
 
   def personalizer
     {
@@ -62,6 +62,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     
     self.invoice.company_id = user.company.id
     if self.invoice.save
+      if (params[:document_type].present? && params[:document_type] == 'proforma_invoice')
+        self.invoice.proforma_invoice_id = self.invoice.id
+      end
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
       self.invoice.save
 
@@ -117,6 +120,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
       real_q = 0
 
+    if (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
       if self.previous_invoices.present?
 
         item_in_invoice = self.previous_invoices.first.invoice_items.pluck(:inventory_line_item_id).include? item.inventory_line_item_id
@@ -150,7 +154,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           real_q = item.quantity
         end
       end
-
+    else
+      real_q = item.quantity
+    end
       invoice_items_attributes << {
           tax: item.tax,
           discount: item.discount,
@@ -170,7 +176,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     if (invoice_items_attributes.pluck(:quantity).sum == 0) then add_message :error, "Invoice can't be created. Either all items are billed or you need to add a GRN first." end
     
 
-    if self.advance.present?
+    if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
 
       # for the new invoice where they want to adjust the advance,
       # in prev adjusted amount, we store the sum of last invoices prev adjusted and its current adjusted advance
@@ -190,11 +196,17 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       end
     end
 
+    invoice_type = ::InwardInvoiceType.id_for(:tax_invoice)
+    if (params[:document_type].present? && params[:document_type] == 'proforma_invoice')
+      invoice_type = ::InwardInvoiceType.id_for(:proforma_invoice)
+      self.proforma_advance = Amount.new(value: 0, currency_id: 1)
+    end
+
     invoice_params = {
       vendor_id: self.purchase_order.vendor_id,
       invoice_status_id: ::InwardInvoiceStatus.id_for(:open),
       created_by_user_id: user.id,
-      invoice_type_id: ::InwardInvoiceType.id_for(:tax_invoice),
+      invoice_type_id: invoice_type,
       payment_term_id: self.purchase_order.payment_term_id,
       due_date: self.purchase_order.delivery_date,
       receiving_account: receiving_account,
@@ -207,12 +219,18 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       sub_department_id: self.purchase_order.sub_department_id,
       cost_center_id: self.purchase_order.cost_center_id,
       invoice_items_attributes: invoice_items_attributes,
-      policy_id: self.purchase_order.policy_id
+      policy_id: self.purchase_order.policy_id,
+      gstin_location_id: self.purchase_order.gstin_location_id
     }
-    if self.advance.present?
+
+    if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
         invoice_params[:po_advance] = self.po_advance
         invoice_params[:po_prev_adjusted_advance] = self.po_prev_adjusted_advance
         invoice_params[:po_adjusted_advance] = self.po_adjusted_advance
+    end
+
+    if (params[:document_type].present? && params[:document_type] == 'proforma_invoice')
+      invoice_params[:proforma_advance] = self.proforma_advance
     end
     return invoice_params
   end

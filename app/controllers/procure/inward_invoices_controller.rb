@@ -22,6 +22,11 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
     respond
   end
 
+  def bulk_forward
+    @result = Procurements::Invoices::BulkForward.(current_user, params)
+    respond
+  end
+
   def show
     @result = Procurements::Invoices::Show.(current_user, params)
     respond
@@ -95,6 +100,26 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
 
   def bulk_approve
     @result = Procurements::Invoices::BulkApprove.(current_user, params)
+    respond
+  end
+
+  def bulk_reject
+    @result = Procurements::Invoices::BulkReject.(current_user, params)
+    respond
+  end
+
+  def bulk_take_control
+    @result = Procurements::Invoices::BulkTakeControl.(current_user, params)
+    respond
+  end
+
+  def take_control
+    @result = Procurements::Invoices::TakeControl.(current_user, params)
+    respond
+  end
+
+  def return_control
+    @result = Procurements::Invoices::ReturnControl.(current_user, params)
     respond
   end
 

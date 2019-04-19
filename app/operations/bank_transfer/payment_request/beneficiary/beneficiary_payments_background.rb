@@ -105,28 +105,39 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
   end
 
   def process
-    self.payment_params.each do |params|
-      custom_fields = params[:custom_fields]
-      params.delete(:custom_fields)
-      params[:payment_order_id] = self.bank_payment_request.payment_order.id
-      # payment = ::Payment.new(params)
-      payment = self.bank_payment_request.payment_order.payments.build(params)
+    self.payment_params.each do |payment_param|
+      custom_fields = payment_param[:custom_fields]
+      payment_param.delete(:custom_fields)
+      payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
+      # payment = ::Payment.new(payment_param)
+      payment = self.bank_payment_request.payment_order.payments.build(payment_param)
       if payment.save
         # perform the required calculations
-        beneficiary_payment = self.beneficiary_payments.find(params[:beneficiary_payment_id])
+        beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id])
         beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
 
-        # InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+        InvoiceCalculationUtils.new.calculate_tax_and_discounts({}, payment)
+        payment.save
+        set_custom_fields_invoice(payment, {custom_fields: custom_fields}, true)
       end
     end
 
     # now once the payment request has been created and the payments saved, we can mark it as open
-    self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open))
+    max_payment_amount = self.bank_payment_request.payment_order.payments.reload.joins(:amount).pluck(:value).max || 0
+    self.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:open), max_payment_amount: max_payment_amount)
     self.bank_payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval))
     # puts 'SUCCESSFUL!'
   end
 
   private
+
+  def set_custom_fields_invoice(payment, data, save)
+    custom_fields = {custom_fields: data[:custom_fields]}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+  end
 
   def retrieve_bank_account(order_details)
     if order_details[:account_id].present?
@@ -137,7 +148,8 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
                                            company_id: self.company_id, name: order_details[:name]&.strip,
                                            account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
-      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
+      business_name = order_details[:business_name] || order_details[:name]
+      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id, business_name: business_name)
       ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
       if ba.nil?
         ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,account_owner: vendor, company_id: self.company_id, default_account: true)
