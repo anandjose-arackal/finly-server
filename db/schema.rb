@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_16_133531) do
+ActiveRecord::Schema.define(version: 2019_04_18_093631) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -1571,6 +1571,7 @@ ActiveRecord::Schema.define(version: 2019_04_16_133531) do
     t.boolean "sso_enabled", default: false
     t.text "address"
     t.boolean "cash_money_requests_enabled", default: true
+    t.boolean "auto_retry_payment", default: false
     t.index ["company_id"], name: "index_company_configurations_on_company_id"
     t.index ["contact_id"], name: "index_company_configurations_on_contact_id"
   end
@@ -1719,6 +1720,7 @@ ActiveRecord::Schema.define(version: 2019_04_16_133531) do
     t.integer "user_pocket_type_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "active", default: true
     t.index ["company_id"], name: "index_company_pocket_templates_on_company_id"
     t.index ["user_pocket_type_id"], name: "index_company_pocket_templates_on_user_pocket_type_id"
   end
@@ -2945,7 +2947,9 @@ ActiveRecord::Schema.define(version: 2019_04_16_133531) do
     t.integer "tax_rate_id"
     t.integer "cost_center_id"
     t.string "unit_of_measurement"
+    t.integer "department_id"
     t.index ["category_id"], name: "index_invoice_line_items_on_category_id"
+    t.index ["department_id"], name: "index_invoice_line_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id"
     t.index ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id"
     t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
@@ -4366,6 +4370,8 @@ ActiveRecord::Schema.define(version: 2019_04_16_133531) do
     t.datetime "deleted_at"
     t.string "unit_of_measurement"
     t.integer "purchase_request_item_id"
+    t.integer "department_id"
+    t.index ["department_id"], name: "index_purchase_order_items_on_department_id"
     t.index ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id"
     t.index ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id"
     t.index ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id"
@@ -4492,8 +4498,12 @@ ActiveRecord::Schema.define(version: 2019_04_16_133531) do
     t.boolean "rejected"
     t.string "unit_of_measurement"
     t.string "reject_note"
+    t.integer "department_id"
+    t.integer "cost_center_id"
     t.index ["approved"], name: "index_purchase_request_items_on_approved"
+    t.index ["cost_center_id"], name: "index_purchase_request_items_on_cost_center_id"
     t.index ["delivery_location_id"], name: "index_purchase_request_items_on_delivery_location_id"
+    t.index ["department_id"], name: "index_purchase_request_items_on_department_id"
     t.index ["estimated_amount_id"], name: "index_purchase_request_items_on_estimated_amount_id"
     t.index ["item_id"], name: "index_purchase_request_items_on_item_id"
     t.index ["per_unit_estimated_amount_id"], name: "index_purchase_request_items_on_per_unit_estimated_amount_id"
@@ -5295,9 +5305,11 @@ ActiveRecord::Schema.define(version: 2019_04_16_133531) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "sequence_number"
+    t.bigint "payment_id"
     t.index ["amount_id"], name: "fk_rails_12e08cc879"
     t.index ["company_id"], name: "index_transaction_details_on_company_id"
     t.index ["finly_transaction_id"], name: "fk_rails_db0f67a401"
+    t.index ["payment_id"], name: "index_transaction_details_on_payment_id"
   end
 
   create_table "transaction_statuses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -5660,6 +5672,7 @@ ActiveRecord::Schema.define(version: 2019_04_16_133531) do
     t.integer "user_id"
     t.integer "base_currency_id"
     t.integer "company_pocket_template_id"
+    t.boolean "active", default: true
     t.index ["balance_id"], name: "index_user_pockets_on_balance_id"
     t.index ["user_pocket_type_id"], name: "index_user_pockets_on_user_pocket_type_id"
   end
