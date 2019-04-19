@@ -39,7 +39,7 @@ class Statements::AsSpreadsheet < Statements::Base
           transaction_detail.closing_balance&.value,
           transaction_detail.status.humanize,
           transaction_detail.transaction_reference_id,
-          transaction_detail.note
+          transaction_detail.get_note
       ]
     end
   end

@@ -35,9 +35,11 @@ json.results do
       json.po_amount po.balance_amount
       json.location po.delivery_location
       json.po_bulk_actions do  
-        json.can_approve po.can_approve?
-        json.can_reject po.can_reject?
-        json.can_take_control po.can_take_control?
+      # json.can_approve po.can_approve?
+      json.can_approve po.can_really_approve?
+      # json.can_reject po.can_reject?
+      json.can_reject po.can_really_reject?
+      json.can_take_control po.can_take_control?
       end
 
       if po.items.present?

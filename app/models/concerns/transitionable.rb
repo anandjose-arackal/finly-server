@@ -216,6 +216,8 @@ module Transitionable
         if level.present?
           user_ids += document_level_reviewer_mappings.with_provider_name(provider_name).with_level_id(level.id).pluck(:taken_control_by_id).compact
         end
+      when 'take_control', :take_control
+        user_ids << self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id
       else
         # nothing to do
       end

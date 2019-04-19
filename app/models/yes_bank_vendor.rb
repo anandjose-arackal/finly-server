@@ -274,13 +274,35 @@ class YesBankVendor < ApplicationRecord
     (awaiting_approval? rescue nil)
   end
 
+  def can_really_approve?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      awaiting_approval? rescue false
+    elsif self.action_users(:approve).include?(user)
+      awaiting_approval? rescue false
+    else
+      false
+    end
+  end
+
   def can_reject?
     (awaiting_approval? rescue nil)
+  end
+
+  def can_really_reject?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      awaiting_approval? rescue false
+    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+      awaiting_approval? rescue false
+    else
+      false
+    end
   end
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     return false if self.action_users(:approve).include?(user)
-    (awaiting_approval? rescue nil) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
+    (awaiting_approval? rescue false) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 end

@@ -167,9 +167,10 @@ class PurchaseOrder < ApplicationRecord
   }
   scope :with_budgetable_user_ids, -> (user_ids) {
     if user_ids.present?
-      where created_by_user_id: user_ids
+      where user_id: user_ids
     end
   }
+  
   scope :with_budgetable_vendor_ids, -> (vendor_ids) {
     if vendor_ids.present?
       where vendor_id: vendor_ids
@@ -406,8 +407,30 @@ class PurchaseOrder < ApplicationRecord
     processing?
   end
 
+  def can_really_approve?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      processing?
+    elsif self.action_users(:approve).include?(user)
+      processing?
+    else
+      false
+    end
+  end
+
   def can_reject?
     processing?
+  end
+
+  def can_really_reject?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      processing?
+    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+      processing?
+    else
+      false
+    end
   end
 
   def can_take_control?(user=nil)

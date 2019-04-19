@@ -644,8 +644,30 @@ class Invoice < ApplicationRecord
     processing? rescue false
   end
 
+  def can_really_approve?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      processing? rescue false
+    elsif self.action_users(:approve).include?(user)
+      processing? rescue false
+    else
+      false
+    end
+  end
+
   def can_reject?
     processing? rescue false
+  end
+
+  def can_really_reject?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.action_users(:take_control).include?(user)
+      processing? rescue false
+    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+      processing? rescue false
+    else
+      false
+    end
   end
 
   def can_take_control?(user=nil)
