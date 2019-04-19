@@ -1,0 +1,95 @@
+class Event::EInvoice::BulkForward < Event::EInvoice::Base
+  attr_accessor :result, :forwarded_to_user
+
+  def pre_validate
+    unless user.present?
+      add_message :error, 'User not found'
+      return
+    end
+  end
+
+  def init
+    self.result = params[:result]
+    self.forwarded_to_user = params[:forwarded_to_user]
+  end
+
+  def validate
+    unless forwarded_to_user.present?
+      add_message :error, "No Forwarded To User Found"
+    end
+  end
+
+  def send_mailer(user)
+    # If no purchase orders could be forwarded, don't send mail to forward to user
+    return if result[:success].length == 0 && user.id == forwarded_to_user.id
+    return if user.blank?
+    set_presenter_params(user)
+    return unless params[:subject].present? && params[:body].present?
+    params[:result] = self.result
+    params[:display_errors] = true unless user.id == forwarded_to_user.id
+    ProcurementMailer.delay.invoice_bulk_approval(Event::EInvoice::BulkApprove::MailerPresenter.new(user, params))
+  end
+
+  def process
+    send_mailer(user)
+  end
+
+  def event_id
+    nil
+  end
+
+  def affected_users
+  end
+
+  def notification_affected_users
+    []
+  end
+
+  def set_notification(user)
+  end
+
+  def mailer_subject(user)
+    if user.id == forwarded_to_user.id
+      "Invoices Forwarded To You"
+    else
+      "You Forwarded Invoices"
+    end
+  end
+
+  def mailer_body(user)
+    if user.id == forwarded_to_user.id
+      "#{self.user.name} has forwarded #{self.result[:success].length} invoices to you for approval"
+    else
+      "You successfully forwarded #{self.result[:success].length} invoices to #{forwarded_to_user.name} for approval \n " +
+      "#{self.result[:success].length} invoices couldn't be forwarded"
+    end
+  end
+
+  class Event::EInvoice::BulkApprove::MailerPresenter < Event::SetNotifier::MailerPresenter
+    attr_accessor :user, :body_val, :subject_val, :button_val, :company, :result
+
+    def initialize(user, params)
+      self.user = user
+      self.body_val = params[:body]
+      self.subject_val = params[:subject]
+      self.company = user.company
+      self.result = params[:result]
+    end
+
+    def validate
+      self.user.present?
+    end
+
+    def to
+      self.user.email
+    end
+
+    def subject
+      self.subject_val
+    end
+
+    def body
+      self.body_val
+    end
+  end
+end
