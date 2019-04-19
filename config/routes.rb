@@ -690,6 +690,7 @@
 #                                                         PUT    /reports/:id(.:format)                                                                                              reports#update
 #                                                         DELETE /reports/:id(.:format)                                                                                              reports#destroy
 #                                           export_report GET    /export/report(.:format)                                                                                            export#report
+# #                                           export_request GET    /export/request(.:format)                                                                                            export#report
 #                                  export_templates_index GET    /export/templates/index(.:format)                                                                                   export#index_template
 #                                                         GET    /export/templates/:template_key(.:format)                                                                           export#export_template
 #                                          report_comment POST   /reports/:report_id/comment(.:format)                                                                               reports#comment
@@ -2750,6 +2751,7 @@ Rails.application.routes.draw do
   get 'export/report(.:format)' => 'export#report', as: :export_report
   get 'export/templates/index' => 'export#index_template'
   get 'export/templates/:template_key' => 'export#export_template'
+  get 'export/money_request(.:format)' => 'export#money_request', as: :export_money_request
 
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
@@ -3569,6 +3571,7 @@ Rails.application.routes.draw do
     get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
     get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
+    get 'vp/purchase_requests', to: 'vendor_payments#purchase_requests'
     get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
     get 'vp/po_invoices', to: 'vendor_payments#po_invoices'
     get 'vp/non_po_invoices', to: 'vendor_payments#non_po_invoices'

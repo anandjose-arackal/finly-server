@@ -88,6 +88,38 @@ class PurchaseRequest < ApplicationRecord
     end
   }
 
+  scope :with_status_ids, -> (status_ids) {where purchase_request_status_id: status_ids}
+
+  scope :filter_status_id, -> (status_ids) {
+    with_status_ids(status_ids)
+  }
+
+  scope :filter_user_id, -> (ids) {
+    where creator_id: ids
+  }
+
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+
+  scope :filter_location_id, -> (location_id) {where location_id: location_id}
+
+  scope :filter_department_id, -> (ids) {
+    where department_id: ids
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
+  }
+
   def add_company
     self.company_id = self.creator.company_id
   end

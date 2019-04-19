@@ -29,4 +29,9 @@ class TransactionDetail < ApplicationRecord
   belongs_to :opening_balance, optional: true, class_name: 'Amount'
   belongs_to :closing_balance, optional: true, class_name: 'Amount'
 
+  def get_note
+    return self.note if self.payment_purpose != 'corporate_balance_refund'
+    self.finly_transaction&.payment&.original_payment_for_refund&.note
+  end
+
 end

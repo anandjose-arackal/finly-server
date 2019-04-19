@@ -221,7 +221,7 @@ class MoneyRequest < ApplicationRecord
       reorder(submitted_at: :desc)
     end
   }
-  scope :include_details, -> {includes(:user, :policy, :status, :payment_mode, :controlling_user, :user, {items: [{amount: [:currency]}]})}
+  scope :include_details, -> {includes(:user, :policy, :status, :payment_mode, :controlling_user, :user, {destination_pocket: :base_currency}, {items: [{amount: [:currency]}]})}
 
   accepts_nested_attributes_for :custom_fields
 

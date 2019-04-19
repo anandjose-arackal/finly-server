@@ -38,8 +38,11 @@ class Dashboards::VendorPaymentsController < ApplicationController
     respond
   end
 
-  def purchase_requisitions
+  def purchase_requests
     # to be built
+    # now built
+    @result = Dashboard::VendorPayments::PurchaseRequests.(current_user, params)
+    respond
   end
 
   def payment_tickets

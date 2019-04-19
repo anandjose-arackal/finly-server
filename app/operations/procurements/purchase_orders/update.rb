@@ -7,7 +7,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
                 :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation,
-                :gstin_location
+                :gstin_location, :global_setting
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -35,7 +35,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
 
     self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
-    # self.purchase_order_params[:policy_id] = 457
+
+    # Check if department and cost center are to be saved globally for the po or individually for each item
+    self.global_setting = StringUtils.to_bool(self.purchase_order_params[:global_setting])
+    self.purchase_order_params.delete(:global_setting)
   end
 
   def validate
@@ -105,13 +108,27 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
-    # arr = self.purchase_order_params[:items_attributes].pluck(:unit_of_measurement)
+    if self.global_setting
+      arr = self.purchase_order_params[:items_attributes].pluck(:department_id)
+
+      if arr.collect {|a| a.blank? }.include? true
+        add_message :error, "Please select a Department for which the item would be purchased."
+        return
+      end
+
+      arr = self.purchase_order_params[:items_attributes].pluck(:cost_center_id)
 
 
-    # if arr.collect {|a| a.blank?}.include? true
-    #   add_message :error, "Please mention the Unit of Measurement for the items supplied."
-    #   return
-    # end
+      if arr.collect {|a| a.blank? }.include? true
+        add_message :error, "Please select a Cost Center for which the item would be purchased."
+        return
+      end
+    else
+      self.purchase_order_params[:items_attributes].each do |item|
+        item[:department_id] = self.purchase_order_params[:department_id]
+        item[:cost_center_id] = self.purchase_order_params[:cost_center_id]
+      end
+    end
 
     if StringUtils.to_bool( self.purchase_order_params[:advance_amount_required] ) 
       unless self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0
