@@ -2,7 +2,10 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
   attr_accessor :purchase_orders, :procurement, :policy, :purchase_order_params, :forwarded_to_user, :result
 
   def init
-    self.result = {}
+    self.result = {
+        success: [],
+        error: []
+    }
     unless params[:document_ids].present? || params[:document_ids].is_a?(Array)
       add_message :error, "Invalid Type"
     end
@@ -42,36 +45,44 @@ class Procurements::PurchaseOrders::BulkForward < Procurements::PurchaseOrders::
   end
 
   def process
-    forwarded = 0
-    not_forwarded = 0
     self.purchase_orders.each do |purchase_order|
-      workflow_output = {
+      data_success = {}
+      data_error = {}
+      workflow_input = {
         document: purchase_order,
         aasm_event: 'forward',
-        violation_present: false,
         forwarded_to_user: forwarded_to_user
       }
 
-      op = WorkflowManager::Base.(user, workflow_output)
+      op = WorkflowManager::Base.(user, workflow_input)
       if op.success?
-        forwarded += 1
+        data_success[:po_number] = purchase_order&.po_number
+        data_success[:sub_department] = purchase_order&.sub_department&.name
+        data_success[:department] = purchase_order&.department&.name
+        data_success[:user] = purchase_order&.user&.name
+        data_success[:amount] = purchase_order&.balance_amount&.value
+        self.result[:success].push(data_success)
       else
-        not_forwarded += 1
+        data_error[:messages] = op.messages[:error]
+        data_error[:po_number] = purchase_order&.po_number
+        data_error[:sub_department] = purchase_order&.sub_department&.name
+        data_error[:department] = purchase_order&.department&.name
+        data_error[:user] = purchase_order&.user&.name
+        data_error[:amount] = purchase_order&.balance_amount&.value
+        self.result[:error].push(data_error)
       end
     end
-
-    self.result[:forwarded] = forwarded
-    self.result[:not_forwarded] = not_forwarded
   end
 
   def post_process
-    if self.result[:forwarded] != 0
-      add_message :success, "Successfully forwarded #{self.result[:forwarded]} purchase orders to #{self.forwarded_to_user.name}"
+    if self.result[:success].length != 0
+      add_message :success, "Successfully forwarded #{self.result[:success].length} purchase orders to #{self.forwarded_to_user.name}"
     end
 
-    if self.result[:not_forwarded] != 0
-      add_message :success, "Couldn't forward #{self.result[:non_forwarded]} purchase orders"
+    if self.result[:error].length != 0
+      add_message :success, "Couldn't forward #{self.result[:error].length} purchase orders"
     end
 
+    Event::EPurchaseOrder::BulkForward.(user, result: result, forwarded_to_user: forwarded_to_user)
   end
 end

@@ -32,9 +32,11 @@ class BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor < BudgetsCalcul
         entity: invoice_item,
         category_id: invoice_item.inventory_line_item&.category_id,
         cost_center_id: invoice_item.parent.cost_center_id,
+        # cost_center_id: invoice_item.cost_center_id,
         user_id: invoice_item.parent.created_by_user_id,
         location_id: invoice_item.parent.location_id,
         department_id: invoice_item.parent.sub_department_id,
+        # department_id: invoice_item.department_id,
         date: invoice_item.parent.created_at,
         amount_attributes: {
             value: invoice_item.net_amount&.value,
