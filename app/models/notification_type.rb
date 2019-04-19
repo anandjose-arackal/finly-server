@@ -12,7 +12,7 @@ class NotificationType < ApplicationRecord
 
   VALUES = {
       user: 1, report: 2, payment: 3, card: 4, expense: 5, settlement: 6, money_request: 7, wallet: 8, bank_payment_request: 9,
-      purchase_order: 10, invoice: 11
+      purchase_order: 10, invoice: 11, vendor: 12
   }
 
   def self.seed_data

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_15_132348) do
+ActiveRecord::Schema.define(version: 2019_04_16_133531) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2216,6 +2216,9 @@ ActiveRecord::Schema.define(version: 2019_04_15_132348) do
     t.decimal "threshold", precision: 20, scale: 5
     t.boolean "active", default: true
     t.boolean "wo_exception", default: true
+    t.boolean "forwarded", default: false
+    t.integer "forwarded_by_id"
+    t.integer "forwarded_to_id"
     t.index ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id"
     t.index ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id"
     t.index ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id"
@@ -2771,11 +2774,12 @@ ActiveRecord::Schema.define(version: 2019_04_15_132348) do
     t.string "constitution_of_business"
     t.string "taxpayer_type"
     t.string "status"
-    t.text "api_response"
+    t.text "api_response", limit: 16777215
     t.string "api_provider"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "address"
+    t.string "trade_name"
   end
 
   create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

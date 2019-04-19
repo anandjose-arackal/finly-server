@@ -145,6 +145,7 @@
             <td width="20%"><label>Date</label></td>
             <td width="20%"><label>Merchant</label></td>
             <td width="20%"><label>Note</label></td>
+            <td width="20%"><label>Additional Fields</label></td>
             <td width="20%"><label>Total</label></td>
           </tr>
 
@@ -161,13 +162,19 @@
               <% when ExpenseType.id_for(:time) %>
                 <td width="20%"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= @index %></td>
               <% when ExpenseType.id_for(:per_diem) %>
-                <td width="20%"><i class="fa fa-briefcase"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= @index %></td>
+                <td width="10%"><i class="fa fa-briefcase"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= @index %></td>
               <% else %>
                 <!-- do nothing -->
               <% end %>
               <td width="20%"><%= expense.date %></td>
               <td width="20%"><%= expense.merchant_name %></td>
               <td width="20%"><%= expense.note %></td>
+              <td width="20%">
+                <% expense.custom_fields.each do |field| %>
+                  <%= "#{field.field_configuration.field_name}: #{field.string_value}" %>
+                  <br>
+                <% end %>
+              </td>
               <td width="20%"><i class="fa fa-inr">&nbsp;</i><%= expense.amount_value %></td>
             </tr>
             <% @index += 1 %>

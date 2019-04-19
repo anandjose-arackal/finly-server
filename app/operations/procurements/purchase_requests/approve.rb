@@ -26,19 +26,21 @@ class Procurements::PurchaseRequests::Approve < Procurements::PurchaseRequests::
         params[:aasm_event] = 'approve'
         op = WorkflowManager::Base.(user, params)
         if op.success?
+          # If reviewer cancels rejection of already approved items, those items will have status equivalent to PR status
+
+          # If reviewer rejects line item with status awaiting approval, those items will have status as rejected
+
           # Mark rejected line items
           rejected = purchase_request.reject_purchase_request_items(params, user) if params[:rejected_purchase_request_items].present?
-          # Break if rejection fails
+          # Remove line items from rejected status
+          approved = purchase_request.approve_purchase_request_items(params, user) if params[:approved_purchase_request_items].present?
+          # Break if rejection or approval fails
           raise if params[:rejected_purchase_request_items].present? && !rejected
+          raise if params[:approved_purchase_request_items].present? && !approved
           # Approve the line items too
           unless purchase_request.status.name.to_sym.present? && !purchase_request.purchase_request_items.non_rejected.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request.status.name.to_sym)).zero?
             raise
           end
-          # self.purchase_request.purchase_request_items.each do |item|
-          #   params[:document] = item
-          #   params[:aasm_event] = 'submit'
-          #   item_op = WorkflowManager::Base.(user, params)
-          # end if self.purchase_request.purchase_request_items.present?
           self.workflow_output = op.workflow_output
         else
           raise

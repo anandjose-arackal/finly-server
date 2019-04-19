@@ -240,8 +240,8 @@ class User < ApplicationRecord
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
-  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
-  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
   validates :user_panel_subscription, presence: true
@@ -1206,6 +1206,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:goods_receiver), document)
   end
 
+  def is_inventory_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
+  end
+
   # ************ User Role for vendor payments ******************
 
   def relevant
@@ -1221,6 +1225,10 @@ class User < ApplicationRecord
 
   def vp_admin_or_auditor?
     self.vendor_payments_admin? || self.vendor_payments_auditor?
+  end
+
+  def policy_admin_or_auditor?
+    self.has_policy_role?(UserRole.id_for(:policy_admin)) || self.has_policy_role?(UserRole.id_for(:policy_auditor))
   end
 
   # locations associated with policies to which users are associated as initiator role

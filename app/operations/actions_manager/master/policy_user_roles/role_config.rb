@@ -48,7 +48,7 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def inventory_manager
-    # true
+    true
   end
 
   def vendor_creator

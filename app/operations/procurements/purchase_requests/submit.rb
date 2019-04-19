@@ -24,11 +24,6 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
           unless purchase_request&.status&.name&.to_sym&.present? && purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym))
             raise
           end
-          # self.purchase_request.purchase_request_items.each do |item|
-          #   params[:document] = item
-          #   params[:aasm_event] = 'submit'
-          #   item_op = WorkflowManager::Base.(user, params)
-          # end if self.purchase_request.purchase_request_items.present?
         else
           raise
         end

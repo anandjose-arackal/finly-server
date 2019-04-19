@@ -26,6 +26,9 @@
 #  gross_amount_id    :integer
 #  roundoff_amount    :decimal(10, )
 #  cost_center_id     :integer
+#  invoice_number     :text(65535)
+#  invoice_date       :date
+#  invoice_due_date   :date
 #
 
     #                 :id => :integer,
