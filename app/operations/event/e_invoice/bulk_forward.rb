@@ -31,7 +31,7 @@ class Event::EInvoice::BulkForward < Event::EInvoice::Base
     return unless params[:subject].present? && params[:body].present?
     params[:result] = self.result
     params[:display_errors] = true unless user.id == forwarded_to_user.id
-    ProcurementMailer.delay.invoice_bulk_approval(Event::EInvoice::BulkForward::MailerPresenter.new(user, params))
+    ProcurementMailer.delay.invoice_bulk_forward(Event::EInvoice::BulkForward::MailerPresenter.new(user, params))
   end
 
   def process

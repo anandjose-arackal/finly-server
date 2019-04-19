@@ -128,7 +128,7 @@ class ProcurementMailer < ApplicationMailer
   end
 
 
-  def invoice_bulk_approval(presenter)
+  def invoice_bulk_forward(presenter)
     @data = presenter
     if presenter.success?
       mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_invoices'
