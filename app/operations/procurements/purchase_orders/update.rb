@@ -7,7 +7,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
                 :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation,
-                :gstin_location, :global_setting
+                :gstin_location, :cost_allocation_items
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -37,8 +37,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
 
     # Check if department and cost center are to be saved globally for the po or individually for each item
-    self.global_setting = StringUtils.to_bool(self.purchase_order_params[:global_setting])
-    self.purchase_order_params.delete(:global_setting)
+    self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
+    self.purchase_order_params.delete(:cost_allocation_items)
   end
 
   def validate
@@ -90,8 +90,10 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    if self.department.blank?
-      add_message :error, "Please select a department"
+    unless self.cost_allocation_items
+      if self.department.blank?
+        add_message :error, "Please select a department"
+      end
     end
 
     if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?
@@ -108,7 +110,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
-    if self.global_setting
+    if self.cost_allocation_items
       arr = self.purchase_order_params[:items_attributes].pluck(:department_id)
 
       if arr.collect {|a| a.blank? }.include? true
