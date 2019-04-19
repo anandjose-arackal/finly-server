@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_18_093631) do
+ActiveRecord::Schema.define(version: 2019_04_19_142355) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -949,7 +949,7 @@ ActiveRecord::Schema.define(version: 2019_04_18_093631) do
     t.index ["booking_type_id"], name: "index_bookings_on_booking_type_id"
   end
 
-  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "gstin"
     t.string "pan"
@@ -4572,6 +4572,7 @@ ActiveRecord::Schema.define(version: 2019_04_18_093631) do
     t.boolean "advance_amount_required", default: false
     t.integer "requested_advance_amount_id"
     t.bigint "gstin_location_id"
+    t.boolean "cost_allocation_items", default: false
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
