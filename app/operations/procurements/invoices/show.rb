@@ -26,7 +26,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       # self.departments = user.company.departments
 
       # self.locations = user.company.locations
-      params[:filter_role_id] = UserRole.id_for(:invoice_initiator)
+      params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
       self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
       self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
 
@@ -41,7 +41,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       # policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
-      params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
+      # params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
       self.policies = Policy::VendorPayments::Index.(invoice.created_by, params).policies rescue Invoice.none
 
       self.reviewal_chains = []
@@ -195,6 +195,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   end
 
   def validate_document_access
+    # This will be refactored when Non-po initiator/reviewer will be in place i.e. po and non-po invoice can have different policy
+
     # Validate of current user is owner of PO
     return if invoice.validate_if_owner(user)
     return if invoice.validate_if_admin(user)
@@ -204,6 +206,9 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     # Need to check dlrms as above conditions are breaking
     #Quick fix
     return if user.is_invoice_reviewer?
+    return if user.is_bank_payment_request_initiator?
+    return if user.is_bank_payment_request_reviewer?
+    return if user.is_bank_payment_request_creditor?
     raise_unauthorized_exception
   end
 

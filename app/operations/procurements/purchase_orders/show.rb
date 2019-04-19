@@ -34,7 +34,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.actions = get_actions
       # self.departments = user.company.departments.leaves
       # self.locations = user.company.locations.includes(:state).leaves
-      params[:filter_role_id] = UserRole.id_for(:purchase_order_initiator)
+      params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
       self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
       self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
       self.gstin_locations = self.purchase_order.vendor&.gstin_locations
@@ -51,7 +51,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
       # policy_ids = purchase_order.user.policy_user_mappings.exclude_deleted.pluck(:policy_id)
       # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
-      params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
+      # params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator)]
       self.policies = Policy::VendorPayments::Index.(purchase_order.user, params).policies rescue Policy.none
       # Show taxes as applicable in the pdf based on this
       self.taxes_applicable_flag = taxes_applicable_flag?
