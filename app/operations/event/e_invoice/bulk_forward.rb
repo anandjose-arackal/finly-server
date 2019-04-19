@@ -19,6 +19,10 @@ class Event::EInvoice::BulkForward < Event::EInvoice::Base
     end
   end
 
+  def affected_users
+    [user, forwarded_to_user]
+  end
+
   def send_mailer(user)
     # If no purchase orders could be forwarded, don't send mail to forward to user
     return if result[:success].length == 0 && user.id == forwarded_to_user.id
@@ -31,7 +35,15 @@ class Event::EInvoice::BulkForward < Event::EInvoice::Base
   end
 
   def process
-    send_mailer(user)
+    users = mailer_affected_users
+    if users.present?
+      users.each do |user|
+        next if user.blank? # or not user.is_a?(User)
+        if user.is_a?(User)
+          send_mailer(user)
+        end
+      end
+    end
   end
 
   def event_id
