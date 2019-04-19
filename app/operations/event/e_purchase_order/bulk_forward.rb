@@ -65,7 +65,7 @@ class Event::EPurchaseOrder::BulkForward < Event::EPurchaseOrder::Base
     end
   end
 
-  class Event::EPurchaseOrder::BulkApprove::MailerPresenter < Event::SetNotifier::MailerPresenter
+  class Event::EPurchaseOrder::BulkForward::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :user, :body_val, :subject_val, :button_val, :company, :result, :display_errors
 
     def initialize(user, params)
