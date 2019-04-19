@@ -5,11 +5,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company]},
+          {requests: [:pr_initiator, :pr_company, :pr_awaiting_approval]},
+          {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :po_invoices, :non_po_invoices, :payment_tickets]},
           {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
-          {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket]}
+          {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request]}
       ]
   )
   register_structure(
@@ -141,9 +142,42 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'New Payment Ticket', id: 'create', url: 'new_payment_ticket/params={}'}
   end
 
+  def create_purchase_request
+    return nil unless user.is_purchase_request_initiator? || user.vp_admin_or_auditor?
+    {name: 'New Purchase Request', id: 'create', url: 'purchase_request/params={}'}
+  end
+
   def attachments
     # return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
     {name: 'Attachments', id: 'attachments', url: '#attachments/params={}'}
+  end
+
+  def requests
+    return nil unless user.company.purchase_requisition_enabled?
+    {name: 'Requests', id: 'requests', url: 'requests'}
+  end
+
+  def pr_team
+  end
+
+  def pr_awaiting_approval
+    return nil unless user.is_purchase_request_reviewer?
+    { name: 'PRs Awaiting Approval', id: 'requests', url: 'purchase_requests/params={"filter_awaiting_approval":"1"}' }
+  end
+
+  def pr_company
+    return nil unless user.vp_admin_or_auditor?
+    { name: 'Company PRs', id: 'requests', url: 'purchase_requests' }
+  end
+
+  def pr_approved_items
+    return nil unless user.is_purchase_request_initiator? || user.is_purchase_request_reviewer? || user.vp_admin_or_auditor?
+    { name: 'Approved Items', id: 'procure', url: 'po_approval_items/params={}'}
+  end
+
+  def pr_initiator
+    return nil unless user.is_purchase_request_initiator?
+    { name: 'Your PRs', id: 'requests', url: "purchase_requests/params={\"search_by_email\":\"#{user.email}\"}"}
   end
 
 end

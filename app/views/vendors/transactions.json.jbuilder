@@ -45,5 +45,4 @@ json.result do
 end
 
 
-
 json.count @result.transactions.count

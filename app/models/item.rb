@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 # == Schema Information
 #
 # Table name: items
@@ -23,6 +22,8 @@
 #  supply_item_type_id :integer
 #  deleted_at          :datetime
 #  product_type_id     :integer          default(1)
+#  item_number         :string(255)
+#  unit_of_measurement :string(255)
 #
 
 class Item < ApplicationRecord
@@ -42,10 +43,10 @@ class Item < ApplicationRecord
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
   has_many :artifacts, as: :resource, dependent: :destroy
-
   # validates :rate, presence: true
   validates :description, presence: true
-  validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
+  # validates :hsn_sac, format: {with: /\A(\d{6}|\d{8})\Z/}, allow_blank: true
+  validates :hsn_sac, numericality: {only_integer: true}, length: {minimum: 4, maximum: 8}, allow_blank: true
 
   accepts_nested_attributes_for :artifacts, allow_destroy: true
 
@@ -99,6 +100,7 @@ class Item < ApplicationRecord
       supply_item_type_id: supply_item_type_id,
       item_type: supply_item_type.as_json,
       product_type: product_type_id,
+      rate_contract_vendors: rate_contract_vendors
     }
   end
 
@@ -129,5 +131,9 @@ class Item < ApplicationRecord
     purchase_order_items.each do |item|
       BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
     end
+  end
+
+  def rate_contract_vendors
+    rate_contracts.joins(:vendor).map{|rate_contract| {vendor_id: rate_contract.vendor.id, vendor_name: rate_contract.vendor.name}}
   end
 end

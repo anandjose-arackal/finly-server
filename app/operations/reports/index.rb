@@ -147,9 +147,11 @@ class Reports::Index < Reports::Base
     has_scope :filter_custom_drop_down_selection, type: :array
     has_scope :filter_category
     has_scope :filter_group, type: :array
+    has_scope :filter_report_status_id, type: :array
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
+      ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)
       self.reports = params[:reports]
 
       get_counts
@@ -166,7 +168,7 @@ class Reports::Index < Reports::Base
         end
       end
       self.count = self.reports.count
-      self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30).include_details
+      self.paginated_reports = self.reports.paginate(page: params[:page], per_page: params[:per_page]).include_details
     end
 
     def get_counts

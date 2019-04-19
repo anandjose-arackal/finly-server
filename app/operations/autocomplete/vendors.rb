@@ -9,7 +9,8 @@ class Autocomplete::Vendors < BaseOperation
   def process
     params[:filter_approved] = true
     params[:non_deleted] = true
-    op = Vendors::Index.(user, params)
+    params[:filter_active] = true
+    op = ::Vendors::Index.(user, params)
     if op.success?
       self.vendors = op.vendors
     end

@@ -64,6 +64,10 @@ json.items do
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
+    
+    json.item_number item.inventory_line_item&.item_number rescue nil
+    json.gl_code item.inventory_line_item&.item_code rescue nil
+
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
       json.id item.tax_amount&.id
@@ -81,12 +85,29 @@ json.items do
     end
   end
 end
+
+# Removing quotations data from PO for now
+# json.quotations do
+#   json.array! @result.purchase_order.quotations do |quote|
+#     json.merge! quote.as_json
+#     json.attachments do
+#       json.array! quote.attachments do |attachment|
+#         json.extract! attachment, :id, :description
+#         json.file_name attachment.file_file_name
+#         json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
+#         json.url attachment.file.url(:original, timestamp: false)
+#       end
+#     end
+#   end
+# end
+
 json.attachments do
   json.array! @result.purchase_order.attachments do |attachment|
     json.extract! attachment, :id, :description
     json.file_name attachment.file_file_name
     json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
     json.url attachment.file.url(:original, timestamp: false)
+    json.content_type attachment.file_content_type
   end
 end
 
@@ -137,6 +158,7 @@ json.reviewal_chains do
         json.level_number item[:level_number]
         json.level_name item[:level_name]
         json.level_id item[:level_id]
+        json.timestamp item[:timestamp]&.strftime("%Y-%m-%d  %H:%M:%s")
         if item[:selected_reviewer].present?
           json.selected_reviewer do
             json.reviewer_details item[:selected_reviewer].as_json
@@ -185,6 +207,7 @@ end
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
     json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
+    json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
   end
 end
 

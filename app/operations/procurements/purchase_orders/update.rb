@@ -60,6 +60,20 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
+    if self.purchase_order.quotations.present?
+      quotes = self.purchase_order.quotations
+      selected_quotes = quotes.map { |q| q if q.selected }.compact
+      if selected_quotes.count > 1
+        add_message :error, "Please select atmost one quotation"
+        return
+      end
+
+      if selected_quotes.blank?
+        add_message :error, "Please select atleast one quotation"
+        return
+      end
+    end
+
     if self.purchase_order_params[:delivery_date].present?
       valid_date = Date.parse(self.purchase_order_params[:delivery_date]) rescue false 
       unless valid_date
@@ -90,6 +104,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       add_message :error, 'Please select the bank account of the vendor.'
       return
     end
+
+    # arr = self.purchase_order_params[:items_attributes].pluck(:unit_of_measurement)
+
+
+    # if arr.collect {|a| a.blank?}.include? true
+    #   add_message :error, "Please mention the Unit of Measurement for the items supplied."
+    #   return
+    # end
 
     if StringUtils.to_bool( self.purchase_order_params[:advance_amount_required] ) 
       unless self.purchase_order_params[:requested_advance_amount_attributes][:value].to_f > 0

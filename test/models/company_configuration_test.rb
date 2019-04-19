@@ -20,8 +20,8 @@
 #  sso_enabled                      :boolean          default(FALSE)
 #  address                          :text(65535)
 #  cash_money_requests_enabled      :boolean          default(TRUE)
+#  auto_retry_payment               :boolean          default(FALSE)
 #
-
 
 require 'test_helper'
 

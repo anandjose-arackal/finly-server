@@ -29,6 +29,7 @@
 #  procurement                 :boolean          default(FALSE)
 #  custom_currency_conversion  :boolean          default(FALSE)
 #  vendor_empanelment_workflow :boolean          default(FALSE)
+#  purchase_requisition_system :boolean
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

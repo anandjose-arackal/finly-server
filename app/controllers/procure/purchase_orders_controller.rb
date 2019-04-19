@@ -57,6 +57,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def bulk_forward
+    @result = Procurements::PurchaseOrders::BulkForward.(current_user, params)
+    respond
+  end
+
   def bulk_approve
     @result = Procurements::PurchaseOrders::BulkApprove.(current_user, params)
     respond
