@@ -8,6 +8,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
     self.request_types = {
       awaiting_action: false,
       payment_tickets: false,
+      purchase_reqeusts: false,
       purchase_orders: false,
       non_po_invoices: false,
       po_invoices: false,
