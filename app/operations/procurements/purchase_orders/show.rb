@@ -32,8 +32,11 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.purchase_order = params[:purchase_order]
       self.procurement = self.purchase_order.procurement
       self.actions = get_actions
-      self.departments = user.company.departments.leaves
-      self.locations = user.company.locations.includes(:state).leaves
+      # self.departments = user.company.departments.leaves
+      # self.locations = user.company.locations.includes(:state).leaves
+      params[:filter_role_id] = UserRole.id_for(:purchase_order_initiator)
+      self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
+      self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
       self.gstin_locations = self.purchase_order.vendor&.gstin_locations
 
       if purchase_order.user.departments.present?

@@ -23,9 +23,13 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     def init
       self.invoice = params[:invoice]
       # self.departments = user.company.departments.roots
-      self.departments = user.company.departments
+      # self.departments = user.company.departments
 
-      self.locations = user.company.locations
+      # self.locations = user.company.locations
+      params[:filter_role_id] = UserRole.id_for(:invoice_initiator)
+      self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
+      self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+
       if invoice.created_by&.departments.present?
         self.sub_departments = invoice.created_by.departments.only_sub_departments
       else
