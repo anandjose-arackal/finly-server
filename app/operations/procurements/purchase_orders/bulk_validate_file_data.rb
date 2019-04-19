@@ -79,7 +79,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       self.error_messages = []
       self.issue_item = {}
 
-      if items_not_found.include? item_number
+      if item_number.nil? or items_not_found.include? item_number
         self.valid = false
         self.error_messages << "Unable to find this item number in inventory list"
         self.issue_item[:item_number] = "Unable to find this item number in inventory list"
