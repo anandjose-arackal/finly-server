@@ -3571,11 +3571,13 @@ Rails.application.routes.draw do
     get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
     get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
+    get 'vp/purchase_requests', to: 'vendor_payments#purchase_requests'
     get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
     get 'vp/po_invoices', to: 'vendor_payments#po_invoices'
     get 'vp/non_po_invoices', to: 'vendor_payments#non_po_invoices'
     get 'vp/po_advances', to: 'vendor_payments#po_advances'
     get 'vp/grns', to: 'vendor_payments#grns'
+    get 'vp/vendors', to: 'vendor_payments#vendors'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end

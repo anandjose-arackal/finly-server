@@ -44,7 +44,7 @@ class Dashboard::VendorPayments::Vendors < Dashboard::VendorPayments::Base
           data: [
             {
               title: "Awaiting Approval",
-              count: YesBankVendor.awaiting_action_items(user),
+              count: YesBankVendor.awaiting_action_items(user).count,
               filters: [
                 {filter_status_id: 'awaiting_approval'}
               ]

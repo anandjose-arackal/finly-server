@@ -2,7 +2,10 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
   attr_accessor :invoices, :policy, :forwarded_to_user, :result
 
   def init
-    self.result = {}
+    self.result = {
+      success: [],
+      error: []
+    }
     unless params[:document_ids].present? || params[:document_ids].is_a?(Array)
       add_message :error, "Invalid Type"
     end
@@ -43,36 +46,46 @@ class Procurements::Invoices::BulkForward < Procurements::Invoices::Base
   end
 
   def process
-    forwarded = 0
-    not_forwarded = 0
     self.invoices.each do |invoice|
-      workflow_output = {
+      data_success = {}
+      data_error = {}
+      workflow_input = {
         document: invoice,
         aasm_event: 'forward',
-        violation_present: false,
         forwarded_to_user: forwarded_to_user
       }
 
-      op = WorkflowManager::Base.(user, workflow_output)
+      op = WorkflowManager::Base.(user, workflow_input)
       if op.success?
-        forwarded += 1
+        data_success[:invoice_id] = invoice&.invoice_id
+        data_success[:invoice_number] = invoice&.invoice_number
+        data_success[:sub_department] = invoice&.sub_department&.name
+        data_success[:department] = invoice&.department&.name
+        data_success[:user] = invoice&.created_by&.name
+        data_success[:amount] = invoice&.net_amount&.value
+        self.result[:success].push(data_success)
       else
-        not_forwarded += 1
+        data_error[:messages] = op.messages[:error]
+        data_error[:invoice_id] = invoice&.invoice_id
+        data_error[:invoice_number] = invoice&.invoice_number
+        data_error[:sub_department] = invoice&.sub_department&.name
+        data_error[:department] = invoice&.department&.name
+        data_error[:user] = invoice&.created_by&.name
+        data_error[:amount] = invoice&.net_amount&.value
+        self.result[:error].push(data_error)
       end
     end
-
-    self.result[:forwarded] = forwarded
-    self.result[:not_forwarded] = not_forwarded
   end
 
   def post_process
     if self.result[:forwarded] != 0
-      add_message :success, "Successfully forwarded #{self.result[:forwarded]} invoice to #{self.forwarded_to_user.name}"
+      add_message :success, "Successfully forwarded #{self.result[:success].length} invoice to #{self.forwarded_to_user.name}"
     end
 
     if self.result[:not_forwarded] != 0
-      add_message :success, "Couldn't forward #{self.result[:non_forwarded]} invoice"
+      add_message :success, "Couldn't forward #{self.result[:error].length} invoice"
     end
 
+    Event::EInvoice::BulkForward.(user, result: result, forwarded_to_user: forwarded_to_user)
   end
 end

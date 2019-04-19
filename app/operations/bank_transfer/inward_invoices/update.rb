@@ -1,7 +1,7 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement,
-                :gstin_location
+                :gstin_location, :global_setting
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
@@ -31,6 +31,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    # Check if department and cost center are to be saved globally for the non-po invoice or individually for each item
+    self.global_setting = StringUtils.to_bool(self.inward_invoice_params[:global_setting])
+    self.inward_invoice_params.delete(:global_setting)
 
   end
 
@@ -135,6 +138,30 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       add_message :error, "Please mention the Unit of Measurement for the items supplied."
       return
     end
+
+    if self.inward_invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+      if self.global_setting
+        arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:department_id)
+
+        if arr.collect {|a| a.blank? }.include? true
+          add_message :error, "Please select a Department for which the item would be purchased."
+          return
+        end
+
+        arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:cost_center_id)
+
+        if arr.collect {|a| a.blank? }.include? true
+          add_message :error, "Please select a Cost Center for which the item would be purchased."
+          return
+        end
+      else
+        self.inward_invoice_params[:invoice_items_attributes].each do |item|
+          item[:department_id] = self.inward_invoice_params[:department_id]
+          item[:cost_center_id] = self.inward_invoice_params[:cost_center_id]
+        end
+      end
+    end
+
   end
 
   def pre_process
