@@ -37,7 +37,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
 
     # Check if department and cost center are to be saved globally for the po or individually for each item
-    self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
+    self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items].to_s)
     self.purchase_order_params.delete(:cost_allocation_items)
   end
 
