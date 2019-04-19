@@ -26,6 +26,7 @@ class Event::EPurchaseOrder::BulkForward < Event::EPurchaseOrder::Base
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     params[:result] = self.result
+    params[:display_errors] = true unless user.id == forwarded_to_user.id
     ProcurementMailer.delay.purchase_order_bulk_forward(Event::EPurchaseOrder::BulkForward::MailerPresenter.new(user, params))
   end
 
@@ -65,7 +66,7 @@ class Event::EPurchaseOrder::BulkForward < Event::EPurchaseOrder::Base
   end
 
   class Event::EPurchaseOrder::BulkApprove::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :user, :body_val, :subject_val, :button_val, :company, :result
+    attr_accessor :user, :body_val, :subject_val, :button_val, :company, :result, :display_errors
 
     def initialize(user, params)
       self.user = user

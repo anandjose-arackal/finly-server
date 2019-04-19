@@ -3577,6 +3577,7 @@ Rails.application.routes.draw do
     get 'vp/non_po_invoices', to: 'vendor_payments#non_po_invoices'
     get 'vp/po_advances', to: 'vendor_payments#po_advances'
     get 'vp/grns', to: 'vendor_payments#grns'
+    get 'vp/vendors', to: 'vendor_payments#vendors'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end

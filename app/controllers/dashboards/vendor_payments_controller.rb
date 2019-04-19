@@ -26,6 +26,11 @@ class Dashboards::VendorPaymentsController < ApplicationController
     respond
   end
 
+  def vendors
+    @result = Dashboard::VendorPayments::Vendors.(current_user, params)
+    respond
+  end
+
   def po_invoices
     params[:filter_inward_invoice_type] = 'tax_invoice'
     @result = Dashboard::VendorPayments::Invoices.(current_user, params)

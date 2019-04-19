@@ -99,6 +99,13 @@ class ProcurementMailer < ApplicationMailer
     end
   end
 
+  def purchase_order_bulk_forward(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_po'
+    end
+  end
+
   def purchase_order_bulk_take_control(presenter)
     @data = presenter
     if presenter.success?
