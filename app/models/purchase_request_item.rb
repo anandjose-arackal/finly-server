@@ -51,11 +51,10 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :purchase_order, optional: true
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
-
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
   has_many :trails, as: :parent
 
-  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
+  validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, :unit_of_measurement, presence: true
 
   accepts_nested_attributes_for :per_unit_estimated_amount, :attachment, allow_destroy: true
 

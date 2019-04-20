@@ -163,7 +163,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def pr_awaiting_approval
-    return nil unless user.is_purchase_request_reviewer?
+    return nil unless user.is_purchase_request_reviewer? || user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
     { name: 'PRs Awaiting Approval', id: 'requests', url: 'purchase_requests/params={"filter_awaiting_approval":"1"}' }
   end
 
