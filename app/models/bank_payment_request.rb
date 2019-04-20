@@ -418,6 +418,12 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     self.company_id = self.owner.company_id
   end
 
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
   private
 
   def self.status_ids(*statuses)
@@ -479,7 +485,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   def self.roles
     # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
-    [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor]
+    [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor]
   end
 
   ####################### Overridden Methods ########################

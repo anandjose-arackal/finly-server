@@ -38,7 +38,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     # Check if department and cost center are to be saved globally for the po or individually for each item
     self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
-    self.purchase_order_params.delete(:cost_allocation_items)
   end
 
   def validate
@@ -90,10 +89,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    unless self.cost_allocation_items
-      if self.department.blank?
-        add_message :error, "Please select a department"
-      end
+    if self.department.blank? && !self.cost_allocation_items
+      add_message :error, "Please select a department"
     end
 
     if self.purchase_order.procurement.invoices.present? && self.purchase_order.procurement.inward_documents.present?

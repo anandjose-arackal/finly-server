@@ -19,6 +19,15 @@ class NewPoPolicyUserRoleMigration < ActiveRecord::Migration[5.2]
           if policy.policy_user_roles.where(user_id: mapping.user_id, user_role_id: UserRole.id_for(:invoice_initiator)).blank?
             policy.policy_user_roles.create!(user_id: mapping.user_id, user_role_id: UserRole.id_for(:invoice_initiator))
           end
+
+          if policy.policy_user_roles.where(user_id: mapping.user_id, user_role_id: UserRole.id_for(:item_master_manager)).blank?
+            policy.policy_user_roles.create!(user_id: mapping.user_id, user_role_id: UserRole.id_for(:item_master_manager))
+          end
+
+          if policy.policy_user_roles.where(user_id: mapping.user_id, user_role_id: UserRole.id_for(:inventory_manager)).blank?
+            policy.policy_user_roles.create!(user_id: mapping.user_id, user_role_id: UserRole.id_for(:inventory_manager))
+          end
+
         end
       end
 

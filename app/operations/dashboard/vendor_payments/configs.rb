@@ -44,11 +44,13 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
         request_types[:payment_tickets] = true
       when UserRole.id_for(:bank_payment_request_creditor)
         request_types[:payment_tickets] = true
-        request_types[:po_advances] = true
-      when UserRole.id_for(:vendor_reviewer)
-        if user.company.vendor_empanelment_workflow_enabled?
-          request_types[:vendors] = true
+        if user.company.procurement_enabled?
+          request_types[:po_advances] = true
         end
+      # when UserRole.id_for(:vendor_creator)
+      #   if user.company.vendor_empanelment_workflow_enabled?
+      #     request_types[:vendors] = true
+      #   end
       end
     end
   end
@@ -70,7 +72,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
 
     def init
       self.departments = apply_scopes(params[:departments], {filter_only_roots: true})
-      self.sub_departments = params[:departments].only_sub_departments
+      self.sub_departments = params[:departments].only_sub_departments rescue Department.none
       self.policies = params[:policies]
       self.locations = params[:locations]
       self.policies = params[:policies]

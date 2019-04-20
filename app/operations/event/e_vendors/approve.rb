@@ -79,7 +79,7 @@ class Event::EVendors::Approve < Event::EVendors::Base
     if approver_id.present? and user.id == approver_id
       message = "You have successfully approved the document: #{self.document.business_name}"
     else
-      if approved and user.id == document.owner_id
+      if approved and user.id == document.created_by_id
         if auto_approve
           message = "Congratulations! Vendor #{document.business_name} has been auto-approved"
         else

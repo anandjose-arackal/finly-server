@@ -119,7 +119,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
   def create_beneficiary
     ba = BankAccount.non_deleted.find_by(account_number: params[:account_number]&.strip, ifsc: params[:ifsc]&.strip,
                                          company_id: self.company_id)
-    self.vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: params[:name], company_id: self.company_id)
+    self.vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: params[:name], business_name: params[:name], company_id: self.company_id)
     ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
     if ba.nil?
       ba = BankAccount.create(name: params[:name], account_number: params[:account_number]&.strip, ifsc: params[:ifsc]&.strip,

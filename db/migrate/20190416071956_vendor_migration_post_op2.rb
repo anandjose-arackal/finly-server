@@ -25,13 +25,17 @@ class VendorMigrationPostOp2 < ActiveRecord::Migration[5.2]
       op = Vendors::Support::ValidateGstin.(user, {gstin_location: {gstin: vendor.gst, business_name: ""}})
 
       if op.success? && op.gstin_master.present?
+        location = op.gstin_master.api_response[:data][:pradr][:addr][:loc] rescue "Location 1"
+        gst_state_code_id = GstStateCode.where(state_code: (op.gstin_master.gstin[0..1])).first.id rescue nil
         # Save gstin details
         gstin = vendor.gstin_locations.new({
           gstin_id: op.gstin_master.id,
           gstin: op.gstin_master.gstin,
           poc_name: op.gstin_master.legal_name_of_business,
           poc_email: vendor.email,
-          poc_mobile_number: vendor.mobile_number
+          poc_mobile_number: vendor.mobile_number,
+          location: location,
+          state_id: gst_state_code_id
         })
 
         # Save gstin
