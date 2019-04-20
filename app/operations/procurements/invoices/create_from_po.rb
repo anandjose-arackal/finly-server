@@ -1,7 +1,7 @@
 class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision, :previous_invoices, :advance,
-                :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance
+                :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance, :custom_fields
 
   def personalizer
     {
@@ -61,6 +61,10 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.invoice = self.procurement.invoices.build(self.invoice_params)
     
     self.invoice.company_id = user.company.id
+    
+    validate_custom_fields_invoice
+    return if has_errors?
+    
     if self.invoice.save
       if (params[:document_type].present? && params[:document_type] == 'proforma_invoice')
         self.invoice.proforma_invoice_id = self.invoice.id
@@ -237,6 +241,28 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     end
     return invoice_params
   end
+
+  def validate_custom_fields_invoice
+    set_fields = set_custom_fields_invoice self.invoice, self.custom_fields, false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.invoice)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+  end
+
+  def set_custom_fields_invoice(invoice, data, save)
+    custom_fields = {custom_fields: data}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
+  end
+  
 end
 
 
