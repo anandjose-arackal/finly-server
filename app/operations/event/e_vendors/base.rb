@@ -58,7 +58,7 @@ class Event::EVendors::Base < Event::SetNotifier
     params[:body] = self.mailer_body(user)
     params[:event_id] = event_id
     params[:action_name] = action_name
-    params[:role_id] = bank_payment_request_view_role user
+    # params[:role_id] = bank_payment_request_view_role user
   end
 
   class Event::EVendors::Base::VendorMailerPresenter < Event::SetNotifier::MailerPresenter

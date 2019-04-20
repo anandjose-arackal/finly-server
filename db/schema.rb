@@ -950,7 +950,7 @@ ActiveRecord::Schema.define(version: 2019_04_20_053956) do
     t.index ["booking_type_id"], name: "index_bookings_on_booking_type_id"
   end
 
-  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.string "gstin"
     t.string "pan"
@@ -2105,7 +2105,7 @@ ActiveRecord::Schema.define(version: 2019_04_20_053956) do
     t.index ["vendor_id"], name: "index_delivery_challans_on_vendor_id"
   end
 
-  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.integer "company_id"
     t.datetime "created_at", null: false
@@ -4522,11 +4522,6 @@ ActiveRecord::Schema.define(version: 2019_04_20_053956) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "location_id"
-    t.integer "department_id"
-    t.integer "policy_id"
-    t.integer "controlling_level_id"
-    t.integer "company_id"
     t.integer "purchase_request_status_id"
     t.text "note"
     t.integer "creator_id"
@@ -5931,7 +5926,7 @@ ActiveRecord::Schema.define(version: 2019_04_20_053956) do
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
 
-  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
@@ -6131,7 +6126,6 @@ ActiveRecord::Schema.define(version: 2019_04_20_053956) do
     t.string "vendor_id"
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
-    t.string "vedor_code"
     t.boolean "msme_registered", default: false
     t.string "msme_registration_number"
     t.integer "status_id"
@@ -6139,6 +6133,7 @@ ActiveRecord::Schema.define(version: 2019_04_20_053956) do
     t.integer "controlling_level_id"
     t.datetime "submitted_at"
     t.datetime "approved_at"
+    t.string "vedor_code"
     t.index ["company_id"], name: "index_yes_bank_vendors_on_company_id"
     t.index ["name"], name: "index_yes_bank_vendors_on_name"
     t.index ["tds_rates_list_id"], name: "index_yes_bank_vendors_on_tds_rates_list_id"
