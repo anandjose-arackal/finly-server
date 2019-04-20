@@ -30,7 +30,9 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       when UserRole.id_for(:bank_payment_request_reviewer)
         document_types[:payment_tickets] = true
       when UserRole.id_for(:vendor_reviewer)
-        document_types[:vendors] = true
+        if user.company.vendor_empanelment_workflow_enabled?
+          document_types[:vendors] = true
+        end
       end
     end
 
