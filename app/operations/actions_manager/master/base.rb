@@ -58,7 +58,7 @@ class ActionsManager::Master::Base
   end
 
   def valid?
-    clear_messages
+    # clear_messages
     self.class.validations&.each do |method|
       self.send method
     end
