@@ -5,7 +5,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {requests: [:pr_initiator, :pr_company, :pr_awaiting_approval, :pr_team]},
+          {requests: [:pr_initiator, :pr_awaiting_approval, :pr_team, :pr_company]},
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :po_invoices, :non_po_invoices, :payment_tickets]},
