@@ -70,7 +70,7 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
 
     def init
       self.departments = apply_scopes(params[:departments], {filter_only_roots: true})
-      self.sub_departments = params[:departments].only_sub_departments
+      self.sub_departments = params[:departments].only_sub_departments rescue Department.none
       self.policies = params[:policies]
       self.locations = params[:locations]
       self.policies = params[:policies]

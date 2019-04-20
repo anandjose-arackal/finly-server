@@ -8,6 +8,7 @@ class VendorsController < ApplicationController
 
   def index
     params[:non_deleted] = true
+    params[:authorized] = true
     @result = Vendors::Index.(current_user, params)
     respond
   end
