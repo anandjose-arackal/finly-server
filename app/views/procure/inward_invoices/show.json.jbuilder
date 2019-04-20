@@ -148,30 +148,27 @@ json.invoice do
 
   json.custom_fields invoice.custom_fields
 
-  # json.vendor do
-  #   json.name invoice.vendor&.name
-  #   json.email invoice.vendor&.email
-  #   json.id invoice.vendor&.id
-  #
-  #   json.selected_bank_account do
-  #     json.account_number invoice.receiving_account&.account_number
-  #     json.ifsc invoice.receiving_account&.ifsc
-  #     json.name invoice.receiving_account&.name
-  #     json.id invoice.receiving_account&.id
-  #   end
-  #
-  #   if invoice.vendor&.bank_accounts.present?
-  #     json.bank_accounts do
-  #       json.array!(invoice.vendor&.bank_accounts) do |bank_account|
-  #         json.id bank_account.id
-  #         json.name bank_account.name
-  #         json.account_number bank_account.account_number
-  #         json.ifsc bank_account.ifsc
-  #       end
-  #     end
-  #   end
-  # end
-  json.vendor invoice.vendor&.as_json
+  json.vendor do
+    json.extract! invoice&.vendor
+
+    json.selected_bank_account do
+      json.account_number invoice.receiving_account&.account_number
+      json.ifsc invoice.receiving_account&.ifsc
+      json.name invoice.receiving_account&.name
+      json.id invoice.receiving_account&.id
+    end
+
+    if invoice.vendor&.bank_accounts.present?
+      json.bank_accounts do
+        json.array!(invoice.vendor&.bank_accounts) do |bank_account|
+          json.id bank_account.id
+          json.name bank_account.name
+          json.account_number bank_account.account_number
+          json.ifsc bank_account.ifsc
+        end
+      end
+    end
+  end
 end
 
 json.invoice_categories do
