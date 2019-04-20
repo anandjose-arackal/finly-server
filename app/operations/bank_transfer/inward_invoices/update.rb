@@ -7,7 +7,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
-    self.custom_fields = params&.dig(:invoice, :custom_fields)
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
 
 
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]

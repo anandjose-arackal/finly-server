@@ -26,6 +26,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.previous_invoices = (self.procurement.invoices.present?) ? self.procurement.invoices.includes(:invoice_items) : nil
 
     self.invoice_params = set_invoice_parameters
+
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
+
   end
 
   def validate
