@@ -12,10 +12,16 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       self.purchase_request = params[:purchase_request]
       # self.locations = user.company.locations
       # Admin should also be initiator for the policy
-      self.locations = user.initiator_associated_locations(UserRole.id_for(:purchase_request_initiator)).leaves
+      # self.locations = user.initiator_associated_locations(UserRole.id_for(:purchase_request_initiator)).leaves
       # self.departments = user.company.departments
-      self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
+      # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
       params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
+      self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
+      self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+      # self.locations = user.initiator_associated_locations(UserRole.id_for(:purchase_request_initiator)).leaves
+      # self.departments = user.company.departments
+      # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
+      # params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
       self.policies = Policy::VendorPayments::Index.(user, params).policies
       self.reviewal_chains = []
       params[:reviewal_document] = purchase_request

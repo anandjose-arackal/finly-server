@@ -42,7 +42,10 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.purchase_order.controlling_user_role_id = UserRole.id_for(:initiator)
 
     if purchase_order.valid?
-      purchase_order.save
+      unless purchase_order.save
+        add_message :error, 'Unable to save'
+        return
+      end
       purchase_order.process_line_item_calculation
       purchase_order.save
 

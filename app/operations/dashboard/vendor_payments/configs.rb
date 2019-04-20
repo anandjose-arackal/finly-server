@@ -2,9 +2,9 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
   attr_accessor :departments, :sub_departments, :request_types, :policies, :locations
 
   def init
-    self.departments = Company::Departments::Index.(user, params).departments
+    self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping
     self.policies = Policy::VendorPayments::Index.(user, params).policies
-    self.locations = user.company.locations
+    self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping
     self.request_types = {
       awaiting_action: false,
       payment_tickets: false,

@@ -636,6 +636,11 @@ class Invoice < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
   end
 
+  def is_crediting_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
+  end
+
   # def can_take_control?
   #   processing?
   # end
