@@ -112,11 +112,11 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         self.issue_item[:quantity] = "Quantity entered has non-numeric characters."
       end
 
-      unless validate_hsn_sac hsn_sac
-        self.valid = false
-        self.error_messages << "HSN/SAC is invalid. Please recheck."
-        self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
-      end
+      # unless validate_hsn_sac hsn_sac
+      #   self.valid = false
+      #   self.error_messages << "HSN/SAC is invalid. Please recheck."
+      #   self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
+      # end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
@@ -153,9 +153,9 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
   private
 
-  def validate_hsn_sac(hsn_sac)
-    ( /\A(\d{6}|\d{8})\Z/.match(hsn_sac)) ? true : false
-  end
+  # def validate_hsn_sac(hsn_sac)
+  #   ( /\A(\d{6}|\d{8})\Z/.match(hsn_sac)) ? true : false
+  # end
 
   def validate_amount(amount)
     if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer
