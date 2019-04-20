@@ -98,8 +98,8 @@ class YesBankVendor < ApplicationRecord
   scope :with_id, -> (ids) {where id: ids}
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
-  scope :non_deleted, -> {where deleted_at: nil}
-  scope :authorized, -> { where authorized: true}
+  scope :non_deleted, -> {where deleted_at: nil }
+  scope :authorized, -> { where authorized: true }
   scope :approved, -> {where status_id: [VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved)]}
   scope :filter_active, -> { where.not(status_id: VendorStatus.id_for(:deactivated))}
 
