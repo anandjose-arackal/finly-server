@@ -15,17 +15,17 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
     #   add_message :error, "Purchase Request not found for this user."
     # end
 
-    arr = self.purchase_request_params[:purchase_request_items_attributes].keys.collect {|pr| self.purchase_request_params[:purchase_request_items_attributes][pr]["department_id"].blank? }
-    if arr.include? true
-      add_message :error, "Please select a Department for which the item would be purchased."
-      return
-    end
+    # arr = self.purchase_request_params[:purchase_request_items_attributes].keys.collect {|pr| self.purchase_request_params[:purchase_request_items_attributes][pr]["department_id"].blank? }
+    # if arr.include? true
+    #   add_message :error, "Please select a Department for which the item would be purchased."
+    #   return
+    # end
 
-    arr  = self.purchase_request_params[:purchase_request_items_attributes].keys.collect {|pr| self.purchase_request_params[:purchase_request_items_attributes][pr]["cost_center_id"].blank? }
-    if arr.include? true
-      add_message :error, "Please select a Cost Center for which the item would be purchased."
-      return
-    end
+    # arr  = self.purchase_request_params[:purchase_request_items_attributes].keys.collect {|pr| self.purchase_request_params[:purchase_request_items_attributes][pr]["cost_center_id"].blank? }
+    # if arr.include? true
+    #   add_message :error, "Please select a Cost Center for which the item would be purchased."
+    #   return
+    # end
 
   end
 
