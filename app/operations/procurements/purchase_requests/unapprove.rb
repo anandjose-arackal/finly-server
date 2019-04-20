@@ -18,15 +18,16 @@ class Procurements::PurchaseRequests::Unapprove < Procurements::PurchaseRequests
         params[:aasm_event] = 'unapprove'
         op = WorkflowManager::Base.(user, params)
         if op.success?
-          # Approve the line items too
+          # Unapprove the line items too
+          # Non rejected items will follow PR status
           unless purchase_request&.status&.name&.to_sym&.present? && purchase_request.purchase_request_items.non_rejected.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym))
             raise
           end
-          # self.purchase_request.purchase_request_items.each do |item|
-          #   params[:document] = item
-          #   params[:aasm_event] = 'submit'
-          #   item_op = WorkflowManager::Base.(user, params)
-          # end if self.purchase_request.purchase_request_items.present?
+          # # Rejected line items by current reviewer will rollback to awaiting_approval state
+          # # Rejected line items by previous reviewer will remain rejected
+          # status_changed = rollback_rejected_items_status
+          # # Rollack changes if anything fails
+          # raise if !status_changed
           self.workflow_output = op.workflow_output
         else
           raise
@@ -40,4 +41,15 @@ class Procurements::PurchaseRequests::Unapprove < Procurements::PurchaseRequests
   def post_process
     add_message :success, "Purchase request unapproved"
   end
+
+  private
+
+  # def rollback_rejected_items_status
+  #   purchase_request.purchase_request_items.rejected.each do |item|
+  #     if item.trails.order(:created_at).last.action_id == TrailAction.id_for(:reject)
+  #       item.rejected = false
+  #       item.status_id = PurchaseRequestItemStatus.id_for(:awaiting_approval)
+  #     end
+  #   end unless purchase_request.purchase_request_items&.rejected.blank?
+  # end
 end

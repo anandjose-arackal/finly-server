@@ -1,18 +1,33 @@
 class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::Base
   attr_accessor :purchase_request, :purchase_request_params
 
-  # def init
-  #   self.purchase_request_params = purchase_request_parameters
+  def init
+    super
+    self.purchase_request_params = purchase_request_parameters
   #   pr_id = params[:id] || params[:purchase_request_id]
   #   self.purchase_request = user.company.purchase_requests.find_by(id: pr_id)
 
-  # end
+  end
 
-  # def validate
-  #   if self.purchase_request.blank?
-  #     add_message :error, "Purchase Request not found for this user."
-  #   end
-  # end
+  def validate
+    super
+    # if self.purchase_request.blank?
+    #   add_message :error, "Purchase Request not found for this user."
+    # end
+
+    # arr = self.purchase_request_params[:purchase_request_items_attributes].keys.collect {|pr| self.purchase_request_params[:purchase_request_items_attributes][pr]["department_id"].blank? }
+    # if arr.include? true
+    #   add_message :error, "Please select a Department for which the item would be purchased."
+    #   return
+    # end
+
+    # arr  = self.purchase_request_params[:purchase_request_items_attributes].keys.collect {|pr| self.purchase_request_params[:purchase_request_items_attributes][pr]["cost_center_id"].blank? }
+    # if arr.include? true
+    #   add_message :error, "Please select a Cost Center for which the item would be purchased."
+    #   return
+    # end
+
+  end
 
   def process
     self.purchase_request.assign_attributes(purchase_request_parameters)

@@ -39,7 +39,7 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
-  include Transitionable
+  # include Transitionable
 
   belongs_to :purchase_request, optional: true
   belongs_to :item, optional: true
@@ -49,7 +49,11 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :status, optional: true, class_name: 'PurchaseRequestItemStatus', foreign_key: :status_id
   belongs_to :purchase_order, optional: true
+  belongs_to :department, optional: true
+  belongs_to :cost_center, optional: true
+
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
+  has_many :trails, as: :parent
 
   validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
 
@@ -60,6 +64,10 @@ class PurchaseRequestItem < ApplicationRecord
   scope :with_ids, -> (ids) { where id: ids }
   scope :with_id, -> (id) { where id: id }
   scope :non_rejected, -> { where rejected: [nil, false] }
+  scope :rejected, -> { where rejected: true }
+  scope :issued_from_inventory, -> { where status_id: PurchaseRequestItemStatus.id_for(:issued_from_inventory)}
+  scope :po_created, -> { where status_id: PurchaseRequestItemStatus.id_for(:po_created) }
+  scope :approved, -> { where status_id: PurchaseRequestItemStatus.id_for(:approved) }
 
   scope :item_id, -> (id) {
     where item_id: id
@@ -79,7 +87,7 @@ class PurchaseRequestItem < ApplicationRecord
   }
 
   scope :order_number, -> (order_number) {
-    where order_number: order_number
+    joins(:purchase_request).where('purchase_requests.order_number = ?', order_number)
   }
 
 

@@ -2,12 +2,13 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
   attr_accessor :departments, :sub_departments, :request_types, :policies, :locations
 
   def init
-    self.departments = Company::Departments::Index.(user, params).departments
+    self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping
     self.policies = Policy::VendorPayments::Index.(user, params).policies
-    self.locations = user.company.locations
+    self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping
     self.request_types = {
       awaiting_action: false,
       payment_tickets: false,
+      purchase_reqeusts: false,
       purchase_orders: false,
       non_po_invoices: false,
       po_invoices: false,
@@ -44,8 +45,10 @@ class Dashboard::VendorPayments::Configs < Dashboard::VendorPayments::Base
       when UserRole.id_for(:bank_payment_request_creditor)
         request_types[:payment_tickets] = true
         request_types[:po_advances] = true
-      when UserRole.id_for(:vendor_reviewer) && user.company.vendor_empanelment_workflow_enabled?
-        request_types[:vendors] = true
+      when UserRole.id_for(:vendor_reviewer)
+        if user.company.vendor_empanelment_workflow_enabled?
+          request_types[:vendors] = true
+        end
       end
     end
   end
