@@ -4,6 +4,28 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
               :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items
 json.vendor @result.purchase_order.vendor.as_json
 
+json.vendor do
+  json.extract! @result.purchase_order&.vendor
+
+  json.selected_bank_account do
+    json.account_number @result.purchase_order.bank_account&.account_number
+    json.ifsc @result.purchase_order.bank_account&.ifsc
+    json.name @result.purchase_order.bank_account&.name
+    json.id @result.purchase_order.bank_account&.id
+  end
+
+  if @result.purchase_order.vendor&.bank_accounts.present?
+    json.bank_accounts do
+      json.array!(@result.purchase_order.vendor&.bank_accounts) do |bank_account|
+        json.id bank_account.id
+        json.name bank_account.name
+        json.account_number bank_account.account_number
+        json.ifsc bank_account.ifsc
+      end
+    end
+  end
+end
+
 json.actions @result.actions
 
 if @result.purchase_order.advance_payments&.present?
