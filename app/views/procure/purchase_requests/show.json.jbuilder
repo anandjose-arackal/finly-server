@@ -30,7 +30,7 @@ json.result do
           json.id line_item.id
           json.status line_item&.status&.name
           json.rejected line_item.rejected
-          json.unit_type line_item.unit_of_measurement
+          json.unit_of_measurement line_item.unit_of_measurement
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id
@@ -46,7 +46,6 @@ json.result do
           end
           json.purpose line_item.purpose
           json.quantity line_item.quantity
-          json.unit_type "each"
           json.estimated_cost do
             json.currency_id line_item&.estimated_amount&.currency_id
             json.value line_item&.estimated_amount&.value

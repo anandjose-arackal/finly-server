@@ -9,7 +9,7 @@ class Vendors::Reactivate < Vendors::Base
   end
 
   def init
-    id = params[:id] || params[:vendor_id] || params[:yes_bank_vendor_id]
+    # id = params[:id] || params[:vendor_id] || params[:yes_bank_vendor_id]
     self.vendor = Vendors::Show.(user, params).vendor rescue nil
   end
 
