@@ -42,7 +42,7 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
 
   def item_master
     return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
-    {name: 'Item Master', id: 'item_master', url: 'inventory/params={}'}
+    {name: 'Item Master', id: 'item_master', url: 'catalogue/params={"tabName": "item_master"}'}
   end
 
   def create
