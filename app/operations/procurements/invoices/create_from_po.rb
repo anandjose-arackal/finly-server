@@ -169,6 +169,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           gst_type_id: self.purchase_order.gst_type_id,
           comment: item.comment,
           inventory_line_item_id: item.inventory_line_item_id,
+          department_id: item.department_id,
+          cost_center_id: item.cost_center_id,
           tax_rate_id: item.tax_rate_id
       }
     end
@@ -220,7 +222,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       cost_center_id: self.purchase_order.cost_center_id,
       invoice_items_attributes: invoice_items_attributes,
       policy_id: self.purchase_order.policy_id,
-      gstin_location_id: self.purchase_order.gstin_location_id
+      gstin_location_id: self.purchase_order.gstin_location_id,
+      cost_allocation_items: self.purchase_order.cost_allocation_items
     }
 
     if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
