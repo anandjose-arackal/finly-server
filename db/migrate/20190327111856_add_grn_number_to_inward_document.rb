@@ -3,7 +3,7 @@ class AddGrnNumberToInwardDocument < ActiveRecord::Migration[5.2]
     Purpose.seed_data
     Seedable.init_global_variables
 
-    # add_column :inward_documents, :grn_number, :string, index: true
+    add_column :inward_documents, :grn_number, :string, index: true
     company_ids = InwardDocument.all.pluck(:company_id).uniq
     company_ids.each do |id|
       InwardDocument.where(company_id: id).reorder(created_at: :asc).all.each do |inward_document|
@@ -11,7 +11,7 @@ class AddGrnNumberToInwardDocument < ActiveRecord::Migration[5.2]
       end
     end
 
-    # add_column :items, :item_number, :string, index: true
+    add_column :items, :item_number, :string, index: true
     company_ids = Item.all.pluck(:company_id).uniq
     company_ids.each do |id|
       Item.where(company_id: id).reorder(created_at: :asc).all.each do |item|
@@ -19,7 +19,7 @@ class AddGrnNumberToInwardDocument < ActiveRecord::Migration[5.2]
       end
     end
 
-    # add_column :rate_contracts, :rate_contract_number, :string, index: true
+    add_column :rate_contracts, :rate_contract_number, :string, index: true
     company_ids = RateContract.all.pluck(:company_id).uniq
     company_ids.each do |id|
       RateContract.where(company_id: id).reorder(created_at: :asc).all.each do |rate_contract|
