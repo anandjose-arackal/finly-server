@@ -47,7 +47,7 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
 
   def create
     return nil unless user.initiator_for_any_document? || user.vp_admin_or_auditor?
-    {name: 'Create', id: 'create', url: 'create/params={}'}
+    {name: 'Create', id: 'create', url: 'create'}
   end
 
   def create_payment_ticket
