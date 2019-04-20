@@ -31,6 +31,7 @@ class ActionsManager::Processor < BaseOperation
   end
 
   def validate
+    self.master.clear_messages
     if self.master.blank?
       add_message :error, "Invalid Operation"
       return
