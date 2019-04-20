@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_20_053956) do
+ActiveRecord::Schema.define(version: 2019_04_20_083210) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -1031,7 +1031,7 @@ ActiveRecord::Schema.define(version: 2019_04_20_053956) do
     t.index ["travel_request_id"], name: "index_bookings_on_travel_request_id"
   end
 
-  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "gstin"
     t.string "pan"
@@ -3258,6 +3258,7 @@ ActiveRecord::Schema.define(version: 2019_04_20_053956) do
     t.decimal "total_proforma_advance", precision: 20, scale: 2
     t.integer "accounting_system_sync_status_id"
     t.integer "accounting_system_id"
+    t.boolean "cost_allocation_items", default: false
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
