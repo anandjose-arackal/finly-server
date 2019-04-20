@@ -595,7 +595,7 @@ module Transitionable
     end
 
     def role_based_associated_items(user, role_id, options={})
-      if user.has_policy_role?(role_id)
+      if user.has_poliy_role?(role_id)
         # role_id = UserRole.id_for(role_name.to_sym)
         role_name = UserRole.find_by_id(role_id).name
         data = nil
