@@ -3602,6 +3602,8 @@ Rails.application.routes.draw do
   resources :vendors do
     put 'approve', to: "vendors#approve"
     put 'submit', to: "vendors#submit"
+    put 'deactivate', to: "vendors#deactivate"
+    put 'reactivate', to: "vendors#reactivate"
     put 'reject', to: "vendors#reject"
     put 'retract', to: "vendors#retract"
     put 'take_control', to: "vendors#take_control"
