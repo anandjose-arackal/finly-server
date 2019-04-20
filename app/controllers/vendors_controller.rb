@@ -68,6 +68,16 @@ class VendorsController < ApplicationController
     respond
   end
 
+  def deactivate
+    @result = Vendors::Deactivate.(current_user, params)
+    respond
+  end
+
+  def reactivate
+    @result = Vendors::Reactivate.(current_user, params)
+    respond
+  end
+
   def take_control
     @result = Vendors::TakeControl.(current_user, params)
     respond
