@@ -43,7 +43,7 @@ class Event::EVendors::Submit < Event::EVendors::Base
   end
 
   def mailer_body(user)
-    if user.id == bank_payment_request.owner_id
+    if user.id == document.created_by_id
       "Congratulations, you have successfully submitted the vendor for approval : #{self.document.business_name} to #{document.get_reviewers.map(&:name).join(", ")}"
     else
       "#{self.document.created_by.name} has submitted the vendor: #{self.document.business_name} and is currently awaiting your approval."
