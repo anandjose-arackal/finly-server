@@ -11,8 +11,8 @@ class WorkflowManager::Aasm::YesBankVendorProvider < WorkflowManager::Aasm::Base
     # todo add unapprove etc
 
     event :submit do
-      transitions from: [:draft, :rejected], to: :auto_approved, guard: :reviewers_not_present?
-      transitions from: [:draft, :rejected], to: :awaiting_approval
+      transitions from: [:draft, :retracted, :rejected], to: :auto_approved, guard: :reviewers_not_present?
+      transitions from: [:draft, :retracted, :rejected], to: :awaiting_approval
     end
 
     event :approve do
