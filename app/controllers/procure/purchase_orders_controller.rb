@@ -67,11 +67,6 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
-  def bulk_reject
-    @result = Procurements::PurchaseOrders::BulkReject.(current_user, params)
-    respond
-  end
-
   def bulk_take_control
     @result = Procurements::PurchaseOrders::BulkTakeControl.(current_user, params)
     respond
