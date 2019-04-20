@@ -81,6 +81,7 @@ class ActionsManager::Master::Base
   def initialize(user, params)
     self.user = user
     self.params = params
+    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end
 
   def self.fields
@@ -127,10 +128,6 @@ class ActionsManager::Master::Base
       end
     end
     return result
-  end
-
-  def clear_messages
-    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end
 
 end
