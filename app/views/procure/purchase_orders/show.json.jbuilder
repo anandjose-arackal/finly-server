@@ -198,10 +198,15 @@ json.tax_rates do
 end
 
 json.locations do
+  # json.array! @result.locations do |location|
+    # json.extract! location, :id, :name, :gstin, :pan
+    # json.address location.address
   json.array! @result.locations do |location|
-    json.extract! location, :id, :name, :gstin, :pan
-    json.address location.address
+    json.merge! location.as_json(tree: true)
   end
+
+
+  # end
 end
 
 json.gstin_locations do

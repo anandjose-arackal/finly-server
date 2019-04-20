@@ -96,6 +96,14 @@ class Policy::Show < Policy::Base
     end
   end
 
+  def validate
+    if params[:sub_tab_config] == 'org_config' && params[:sub_tab] == 'PurchaseOrderProvider'
+      if !user.vp_admin_or_auditor?
+        raise_unauthorized_exception
+      end
+    end
+  end
+
   def success
     params[:policy] = self.policy
     params[:policy_users] = self.policy_users
