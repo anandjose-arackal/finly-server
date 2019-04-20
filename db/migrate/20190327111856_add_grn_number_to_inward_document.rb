@@ -3,7 +3,7 @@ class AddGrnNumberToInwardDocument < ActiveRecord::Migration[5.2]
     Purpose.seed_data
     Seedable.init_global_variables
 
-    add_column :inward_documents, :grn_number, :string, index: true
+    # add_column :inward_documents, :grn_number, :string, index: true
     company_ids = InwardDocument.all.pluck(:company_id).uniq
     company_ids.each do |id|
       InwardDocument.where(company_id: id).reorder(created_at: :asc).all.each do |inward_document|
