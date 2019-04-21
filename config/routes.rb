@@ -3469,6 +3469,8 @@ Rails.application.routes.draw do
 
       resources :quotations, only: %i[index create update destroy]
     end
+    post 'purchase_order/bulk_upload_items', to: 'purchase_orders#bulk_upload_items'
+    get 'purchase_order/template_bulk_import_items', to: 'purchase_orders#template_bulk_import_items'
     get 'po_advances', to: 'purchase_orders#po_advances', as: :po_advances
     post 'po_advance_ticket', to: 'purchase_orders#po_advance_ticket', as: :po_advance_ticket
     get 'po_with_advance', to: 'purchase_orders#po_with_advance', as: :po_with_advance
@@ -3519,6 +3521,8 @@ Rails.application.routes.draw do
     put 'inward_invoices/bulk_approve', to: 'inward_invoices#bulk_approve'
     put 'inward_invoices/bulk_reject', to: 'inward_invoices#bulk_reject'
     put 'inward_invoices/bulk_take_control', to: 'inward_invoices#bulk_take_control'
+    post 'inward_invoices/bulk_upload_items', to: 'inward_invoices#bulk_upload_items'
+    get 'inward_invoices/template_bulk_import_items', to: 'inward_invoices#template_bulk_import_items'
     put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'

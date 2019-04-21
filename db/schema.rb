@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_20_132120) do
+ActiveRecord::Schema.define(version: 2019_04_20_053956) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -3185,7 +3185,6 @@ ActiveRecord::Schema.define(version: 2019_04_20_132120) do
     t.integer "proforma_invoice_id"
     t.integer "proforma_advance"
     t.decimal "total_proforma_advance", precision: 20, scale: 2
-    t.boolean "cost_allocation_items", default: false
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
@@ -4260,16 +4259,6 @@ ActiveRecord::Schema.define(version: 2019_04_20_132120) do
     t.index ["policy_id"], name: "index_policy_configurations_on_policy_id"
     t.index ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id"
     t.index ["technical_contact_id"], name: "index_policy_configurations_on_technical_contact_id"
-  end
-
-  create_table "policy_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "policy_id"
-    t.integer "department_id"
-    t.boolean "enabled"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["department_id"], name: "index_policy_department_mappings_on_department_id"
-    t.index ["policy_id"], name: "index_policy_department_mappings_on_policy_id"
   end
 
   create_table "policy_field_mappings", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|

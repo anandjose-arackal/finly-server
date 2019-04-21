@@ -179,6 +179,12 @@ class YesBankVendor < ApplicationRecord
 
   # Scopes for ordering ends
 
+  before_validation do
+    if self.business_name.blank?
+      self.business_name = self.name
+    end
+  end
+
   after_create do
     if self.vendor_account.blank?
       self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save
