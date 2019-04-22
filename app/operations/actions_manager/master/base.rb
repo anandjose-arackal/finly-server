@@ -61,7 +61,7 @@ class ActionsManager::Master::Base
     # clear_messages
     self.class.validations&.each do |method|
       self.send method
-    end
+    end unless self.class.validations.blank?
     self.messages[:error].blank?
   end
 
