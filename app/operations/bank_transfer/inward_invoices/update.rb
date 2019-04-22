@@ -163,15 +163,13 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     #   end
     # end
 
-    if self.inward_invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
-      unless self.cost_allocation_items
-        self.inward_invoice_params[:invoice_items_attributes].each do |item|
-          item[:department_id] = self.inward_invoice_params[:department_id]
-          item[:cost_center_id] = self.inward_invoice_params[:cost_center_id]
-        end
+    unless self.cost_allocation_items
+      self.inward_invoice_params[:invoice_items_attributes].each do |item|
+        item[:department_id] = self.inward_invoice_params[:department_id]
+        item[:cost_center_id] = self.inward_invoice_params[:cost_center_id]
       end
     end
-    
+
   end
 
   def pre_process
