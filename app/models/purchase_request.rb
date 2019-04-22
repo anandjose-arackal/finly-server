@@ -241,7 +241,7 @@ class PurchaseRequest < ApplicationRecord
 
   def self.roles
     # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
-    [:admin, :purchase_request_initiator, :purchase_request_reviewer]
+    [:admin, :purchase_request_initiator, :purchase_request_reviewer, :purchase_request_auditor]
   end
 
   private

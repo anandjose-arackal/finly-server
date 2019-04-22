@@ -13,29 +13,44 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       vendors: false
     }
 
-    user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
+    if user.vendor_payments_admin?
+      document_types.keys.map {|key| document_types[key] = true }
+      unless user.company.procurement_enabled?
+        document_types[:purchase_orders] = false
+        document_types[:po_invoices] = false
+        document_types[:non_po_invoices] = false
+      end
 
-    user_roles.each do |role_id|
-      case role_id
-      when UserRole.id_for(:admin)
-        document_types.keys.map {|key| document_types[key] = true }
-        break
-      when UserRole.id_for(:purchase_request_reviewer)
-        document_types[:purchase_requests] = true
-      when UserRole.id_for(:purchase_order_reviewer)
-        document_types[:purchase_orders] = true
-      when UserRole.id_for(:invoice_reviewer)
-        document_types[:po_invoices] = true
-        document_types[:non_po_invoices] = true
-      when UserRole.id_for(:bank_payment_request_reviewer)
-        document_types[:payment_tickets] = true
-      when UserRole.id_for(:vendor_reviewer)
-        if user.company.vendor_empanelment_workflow_enabled?
-          document_types[:vendors] = true
+      unless user.company.purchase_requisition_enabled?
+        document_types[:purchase_requests] = false
+      end
+
+      unless user.company.vendor_empanelment_workflow_enabled?
+        document_types[:vendors] = false
+      end
+    else
+      user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
+      user_roles.each do |role_id|
+        case role_id
+        # when UserRole.id_for(:admin) ######## Admin role removed as PUR doesn't have it
+        #   document_types.keys.map {|key| document_types[key] = true }
+        #   break
+        when UserRole.id_for(:purchase_request_reviewer)
+          document_types[:purchase_requests] = true
+        when UserRole.id_for(:purchase_order_reviewer)
+          document_types[:purchase_orders] = true
+        when UserRole.id_for(:invoice_reviewer)
+          document_types[:po_invoices] = true
+          document_types[:non_po_invoices] = true
+        when UserRole.id_for(:bank_payment_request_reviewer)
+          document_types[:payment_tickets] = true
+        when UserRole.id_for(:vendor_reviewer)
+          if user.company.vendor_empanelment_workflow_enabled?
+            document_types[:vendors] = true
+          end
         end
       end
     end
-
     self.result = []
   end
 
