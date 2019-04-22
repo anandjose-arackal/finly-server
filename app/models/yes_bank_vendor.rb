@@ -245,7 +245,7 @@ class YesBankVendor < ApplicationRecord
   end
 
   def self.roles
-    [:vendor_creator, :vendor_reviewer, :vendor_manager, :admin]
+    [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :admin]
   end
 
   def self.role_based_associated_status_ids(user)
