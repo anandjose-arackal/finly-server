@@ -36,6 +36,7 @@ class Attachment < ApplicationRecord
     where id: ids
   } 
 
+  scope :with_id, -> (ids) { where id: ids }
 
   def as_json(options={})
     if options[:array]
