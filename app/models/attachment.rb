@@ -49,6 +49,7 @@ class Attachment < ApplicationRecord
 
   def default_json
     {
+      uid: self.id,
       id: self.id,
       name: self.file_file_name,
       url: self.file&.url,
