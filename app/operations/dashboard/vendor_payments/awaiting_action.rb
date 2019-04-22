@@ -14,19 +14,19 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     }
 
     if user.vendor_payments_admin?
-      request_types.keys.map {|key| request_types[key] = true }
+      document_types.keys.map {|key| document_types[key] = true }
       unless user.company.procurement_enabled?
-        request_types[:purchase_orders] = false
-        request_types[:po_invoices] = false
-        request_types[:non_po_invoices] = false
+        document_types[:purchase_orders] = false
+        document_types[:po_invoices] = false
+        document_types[:non_po_invoices] = false
       end
 
       unless user.company.purchase_requisition_enabled?
-        request_types[:purchase_requests] = false
+        document_types[:purchase_requests] = false
       end
 
       unless user.company.vendor_empanelment_workflow_enabled?
-        request_types[:vendors] = false
+        document_types[:vendors] = false
       end
     else
       user_roles = user.policy_user_roles.pluck(:user_role_id).uniq
