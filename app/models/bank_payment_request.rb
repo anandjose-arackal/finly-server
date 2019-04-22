@@ -188,7 +188,10 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   }
 
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
-  scope :filter_controlling_user, -> (user_id) {self.awaiting_action_items(user_id)}
+  scope :filter_controlling_user, -> (user_id) {
+    # self.awaiting_action_items(user_id)
+    self.where(controlling_user_id: user_id, status_id: BankPaymentRequestStatus.id_for(:processing))
+  }
 
   # scope :filter_controlling_user, -> (user_id) {
   #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
