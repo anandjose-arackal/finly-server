@@ -4,7 +4,7 @@ class Attachments::Destroy < Attachments::Base
 
   def init
     id = params[:id] || params[:attachment_id]
-    self.attachment = user.company.attachments.orphans.with_id(id).first
+    self.attachment = user.company.attachments.with_id(id).first
   end
 
   def validate
