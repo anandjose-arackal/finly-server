@@ -739,9 +739,11 @@ class PurchaseOrder < ApplicationRecord
     [
         :purchase_order_initiator,
         :purchase_order_reviewer,
+        :purchase_order_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
-        :bank_payment_request_creditor
+        :bank_payment_request_creditor,
+        :bank_payment_request_auditor
     ]
   end
 
