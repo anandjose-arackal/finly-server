@@ -139,29 +139,39 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     #   return
     # end
 
+    # Removing hard check for department and cc line item wise
+    # if self.inward_invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+    #   if self.cost_allocation_items
+    #     arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:department_id)
+
+    #     if arr.collect {|a| a.blank? }.include? true
+    #       add_message :error, "Please select a Department for which the item would be purchased."
+    #       return
+    #     end
+
+    #     arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:cost_center_id)
+
+    #     if arr.collect {|a| a.blank? }.include? true
+    #       add_message :error, "Please select a Cost Center for which the item would be purchased."
+    #       return
+    #     end
+    #   else
+    #     self.inward_invoice_params[:invoice_items_attributes].each do |item|
+    #       item[:department_id] = self.inward_invoice_params[:department_id]
+    #       item[:cost_center_id] = self.inward_invoice_params[:cost_center_id]
+    #     end
+    #   end
+    # end
+
     if self.inward_invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
-      if self.cost_allocation_items
-        arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:department_id)
-
-        # if arr.collect {|a| a.blank? }.include? true
-        #   add_message :error, "Please select a Department for which the item would be purchased."
-        #   return
-        # end
-
-        arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:cost_center_id)
-
-        # if arr.collect {|a| a.blank? }.include? true
-        #   add_message :error, "Please select a Cost Center for which the item would be purchased."
-        #   return
-        # end
-      else
-        self.inward_invoice_params[:invoice_items_attributes].each do |item|
-          item[:department_id] = self.inward_invoice_params[:department_id]
-          item[:cost_center_id] = self.inward_invoice_params[:cost_center_id]
+      unless self.cost_allocation_items
+        self.purchase_order_params[:items_attributes].each do |item|
+          item[:department_id] = self.purchase_order_params[:department_id]
+          item[:cost_center_id] = self.purchase_order_params[:cost_center_id]
         end
       end
     end
-
+    
   end
 
   def pre_process
