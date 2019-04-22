@@ -110,22 +110,22 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
         self.counts.push(personal_data)
       end
 
-      if user.vendor_payments_reviewer?
-        reviewer_data = {
-          type: "reviewer",
-          title: "Teams' Payment Tickets",
-          data: [
-            {
-              title: "Awaiting Approval",
-              count: BankPaymentRequest.awaiting_action_items(user)&.count,
-              filters: [
-                {filter_status_id: 10}
-              ]
-            }
-          ]
-        }
-        self.counts.push(reviewer_data)
-      end
+    #   if user.vendor_payments_reviewer?
+    #     reviewer_data = {
+    #       type: "reviewer",
+    #       title: "Teams' Payment Tickets",
+    #       data: [
+    #         {
+    #           title: "Awaiting Approval",
+    #           count: BankPaymentRequest.awaiting_action_items(user)&.count,
+    #           filters: [
+    #             {filter_status_id: 10}
+    #           ]
+    #         }
+    #       ]
+    #     }
+    #     self.counts.push(reviewer_data)
+    #   end
     end
   end
 end

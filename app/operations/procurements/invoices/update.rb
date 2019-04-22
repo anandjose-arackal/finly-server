@@ -18,6 +18,8 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
         self.purchase_order = self.po_revision
       end
     end
+
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
   end
 
   def validate

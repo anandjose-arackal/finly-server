@@ -30,7 +30,9 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       when UserRole.id_for(:bank_payment_request_reviewer)
         document_types[:payment_tickets] = true
       when UserRole.id_for(:vendor_reviewer)
-        document_types[:vendors] = true
+        if user.company.vendor_empanelment_workflow_enabled?
+          document_types[:vendors] = true
+        end
       end
     end
 
@@ -53,7 +55,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         title: "Payment Tickets",
         type: 'orders',
         count: BankPaymentRequest.awaiting_action_items(user).count,
-        filters: [{filter_awaiting_approval: true}]
+        filters: [{filter_status_id: 10}]
       }
       self.result.push data
     end
