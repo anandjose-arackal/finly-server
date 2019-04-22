@@ -23,7 +23,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
   def invoice_attributes
     params.require(:invoice).permit(:note, :tax, :gst_type_id, :tds, :tds_type_id, :category_id, :cost_center_id, :tds_slab_id, :payment_term_id, :gstin_location_id,
-                                    :department_id, :sub_department_id, :policy_id, :billing_address, :shipping_address, :global_setting,
+                                    :department_id, :sub_department_id, :policy_id, :billing_address, :shipping_address, :cost_allocation_items,
                                     :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount, :location_id,
                                     :delivery_location_id, :transaction_service_period_from, :transaction_service_period_to,
                                     :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id,
