@@ -107,22 +107,31 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
-    if self.cost_allocation_items
-      arr = self.purchase_order_params[:items_attributes].pluck(:department_id)
+    # Removing hard check for department and cc line item wise
 
-      if arr.collect {|a| a.blank? }.include? true
-        add_message :error, "Please select a Department for which the item would be purchased."
-        return
-      end
+    # if self.cost_allocation_items
+    #   arr = self.purchase_order_params[:items_attributes].pluck(:department_id)
 
-      arr = self.purchase_order_params[:items_attributes].pluck(:cost_center_id)
+    #   if arr.collect {|a| a.blank? }.include? true
+    #     add_message :error, "Please select a Department for which the item would be purchased."
+    #     return
+    #   end
+
+    #   arr = self.purchase_order_params[:items_attributes].pluck(:cost_center_id)
 
 
-      if arr.collect {|a| a.blank? }.include? true
-        add_message :error, "Please select a Cost Center for which the item would be purchased."
-        return
-      end
-    else
+    #   if arr.collect {|a| a.blank? }.include? true
+    #     add_message :error, "Please select a Cost Center for which the item would be purchased."
+    #     return
+    #   end
+    # else
+    #   self.purchase_order_params[:items_attributes].each do |item|
+    #     item[:department_id] = self.purchase_order_params[:department_id]
+    #     item[:cost_center_id] = self.purchase_order_params[:cost_center_id]
+    #   end
+    # end
+
+    unless self.cost_allocation_items
       self.purchase_order_params[:items_attributes].each do |item|
         item[:department_id] = self.purchase_order_params[:department_id]
         item[:cost_center_id] = self.purchase_order_params[:cost_center_id]
@@ -195,7 +204,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
-
 
       # purchase_order.save
       purchase_order.process_line_item_calculation(self.skip_adv_calculation)

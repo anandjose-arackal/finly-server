@@ -68,6 +68,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       invoice_date = item[:invoice_date] || item[:date]
       invoice_due_date = item[:invoice_due_date] || item[:due_date]
       note = item[:note]
+      custom_fields_key = item[:custom_fields] || item["custom_fields"]
 
       # generating custom field data
       custom_fields = {}
@@ -83,7 +84,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         end
       end
 
-      item[:custom_fields] = custom_fields
+      item[:custom_fields] = custom_fields_key || custom_fields
       
 
 

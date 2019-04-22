@@ -155,7 +155,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_policy_id
     has_scope :filter_user_id
     has_scope :filter_scheduled_date, using: [:from, :to], type: :hash
-    # has_scope :filter_controlling_user
+    has_scope :filter_controlling_user
     has_scope :filter_payment_ids
     has_scope :filter_vendor_id
     has_scope :filter_month
@@ -172,7 +172,9 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       #     self.payment_requests = self.payment_requests.order_by(:submitted_at)#.order_by(:manager_controlling_user, user.id)
       #   end
       # end
+      if self.payment_requests.present?
       self.payment_requests&.order_by(:submitted_at)
+      end
       self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page) rescue ::PaymentRequest.none
     end
 
