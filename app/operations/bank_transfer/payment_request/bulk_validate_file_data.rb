@@ -68,6 +68,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       invoice_date = item[:invoice_date] || item[:date]
       invoice_due_date = item[:invoice_due_date] || item[:due_date]
       note = item[:note]
+      external_reference_id = item[:external_reference_id]
 
       # generating custom field data
       custom_fields = {}
@@ -157,6 +158,11 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:ifsc] = 'Invalid IFSC'
       end
 
+      if ::Payment.with_company_id(user.company_id).find_by(external_reference_id: external_reference_id)
+        self.valid = false
+        self.error_messages << "This external reference ID is already taken"
+        self.issue_item[:external_reference_id] = "This external reference ID is already taken"
+      end
       
       # adding all invoice specific validations here for the payment
       # 
