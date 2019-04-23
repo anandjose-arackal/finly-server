@@ -2,6 +2,8 @@ class Dashboard::VendorPayments::Vendors < Dashboard::VendorPayments::Base
   attr_accessor :vendors
 
   def init
+    params[:non_deleted] = true
+    params[:authorized] = true
     self.vendors = ::Vendors::Index.(user, params).vendors
   end
 

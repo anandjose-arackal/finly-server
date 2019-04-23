@@ -175,6 +175,8 @@ class Trail < ApplicationRecord
         action = " created a revision for this"
       when TrailAction.id_for(:reopen)
         action = " reopened"
+      when TrailAction.id_for(:forward)
+        action = " forwarded"
       else
         action = ""
     end
