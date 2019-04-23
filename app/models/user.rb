@@ -1136,9 +1136,9 @@ class User < ApplicationRecord
       data = policy.policy_user_roles.where(user_id: self.id, user_role_id: role_id) rescue nil
     else
       if self.enforce_policy_enabled?
-        data = self.company.policies.where.not(default: true).joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+        data = self.company.policies.exclude_deleted.where.not(default: true).joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
       else
-        data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+        data = self.company.policies.exclude_deleted.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
       end
     end
     data.present?
