@@ -8,7 +8,8 @@
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
 # server 'dev2.finly.io', user: 'centos', roles: %w{web app db}, port: 22
-server '35.154.209.41', user: 'centos', roles: %w{web app db}, port: 22
+# server '35.154.209.41', user: 'centos', roles: %w{web app db}, port: 22
+server '13.126.31.9', user: 'centos', roles: %w{web app db}, port: 22
 
 set :stage, 'staging'
 set :use_sudo, false
