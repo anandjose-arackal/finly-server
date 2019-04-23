@@ -19,7 +19,7 @@ class Procurements::PurchaseOrders::BulkReject < Procurements::PurchaseOrders::B
 
     accept_po = []
     self.purchase_orders.each do |purchase_order|
-      valid = (purchase_order.can_reject?) ? true : false
+      valid = (purchase_order.can_really_reject?) ? true : false
 
       if valid
         accept_po << purchase_order.id

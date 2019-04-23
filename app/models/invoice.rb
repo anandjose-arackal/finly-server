@@ -283,12 +283,22 @@ class Invoice < ApplicationRecord
     where('date >= ? && date <= ?', from, to)
   }
 
+  scope :filter_invoice_date, -> (from) {
+    from = Date.parse(from) rescue Date.today
+    where('date = ?', from)
+  }
+
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
     where('due_date >= ? && due_date <= ?', from, to)
+  }
+
+  scope :filter_due_date, -> (from) {
+    from = Date.parse(from) rescue Date.today
+    where('due_date = ?', from)
   }
 
   scope :created_at_desc, -> {order(created_at: :desc)}
@@ -472,7 +482,7 @@ class Invoice < ApplicationRecord
   def item_amounts_total
     if self.invoice_items.present?
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount&.value}.sum
+      return self.invoice_items.map {|p| p.amount&.value}.compact.sum
     else
       return 0
     end
@@ -651,13 +661,15 @@ class Invoice < ApplicationRecord
 
   def can_really_approve?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing? rescue false
-    elsif self.action_users(:approve).include?(user)
-      processing? rescue false
-    else
-      false
-    end
+    return false if user.blank?
+    (processing? rescue false) && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing? rescue false
+    # elsif self.action_users(:approve).include?(user)
+    #   processing? rescue false
+    # else
+    #   false
+    # end
   end
 
   def can_reject?
@@ -666,17 +678,20 @@ class Invoice < ApplicationRecord
 
   def can_really_reject?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing? rescue false
-    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
-      processing? rescue false
-    else
-      false
-    end
+    return false if user.blank?
+    (processing? rescue false) && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing? rescue false
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   processing? rescue false
+    # else
+    #   false
+    # end
   end
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     (processing? rescue false) && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end

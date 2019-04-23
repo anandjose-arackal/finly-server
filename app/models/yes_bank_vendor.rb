@@ -107,7 +107,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :filter_search, -> (term) do
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
@@ -145,7 +145,7 @@ class YesBankVendor < ApplicationRecord
   scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
   scope :filter_created_by_id, -> (user_id) {where created_by_id: user_id}
   scope :filter_business_name, -> (term) {where("business_name like ?", "%#{term}%")}
-  scope :filter_vendor_id, -> (vendor_id) {where(vendor_id: vendor_id)}
+  scope :filter_vendor_id, -> (vendor_id) {where("yes_bank_vendors.vendor_id like ?", "%#{vendor_id}%")}
   scope :filter_account_details, -> (term) {
     bank_account_ids = BankAccount.where(account_owner_type: "YesBankVendor").where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:account_owner_id)
     where id: bank_account_ids
@@ -286,13 +286,15 @@ class YesBankVendor < ApplicationRecord
 
   def can_really_approve?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      awaiting_approval? rescue false
-    elsif self.action_users(:approve).include?(user)
-      awaiting_approval? rescue false
-    else
-      false
-    end
+    return false if user.blank?
+    (awaiting_approval? rescue false) && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   awaiting_approval? rescue false
+    # elsif self.action_users(:approve).include?(user)
+    #   awaiting_approval? rescue false
+    # else
+    #   false
+    # end
   end
 
   def can_reject?
@@ -301,17 +303,20 @@ class YesBankVendor < ApplicationRecord
 
   def can_really_reject?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      awaiting_approval? rescue false
-    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
-      awaiting_approval? rescue false
-    else
-      false
-    end
+    return false if user.blank?
+    (awaiting_approval? rescue false) && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   awaiting_approval? rescue false
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   awaiting_approval? rescue false
+    # else
+    #   false
+    # end
   end
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     (awaiting_approval? rescue false) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
