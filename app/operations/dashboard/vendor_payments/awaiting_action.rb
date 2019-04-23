@@ -118,7 +118,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     if document_types[:vendors]
       data = {
         title: "Vendors",
-        type: 'vendors',
+        type: 'vendor',
         count: YesBankVendor.awaiting_action_items(user).count,
         filters: [{filter_status_id: 'awaiting_approval'}]
       }
