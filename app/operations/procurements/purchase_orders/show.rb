@@ -57,15 +57,19 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.taxes_applicable_flag = taxes_applicable_flag?
 
       self.reviewal_chains = []
-      params[:reviewal_document] = purchase_order
 
-      policies.each do |policy|
-        params[:policy_id] = policy.id
-        chain = {
-            policy_id: policy.id,
-            reviewal_chain: get_reviewal_chain
-        }
-        self.reviewal_chains.push(chain)
+
+      # Load reviewal chain only when its editable & owner's viewing the document
+      if self.purchase_order.user_id == user.id && PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(self.purchase_order.purchase_order_status_id)
+        params[:reviewal_document] = purchase_order
+        policies.each do |policy|
+          params[:policy_id] = policy.id
+          chain = {
+              policy_id: policy.id,
+              reviewal_chain: get_reviewal_chain
+          }
+          self.reviewal_chains.push(chain)
+        end
       end
 
       if purchase_order.items.present?
