@@ -28,6 +28,13 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
   def init
     self.order_data = params[:payment_order]
+    self.policy_id = params[:policy_id]
+    
+    unless user.company.policies.with_application("vp").pluck(:id).include?(self.policy_id.to_i)
+      add_message :error, "This policy does not belong to your company"
+      return
+    end
+
     op = BankTransfer::PaymentRequest::Process.(user, scheduled_at: params[:scheduled_at],
                                                 payment_order: self.order_data,
                                                 policy_id: params[:policy_id])
