@@ -292,7 +292,7 @@ class Procurement < ApplicationRecord
   }
 
   scope :filter_awaiting_approval, -> (user) {
-    if user.vendor_payments_reviewer?
+    if user.vendor_payments_reviewer? || user.vendor_payments_admin?
       # level_ids = []
 
       # policy_ids = user.company.policies.with_application(:vp).pluck(:id)
@@ -336,7 +336,9 @@ class Procurement < ApplicationRecord
 
       # where(id: procurement_ids.uniq)
       procurement_ids = PurchaseOrder.awaiting_action_items(user).pluck(:procurement_id).compact
-      procurement_ids += Invoice.awaiting_action_items(user).pluck(:procurement_id).compact
+      # Removed, since procurements is only used for purchase orders
+      # For invoices(PO/NPO) api/bank_transfer/inward_invoices.json is used
+      # procurement_ids += Invoice.awaiting_action_items(user).pluck(:procurement_id).compact
       where(id: procurement_ids.uniq)
     end
   }

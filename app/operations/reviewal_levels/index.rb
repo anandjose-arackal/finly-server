@@ -35,6 +35,15 @@ class ReviewalLevels::Index < ReviewalLevels::Base
 
   end
 
+  # def validate
+  #   # Currently implementing for vendor payments only
+  #   if ['PurchaseOrderProvider', 'PurchaseRequestProvider', 'PaymentTicketProvider', 'YesBankVendorProvider'].include?(params[:filter_associated_entity_type])
+  #     unless user.vendor_payments_admin?
+  #       raise_unauthorized_exception
+  #     end
+  #   end
+  # end
+
   def success
     params[:reviewal_levels] = self.reviewal_levels
     ReviewalLevels::Index::IndexPresenter.new(user, params, messages)

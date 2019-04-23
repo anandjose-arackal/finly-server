@@ -71,9 +71,9 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
       item_number = item[:item_number] || item["item_number"]
       department_id = item[:department_id] || item["department_id"]
       comment = item[:comment] || item["comment"]
-      item_code = item[:item_code] || item[:item_code]
-      hsn_sac = item[:hsn_sac] || item[:hsn_sac]
-      quantity = item[:quantity] || item[:quantity]
+      item_code = item[:item_code] || item['item_code']
+      hsn_sac = item[:hsn_sac] || item['hsn_sac']
+      quantity = item[:quantity] || item['quantity']
       unit_of_measurement = item[:unit_of_measurement] || item["unit_of_measurement"]
       rate = item[:rate] || item["rate"]
       discount = item[:discount] || item["discount"]
@@ -83,7 +83,7 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
       self.error_messages = []
       self.issue_item = {}
 
-      if items_not_found.include? item_number.strip
+      if item_number.nil? or items_not_found.include? item_number.strip
         self.valid = false
         self.error_messages << "Unable to find this item number in inventory list"
         self.issue_item[:item_number] = "Unable to find this item number in inventory list"
@@ -123,11 +123,11 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
         self.issue_item[:quantity] = "Quantity entered has non-numeric characters."
       end
 
-      unless validate_hsn_sac hsn_sac
-        self.valid = false
-        self.error_messages << "HSN/SAC is invalid. Please recheck."
-        self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
-      end
+      # unless validate_hsn_sac hsn_sac
+      #   self.valid = false
+      #   self.error_messages << "HSN/SAC is invalid. Please recheck."
+      #   self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
+      # end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
@@ -164,9 +164,9 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
 
   private
 
-  def validate_hsn_sac(hsn_sac)
-    ( /\A(\d{6}|\d{8})\Z/.match(hsn_sac)) ? true : false
-  end
+  # def validate_hsn_sac(hsn_sac)
+  #   ( /\A(\d{6}|\d{8})\Z/.match(hsn_sac)) ? true : false
+  # end
 
   def validate_amount(amount)
     if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer

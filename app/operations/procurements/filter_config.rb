@@ -5,7 +5,7 @@ class Procurements::FilterConfig < Procurements::Base
     self.status_tags = StatusTag.all
     self.po_statuses = PurchaseOrderStatus.all
     self.invoice_statuses = InwardInvoiceStatus.all
-    self.locations = user.company.locations if user.vp_admin_or_auditor?
+    # self.locations = user.company.locations if user.vp_admin_or_auditor?
     # self.departments = user.company.departments.roots
     self.sub_departments = user.company.departments.only_sub_departments
     # self.sub_departments = user.company.dep_subdept_mapping

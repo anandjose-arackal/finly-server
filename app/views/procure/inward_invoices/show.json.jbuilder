@@ -130,7 +130,7 @@ json.invoice do
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
       json.extract! item, :id, :comment, :rate, :quantity, :tax, :discount, :category_id,
-                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id
+                    :unit_of_measurement, :description, :hsn_sac, :inventory_line_item_id, :tax_rate_id, :department_id, :cost_center_id
 
       json.item_number item.inventory_line_item&.item_number rescue nil
       json.gl_code item.inventory_line_item&.item_code rescue nil

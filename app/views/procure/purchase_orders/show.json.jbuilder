@@ -63,7 +63,7 @@ json.items do
   json.array! @result.purchase_order.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
-                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
+                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id
     
     json.item_number item.inventory_line_item&.item_number rescue nil
     json.gl_code item.inventory_line_item&.item_code rescue nil
@@ -198,10 +198,15 @@ json.tax_rates do
 end
 
 json.locations do
+  # json.array! @result.locations do |location|
+    # json.extract! location, :id, :name, :gstin, :pan
+    # json.address location.address
   json.array! @result.locations do |location|
-    json.extract! location, :id, :name, :gstin, :pan
-    json.address location.address
+    json.merge! location.as_json(tree: true)
   end
+
+
+  # end
 end
 
 json.gstin_locations do
