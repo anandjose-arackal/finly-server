@@ -44,7 +44,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.company_items = user.company.items
 
     self.all_departments = Company::Departments::Index.(user, params)
-    self.all_departments_ids = self.all_departments&.pluck(:id)
+    self.all_departments_ids = self.all_departments&.departments&.pluck(:id)
   
   end
 

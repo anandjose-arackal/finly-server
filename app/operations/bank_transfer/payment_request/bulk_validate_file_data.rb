@@ -85,7 +85,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         end
       end
 
-      item[:custom_fields] = custom_fields_key || custom_fields
+      item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
       
 
 
