@@ -1,7 +1,7 @@
 class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Base
   attr_accessor :result, :document_types
 
-  has_scope :filter_inward_invoice_type
+  has_scope :filter_invoice_type
 
   def init
     self.document_types = {
@@ -92,9 +92,9 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         data = {
           title: "PO Invoices",
           type: 'new_payment_invoices',
-          count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: 'po_invoices'}).count,
+          count: apply_scopes(awaiting_invoices, {filter_invoice_type: 'po_invoice'}).count,
           filters: [
-            {filter_invoice_type: 'po_invoices'},
+            {filter_invoice_type: 'po_invoice'},
             {filter_awaiting_approval: true}
           ]
         }
@@ -105,9 +105,9 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         data = {
           title: "Non PO Invoices",
           type: 'new_payment_invoices',
-          count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: 'non_po_invoices'}).count,
+          count: apply_scopes(awaiting_invoices, {filter_invoice_type: 'non_po_invoice'}).count,
           filters: [
-            {filter_invoice_type: 'non_po_invoices'},
+            {filter_invoice_type: 'non_po_invoice'},
             {filter_awaiting_approval: true}
           ]
         }
