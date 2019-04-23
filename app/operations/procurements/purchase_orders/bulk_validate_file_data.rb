@@ -94,16 +94,23 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         self.issue_item[:rate] = "Rate entered has non-numeric characters."
       end
 
-      if unit_of_measurement.blank?
-        self.valid = false
-        self.error_messages << "Unit of Measurement for the item has not been provided."
-        self.issue_item[:unit_of_measurement] = "Unit of Measurement for the item has not been provided."
-      end
+      # Removing it for now
+      # if unit_of_measurement.blank?
+      #   self.valid = false
+      #   self.error_messages << "Unit of Measurement for the item has not been provided."
+      #   self.issue_item[:unit_of_measurement] = "Unit of Measurement for the item has not been provided."
+      # end
 
       if quantity.blank?
         self.valid = false
         self.error_messages << "Please input the quantity."
         self.issue_item[:quantity] = "Please input the quantity."
+      end
+
+      if department_id.blank?
+        self.valid = false
+        self.error_messages << "Please provide the department for which the item would be purchased."
+        self.issue_item[:quantity] = "Please provide the department for which the item would be purchased."
       end
 
       unless validate_amount quantity

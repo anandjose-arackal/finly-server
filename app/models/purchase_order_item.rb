@@ -54,7 +54,8 @@ class PurchaseOrderItem < ApplicationRecord
   # link to budget trails table
   has_many :budget_trails, as: :entity
 
-  validates_presence_of :unit_of_measurement
+  # removing for now
+  # validates_presence_of :unit_of_measurement
 
   accepts_nested_attributes_for :tax_amount, :discount_amount,
                                 :total_amount

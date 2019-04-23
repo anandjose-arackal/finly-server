@@ -53,7 +53,8 @@ class InvoiceLineItem < ApplicationRecord
   validates :description, presence: true
   validates :quantity, presence: true
   validates :rate, presence: true
-  validates_presence_of :unit_of_measurement
+  # removing for now
+  # validates_presence_of :unit_of_measurement
 
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy

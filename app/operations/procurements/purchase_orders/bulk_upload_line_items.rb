@@ -19,7 +19,7 @@ class Procurements::PurchaseOrders::BulkUploadLineItems < Procurements::Purchase
   def init
     Rails.logger.fatal "FROM BulkUploadLineItems start of init,\n #{params.inspect}"
     self.file = params[:file]
-    headers = [:description, :item_number, :comment, :item_code, :hsn_sac, :quantity, :unit_of_measurement, :rate, :discount, :tax, :total]
+    headers = [:description, :item_number, :department_id, :cost_center_id, :comment, :item_code, :hsn_sac, :quantity, :unit_of_measurement, :rate, :discount, :tax, :total]
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
