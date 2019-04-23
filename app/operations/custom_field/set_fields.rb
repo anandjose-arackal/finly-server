@@ -93,6 +93,7 @@ class CustomField::SetFields < CustomField::Base
     end
 
 
+
     configs_to_create.each do |config|
       default_value = nil
       if config.default_value.present?
@@ -105,6 +106,7 @@ class CustomField::SetFields < CustomField::Base
     end
 
     item.custom_fields.with_field_configuration_ids(config_ids_to_destroy).destroy_all
+
 
 
     return if item.custom_fields.blank?
@@ -213,7 +215,7 @@ class CustomField::SetFields < CustomField::Base
           # If root field, add the value to acceptable dropdown values
           acceptable_value = true
         else
-          if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.pluck(:id).include?(drop_down_value)}
+          if acceptable_dropdown_values.any? {|drop_down_value| config.parent_drop_down_items.pluck(:id).include?(drop_down_value.to_i)}
             # if acceptable_dropdown_values.include?(config.parent_id.to_s)
             acceptable_value = true
           end

@@ -167,6 +167,14 @@ class Payment < ApplicationRecord
     where company_id: company_id
   }
 
+  scope :filter_api_initiated, -> (api_initiated) {
+    if StringUtils.to_bool(api_initiated)
+      where api_initiated: api_initiated
+    else
+      where('api_initiated IS ? OR api_initiated = ?', nil, false)
+    end
+  }
+
   # Personal are card transactions from own wallet to own card
 
   scope :personal, -> { where('initiating_user_id = receiving_user_id AND (payment_purpose_id IN (?) OR (payment_type_id IN (?) AND initiating_account_type IN (?) AND receiving_account_type IN (?)))',
