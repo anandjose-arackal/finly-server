@@ -794,7 +794,7 @@ class PurchaseOrder < ApplicationRecord
     {
       # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
 
-      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, purchase_request_item_id: pr_item.id, rate: pr_item&.item&.rate, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement
+      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, purchase_request_item_id: pr_item.id, rate: pr_item&.item&.rate, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id
     }
   end
 
