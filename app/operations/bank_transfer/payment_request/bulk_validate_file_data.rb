@@ -69,6 +69,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       invoice_due_date = item[:invoice_due_date] || item[:due_date]
       note = item[:note]
       external_reference_id = item[:external_reference_id]
+      custom_fields_key = item[:custom_fields] || item["custom_fields"]
 
       # generating custom field data
       custom_fields = {}
@@ -84,7 +85,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         end
       end
 
-      item[:custom_fields] = custom_fields
+      item[:custom_fields] = custom_fields_key || custom_fields
       
 
 
@@ -163,7 +164,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.error_messages << "This external reference ID is already taken"
         self.issue_item[:external_reference_id] = "This external reference ID is already taken"
       end
-      
+
       # adding all invoice specific validations here for the payment
       # 
       # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES

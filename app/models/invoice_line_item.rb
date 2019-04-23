@@ -56,7 +56,6 @@ class InvoiceLineItem < ApplicationRecord
   validates :quantity, presence: true
   validates :rate, presence: true
   validates_presence_of :unit_of_measurement
-  validates_presence_of :cost_center
   validates_presence_of :department
 
   after_save :budget_trail_entry
