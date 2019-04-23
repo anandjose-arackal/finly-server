@@ -38,8 +38,6 @@
 #  vedor_code               :string(255)
 #
 
-
-
 class YesBankVendor < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
@@ -136,7 +134,6 @@ class YesBankVendor < ApplicationRecord
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
         self.awaiting_action_items(user_id)
-        # with_id(ids)
       end
     else
       where status_id: status_id
