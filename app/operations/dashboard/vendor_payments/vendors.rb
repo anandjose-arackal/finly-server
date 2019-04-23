@@ -2,7 +2,7 @@ class Dashboard::VendorPayments::Vendors < Dashboard::VendorPayments::Base
   attr_accessor :vendors
 
   def init
-    self.vendors = Vendors::Index.(user, params).vendors
+    self.vendors = ::Vendors::Index.(user, params).vendors
   end
 
   def success

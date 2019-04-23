@@ -115,7 +115,6 @@ class Vendors::Base < BaseOperation
     types = {pan: "PAN", gstin: "GSTIN Certificate", cancelled_cheque: "Cancelled Cheque", tax_exemption: "Tax Exemption Certificate", lower_exemption: "Lower Exemption Certificate", msme_certificate: "MSME Certificate", others: "Others"}
 
     # attachment_name = 
-
     if vendor_params.present? && vendor_params[:vendor_attachments_attributes].present?    
       unless find_attachment(vendor_params[:vendor_attachments_attributes], type)
         add_message :error, "Please upload #{types[type]}"
