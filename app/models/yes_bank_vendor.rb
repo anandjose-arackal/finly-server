@@ -248,6 +248,10 @@ class YesBankVendor < ApplicationRecord
     [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :admin]
   end
 
+  def self.open_status_ids(user)
+    VendorStatus.ids_for([:open, :draft])
+  end
+
   def self.role_based_associated_status_ids(user)
     self.status_ids(*self.role_based_statuses(user))
   end

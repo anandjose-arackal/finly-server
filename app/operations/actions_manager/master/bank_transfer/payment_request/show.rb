@@ -29,14 +29,14 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     # If admin is creditor too
     if user.vendor_payments_admin?
-      if bank_payment_request.payment_order.partially_completed? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+      if bank_payment_request.payment_order.partially_completed? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted?
         return true
       end
-      if  bank_payment_request.processing? && bank_payment_request.action_users(:return_control).include?(user)
+      if  bank_payment_request.processing? && bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted?
         return true
       end
 
-      if (bank_payment_request.approved? || bank_payment_request.auto_approved?) && !bank_payment_request.credited?
+      if (bank_payment_request.approved? || bank_payment_request.auto_approved?) && !bank_payment_request.credited? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted?
         return true
       end
     end
@@ -170,14 +170,14 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
     # end
 
     if user.vendor_payments_admin?
-      if bank_payment_request.payment_order.partially_completed? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted? 
+      if bank_payment_request.payment_order.partially_completed? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? 
         return true
       end
-      if  bank_payment_request.processing? && bank_payment_request.action_users(:return_control).include?(user)
+      if  bank_payment_request.processing? && bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted?
         return true
       end
 
-      if (bank_payment_request.approved? || bank_payment_request.auto_approved?) && !bank_payment_request.credited?
+      if (bank_payment_request.approved? || bank_payment_request.auto_approved?) && !bank_payment_request.credited? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted?
         return true
       end
     end
@@ -385,9 +385,16 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     ############# Admin logic start ####################
     if user.vendor_payments_admin?
-      return true if bank_payment_request.action_users(:return_control).include?(user)
-      return true if (bank_payment_request.approved? || bank_payment_request.auto_approved?)
-      return true if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) 
+      # return true if bank_payment_request.action_users(:return_control).include?(user)
+      # return true if (bank_payment_request.approved? || bank_payment_request.auto_approved?)
+      # return true if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?)
+
+
+      if (bank_payment_request.approved? || bank_payment_request.auto_approved? || bank_payment_request.processing? || bank_payment_request.retracted? || bank_payment_request.rejected?)
+        if bank_payment_request.action_users(:return_control).include?(user)
+          return true
+        end
+      end
     end
     ############# Admin logic end ####################
   end
@@ -608,7 +615,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
       if (bank_payment_request.processing? && bank_payment_request.get_reviewers.exclude?(user))
         return true
       end
-      if bank_payment_request.processing? && !bank_payment_request.action_users(:return_control).include?(user) && bank_payment_request.action_users(:approve).include?(user)
+      if bank_payment_request.processing? && !bank_payment_request.action_users(:return_control).include?(user) && !bank_payment_request.action_users(:approve).include?(user)
         return true
       end
     end

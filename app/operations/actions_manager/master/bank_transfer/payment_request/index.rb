@@ -19,23 +19,23 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManag
   end
 
   def mark_as_credited
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor?
   end
 
   def credit_payment_order
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor?
   end
 
   def approve_selected
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_reviewer?
   end
 
   def approve_pending
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_reviewer?
   end
 
   def upload_utr
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor?
   end
 
   def bulk_downloads

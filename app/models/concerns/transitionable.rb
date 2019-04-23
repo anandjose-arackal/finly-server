@@ -470,7 +470,7 @@ module Transitionable
     def awaiting_action_items(user)
       if user.instance_of?(User)
         # Do nothing
-      elsif user.is_a?(Integer)
+      elsif (user.is_a?(Integer) || user.to_i.to_s == user)
         user = User.find_by id: user
         return [] unless user.present?
       else
@@ -727,8 +727,10 @@ module Transitionable
       #   document_reviewer_mappable_type: self.name,
       #   forwarded_to_id: user.id
       # )
-
-      self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
+      documents = self.status_based_associated_items(user, role_id).where(id: document_ids, policy_id: policy_ids)
+      open_status_ids = self.open_status_ids(user)
+      documents = documents.where.not("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).or(documents.where("#{self.table_name}.#{self.document_status_attribute} in (?)", open_status_ids).where("#{self.document_owner_attribute} = ?", user.id)) rescue self.none
+      return documents
     end
 
     # Method overridden in bank_payment_request model

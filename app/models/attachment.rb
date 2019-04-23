@@ -36,6 +36,7 @@ class Attachment < ApplicationRecord
     where id: ids
   } 
 
+  scope :with_id, -> (ids) { where id: ids }
 
   def as_json(options={})
     if options[:array]
@@ -48,6 +49,7 @@ class Attachment < ApplicationRecord
 
   def default_json
     {
+      uid: self.id,
       id: self.id,
       name: self.file_file_name,
       url: self.file&.url,

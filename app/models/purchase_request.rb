@@ -213,6 +213,10 @@ class PurchaseRequest < ApplicationRecord
     true
   end
 
+  def self.open_status_ids(user)
+    PurchaseRequestStatus.ids_for([:open, :draft])
+  end
+
   def self.role_based_associated_status_ids(user)
     PurchaseRequestStatus.ids_for(self.role_based_statuses(user))
   end

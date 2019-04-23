@@ -60,7 +60,7 @@ class BankPaymentRequest < ApplicationRecord
 
   default_scope {order(created_at: :desc)}
 
-  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, to: :status
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
@@ -188,7 +188,10 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   }
 
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
-  scope :filter_controlling_user, -> (user_id) {self.awaiting_action_items(user_id)}
+  scope :filter_controlling_user, -> (user_id) {
+    # self.awaiting_action_items(user_id)
+    self.where(controlling_user_id: user_id, status_id: BankPaymentRequestStatus.id_for(:processing))
+  }
 
   # scope :filter_controlling_user, -> (user_id) {
   #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
@@ -463,6 +466,10 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   def self.role_based_associated_status_ids(user)
     BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.open_status_ids(user)
+    BankPaymentRequestStatus.ids_for([:open, :draft])
   end
 
   def self.role_based_statuses(user)
