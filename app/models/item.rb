@@ -38,7 +38,7 @@ class Item < ApplicationRecord
   belongs_to :supply_item_type, optional: true
   belongs_to :product_type, optional: true, class_name: "ProductType", foreign_key: :product_type
 
-  has_many :rate_contracts, foreign_key: :item_id
+  has_many :rate_contract_line_items, foreign_key: :item_id
   # LineItem and Branch Location Mapping
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
@@ -134,6 +134,6 @@ class Item < ApplicationRecord
   end
 
   def rate_contract_vendors
-    rate_contracts.joins(:vendor).map{|rate_contract| {vendor_id: rate_contract.vendor.id, vendor_name: rate_contract.vendor.name}}
+    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name }}
   end
 end
