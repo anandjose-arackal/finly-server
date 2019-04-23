@@ -159,10 +159,12 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:ifsc] = 'Invalid IFSC'
       end
 
-      if ::Payment.with_company_id(user.company_id).find_by(external_reference_id: external_reference_id)
-        self.valid = false
-        self.error_messages << "This external reference ID is already taken"
-        self.issue_item[:external_reference_id] = "This external reference ID is already taken"
+      if external_reference_id.present?
+        if ::Payment.with_company_id(user.company_id).find_by(external_reference_id: external_reference_id)
+          self.valid = false
+          self.error_messages << "This external reference ID is already taken"
+          self.issue_item[:external_reference_id] = "This external reference ID is already taken"
+        end
       end
 
       # adding all invoice specific validations here for the payment
