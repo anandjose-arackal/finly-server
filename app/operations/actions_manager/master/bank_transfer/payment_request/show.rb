@@ -29,7 +29,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Show < ActionsManage
 
     # If admin is creditor too
     if user.vendor_payments_admin?
-      if bank_payment_request.payment_order.partially_completed? || bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+      if bank_payment_request.payment_order.partially_completed? && !bank_payment_request.open? && !bank_payment_request.rejected? && !bank_payment_request.retracted? && !bank_payment_request.credited?
         return true
       end
       if  bank_payment_request.processing? && bank_payment_request.action_users(:return_control).include?(user)
