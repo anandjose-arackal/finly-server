@@ -470,7 +470,7 @@ module Transitionable
     def awaiting_action_items(user)
       if user.instance_of?(User)
         # Do nothing
-      elsif user.is_a?(Integer)
+      elsif (user.is_a?(Integer) || user.to_i.to_s == user)
         user = User.find_by id: user
         return [] unless user.present?
       else
