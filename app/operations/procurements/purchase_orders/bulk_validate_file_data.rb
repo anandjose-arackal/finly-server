@@ -1,7 +1,8 @@
 class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::PurchaseOrders::Base
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
-                :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found
+                :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
+                :all_departments, :all_departments_ids
 
   class Procurements::PurchaseOrders::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -41,7 +42,10 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
 
     self.company_items = user.company.items
-    
+
+    self.all_departments = Company::Departments::Index.(user, params)
+    self.all_departments_ids = self.all_departments&.pluck(:id)
+  
   end
 
   def validate
@@ -94,16 +98,29 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         self.issue_item[:rate] = "Rate entered has non-numeric characters."
       end
 
-      if unit_of_measurement.blank?
-        self.valid = false
-        self.error_messages << "Unit of Measurement for the item has not been provided."
-        self.issue_item[:unit_of_measurement] = "Unit of Measurement for the item has not been provided."
-      end
+      # Removing it for now
+      # if unit_of_measurement.blank?
+      #   self.valid = false
+      #   self.error_messages << "Unit of Measurement for the item has not been provided."
+      #   self.issue_item[:unit_of_measurement] = "Unit of Measurement for the item has not been provided."
+      # end
 
       if quantity.blank?
         self.valid = false
         self.error_messages << "Please input the quantity."
         self.issue_item[:quantity] = "Please input the quantity."
+      end
+
+      if department_id.blank?
+        self.valid = false
+        self.error_messages << "Please provide the department for which the item would be purchased."
+        self.issue_item[:quantity] = "Please provide the department for which the item would be purchased."
+      end
+
+      unless self.all_departments_ids.include? department_id
+        self.valid = false
+        self.error_messages << "Department does not exist or you are not authorized to make purchases for this department."
+        self.issue_item[:department_id] = "Department does not exist or you are not authorized to make purchases for this department."
       end
 
       unless validate_amount quantity
