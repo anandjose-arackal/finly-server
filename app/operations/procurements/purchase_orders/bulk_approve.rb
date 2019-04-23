@@ -18,7 +18,7 @@ class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::
     end
     accept_po = []
     self.purchase_orders.each do |purchase_order|
-      valid = (purchase_order.can_approve?) ? true : false
+      valid = (purchase_order.can_really_approve?) ? true : false
 
       if valid
         accept_po << purchase_order.id

@@ -404,13 +404,15 @@ class PurchaseOrder < ApplicationRecord
 
   def can_really_approve?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing?
-    elsif self.action_users(:approve).include?(user)
-      processing?
-    else
-      false
-    end
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user)
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_reject?
@@ -419,17 +421,20 @@ class PurchaseOrder < ApplicationRecord
 
   def can_really_reject?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing?
-    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
-      processing?
-    else
-      false
-    end
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     processing? && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
