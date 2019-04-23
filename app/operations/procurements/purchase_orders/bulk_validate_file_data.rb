@@ -70,6 +70,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.item_details.each do |item|
       description = item[:description] || item["description"]
       item_number = item[:item_number] || item["item_number"]
+      department_id = item[:department_id] || item["department_id"]
       comment = item[:comment] || item["comment"]
       item_code = item[:item_code] || item[:item_code]
       hsn_sac = item[:hsn_sac] || item[:hsn_sac]
