@@ -11,10 +11,10 @@ class BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor < Budgets
         id: trail_id,
         entity: purchase_order_item,
         category_id: (purchase_order_item.category_id || purchase_order_item.inventory_line_item.category_id),
-        # cost_center_id: purchase_order_item.cost_center_id,
+        cost_center_id: purchase_order_item.cost_center_id,
         user_id: purchase_order_item.purchase_order.user_id,
         location_id: purchase_order_item.purchase_order.location_id,
-        # department_id: purchase_order_item.department_id,
+        department_id: purchase_order_item.department_id,
         date: purchase_order_item.purchase_order.created_at,
         procurement_id: purchase_order_item.purchase_order.procurement_id,
         amount_attributes: {
