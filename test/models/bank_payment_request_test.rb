@@ -26,8 +26,6 @@
 #  deleted_at                   :datetime
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
-#  company_id                   :integer
-#  max_payment_amount           :decimal(20, 5)
 #
 
 require 'test_helper'
