@@ -100,7 +100,7 @@ class Vendors::Base < BaseOperation
           match_percentile = StringUtils.fuzzy_string_match(business_name, gstin_master.legal_name_of_business)
           trade_name_match_percentile = StringUtils.fuzzy_string_match(business_name, gstin_master.trade_name)
 
-          if match_percentile < 90 || trade_name_match_percentile < 90
+          if match_percentile < 90 && trade_name_match_percentile < 90
             add_message :error, "Business Name or Trade Name Match Percentile is below 90% for Location #{index+1}"
           end
         else
@@ -115,7 +115,6 @@ class Vendors::Base < BaseOperation
     types = {pan: "PAN", gstin: "GSTIN Certificate", cancelled_cheque: "Cancelled Cheque", tax_exemption: "Tax Exemption Certificate", lower_exemption: "Lower Exemption Certificate", msme_certificate: "MSME Certificate", others: "Others"}
 
     # attachment_name = 
-
     if vendor_params.present? && vendor_params[:vendor_attachments_attributes].present?    
       unless find_attachment(vendor_params[:vendor_attachments_attributes], type)
         add_message :error, "Please upload #{types[type]}"

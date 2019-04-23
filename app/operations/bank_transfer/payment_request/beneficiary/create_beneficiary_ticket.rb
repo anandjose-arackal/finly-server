@@ -7,7 +7,7 @@
 # TODO
 # create individual payments in the background DONE
 # handle all type of validations DONE
-# reuse existing bulkvalidation DONE
+# reuse existing bulk validation DONE
 
 class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankTransfer::PaymentRequest::Base
 	attr_accessor :vendor_id, :vendor, :total_amount, :payment_mode, :bank_payment_request_params, :bank_payment_request,
@@ -53,7 +53,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	def init
 		
-		self.payment_mode = params[:payment_mode]
+		self.payment_mode = params[:payment_mode] || params[:transfer_type]
 		self.scheduled_at = params[:scheduled_at]
 	    self.description = params[:description]
 	    policy_id = params[:policy_id]
@@ -128,12 +128,13 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 	    end
 
 	    # Delegate payment creation to the background operation
-		BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+			::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
 	end
 
 	def success
 	    params[:bank_payment_request_id] = self.bank_payment_request.id
+			params[:bank_payment_request] = self.bank_payment_request
 	    BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::SuccessPresenter.new(user, params, messages)
 	end
 
@@ -144,10 +145,11 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-	    attr_accessor :bank_payment_request_id
+	    attr_accessor :bank_payment_request_id, :bank_payment_request
 
 	    def init
 	      self.bank_payment_request_id = params[:bank_payment_request_id]
+				self.bank_payment_request = params[:bank_payment_request]
 	    end
 	end
 
@@ -174,7 +176,6 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		        currency_id: 1
 		    },
 		    payment_mode: self.payment_mode,
-		    scheduled_at: params[:scheduled_at],
 		    # payment_mode: params[:payment_mode],
 		    initiating_account_type: YesBankCompanyAccount.name,
 		    receiving_account_type: BankAccount.name,

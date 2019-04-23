@@ -60,7 +60,7 @@ class BankPaymentRequest < ApplicationRecord
 
   default_scope {order(created_at: :desc)}
 
-  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, to: :status
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
@@ -188,7 +188,10 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   }
 
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
-  scope :filter_controlling_user, -> (user_id) {self.awaiting_action_items(user_id)}
+  scope :filter_controlling_user, -> (user_id) {
+    # self.awaiting_action_items(user_id)
+    self.where(controlling_user_id: user_id, status_id: BankPaymentRequestStatus.id_for(:processing))
+  }
 
   # scope :filter_controlling_user, -> (user_id) {
   #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
@@ -267,13 +270,15 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   def can_really_approve?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing?
-    elsif self.action_users(:approve).include?(user)
-      processing?
-    else
-      false
-    end
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user)
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_reject?
@@ -282,13 +287,15 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   def can_really_reject?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing?
-    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
-      processing?
-    else
-      false
-    end
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_retract?
@@ -307,6 +314,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     # work with this method, dont want to modify the older method since,
     # it is used other places and dont want to modify unless sure if this check works in other ppls work.
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     processing? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
   end

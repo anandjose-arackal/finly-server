@@ -68,7 +68,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
           category_id: payment[:category_id],
           cost_center_id: payment[:cost_center_id],
           company_id: user.company_id,
-          api_initiated: true,
+          api_initiated: false,
           beneficiary_payment_id: beneficiary_payment.id,
           parent_type: beneficiary_payment.class.name,
           parent_id: beneficiary_payment.id,

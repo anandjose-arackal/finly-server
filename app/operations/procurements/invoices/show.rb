@@ -44,7 +44,6 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
       # params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
       self.policies = Policy::VendorPayments::Index.(invoice.created_by, params).policies rescue Invoice.none
 
-      self.reviewal_chains = []
 
       self.actions = get_actions
 
@@ -55,16 +54,19 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         end
       end
 
-      params[:reviewal_document] = invoice
+      if self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
+        self.reviewal_chains = []
+        params[:reviewal_document] = invoice
 
-      policies.each do |policy|
-        params[:policy_id] = policy.id
-        chain = {
-            policy_id: policy.id,
-            reviewal_chain: get_reviewal_chain
-        }
+        policies.each do |policy|
+          params[:policy_id] = policy.id
+          chain = {
+              policy_id: policy.id,
+              reviewal_chain: get_reviewal_chain
+          }
 
-        self.reviewal_chains.push(chain)
+          self.reviewal_chains.push(chain)
+        end
       end
     end
 
