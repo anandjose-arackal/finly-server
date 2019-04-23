@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::Close < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params
 
   def init
-    purchase_order_id = params[:id] || params[:purchase_order_id]
+    purchase_order_id = params[:purchase_order_id] || params[:id] 
     self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
   end
 
@@ -14,7 +14,7 @@ class Procurements::PurchaseOrders::Close < Procurements::PurchaseOrders::Base
 
   def process
     params[:document] = self.purchase_order
-    params[:aasm_event] = 'approve'
+    params[:aasm_event] = 'close'
     params[:violation_present] = false #todo Check violations
     op = WorkflowManager::Base.(user, params)
     unless op.success?

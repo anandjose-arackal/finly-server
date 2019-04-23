@@ -1,15 +1,25 @@
 class Procurements::Invoices::Update < Procurements::Invoices::Base
 
-  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
+  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision
 
   def init
     id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
-    # self.purchase_order = self.procurement.purchase_order
+    self.purchase_order = self.procurement.purchase_order
 
     invoice_id = params[:id] || params[:invoice_id]
     self.invoice = user.company.invoices.find_by(id: invoice_id)
     self.invoice_params = set_invoice_parameters
+
+    if self.procurement.po_revisions.present?
+      # self.po_revision = self.procurement.po_revisions.find_by(id: params[:po_id])
+      self.po_revision = self.procurement.po_revisions.last
+      if po_revision.present?
+        self.purchase_order = self.po_revision
+      end
+    end
+
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
   end
 
   def validate
@@ -18,10 +28,10 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
       return
     end
 
-    # if self.purchase_order.blank?
-    #   add_message :error, "Purchase order not present"
-    #   return
-    # end
+    if self.purchase_order.blank?
+      add_message :error, "Purchase order not present"
+      return
+    end
 
     if self.invoice_params.blank?
       add_message :error, "Procurement or purchase order not present"
@@ -34,6 +44,8 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
 
   def process
     self.invoice.assign_attributes(invoice_params)
+    validate_custom_fields_invoice
+    return if has_errors?
 
     if invoice.valid?
       invoice.save
@@ -87,6 +99,27 @@ class Procurements::Invoices::Update < Procurements::Invoices::Base
         invoice_items_attributes: invoice_items_attributes
     }
     invoice_params
+  end
+
+  def validate_custom_fields_invoice
+    set_fields = set_custom_fields_invoice self.invoice, self.custom_fields, false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.invoice)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+  end
+
+  def set_custom_fields_invoice(invoice, data, save)
+    custom_fields = {custom_fields: data}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 
 end

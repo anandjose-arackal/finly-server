@@ -1,11 +1,14 @@
 class BankTransfer::PaymentRequest::Beneficiary::Remove < BankTransfer::PaymentRequest::Beneficiary::Base
 
-  attr_accessor :removed_payment, :beneficiary_account
+  attr_accessor :removed_payment, :beneficiary_account, :parent_details
 
   def init
     super
     id = params[:payment_id]
     self.removed_payment = payment_order&.payments.find_by(id: id)
+
+    
+
   end
 
   def pre_process
@@ -20,6 +23,15 @@ class BankTransfer::PaymentRequest::Beneficiary::Remove < BankTransfer::PaymentR
 
   def post_process
     add_message :success, "Payment successfully removed"
+
+    # case self.removed_payment.parent_type
+    # when 'Invoice'
+    #   self.parent_details = user.company.inward_invoices.non_beneficiary.find_by(id: self.removed_payment.parent_id)
+    #   self.parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+    # when 'PurchaseOrder'
+    #   self.parent_details = user.company.purchase_orders.find_by(id: self.removed_payment.parent_id)
+    #   self.parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    # end
 
     # update the amount requested for this particular payment order
     amount_requested = self.payment_order.request_total

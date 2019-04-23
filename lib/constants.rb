@@ -7,10 +7,13 @@ module Constants
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
   VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
   VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
+  VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}/i
 
   ENDING_NUMBERS = /\d+$/
 
   OTP_RESEND_INTERVAL = 60
+
+  PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
 
   # todo - needs to be edited once we get the account details.
   if Rails.env.production?

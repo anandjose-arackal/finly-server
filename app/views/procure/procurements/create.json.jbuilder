@@ -1,1 +1,1 @@
-json.extract! @result.procurement, :id
+json.merge! @result.procurement.as_json

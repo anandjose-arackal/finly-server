@@ -24,6 +24,7 @@ json.invoicing_system @result.company.invoicing_system_enabled?
 json.procurement @result.company.procurement_enabled?
 json.travel_request @result.company.travel_desk_enabled?
 json.budgeting_system @result.company.budgeting_system_enabled?
+json.vendor_empanelment_workflow @result.company.vendor_empanelment_workflow_enabled?
 
 if Rails.env.production?
   json.url "https://www.itzcash.com/finly/servlet/AccountReloadServlet"

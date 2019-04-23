@@ -35,7 +35,10 @@ class ReviewalLevels::Reviewers::Create < ReviewalLevels::Reviewers::Base
     level_reviewer_mapping = reviewal_level.level_reviewer_mappings.new(reviewer_params)
 
     if level_reviewer_mapping.valid?
-      level_reviewer_mapping.save
+      if level_reviewer_mapping.save
+        # Map reviewer to the policy user role
+        reviewal_level.set_reviewer_role_in_policy(reviewer)
+      end
     end
   end
 

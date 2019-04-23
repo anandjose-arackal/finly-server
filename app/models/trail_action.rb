@@ -27,12 +27,17 @@ class TrailAction < ApplicationRecord
         :settlement_confirmed,
         :reimbursed,
         :reimbursement_confirmed,
-        :closed,
+        :closed, # keeping this for historical purpose
+        :close,
+        :downloaded,
+        :revision,
         :hold,
         :release,
         # Bank Payment Request
         :mark_as_credited,
         :credit,
+        :send_to_vendor,
+        :reopen,
 
         # TravelRequestBookingActions
         :confirm_selection,
@@ -42,8 +47,8 @@ class TrailAction < ApplicationRecord
         :confirm_booking,
         :reject_booking_request,
         :request_selection,
-        :retract_booking
-
+        :retract_booking,
+        :forward
     ]
   end
 end

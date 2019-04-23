@@ -30,6 +30,11 @@ class InvoiceCalculationUtils
       self.balance_due_amount = precision_value self.net_amount, 0
     end
 
+    # If po invoice has po advance, then adjust the balance due
+    if self.invoice.po_advance.present? && self.invoice.po_adjusted_advance[:value].present? && self.invoice.advance_amount_required
+      self.balance_due_amount = self.balance_due_amount - self.invoice.po_adjusted_advance.value unless ( self.invoice.po_adjusted_advance.value > self.balance_due_amount )
+    end
+
     # assign TDS and advance amount
     if self.invoice&.tds_amount.present?
       self.invoice.tds_amount.value = self.tds_amount
@@ -103,7 +108,7 @@ class InvoiceCalculationUtils
       calculate_discount_exclusive
       calculate_exclusive_taxes
       calculate_tds
-      self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
+      self.net_amount = (self.gross_amount + self.tax_amount - self.tds_amount) rescue 0
       self.invoice_amount = self.invoice.original_amount&.value
       calculate_advance_paid
       calculate_freight_charges
@@ -237,7 +242,7 @@ class InvoiceCalculationUtils
       tds = invoice.tds
     end
     new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, tds)
-    self.tds_amount = self.gross_amount - new_gross_amount
+    self.tds_amount = (self.gross_amount - new_gross_amount) rescue 0
   end
 
   def calculate_advance_paid

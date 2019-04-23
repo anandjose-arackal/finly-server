@@ -23,6 +23,8 @@ class User::Team::Index < User::Team::Base
   has_scope :filter_vendor_payments
   has_scope :yes_bank_account_transfer
   has_scope :filter_vendor_payments_reviewers
+  # has_scope :reviewer_type
+  # has_scope :policy_id
   has_scope :filter_em_reviewers
   has_scope :filter_unassigned_travel_for_policy
   has_scope :filter_unassigned_finance_for_policy
@@ -174,7 +176,7 @@ class User::Team::Index < User::Team::Base
   private
   def admin_team
     clear_messages
-    if user.company_admin? || user.auditor?
+    if user.company_admin? || user.auditor? || user.vendor_payments_admin?
       return user.company.users
     elsif user.policy_admin?
       users = user.company.users

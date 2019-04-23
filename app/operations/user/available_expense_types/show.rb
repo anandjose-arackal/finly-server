@@ -27,7 +27,7 @@ class User::AvailableExpenseTypes::Show < User::Base
   end
 
   def authorized_user_types
-    [:employee]
+    [:employee, :vendor_payments_admin]
   end
 
   def pre_validate

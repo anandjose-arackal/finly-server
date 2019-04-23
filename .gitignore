@@ -18,10 +18,13 @@ config/sentry.yml
 config/aws_config.yml
 config/mailer_config.yml
 config/redis_config.yml
+config/gstin_verification_config.yml
 .rubocop.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
+/doc/*
+erd.pdf
 !/log/.keep
 /tmp
 /public/system/receipts/*

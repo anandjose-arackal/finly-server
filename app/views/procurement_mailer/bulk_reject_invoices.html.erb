@@ -1,0 +1,69 @@
+<% content_for :body do %>
+  <head>
+    <title>Bulk Reject Invoices</title>
+  </head>
+  <body style="background-color: #f3f3f3; height: auto;">
+  <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
+    <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;">Bulk Reject Invoices</p>
+  </div>
+
+    <% if @data.reject_results[:success].length > 0 %>
+      <div style="text-align: left;">Following Invoices were rejected in bulk:</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Invoice ID</th>
+          <th>Invoice Number</th>
+          <th>Created By</th>
+          <th>Sub Department</th>
+          <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.reject_results[:success].each_with_index do |invoice_details, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= invoice_details[:invoice_id] %></td>
+            <td><%= invoice_details[:invoice_number] %></td>
+            <td><%= invoice_details[:user] %></td>
+            <td><%= invoice_details[:sub_department] %></td>
+            <td>&#8377;<%= invoice_details[:amount]&.to_d.round(2) rescue 0 %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <% if @data.reject_results[:error].length > 0 %>
+      <div style="text-align: left;">Following Invoices could not be rejected in bulk:</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>Invoice IDth>
+          <th>Invoice Number</th>
+          <th>Created By</th>
+          <th>Sub Department</th>
+          <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.reject_results[:error].each_with_index do |invoice_details, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= invoice_details[:invoice_id] %></td>
+            <td><%= invoice_details[:invoice_number] %></td>
+            <td><%= invoice_details[:user] %></td>
+            <td><%= invoice_details[:sub_department] %></td>
+            <td>&#8377;<%= invoice_details[:amount]&.to_d.round(2) rescue 0 %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+  </div>
+  </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>

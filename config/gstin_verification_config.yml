@@ -12,5 +12,5 @@ authentication:
 search:
   headers:
   - Content-Type: application/json
-  - Authorization: Bearer 96acb7bae120f3234b3bbb62d13fcfa90f746c38
+  - Authorization: Bearer a3881af1d0e91d71b5f3d3809ea2341822c76ffe
   - client_id: pwvTXWlwizCcfzUYzq

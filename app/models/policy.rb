@@ -34,6 +34,11 @@ class Policy < ApplicationRecord
   has_many :expense_rules, dependent: :destroy
   has_many :budget_rules, dependent: :destroy
   has_many :policy_user_roles, dependent: :destroy
+  has_many :policy_department_mappings, dependent: :destroy
+  has_many :departments, through: :policy_department_mappings
+  has_many :policy_location_mappings, dependent: :destroy
+  has_many :locations, class_name: 'BranchLocation', through: :policy_location_mappings
+
 
   has_one :distance_expense_config
   has_one :time_expense_config
@@ -43,6 +48,8 @@ class Policy < ApplicationRecord
 
   has_many :per_diems, as: :configurable
   has_many :vehicle_rates
+
+  accepts_nested_attributes_for :policy_department_mappings, :policy_location_mappings
 
   scope :default, -> {where default: true}
   scope :non_default, -> {where default: false}
@@ -55,6 +62,22 @@ class Policy < ApplicationRecord
   scope :with_application, -> (application) {where( application: application).or(default)}
   scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
   scope :include_user_mapping, -> { includes :user_mapping }
+  scope :with_company_id, -> (company_id) {where company_id: company_id}
+  scope :with_policy_user_roles, -> { joins(:policy_user_roles) }
+  scope :with_policy_id, -> (policy_id){ where "policies.id = ? ", policy_id }
+  scope :with_purchase_order_initiator_role, -> {
+    where("policy_user_roles.user_role_id", UserRole.id_for(:purchase_order_initiator))
+  }
+
+  scope :with_invoice_initiator_role, -> {
+    where("policy_user_roles.user_role_id", UserRole.id_for(:invoice_initiator))
+  }
+
+  scope :with_bank_payment_request_initiator_role, -> {
+    where("policy_user_roles.user_role_id", UserRole.id_for(:bank_payment_request_initiator))
+  }
+
+
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
@@ -114,6 +137,35 @@ class Policy < ApplicationRecord
         id: id,
         name: name
     }
+  end
+
+  def update_policy_department_mapping(params)
+    # Creating new record on every update as it was required to be like this only
+    policy_department_mapping_ids = self.departments.pluck(:id)
+    begin
+      ActiveRecord::Base.transaction do
+        self.policy_department_mappings.destroy_all
+        params[:policy_department_mappings_attributes].each do |policy_department|
+          result = self.policy_department_mappings.create!(department_id: policy_department[:department_id], enabled: policy_department[:enabled])
+        end
+      end
+    rescue
+      false
+    end
+  end
+
+  def update_location_department_mapping(params)
+    # Creating new record on every update as it was required to be like this only
+    begin
+      ActiveRecord::Base.transaction do
+        self.policy_location_mappings.destroy_all
+        params[:policy_location_mappings_attributes].each do |policy_location|
+          result = self.policy_location_mappings.create!(location_id: policy_location[:location_id], enabled: policy_location[:enabled])
+        end
+      end
+    rescue
+      false
+    end
   end
 
   private
