@@ -33,6 +33,8 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
     self.purchase_request.assign_attributes(purchase_request_parameters)
 
     if self.purchase_request.save
+      # Copy department id to purchase request item
+      self.purchase_request.purchase_request_items.update_all(department_id: self.purchase_request.department_id)
       # Create document level reviewer mapping
       # For setting level  specific reviewers from reviewal chain for a document
       params[:reviewal_document] = self.purchase_request
