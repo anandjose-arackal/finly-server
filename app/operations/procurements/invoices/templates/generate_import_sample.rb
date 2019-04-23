@@ -27,6 +27,30 @@ class Procurements::Invoices::Templates::GenerateImportSample < Procurements::In
         name: "Inventory Items"
     }
 
+    # adding departments to the excel sheet
+    department_headers = ["ID", "Department Name"]
+    department_contents = []
+    current_company.departments.each do |department|
+      department_contents << [department.id, department.name]
+    end
+    self.sheets << {
+        item_headers: department_headers,
+        item_contents: department_contents,
+        name: "Departments"
+    }
+
+    # adding Cost Centers to the excel sheet
+    cost_center_headers = ["ID", "Cost Center Name"]
+    cost_center_contents = []
+    current_company.cost_centers.vendor_payments_only.each do |cost_center|
+      cost_center_contents << [cost_center.id, cost_center.name]
+    end
+    self.sheets << {
+        item_headers: cost_center_headers,
+        item_contents: cost_center_contents,
+        name: "Cost Centers"
+    }
+
   end
 
   def success
@@ -39,6 +63,8 @@ class Procurements::Invoices::Templates::GenerateImportSample < Procurements::In
     [
      "Description",
      "Item number",
+     "Department ID",
+     "Cost Center ID",
      "Comment",
      "Item code",
      "HSN/SAC",
