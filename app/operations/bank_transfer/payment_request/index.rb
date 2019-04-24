@@ -255,6 +255,6 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
   #     # merge
   #     bpr_name.reverse_merge(po_name)
   #   end
-  # end
+  end
 
 end
