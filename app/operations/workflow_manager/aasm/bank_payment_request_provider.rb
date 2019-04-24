@@ -46,7 +46,7 @@ class WorkflowManager::Aasm::BankPaymentRequestProvider < WorkflowManager::Aasm:
     end
 
     event :reject do
-      transitions :from => :processing, :to => :rejected, guard: :user_can_review?
+      transitions :from => [:processing, :pending], :to => :rejected, guard: :user_can_review?
     end
 
     event :retract do

@@ -26,7 +26,6 @@
 #  deleted_at                   :datetime
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
-#  company_id                   :integer
 #
 
 require 'test_helper'

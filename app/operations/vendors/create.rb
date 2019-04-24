@@ -7,9 +7,7 @@ class Vendors::Create < Vendors::Base
     def init
       self.vendor = params[:vendor]
     end
-
   end
-
 
   def personalizer
     {

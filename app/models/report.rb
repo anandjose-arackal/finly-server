@@ -300,6 +300,39 @@ class Report < ApplicationRecord
     end
   }
 
+  scope :filter_report_status_id, -> (status) {
+    filter_status = []
+    status = [status] unless status.is_a?(Array)
+    if status.include?("1")
+      filter_status << ReportStatus.id_for(:Open)
+    end
+    if status.include?("2")
+      filter_status << ReportStatus.id_for(:Processing)
+    end
+    if status.include?("3")
+      filter_status << ReportStatus.id_for(:Approved)
+    end
+    if status.include?("4")
+      filter_status << ReportStatus.id_for(:Rejected)
+    end
+    if status.include?("5")
+      filter_status << ReportStatus.id_for(:Retracted)
+    end
+    if status.include?("6")
+      filter_status << ReportStatus.id_for(:Settled)
+    end
+    if status.include?("7")
+      filter_status << ReportStatus.id_for(:settlement_confirmed)
+    end
+    if status.include?("8")
+      filter_status << ReportStatus.id_for(:Closed)
+    end
+    if status.blank?
+      filter_status = ReportStatus.all.collect(&:id)
+    end
+    where report_status_id: filter_status
+  }
+
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount

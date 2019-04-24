@@ -111,19 +111,19 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
         self.counts.push(personal_data)
       end
 
-      if user.is_purchase_order_reviewer?
-        reviewer_data = {
-          type: "reviewer",
-          data: [
-            {
-              title: "Awaiting Approval",
-              count: PurchaseOrder.awaiting_action_items(user)&.count,
-              filters: [{filter_awaiting_approval: true}]
-            }
-          ]
-        }
-        self.counts.push(reviewer_data)
-      end
+      # if user.is_purchase_order_reviewer?
+      #   reviewer_data = {
+      #     type: "reviewer",
+      #     data: [
+      #       {
+      #         title: "Awaiting Approval",
+      #         count: PurchaseOrder.awaiting_action_items(user)&.count,
+      #         filters: [{filter_awaiting_approval: true}]
+      #       }
+      #     ]
+      #   }
+      #   self.counts.push(reviewer_data)
+      # end
     end
   end
 end

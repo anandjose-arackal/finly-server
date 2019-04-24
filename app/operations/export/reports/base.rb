@@ -95,6 +95,12 @@ class Export::Reports::Base < Export::Base
           data_arr << expense.reimbursable ? 'YES' : 'NO'
         when ExportField.id_for(:spent_from_account)
           data_arr << expense.spent_from.present? ? expense.spent_from.name : "NONE"
+        when ExportField.id_for(:policy)
+          data_arr << expense.report.policy&.name
+        when ExportField.id_for(:report_submission_date)
+          data_arr << expense.report.submitted_at&.strftime("%H:%M, %d/%m/%Y")
+        when ExportField.id_for(:report_creation_date)
+          data_arr << expense.report.created_at&.strftime("%H:%M, %d/%m/%Y")
         else
           data_arr << ''
       end

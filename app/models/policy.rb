@@ -64,7 +64,7 @@ class Policy < ApplicationRecord
   scope :include_user_mapping, -> { includes :user_mapping }
   scope :with_company_id, -> (company_id) {where company_id: company_id}
   scope :with_policy_user_roles, -> { joins(:policy_user_roles) }
-  scope :with_policy_id, -> (policy_id){ where "policies.id = ? ", policy_id }
+  scope :with_policy_id, -> (policy_id){ where "policies.id = ? ", policy_id }
   scope :with_purchase_order_initiator_role, -> {
     where("policy_user_roles.user_role_id", UserRole.id_for(:purchase_order_initiator))
   }

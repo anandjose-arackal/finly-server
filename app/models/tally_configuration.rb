@@ -10,6 +10,7 @@
 #  updated_at           :datetime         not null
 #  voucher_expense_date :string(255)
 #  custom_voucher       :boolean          default(FALSE)
+#  excel_export         :boolean          default(FALSE)
 #
 
 class TallyConfiguration < ApplicationRecord

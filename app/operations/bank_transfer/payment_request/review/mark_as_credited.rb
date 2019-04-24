@@ -34,9 +34,9 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
       #   add_message :error, "Payment Order: #{payment_request.name} cannot be marked as Credited as it is #{payment_request.status.name.humanize}"
       # end
       # Allow to mark as credited in open and processing state too
-      if payment_request.credited?
+      if payment_request.open? || payment_request.retracted? || payment_request.rejected? || payment_request.credited?
         add_message :error, "Payment Order: #{payment_request.name} cannot be marked as Credited as it is #{payment_request.status.name.humanize}"
-      end 
+      end
     end
     return if has_errors?
   end

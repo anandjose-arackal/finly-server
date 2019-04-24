@@ -45,12 +45,15 @@ class PurchaseOrderItem < ApplicationRecord
   belongs_to :total_amount, optional: true, class_name: "Amount"
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
+  belongs_to :department, optional: true
   belongs_to :purchase_request_item, optional: true
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
 
-  validates_presence_of :unit_of_measurement
+  # removing for now
+  # validates_presence_of :unit_of_measurement
+  validates_presence_of :department
 
   accepts_nested_attributes_for :tax_amount, :discount_amount,
                                 :total_amount

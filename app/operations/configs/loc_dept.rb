@@ -2,8 +2,10 @@ class Configs::LocDept < BaseOperation
   attr_accessor :locations, :departments, :cost_centers
 
   def process
-    self.departments = Company::Departments::Index.(user, params).departments
-    self.locations = Company::Locations::Index.(user, params).locations
+    # self.departments = Company::Departments::Index.(user, params).departments
+    self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping
+    # self.locations = Company::Locations::Index.(user, params).locations
+    self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping
     self.cost_centers = CostCenters::Index.(user, params).cost_centers
   end
 

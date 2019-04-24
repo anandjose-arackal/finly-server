@@ -19,7 +19,7 @@ class Vendors::BulkApprove < Vendors::Base
 
     accept_vendor = []
     self.vendors.each do |vendor|
-      valid = (vendor.can_approve?) ? true : false
+      valid = (vendor.can_really_approve?) ? true : false
 
       if valid
         accept_vendor << vendor.id

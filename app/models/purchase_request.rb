@@ -2,16 +2,21 @@
 #
 # Table name: purchase_requests
 #
-#  id                   :bigint(8)        not null, primary key
-#  title                :text(65535)
-#  user_id              :integer
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  location_id          :integer
-#  department_id        :integer
-#  policy_id            :integer
-#  controlling_level_id :integer
-#  company_id           :integer
+#  id                         :bigint(8)        not null, primary key
+#  description                :text(65535)
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  purchase_request_status_id :integer
+#  note                       :text(65535)
+#  creator_id                 :integer
+#  submitted_at               :datetime
+#  approved_at                :datetime
+#  location_id                :integer
+#  department_id              :integer
+#  policy_id                  :integer
+#  controlling_level_id       :integer
+#  company_id                 :integer
+#  order_number               :string(255)
 #
 
 class PurchaseRequest < ApplicationRecord
@@ -51,19 +56,22 @@ class PurchaseRequest < ApplicationRecord
 
 
   scope :filter_by_location_id, -> (id) {
-    where location_id: id
+    user_id = RequestStore.store[:current_user]&.id
+    where location_id: PurchaseRequest.process_location_id(id, user_id)
   }
 
   scope :filter_by_department_id, -> (id) {
-    where department_id: id
+    user_id = RequestStore.store[:current_user]&.id
+    where department_id: PurchaseRequest.process_department_id(id, user_id)
+    # where department_id: id
   }
 
   scope :filter_by_title, -> (description) {
     where description: description
   }
 
-  scope :filter_by_request_id, -> (id) {
-    where id: id
+  scope :filter_by_request_id, -> (code) {
+    where order_number: code
   }
 
   scope :filter_by_date_range, -> (from, to) {
@@ -72,6 +80,47 @@ class PurchaseRequest < ApplicationRecord
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
     where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
+  }
+
+  scope :filter_awaiting_approval, -> (boolean) {
+    user_id = RequestStore.store[:current_user]&.id
+
+    if user_id.present?
+      ids = self.awaiting_action_items(user_id)&.pluck(:id)
+      with_ids(ids)
+    end
+  }
+
+  scope :with_status_ids, -> (status_ids) {where purchase_request_status_id: status_ids}
+
+  scope :filter_status_id, -> (status_ids) {
+    with_status_ids(status_ids)
+  }
+
+  scope :filter_user_id, -> (ids) {
+    where creator_id: ids
+  }
+
+  scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
+
+  scope :filter_location_id, -> (location_id) {where location_id: location_id}
+
+  scope :filter_department_id, -> (ids) {
+    where department_id: ids
+  }
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
   }
 
   def add_company
@@ -98,7 +147,7 @@ class PurchaseRequest < ApplicationRecord
   def calculate_total_amount
     # amount_ids = self.purchase_request_items&.pluck(:estimated_amount_id)
     # Amount.where(id: amount_ids)&.pluck(:value).sum
-    self.purchase_request_items.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
+    self.purchase_request_items.non_rejected.joins(:estimated_amount).pluck(:value)&.flatten&.compact&.sum rescue nil
   end
 
   def get_default_provider
@@ -138,16 +187,45 @@ class PurchaseRequest < ApplicationRecord
   end
 
   def reject_purchase_request_items(options={}, user)
-    item_ids = options[:rejected_purchase_request_items]
+    rejected_item_ids = options[:rejected_purchase_request_items]
     # Filter rejected ids
-    filtered_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", item_ids).pluck('purchase_request_items.id')
-    rejected_items = PurchaseRequestItem.with_ids(filtered_item_ids).update_all(rejected: true, status_id: PurchaseRequestItemStatus.id_for(:rejected)) unless filtered_item_ids.blank?
-    return !rejected_items.zero? if filtered_item_ids.present?
-    false
+    filtered_rejected_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", rejected_item_ids).pluck('purchase_request_items.id')
+    # rejected_items = PurchaseRequestItem.with_ids(filtered_rejected_item_ids).update_all(rejected: true, status_id: PurchaseRequestItemStatus.id_for(:rejected)) unless filtered_rejected_item_ids.blank?
+    PurchaseRequestItem.with_ids(filtered_rejected_item_ids).each do |item|
+      item.rejected = true
+      item.status_id = PurchaseRequestItemStatus.id_for(:rejected)
+      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(:reject))
+        return false
+      end
+    end unless filtered_rejected_item_ids.blank?
+    true
+  end
+
+  def approve_purchase_request_items(options={}, user)
+    approved_item_ids = options[:approved_purchase_request_items]
+    # Filter rejected ids
+    filtered_approved_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", approved_item_ids).pluck('purchase_request_items.id')
+
+    PurchaseRequestItem.with_ids(filtered_approved_item_ids).each do |item|
+      item.rejected = false
+      item.status_id = PurchaseRequestItemStatus.id_for(self.reload&.status&.name&.to_sym)
+      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(self&.status&.name&.to_sym))
+        return false
+      end
+    end unless filtered_approved_item_ids.blank?
+    true
+  end
+
+  def self.open_status_ids(user)
+    PurchaseRequestStatus.ids_for([:open, :draft])
   end
 
   def self.role_based_associated_status_ids(user)
     PurchaseRequestStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.auditor_associated_status_ids
+    self.status_ids(:awaiting_approval, :approved, :auto_approved, :retracted, :rejected, :closed, :order_initiated, :cancelled, :po_created)
   end
 
   def self.role_based_statuses(user)
@@ -166,7 +244,46 @@ class PurchaseRequest < ApplicationRecord
 
   def self.roles
     # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
-    [:admin, :purchase_request_initiator, :purchase_request_reviewer]
+    [:admin, :purchase_request_initiator, :purchase_request_reviewer, :purchase_request_auditor]
+  end
+
+  def self.create_status_change_trail(item, user, action_id)
+    # Since PR line item does not have policy, trail has PR data
+    role_id = item.purchase_request.is_reviewing_user? ? UserRole.id_for(:purchase_request_reviewer) : UserRole.id_for(:admin)
+    trail = item.trails.new action_user: user,
+                           action_id: action_id,
+                           action_user_role_id: role_id,
+                           # Current level if previous level is not present
+                           action_level_id: item.purchase_request.get_level(:previous).id || item.purchase_request.level.id,
+                           modified_level_id: item.purchase_request&.level&.id
+    trail.save
+  end
+
+  private
+
+
+  def self.process_location_id(location_id, user_id)
+    user = User.find_by_id user_id
+    location = user.company.locations.find_by_id location_id
+    if user.present?
+      # If location is parent location, then get all of its child locations
+      if location.ancestry.blank?
+        return location.descendants.pluck(:id)
+      end
+    end
+    return location_id
+  end
+
+  def self.process_department_id(department_id, user_id)
+    user = User.find_by_id user_id
+    department = user.company.departments.find_by_id department_id
+    if user.present?
+      # If department is parent department, then get all of its child departments
+      if department.ancestry.blank?
+        return department.descendants.pluck(:id)
+      end
+    end
+    return department_id
   end
 
 end

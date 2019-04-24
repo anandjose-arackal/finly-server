@@ -1,44 +1,54 @@
 class WorkflowManager::Base < BaseOperation
-  attr_accessor :document, :aasm_document, :violations_present,
+  attr_accessor :document, :aasm_document, :violations_present, :forwarded_to_user,
                 :aasm_event, :document_types, :note, :role_id, :provider_name, :trail, :document_class_name
   def init
     self.document = params[:document]
     self.violations_present = params[:violations_present]
     self.aasm_event = params[:aasm_event]
     self.note = params[:note]
+    self.forwarded_to_user = params[:forwarded_to_user]
     self.provider_name = params[:provider_name] || self.document.get_default_provider
+
 
 
     # todo - The below switch case can be reduced to one line since provider name is already present
     self.document_class_name = self.document&.class&.name
 
+    workflow_input = {
+      violations_present: violations_present,
+      document: document,
+      provider_name: provider_name,
+      forwarded_to_user: forwarded_to_user
+    }
+
     case self.document_class_name
     when 'PurchaseOrder'
-      self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrderProvider.new self.document, violations_present, user
+      self.aasm_document = ::WorkflowManager::Aasm::PurchaseOrderProvider.new user, workflow_input
     when 'Invoice'
-      self.aasm_document = ::WorkflowManager::Aasm::InvoiceProvider.new self.document, violations_present, user
+      self.aasm_document = ::WorkflowManager::Aasm::InvoiceProvider.new user, workflow_input
     when 'Report'
-      self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new self.document, violations_present, user
+      self.aasm_document = ::WorkflowManager::Aasm::ReportProvider.new user, workflow_input
     when 'MoneyRequest'
       if provider_name == 'TravelRequestProvider'
-        self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user, provider_name
+        self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new user, workflow_input
       else
-        self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new self.document, violations_present, user
+        self.aasm_document = ::WorkflowManager::Aasm::MoneyRequestProvider.new user, workflow_input
       end
     when 'TravelRequest'
       if provider_name == 'TravelRequestBookingProvider'
-        self.aasm_document = ::WorkflowManager::Aasm::TravelRequestBookingProvider.new self.document, violations_present, user
+        self.aasm_document = ::WorkflowManager::Aasm::TravelRequestBookingProvider.new user, workflow_input
       else
-        self.aasm_document = ::WorkflowManager::Aasm::TravelRequestProvider.new self.document, violations_present, user
+        self.aasm_document = ::WorkflowManager::Aasm::TravelRequestProvider.new user, workflow_input
       end
     when 'BankPaymentRequest'
-      self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
+      self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new user, workflow_input
+      # self.aasm_document = ::WorkflowManager::Aasm::BankPaymentRequestProvider.new self.document, violations_present, user
     when 'PurchaseRequest'
-      self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestProvider.new self.document, violations_present, user
+      self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestProvider.new user, workflow_input
     when 'PurchaseRequestItem'
-      self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestItemProvider.new self.document, violations_present, user
+      self.aasm_document = ::WorkflowManager::Aasm::PurchaseRequestItemProvider.new user, workflow_input
     when 'YesBankVendor'
-      self.aasm_document = ::WorkflowManager::Aasm::YesBankVendorProvider.new self.document, violations_present, user
+      self.aasm_document = ::WorkflowManager::Aasm::YesBankVendorProvider.new user, workflow_input
     else
       add_message :error, 'Unknown document type'
     end

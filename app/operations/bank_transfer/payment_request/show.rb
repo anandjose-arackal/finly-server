@@ -702,6 +702,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     return if bank_payment_request.validate_if_admin(user) && (!bank_payment_request.open? || (bank_payment_request.owner_id == user.id) || bank_payment_request.owner_id.blank?)
     return if bank_payment_request.validate_if_reviewer(user)
     return if bank_payment_request.validate_if_creditor(user)
+    return if bank_payment_request.validate_if_auditor(user)
     raise_unauthorized_exception
   end
 

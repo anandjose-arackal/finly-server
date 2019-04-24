@@ -21,7 +21,7 @@ class Procurements::Invoices::BulkApprove < Procurements::Invoices::Base
 
     accept_invoice = []
     self.invoices.each do |invoice|
-      valid = (invoice.can_approve?) ? true : false
+      valid = (invoice.can_really_approve?) ? true : false
 
       if valid
         accept_invoice << invoice.id

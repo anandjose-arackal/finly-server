@@ -5,7 +5,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
       :tabs,
       [
           :dashboard,
-          {requests: [:pr_initiator, :pr_company, :pr_awaiting_approval]},
+          {requests: [:pr_initiator, :pr_awaiting_approval, :pr_team, :pr_company]},
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :po_invoices, :non_po_invoices, :payment_tickets]},
@@ -153,15 +153,18 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def requests
+    return nil unless user.company.purchase_requisition_enabled?
     {name: 'Requests', id: 'requests', url: 'requests'}
   end
 
   def pr_team
+    return nil unless user.is_purchase_request_reviewer?
+    {name: 'Team PRs', id: 'requests', url: 'purchase_requests'}
   end
 
   def pr_awaiting_approval
-    return nil unless user.is_purchase_request_reviewer?
-    { name: 'PRs Awaiting Approval', id: 'requests', url: 'purchase_requests/params={"filter_by_status_id":"2"}' }
+    return nil unless user.is_purchase_request_reviewer? || user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
+    { name: 'PRs Awaiting Approval', id: 'requests', url: 'purchase_requests/params={"filter_awaiting_approval":"1"}' }
   end
 
   def pr_company
@@ -170,7 +173,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def pr_approved_items
-    return nil unless user.is_purchase_request_initiator? || user.is_purchase_request_reviewer? || user.vp_admin_or_auditor?
+    return nil unless user.company.purchase_requisition_enabled? && (user.is_inventory_manager? || user.vp_admin_or_auditor?)
     { name: 'Approved Items', id: 'procure', url: 'po_approval_items/params={}'}
   end
 

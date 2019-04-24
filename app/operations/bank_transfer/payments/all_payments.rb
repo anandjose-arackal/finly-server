@@ -40,6 +40,7 @@ class BankTransfer::Payments::AllPayments < BankTransfer::Payments::Base
     has_scope :filter_beneficiary_account_number
     has_scope :filter_beneficiary_account_ifsc
     has_scope :filter_initiating_user_name
+    has_scope :filter_api_initiated
 
 
     def init

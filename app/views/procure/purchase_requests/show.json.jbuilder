@@ -30,14 +30,14 @@ json.result do
           json.id line_item.id
           json.status line_item&.status&.name
           json.rejected line_item.rejected
-          json.unit_type line_item.unit_of_measurement
+          json.unit_of_measurement line_item.unit_of_measurement
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id
           end
           json.preferred_vendor do        
-            json.name line_item&.vendor&.name
-            json.id line_item.vendor_id
+            json.vendor_name line_item&.vendor&.name
+            json.vendor_id line_item.vendor_id
           end
           json.required_by_date line_item&.required_by_date&.to_date
           json.delivery_location do  
@@ -46,7 +46,6 @@ json.result do
           end
           json.purpose line_item.purpose
           json.quantity line_item.quantity
-          json.unit_type "each"
           json.estimated_cost do
             json.currency_id line_item&.estimated_amount&.currency_id
             json.value line_item&.estimated_amount&.value
@@ -58,11 +57,12 @@ json.result do
             json.id line_item&.per_unit_estimated_amount_id
           end
           json.attachment_attributes do
-            json.uid line_item.attachment&.id
-            json.name line_item.attachment&.file_file_name
-            json.url line_item.attachment&.file&.url
-            # As required by frontend
-            json.status 'done'
+            # json.uid line_item.attachment&.id
+            # json.name line_item.attachment&.file_file_name
+            # json.url line_item.attachment&.file&.url
+            # # As required by frontend
+            # json.status 'done'
+            json.merge! line_item.attachment.as_json(array: true)
           end
         end
       else

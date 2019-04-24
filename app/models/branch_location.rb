@@ -19,9 +19,6 @@
 #  contact_mobile_number :string(255)
 #  is_deleted            :boolean          default(FALSE), not null
 #  deleted_at            :datetime
-#  location_code         :string(255)
-#  ancestry              :string(255)
-#  nature_of_office      :string(255)
 #
 
 class BranchLocation < ApplicationRecord
@@ -89,7 +86,7 @@ class BranchLocation < ApplicationRecord
   end
 
   def as_json(options={})
-    args = {id: self.id}
+    args = { id: self.id, name: self.name, gstin: self.gstin, pan: self.pan, address_1: self.address_1, address_2: self.address_2, city: self.city, country: self.country, pin: self.pin, address: self.address, location_code: self.location_code }
     args[:name] = options&.dig(:tree) ? location_name : name
     args
   end

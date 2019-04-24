@@ -12,7 +12,7 @@ class Vendors::Submit < Vendors::Base
 
   def init
     id = params[:id] || params[:vendor_id] || params[:yes_bank_vendor_id]
-    self.vendor = Vendors::Show.(user, params).vendors.with_id(id).first rescue nil
+    self.vendor = Vendors::Show.(user, params).vendor rescue nil
   end
 
   def process
@@ -34,6 +34,7 @@ class Vendors::Submit < Vendors::Base
     else
       add_message :success, "Vendor Submitted for Approval"
     end
+    Event::EVendors::Submit.(user, document: self.vendor)
   end
 
   def success

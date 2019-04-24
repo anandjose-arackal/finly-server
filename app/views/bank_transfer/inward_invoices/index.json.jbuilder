@@ -5,8 +5,10 @@ json.results do
     json.awaiting_action invoice.awaiting_action(@result.user)
     json.invoice_type invoice.invoice_type&.name
     json.proforma_advance invoice.proforma_advance&.value
-    json.can_approve invoice.can_approve?
-    json.can_reject invoice.can_reject?
+    # json.can_approve invoice.can_approve?
+    json.can_approve invoice.can_really_approve?
+    # json.can_reject invoice.can_reject?
+    json.can_reject invoice.can_really_reject?
     json.can_take_control invoice.can_take_control?
 
     json.invoice do

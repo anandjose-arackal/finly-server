@@ -8,6 +8,7 @@ class VendorsController < ApplicationController
 
   def index
     params[:non_deleted] = true
+    params[:authorized] = true
     @result = Vendors::Index.(current_user, params)
     respond
   end
@@ -65,6 +66,16 @@ class VendorsController < ApplicationController
 
   def approve
     @result = Vendors::Approve.(current_user, params)
+    respond
+  end
+
+  def deactivate
+    @result = Vendors::Deactivate.(current_user, params)
+    respond
+  end
+
+  def reactivate
+    @result = Vendors::Reactivate.(current_user, params)
     respond
   end
 

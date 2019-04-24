@@ -80,7 +80,11 @@ class Policy::Show < Policy::Base
     self.mappings = []
     # Seperating api temporarily until policy user role is setup in all systems
     if vendor_payments?
-      self.policy = Policy::VendorPayments::Index.(current_user, params).policies&.with_id(id)&.first
+      if params[:sub_tab_config] == 'org_config'
+        self.policy = Policy::VendorPayments::Index.(current_user, params).admin_policies&.with_id(id)&.first
+      else
+        self.policy = Policy::VendorPayments::Index.(current_user, params).policies&.with_id(id)&.first
+      end
       user_ids = self.policy.policy_user_roles.pluck(:user_id) rescue []
       user_ids += [user.id] if user.vp_admin_or_auditor? && user_ids.exclude?(user.id)
     else
@@ -93,6 +97,14 @@ class Policy::Show < Policy::Base
   def authorize
     unless policy
       raise_unauthorized_exception
+    end
+  end
+
+  def validate
+    if params[:sub_tab_config] == 'org_config' && params[:sub_tab] == 'PurchaseOrderProvider'
+      if !user.vp_admin_or_auditor?
+        raise_unauthorized_exception
+      end
     end
   end
 
