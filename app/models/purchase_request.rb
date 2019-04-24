@@ -201,7 +201,7 @@ class PurchaseRequest < ApplicationRecord
     true
   end
 
-  def reject_purchase_request_items(options={}, user)
+  def approve_purchase_request_items(options={}, user)
     approved_item_ids = options[:approved_purchase_request_items]
     # Filter rejected ids
     filtered_approved_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", approved_item_ids).pluck('purchase_request_items.id')
@@ -251,12 +251,13 @@ class PurchaseRequest < ApplicationRecord
 
   def create_status_change_trail(item, user, action_id)
     # Since PR line item does not have policy, trail has PR data
-    role_id = self.item.purchase_request.is_reviewing_user? ? UserRole.id_for(:purchase_request_reviewer) : UserRole.id_for(:admin)
+    role_id = item.purchase_request.is_reviewing_user? ? UserRole.id_for(:purchase_request_reviewer) : UserRole.id_for(:admin)
     trail = item.trails.new action_user: user,
                            action_id: action_id,
                            action_user_role_id: role_id,
-                           action_level_id: item.purchase_request.current_level&.id,
-                           modified_level_id: item.purchase_request.new_level&.id
+                           # Current level if previous level is not present
+                           action_level_id: item.purchase_request.get_level(:previous).id || item.purchase_request.level.id,
+                           modified_level_id: item.purchase_request.get_level(:next)&.id
     trail.save
   end
 
