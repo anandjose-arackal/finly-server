@@ -81,9 +81,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     #   end
     # end
     # ############# Reviewer logic end #########################
-    if purchase_request.is_reviewing_user?
-      purchase_request.get_reviewers.include?(user) && PurchaseRequest.status_ids(:awaiting_approval).include?(purchase_request.purchase_request_status_id)
-    end
+    purchase_request.get_reviewers.include?(user) && PurchaseRequest.status_ids(:awaiting_approval).include?(purchase_request.purchase_request_status_id)
   end
 
   def unapprove
