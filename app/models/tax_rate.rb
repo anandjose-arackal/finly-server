@@ -11,9 +11,6 @@
 #  updated_at  :datetime         not null
 #  is_deleted  :boolean          default(FALSE), not null
 #  deleted_at  :datetime
-#  cgst        :decimal(10, 5)
-#  sgst        :decimal(10, 5)
-#  igst        :decimal(10, 5)
 #
 
 class TaxRate < ApplicationRecord

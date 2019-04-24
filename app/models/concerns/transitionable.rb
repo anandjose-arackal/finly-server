@@ -133,7 +133,6 @@ module Transitionable
       dlrms = self.document_level_reviewer_mappings.with_provider_name(provider_name).includes(:level, :reviewer, :action_taken_by, :taken_control_by)
       chain = []
 
-
       dlrms.each do |dlrm|
         level_number = dlrm.level_number
 

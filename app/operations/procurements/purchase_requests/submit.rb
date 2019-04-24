@@ -21,7 +21,7 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
         op = WorkflowManager::Base.(user, params)
         if op.success?
           # Submit the line items too
-          unless purchase_request&.status&.name&.to_sym&.present? && purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym))
+          unless purchase_request&.status&.name&.to_sym&.present? && purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym), rejected: false)
             raise
           end
         else
