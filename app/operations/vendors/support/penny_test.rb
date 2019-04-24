@@ -31,7 +31,12 @@ class Vendors::Support::PennyTest < Vendors::Base
     # else
     #   add_message :error, op.messages[:error]
     # end
+
+    # Junk code - todo
     self.account_name = "Validated Account"
+  end
+
+  def post_process
     add_message :success, "Account Validation Successful"
   end
 
