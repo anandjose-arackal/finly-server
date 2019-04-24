@@ -2,10 +2,11 @@ class Vendors::Support::PennyTest < Vendors::Base
   attr_accessor :bank_account_params, :account_name
 
   class Vendors::Support::PennyTest::TestPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :account_name
+    attr_accessor :account_name, :card_id
 
     def init
       self.account_name = params[:account_name]
+      self.card_id = params[:card_id]
     end
   end
 
