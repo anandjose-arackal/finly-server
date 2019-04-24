@@ -88,7 +88,7 @@ if @result.vendor.policy.present?
 end
 
 json.edit_config do
-  json.vendor_approval_workflow @result.edit_config.vendor_approval_workflow
+  json.vendor_approval_workflow @result.edit_config&.vendor_approval_workflow
   json.codes do
     json.array! @result.edit_config.states, :id, :name
   end

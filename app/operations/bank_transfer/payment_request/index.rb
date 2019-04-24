@@ -179,29 +179,82 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     end
 
     def status_count
-      # grab all relevant ids whose filter count needs to be sent
-      bpr_ids = [ BankPaymentRequestStatus.id_for(:open), BankPaymentRequestStatus.id_for(:processing),
-                  BankPaymentRequestStatus.id_for(:retracted), BankPaymentRequestStatus.id_for(:rejected),
-                  BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited) ]
-      po_ids = [ PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
+      pt_status_ids = BankPaymentRequest.status_ids(:open, :processing, :retracted, :rejected, :approved, :credited)
+      po_status_ids = [PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
 
-      awaiting_ids = self.payment_requests&.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
-      awaiting_approval = self.payment_requests&.with_id(awaiting_ids)&.count
+      payment_tickets_counts = self.payment_requests.with_status_id(pt_status_ids)&.group(status_id)&.count
 
-      # get raw count and then replace the id with its status name
-      bpr = self.payment_requests&.where(status_id: bpr_ids)&.group(:status_id)&.count
-      bpr_name = {}
-      BankPaymentRequestStatus.all.each {|ps| if bpr&.keys&.include? ps.id then bpr_name[ps.name] = bpr[ps.id] end}
+      result = {
+        all: 0,
+        draft: 0,
+        processing: 0,
+        approved: 0,
+        credited: 0,
+        failed: 0,
+        scheduled: 0,
+        pending: 0,
+        awaiting_approval: 0
+      }
 
-      # get raw count and then replace the id with its status name
-      po = self.payment_requests&.joins(:payment_order)&.where('payment_orders.payment_order_status_id': po_ids)&.group(:payment_order_status_id)&.count      
-      po_name = {}
-      PaymentOrderStatus.all.each {|ps| if po&.keys&.include? ps.id then po_name[ps.name] = po[ps.id] end}
-      po_name[:awaiting_approval] = awaiting_approval || 0
+      BankPaymentRequestStatus.all.map do |status|
+        if payment_tickets_counts&.keys&.include?(status.id)
+          case status.id
+          when BankPaymentRequestStatus.id_for(:open), BankPaymentRequestStatus.id_for(:retracted), BankPaymentRequestStatus.id_for(:rejected)
+            result[:draft] += payment_tickets_counts[status.id]
+          when BankPaymentRequestStatus.id_for(:processing)
+            result[:processing] += payment_tickets_counts[status.id]
+          when BankPaymentRequestStatus.id_for(:approved)
+            result[:approved] += payment_tickets_counts[status.id]
+          when BankPaymentRequestStatus.id_for(:credited)
+            result[:credited] += payment_tickets_counts[status.id]
+          end
+        end
+      end
 
-      # merge
-      bpr_name.reverse_merge(po_name)
+      result[:awaiting_approval] = self.payment_requests.awaiting_action_items(user).count
+
+      payment_order_counts = self.payment_requests&.joins(:payment_order)&.where('payment_orders.payment_order_status_id': po_ids)&.group(:payment_order_status_id)&.count
+      PaymentOrderStatus.all.map do |status|
+        if payment_order_counts&.keys&.include? status.id
+          case status.id
+          when PaymentOrderStatus.id_for(:failed)
+            result[:failed] += payment_order_counts[status.id]
+          when PaymentOrderStatus.id_for(:scheduled)
+            result[:scheduled] += payment_order_counts[status.id]
+          when PaymentOrderStatus.id_for(:pending)
+            result[:pending] += payment_order_counts[status.id]
+          end
+        end
+      end
+      result
     end
-  end
+
+  #   def status_count
+  #     # grab all relevant ids whose filter count needs to be sent
+  #     bpr_ids = [ BankPaymentRequestStatus.id_for(:open), BankPaymentRequestStatus.id_for(:processing),
+  #                 BankPaymentRequestStatus.id_for(:retracted), BankPaymentRequestStatus.id_for(:rejected),
+  #                 BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited) ]
+  #     po_ids = [ PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
+
+
+
+  #     awaiting_ids = self.payment_requests&.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+  #     awaiting_approval = self.payment_requests&.with_id(awaiting_ids)&.count
+
+  #     # get raw count and then replace the id with its status name
+  #     bpr = self.payment_requests&.where(status_id: bpr_ids)&.group(:status_id)&.count
+  #     bpr_name = {}
+  #     BankPaymentRequestStatus.all.each {|ps| if bpr&.keys&.include? ps.id then bpr_name[ps.name] = bpr[ps.id] end}
+
+  #     # get raw count and then replace the id with its status name
+  #     po = self.payment_requests&.joins(:payment_order)&.where('payment_orders.payment_order_status_id': po_ids)&.group(:payment_order_status_id)&.count      
+  #     po_name = {}
+  #     PaymentOrderStatus.all.each {|ps| if po&.keys&.include? ps.id then po_name[ps.name] = po[ps.id] end}
+  #     po_name[:awaiting_approval] = awaiting_approval || 0
+
+  #     # merge
+  #     bpr_name.reverse_merge(po_name)
+  #   end
+  # end
 
 end
