@@ -56,11 +56,14 @@ class PurchaseRequest < ApplicationRecord
 
 
   scope :filter_by_location_id, -> (id) {
-    where location_id: id
+    user_id = RequestStore.store[:current_user]&.id
+    where location_id: PurchaseRequest.process_location_id(id, user_id)
   }
 
   scope :filter_by_department_id, -> (id) {
-    where department_id: id
+    user_id = RequestStore.store[:current_user]&.id
+    where department_id: PurchaseRequest.process_department_id(id, user_id)
+    # where department_id: id
   }
 
   scope :filter_by_title, -> (description) {
@@ -255,6 +258,30 @@ class PurchaseRequest < ApplicationRecord
                            action_level_id: item.purchase_request.current_level&.id,
                            modified_level_id: item.purchase_request.new_level&.id
     trail.save
+  end
+
+  def self.process_location_id(location_id, user_id)
+    user = User.find_by_id user_id
+    location = user.company.locations.find_by_id location_id
+    if user.present?
+      # If location is parent location, then get all of its child locations
+      if location.ancestry.blank?
+        return location.descendants.pluck(:id)
+      end
+    end
+    return location_id
+  end
+
+  def self.process_department_id(department_id, user_id)
+    user = User.find_by_id user_id
+    department = user.company.departments.find_by_id department_id
+    if user.present?
+      # If department is parent department, then get all of its child departments
+      if department.ancestry.blank?
+        return department.descendants.pluck(:id)
+      end
+    end
+    return department_id
   end
 
 end
