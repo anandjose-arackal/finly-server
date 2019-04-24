@@ -70,8 +70,8 @@ class PurchaseRequest < ApplicationRecord
     where description: description
   }
 
-  scope :filter_by_request_id, -> (id) {
-    where id: id
+  scope :filter_by_request_id, -> (code) {
+    where order_number: code
   }
 
   scope :filter_by_date_range, -> (from, to) {
