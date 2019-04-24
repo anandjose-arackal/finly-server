@@ -1,6 +1,6 @@
 json.count @result.payment_requests&.count
 json.results do
-  json.array! @result.paginated_requests.each do |payment_request|
+  json.array! @result.paginated_payment_requests.each do |payment_request|
     
     # json.can_approve payment_request.can_approve?
     json.can_approve payment_request.can_really_approve?
@@ -59,5 +59,5 @@ json.results do
         json.payment_status payment.payment_status_name
       end
     end
-  end unless @result.paginated_requests.blank?
+  end
 end
