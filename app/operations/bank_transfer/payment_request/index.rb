@@ -213,7 +213,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
       result[:awaiting_approval] = self.payment_requests.awaiting_action_items(user).count
 
-      payment_order_counts = self.payment_requests&.joins(:payment_order)&.where('payment_orders.payment_order_status_id': po_ids)&.group(:payment_order_status_id)&.count
+      payment_order_counts = self.payment_requests&.joins(:payment_order)&.where('payment_orders.payment_order_status_id': po_status_ids)&.group(:payment_order_status_id)&.count
       PaymentOrderStatus.all.map do |status|
         if payment_order_counts&.keys&.include? status.id
           case status.id
