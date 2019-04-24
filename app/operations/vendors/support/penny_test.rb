@@ -5,7 +5,7 @@ class Vendors::Support::PennyTest < Vendors::Base
     attr_accessor :account_name
 
     def init
-      params[:account_name] = params[:account_name]
+      self.account_name = params[:account_name]
     end
   end
 
