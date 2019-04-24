@@ -14,7 +14,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
   class Dashboard::VendorPayments::PaymentTickets::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_tickets, :counts
 
-    has_scope :filter_status_id
+    has_scope :filter_status
     has_scope :filter_user_id
 
     # General Filters from frontend
@@ -49,23 +49,23 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
             },
             {
               title: "Processing",
-              count: apply_scopes(payment_tickets, {filter_status_id: BankPaymentRequestStatus.id_for(:processing)})&.count,
+              count: apply_scopes(payment_tickets, {filter_status: 'processing'})&.count,
               filters: [
-                {filter_status_id: BankPaymentRequestStatus.id_for(:processing)}
+                {filter_status: 'processing'}
               ]
             },
             {
               title: "Approved",
-              count: apply_scopes(payment_tickets, {filter_status_id: BankPaymentRequestStatus.id_for(:approved)})&.count,
+              count: apply_scopes(payment_tickets, {filter_status: 'approved'})&.count,
               filters: [
-                {filter_status_id: BankPaymentRequestStatus.id_for(:approved)}
+                {filter_status: 'approved'}
               ]
             },
             {
               title: "Credited",
-              count: apply_scopes(payment_tickets, {filter_status_id: BankPaymentRequestStatus.id_for(:credited)})&.count,
+              count: apply_scopes(payment_tickets, {filter_status: 'credited'})&.count,
               filters: [
-                {filter_status_id: BankPaymentRequestStatus.id_for(:credited)}
+                {filter_status: 'credited'}
               ]
             }
           ]
@@ -89,18 +89,18 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
             },
             {
               title: "Processing",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status_id: BankPaymentRequestStatus.id_for(:processing)})&.count,
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'processing'})&.count,
               filters: [
-                {filter_status_id: BankPaymentRequestStatus.id_for(:processing)},
+                {filter_status: 'processing'},
                 {filter_user_name: user.name},
                 {filter_user_id: user.id}
               ]
             },
             {
               title: "Approved",
-              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status_id: BankPaymentRequestStatus.id_for(:approved)})&.count,
+              count: apply_scopes(payment_tickets, {filter_user_id: user.id, filter_status: 'approved'})&.count,
               filters: [
-                {filter_status_id: BankPaymentRequestStatus.id_for(:approved)},
+                {filter_status: 'approved'},
                 {filter_user_name: user.name},
                 {filter_user_id: user.id}
               ]
@@ -119,7 +119,7 @@ class Dashboard::VendorPayments::PaymentTickets < Dashboard::VendorPayments::Bas
     #           title: "Awaiting Approval",
     #           count: BankPaymentRequest.awaiting_action_items(user)&.count,
     #           filters: [
-    #             {filter_status_id: 10}
+    #             {filter_status: 10}
     #           ]
     #         }
     #       ]
