@@ -7,9 +7,12 @@ class Company::Locations::Import < Company::Locations::Base
     end
   end
 
-  def init
+  def user_model
+   [User, AdminUser]
+  end
 
-    self.company = Company.find_by params[:company_id]
+  def init
+    self.company = Company.find_by_id params[:company_id].to_i
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
@@ -30,7 +33,7 @@ class Company::Locations::Import < Company::Locations::Base
   def process
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
-      self.card_params = process_row(row)
+      self.location_params = process_row(row)
 
       unless validate_params(row)
         result_hash[i] = "#{missing_params.to_sentence} cannot be blank"
@@ -41,7 +44,6 @@ class Company::Locations::Import < Company::Locations::Base
       if location.save
         result_hash[i] = "Success!"
       else
-        #add_message :error location.errors.full_messages
       end
     end
   end
@@ -67,21 +69,23 @@ class Company::Locations::Import < Company::Locations::Base
   private
 
   def process_row(row)
-    card_proxy = row[import_fields[:proxy]].to_s
-    card_program_id = row[import_fields[:card_program_id]].to_i.to_s
-    itz_cash_card_program_id = row[import_fields[:itz_cash_card_program_id]].to_i.to_s
-    company_id = row[import_fields[:company_id]].to_i.to_s
-    ending_number = row[import_fields[:ending_number]].to_i.to_s
+  p row
+    name = row[import_fields[:name]].to_s
+    state_name = row[import_fields[:state]].to_s
+    state_id = State.where("name LIKE ?", state_name)&.first&.id
+    address_1 = row[import_fields[:address_1]].to_s
+    gstin = row[import_fields[:gstin]].to_s
+    location_code = row[import_fields[:location_code]].to_s
+    nature_of_office = row[import_fields[:nature_of_office]].to_s
 
     params = {
 
-        proxy: card_proxy,
-        card_program_id: card_program_id,
-        itz_cash_card_program_id: itz_cash_card_program_id,
-        company_id: company_id,
-        ending_number: ending_number,
-        card_status_id: CardStatus.id_for(:unassigned)
-
+        name: name,
+        state_id: state_id,
+        address_1: address_1,
+        gstin: gstin,
+        location_code: location_code,
+        nature_of_office: nature_of_office
     }
   end
 
@@ -89,25 +93,18 @@ class Company::Locations::Import < Company::Locations::Base
     {
         :name=> 0,
         :address_1 => 1,
-        :address_2 => 2,
-        :city => 3,
-        :ending_number => 4
+        :city => 2,
+        :state => 3,
+        :gstin => 4,
+        :location_code => 5,
+        :nature_of_office => 6
     }
   end
 
   def validate_params(row)
     self.missing_params = []
-    if row[import_fields[:proxy]].blank?
-      missing_params << "Card Serial No."
-    end
-    if row[import_fields[:company_id]].blank?
-      missing_params << "Company ID"
-    end
-    if row[import_fields[:itz_cash_card_program_id]].blank?
-      missing_params << "ItzCash Card Program"
-    end
-    if row[import_fields[:card_program_id]].blank?
-      missing_params << "Card Program"
+    if row[import_fields[:name]].blank?
+      missing_params << "Location."
     end
     missing_params
   end

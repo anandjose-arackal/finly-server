@@ -66,9 +66,40 @@ class AdminUsers::CompaniesController < ApplicationController
   def import_data_configuration
     if params[:'data-target'].present?
       case params[:'data-target']
-        when 'locations'
-        when 'departments'
+      when 'locations'
+          @result = Company::Locations::Import.(current_user, params)
+      when 'departments'
+          @result = Company::Departments::Import.(current_user,params)
+      when 'categories'
+          @result = Categories::Import.(current_user,params)
+      when 'cost-centers'
+          @result = CostCenters::Import.(current_user,params)
+      when 'tds-slab'
+          @result = TdsSlabs::Import.(current_user,params)
+      when 'vendors'
+      when 'item-master'
       end
+    end
+
+    if @result.success?
+      @response = {
+          success: true,
+          file_url: @result.file_url,
+          messages: {
+              error: [],
+              failure: [],
+              success: [],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json {
+          render json: @response.as_json
+        }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
     end
   end
 
