@@ -6,6 +6,11 @@ class Dashboards::VendorPaymentsController < ApplicationController
     respond
   end
 
+  def awaiting_action
+    @result = Dashboard::VendorPayments::AwaitingAction.(current_user, params)
+    respond
+  end
+
   def budgets
     @result = Dashboard::VendorPayments::PurchaseOrders.(current_user, params)
     respond
@@ -21,6 +26,11 @@ class Dashboards::VendorPaymentsController < ApplicationController
     respond
   end
 
+  def vendors
+    @result = Dashboard::VendorPayments::Vendors.(current_user, params)
+    respond
+  end
+
   def po_invoices
     params[:filter_inward_invoice_type] = 'tax_invoice'
     @result = Dashboard::VendorPayments::Invoices.(current_user, params)
@@ -33,8 +43,11 @@ class Dashboards::VendorPaymentsController < ApplicationController
     respond
   end
 
-  def purchase_requisitions
+  def purchase_requests
     # to be built
+    # now built
+    @result = Dashboard::VendorPayments::PurchaseRequests.(current_user, params)
+    respond
   end
 
   def payment_tickets

@@ -116,7 +116,7 @@ class TravelRequests::Index < TravelRequests::Base
         end
       end
       self.count = self.travel_requests.count
-      self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
+      self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: params[:per_page])
     end
   end
 

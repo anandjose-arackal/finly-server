@@ -69,10 +69,6 @@
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
-#  po_adjusted_advance          :integer
-#  po_advance                   :integer
-#  po_prev_adjusted_advance     :integer
-#  advance_amount_required      :boolean          default(FALSE)
 #
 
 class Invoice < ApplicationRecord
@@ -256,7 +252,7 @@ class Invoice < ApplicationRecord
     end
 
     if user_id.present?
-      ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+      ids = self.awaiting_action_items(user_id)&.pluck(:id)
       with_id(ids)
     end
   }
@@ -277,12 +273,22 @@ class Invoice < ApplicationRecord
     where('date >= ? && date <= ?', from, to)
   }
 
+  scope :filter_invoice_date, -> (from) {
+    from = Date.parse(from) rescue Date.today
+    where('date = ?', from)
+  }
+
   scope :due_date, -> (from, to) {
     from = Date.parse('01-01-1990') if from.blank?
     to = Date.today if to.blank?
     from = Date.parse(from) unless from.is_a?(Date)
     to = Date.parse(to) unless to.is_a?(Date)
     where('due_date >= ? && due_date <= ?', from, to)
+  }
+
+  scope :filter_due_date, -> (from) {
+    from = Date.parse(from) rescue Date.today
+    where('due_date = ?', from)
   }
 
   scope :created_at_desc, -> {order(created_at: :desc)}
@@ -466,7 +472,7 @@ class Invoice < ApplicationRecord
   def item_amounts_total
     if self.invoice_items.present?
       # return self.invoice_items.joins(:amount).sum(:value)
-      return self.invoice_items.map {|p| p.amount&.value}.sum
+      return self.invoice_items.map {|p| p.amount&.value}.compact.sum
     else
       return 0
     end
@@ -630,6 +636,11 @@ class Invoice < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:invoice_reviewer), self)
   end
 
+  def is_crediting_user?(user = nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
+  end
+
   # def can_take_control?
   #   processing?
   # end
@@ -638,12 +649,39 @@ class Invoice < ApplicationRecord
     processing? rescue false
   end
 
+  def can_really_approve?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
+    (processing? rescue false) && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing? rescue false
+    # elsif self.action_users(:approve).include?(user)
+    #   processing? rescue false
+    # else
+    #   false
+    # end
+  end
+
   def can_reject?
     processing? rescue false
   end
 
+  def can_really_reject?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
+    (processing? rescue false) && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing? rescue false
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   processing? rescue false
+    # else
+    #   false
+    # end
+  end
+
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     (processing? rescue false) && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
@@ -701,6 +739,14 @@ class Invoice < ApplicationRecord
     InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed)
   end
 
+  def self.auditor_associated_status_ids
+    self.status_ids(:unpaid, :partially_paid, :paid, :retracted, :processing, :approved, :rejected, :auto_approved, :closed, :pending, :initiated)
+  end
+
+  def self.open_status_ids(user)
+    InwardInvoiceStatus.ids_for([:open, :draft])
+  end
+
   def self.role_based_associated_status_ids(user)
     InwardInvoiceStatus.ids_for(self.role_based_statuses(user))
   end
@@ -726,9 +772,11 @@ class Invoice < ApplicationRecord
     [
         :invoice_initiator,
         :invoice_reviewer,
+        :invoice_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
-        :bank_payment_request_creditor
+        :bank_payment_request_creditor,
+        :bank_payment_request_auditor
     ]
   end
 

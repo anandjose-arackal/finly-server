@@ -31,14 +31,17 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
   def validate
     # this will take all the payment requests that are not approvabe and
     # exclude them from the list of payment requests
-    self.payment_requests.each do |payment_request|
+    
+    # Wont be required, since this check is now done in foreground
+    # otherwise it would confuse the user
+    # self.payment_requests.each do |payment_request|
 
-      if payment_request.pending? && payment_request.get_reviewers.include?(initiating_user)
-        self.processing_payment_requests.push(payment_request)
-      end
+    #   if payment_request.pending? && payment_request.get_reviewers.include?(initiating_user)
+    #     self.processing_payment_requests.push(payment_request)
+    #   end
 
-      # todo - Change status of other payment requests from pending to processing
-    end
+    #   # todo - Change status of other payment requests from pending to processing
+    # end
 
     if self.initiating_user.blank?
       add_message :error, "Initiating user has been returned as blank"
@@ -47,7 +50,7 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
   end
 
   def process
-    self.processing_payment_requests.each do |payment_request|
+    self.payment_requests.each do |payment_request|
       # presenter = User::Team::Review::NextReviewer.(payment_request)
       # next_reviewer = presenter.user
       # next_reviewer_role_id = presenter.role_id

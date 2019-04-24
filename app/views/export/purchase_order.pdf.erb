@@ -84,7 +84,11 @@
       </div>
       <div class="col col-xs-12 no-padding">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.gst %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Location</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.location} - #{@result.purchase_order&.gstin_location&.state&.name}" %></div>
       </div>
     </div>
     <div class="col col-xs-4 billing-address">
@@ -221,7 +225,7 @@
       <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
-      <% unless @company.id == 137 %>
+      <% unless (@company.id == 137 || @company.id == 153) %>
       <ul>
         <% approved_users = [] %>
         <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>

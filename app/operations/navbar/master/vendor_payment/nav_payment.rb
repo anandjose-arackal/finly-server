@@ -37,17 +37,17 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
 
   def vendors
     return nil unless user.is_vendor_creator? || user.vp_admin_or_auditor?
-    {name: 'Vendors', id: 'vendors', url: 'beneficiaries/params={}'}
+    {name: 'Vendors', id: 'vendors', url: 'vendor/params={}'}
   end
 
   def item_master
     return nil unless user.is_item_master_manager? || user.vp_admin_or_auditor?
-    {name: 'Item Master', id: 'item_master', url: 'inventory/params={}'}
+    {name: 'Item Master', id: 'item_master', url: 'catalogue/params={"tabName": "item_master"}'}
   end
 
   def create
     return nil unless user.initiator_for_any_document? || user.vp_admin_or_auditor?
-    {name: 'Create', id: 'create', url: 'create/params={}'}
+    {name: 'Create', id: 'create', url: 'create'}
   end
 
   def create_payment_ticket

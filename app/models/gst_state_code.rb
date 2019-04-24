@@ -13,7 +13,7 @@ class GstStateCode < ApplicationRecord
 
 
   scope :with_state_code, -> (state_code) {
-    where(state_code)
+    where(state_code: state_code)
   }
   def full_name
     "#{self.name} - #{self.state_code}"

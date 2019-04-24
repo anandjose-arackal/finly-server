@@ -13,6 +13,7 @@
 #  user_id                    :integer
 #  base_currency_id           :integer
 #  company_pocket_template_id :integer
+#  active                     :boolean          default(TRUE)
 #
 
 class UserPocket < ApplicationRecord
@@ -72,6 +73,8 @@ class UserPocket < ApplicationRecord
   scope :with_user_id, -> (user_ids) {
     where user_id: user_ids
   }
+
+  scope :active, -> { where active: true }
 
   scope :include_details, -> {includes :user_pocket_type, :base_currency, {balance: [:currency]}}
 

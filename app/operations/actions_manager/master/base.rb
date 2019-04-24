@@ -58,10 +58,10 @@ class ActionsManager::Master::Base
   end
 
   def valid?
-    clear_messages
+    # clear_messages
     self.class.validations&.each do |method|
       self.send method
-    end
+    end unless self.class.validations.blank?
     self.messages[:error].blank?
   end
 
@@ -81,6 +81,7 @@ class ActionsManager::Master::Base
   def initialize(user, params)
     self.user = user
     self.params = params
+    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end
 
   def self.fields
@@ -94,7 +95,7 @@ class ActionsManager::Master::Base
   # Get allowed actions as hash
   def run
     actions = self.class.set_data_map[:actions]
-    allowed_actions = allowed_actions(actions)
+    allowed_actions(actions)
   end
 
   def input
@@ -102,6 +103,10 @@ class ActionsManager::Master::Base
 
   def clear_messages
     self.messages = {error: [], failure: [], success: [], message: [], notice: []}
+  end
+
+  def has_errors?
+    self.messages.present? and (self.messages[:error].present? or self.messages[:failure].present?)
   end
 
   def add_message(type, message)
@@ -118,14 +123,11 @@ class ActionsManager::Master::Base
     result = {}
     unless actions.blank?
       actions.each do |action|
-        result[action] = self.send(action) if self.send(action)
+        action_result = self.send(action)
+        result[action] = action_result if action_result
       end
     end
     return result
-  end
-
-  def clear_messages
-    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end
 
 end

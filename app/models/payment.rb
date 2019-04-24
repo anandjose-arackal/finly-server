@@ -45,7 +45,6 @@
 #  department_id                  :integer
 #  location_id                    :integer
 #  deleted_at                     :datetime
-#  beneficiary_payment_id         :integer
 #
 
 class Payment < ApplicationRecord
@@ -162,6 +161,18 @@ class Payment < ApplicationRecord
 
   scope :with_receiving_user_type, -> (type) {
     where receiving_user_type: type
+  }
+
+  scope :with_company_id, -> (company_id) {
+    where company_id: company_id
+  }
+
+  scope :filter_api_initiated, -> (api_initiated) {
+    if StringUtils.to_bool(api_initiated)
+      where api_initiated: api_initiated
+    else
+      where('api_initiated IS ? OR api_initiated = ?', nil, false)
+    end
   }
 
   # Personal are card transactions from own wallet to own card

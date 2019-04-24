@@ -18,7 +18,24 @@
 #
 
 class Gstin < ApplicationRecord
+  serialize :api_response, Hash
   scope :with_gstin, -> (gstin) {where gstin: gstin}
+
+  def as_json
+    {
+      gstin: gstin,
+      legal_name_of_business: legal_name_of_business,
+      trade_name: trade_name,
+      state: state,
+      date_of_registration: date_of_registration,
+      constitution_of_business: constitution_of_business,
+      taxpayer_type: taxpayer_type,
+      status: status,
+      api_response: api_response,
+      api_provider: api_provider,
+      address: address
+    }
+  end
 end
 
 

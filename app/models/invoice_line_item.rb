@@ -41,6 +41,8 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :gst_type, optional: true
   belongs_to :tax_rate, optional: true
+  belongs_to :cost_center, optional: true
+  belongs_to :department, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -52,7 +54,10 @@ class InvoiceLineItem < ApplicationRecord
   validates :description, presence: true
   validates :quantity, presence: true
   validates :rate, presence: true
-  validates_presence_of :unit_of_measurement
+
+  # removing for now
+  # validates_presence_of :unit_of_measurement
+  validates_presence_of :department
 
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy

@@ -57,13 +57,13 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
-  def bulk_approve
-    @result = Procurements::PurchaseOrders::BulkApprove.(current_user, params)
+  def bulk_forward
+    @result = Procurements::PurchaseOrders::BulkForward.(current_user, params)
     respond
   end
 
-  def bulk_reject
-    @result = Procurements::PurchaseOrders::BulkReject.(current_user, params)
+  def bulk_approve
+    @result = Procurements::PurchaseOrders::BulkApprove.(current_user, params)
     respond
   end
 
@@ -84,6 +84,28 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def return_control
     @result = Procurements::PurchaseOrders::ReturnControl.(current_user, params)
+    respond
+  end
+
+  def bulk_upload_items
+    @result = Procurements::PurchaseOrders::BulkUploadLineItems.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_failure'
+        }
+      end
+    end
+  end
+
+  def template_bulk_import_items
+    @result = Procurements::PurchaseOrders::GenerateImportSample.(current_user, params)
     respond
   end
 

@@ -123,23 +123,23 @@ class Dashboard::VendorPayments::Invoices < Dashboard::VendorPayments::Base
         self.counts.push(personal_data)
       end
 
-      if user.is_invoice_reviewer? || user.vendor_payments_admin?
-        awaiting_invoices = Invoice.awaiting_action_items(user)
-        data = {
-          type: "reviewer",
-          data: [
-            {
-              title: "Awaiting Approval",
-              count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: params[:filter_inward_invoice_type]})&.count,
-              filters: [
-                {filter_invoice_type: invoice_type},
-                {filter_awaiting_approval: true}
-              ]
-            }
-          ]
-        }
-        self.counts.push(data)
-      end
+      # if user.is_invoice_reviewer? || user.vendor_payments_admin?
+      #   awaiting_invoices = Invoice.awaiting_action_items(user)
+      #   data = {
+      #     type: "reviewer",
+      #     data: [
+      #       {
+      #         title: "Awaiting Approval",
+      #         count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: params[:filter_inward_invoice_type]})&.count,
+      #         filters: [
+      #           {filter_invoice_type: invoice_type},
+      #           {filter_awaiting_approval: true}
+      #         ]
+      #       }
+      #     ]
+      #   }
+      #   self.counts.push(data)
+      # end
     end
   end
 end
