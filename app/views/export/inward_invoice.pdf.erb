@@ -81,11 +81,11 @@
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.location.gstin %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.location&.gstin %></div>
       </div>
       <div class="col col-xs-12 no-padding">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">PAN Number</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.location.pan %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.invoice.location&.pan %></div>
       </div>
     </div>
     <div class="col col-xs-4 shipping-address">
