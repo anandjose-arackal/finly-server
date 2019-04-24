@@ -149,7 +149,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     attr_accessor :payment_requests, :paginated_payment_requests
 
-    has_scope :filter_status_id
+    has_scope :filter_status
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_custom_drop_down_selection, type: :array
     has_scope :filter_policy_id
