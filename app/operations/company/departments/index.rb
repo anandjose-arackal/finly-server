@@ -15,6 +15,9 @@ class Company::Departments::Index < Company::Departments::Base
     end
   end
 
+  def user_model
+    [User, AdminUser]
+  end
 
   def process
     if user.company_admin? || user.vp_admin_or_auditor?
