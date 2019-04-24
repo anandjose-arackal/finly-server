@@ -10,7 +10,7 @@ class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseP
 
     self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
     self.policy_id = self.document.policy_id
-    self.policy = Policy.find_id id: policy_id ## Have to take care where status is stored in a different attribute
+    self.policy = Policy.find_by id: policy_id ## Have to take care where status is stored in a different attribute
 
     # get reviewers
     self.current_level = document.level
