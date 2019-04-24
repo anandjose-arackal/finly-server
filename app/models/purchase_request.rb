@@ -194,7 +194,7 @@ class PurchaseRequest < ApplicationRecord
     PurchaseRequestItem.with_ids(filtered_rejected_item_ids).each do |item|
       item.rejected = true
       item.status_id = PurchaseRequestItemStatus.id_for(:rejected)
-      unless item.save && create_status_change_trail(item, user, action_id=TrailAction.id_for(:reject))
+      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(:reject))
         return false
       end
     end unless filtered_rejected_item_ids.blank?
@@ -209,7 +209,7 @@ class PurchaseRequest < ApplicationRecord
     PurchaseRequestItem.with_ids(filtered_approved_item_ids).each do |item|
       item.rejected = false
       item.status_id = PurchaseRequestItemStatus.id_for(self.reload&.status&.name&.to_sym)
-      unless item.save && create_status_change_trail(item, user, action_id=TrailAction.id_for(self&.status&.name&.to_sym))
+      unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(self&.status&.name&.to_sym))
         return false
       end
     end unless filtered_approved_item_ids.blank?
@@ -247,9 +247,7 @@ class PurchaseRequest < ApplicationRecord
     [:admin, :purchase_request_initiator, :purchase_request_reviewer, :purchase_request_auditor]
   end
 
-  private
-
-  def create_status_change_trail(item, user, action_id)
+  def self.create_status_change_trail(item, user, action_id)
     # Since PR line item does not have policy, trail has PR data
     role_id = item.purchase_request.is_reviewing_user? ? UserRole.id_for(:purchase_request_reviewer) : UserRole.id_for(:admin)
     trail = item.trails.new action_user: user,
@@ -257,9 +255,12 @@ class PurchaseRequest < ApplicationRecord
                            action_user_role_id: role_id,
                            # Current level if previous level is not present
                            action_level_id: item.purchase_request.get_level(:previous).id || item.purchase_request.level.id,
-                           modified_level_id: item.purchase_request.get_level(:next)&.id
+                           modified_level_id: item.purchase_request.get_level(:next).id
     trail.save
   end
+
+  private
+
 
   def self.process_location_id(location_id, user_id)
     user = User.find_by_id user_id
