@@ -81,7 +81,7 @@ class InvoiceLineItem < ApplicationRecord
     if category_ids.present?
       category_ids = [category_ids] unless category_ids.is_a?(Array)
       # ids = joins(:inventory_line_item).where("inventory_line_items.category_id IN (?)", category_ids).pluck('invoice_line_items.id')
-      ids = joins(:inventory_line_item).where("items.category_id IN (?)", category_ids).pluck('items.id')
+      ids = joins(:item).where("items.category_id IN (?)", category_ids).pluck('items.id')
       where(id: ids)
     end
   }
