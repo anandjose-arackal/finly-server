@@ -255,7 +255,7 @@ class PurchaseRequest < ApplicationRecord
                            action_user_role_id: role_id,
                            # Current level if previous level is not present
                            action_level_id: item.purchase_request.get_level(:previous).id || item.purchase_request.level.id,
-                           modified_level_id: item.purchase_request.get_level(:next).id
+                           modified_level_id: item.purchase_request&.level&.id
     trail.save
   end
 
