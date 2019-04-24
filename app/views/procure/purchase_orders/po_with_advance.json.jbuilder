@@ -16,7 +16,7 @@ json.results do
     json.procurement_id purchase_order.procurement_id
     # json.po_status purchase_order.status&.name&.humanize
     json.po_number purchase_order.po_number
-    json.po_vendor_name purchase_order.vendor.name
+    json.po_vendor_name purchase_order.vendor&.business_name || purchase_order.vendor&.name
     json.po_advance_status purchase_order.advance_amount_status&.name&.humanize || ""
 
     if purchase_order.dlrms.present?
