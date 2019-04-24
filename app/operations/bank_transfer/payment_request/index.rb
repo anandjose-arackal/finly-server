@@ -182,7 +182,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       pt_status_ids = BankPaymentRequest.status_ids(:open, :processing, :retracted, :rejected, :approved, :credited)
       po_status_ids = [PaymentOrderStatus.id_for(:failed), PaymentOrderStatus.id_for(:scheduled), PaymentOrderStatus.id_for(:pending)]
 
-      payment_tickets_counts = self.payment_requests.with_status_id(pt_status_ids)&.group(status_id)&.count
+      payment_tickets_counts = self.payment_requests.where(status_id: pt_status_ids)&.group(:status_id)&.count
 
       result = {
         all: 0,
