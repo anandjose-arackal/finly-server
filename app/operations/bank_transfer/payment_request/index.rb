@@ -147,7 +147,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
   class BankTransfer::PaymentRequest::Index::PaymentPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :payment_requests, :paginated_requests
+    attr_accessor :payment_requests, :paginated_payment_requests
 
     has_scope :filter_status_id
     has_scope :filter_date, using: [:from, :to], type: :hash
