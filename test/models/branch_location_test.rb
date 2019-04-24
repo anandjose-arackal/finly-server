@@ -19,9 +19,6 @@
 #  contact_mobile_number :string(255)
 #  is_deleted            :boolean          default(FALSE), not null
 #  deleted_at            :datetime
-#  location_code         :string(255)
-#  ancestry              :string(255)
-#  nature_of_office      :string(255)
 #
 
 require 'test_helper'

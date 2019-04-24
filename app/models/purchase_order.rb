@@ -48,20 +48,8 @@
 #  template_name                :string(255)
 #  resource_template_id         :integer
 #  deleted_at                   :datetime
-#  advance_amount_id            :integer
-#  due_date                     :date
-#  advance_amount_status_id     :integer
-#  bank_account_id              :integer
-#  revised_po_id                :integer
-#  revision_of_id               :integer
-#  revision_number              :integer          default(0)
-#  note                         :text(65535)
-#  advance_tds_slab_id          :integer
-#  advance_tds_amount_id        :integer
-#  advance_amount_required      :boolean          default(FALSE)
-#  requested_advance_amount_id  :integer
-#  gstin_location_id            :bigint(8)
 #  submitted_at                 :datetime
+#  approved_at                  :datetime
 #
 
 class PurchaseOrder < ApplicationRecord
