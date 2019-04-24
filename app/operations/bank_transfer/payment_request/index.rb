@@ -165,6 +165,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       self.payment_requests = params[:payment_requests]
       self.payment_requests = apply_scopes(payment_requests)
       per_page = params[:per_page] || 30
+      page = params[:page] || 1
       # if self.payment_requests.present?
       #   if personal_view?
       #     self.payment_requests = self.payment_requests.order_by(:created_at)#.order_by(:controlling_user, user.id)
@@ -175,7 +176,8 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       if self.payment_requests.present?
       self.payment_requests&.order_by(:submitted_at)
       end
-      self.paginated_requests = self.payment_requests.paginate(page: params[:page], per_page: per_page) rescue ::PaymentRequest.none
+      self.paginated_requests = self.payment_requests.paginate(page: page, per_page: per_page) rescue ::BankPaymentRequest.none
+      self.paginated_requests = self.paginated_requests.include_for_index
     end
 
     def status_count
