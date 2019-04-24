@@ -46,6 +46,9 @@ gem 'omniauth-quickbooks', '~> 0.0.2'
 gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
 gem 'finly-secure_storage-sdk', git: 'git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git'
+# gem 'finly-secure_storage-sdk', git: 'git@gitlab.com:finlycore/finly-secure_storage-sdk.git'
+
+
 
 gem 'rubyzip', '~> 1.2.2'
 
@@ -138,8 +141,8 @@ gem 'font-awesome-rails', '~> 4.7.0.4'
 gem 'has_scope', '~> 0.7.2'
 
 # gem 'sendgrid-ruby', '~> 5.3.0'
-gem 'griddler', '~> 1.5.2'
-gem 'griddler-sendgrid', '~> 1.1.0'
+# gem 'griddler', '~> 1.5.2'
+# gem 'griddler-sendgrid', '~> 1.1.0'
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
 # gem 'wkhtmltoimage-binary'
@@ -185,6 +188,9 @@ gem 'aws-sdk-s3', '~> 1.30.0'
 gem 'aws-sdk-sqs', '~> 1.10.0'
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '~> 1.8.0'
+
+# Fuzzy String Match
+gem 'fuzzy-string-match', '1.0.1'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

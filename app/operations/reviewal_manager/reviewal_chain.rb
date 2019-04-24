@@ -10,7 +10,8 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.provider_name = params[:provider_name] || self.document&.get_default_provider
     self.violations_present = !!params[:violations_present]
     self.chain = []
-    self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider )
+    self.provider_names = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider YesBankVendorProvider PurchaseRequestProvider)
+
     policy_id = params[:policy_id]
 
     # self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
@@ -38,16 +39,23 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
 
     levels.each do |level|
       if level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).present?
-        mappings = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present)
+        mappings = level.level_user_reviewer_mappings.with_user_id(user.id).with_exception(violations_present).includes(:reviewer)
       else
-        mappings = level.level_reviewer_mappings.with_exception(violations_present).non_deleted
+        mappings = level.level_reviewer_mappings.with_exception(violations_present).non_deleted.includes(:reviewer)
       end
-      selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
-      selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
+      if self.document.present?
+        selected_reviewer_from_dlrm = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id)
+        selected_reviewer = selected_reviewer_from_dlrm.first if selected_reviewer_from_dlrm.length == 1
+        timestamp = selected_reviewer_from_dlrm.first&.updated_at
+      else
+        selected_reviewer = nil
+        timestamp = nil
+      end
       level_data = {
           level_number: level.level_number,
           level_id: level.id,
           level_name: level.name,
+          timestamp: timestamp,
           reviewers: mappings
       }
       if selected_reviewer.present?

@@ -40,6 +40,8 @@ class UserRoleMapping < ApplicationRecord
     role(role_id)
   }
 
+  scope :only_admin_and_auditor, -> {where(user_role_id: [UserRole.id_for(:admin), UserRole.id_for(:auditor)])}
+
   before_destroy do
     employee_role_presence
   end

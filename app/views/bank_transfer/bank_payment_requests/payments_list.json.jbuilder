@@ -44,6 +44,8 @@ json.payments do
       end
       json.invoice do
         json.id invoice.id
+        json.invoice_type invoice.invoice_type&.name
+        json.procurement_id invoice.procurement_id
         json.advance invoice.advance
         json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
@@ -65,7 +67,7 @@ json.payments do
         json.net_payable_amount invoice.balance_due&.value
         json.balance_due invoice.balance_due&.value
         json.taxable_amount precision_value invoice.gross_amount&.value
-        json.editable invoice.unpaid?
+        json.editable invoice.unpaid? || invoice.initiated?
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -130,11 +132,24 @@ json.payments do
         json.balance_due payment.amount&.value
       end
     end
+
+    json.parent_type payment.parent_type
+    json.parent_id payment.parent_id
+    # json.invoice_details payment.invoice.invoice_amount_details
+    json.parent_details do
+      json.merge! payment.parent_details
+      # json.payable_amount payment.get_payable_amount
+      json.payable_amount payment.amount_value
+    end
   end
 end
 
+# json.payments_count @result.ordered_payments.count
+# json.payments_status_ids @result.payment_status_ids
+# json.payment_status_id_count @result.payment_status_id_count
 json.payments_count @result.ordered_payments.size
 # non-paginated payments listing all payments in this payment order
+json.filter_count @result.filter_count
 unless current_company.id == 118
 json.unpaid_payments do
   json.array!(@result.unpaid_payments.include_minimal_for_index) do |payment|

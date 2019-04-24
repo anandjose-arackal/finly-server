@@ -2,12 +2,13 @@
   <div class="col col-xs-12 header-container">
     <div class="col col-xs-8 no-padding company-details">
       <div class="col col-xs-12 no-padding logo">
-        <img src="<%= @company.configuration.logo.url(:thumb) %>" width="120" height="auto">
+        <img src="<%="http:"+@company.configuration.logo.url(:thumb) %>" width="120" height="auto">
       </div>
       <div class="col col-xs-12 no-padding address fs-12 mg-top-5">
         <br>
+        <div class="mg-botm-8"><b><%= @company.name %></b></div>
         <div class="font-light-gray mg-botm-8">Business Office :</div>
-        <div class="font-light-gray">
+        <div class="font-light-gray col-xs-6">
           <%= simple_format @company.configuration.address, {}, wrapper_tag: "div" %>
         </div>
       </div>
@@ -24,7 +25,7 @@
             <td class="font-dark-gray"><%= @result.purchase_order.po_number %></td>
           </tr>
           <tr>
-            <td class="font-light-gray">Document Date</td>
+            <td class="font-light-gray">PO Date</td>
             <td class="font-dark-gray"><%= @result.purchase_order.created_at.strftime "%b-%d-%Y" %></td>
           </tr>
           <tr>
@@ -33,7 +34,7 @@
           </tr>
           <tr>
             <td class="font-light-gray">Payment Term</td>
-            <td class="font-dark-gray"><%= @result.purchase_order.payment_term&.name %></td>
+            <td class="font-dark-gray"><%= @result.purchase_order.payment_term&.description %></td>
           </tr>
           <tr>
             <td class="font-light-gray">Sub Department</td>
@@ -43,6 +44,25 @@
         </table>
       </div>
     </div>
+    <% field_configurations = FieldConfiguration.with_id(@result.purchase_order.custom_fields.pluck(:field_configuration_id)) %>
+    <% if field_configurations.present? && field_configurations.pluck(:printable).include?(true) %>
+      <div class="col col-xs-12 no-padding">
+        <% @result.purchase_order.custom_fields.each do |custom_field| %>
+          <% if custom_field.field_configuration.printable %>
+            <div class="col col-xs-3 no-padding mg-botm-8">
+              <div class="col col-xs-12 no-padding font-light-gray mg-botm-2"><%= custom_field.field_configuration.field_name %></div>
+              <div class="col col-xs-12 no-padding font-dark-gray">
+                <% if custom_field.value_type == 'FieldDropDownSelection' %>
+                  <%= custom_field.value.value.name %>
+                <% else %>
+                  <%= custom_field.value&.value || '--' %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
     <div class="col col-xs-12 no-padding">
       <p class="text-center"><%= @result.purchase_order&.procurement&.note %></p>
     </div>
@@ -64,7 +84,11 @@
       </div>
       <div class="col col-xs-12 no-padding">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GSTIN</div>
-        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.gst %></div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Location</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.location} - #{@result.purchase_order&.gstin_location&.state&.name}" %></div>
       </div>
     </div>
     <div class="col col-xs-4 billing-address">
@@ -179,12 +203,29 @@
       </div>
     </div>
   </div>
+
+  <% unless @result.purchase_order.note.blank? %>
+  <div class="col col-xs-12 notes-container mg-top-5">
+    <h4 class="section-title">Note to Vendor</h4>
+    <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
+      <% if @result.purchase_order.note.blank? %>
+        <%= simple_format "<i>Empty </i>", {}, wrapper_tag: "div" %>
+      <% else %>
+        <%= simple_format @result.purchase_order.note, {}, wrapper_tag: "div" %>
+      <% end %>
+    </div>
+  </div>
+  <% end %>
+
+
+
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
     <h4 class="section-title">Terms and Conditions</h4>
     <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
-      <%= simple_format @result.purchase_order.procurement_term_text, {}, wrapper_tag: "div" %>
+      <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
+      <% unless (@company.id == 137 || @company.id == 153) %>
       <ul>
         <% approved_users = [] %>
         <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
@@ -210,6 +251,7 @@
           </div>
         </li>
       </ul>
+      <% end %>
       <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
     </div>
   </div>
@@ -504,7 +546,7 @@
       color: #26C965 !important;
       -webkit-print-color-adjust: exact;
     }
-    .terms-and-conditions-container{
+    .terms-and-conditions-container, .notes-container{
       /*page-break-inside: avoid;*/
     }
     .fc-dark-red{

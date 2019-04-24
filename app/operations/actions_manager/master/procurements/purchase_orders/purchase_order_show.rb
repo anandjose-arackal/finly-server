@@ -2,15 +2,17 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
 
   register_handle :non_po_purchase_order_show
   validate :input
-  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete, :save_and_submit, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_invoice_items]
+  register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :close, :approve, :remind, :retract, :remind_approver, :void, :save_btn, :export_po_items, :update_btn, :delete, :save_and_submit, :more_actions, :audit_trail, :download, :send_btn, :export_invoice_items]
 
   def more_details_button
     true
   end
   
   def send_mail
-    (purchase_order.approved? || purchase_order.auto_approved?) && 
-    (user_in_level? || document_owner?)
+    if purchase_order.is_initiating_user?
+      (purchase_order.approved? || purchase_order.auto_approved?) && 
+      (user_in_level? || document_owner?)
+    end
   end
   
   def export_items
@@ -18,12 +20,16 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def submit
-    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    if user.is_purchase_order_initiator?
+      document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    end
   end
 
   def reject
-    purchase_order.processing? &&
-    user_in_level?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      user_in_level?
+    end
   end
 
   def close
@@ -31,32 +37,37 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def approve
-    purchase_order.processing? &&
-    user_in_level?
+    if purchase_order.is_reviewing_user?
+      purchase_order.processing? &&
+      user_in_level?
+    end
   end
 
   def remind
-    purchase_order.processing? &&
-    document_owner?
+    purchase_order.processing? && document_owner?
   end
 
   def retract
-    purchase_order.processing? &&
-    document_owner?
+    if user.is_purchase_order_initiator?
+      purchase_order.processing? &&
+      document_owner?
+    end
   end
 
   def remind_approver
-    purchase_order.processing? &&
-    document_owner?
+    if purchase_order.is_initiating_user?
+      purchase_order.processing? &&
+      document_owner?
+    end
   end
 
   def void
-    (PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id) && 
-      user.vendor_payment_admin?
+    (PurchaseOrderStatus.status_ids_for_voidable.include? purchase_order.purchase_order_status_id) && (user.vendor_payments_admin? or document_owner?)
   end
 
   def save_btn
-    (user.vendor_payment_admin? && !purchase_order.voided?) || (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) || 
+    (user.vendor_payments_admin? && !purchase_order.voided? &&  !(purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) ||
+        (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) ||
     (purchase_order.processing? && user_in_level?)
     # (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
   end
@@ -66,24 +77,25 @@ class ActionsManager::Master::Procurements::PurchaseOrders::PurchaseOrderShow < 
   end
 
   def update_btn
-    true
+    save_btn
   end
 
   def delete
-    document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    if user.is_purchase_order_initiator?
+      document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)
+    end
   end
 
   def save_and_submit
-    (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
+    if user.is_purchase_order_initiator?
+      (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))
+    end
   end
 
   def more_actions
     true
   end
 
-  def make_payment
-    true
-  end
 
   def audit_trail
     true

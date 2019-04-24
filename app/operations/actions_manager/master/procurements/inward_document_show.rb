@@ -1,21 +1,58 @@
 class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager::Master::Base
 
   register_handle :proc_inward_document_show
-  register_actions [:update_document]
+  register_actions [:update_document, :editable, :delete]
+
+  def initialize(user=nil, params={})
+    super
+    result = ::Procurements::InwardDocuments::Show.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
+
+    self.inward_document = result.inward_document
+    self.procurement = self.inward_document.procurement
+  end
 
 
   def update_document
-    true
+    
+    # editable
+    if (self.inward_document.id == self.procurement.inward_documents.last.id) && (self.procurement.documents&.first&.class&.name != "Invoice")
+      unless all_accepted?
+        true
+      end
+    end
   end
 
-  # def initializing(user=nil, params={})
-  #   result = ::Procurements::Invoices::Show.(user, params)
-  #   unless result.success?
-  #     add_message :error, result.messages[:error]
-  #     return
-  #   end
-  #   self.invoice = result.invoice
-  # end
+  def editable
+    # edit button only appears after we have updated it with some items 
+    # do not show edit button while the doc has just been created
+    # after doc has been updated with some delivered items, show the edit button
+
+    if (self.inward_document.id == self.procurement.inward_documents.last.id) && (self.procurement.documents&.first&.class&.name != "Invoice")
+      unless all_accepted?
+        e = inward_document.items.map {|i| i.delivered == 0}
+        unless e.include? true
+          e = inward_document.items.map {|i| i.quantity >= i.accepted}
+          e.include? true
+        end
+      end
+    end
+  end
+
+  def delete
+    if self.procurement.documents&.first&.class&.name != "Invoice"
+      unless self.inward_document.id != self.procurement.inward_documents.last.id
+        true
+      end
+    end
+  end
+
+  def delete
+    true
+  end
 
   # # alias_method :invoice, :input
 
@@ -115,6 +152,16 @@ class ActionsManager::Master::Procurements::InwardDocumentShow < ActionsManager:
   # def document_owner?
   #   invoice.created_by_user_id.eql? user.id
   # end
+
+  def all_delivered?
+    e = inward_document.items.map {|i| i.delivered == i.quantity}
+    (e.uniq.size == 1) && e.include?(true)
+  end
+
+  def all_accepted?
+    e = inward_document.items.map {|i| i.accepted == i.quantity}
+    (e.uniq.size == 1) && e.include?(true)
+  end
 
 
 end

@@ -1,7 +1,8 @@
 class ActionsManager::Master::Base
 
   cattr_accessor :data_map
-  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order
+
+  attr_accessor :user, :params, :messages, :bank_payment_request, :account_owner, :invoice, :purchase_order, :inward_document, :procurement, :vendor, :purchase_request
 
   MASTERS ||= {
     payment_ticket_index: '::ActionsManager::Master::BankTransfer::PaymentRequest::Index',
@@ -27,7 +28,13 @@ class ActionsManager::Master::Base
     proc_tax_invoice_show: '::ActionsManager::Master::Procurements::TaxInvoiceShow',
     proc_payment_item_show: '::ActionsManager::Master::Procurements::PaymentItemShow',
     users_index: '::ActionsManager::Master::BankTransfer::Users::Index',
-    users_show: '::ActionsManager::Master::BankTransfer::Users::Show' 
+    users_show: '::ActionsManager::Master::BankTransfer::Users::Show',
+    vp_role_config: '::ActionsManager::Master::PolicyUserRoles::RoleConfig',
+    purchase_request_show: '::ActionsManager::Master::Procurements::PurchaseRequests::Show',
+    purchase_request_create: '::ActionsManager::Master::Procurements::PurchaseRequests::Create',
+    purchase_request_index: '::ActionsManager::Master::Procurements::PurchaseRequests::Index',
+    vendor_show: '::ActionsManager::Master::Vendors::Show',
+    vendors_index: '::ActionsManager::Master::Vendors::Index'
 
   }.with_indifferent_access
 
@@ -51,10 +58,10 @@ class ActionsManager::Master::Base
   end
 
   def valid?
-    clear_messages
+    # clear_messages
     self.class.validations&.each do |method|
       self.send method
-    end
+    end unless self.class.validations.blank?
     self.messages[:error].blank?
   end
 
@@ -74,6 +81,7 @@ class ActionsManager::Master::Base
   def initialize(user, params)
     self.user = user
     self.params = params
+    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end
 
   def self.fields
@@ -87,7 +95,7 @@ class ActionsManager::Master::Base
   # Get allowed actions as hash
   def run
     actions = self.class.set_data_map[:actions]
-    allowed_actions = allowed_actions(actions)
+    allowed_actions(actions)
   end
 
   def input
@@ -95,6 +103,10 @@ class ActionsManager::Master::Base
 
   def clear_messages
     self.messages = {error: [], failure: [], success: [], message: [], notice: []}
+  end
+
+  def has_errors?
+    self.messages.present? and (self.messages[:error].present? or self.messages[:failure].present?)
   end
 
   def add_message(type, message)
@@ -111,14 +123,11 @@ class ActionsManager::Master::Base
     result = {}
     unless actions.blank?
       actions.each do |action|
-        result[action] = self.send(action) if self.send(action)
+        action_result = self.send(action)
+        result[action] = action_result if action_result
       end
     end
     return result
-  end
-
-  def clear_messages
-    self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end
 
 end

@@ -42,6 +42,11 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.purchase_order.controlling_user_role_id = UserRole.id_for(:initiator)
 
     if purchase_order.valid?
+      unless purchase_order.save
+        add_message :error, 'Unable to save'
+        return
+      end
+      purchase_order.process_line_item_calculation
       purchase_order.save
 
       # Create Trail for it
@@ -52,6 +57,11 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
       self.procurement.status_tags << status_tag
 
       CustomField::SetFields.(purchase_order, FieldParentType.id_for(:purchase_order), reset_fields: true, save: true)
+
+      # params[:purchase_order_id] = self.purchase_order.id
+      # params[:receiving_user_type] = self.vendor.class&.name
+      # params[:receiving_user_id] = self.vendor.bank_accounts.first.account_owner_id
+      # params[:receiving_account_id] = self.vendor.id
 
     else
       add_message :error, purchase_order.errors.full_messages
@@ -72,4 +82,14 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
     self.template = result.template
     self.purchase_order = self.template.resource.amoeba_dup
   end
+
+
+
+  # def purchase_request_tasks
+  #   if params[:associated_resource] == "purchase_request_item"
+  #     # Status transition of PR
+  #     perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: params})
+  #     purchase_order.associate_purchase_request_items(params, user)
+  #   end
+  # end
 end

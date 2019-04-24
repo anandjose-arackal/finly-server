@@ -2,10 +2,11 @@ class ReviewalLevels::Index < ReviewalLevels::Base
   attr_accessor :reviewal_levels
 
   class ReviewalLevels::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :reviewal_levels
+    attr_accessor :reviewal_levels, :levels
 
     has_scope :filter_policy
     has_scope :filter_policy_id
+    has_scope :filter_policy_ids, type: :array
     has_scope :filter_associated_entity_type
     # has_scope :reviewal_level_id
 
@@ -17,6 +18,8 @@ class ReviewalLevels::Index < ReviewalLevels::Base
         self.reviewal_levels = self.reviewal_levels.non_deleted
         self.reviewal_levels = self.reviewal_levels.order(:level_number)
       end
+
+      self.levels = self.reviewal_levels
 
     end
   end
@@ -31,6 +34,15 @@ class ReviewalLevels::Index < ReviewalLevels::Base
     self.reviewal_levels = ReviewalLevel.with_policy_ids(policy_ids)
 
   end
+
+  # def validate
+  #   # Currently implementing for vendor payments only
+  #   if ['PurchaseOrderProvider', 'PurchaseRequestProvider', 'PaymentTicketProvider', 'YesBankVendorProvider'].include?(params[:filter_associated_entity_type])
+  #     unless user.vendor_payments_admin?
+  #       raise_unauthorized_exception
+  #     end
+  #   end
+  # end
 
   def success
     params[:reviewal_levels] = self.reviewal_levels

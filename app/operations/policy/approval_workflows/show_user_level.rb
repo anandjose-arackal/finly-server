@@ -32,7 +32,7 @@ class Policy::ApprovalWorkflows::ShowUserLevel < Policy::ApprovalWorkflows::Base
   end
 
   def authorized_user_types
-    [:admin]
+    [:admin, :vendor_payments_admin]
   end
 
   def init
@@ -44,7 +44,13 @@ class Policy::ApprovalWorkflows::ShowUserLevel < Policy::ApprovalWorkflows::Base
       add_message :error, "Policy not found"
     end
 
-    self.target_user = User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id)).with_id(params[:user_id]).first rescue nil
+    if vendor_payments?
+      user_ids = self.policy.policy_user_roles.pluck(:user_id) rescue nil
+      user_ids = params[:user_id] if User.with_id(params[:user_id])&.first&.vp_admin_or_auditor? && user_ids.blank?
+      self.target_user = User.with_id(user_ids).with_id(params[:user_id]).first rescue nil
+    else
+      self.target_user = User.with_id(self.policy.user_mapping.non_deleted.pluck(:user_id)).with_id(params[:user_id]).first rescue nil
+    end
     self.reviewal_levels = ReviewalLevel.with_policy_ids(self.policy.id)
   end
 
