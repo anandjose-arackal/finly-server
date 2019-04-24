@@ -77,7 +77,9 @@ class AdminUsers::CompaniesController < ApplicationController
       when 'tds-slab'
           @result = TdsSlabs::Import.(current_user,params)
       when 'vendors'
+          @result = Vendors::Import.(current_user,params)
       when 'item-master'
+          @result =  ItemMaster::Item::Import.(current_user, params)
       end
     end
 

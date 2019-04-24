@@ -25,16 +25,18 @@ class Company::Departments::Index < Company::Departments::Base
     else
       self.departments = user.departments
     end
-    user_role_id = params[:filter_role_id]
-    if user_role_id.present?
-      department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ? AND policy_user_roles.user_role_id IN (?)', user.id, user_role_id).joins(:policy_department_mappings).with_application(current_app).exclude_deleted.pluck('policy_department_mappings.department_id')
-    else
-      # User has any role in policy
-      department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id).joins(:policy_department_mappings).with_application(current_app).exclude_deleted.pluck('policy_department_mappings.department_id')
+    unless user.class.name =='AdminUser'
+      user_role_id = params[:filter_role_id]
+      if user_role_id.present?
+        department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ? AND policy_user_roles.user_role_id IN (?)', user.id, user_role_id).joins(:policy_department_mappings).with_application(current_app).exclude_deleted.pluck('policy_department_mappings.department_id')
+      else
+        # User has any role in policy
+        department_ids = user.company.policies.joins(:policy_user_roles).where('policy_user_roles.user_id = ?', user.id).joins(:policy_department_mappings).with_application(current_app).exclude_deleted.pluck('policy_department_mappings.department_id')
+      end
+      department_parent_id = [user.company.departments.where(id: department_ids)&.last&.parent&.id] rescue []
+      # To be shown on filter page
+      self.policy_department_filter_mapping = user.company.departments.where(id: department_ids + department_parent_id) unless department_ids.blank?
     end
-    department_parent_id = [user.company.departments.where(id: department_ids)&.last&.parent&.id] rescue []
-    # To be shown on filter page
-    self.policy_department_filter_mapping = user.company.departments.where(id: department_ids + department_parent_id) unless department_ids.blank?
 
   end
 
