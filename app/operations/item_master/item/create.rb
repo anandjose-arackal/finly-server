@@ -33,6 +33,7 @@ class ItemMaster::Item::Create < ItemMaster::Item::Base
   end
 
   def process
+    self.inventory_item_parameters[:user] = user
     self.inventory_line_item = user.company.items.build(self.inventory_item_parameters)
     if  self.inventory_line_item.save
       # if inventory_item_parameters[:artifacts].present?

@@ -1,6 +1,6 @@
 class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Base
   attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :id_old_attachments,
-                :id_current_attachments, :po_revision
+                :id_current_attachments, :po_revision, :po_previous_status
   def init
     procurement_id = params[:procurement_id]
     inward_document_id = params[:id] || params[:inward_document_id]
@@ -16,6 +16,16 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
         self.purchase_order = self.po_revision
       end
     end
+
+    if is_approve?
+      self.po_previous_status = PurchaseOrderStatus.id_for(:approved)
+
+    elsif is_auto_approve?
+      self.po_previous_status = PurchaseOrderStatus.id_for(:auto_approved)
+
+    elsif is_send_to_vendor?
+      self.po_previous_status = PurchaseOrderStatus.id_for(:sent_to_vendor)
+      end
   end
 
   def validate
@@ -46,6 +56,8 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     unless inward_document.destroy
       add_message :error, inward_document.errors.full_messages
       return
+    else
+      self.purchase_order.update(purchase_order_status_id: self.po_previous_status)
     end
 
     # self.id_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
@@ -80,6 +92,26 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
     purchase_order_item.assign_attributes(po_item_params)
     purchase_order_item.save
 
+  end
+
+  def previous_state
+    ps = self.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
+    ps.last.action_id
+  end
+
+  def is_approve?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == TrailAction.id_for(:approve) ) ? true : false
+  end
+
+  def is_auto_approve?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == TrailAction.id_for(:auto_approve) ) ? true : false
+  end
+
+  def is_send_to_vendor?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == TrailAction.id_for(:send_to_vendor) ) ? true : false
   end
 
 end
