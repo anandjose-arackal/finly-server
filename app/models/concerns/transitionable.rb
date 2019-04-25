@@ -393,7 +393,7 @@ module Transitionable
     
     def validate_if_reviewer(user)
       if self.policy.present? && self.document_level_reviewer_mappings.present?
-        self.document_level_reviewer_mappings.pluck(:reviewer_id).include?(user.id) rescue false
+        self.document_level_reviewer_mappings.with_viewable.pluck(:reviewer_id).include?(user.id) rescue false
       end
     end
 
