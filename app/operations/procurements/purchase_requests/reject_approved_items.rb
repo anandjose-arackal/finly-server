@@ -19,6 +19,8 @@ class Procurements::PurchaseRequests::RejectApprovedItems < Procurements::Purcha
   end
 
   def process
+    # Update status to processing
+    self.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:rejection_in_progress))
     ::Procurements::PurchaseRequests::PurchaseRequestItems::BulkRejectProcessor.call_async(user.id, {purchase_request_item_ids: purchase_request_items.pluck(:id)})
   end
 

@@ -1,8 +1,9 @@
 class DepartmentsController < ApplicationController
 
-  before_action -> { finly_authorize! :web }
+  before_action -> { finly_authorize! :web, :admin }
 
   def index
+    p params
     @result = Company::Departments::Index.(current_user, params)
     respond
   end

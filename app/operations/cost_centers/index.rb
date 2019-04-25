@@ -11,8 +11,12 @@ class CostCenters::Index < CostCenters::Base
     end
   end
 
-  def init
-    self.cost_centers = user.company.cost_centers
+  def process
+    self.cost_centers = company.cost_centers
+  end
+
+  def user_model
+    [User, AdminUser]
   end
 
   def success
