@@ -11,8 +11,12 @@ class TdsSlabs::Index < TdsSlabs::Base
     end
   end
 
-  def init
-    self.tds_slabs = user.company.tds_slabs
+  def user_model
+    [User, AdminUser]
+  end
+
+  def process
+    self.tds_slabs = company.tds_slabs
   end
 
   def success

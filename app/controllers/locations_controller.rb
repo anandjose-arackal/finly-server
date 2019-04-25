@@ -1,6 +1,6 @@
 class LocationsController < ApplicationController
 
-  before_action -> { finly_authorize! :web }
+  before_action -> { finly_authorize! :web, :admin }
 
   def show
     @result = Company::Locations::Show.(current_user, params)
