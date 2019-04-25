@@ -43,6 +43,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       return
     end
 
+    if self.inward_invoice_params[:invoice_number].blank?
+      add_message :error, "Invoice number is required. You can input alphanumeric characters, dash and forward slash. No spaces allowed."
+      return
+    end
+
     
     # checking for duplicates within this particular company
     current_company_invoices = current_company.inward_invoices
@@ -61,8 +66,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         add_message :error, "Please add the advance amount to be adjusted for this Invoice."
         return
       end
-      if self.inward_invoice_params[:po_adjusted_advance_attributes][:value].to_i > self.inward_invoice.po_advance
-        add_message :error, "Error: Adjusted advance entered is more than the required Purchase Order advance."
+      possible_adjustment = (self.inward_invoice.po_advance - self.inward_invoice.po_prev_adjusted_advance) rescue 0
+      if self.inward_invoice_params[:po_adjusted_advance_attributes][:value].to_i > possible_adjustment
+        add_message :error, "Error: Adjusted advance entered is more than the required Purchase Order advance.\n Maximum adjustment for this Invoice can be - \"#{possible_adjustment}\""
         return
       end
     else

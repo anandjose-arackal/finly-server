@@ -14,6 +14,7 @@ class ItemMaster::Item::Search < ItemMaster::Item::Base
   def init
     self.term = params[:term]
     params[:search] = params[:term]
+    params[:filter_active] = true
   end
 
   def process
