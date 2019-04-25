@@ -15,6 +15,7 @@
 #  expense_type_id           :integer
 #  with_receipt_amount_id    :integer
 #  without_receipt_amount_id :integer
+#  deleted_at                :datetime
 #
 
 # expense_type_id: contains details about whether the budget is scoped to a particular
@@ -113,13 +114,15 @@ class BudgetRule < ApplicationRecord
     rule_in_words += " Expenses"
     if self.period_id
       case self.period_id
-      when 1
+      when Period.id_for(:day)
         period = "day"
-      when 2
+      when Period.id_for(:week)
         period = "week"
-      when 3
+      when Period.id_for(:month)
         period = "month"
-      when 4
+      when Period.id_for(:quarter)
+        period = "quarter"
+      when Period.id_for(:year)
         period = "year"
       else
         period = ""

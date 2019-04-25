@@ -15,4 +15,9 @@ class Procure::InwardDocumentsController < ApplicationController
     @result = Procurements::InwardDocuments::Update.(current_user, params)
     respond
   end
+
+  def destroy
+    @result = Procurements::InwardDocuments::Destroy.(current_user, params)
+    respond
+  end
 end

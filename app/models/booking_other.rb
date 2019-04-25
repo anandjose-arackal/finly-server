@@ -12,6 +12,7 @@
 #  cost_id         :integer
 #  is_deleted      :boolean          default(FALSE)
 #  booking_id      :integer
+#  deleted_at      :datetime
 #
 
 class BookingOther < ApplicationRecord

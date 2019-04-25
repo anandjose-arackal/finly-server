@@ -29,6 +29,7 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #  account                :string(255)
 #  tax_rate_id            :integer
+#  deleted_at             :datetime
 #
 
 class PurchaseOrderItem < ApplicationRecord
@@ -38,15 +39,21 @@ class PurchaseOrderItem < ApplicationRecord
 
   belongs_to :tax_rate, optional: true
   belongs_to :purchase_order, optional: true
-  belongs_to :inventory_line_item, optional: true
+  belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :tax_amount, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount"
   belongs_to :total_amount, optional: true, class_name: "Amount"
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
+  belongs_to :department, optional: true
+  belongs_to :purchase_request_item, optional: true
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
+
+  # removing for now
+  # validates_presence_of :unit_of_measurement
+  validates_presence_of :department
 
   accepts_nested_attributes_for :tax_amount, :discount_amount,
                                 :total_amount
@@ -70,7 +77,7 @@ class PurchaseOrderItem < ApplicationRecord
   scope :with_budgetable_category_ids, -> (category_ids) {
     if category_ids.present?
       category_ids = [category_ids] unless category_ids.is_a?(Array)
-      ids = joins(:inventory_line_item).where("inventory_line_items.category_id IN (?)", category_ids).pluck('purchase_order_items.id')
+      ids = joins(:inventory_line_item).where("items.category_id IN (?)", category_ids).pluck('purchase_order_items.id')
       where(id: ids)
     end
   }

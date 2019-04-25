@@ -172,7 +172,7 @@ class Expense::Base < BaseOperation
       self.vehicle_rates = retrieve_vehicle_rates(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
-      self.cash_pockets = expense.user.user_pockets.non_bank_card_transfer_pockets
+      self.cash_pockets = expense.user.user_pockets.non_bank_card_transfer_pockets.active
     end
 
     def retrieve_vehicle_rates(expense)
@@ -201,7 +201,7 @@ class Expense::Base < BaseOperation
     def retrieve_violation
       violations = {blocking_present: false, warning_present: false, items: []}
       if expense.report_id and expense.report&.policy
-        violations = Report::Violation.(user, report: expense.report)
+        violations = Reports::Violation.(user, report: expense.report)
         items = violations[expense.id]
         # constructing the violation hash as required
         violations = {}

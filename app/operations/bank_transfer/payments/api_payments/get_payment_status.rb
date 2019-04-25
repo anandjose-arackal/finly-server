@@ -14,7 +14,14 @@ class BankTransfer::Payments::ApiPayments::GetPaymentStatus < BankTransfer::Paym
   def init
     id = params[:id] || params[:payment_id]
     payment_order_ids = ::PaymentOrder.with_company_id(user.company_id).pluck(:id)
-    self.payment = ::Payment.with_payment_order_id(payment_order_ids).find_by(id: id)
+    case params[:search_type]
+      when 'id'
+        self.payment = ::Payment.with_payment_order_id(payment_order_ids).find_by(id: id)
+      when 'external_id'
+        self.payment = ::Payment.with_payment_order_id(payment_order_ids).find_by(external_reference_id: id)
+      else
+        self.payment = ::Payment.with_payment_order_id(payment_order_ids).find_by(id: id)
+    end
   end
 
   def validate

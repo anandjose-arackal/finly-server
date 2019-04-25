@@ -1,6 +1,13 @@
 class Procurements::Invoices::Reject < Procurements::Invoices::Base
   attr_accessor :invoice, :procurement, :invoice_params
 
+  def pre_validate
+    if params[:note].blank?
+      add_message :error, "Please input a reason for rejection."
+      return
+    end
+  end
+
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.invoice = user.company.inward_invoices.find_by id: invoice_id
@@ -24,7 +31,8 @@ class Procurements::Invoices::Reject < Procurements::Invoices::Base
   end
 
   def post_process
-    Event::EInvoice::Reject.(user, invoice: invoice, workflow_output: workflow_output)
+    role_id = self.workflow_output[:role_id]
+    Event::EInvoice::Reject.(user, invoice: invoice, workflow_output: workflow_output, role_id: role_id)
     add_message :success, 'Successfully Rejected Invoice'
   end
 end

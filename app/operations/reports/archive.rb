@@ -1,0 +1,47 @@
+# params:
+# report_id: id of report that needs to be archived
+
+class Reports::Archive < Reports::Base
+
+  def authorized_user_types
+    [:employee]
+  end
+
+  def pre_validate
+    if user.blank? or params.blank?
+      messages[:error] << "No user or params passed."
+    end
+  end
+
+  def init
+    self.report = Report.find_by(id: params[:report_id])
+  end
+
+  def validate
+
+    # check if report can be archived at all
+    unless report.can_archive?
+      messages[:error] << "Repoert is still not completely processed to archive it."
+    end
+  end
+
+  def authorize
+    unless report
+      raise_unauthorized_exception
+    end
+    unless report.user_id == user.id
+      raise_unauthorized_exception
+    end
+  end
+
+  def process
+    unless report.update(archived: true)
+      messages[:error] << "Couldn't archive report. PLease try again."
+    end
+  end
+
+  def post_process
+    messages[:success] << "Expenses archived."
+  end
+
+end

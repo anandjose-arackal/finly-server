@@ -16,7 +16,7 @@ class SubmitReportTest < ActiveSupport::TestCase
 
     # report with amount < 1000
     Report.any_instance.stubs(:total_amount).returns(800)
-    submit_op = Report::Submit.new(@employee, {id: @report.id})
+    submit_op = Reports::Submit.new(@employee, {id: @report.id})
     assert_difference '@employee.reports.open.count', -1 do
       @result = submit_op.run
     end
@@ -29,7 +29,7 @@ class SubmitReportTest < ActiveSupport::TestCase
 
     # report with amount > 1000
     Report.any_instance.stubs(:total_amount).returns(1200)
-    submit_op = Report::Submit.new(@employee, {id: @report.id})
+    submit_op = Reports::Submit.new(@employee, {id: @report.id})
     assert_difference '@employee.reports.open.count', -1 do
       @result = submit_op.run
     end
@@ -40,7 +40,7 @@ class SubmitReportTest < ActiveSupport::TestCase
 
   test "cannot submit another user's report" do
     Report.any_instance.stubs(:user_id).returns(@second_employee.id)
-    submit_op = Report::Submit.new(@employee, {id: @report.id})
+    submit_op = Reports::Submit.new(@employee, {id: @report.id})
     begin
       @result = submit_op.run
     rescue NotAuthorizedException
@@ -56,7 +56,7 @@ class SubmitReportTest < ActiveSupport::TestCase
     Report.any_instance.stubs(:open?).returns(false)
     Report.any_instance.stubs(:retracted?).returns(false)
     Report.any_instance.stubs(:rejected?).returns(false)
-    submit_op = Report::Submit.new(@employee, {id: @report.id})
+    submit_op = Reports::Submit.new(@employee, {id: @report.id})
     assert_no_difference '@employee.reports.open.count' do
       @result = submit_op.run
     end
@@ -74,9 +74,9 @@ class SubmitReportTest < ActiveSupport::TestCase
       warning_messages[expense.id]['budget_warning'] = []
       warning_messages[expense.id]['budget_blocking'] = [{type: 'receipt', message: "Some shitty violation"}]
     end
-    Report::Violation.stubs(:call).returns(warning_messages)
+    Reports::Violation.stubs(:call).returns(warning_messages)
 
-    submit_op = Report::Submit.new(@employee, {id: @report.id})
+    submit_op = Reports::Submit.new(@employee, {id: @report.id})
     assert_no_difference '@employee.reports.open.count' do
       @result = submit_op.run
     end
@@ -94,10 +94,10 @@ class SubmitReportTest < ActiveSupport::TestCase
       warning_messages[expense.id]['budget_warning'] = [{type: 'receipt', message: "Some shitty violation"}]
       warning_messages[expense.id]['budget_blocking'] = []
     end
-    Report::Violation.stubs(:call).returns(warning_messages)
+    Reports::Violation.stubs(:call).returns(warning_messages)
 
     # report should go to processing state
-    submit_op = Report::Submit.new(@employee, {id: @report.id})
+    submit_op = Reports::Submit.new(@employee, {id: @report.id})
     assert_difference '@employee.reports.open.count', -1 do
       @result = submit_op.run
     end
@@ -107,7 +107,7 @@ class SubmitReportTest < ActiveSupport::TestCase
 
   test "cannot submit a report that's empty" do
     Report.any_instance.stubs(:expenses).returns([])
-    submit_op = Report::Submit.new(@employee, {id: @report.id})
+    submit_op = Reports::Submit.new(@employee, {id: @report.id})
     assert_no_difference '@employee.reports.open.count' do
       @result = submit_op.run
     end

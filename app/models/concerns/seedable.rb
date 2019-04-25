@@ -52,6 +52,10 @@ module Seedable
       as_hash
     end
 
+    def reload_to_simple_config
+
+    end
+
     # Generates a hash out of all the values in {name: id} format
     def as_hash
       values = HashInsensitive.new
@@ -75,13 +79,13 @@ module Seedable
 
   # Load all values of all variables in SimpleConfig
   def self.init_global_variables
-    unless Rails.env.production?
+    if Rails.env.development?
       Rails.application.eager_load!
     end
     seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
     values = {}
     seedable_classes.each do |seedable_class|
-      values[seedable_class.name] = seedable_class.as_hash
+      values[seedable_class.name] = seedable_class.as_hash rescue nil
     end
     SimpleConfig.for :application do
       set :seedable, values.with_indifferent_access

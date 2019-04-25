@@ -31,7 +31,14 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
     else
       unless self.payment_order.scheduled? || self.payment_order.pending?
         add_message :error, "Cannot be processed yet"
+        return
       end
+    end
+
+    if self.payment_order.bank_payment_request.blank?
+      add_message :error, "Invalid payment order, cannot be processed"
+      add_system_message :error, self.payment_order, "Invalid payment order, cannot be processed"
+      return
     end
   end
 
@@ -42,10 +49,37 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
   end
 
   def post_process
-    # add condition here that if the payment order has been successfully executed,
-    # mark the respective bank payment request also as credited
-    if payment_order.completed?
-      payment_order.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+    # mark the respective bank payment request as credited because it has been officially executed
+    unless payment_order.bank_payment_request&.status_id == BankPaymentRequestStatus.id_for(:credited)
+      payment_order.bank_payment_request&.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+      # Missing user payment initiating user information hence doing workflow manager's task manually
+      current_level = payment_order.bank_payment_request.level
+      if current_level.present?
+        # Update current dlrm with action
+        current_dlrms_taken_control = document.document_level_reviewer_mappings.with_level_id(current_level.id).where(taken_control: true).first rescue nil
+
+        if current_dlrms_taken_control.present?
+          taken_control_user = current_dlrms_taken_control.taken_control_by
+          current_dlrms_taken_control.update(action_id: TrailAction.id_for(:credit), action_taken_by_id: taken_control_user&.id)
+        else
+          current_dlrms = document.document_level_reviewer_mappings.with_level_id(current_level.id)
+
+          if current_dlrms.present?
+            current_dlrms.update_all(
+              action_id: TrailAction.id_for(:credit),
+              action_taken_by_id: current_dlrms.first&.reviewer_id
+            ) 
+          end
+        end
+
+        # Update next dlrms as active false
+        current_level_number = current_level.level_number
+        dlrms = document.document_level_reviewer_mappings.with_level_number_gt(current_level_number)
+
+        if dlrms.present?
+          dlrms.update_all(active: false)
+        end
+      end
     end
   end
 

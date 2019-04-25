@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+   <HEADER>
+      <TALLYREQUEST>Import Data</TALLYREQUEST>
+   </HEADER>
+   <BODY>
+      <IMPORTDATA>
+         <REQUESTDESC>
+            <REPORTNAME>Vouchers</REPORTNAME>
+            <STATICVARIABLES>
+               <SVCURRENTCOMPANY><%= html_escape configuration.company_name %></SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+         </REQUESTDESC>
+         <REQUESTDATA>
+            <TALLYMESSAGE xmlns:UDF="TallyUDF">
+            <% request = Personalizer::Adapters::Company137::Tally::TallyTemplate.generate_request_for expenses,configuration %>
+            <% if request.present? %>
+            <% request.each do |report_id, vouchers| %>
+            <% vouchers.each do |name, details| %>
+              <VOUCHER VCHTYPE="<%= name %>" ACTION="Create">
+                 <VOUCHERTYPENAME><%= name %></VOUCHERTYPENAME>
+                 <DATE><%= Date.today.strftime("%d.%m.%Y") %></DATE>
+                 <NARRATION><%= details[:narration] %></NARRATION>
+                 <EFFECTIVEDATE><%= Date.today.strftime("%d.%m.%Y") %></EFFECTIVEDATE>
+              <% details[:transactions].each do |ledger_name, amount| %>
+                 <ALLLEDGERENTRIES.LIST>
+                    <LEDGERNAME><%= html_escape ledger_name %></LEDGERNAME>
+                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                    <ISDEEMEDPOSITIVE><%= amount >= 0 ? 'No' : 'Yes' %></ISDEEMEDPOSITIVE>
+                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                    <AMOUNT><%= amount %></AMOUNT>
+                    <% if amount < 0 %>
+                    <CATEGORYALLOCATIONS.LIST>
+                      <CATEGORY>Primary Cost Category</CATEGORY>
+                      <ISDEEMEDPOSITIVE><%= amount >= 0 ? 'No' : 'Yes' %></ISDEEMEDPOSITIVE>
+                      <COSTCENTREALLOCATIONS.LIST>
+                        <NAME>SX GRU MUM F &amp; A</NAME>
+                        <AMOUNT><%= amount %></AMOUNT>
+                      </COSTCENTREALLOCATIONS.LIST>
+                    </CATEGORYALLOCATIONS.LIST>
+                    <% else %>
+                    <BILLALLOCATIONS.LIST>
+                       <NAME><%= amount %></NAME>
+                       <BILLTYPE>New Ref</BILLTYPE>
+                       <TDSDEDUCTEEISSPECIALRATE>No</TDSDEDUCTEEISSPECIALRATE>
+                       <AMOUNT><%= amount %></AMOUNT>
+                       <INTERESTCOLLECTION.LIST>
+                       </INTERESTCOLLECTION.LIST>
+                       <STBILLCATEGORIES.LIST>
+                       </STBILLCATEGORIES.LIST>
+                    </BILLALLOCATIONS.LIST>
+                    <% end %>
+                 </ALLLEDGERENTRIES.LIST>
+              <% end %>
+              </VOUCHER>
+            <% end %>
+            <% end %>
+            <% end %>
+
+
+            </TALLYMESSAGE>
+         </REQUESTDATA>
+      </IMPORTDATA>
+   </BODY>
+</ENVELOPE>

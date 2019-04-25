@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::Base < BaseOperation
 
-  attr_accessor :initiating_account
+  attr_accessor :initiating_account, :role_id
 
   def authorized_user_types
     [:vendor_payments_admin, :vendor_payments_reviewer, :vendor_payments_creditor, :vendor_payments_initiator, :auditor]
@@ -13,6 +13,7 @@ class BankTransfer::PaymentRequest::Base < BaseOperation
 
   def init
     super
+    self.role_id = params[:role_id]
   end
 
   def retrieve_initiating_account

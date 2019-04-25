@@ -20,6 +20,7 @@
 #
 
 class Category < ApplicationRecord
+  include AncestrySupport
   has_ancestry
 
   belongs_to :company, optional: true
@@ -30,7 +31,7 @@ class Category < ApplicationRecord
   has_many :budgets, through: :budget_criteria_mappings
 
   validates :company_id, presence: true
-  validates :name, presence: true, uniqueness: {scope: :company_id}
+  validates :name, presence: true, uniqueness: {scope: [:company_id, :ancestry]}
   # validate :at_least_one_application
 
   default_scope { order(name: :asc) }

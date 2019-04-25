@@ -3,9 +3,10 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation
+                :headers, :contents, :validate_operation, :policy_id, :policy
 
   def pre_validate
+    Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"
     if user.blank?
       add_message :error, 'User not found'
       return
@@ -14,20 +15,47 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
       add_message :error, 'Error loading file. File not uploaded correctly'
       return
     end
+    unless params[:policy_id].present?
+        add_message :error, 'Policy cannot be blank'
+        return
+    end
+
+    unless params[:scheduled_at].present?
+      add_message :error, 'Please specify a scheduled date for your payment ticket.'
+      return
+    end
+
+    valid_date = Date.parse(params[:scheduled_at]) rescue false 
+    unless valid_date
+        add_message :error, 'Invalid date provided'
+        return
+    end
+
+    unless (Date.parse(params[:scheduled_at]) >= Date.today)
+      add_message :error, 'Cannot create back dated payment tickets'
+      return
+    end
   end
 
   def init
+    Rails.logger.fatal "FROM BulkCreateFromFile start of init,\n #{params.inspect}"
     self.file = params[:file]
-    headers = [:name, :bank_account_number, :ifsc, :original_amount,
+    headers = [:name, :business_name, :bank_account_number, :ifsc, :original_amount,
                :inclusive_of_taxes, :gst_type_id, :tax, :discount, :tds_slab_id, :category_id, :cost_center_id, :department_id, :invoice_number, :invoice_date, :due_date, :note]
     payment_order_custom_fields = current_company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
     payment_order_custom_fields.each do |field|
       headers << field.field_name.gsub(" ", "_").underscore
     end
-    self.parsed_data = ImportUtil.load_spreadsheet(file, headers,
-                                                   {skip_empty_lines: true})
+    begin
+      self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
+    rescue Ole::Storage::FormatError => e
+      add_message :error, "File Format error. Please re-save your Excel sheet in 2003 format or greater."
+    end
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]
+    Rails.logger.fatal "FROM BulkCreateFromFile end of init,\n #{params.inspect}"
+    self.policy_id = params[:policy_id]
+    self.policy = current_company.policies.find_by(id: self.policy_id)
   end
 
   def validate
@@ -36,7 +64,18 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
       return
     end
 
+    if self.policy.blank?
+      add_message :error, "Policy not found."
+      return
+    end
+
+    if self.payment_mode.blank?
+      add_message :error, "Payment mode cannot be blank"
+      return
+    end
+
     self.validate_operation = BankTransfer::PaymentRequest::BulkValidateFileData.(user, {order_details: self.parsed_data})
+    Rails.logger.fatal "FROM BulkCreateFromFile validate_operation,\n #{validate_operation.inspect}"
     if validate_operation.success?
       self.requested_amount = validate_operation.requested_amount
     else
@@ -53,9 +92,21 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     self.bank_payment_request_params = parse_payment_order_data
     self.bank_payment_request = BankPaymentRequest.create(self.bank_payment_request_params)
 
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+    params[:reviewal_document] = self.bank_payment_request.reload
+
+    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+    unless document_reviewer_mappings_op.success?
+      self.bank_payment_request.destroy
+      add_message :error, document_reviewer_mappings_op.messages[:error]
+      return
+    end
+
     # now pass this particular bank payment request and the payments data to the
     # background operation where it will continue creating payments till the data is exhausted
-    op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+    op = BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
     # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
   end
@@ -98,7 +149,6 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   private
 
   def parse_payment_order_data
-    policy = user.enforce_policy_enabled? ? user.policies.non_default.first : user.policies.default.first
     payment_order_attributes = {
         initiating_user_id: user.id,
         payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
@@ -108,6 +158,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             currency_id: 1
         },
         payment_mode: self.payment_mode,
+        scheduled_at: params[:scheduled_at],
         initiating_account_type: YesBankCompanyAccount.name,
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
@@ -118,13 +169,13 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     bpr_attributes = {
         owner_id: user.id,
         status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
-        controlling_user_id: user.id,
+        # controlling_user_id: user.id,
         requested_amount_attributes: {
             value: self.requested_amount,
             currency_id: 1
         },
         beneficiary_type_id: 2,
-        policy_id: policy&.id,
+        policy_id: self.policy_id,
         payment_order_attributes: payment_order_attributes,
         api_initiated: false
     }

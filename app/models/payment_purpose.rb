@@ -51,7 +51,12 @@ class PaymentPurpose < ApplicationRecord
         :opening_balance_load,
         :collect_funds_withdrawal,
         :settlement_against_advance,
-        :advance_against_purchase_order
+        :advance_against_purchase_order,
+        :account_number_check
     ]
+  end
+
+  def collect_funds_withdrawal?
+    self.id == PaymentPurpose.id_for(:collect_funds_withdrawal)
   end
 end

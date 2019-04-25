@@ -32,12 +32,29 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
     if bank_payment_requests.empty?
       add_message :error, "Payment orders not found"
     end
+
+    accept_bpr = []
+    self.bank_payment_requests.each do |bank_payment_request|
+      valid = (bank_payment_request.can_really_approve?) ? true : false
+
+      if valid
+        accept_bpr << bank_payment_request.id
+      end
+    end
+ 
+    self.bank_payment_requests = self.bank_payment_requests.where(id: accept_bpr)
+
+    if self.bank_payment_requests.blank?
+      add_message :error, "None of the payment tickets are in a state to be apporved."
+      return
+    end
   end
 
   def process
     # update the status of all payment orders as pending
     self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
-    ids = self.bank_payment_requests.pluck(:id)
+    # ids = self.bank_payment_requests.pluck(:id)
+    ids = self.bank_payment_requests.map { |b| b[:id] }
     BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
     # op = BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user_id: user.id)
   end

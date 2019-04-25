@@ -24,8 +24,12 @@ class Admin::Companies::Base < Admin::Base
                                       :payroll_card_enabled,
                                       :invoicing_system,
                                       :em_tax_tracking,
-                                      :procurement
-                                    ])
+                                      :procurement,
+                                      :travel_request,
+                                      :budgeting_system,
+                                      :invoicing_system,
+                                      :vendor_empanelment_workflow
+    ])
   end
 
   def success

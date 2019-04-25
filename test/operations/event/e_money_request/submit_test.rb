@@ -15,7 +15,7 @@ class SubmitTest < ActiveSupport::TestCase
     @money_request.stubs(:controlling_user).returns(@manager)
 
     response = nil
-    event = Event::EMoneyRequest::Submit.new(@owner, money_request: @money_request)
+    event = Event::EMoneyRequests::Submit.new(@owner, money_request: @money_request)
     # Ensure 2 mailers have been triggered
     assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',2 do
       response = event.run
@@ -32,7 +32,7 @@ class SubmitTest < ActiveSupport::TestCase
     @money_request.stubs(:controlling_user).returns(nil)
 
     response = nil
-    event = Event::EMoneyRequest::Submit.new(@owner, money_request: @money_request)
+    event = Event::EMoneyRequests::Submit.new(@owner, money_request: @money_request)
     # Ensure 1 mailer have been triggered
     assert_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size',1 do
       response = event.run
@@ -47,7 +47,7 @@ class SubmitTest < ActiveSupport::TestCase
 
   test 'behavior when money_request is not sent' do
     response = nil
-    event = Event::EMoneyRequest::Submit.new(@owner)
+    event = Event::EMoneyRequests::Submit.new(@owner)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -56,7 +56,7 @@ class SubmitTest < ActiveSupport::TestCase
 
   test 'behavior when current user is not sent' do
     response = nil
-    event = Event::EMoneyRequest::Submit.new(nil, money_request: @money_request)
+    event = Event::EMoneyRequests::Submit.new(nil, money_request: @money_request)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end
@@ -65,7 +65,7 @@ class SubmitTest < ActiveSupport::TestCase
 
   test 'behavior when current user is not sent and money_request is not sent ' do
     response = nil
-    event = Event::EMoneyRequest::Submit.new(nil, money_request: nil)
+    event = Event::EMoneyRequests::Submit.new(nil, money_request: nil)
     assert_no_difference 'Sidekiq::Extensions::DelayedMailer.jobs.size' do
       response = event.run
     end

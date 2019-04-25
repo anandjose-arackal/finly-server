@@ -32,7 +32,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     end
     op = BankTransfer::PaymentRequest::Index.(user, params)
     if op.success?
-      self.payment_requests = op.payment_requests.with_id(ids)
+      self.payment_requests = op.payment_requests.with_id(ids).includes_details
     else
       add_message :error, op.messages[:error]
     end
@@ -75,7 +75,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
         hash[:selectable] = false
       else
         # check if the payment request can be credited by the selecting user
-        if (payment_request.controlling_user_id == user.id) || (user.vendor_payments_admin? && payment_request.approved?)
+        # if (payment_request.controlling_user_id == user.id) || (user.vendor_payments_admin? && payment_request.approved?)
+        if (payment_request.get_reviewers.include?(user) && !payment_request.open? && !payment_request.retracted? && !payment_request.rejected?) || (user.vendor_payments_admin? && payment_request.approved?) || (payment_request.document_role_users(:creditor).include?(user) && (payment_request.approved? || payment_request.auto_approved?))
           if hash[:allowed]
             self.processable_amount += payment_request.payment_order.amount_requested&.value
           else
@@ -87,6 +88,22 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           errors << "You can only credit payment orders which are awaiting your approval or have already been approved"
           hash[:selectable] = false
           self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
+        end
+
+        if self.user.vendor_payments_creditor? && !self.user.vendor_payments_admin?
+          minimum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.min_amount
+          maximum = payment_request.policy.policy_user_roles.with_user_id(self.user).with_role_id(UserRole.id_for(:creditor)).first.max_amount || 999999999999999999999999
+
+          max_payment_value = payment_request.payments.joins(:amount).pluck(:amount).max || 0
+          if  max_payment_value > maximum
+            hash[:selectable] = false
+            self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
+            errors << "You are not eligible to credit the payment order, you are eligible to credit only upto #{maximum}"
+          elsif max_payment_value < minimum
+            hash[:selectable] = false
+            self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
+            errors << "You are not eligible to credit the payment order, you are eligible to credit only greater than #{minimum}"
+          end
         end
       end
 
@@ -121,7 +138,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     params[:scheduled_amount] = self.scheduled_amount
     params[:source_account_balance] = self.source_account_balance
     params[:wallet_balance] = self.wallet_adapter.balance
-    params[:company_credits_balance] = self.company_credits_adapter.balance
+    params[:company_credits_balance] = self.company_credits_adapter.balance(payment_process: true)
     BankTransfer::PaymentRequest::Review::BulkCreditValidate::BulkCreditValidationPresenter.new(user, params, messages)
   end
 

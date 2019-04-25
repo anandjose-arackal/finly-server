@@ -8,16 +8,16 @@ class ExportController < ApplicationController
   def report
     respond_to do |format|
       format.csv {
-        @report = Export::Report::AsCsv.(current_user, params)
+        @report = Export::Reports::AsCsv.(current_user, params)
         send_data @report.data, filename: "#{@report.report_names}.csv"
       }
       format.xls {
-        @report = Export::Report::AsXml.(current_user, params)
+        @report = Export::Reports::AsXml.(current_user, params)
         @header = @report.header
         @data = @report.data
       }
       format.pdf {
-        op = Report::ExportHandler.(current_user, params)
+        op = Reports::ExportHandler.(current_user, params)
         local_variables = op.local_variables
         template = op.template
         local_variables[:op] = op
@@ -25,7 +25,7 @@ class ExportController < ApplicationController
         @result.render(self)
       }
       format.zip {
-        @result = Export::Report::WithReceipts.(current_user, params)
+        @result = Export::Reports::WithReceipts.(current_user, params)
         if @result.success?
           @result.render self
         else
@@ -80,6 +80,20 @@ class ExportController < ApplicationController
       }
       format.pdf {
         # todo - need to create view for this
+      }
+    end
+  end
+
+  def money_request
+    respond_to do |format|
+      format.csv {
+        @money_request = Export::MoneyRequest::AsCsv.(current_user, params)
+        send_data @money_request.data, filename: "#{@money_request.money_request_name}.csv"
+      }
+      format.xls {
+        @money_request = Export::MoneyRequest::AsXml.(current_user, params)
+        @header = @money_request.header
+        @data = @money_request.data
       }
     end
   end

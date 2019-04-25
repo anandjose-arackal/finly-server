@@ -10,6 +10,7 @@
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  is_deleted  :boolean          default(FALSE), not null
+#  deleted_at  :datetime
 #
 
 class TaxRate < ApplicationRecord
@@ -26,6 +27,7 @@ class TaxRate < ApplicationRecord
         name: self.name,
         rate: self.rate,
         internal_id: self.internal_id,
+        display_name: "#{self.name} - #{self.rate}"
     }
   end
 end

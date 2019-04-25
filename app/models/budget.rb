@@ -20,10 +20,11 @@
 #  payment          :boolean
 #  expense          :boolean
 #  ancestry         :string(255)
+#  deleted_at       :datetime
 #
 
 class Budget < ApplicationRecord
-  include SoftDeletable
+  include SoftDeletable, AncestrySupport
 
   has_ancestry
   has_many :budget_children, class_name: 'Budget', foreign_key: 'ancestry'
@@ -52,6 +53,8 @@ class Budget < ApplicationRecord
   validates :name, presence: true
   validates :start_date, presence: true
   validates :end_date, presence: true
+
+  after_update :recalculate_parent_budget
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
@@ -202,5 +205,26 @@ class Budget < ApplicationRecord
                  ]
              ])
   }
+
+  def validate_if_owner?(user)
+    self.user_id == user.id
+  end
+
+  def validate_of_manager?(user)
+    user.is_budget_manager?
+  end
+
+  def validate_if_admin?(user)
+    user.admin? || user.vp_admin_or_auditor?
+  end
+
+  private
+
+  def recalculate_parent_budget
+    if self.parent.present?
+      sum_children = self.parent.children.joins(:budget_amount).sum(:value)
+      self.parent.budget_amount.update(value: sum_children)
+    end
+  end
 
 end

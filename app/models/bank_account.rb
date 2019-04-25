@@ -21,6 +21,8 @@
 #  default_account    :boolean          default(FALSE)
 #  is_deleted         :boolean          default(FALSE)
 #  disabled           :boolean          default(FALSE)
+#  deleted_at         :datetime
+#  on_hold            :boolean          default(FALSE)
 #
 
 class BankAccount < ApplicationRecord
@@ -29,12 +31,15 @@ class BankAccount < ApplicationRecord
 
   belongs_to :account_owner, optional: true, polymorphic: true
 
+  belongs_to :purchase_order, optional: true
+
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
 
-  validates :account_number, presence: true #, format: Constants::VALID_BANK_ACCOUNT
+  validates :account_number, presence: true, format: Constants::VALID_BANK_ACCOUNT
   validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
+  validate :valid_bank_account
 
   accepts_nested_attributes_for :account_owner
 
@@ -118,6 +123,17 @@ class BankAccount < ApplicationRecord
         name: name,
         default_account: default_account
     }
+  end
+
+  private
+
+  def valid_bank_account
+    pattern = Regexp.new(Constants::VALID_BANK_ACCOUNT)
+    return if self.persisted?
+    unless self.account_number =~ pattern && !self.persisted?
+      errors.add(:account_number, "is not valid")
+      return false
+    end
   end
 
 end

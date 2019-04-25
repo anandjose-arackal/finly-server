@@ -28,6 +28,13 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
   def init
     self.order_data = params[:payment_order]
+    self.policy_id = params[:policy_id]
+
+    unless user.company.policies.with_application("vp").pluck(:id).include?(self.policy_id.to_i)
+      add_message :error, "This policy does not belong to your company"
+      return
+    end
+
     op = BankTransfer::PaymentRequest::Process.(user, scheduled_at: params[:scheduled_at],
                                                 payment_order: self.order_data,
                                                 policy_id: params[:policy_id])
@@ -110,6 +117,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       add_message :error, bank_payment_request.errors.full_messages
       return
     end
+
     self.bank_payment_request.payment_order.payments.each_with_index do |payment, index|
       payment_params = request_params[:payment_order_attributes][:payments_attributes][index]
       calculate_tax_and_discounts(payment_params, payment)
@@ -118,9 +126,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
         inv_attachment.update(invoice_id: payment.invoice.id)
       end
     end
-  end
 
-  def post_process
     # if there are unauthorized vendors, mandate an approval flow
     authorized = []
     self.bank_payment_request.payment_order.payments.each do |payment|
@@ -136,6 +142,20 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
     # update the requested amount for this payment order
     self.bank_payment_request.payment_order.update_requested_amount
+
+    # Create Document Level Reviewer Mapping
+    # For setting level specific reviewers from reviewal chain for a document
+    params[:reviewal_document] = self.bank_payment_request.reload
+
+    document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+    unless document_reviewer_mappings_op.success?
+      add_message :error, document_reviewer_mappings_op.messages[:error]
+      return
+    end
+  end
+
+  def post_process
+    self.bank_payment_request.trails.create action_user: user, action_id: TrailAction.id_for(:create)
 
     add_message :success, "Payment Request created successfully!"
   end
@@ -247,6 +267,9 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
         end
       end
       bank_account = retrieve_bank_account order_details
+      beneficiary_payment = retrieve_beneficiary_payment(order_details, bank_account)
+      order_details[:date] = order_details[:invoice_date] || order_details[:date]
+      order_details[:due_date] = order_details[:invoice_due_date] || order_details[:due_date]
       p[:payment_order_attributes][:payments_attributes] << {
           payment_type_id: PaymentType.id_for(:credit),
           application: RequestStore.store[:current_app],
@@ -271,6 +294,9 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
           category_id: order_details[:category_id],
           department_id: order_details[:department_id],
           date: DateUtils.local_date,
+          beneficiary_payment_id: beneficiary_payment.id,
+          parent_type: beneficiary_payment.class.name,
+          parent_id: beneficiary_payment.id,
           invoice_attributes: {
               invoice_number: order_details[:invoice_number],
               date: order_details[:invoice_date],
@@ -288,6 +314,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               cost_center_id: order_details[:cost_center_id],
               tds_slab_id: order_details[:tds_slab_id],
               invoice_type_id: order_details[:invoice_type_id],
+              receiving_account_type: "BankAccount",
+              receiving_account_id: bank_account.id,
               original_amount_attributes: {
                   value: order_details[:original_amount],
                   currency_id: 1
@@ -357,6 +385,47 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       InvoiceCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
       payment.save
     end
+  end
+
+  # to accommodate the new structure
+  def retrieve_beneficiary_payment(payment, bank_account)
+    # bp = BeneficiaryPayment.create(name:)
+    vendor_id = bank_account.account_owner_id
+    bank_account_id = bank_account.id
+
+
+    bp_params = beneficiary_payment_params(payment, vendor_id, bank_account_id)
+    bp = BeneficiaryPayment.new(bp_params)
+    bp.calculate_tax_and_amount
+    bp.save
+    return bp
+  end
+
+  def beneficiary_payment_params(payment, vendor_id, bank_account_id)
+    payment[:date] = payment[:invoice_date] || payment[:date]
+    payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
+    {
+        name: payment[:name],
+        vendor_id: vendor_id,
+        bank_account_id: bank_account_id,
+        category_id: payment[:category_id],
+        cost_center_id: payment[:cost_center_id],
+        department_id: payment[:department_id],
+        sub_department_id: payment[:sub_department_id],
+        company_id: self.company_id,
+        gst_type_id: payment[:gst_type_id],
+        tds_slab_id: payment[:tds_slab_id],
+        status_id: BeneficiaryPaymentStatus.id_for(:pending),
+        inclusive_of_taxes: StringUtils.to_bool(payment[:inclusive_of_taxes]),
+        tax: payment[:tax],
+        original_amount_attributes: {
+            value: payment[:original_amount],
+            currency_id: Currency.first.id
+        },
+        invoice_number: payment[:invoice_number],
+        invoice_date: payment[:date],
+        invoice_due_date: payment[:due_date]
+    }
   end
 
 end

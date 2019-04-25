@@ -83,7 +83,7 @@ class User < ApplicationRecord
   has_many :receipts, dependent: :destroy
   has_many :receipt_emails, dependent: :destroy
   has_many :policy_user_mappings, dependent: :destroy
-  has_many :policies, through: :policy_user_mappings, dependent: :destroy
+  has_many :policies,-> { where(:'policy_user_mappings.deleted_at' => nil)}, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
   has_many :reports, inverse_of: :user, dependent: :destroy
@@ -94,6 +94,7 @@ class User < ApplicationRecord
   has_many :manager_reports, -> { distinct }, source: :report, through: :manager_report_tracks
   has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
+  has_many :policy_user_roles
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment'
@@ -181,12 +182,19 @@ class User < ApplicationRecord
   has_many :purchase_order_templates, -> { filter_resource_type(:purchase_orders) }, class_name: 'ResourceTemplate', foreign_key: :user_id
   has_many :invoice_templates, -> { filter_resource_type(:invoices) }, class_name: 'ResourceTemplate', foreign_key: :user_id
 
+  # Inward Invoices
+  has_many :inward_invoices, class_name: "Invoice", foreign_key: :created_by_user_id
+
   has_many :user_department_mappings
   has_many :departments, through: :user_department_mappings
 
   # adding a many to many association for user and his/her delegates
   has_many :user_delegate_mappings
   has_many :delegated_for_users, class_name: "User", through: :user_delegate_mappings, source: :delegate_for_user
+
+  # P2P Documents
+  has_many :purchase_orders
+  has_many :purchase_requests, foreign_key: :creator_id
 
   # Budgets
 
@@ -198,7 +206,10 @@ class User < ApplicationRecord
 
   has_many :procurements
   has_many :level_reviewer_mappings
+  has_many :level_user_reviewer_mappings
+  alias_method :lurms, :level_user_reviewer_mappings
   has_many :procurement_attachments
+  has_many :attachments, foreign_key: :creator_id
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
@@ -209,6 +220,10 @@ class User < ApplicationRecord
 
   has_many :user_branch_location_mappings
   has_many :branch_locations, through: :user_branch_location_mappings
+
+  has_many :rate_contracts, foreign_key: :creator_id
+
+  has_many :vendors, class_name: "YesBankVendor", foreign_key: :created_by_id
 
   # has_one :feature_access, as: :accessible
 
@@ -225,8 +240,8 @@ class User < ApplicationRecord
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
-  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
-  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
   validates :user_panel_subscription, presence: true
@@ -235,7 +250,6 @@ class User < ApplicationRecord
   scope :with_id_or_email_or_mobile_number, -> (string) {
     ids = where('users.id = ? OR users.email = ? OR users.mobile_number = ?', string, string, string).pluck('users.id')
     where id: ids
-
   }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :without_id, ->(user_id) { where.not id: user_id }
@@ -249,9 +263,30 @@ class User < ApplicationRecord
   scope :only_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
+
   scope :filter_vendor_payments_reviewers, -> (flag) {
     # passed argument is only for has scope, no effect here
     with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))
+  }
+
+  # Use only for has_scope filter, scope to policy_user_roles
+  scope :policy_id, -> (policy_id) {
+     where('policy_user_roles.policy_id = ?', policy_id )
+  }
+
+  scope :reviewer_type, -> (type) {
+    case type
+    when 'PurchaseOrderProvider', :PurchaseOrderProvider
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:purchase_order_reviewer)).distinct
+    when 'InvoiceProvider', :InvoiceProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
+    when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
+    end
+  }
+
+  scope :filter_em_reviewers, -> (flag) {
+    with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management))
   }
   scope :only_finance_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:expense_management)) }
   scope :only_vendor_payment_creditors, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments)) }
@@ -496,6 +531,170 @@ class User < ApplicationRecord
     includes(:cards, :company)
   }
 
+  # Gives list of user who are not part of a policy as finance manager
+  scope :filter_unassigned_finance_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:finance_manager)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_travel_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:travel_manager)).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_members_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+
+    if policy.present?
+      user_ids = policy.user_mapping.non_deleted.pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
+
+  # Gives list of user who are not part of a policy as travel manager
+  scope :filter_unassigned_creditor_for_policy, -> (policy_id){
+    policy = Policy.find_by id: policy_id
+
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy.id).with_role_id(UserRole.id_for(:creditor)).pluck(:user_id)
+      without_id(user_ids)
+    end
+
+  }
+
+  scope :with_policy_user_roles, -> {
+    joins(:policy_user_roles)
+  }
+
+  scope :filter_unassigned_purchase_order_initiator_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:purchase_order_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_purchase_order_reviewer_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:purchase_order_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_goods_receiver_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:goods_receiver)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_invoice_initiator_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:invoice_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_invoice_reviewer_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:invoice_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_bank_payment_request_initiator_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:bank_payment_request_initiator)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_bank_payment_request_reviewer_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:bank_payment_request_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_bank_payment_request_creditor_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:bank_payment_request_creditor)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_item_master_manager_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:item_master_manager)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_vendor_creator_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:vendor_creator)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_vendor_reviewer_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:vendor_reviewer)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_vendor_manager_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:vendor_manager)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_budget_manager_for_policy, -> (policy_id){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:budget_manager)).pluck(:user_id)
+      without_id(user_ids)
+    end     
+  }
+
+  scope :filter_unassigned_non_po_initiator_for_policy, -> (policy_id){
+    # policy = Policy.find_by_id policy_id
+    # if policy.present?
+    #   user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_initiator)).pluck(:user_id)
+    #   without_id(user_ids)
+    # end
+    role_ids = [UserRole.id_for(:non_po_initiator)]
+    filter_unassigned_roles_for_policy(policy_id, role_ids)    
+  }
+
+  scope :filter_unassigned_roles_for_policy, -> (policy_id, role_ids){
+    policy = Policy.find_by_id policy_id
+    if policy.present?
+      user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id([role_ids]).pluck(:user_id)
+      without_id(user_ids)
+    end
+  }
 
   before_save :strip_whitespace
 
@@ -626,13 +825,17 @@ class User < ApplicationRecord
     self.role_mapping.vendor_payments.manager.present?
   end
 
+  def vendor_payments_auditor?
+    self.role_mapping.vendor_payments.auditor.present?
+  end
+
   alias_method :vendor_payments_manager?, :vendor_payment_manager?
 
   alias_method :vendor_payment_reviewer?, :vendor_payment_manager?
   alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
 
   def vendor_payment_finance?
-    self.role_mapping.vendor_payments.finance_manager.present?
+    self.role_mapping.vendor_payments.creditor.present?
   end
 
   alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
@@ -752,6 +955,14 @@ class User < ApplicationRecord
         name: name,
         email: email,
         mobile_number: mobile_number
+    }
+  end
+
+  def json_for_trail(options = {})
+    {
+        id: id,
+        name: name,
+        email: email
     }
   end
 
@@ -917,6 +1128,123 @@ class User < ApplicationRecord
 
   def current_user
     RequestStore.store[:current_user]
+  end
+
+  def has_policy_role?(role_id, document=nil)
+    if document.present?
+      policy = Policy.with_company_id(self.company_id).find_by_id document.policy_id
+      data = policy.policy_user_roles.where(user_id: self.id, user_role_id: role_id) rescue nil
+    else
+      if self.enforce_policy_enabled?
+        data = self.company.policies.exclude_deleted.where.not(default: true).joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+      else
+        data = self.company.policies.exclude_deleted.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+      end
+    end
+    data.present?
+  end
+
+  # ********** User Roles for Vendor Payments ******************
+
+  def is_vendor_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_manager), document)
+  end
+
+  def is_vendor_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_creator), document)
+  end
+
+  def is_vendor_creator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_creator), document)
+  end
+
+  def is_vendor_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:vendor_reviewer), document)
+  end
+
+  def is_item_master_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:item_master_manager), document)
+  end
+
+  def is_purchase_order_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_order_initiator), document)
+  end
+
+  def is_purchase_order_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
+  end
+
+  def is_purchase_request_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_request_initiator), document)
+  end
+
+  def is_purchase_request_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
+  end
+
+  def is_bank_payment_request_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), document)
+  end
+
+  def is_bank_payment_request_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), document)
+  end
+
+  def is_bank_payment_request_creditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), document)
+  end
+
+  def is_invoice_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:invoice_initiator), document)
+  end
+
+  def is_invoice_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:invoice_reviewer), document)
+  end
+
+  def is_budget_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:budget_manager), document)
+  end
+
+  def is_goods_receiver?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:goods_receiver), document)
+  end
+
+  def is_inventory_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
+  end
+
+  # ************ User Role for vendor payments ******************
+
+  def relevant
+    {
+      email: self.email,
+      company_id: self.company_id
+    }
+  end
+
+  def initiator_for_any_document?
+    self.is_purchase_order_initiator? || self.is_invoice_initiator? || self.is_bank_payment_request_initiator? || self.is_item_master_manager? || self.is_vendor_initiator? || self.vendor_payments_admin?
+  end
+
+  def vp_admin_or_auditor?
+    self.vendor_payments_admin? || self.vendor_payments_auditor?
+  end
+
+  def policy_admin_or_auditor?
+    self.has_policy_role?(UserRole.id_for(:policy_admin)) || self.has_policy_role?(UserRole.id_for(:policy_auditor))
+  end
+
+  # locations associated with policies to which users are associated as initiator role
+  def initiator_associated_locations(role_id)
+    location_ids = company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ?', role_id).joins(:policy_location_mappings).pluck('policy_location_mappings.location_id')
+    return company.locations.with_ids(location_ids)
+  end
+
+  # departments associated with policies to which users are associated as initiator role
+  def initiator_associated_departments(role_id)
+    department_ids = company.policies.joins(:policy_user_roles).where('policy_user_roles.user_role_id = ?', role_id).joins(:policy_department_mappings).pluck('policy_department_mappings.department_id')
+    return company.departments.with_ids(department_ids)
   end
 
   private

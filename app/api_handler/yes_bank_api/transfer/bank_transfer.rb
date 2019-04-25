@@ -10,6 +10,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   def initialize(params)
     self.transfer_request = params[:transfer_request]
     self.payment = params[:payment]
+    self.bank_transaction = params[:bank_transaction]
     self.params = {}
   end
 
@@ -45,12 +46,14 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def init
-    self.company_id = self.payment.payment_order.company_id
+    self.company_id = self.payment&.payment_order&.company_id || self.bank_transaction.company_id
     super()
-    self.account = payment.receiving_account
+    self.account = payment&.receiving_account
     # extracting contact email and mobile number
-    self.beneficiary_email = self.account.account_owner.email
-    self.beneficiary_mobile_number = self.account.account_owner.mobile_number
+    unless self.account&.account_owner&.is_a?(Company)
+      self.beneficiary_email = self.account&.account_owner&.email
+      self.beneficiary_mobile_number = self.account&.account_owner&.mobile_number
+    end
     set_xml_params
   end
 
@@ -97,6 +100,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
         self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
         self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
+        self.transfer_request.beneficiary_full_name = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("nameWithBeneficiaryBank")
         if self.transfer_request.bank_reference_number.present?
           if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
             self.transfer_status_id = BankTransferStatus.id_for(:completed)
@@ -109,18 +113,19 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     end
     # create the bank transaction right here
     self.company = Company.find_by(id: self.transfer_request.company_id)
-    if self.payment&.reference_resource&.is_a?(BankTransaction)
+    if self.payment&.reference_resource&.is_a?(BankTransaction) || self.bank_transaction.present?
       # just update the bank transaction with the latest details
-      self.bank_transaction = payment.reference_resource
+      self.bank_transaction = self.bank_transaction || payment.reference_resource
       self.bank_transaction.update(
                           bank_reference_number: self.transfer_request.bank_reference_number,
                           transfer_status_id: self.transfer_status_id,
-                          bank_response: self.transfer_request.transaction_result
+                          bank_response: self.transfer_request.transaction_result,
+                          beneficiary_full_name: self.transfer_request.beneficiary_full_name
       )
-      self.payment.retry_count += 1
+      self.payment&.update(retry_count: self.payment.retry_count.to_f + 1)
     else
       # this is an anomaly, so send email and flag it
-      Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
+      Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
     end
   end
 

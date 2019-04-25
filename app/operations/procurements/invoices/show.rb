@@ -7,9 +7,8 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
   end
 
   def validate
-    unless self.invoice.present?
-      add_message :error, 'Invoice not found'
-    end
+    return if record_not_present
+    validate_document_access
   end
 
   def success
@@ -19,25 +18,32 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
   class Procurements::Invoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice, :actions, :departments, :sub_departments, :cost_centers, :reviewal_chains, :policies,
-                  :tax_rates, :locations, :budgets
+                  :tax_rates, :locations, :budgets, :gstin_locations
 
     def init
       self.invoice = params[:invoice]
-      self.departments = user.company.departments.roots
+      # self.departments = user.company.departments.roots
+      # self.departments = user.company.departments
 
-      self.locations = user.company.locations
-      if invoice.created_by.departments.present?
+      # self.locations = user.company.locations
+      params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
+      self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
+      self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+
+      if invoice.created_by&.departments.present?
         self.sub_departments = invoice.created_by.departments.only_sub_departments
       else
         self.sub_departments = invoice.created_by.company.departments.only_sub_departments
       end
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
+      self.gstin_locations = self.invoice.vendor&.gstin_locations
 
-      policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
-      self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      # policy_ids = invoice.created_by.policy_user_mappings.exclude_deleted.pluck(:policy_id)
+      # self.policies = user.company.policies.with_id(policy_ids).with_application(:vp)
+      # params[:filter_role_id] = [UserRole.id_for(:invoice_initiator)]
+      self.policies = Policy::VendorPayments::Index.(invoice.created_by, params).policies rescue Invoice.none
 
-      self.reviewal_chains = []
 
       self.actions = get_actions
 
@@ -48,16 +54,19 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
         end
       end
 
-      params[:reviewal_document] = invoice
+      if self.invoice.created_by_user_id == user.id && Invoice.status_ids(:open, :retracted, :rejected).include?(self.invoice.invoice_status_id)
+        self.reviewal_chains = []
+        params[:reviewal_document] = invoice
 
-      policies.each do |policy|
-        params[:policy_id] = policy.id
-        chain = {
-            policy_id: policy.id,
-            reviewal_chain: get_reviewal_chain
-        }
+        policies.each do |policy|
+          params[:policy_id] = policy.id
+          chain = {
+              policy_id: policy.id,
+              reviewal_chain: get_reviewal_chain
+          }
 
-        self.reviewal_chains.push(chain)
+          self.reviewal_chains.push(chain)
+        end
       end
     end
 
@@ -173,7 +182,41 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
 
       false
     end
+  end
 
+  def validate_presence
+    if invoice.blank?
+      add_message :error, 'Record not found'
+      return false
+    end
+    true
+  end
 
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_document_access
+    # This will be refactored when Non-po initiator/reviewer will be in place i.e. po and non-po invoice can have different policy
+
+    # Validate of current user is owner of PO
+    return if invoice.validate_if_owner(user)
+    return if invoice.validate_if_admin(user)
+    return if invoice.validate_if_reviewer(user)
+    # Need to check dlrms as above conditions are breaking
+    #Quick fix
+    return if user.is_invoice_reviewer?
+    return if user.is_bank_payment_request_initiator?
+    return if user.is_bank_payment_request_reviewer?
+    return if user.is_bank_payment_request_creditor?
+    # Jugaad because invoice show, po show, inward doc show.. all are on procurement show. So if one has access to one document , he will have access to all documents as all documents are being shown
+    # return if validate_po_access
+    raise_unauthorized_exception
+  end
+
+  def validate_po_access
+    po_params = params
+    po_params["id"] = invoice.procurement.purchase_order.id rescue nil
+    Procurements::PurchaseOrders::Show.(user, po_params).success? if po_params["id"].present?
   end
 end

@@ -4,7 +4,7 @@
 # report_id: id of the report that is being unapproved
 
 
-class Settlement::SReport::Unapproved < Report::Base
+class Settlement::SReport::Unapproved < Reports::Base
   attr_accessor :report
 
   def authorized_user_types

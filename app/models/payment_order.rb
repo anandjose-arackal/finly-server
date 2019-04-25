@@ -68,6 +68,7 @@ class PaymentOrder < ApplicationRecord
   has_one :bank_payment_request
   has_many :payments, dependent: :destroy
   has_many :payment_order_attachments, dependent: :destroy
+  has_many :system_messages, as: :messagable, dependent: :destroy
 
   has_attached_file :payment_file, default_url: '/images/:style/missing.png'
   validates_attachment_content_type :payment_file,
@@ -151,6 +152,11 @@ class PaymentOrder < ApplicationRecord
   scope :from_disburse, -> {where application: ["fd", "ft"]}
   scope :from_vendor_payments, -> {where application: "vp"}
 
+  scope :includes_for_show, -> do
+    includes(:initiating_user, :payment_order_status, :initiating_user, {amount_requested: :currency},{amount_processed: :currency}, payments: [{amount: :currency}, :payment_status, :payment_type, :initiating_user, :receiving_user,:system_messages])
+  end
+
+
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
   delegate :amount_requested_value, to: :amount_requested
   delegate :amount_processed_value, to: :amount_processed
@@ -230,7 +236,7 @@ class PaymentOrder < ApplicationRecord
 
   # again, for convenience, and only applies to bank transfer poyments
   def bank_transfer_type
-    self.payments.first.payment_mode
+    payment_mode
   end
 
   def update_order_status

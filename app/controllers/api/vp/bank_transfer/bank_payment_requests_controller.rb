@@ -6,6 +6,9 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
 
   def create
     params[:api_initiated] = true
+    # reformat_params
+    # debugger
+    # @result = BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket.(current_user, params)
     @result = BankTransfer::PaymentRequest::Create.(current_user, params)
     if @result.success? and @result.bank_payment_request.present?
       RequestStore.store[:current_app] = :vp # todo jugaad for fixing the reviewer for API requests
@@ -45,6 +48,13 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
 
   # this action will take a particular payment ID and return the status of that particular payment
   def payment_status
+    params[:search_type] = 'id'
+    @result = BankTransfer::Payments::ApiPayments::GetPaymentStatus.(current_user, params)
+    respond
+  end
+
+  def payment_status_by_external_ref
+    params[:search_type] = 'external_id'
     @result = BankTransfer::Payments::ApiPayments::GetPaymentStatus.(current_user, params)
     respond
   end

@@ -7,7 +7,15 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
   FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
-  SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  if Rails.env.production?
+    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  else
+    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED", "SENT_TO_BENEFICIARY"]
+  end
+  TEMPORARY_ERRORS_FROM_BANK = [
+      "Acquiring Bank CBS or node offline",
+      "Rejected/Failed at downstream system"
+  ]
 
   attr_accessor :errors, :company
 
@@ -25,7 +33,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
       return false
-    elsif bank_transaction&.retriable?
+    elsif bank_transaction&.retriable? || bank_transaction&.open?
       reference_number = bank_transaction.unique_request_number
     else
       # i.e. it's a whole new payment being initiated for the first time
@@ -74,7 +82,17 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
-        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        # Payment with pending transaction will rerun through CronJobs
+        if self.account.account_owner.is_a?(Company)
+          self.company = self.account.account_owner
+        else
+          self.company = account.account_owner.company
+        end
+        if TEMPORARY_ERRORS_FROM_BANK.include?(op.transfer_request.bank_error_message) && self.company.auto_retry_payment_enabled?
+          payment.update(payment_status_id: PaymentStatus.id_for(:pending_retry))
+        else
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        end
         error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error) || "Payment could not be processed at this time"
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
@@ -158,7 +176,11 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   private
 
   def create_bank_transaction(payment, transfer_request)
-    self.company = account.account_owner.company
+    if self.account.account_owner.is_a?(Company)
+      self.company = self.account.account_owner
+    else
+      self.company = account.account_owner.company
+    end
     case payment.payment_status_id
       when PaymentStatus.id_for(:completed)
         transfer_status_id = BankTransferStatus.id_for(:completed)
@@ -184,7 +206,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         return false
       end
       unless payment.update(reference_resource: bank_transaction)
-        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
+        Event::EAlert::Create.(nil, title: 'Payment did not update with a new bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not update. Details: #{self.payment.errors.full_messages}", subject: 'Payment did not update with a new bank transaction')
       end
     end
     bank_transaction

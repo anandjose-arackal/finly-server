@@ -25,7 +25,8 @@ class Procurements::Invoices::Retract < Procurements::Invoices::Base
   end
 
   def post_process
-    Event::EInvoice::Retract.(user, invoice: invoice, workflow_output: workflow_output)
+    role_id = self.workflow_output[:role_id]
+    Event::EInvoice::Retract.(user, invoice: invoice, workflow_output: workflow_output, role_id: role_id)
     add_message :success, 'Successfully Retracted Invoice'
   end
 end

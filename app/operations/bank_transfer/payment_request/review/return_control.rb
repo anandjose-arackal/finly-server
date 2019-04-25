@@ -5,11 +5,17 @@ class BankTransfer::PaymentRequest::Review::ReturnControl < BankTransfer::Paymen
   attr_accessor :return_control_note
 
   def init
-    super
+    id = params[:id] || params[:bank_payment_request_id]
+    self.bank_payment_request = BankPaymentRequest.admin_associated_items(user).find_by id: id
     self.return_control_note = params[:note]
   end
 
   def validate
+    if self.bank_payment_request.blank?
+      add_message :error, "Payment Ticket not found"
+      return
+    end
+
     unless user.vendor_payment_admin?
       add_message :error, "Only admins can return control of a payment order"
       return
@@ -20,33 +26,47 @@ class BankTransfer::PaymentRequest::Review::ReturnControl < BankTransfer::Paymen
       return
     end
 
-    unless self.bank_payment_request.controlling_user_id == self.user.id
-      add_message :error, "Only the current reviewer can return control of a payment order"
-      return
-    end
+    # unless self.bank_payment_request.controlling_user_id == self.user.id
+    #   add_message :error, "Only the current reviewer can return control of a payment order"
+    #   return
+    # end
 
-    unless self.bank_payment_request.controlling_for_user.present?
-      add_message :error, "Payment Order not configured properly while taking control"
-    end
+    # unless self.bank_payment_request.controlling_for_user.present?
+    #   add_message :error, "Payment Order not configured properly while taking control"
+    # end
   end
 
 
   def process
-    previous_reviewer = self.bank_payment_request.controlling_for_user
-    previous_reviewer_role_id = self.bank_payment_request.controlling_for_user_role_id
-    if bank_payment_request.update controlling_user: previous_reviewer,
-                                   controlling_for_user: nil,
-                                   controlling_user_role_id: previous_reviewer_role_id,
-                                   controlling_for_user_role_id: nil
-      bank_payment_request.bank_payment_request_trails.create action_user: user,
-                                                              action_user_role_id: UserRole.id_for(:admin),
-                                                              modified_user_id:previous_reviewer.id,
-                                                              modified_user_role_id: previous_reviewer_role_id,
-                                                              action_id: BankPaymentRequestTrailAction.id_for(:return_control)
+    # previous_reviewer = self.bank_payment_request.controlling_for_user
+    # previous_reviewer_role_id = self.bank_payment_request.controlling_for_user_role_id
+    # if bank_payment_request.update controlling_user: previous_reviewer,
+    #                                controlling_for_user: nil,
+    #                                controlling_user_role_id: previous_reviewer_role_id,
+    #                                controlling_for_user_role_id: nil
+    #   bank_payment_request.bank_payment_request_trails.create action_user: user,
+    #                                                           action_user_role_id: UserRole.id_for(:admin),
+    #                                                           modified_user_id:previous_reviewer.id,
+    #                                                           modified_user_role_id: previous_reviewer_role_id,
+    #                                                           action_id: BankPaymentRequestTrailAction.id_for(:return_control)
+    #
+    #   return
+    # end
+    # add_message :error, bank_payment_request.errors.full_messages
 
+    ##################
+    # NEW CODE
+    params[:document] = self.bank_payment_request
+    params[:aasm_event] = 'return_control'
+    params[:violation_present] = false # Will be used in future
+    op = WorkflowManager::Base.(user, params)
+
+    unless op.success?
+      add_message :error, op.messages[:error]
       return
     end
-    add_message :error, bank_payment_request.errors.full_messages
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process

@@ -30,7 +30,7 @@ class BankTransaction < ApplicationRecord
 
   validates :bank_reference_number, presence: true, if: :successful?
   validates :unique_request_number, presence: true, if: :through_finly?
-  validates :beneficiary_bank_account_id, presence: true
+  validates :beneficiary_bank_account_id, presence: true, if: :not_account_check?
   validates :transfer_status_id, presence: true
   validates :amount, presence: true
   validates :company, presence: true
@@ -39,7 +39,7 @@ class BankTransaction < ApplicationRecord
   accepts_nested_attributes_for :amount
 
   delegate :amount_value, to: :amount
-  delegate :completed?, :processing?, :failed?, :retriable?, :possible_failure?, to: :transfer_status
+  delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, to: :transfer_status
 
   scope :processing_transactions, -> {where transfer_status_id: [BankTransferStatus.id_for(:processing), BankTransferStatus.id_for(:possible_failure)]}
 
@@ -56,6 +56,10 @@ class BankTransaction < ApplicationRecord
 
   def through_finly?
     self.bank_transaction_type_id == BankTransactionType.id_for(:yes_bank)
+  end
+
+  def not_account_check?
+    !account_name_check
   end
 
 end

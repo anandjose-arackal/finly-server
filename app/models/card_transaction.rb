@@ -35,6 +35,7 @@
 #  mid                          :string(255)
 #  tid                          :string(255)
 #  transaction_message          :text(65535)
+#  deleted_at                   :datetime
 #
 
 class CardTransaction < ApplicationRecord

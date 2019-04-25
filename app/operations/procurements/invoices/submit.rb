@@ -20,6 +20,11 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       add_message :error, 'Invoice not found'
     end
 
+    if self.invoice.attachments.blank?
+      add_message :error, "Please attach an invoice document before submitting."
+      return
+    end
+
     # checking for configuration on whether this particular company
     # has budgeting enforced or not
     # this will apply only if this invoice is part of a non-PO
@@ -34,6 +39,15 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
         add_message :error, "You cannot submit this Invoice because there are no budgets associated with it"
         return
       end
+    end
+
+    # Set validation of DLRMs
+    dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+        reviewal_document: self.invoice
+    })
+
+    unless dlrm_validation_op.success?
+      add_message :error, dlrm_validation_op.messages[:error]
     end
   end
 
@@ -63,7 +77,8 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
   end
 
   def post_process
-    Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output})
+    role_id = self.workflow_output[:role_id]
+    Event::EInvoice::Submit.(user, {invoice: invoice, workflow_output: workflow_output, role_id: role_id})
     add_message :success, 'Successfully submitted invoice'
   end
 end

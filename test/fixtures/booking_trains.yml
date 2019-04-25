@@ -23,6 +23,7 @@
 #  arrival_date        :date
 #  arrival_time        :time
 #  booking_id          :integer
+#  deleted_at          :datetime
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

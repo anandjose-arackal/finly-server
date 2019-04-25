@@ -23,6 +23,11 @@ class Procure::InwardInvoicesController < ApplicationController
     respond
   end
 
+  def bulk_forward
+    @result = Procurements::Invoices::BulkForward.(current_user, params)
+    respond
+  end
+
   def show
     @result = Procurements::Invoices::Show.(current_user, params)
     respond
@@ -35,6 +40,11 @@ class Procure::InwardInvoicesController < ApplicationController
 
   def approve
     @result = Procurements::Invoices::Approve.(current_user, params)
+    respond
+  end
+
+  def unapprove
+    @result = Procurements::Invoices::Unapprove.(current_user, params)
     respond
   end
 
@@ -89,8 +99,50 @@ class Procure::InwardInvoicesController < ApplicationController
     respond response: @result.success? ? :success : :failure
   end
 
+  def template_bulk_import_items
+    @result = Procurements::Invoices::Templates::GenerateImportSample.(current_user, params)
+    respond
+  end
+
+  def bulk_upload_items
+    @result = Procurements::Invoices::BulkUploadLineItems.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_failure'
+        }
+      end
+    end
+  end
+
   def bulk_approve
     @result = Procurements::Invoices::BulkApprove.(current_user, params)
+    respond
+  end
+
+  def bulk_reject
+    @result = Procurements::Invoices::BulkReject.(current_user, params)
+    respond
+  end
+
+  def bulk_take_control
+    @result = Procurements::Invoices::BulkTakeControl.(current_user, params)
+    respond
+  end
+
+  def take_control
+    @result = Procurements::Invoices::TakeControl.(current_user, params)
+    respond
+  end
+
+  def return_control
+    @result = Procurements::Invoices::ReturnControl.(current_user, params)
     respond
   end
 

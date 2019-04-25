@@ -73,21 +73,21 @@ Rails.application.configure do
   #   end
   #   hash.as_json
   # end
+  # config.action_mailer.default_url_options = { host: "localhost" }
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.smtp_settings = {
+  #     address:              'smtp.sendgrid.net',
+  #     port:                 587,
+  #     domain:               'localhost',
+  #     user_name:            'apikey',
+  #     password:             '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',
+  #     # ssl:                  true,
+  #     # tls:                  true,
+  #     authentication:       :plain,
 
-  config.action_mailer.default_url_options = { host: "localhost" }
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-      address:              'smtp.sendgrid.net',
-      port:                 587,
-      domain:               'localhost',
-      user_name:            'apikey',
-      password:             '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',
-      # ssl:                  true,
-      # tls:                  true,
-      authentication:       :plain,
-      enable_starttls_auto: true,
-      :openssl_verify_mode  => 'none'
-  }
+  #     enable_starttls_auto: true,
+  #     :openssl_verify_mode  => 'none'
+  # }
 
   # Debug mode disables concatenation and preprocessing of assets.
   # This option may cause significant delays in view rendering with a large

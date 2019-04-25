@@ -34,35 +34,30 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
       add_message :error, op.messages[:error]
       return
     end
+
     if purchase_order.approved? || purchase_order.auto_approved?
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
       self.procurement.status_tags.delete(old_status_tag)
       self.procurement.status_tags << status_tag
+      if purchase_order.advance_amount&.present?
+        if purchase_order.advance_amount.value > 0
+          purchase_order.advance_amount_status_id = AdvanceAmountStatus.id_for(:to_be_processed)
+          purchase_order.save
+        end
+      end
     end
 
     self.workflow_output = op.workflow_output
   end
 
   def post_process
+    # role_id = self.workflow_output[:role_id]
     Event::EPurchaseOrder::Approve.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Approved Purchase Order'
   end
 
   def awaiting_action_from?
-    # find document level reviewer mapping
-    dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
-    level = purchase_order.level
-
-    if dlrm.present?
-      # dlrm.pluck(:reviewer_id).include? user.id
-      if dlrm.pluck(:reviewer_id).include?(nil)
-        level.level_reviewer_mappings.with_threshold(self.purchase_order.balance_amount.value).pluck(:reviewer_id).include? user.id
-      else
-        dlrm.pluck(:reviewer_id).include? user.id
-      end
-    else
-      level.level_reviewer_mappings.with_threshold(self.purchase_order.balance_amount.value).pluck(:reviewer_id).include? user.id
-    end
+    self.purchase_order.get_reviewers.include?(user)   
   end
 end

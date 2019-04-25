@@ -7,10 +7,13 @@ module Constants
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
   VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
   VALID_BANK_ACCOUNT = /\A[A-Za-z0-9]{3,32}\z/i
+  VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}/i
 
   ENDING_NUMBERS = /\d+$/
 
   OTP_RESEND_INTERVAL = 60
+
+  PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
 
   # todo - needs to be edited once we get the account details.
   if Rails.env.production?
@@ -22,10 +25,10 @@ module Constants
   end
 
   # todo - to be removed once companies are done migrating from HDFC to RBL
-  MIGRATING_COMPANIES = [10, 67, 112]
+  MIGRATING_COMPANIES = []
 
   # PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
-  PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['venu.reddy@finly.io', 'kashyap.bj@finly.io', 'ankit.bazari@finly.io', 'chandra@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
@@ -300,7 +303,11 @@ module Constants
   class Constants::YesBank
     PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN-PROCESS","IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
     FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY", "REQUEST NOT FOUND"]
-    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+    if Rails.env.production?
+      SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+    else
+      SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED", "SENT_TO_BENEFICIARY"]
+    end
 
     YES_BANK_RECEIVING_IFSC = "YESB0000022"
     YES_BANK_COLLECT_IFSC = 'YESB0CMSNOC'

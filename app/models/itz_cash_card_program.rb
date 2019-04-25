@@ -48,6 +48,12 @@ class ItzCashCardProgram < ApplicationRecord
           name: "Jotun Reward Card",
           bank: "HDFC",
           product_code: "FNHREW"
+      },
+      {
+          name: "HDFC Chip card",
+          bank: "HDFC",
+          product_code: "HDFFRG",
+          charge_code: "HBFRGD"
       }
   ]
 

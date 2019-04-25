@@ -17,7 +17,7 @@ class Card::Index < Card::Base
       self.cards = user.cards
     else
       # For policy admin, manager and finance managers
-      user_ids = User::Index.(user, params).team.pluck(:id)
+      user_ids = User::Index.(user, params).team&.pluck(:id)
       self.cards = user.company.cards.with_user(user_ids)
     end
   end
@@ -35,9 +35,8 @@ class Card::Index < Card::Base
       self.cards = params[:cards]
       self.cards = cards
       if self.cards.present?
-        self.paginated_cards = self.cards.paginate(page: params[:page], per_page: 30)
+        self.paginated_cards = self.cards.paginate(page: params[:page], per_page: params[:per_page])
       end
     end
   end
-
 end

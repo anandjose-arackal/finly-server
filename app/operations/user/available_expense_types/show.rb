@@ -20,14 +20,14 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.currencies = Currency.all
       self.em_tax_tracking = params[:em_tax_tracking]
       self.tds_slabs = params[:tds_slabs]
-      self.cash_and_credit_pockets = user.user_pockets.non_bank_card_transfer_pockets
+      self.cash_and_credit_pockets = user.user_pockets.non_bank_card_transfer_pockets.active
       self.custom_currency_conversion = user.company.feature_subscription.custom_currency_conversion
     end
 
   end
 
   def authorized_user_types
-    [:employee]
+    [:employee, :vendor_payments_admin]
   end
 
   def pre_validate
@@ -94,7 +94,8 @@ class User::AvailableExpenseTypes::Show < User::Base
     else
       # checks whether for this particular user the distance, time and per diem expenses are enabled
       self.distance_config = {enabled: user.distance_expense_enabled?, vehicle_rates: []}
-      user.policies.each do |policy|
+      policies = retrieve_policies
+      policies.each do |policy|
         policy.vehicle_rates.each do |vehicle_rate|
         self.distance_config[:vehicle_rates] << vehicle_rate.as_json
         end
@@ -133,6 +134,13 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.custom_fields_config[:distance_expense] = configurations.with_parent_type(FieldParentType.id_for(:distance_expense)) if distance_config[:enabled]
     self.custom_fields_config[:time_expense] = configurations.with_parent_type(FieldParentType.id_for(:time_expense)) if time_config[:enabled]
     self.custom_fields_config[:per_diem_expense] = configurations.with_parent_type(FieldParentType.id_for(:per_diem_expense)) if per_diem_config[:enabled]
+  end
+
+  def retrieve_policies
+    if user.enforce_policy_enabled?
+      return user.policies.with_application(current_app).non_default.non_deleted
+    end
+    user.policies.with_application(current_app).non_deleted
   end
 
   def success

@@ -54,7 +54,11 @@ class Policy::Create < Policy::Base
 
   def success
     # Policy::Base::PolicyPresenter.new(user, {policy: policy, view: params[:view]})
-    Policy::Index.(user, params)
+    if vendor_payments?
+      Policy::VendorPayments::Index.(user, params)
+    else
+      Policy::Index.(user, params)
+    end
   end
 
 end

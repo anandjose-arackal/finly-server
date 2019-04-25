@@ -177,6 +177,7 @@
 #  ZWL         :decimal(20, 5)
 #  is_deleted  :boolean          default(FALSE)
 #  MYR         :decimal(20, 5)
+#  deleted_at  :datetime
 #
 
 class Amount < ApplicationRecord
@@ -198,7 +199,7 @@ class Amount < ApplicationRecord
     end
   end
 
-  default_scope { unscope(:where) }
+  default_scope {unscope(:where)}
 
   # method that returns the amount value
   def amount_value
@@ -263,9 +264,9 @@ class Amount < ApplicationRecord
   alias_method :exact_transaction_amount_value, :amount_value
 
 
-  scope :with_id, -> (id) { where id: id }
-  scope :sum_INR, -> { sum(:INR) }
-  scope :sum_value, -> { sum(:value) }
+  scope :with_id, -> (id) {where id: id}
+  scope :sum_INR, -> {sum(:INR)}
+  scope :sum_value, -> {sum(:value)}
 
   before_save do
     set_base_currency_value
@@ -276,7 +277,7 @@ class Amount < ApplicationRecord
     if Amount.column_names.include?(self.currency.country_code)
       # self.update((self.currency.country_code) => self.value)
       # Setting the value without updating
-      self.send("#{self.currency.country_code}=",self.value)
+      self.send("#{self.currency.country_code}=", self.value)
     end
   end
 
@@ -305,13 +306,16 @@ class Amount < ApplicationRecord
     self.send(currency_code)
   end
 
-  def as_json(options={})
-    {value: self.value,
-     currency: {
-         id: self.currency.id,
-         country: self.currency.country,
-         country_code: self.currency.country_code,
-         symbol: self.currency.symbol}}
+  def as_json(options = {})
+    {
+        value: self.value,
+        currency: {
+            id: self.currency&.id,
+            country: self.currency&.country,
+            country_code: self.currency&.country_code,
+            symbol: self.currency&.symbol
+        }
+    }
   end
 
   def update_currencies(date)
@@ -329,13 +333,13 @@ class Amount < ApplicationRecord
       currency_data = res.currency_data.as_json.with_indifferent_access
       rate = CurrencyConversionRate.create(currency_data)
     end
-    currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
+    currencies = CurrencyConversionRate.column_names.reject {|el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
     orig_curr = self.currency.country_code
     currencies.each do |curr|
       if Amount.column_names.include?(curr)
         currency_rate = rate.send(curr.to_sym).to_f
         normalized_amt = self.amount_value * currency_rate
-        update_hash[curr.to_sym] = (normalized_amt/rate.send(orig_curr.to_sym))
+        update_hash[curr.to_sym] = (normalized_amt / rate.send(orig_curr.to_sym))
       end
     end
     self.update(update_hash)
@@ -343,7 +347,7 @@ class Amount < ApplicationRecord
 
   def destroy_currencies
     update_hash = {}
-    currencies = Amount.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id', "#{self.currency.country_code}", 'value', 'currency_id', 'is_deleted'].include?(el)}
+    currencies = Amount.column_names.reject {|el| ['created_at', 'updated_at', 'date', 'id', "#{self.currency.country_code}", 'value', 'currency_id', 'is_deleted'].include?(el)}
     currencies.each do |curr|
       update_hash[curr.to_sym] = nil
     end
