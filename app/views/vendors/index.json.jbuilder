@@ -7,7 +7,8 @@ json.result do
     json.can_reject vendor.can_really_reject?
     json.can_take_control vendor.can_take_control?
     json.pan vendor.pan
-    json.gstin vendor.gstin_locations&.pluck(:gstin)
+    # json.gstin vendor.gstin_locations&.pluck(:gstin)
+    json.gstin ["07AAACB5343E1Z3","06AAACB5343E1Z5","32AAACB5343E1ZA"]
     json.extract! vendor, :id, :name, :business_name, :description, :vendor_id
     json.vendor_id vendor&.vendor_id
     json.vendor_type vendor.vendor_type.as_json
