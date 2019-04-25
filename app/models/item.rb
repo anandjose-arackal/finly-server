@@ -133,6 +133,10 @@ class Item < ApplicationRecord
     self.product_type_id.present?
   end
 
+  def rate_contract_vendors
+    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name }}
+  end
+
   private
 
   def budget_trail_entry
@@ -142,7 +146,4 @@ class Item < ApplicationRecord
     end
   end
 
-  def rate_contract_vendors
-    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name }}
-  end
 end

@@ -22,7 +22,7 @@ class Procurements::PurchaseRequests::Base < BaseOperation
 
   def purchase_request_parameters
     params.require(:purchase_request).permit(
-      :id, :location_id, :department_id, :note, :description, :reject_note,
+      :id, :location_id, :department_id, :cost_center_id, :note, :description, :reject_note,
         :policy_id,
         purchase_request_items_attributes: [
             :id, :department_id, :cost_center_id , :unit_of_measurement, :item_id, :reject_note, :required_by_date, :purpose, :delivery_location_id, :quantity, :vendor_id, :_destroy, per_unit_estimated_amount_attributes: [:id, :value, :currency_id, :_destroy, :rejected]
