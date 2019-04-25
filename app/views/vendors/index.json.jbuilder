@@ -6,6 +6,8 @@ json.result do
     # json.can_reject vendor.can_reject?
     json.can_reject vendor.can_really_reject?
     json.can_take_control vendor.can_take_control?
+    json.pan vendor.pan
+    json.gstin vendor.gstin_locations&.pluck(:gstin)
     json.extract! vendor, :id, :name, :business_name, :description, :vendor_id
     json.vendor_id vendor&.vendor_id
     json.vendor_type vendor.vendor_type.as_json
@@ -20,7 +22,8 @@ json.result do
     json.created_at vendor.created_at.strftime "%d %b %y"
 
     json.bank_accounts do
-      json.array!(vendor.bank_accounts.non_deleted) do |bank_account|
+      # json.array!(vendor.bank_accounts.non_deleted) do |bank_account|
+      json.array!(vendor.bank_accounts.map {|ba| ba if ba.deleted_at == nil}.compact) do |bank_account|
         json.extract! bank_account, :id, :ifsc, :name, :account_number
         json.default bank_account.default_account
       end
