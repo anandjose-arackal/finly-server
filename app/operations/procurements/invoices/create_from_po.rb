@@ -72,7 +72,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       if (params[:document_type].present? && params[:document_type] == 'proforma_invoice')
         self.invoice.proforma_invoice_id = self.invoice.id
       end
+      # self.invoice.advance_amount_required = (self.po_advance.present?) ? true : false
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
+      # self.invoice.advance_amount_required = false
       self.invoice.save
 
 
@@ -115,7 +117,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
     self.advance = self.purchase_order.advance_amount
 
-    receiving_account = self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
+    receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment. CHANGED.
     invoice_items_attributes = []
 
     # The idea is, twofold
