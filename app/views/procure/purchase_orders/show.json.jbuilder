@@ -21,6 +21,8 @@ json.vendor do
         json.name bank_account.name
         json.account_number bank_account.account_number
         json.ifsc bank_account.ifsc
+        json.selected @result.purchase_order.bank_account&.id == bank_account.id
+        json.default bank_account.default_account
       end
     end
   end
@@ -89,6 +91,8 @@ json.items do
     
     json.item_number item.inventory_line_item&.item_number rescue nil
     json.gl_code item.inventory_line_item&.item_code rescue nil
+    json.category_name item.category&.name
+    json.category_id item.category_id
 
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
