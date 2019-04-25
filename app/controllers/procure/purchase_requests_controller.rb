@@ -101,4 +101,9 @@ class Procure::PurchaseRequestsController < ApplicationController
     respond
   end
 
+  def count
+    @result = Procurements::PurchaseRequests::Count.(current_user, params)
+    respond
+  end
+
 end

@@ -77,6 +77,34 @@ class BankPaymentRequest < ApplicationRecord
   scope :without_id, -> (id) {where.not id: id}
   scope :approved, -> {where status_id: BankPaymentRequestStatus.id_for(:approved)}
   scope :downloadable, -> {where status_id: [BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited), BankPaymentRequestStatus.id_for(:auto_approved)]}
+
+  scope :filter_status, -> (status){
+    case status
+    when 'draft', :draft
+      where status_id: BankPaymentRequest.status_ids(:open, :rejected, :retracted)
+    when 'processing', :processing
+      where status_id: BankPaymentRequestStatus.id_for(:processing)
+    when 'approved', :approved
+      where status_id: BankPaymentRequest.status_ids(:approved, :auto_approved)
+    when 'credited', :credited
+      where status_id: BankPaymentRequestStatus.id_for(:credited)
+    when 'failed', :failed
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+    when 'scheduled', :scheduled
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
+    when 'pending', :pending
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+    when 'awaiting_approval', :awaiting_approval
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      # all
+    end
+  }
+
   scope :filter_status_id, -> (status_id) {
     case status_id
     when 1, '1' # i.e. open

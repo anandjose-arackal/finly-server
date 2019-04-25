@@ -15,11 +15,11 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
 
 
   def submit
-    vendor.created_by.id == user.id && (YesBankVendor.status_ids(:retracted, :rejected, :draft).include? vendor.status_id)
+    vendor.created_by_id == user.id && (YesBankVendor.status_ids(:retracted, :rejected, :draft).include? vendor.status_id)
   end
 
   def retract
-    vendor.created_by.id == user.id && (YesBankVendor.status_ids(:awaiting_approval).include?(vendor.status_id))
+    vendor.created_by_id == user.id && (YesBankVendor.status_ids(:awaiting_approval).include?(vendor.status_id))
   end
 
   def approve
