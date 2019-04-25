@@ -3599,6 +3599,7 @@ Rails.application.routes.draw do
   put 'vendors/bulk_reject', to: 'vendors#bulk_reject'
   put 'vendors/bulk_take_control', to: 'vendors#bulk_take_control'
   
+  get 'vendors/counts', to: 'vendors#counts'
   resources :vendors do
     put 'approve', to: "vendors#approve"
     put 'submit', to: "vendors#submit"

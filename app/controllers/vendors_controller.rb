@@ -125,4 +125,9 @@ class VendorsController < ApplicationController
     @result = ActionsManager::Processor.(current_user, params)
     respond
   end
+
+  def counts
+    @result = Vendors::Counts.(current_user, params)
+    respond
+  end
 end
