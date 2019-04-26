@@ -103,7 +103,7 @@ class PurchaseRequestItem < ApplicationRecord
   def add_attachment
     # Can be put into AR transaction
     params = RequestStore[:params]
-    line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes)
+    line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes) rescue nil
     if line_item_attributes.present?
       line_item_attributes.each do |position, line_item|
         attachment_id = line_item.dig(:attachment_attributes, :id) rescue nil

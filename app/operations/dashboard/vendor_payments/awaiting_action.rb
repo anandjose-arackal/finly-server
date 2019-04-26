@@ -110,7 +110,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         title: "Payment Tickets",
         type: 'orders',
         count: BankPaymentRequest.awaiting_action_items(user).count,
-        filters: [{filter_status_id: 10}]
+        filters: [{filter_status: 'awaiting_approval'}]
       }
       self.result.push data
     end

@@ -37,6 +37,7 @@ class Item < ApplicationRecord
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
   belongs_to :product_type, optional: true, class_name: "ProductType", foreign_key: :product_type
+  belongs_to :user, optional: true
 
   has_many :rate_contract_line_items, foreign_key: :item_id
   # LineItem and Branch Location Mapping
@@ -68,6 +69,11 @@ class Item < ApplicationRecord
 
   scope :with_id, -> (id) { where id: id }
 
+  scope :filter_active, -> (active) {
+    active = StringUtils.to_bool(active)
+    where active: active
+  }
+
   delegate :po_item?, :non_po_item?, to: :supply_item_type
 
   def goods?
@@ -97,10 +103,13 @@ class Item < ApplicationRecord
       tax: tax,
       account: account,
       item_code: item_code,
+      gl_code: item_code,
       supply_item_type_id: supply_item_type_id,
       item_type: supply_item_type.as_json,
       product_type: product_type_id,
-      rate_contract_vendors: rate_contract_vendors
+      rate_contract_vendors: rate_contract_vendors,
+      user: user,
+      active: active
     }
   end
 

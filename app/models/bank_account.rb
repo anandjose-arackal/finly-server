@@ -32,6 +32,7 @@ class BankAccount < ApplicationRecord
   belongs_to :account_owner, optional: true, polymorphic: true
 
   belongs_to :purchase_order, optional: true
+  belongs_to :bank_account_master, optional: true
 
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account

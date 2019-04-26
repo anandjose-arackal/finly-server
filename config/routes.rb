@@ -3501,6 +3501,7 @@ Rails.application.routes.draw do
         get 'approved_items', to: 'purchase_requests#approved_items'
         patch 'bulk_reject_approved_items', to: "purchase_requests#bulk_reject_approved_items", as: :bulk_reject_approved_items
         patch 'issue_from_inventory', to: "purchase_requests#issue_from_inventory", as: :issue_from_inventory
+        get 'count', to: "purchase_requests#count", as: :count
       end
     end
 
@@ -3602,6 +3603,7 @@ Rails.application.routes.draw do
   put 'vendors/bulk_reject', to: 'vendors#bulk_reject'
   put 'vendors/bulk_take_control', to: 'vendors#bulk_take_control'
   
+  get 'vendors/counts', to: 'vendors#counts'
   resources :vendors do
     put 'approve', to: "vendors#approve"
     put 'submit', to: "vendors#submit"
