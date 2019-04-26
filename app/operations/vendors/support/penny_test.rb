@@ -25,15 +25,15 @@ class Vendors::Support::PennyTest < Vendors::Base
   end
 
   def process
-    # op = BankTransfer::BankAccounts::CheckValidity.(user, bank_account_params)
-    # if op.success?
-    #   self.account_name = op.full_name
-    # else
-    #   add_message :error, op.messages[:error]
-    # end
+    op = BankTransfer::BankAccounts::CheckValidity.(user, bank_account_params)
+    if op.success?
+      self.account_name = op.full_name
+    else
+      add_message :error, op.messages[:error]
+    end
 
     # Junk code - todo
-    self.account_name = "Validated Account"
+    # self.account_name = "Validated Account"
   end
 
   def post_process
