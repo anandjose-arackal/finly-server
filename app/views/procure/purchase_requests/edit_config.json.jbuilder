@@ -21,6 +21,8 @@ json.policies do
   end
 end
 
+json.department_mappings @result.department_mappings
+
 json.cost_centers @result.cost_centers.as_json
 
 json.reviewal_chains do
