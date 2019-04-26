@@ -89,6 +89,22 @@ class PurchaseRequestItem < ApplicationRecord
     joins(:purchase_request).where('purchase_requests.order_number = ?', order_number)
   }
 
+  scope :search_item_name, -> (item_name) {
+    joins(:item).where('items.description LIKE ?', "%#{item_name}%")
+  }
+
+  scope :search_order_number, -> (order_number) {
+    joins(:purchase_request).where('purchase_requests.order_number LIKE ?', "%#{order_number}%")
+  }
+
+  scope :search_preferred_vendor, -> (vendor_name) {
+    joins(:vendor).where('yes_bank_vendors.name LIKE ?', "%#{vendor_name}%")
+  }
+
+  scope :search_delivery_location, -> (location_name) {
+    joins(purchase_request: :location).where('branch_locations.name LIKE ?', "%#{location_name}%")
+  }
+
 
   def update_estimated_amount
     quantity = self.quantity
