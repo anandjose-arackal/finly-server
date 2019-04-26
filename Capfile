@@ -32,7 +32,7 @@ require 'capistrano/sidekiq'
 require 'capistrano/rails/console'
 
 # adding rollbar capistrano for deploy tracking
-# require 'rollbar/capistrano3'
+require 'rollbar/capistrano3'
 require 'finly/secure_storage/capistrano/connector'
 
 # require 'slackistrano/capistrano'
