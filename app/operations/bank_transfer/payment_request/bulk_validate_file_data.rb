@@ -187,8 +187,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       unless invoice_number.blank? || validate_invoice_number(invoice_number)
         self.valid = false
-        self.error_messages << "Invoice number can only have letters, numbers, dashes and forward slash and no other special characters"
-        self.issue_item[:invoice_number] = "Invoice number can only have letters, numbers, dashes and forward slash and no other special characters"
+        self.error_messages << "Invoice number can only have letters, numbers, dashes, ampersand and forward slash and no other special characters"
+        self.issue_item[:invoice_number] = "Invoice number can only have letters, numbers, dashes, ampersand and forward slash and no other special characters"
       end
 
       unless validate_rate tax, 1, amount
@@ -272,7 +272,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def validate_invoice_number(invoice_number)
-    ( /\A[a-zA-Z0-9\/-]*\Z/.match(invoice_number) ) ? true : false
+    ( /\A[a-zA-Z0-9\/\-\#\&]*\Z/.match(invoice_number) ) ? true : false
   end
 
   # def validate_amount(amount)

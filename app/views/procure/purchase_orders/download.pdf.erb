@@ -217,7 +217,7 @@
       </div>
   <% end %>
 
-
+  <div class="page-break"></div>
 
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
     <h4 class="section-title">Terms and Conditions</h4>
@@ -419,6 +419,11 @@
   @media print{
     body{
       font-family: 'Open Sans', sans-serif !important;
+    }
+    .page-break {
+      display: block;
+      clear: both;
+      page-break-after: always;
     }
     .fs-12{
       font-size: 12px !important;

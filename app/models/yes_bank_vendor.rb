@@ -152,7 +152,7 @@ class YesBankVendor < ApplicationRecord
   }
 
   scope :include_details, -> {
-    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy)
+    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy, :gstin_locations)
   }
 
   scope :includes_for_show, -> {
@@ -165,6 +165,14 @@ class YesBankVendor < ApplicationRecord
   scope :sort_created_at, -> (type) { ['asc', 'desc'].include?(type) ? reorder(created_at: type.to_sym) : reorder(created_at: :asc) }
   scope :sort_updated_at, -> (type) { ['asc', 'desc'].include?(type) ? reorder(updated_at: type.to_sym) : reorder(updated_at: :asc) }
 
+  scope :filter_gstin, -> (gstin) {
+    v = GstinLocation.find_by(gstin: gstin)&.vendor_id
+    where id: v
+  }
+
+  scope :filter_pan, -> (pan) {
+    where pan: pan
+  }
 
   # Scopes for ordering ends
 
