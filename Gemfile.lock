@@ -96,7 +96,7 @@ GEM
       execjs
     awesome_print (1.8.0)
     aws-eventstream (1.0.3)
-    aws-partitions (1.152.0)
+    aws-partitions (1.153.0)
     aws-sdk-core (3.48.5)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
@@ -341,8 +341,8 @@ GEM
       mime-types
       mimemagic (~> 0.3.0)
       terrapin (~> 0.6.0)
-    paranoia (2.4.1)
-      activerecord (>= 4.0, < 5.3)
+    paranoia (2.4.2)
+      activerecord (>= 4.0, < 6.1)
     parslet (1.8.2)
     power_assert (1.1.4)
     pry (0.12.2)
