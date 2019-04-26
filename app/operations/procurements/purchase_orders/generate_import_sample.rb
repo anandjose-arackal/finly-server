@@ -18,7 +18,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
     # adding Item to excel sheet
     item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code"]
     item_contents = []
-    company.items.each do |item|
+    company.items.where(active: true).each do |item|
       item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
     end
     self.sheets << {

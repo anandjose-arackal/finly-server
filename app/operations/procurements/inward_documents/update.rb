@@ -31,6 +31,23 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       return
     end
 
+    if self.inward_document_params[:delivery_date].blank?
+      add_message :error, "Please add the delivery date for this GRN."
+      return
+    end
+
+    valid_date = Date.parse(self.inward_document_params[:delivery_date]) rescue false
+
+    unless valid_date
+      add_message :error, "Incorrect delivery date supplied."
+      return
+    end
+
+    unless valid_date <= Date.today
+      add_message :error, "Delivery Date cannot be for a future date."
+      return
+    end
+
     # unless self.inward_document.id == self.procurement.inward_documents.last.id
     #   add_message :error, 'You cannot modify the selected GRN'
     #   return
@@ -112,7 +129,6 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   end
 
   def process
-
     self.inward_document.assign_attributes(inward_document_params)
     # Set count for items of purchase order
     # set_purchase_order_items
@@ -153,7 +169,7 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
       self.procurement.status_tags << status_tag
       # self.purchase_order.update(purchase_order_status_id: PurchaseOrderStatus.id_for(:closed))
       params[:purchase_order_id] = self.purchase_order.id
-      Procurements::PurchaseOrders::Close.(current_user, params) if self.purchase_order.all_items_accepted?
+      Procurements::PurchaseOrders::Close.(current_user, params) if self.purchase_order.all_items_accepted?(inward_document)
     else
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
       old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))

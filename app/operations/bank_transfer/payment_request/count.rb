@@ -7,7 +7,7 @@ class BankTransfer::PaymentRequest::Count < BankTransfer::PaymentRequest::Base
   end
 
   def process
-    op = BankTransfer::PaymentRequest::Index.(current_user, params)
+    op = BankTransfer::PaymentRequest::Index.(user, params)
     if op.success?
       # self.payment_request_ids = op.payment_requests&.pluck(:id)
       self.payment_requests_count = op.payment_requests&.pluck(:id).count rescue 0

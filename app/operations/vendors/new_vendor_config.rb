@@ -53,7 +53,7 @@ class Vendors::NewVendorConfig < Vendors::Base
         self.actions[:primary] = {name: "Submit for Approval", url: "vendors/create_and_submit", method: "POST", type: "create_and_submit"}
         self.reviewal_chains = []
         self.policies = params[:policies]
- 
+         
         params[:provider_name] = "YesBankVendorProvider"
         policies.each do |policy|
           params[:policy_id] = policy.id

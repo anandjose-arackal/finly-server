@@ -7,9 +7,9 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     self.document_types = {
       purchase_requests: false,
       purchase_orders: false,
-      payment_tickets: false,
       non_po_invoices: false,
       po_invoices: false,
+      payment_tickets: false,
       vendors: false
     }
 
@@ -55,6 +55,15 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
   end
 
   def process
+    if document_types[:purchase_requests]
+      data = {
+        title: "Purchase Requests",
+        type: 'purchase_requests',
+        count: PurchaseRequest.awaiting_action_items(user).count,
+        filters: [{filter_awaiting_approval: true}]
+      }
+      self.result.push data
+    end
     if document_types[:purchase_orders]
       data = {
         title: "Purchase Orders",
@@ -65,25 +74,6 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       self.result.push data
     end
 
-    if document_types[:payment_tickets]
-      data = {
-        title: "Payment Tickets",
-        type: 'orders',
-        count: BankPaymentRequest.awaiting_action_items(user).count,
-        filters: [{filter_status_id: 10}]
-      }
-      self.result.push data
-    end
-
-    if document_types[:purchase_requests]
-      data = {
-        title: "Purchase Requests",
-        type: 'purchase_requests',
-        count: PurchaseRequest.awaiting_action_items(user).count,
-        filters: [{filter_awaiting_approval: true}]
-      }
-      self.result.push data
-    end
 
     if document_types[:po_invoices] || document_types[:non_po_invoices]
       awaiting_invoices = Invoice.awaiting_action_items(user)
@@ -115,6 +105,16 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       end
     end
 
+    if document_types[:payment_tickets]
+      data = {
+        title: "Payment Tickets",
+        type: 'orders',
+        count: BankPaymentRequest.awaiting_action_items(user).count,
+        filters: [{filter_status_id: 10}]
+      }
+      self.result.push data
+    end
+    
     if document_types[:vendors]
       data = {
         title: "Vendors",

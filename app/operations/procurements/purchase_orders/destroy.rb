@@ -81,26 +81,26 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
   def previous_state
     if self.procurement.po_revisions.present? && (self.procurement.po_revisions.count > 1)
-      ps = self.procurement.reload.po_revisions[-2].trails.where(action_id: [5,7,33])
+      ps = self.procurement.reload.po_revisions[-2].trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
     else
-      ps = self.procurement.reload.purchase_order.trails.where(action_id: [5,7,33])
+      ps = self.procurement.reload.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
     end
     ps.last.action_id
   end
 
   def is_approve?(state=false)
     ps_id = previous_state
-    state = ( ps_id == 5 ) ? true : false
+    state = ( ps_id == TrailAction.id_for(:approve) ) ? true : false
   end
 
   def is_auto_approve?(state=false)
     ps_id = previous_state
-    state = ( ps_id == 7 ) ? true : false
+    state = ( ps_id == TrailAction.id_for(:auto_approve) ) ? true : false
   end
 
   def is_send_to_vendor?(state=false)
     ps_id = previous_state
-    state = ( ps_id == 33 ) ? true : false
+    state = ( ps_id == TrailAction.id_for(:send_to_vendor) ) ? true : false
   end
 
 end

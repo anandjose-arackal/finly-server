@@ -353,11 +353,13 @@ class PurchaseOrder < ApplicationRecord
     shipped
   end
 
-  def all_items_accepted?
+  def all_items_accepted?(inward_document = nil)
     shipped = true
     self.items.each do |item|
       next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
-      unless item.quantity == item.accepted
+      # Commenting this fetch for value for now.
+      # previously_delivered = inward_document.items.detect {|iw| iw if iw.purchase_order_item_id == item.id}.previously_delivered rescue 0
+      unless item.quantity == (item.accepted + 0)
         shipped = false
         break
       end
