@@ -1,18 +1,22 @@
 class WorkflowManager::Aasm::MoneyRequestProvider < WorkflowManager::Aasm::BaseProvider
 
-  def initialize(document, violations_present, user, provider_name=nil)
-    self.document = document
-    self.violations_present = violations_present
-    self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
+  def initialize(user, params)
     self.user = user
-    self.policy = self.document.policy ## Have to take care where status is stored in a different attribute
-    self.provider_name = provider_name || self.document.get_default_provider
+
+    self.document = params[:document]
+    self.violations_present = params[:violations_present]
+    self.forwarded_to_user = params[:forwarded_to_user]
+    self.provider_name = params[:provider_name] || self.document.get_default_provider
+
+    self.aasm.current_state = self.document.status.name.downcase.to_sym ## Have to take care where status is stored in a different attribute
+    self.policy_id = self.document.policy_id
+    self.policy = Policy.find_by id: policy_id ## Have to take care where status is stored in a different attribute
 
     # get reviewers
     self.current_level = document.level
     self.next_level = document.get_level(:next, provider_name)
     self.previous_level = document.get_level(:prev, provider_name)
-    self.current_level_reviewers = document.get_reviewers(:current_level, provider_name)
+    self.current_level_reviewers = document.get_reviewers(:current, provider_name)
     self.reviewers = document.get_reviewers(:next, provider_name)
     self.document_update_params = {}
   end

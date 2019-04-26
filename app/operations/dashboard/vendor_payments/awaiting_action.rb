@@ -1,15 +1,15 @@
 class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Base
   attr_accessor :result, :document_types
 
-  has_scope :filter_inward_invoice_type
+  has_scope :filter_invoice_type
 
   def init
     self.document_types = {
       purchase_requests: false,
       purchase_orders: false,
-      payment_tickets: false,
       non_po_invoices: false,
       po_invoices: false,
+      payment_tickets: false,
       vendors: false
     }
 
@@ -55,6 +55,15 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
   end
 
   def process
+    if document_types[:purchase_requests]
+      data = {
+        title: "Purchase Requests",
+        type: 'purchase_requests',
+        count: PurchaseRequest.awaiting_action_items(user).count,
+        filters: [{filter_awaiting_approval: true}]
+      }
+      self.result.push data
+    end
     if document_types[:purchase_orders]
       data = {
         title: "Purchase Orders",
@@ -63,6 +72,37 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         filters: [{filter_awaiting_approval: true}]
       }
       self.result.push data
+    end
+
+
+    if document_types[:po_invoices] || document_types[:non_po_invoices]
+      awaiting_invoices = Invoice.awaiting_action_items(user)
+
+      if document_types[:po_invoices]
+        data = {
+          title: "PO Invoices",
+          type: 'new_payment_invoices',
+          count: apply_scopes(awaiting_invoices, {filter_invoice_type: 'po_invoice'}).count,
+          filters: [
+            {filter_invoice_type: 'po_invoice'},
+            {filter_awaiting_approval: true}
+          ]
+        }
+        self.result.push data
+      end
+
+      if document_types[:non_po_invoices]
+        data = {
+          title: "Non PO Invoices",
+          type: 'new_payment_invoices',
+          count: apply_scopes(awaiting_invoices, {filter_invoice_type: 'non_po_invoice'}).count,
+          filters: [
+            {filter_invoice_type: 'non_po_invoice'},
+            {filter_awaiting_approval: true}
+          ]
+        }
+        self.result.push data
+      end
     end
 
     if document_types[:payment_tickets]
@@ -74,47 +114,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       }
       self.result.push data
     end
-
-    if document_types[:purchase_requests]
-      data = {
-        title: "Purchase Requests",
-        type: 'purchase_requests',
-        count: PurchaseRequest.awaiting_action_items(user).count,
-        filters: [{filter_awaiting_approval: true}]
-      }
-      self.result.push data
-    end
-
-    if document_types[:po_invoices] || document_types[:non_po_invoices]
-      awaiting_invoices = Invoice.awaiting_action_items(user)
-
-      if document_types[:po_invoices]
-        data = {
-          title: "PO Invoices",
-          type: 'new_payment_invoices',
-          count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: 'po_invoices'}).count,
-          filters: [
-            {filter_invoice_type: 'po_invoices'},
-            {filter_awaiting_approval: true}
-          ]
-        }
-        self.result.push data
-      end
-
-      if document_types[:non_po_invoices]
-        data = {
-          title: "Non PO Invoices",
-          type: 'new_payment_invoices',
-          count: apply_scopes(awaiting_invoices, {filter_inward_invoice_type: 'non_po_invoices'}).count,
-          filters: [
-            {filter_invoice_type: 'non_po_invoices'},
-            {filter_awaiting_approval: true}
-          ]
-        }
-        self.result.push data
-      end
-    end
-
+    
     if document_types[:vendors]
       data = {
         title: "Vendors",
