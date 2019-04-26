@@ -117,10 +117,12 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
         self.issue_item[:department_id] = "Please provide the department for which the item would be purchased."
       end
 
-      unless (self.all_departments_ids.include?(department_id) rescue false )
-        self.valid = false
-        self.error_messages << "Department does not exist for this policy or you are not authorized to make purchases for this department."
-        self.issue_item[:department_id] = "Department does not exist for this policy or you are not authorized to make purchases for this department."
+      if department_id.present?
+        unless (self.all_departments_ids.include?(department_id))
+          self.valid = false
+          self.error_messages << "Department does not exist for this policy or you are not authorized to make purchases for this department."
+          self.issue_item[:department_id] = "Department does not exist for this policy or you are not authorized to make purchases for this department."
+        end
       end
 
       unless validate_amount quantity
