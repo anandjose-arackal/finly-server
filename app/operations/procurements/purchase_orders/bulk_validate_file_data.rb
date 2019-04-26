@@ -190,6 +190,8 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     [
      "Description",
      "Item number",
+     "Department ID",
+     "Cost Center ID",
      "Comment",
      "Item code",
      "HSN/SAC",

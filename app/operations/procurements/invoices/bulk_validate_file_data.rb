@@ -187,6 +187,8 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
     [
      "Description",
      "Item number",
+     "Department ID",
+     "Cost Center ID",
      "Comment",
      "Item code",
      "HSN/SAC",

@@ -2,14 +2,14 @@ class Procurements::PurchaseRequests::BulkTakeControl < Procurements::PurchaseRe
   attr_accessor :purchase_requests
 
   def init
-    purchase_request_ids = params[:ids] || params[:purchase_request_ids]
+    purchase_request_ids = params[:purchase_request_ids]
 
     unless purchase_request_ids.is_a?(Array)
       add_message :error, 'Invalid configuration'
       return
     end
 
-    self.purchase_requests = user.company.purchase_requests.with_id(purchase_request_ids)
+    self.purchase_requests = user.company.purchase_requests.with_ids(purchase_request_ids)
   end
 
   def validate

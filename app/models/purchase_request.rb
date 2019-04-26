@@ -265,11 +265,11 @@ class PurchaseRequest < ApplicationRecord
   def can_approve?
     user = user.present? ? user : RequestStore.store[:current_user]
     return false if user.blank?
-    processing? && self.get_reviewers.include?(user)
+    awaiting_approval? && self.get_reviewers.include?(user)
     # if self.action_users(:take_control).include?(user)
-    #   processing?
+    #   awaiting_approval?
     # elsif self.action_users(:approve).include?(user)
-    #   processing?
+    #   awaiting_approval?
     # else
     #   false
     # end
@@ -278,11 +278,11 @@ class PurchaseRequest < ApplicationRecord
   def can_reject?
     user = user.present? ? user : RequestStore.store[:current_user]
     return false if user.blank?
-    processing? && self.get_reviewers.include?(user)
+    awaiting_approval? && self.get_reviewers.include?(user)
     # if self.action_users(:take_control).include?(user)
-    #   processing?
+    #   awaiting_approval?
     # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
-    #   processing?
+    #   awaiting_approval?
     # else
     #   false
     # end
@@ -292,7 +292,7 @@ class PurchaseRequest < ApplicationRecord
     user = user.present? ? user : RequestStore.store[:current_user]
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
-    processing? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
+    awaiting_approval? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
   end
 
   private

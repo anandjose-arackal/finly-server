@@ -24,14 +24,12 @@ class Procurements::PurchaseRequests::BulkTakeControlProcessor < BackgroundOpera
       unless op.success?
         data_error[:messages] = op.messages[:error]
         data_error[:order_number] = pr&.order_number
-        data_error[:sub_department] = pr&.sub_department&.name
         data_error[:department] = pr&.department&.name
         data_error[:user] = pr&.user&.name
         data_error[:amount] = pr&.calculate_total_amount
         self.result[:error].push(data_error)
       else
         data_success[:order_number] = pr&.order_number
-        data_success[:sub_department] = pr&.sub_department&.name
         data_success[:department] = pr&.department&.name
         data_success[:user] = pr&.user&.name
         data_success[:amount] = pr&.calculate_total_amount
@@ -41,6 +39,6 @@ class Procurements::PurchaseRequests::BulkTakeControlProcessor < BackgroundOpera
   end
 
   def post_process
-    op = Event::EPurchaseRequest::BulkTakeControl.(user, result: result)
+    # op = Event::EPurchaseRequest::BulkTakeControl.(user, result: result)
   end
 end

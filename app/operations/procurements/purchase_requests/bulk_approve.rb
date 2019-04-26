@@ -2,7 +2,6 @@ class Procurements::PurchaseRequests::BulkApprove < Procurements::PurchaseReques
   attr_accessor :purchase_requests
 
   def pre_validate
-    super
     if params[:password].blank?
       add_message :error, 'You need to provide your password to initiate the approval.'
       return
@@ -21,12 +20,13 @@ class Procurements::PurchaseRequests::BulkApprove < Procurements::PurchaseReques
       return
     end
 
-    self.purchase_requests = user.company.purchase_requests.with_procurement_id(user.company.procurements.with_ids(purchase_request_ids).pluck(:id))
+    self.purchase_requests = user.company.purchase_requests.with_ids(purchase_request_ids)
   end
 
   def validate
     if self.purchase_requests.empty?
       add_message :error, 'No Purchase Requests found'
+      return
     end
     accept_pr = []
     self.purchase_requests.each do |purchase_request|

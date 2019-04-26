@@ -39,6 +39,6 @@ class Procurements::PurchaseRequests::BulkApproveProcessor < BackgroundOperation
   end
 
   def post_process
-    op = Event::EPurchaseRequest::BulkApprove.(user, result: result)
+    # op = Event::EPurchaseRequest::BulkApprove.(user, result: result)
   end
 end

@@ -9,12 +9,13 @@ class Procurements::PurchaseRequests::BulkReject < Procurements::PurchaseRequest
       return
     end
 
-    self.purchase_requests = user.company.purchase_requests.with_id(purchase_request_ids)
+    self.purchase_requests = user.company.purchase_requests.with_ids(purchase_request_ids)
   end
 
   def validate
     if self.purchase_requests.empty?
       add_message :error, 'No Purchase Requests found'
+      return
     end
 
     accept_pr = []
