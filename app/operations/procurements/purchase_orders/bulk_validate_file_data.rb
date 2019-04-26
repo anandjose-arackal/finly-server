@@ -44,7 +44,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.company_items = user.company.items
 
     self.all_departments = Company::Departments::Index.(user, params)
-    self.all_departments_ids = self.all_departments&.departments&.pluck(:id)
+    self.all_departments_ids = self.all_departments&.policy_department_filter_mapping&.pluck(:id)
   
   end
 
@@ -118,10 +118,10 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         self.issue_item[:quantity] = "Please provide the department for which the item would be purchased."
       end
 
-      unless self.all_departments_ids.include? department_id
+      unless (self.all_departments_ids.include?(department_id)) rescue false
         self.valid = false
-        self.error_messages << "Department does not exist or you are not authorized to make purchases for this department."
-        self.issue_item[:department_id] = "Department does not exist or you are not authorized to make purchases for this department."
+        self.error_messages << "Department does not exist for this policy or you are not authorized to make purchases for this department."
+        self.issue_item[:department_id] = "Department does not exist for this policy or you are not authorized to make purchases for this department."
       end
 
       unless validate_amount quantity
