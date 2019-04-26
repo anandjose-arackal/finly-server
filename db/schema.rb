@@ -2218,7 +2218,7 @@ ActiveRecord::Schema.define(version: 2019_04_25_125737) do
     t.index ["vendor_id"], name: "index_delivery_challans_on_vendor_id"
   end
 
-  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.integer "company_id"
     t.datetime "created_at", null: false
@@ -6488,7 +6488,7 @@ ActiveRecord::Schema.define(version: 2019_04_25_125737) do
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
 
-  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
