@@ -45,6 +45,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
     self.all_departments = Company::Departments::Index.(user, params)
     self.all_departments_ids = self.all_departments&.policy_department_filter_mapping&.pluck(:id)
+     Rails.logger.fatal "FROM BulkValidateFileData DEPARTMENT IDS,\n #{self.all_departments_ids.inspect}"
   
   end
 
