@@ -43,7 +43,7 @@ class Policy::Update < Policy::Base
         end
         return
       when 'policy_location_mapping'
-        unless policy.update_location_department_mapping(params)
+        unless policy.update_policy_location_mapping(params)
           add_message :error, 'Unable to update'
         end
         return
