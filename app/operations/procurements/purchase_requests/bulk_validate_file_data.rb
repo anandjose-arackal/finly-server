@@ -1,7 +1,8 @@
 class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::PurchaseRequests::Base
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
-                :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found
+                :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
+                :locations
 
   class Procurements::PurchaseRequests::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -41,6 +42,8 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
     Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
 
     self.company_items = user.company.items
+
+    self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
     
   end
 
@@ -124,6 +127,23 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       #   self.issue_item[:quantity] = "Please provide the department for which the item would be purchased."
       # end
 
+      if delivery_location.blank?
+        self.valid = false
+        self.error_messages << "Please provide the delivery location for this item."
+        self.issue_item[:delivery_location] = "Please provide the delivery location for this item."
+      end
+
+      if self.locations.present? && delivery_location.present?
+        location_ids = self.locations.pluck(:id)
+        Rails.logger.fatal "FROM BulkValidateFileData LOCATIONs,\n #{location_ids}"
+        Rails.logger.fatal "FROM BulkValidateFileData LOCATION CHECK,\n #{location_ids.include?(delivery_location.to_i) }"
+        unless location_ids.include? delivery_location.to_i
+          self.valid = false
+          self.error_messages << "Company delivery location was not found. Please recheck the excel sheet and input the correct delivery location id."
+          self.issue_item[:delivery_location] = "Company delivery location was not found. Please recheck the excel sheet and input the correct delivery location id."
+        end
+      end
+
       unless validate_amount quantity
         self.valid = false
         self.error_messages << "Quantity entered has non-numeric characters."
@@ -131,6 +151,11 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
+
+      if valid
+        location = self.locations.find_by(id: delivery_location)
+        item[:delivery_location_name] = location.name
+      end
 
       self.contents << item.values
 

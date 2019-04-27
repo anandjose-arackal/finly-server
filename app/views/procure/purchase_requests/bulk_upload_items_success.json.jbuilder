@@ -2,10 +2,23 @@ json.bulk_items do
 	json.array! @result.parsed_data.each do |item|
 		json.merge! item[:single_item].as_json
 		# Overwrite these attributes to what was written in the excel sheet
-		json.unit_price item[:unit_price]
-
+		json.unit_cost do
+			json.value item[:unit_price]
+			json.currency_id 1
+		end
+		json.unit_of_measurement item.unit_of_measurement
 		json.quantity item[:quantity]
 		json.purpose item[:purpose]
 		json.required_by_date item[:required_by_date]
+
+		json.delivery_location do
+			json.name item.delivery_location_name
+			json.id item.delivery_location
+		end
+		json.preferred_vendor item.preferred_vendor
+		json.product_details do
+			json.product_name item[:single_item].name
+			json.id item[:single_item].id
+		end
 	end
 end

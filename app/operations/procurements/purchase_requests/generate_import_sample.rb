@@ -30,6 +30,19 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
         name: "Inventory Items"
     }
 
+    location_headers = ["Location ID", "Location Name"]
+    location_contents = []
+    locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+    locations.each do |location|
+      location_contents << [location.id, location.name]
+    end
+
+    self.sheets << {
+      item_headers: location_headers,
+      item_contents: location_contents,
+      name: 'Delivery Location'
+    }
+
     # # adding departments to the excel sheet
     # department_headers = ["ID", "Department Name"]
     # department_contents = []
