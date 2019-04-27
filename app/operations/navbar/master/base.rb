@@ -101,7 +101,7 @@ class Navbar::Master::Base
   end
 
   def finly_insights
-    retrun nil unless RequestStoreUtil.current_company.feature_subscription.budgeting_system # && RequestStoreUtil.current_user.is_budget_manager?
+    return nil unless RequestStoreUtil.current_company.feature_subscription.budgeting_system # && RequestStoreUtil.current_user.is_budget_manager?
     {name: 'Finly Insights', id: 'insights', url: '/insights'}
   end
 
