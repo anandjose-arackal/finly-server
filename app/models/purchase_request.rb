@@ -34,12 +34,14 @@ class PurchaseRequest < ApplicationRecord
   belongs_to :creator, optional: true, class_name: 'User'
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :purchase_order, optional: true
+  belongs_to :cost_center, optional: true
+
   has_many :attachments, as: :resource, dependent: :destroy
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
 
-  validates :description, :location, :department, :policy, presence: true
+  validates :description, :location, :department, :policy, :cost_center, presence: true
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
 
@@ -257,6 +259,40 @@ class PurchaseRequest < ApplicationRecord
                            action_level_id: item.purchase_request.get_level(:previous).id || item.purchase_request.level.id,
                            modified_level_id: item.purchase_request&.level&.id
     trail.save
+  end
+
+
+  def can_approve?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
+    awaiting_approval? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   awaiting_approval?
+    # elsif self.action_users(:approve).include?(user)
+    #   awaiting_approval?
+    # else
+    #   false
+    # end
+  end
+
+  def can_reject?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
+    awaiting_approval? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   awaiting_approval?
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   awaiting_approval?
+    # else
+    #   false
+    # end
+  end
+
+  def can_take_control?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
+    return false if self.action_users(:approve).include?(user)
+    awaiting_approval? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
   end
 
   private

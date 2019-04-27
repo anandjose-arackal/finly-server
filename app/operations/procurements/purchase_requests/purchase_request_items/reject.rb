@@ -11,7 +11,11 @@ class Procurements::PurchaseRequests::PurchaseRequestItems::Reject < Procurement
     # end
 
     # self.workflow_output = op.workflow_output
+
+
+    # Do not change status of anything fails
     self.purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(:rejected)
+    self.purchase_request_item.rejected = true
     self.purchase_request_item.save
   end
 
