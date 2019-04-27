@@ -106,17 +106,16 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         self.error_messages << "Please input the quantity."
         self.issue_item[:quantity] = "Please input the quantity."
       end
-
       if required_by_date.blank?
         self.valid = false
         self.error_messages << "Please provide the Required delivery date of the item."
         self.issue_item[:required_by_date] = "Please provide the Required delivery date of the item."
       end
 
-      if validate_date required_by_date
+      unless validate_date required_by_date
         self.valid = false
-        self.error_messages << "Please provide the Required delivery date of the item."
-        self.issue_item[:required_by_date] = "Please provide the Required delivery date of the item."
+        self.error_messages << "Required delivery date provided is not a valid date."
+        self.issue_item[:required_by_date] = "Required delivery date provided is not a valid date."
       end
 
       # if department_id.blank?
