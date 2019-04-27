@@ -33,8 +33,10 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
     location_headers = ["Location ID", "Location Name"]
     location_contents = []
     locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
-    locations.each do |location|
-      location_contents << [location.id, location.name]
+    if locations.present?
+      locations.each do |location|
+        location_contents << [location.id, location.name]
+      end
     end
 
     self.sheets << {

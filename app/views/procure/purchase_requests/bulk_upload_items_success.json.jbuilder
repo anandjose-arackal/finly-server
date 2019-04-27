@@ -17,7 +17,7 @@ json.bulk_items do
 		end
 		json.preferred_vendor item[:preferred_vendor]
 		json.product_details do
-			json.product_name item[:single_item].name
+			json.product_name item[:single_item].description
 			json.id item[:single_item].id
 		end
 	end
