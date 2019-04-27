@@ -36,7 +36,7 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
 
       Attachment.update_resource({ids: pr_attachment_ids, resource_id: self.purchase_request.id, user: user}) if pr_attachment_ids.present?
       # Update for line item attachment
-      # Attachment.update_resource({ids: line_item_attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
+      # Attachment.update_resource({ids: line_item_attachment_ids, resource_id: self.purchase_request.id, user: user}) if line_item_attachment_ids.present?
       # Update all estimated amount in the line item
       purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
 
@@ -86,9 +86,9 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   end
 
   def get_line_item_attachment_ids(params)
-    if params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).present?
+    if params.dig(:purchase_request, :purchase_request_items_attributes).present?
       attachment_ids = []
-      params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).each{ |k, v| attachment_ids << v[:id] }
+       params.dig(:purchase_request, :purchase_request_items_attributes).each{|pi, v| v[:attachment_attributes].each{|k, val| attachment_ids << val[:id]}} rescue attachment_ids
       return attachment_ids
     end
   end
