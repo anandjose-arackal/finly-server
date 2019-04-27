@@ -16,7 +16,7 @@ class Navbar::Master::VendorPayment::NavPayment < Navbar::Master::Base
       :users,
       :load_company_balance, :statements,
       :organization_account,
-      :finly_expense_management, :finly_disburse, :finly_collect
+      :finly_expense_management, :finly_disburse, :finly_collect, :finly_insights
   ]
   )
 

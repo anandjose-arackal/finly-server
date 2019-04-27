@@ -2,7 +2,7 @@
   <div class="col col-xs-12 header-container">
     <div class="col col-xs-8 no-padding company-details">
       <div class="col col-xs-12 no-padding logo">
-        <img src="<%="http:"+@company.configuration.logo.url(:thumb) %>" width="120" height="auto">
+        <img src="<%=@company.configuration.logo.url(:thumb) %>" width="120" height="auto">
       </div>
       <div class="col col-xs-12 no-padding address fs-12 mg-top-5">
         <br>
@@ -231,7 +231,7 @@
       <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
-      <% unless (@company.id == 137 || @company.id == 153) %>
+      <% unless (@company.id == 137 || @company.id == 156) %>
       <ul>
         <% approved_users = [] %>
         <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
