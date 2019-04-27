@@ -14,4 +14,10 @@ class PolicyDepartmentMapping < ApplicationRecord
 
   belongs_to :policy, optional: true
   belongs_to :department, optional: true
+
+
+  # To choose enabled mapping by default
+  # Helpful in :joins
+  # default_scope { where(enabled: true) }
+  scope :enabled, -> { where enabled: true }
 end

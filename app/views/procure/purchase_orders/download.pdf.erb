@@ -87,6 +87,10 @@
         <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
       </div>
       <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Point of Contact</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.poc_name} - #{@result.purchase_order&.gstin_location&.poc_mobile_number}" %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Location</div>
         <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.location} - #{@result.purchase_order&.gstin_location&.state&.name}" %></div>
       </div>
@@ -134,8 +138,7 @@
       </div>
     </div>
   </div><br> <br>
-  <div class="col col-xs-12 line-items-container mg-top-5">
-    <h4 class="section-title">Document Line Items</h4>
+  <div class="col col-xs-12 line-items-container mg-top-5" style="padding-top: 25px">
     <div class="col col-xs-12 no-padding">
       <table class="table table-responsive table-document-items">
         <thead>
@@ -216,11 +219,13 @@
         </div>
       </div>
   <% end %>
-
-
+  <div class="text-center font-dark-small" style="margin-top: 50%; padding-top: 80%">
+    Please refer the next page for the terms and conditions
+  </div>
+  <div class="page-break"></div>
 
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
-    <h4 class="section-title">Terms and Conditions</h4>
+    <h4 class="terms-condition-tittle">Terms and Conditions</h4>
     <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
       <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
@@ -278,6 +283,10 @@
     }
     .font-dark-gray{
       font-weight: bold;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .font-dark-small{
       color: #474747 !important;
       -webkit-print-color-adjust: exact;
     }
@@ -420,6 +429,11 @@
     body{
       font-family: 'Open Sans', sans-serif !important;
     }
+    .page-break {
+      display: block;
+      clear: both;
+      page-break-after: always;
+    }
     .fs-12{
       font-size: 12px !important;
     }
@@ -500,6 +514,12 @@
       color: cornflowerblue !important;
       -webkit-print-color-adjust: exact;
     }
+    .terms-condition-tittle{
+      font-size: 24px;
+      color: cornflowerblue !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .mg
     .mg-botm-5{
       margin-bottom: 5px;
     }
