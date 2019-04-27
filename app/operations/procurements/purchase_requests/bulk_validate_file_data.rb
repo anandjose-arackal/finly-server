@@ -153,6 +153,8 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
       if valid
+
+        Rails.logger.fatal "FROM BulkValidateFileData LOCATION VALID,\n #{self.locations.inspect}"
         location = self.locations.find_by(id: delivery_location)
         item[:delivery_location_name] = location.name
       end

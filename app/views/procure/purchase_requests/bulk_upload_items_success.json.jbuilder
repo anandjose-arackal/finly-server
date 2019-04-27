@@ -6,16 +6,16 @@ json.bulk_items do
 			json.value item[:unit_price]
 			json.currency_id 1
 		end
-		json.unit_of_measurement item.unit_of_measurement
+		json.unit_of_measurement item[:unit_of_measurement]
 		json.quantity item[:quantity]
 		json.purpose item[:purpose]
 		json.required_by_date item[:required_by_date]
 
 		json.delivery_location do
-			json.name item.delivery_location_name
-			json.id item.delivery_location
+			json.name item[:delivery_location_name]
+			json.id item[:delivery_location]
 		end
-		json.preferred_vendor item.preferred_vendor
+		json.preferred_vendor item[:preferred_vendor]
 		json.product_details do
 			json.product_name item[:single_item].name
 			json.id item[:single_item].id
