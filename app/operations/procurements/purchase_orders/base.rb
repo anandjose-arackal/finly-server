@@ -16,7 +16,7 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         :gstin_location_id, :cost_allocation_items, :internal_note,
         items_attributes: [
             :id, :department_id, :cost_center_id, :unit_of_measurement, :_destroy, :product_id, :description, :hsn_sac, :quantity, :rate, :tax, :tax_rate_id, :tds, :discount, :delivery_date, :comment,
-            :inventory_line_item_id
+            :inventory_line_item_id, :category_id
         ],
         attachments: [],
         document_reviewer_mappings: [

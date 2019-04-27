@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_25_032140) do
+ActiveRecord::Schema.define(version: 2019_04_25_125737) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2218,7 +2218,7 @@ ActiveRecord::Schema.define(version: 2019_04_25_032140) do
     t.index ["vendor_id"], name: "index_delivery_challans_on_vendor_id"
   end
 
-  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "departments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.integer "company_id"
     t.datetime "created_at", null: false
@@ -4833,12 +4833,19 @@ ActiveRecord::Schema.define(version: 2019_04_25_032140) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "location_id"
+    t.integer "department_id"
+    t.integer "policy_id"
+    t.integer "controlling_level_id"
     t.integer "purchase_request_status_id"
     t.text "note"
     t.integer "creator_id"
     t.datetime "submitted_at"
     t.datetime "approved_at"
     t.string "order_number"
+    t.text "reject_note"
+    t.integer "company_id"
+    t.integer "cost_center_id"
     t.index ["order_number"], name: "index_purchase_requests_on_order_number"
     t.index ["purchase_request_status_id"], name: "index_purchase_requests_on_purchase_request_status_id"
   end
@@ -6481,7 +6488,7 @@ ActiveRecord::Schema.define(version: 2019_04_25_032140) do
     t.index ["version_id"], name: "index_version_associations_on_version_id"
   end
 
-  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "versions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "item_type", limit: 191, null: false
     t.integer "item_id", null: false
     t.string "event", null: false
