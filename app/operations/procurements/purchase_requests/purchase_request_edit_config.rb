@@ -6,7 +6,7 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
 
   class Procurements::PurchaseRequests::PurchaseRequestEditConfig::EditConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :departments, :policies, :reviewal_chains, :purchase_request
+    attr_accessor :locations, :departments, :policies, :reviewal_chains, :purchase_request, :cost_centers
 
     def init
       self.purchase_request = params[:purchase_request]
@@ -23,6 +23,7 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
       # params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
       self.policies = Policy::VendorPayments::Index.(user, params).policies
+      self.cost_centers = user.company.cost_centers
       self.reviewal_chains = []
       params[:reviewal_document] = purchase_request
 

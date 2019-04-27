@@ -18,6 +18,10 @@ json.result do
       json.name @result.purchase_request&.department&.name
       json.id @result.purchase_request&.department_id
     end
+    json.cost_center do
+      json.name @result.purchase_request&.cost_center&.name
+      json.id @result.purchase_request&.cost_center&.id
+    end
     json.policy do 
       json.name @result.purchase_request.policy&.name
       json.id @result.purchase_request&.policy_id
@@ -39,6 +43,7 @@ json.result do
             json.vendor_name line_item&.vendor&.name
             json.vendor_id line_item.vendor_id
           end
+          json.preferred_vendors line_item&.item&.rate_contract_vendors
           json.required_by_date line_item&.required_by_date&.to_date
           json.delivery_location do  
             json.name line_item&.delivery_location&.name
@@ -105,6 +110,6 @@ json.result do
         end
       end
     end
-    json.reviewal_chain @result.purchase_request.get_reviewal_chain
+    json.reviewal_chain @result.reviewal_chain
   end
 end

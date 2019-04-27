@@ -44,8 +44,9 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.company_items = user.company.items
 
     self.all_departments = Company::Departments::Index.(user, params)
-    self.all_departments_ids = self.all_departments&.departments&.pluck(:id)
-  
+    self.all_departments_ids = self.all_departments&.policy_department_filter_mapping&.pluck(:id)
+     Rails.logger.fatal "FROM BulkValidateFileData DEPARTMENT IDS,\n #{self.all_departments_ids.inspect}"
+    
   end
 
   def validate
@@ -115,13 +116,16 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       if department_id.blank?
         self.valid = false
         self.error_messages << "Please provide the department for which the item would be purchased."
-        self.issue_item[:quantity] = "Please provide the department for which the item would be purchased."
+        self.issue_item[:department_id] = "Please provide the department for which the item would be purchased."
       end
 
-      unless self.all_departments_ids.include? department_id
-        self.valid = false
-        self.error_messages << "Department does not exist or you are not authorized to make purchases for this department."
-        self.issue_item[:department_id] = "Department does not exist or you are not authorized to make purchases for this department."
+      if department_id.present?
+        Rails.logger.fatal "FROM BulkValidateFileData DEPARTMENT CHECK,\n #{self.all_departments_ids.include?(department_id) }"
+        unless (self.all_departments_ids.include?(department_id.to_i) )
+          self.valid = false
+          self.error_messages << "Department does not exist for this policy or you are not authorized to make purchases for this department."
+          self.issue_item[:department_id] = "Department does not exist for this policy or you are not authorized to make purchases for this department."
+        end
       end
 
       unless validate_amount quantity
@@ -186,6 +190,8 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     [
      "Description",
      "Item number",
+     "Department ID",
+     "Cost Center ID",
      "Comment",
      "Item code",
      "HSN/SAC",

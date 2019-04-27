@@ -15,6 +15,9 @@
 json.results do
   json.array!(@result.paginated_purchase_requests) do |purchase_request|
     json.merge! purchase_request.as_json
+    json.can_approve purchase_request.can_approve?
+    json.can_reject purchase_request.can_reject?
+    json.can_take_control purchase_request.can_take_control?
     if purchase_request.purchase_request_items.present?
       json.line_items do
         json.array!(purchase_request.purchase_request_items) do |line_item|
