@@ -6,5 +6,6 @@ json.bulk_items do
 
 		json.quantity item[:quantity]
 		json.purpose item[:purpose]
+		json.required_by_date item[:required_by_date]
 	end
 end
