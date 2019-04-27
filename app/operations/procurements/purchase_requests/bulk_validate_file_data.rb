@@ -65,6 +65,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
   def process
     self.item_details.each do |item|
       description = item[:description] || item["description"]
+      item_number = item[:item_number] || item["item_number"]
       item_code = item[:item_code] || item["item_code"]
       preferred_vendor = item[:preferred_vendor] || item["preferred_vendor"]
       required_by_date = item[:required_by_date] || item["required_by_date"]
