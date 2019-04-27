@@ -53,13 +53,13 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
   end
 
   def pre_process
-    # self.items_in_sheet = self.item_details.pluck(:item_number)
+    self.items_in_sheet = self.item_details.pluck(:item_number)
 
-    # self.list_of_items = self.company_items.where(item_number: self.items_in_sheet)
+    self.list_of_items = self.company_items.where(item_number: self.items_in_sheet)
 
-    # self.items_found = self.list_of_items.pluck(:item_number)
+    self.items_found = self.list_of_items.pluck(:item_number)
 
-    # self.items_not_found = (self.items_in_sheet - self.items_found)
+    self.items_not_found = (self.items_in_sheet - self.items_found)
   end
 
   def process
@@ -78,14 +78,14 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       self.error_messages = []
       self.issue_item = {}
 
-      # if item_number.nil? or items_not_found.include? item_number
-      #   self.valid = false
-      #   self.error_messages << "Unable to find this item number in inventory list"
-      #   self.issue_item[:item_number] = "Unable to find this item number in inventory list"
-      # else
-      #   single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
-      #   item[:single_item] = single_item
-      # end
+      if item_number.nil? or items_not_found.include? item_number
+        self.valid = false
+        self.error_messages << "Unable to find this item number in inventory list"
+        self.issue_item[:item_number] = "Unable to find this item number in inventory list"
+      else
+        single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
+        item[:single_item] = single_item
+      end
 
       unless validate_amount unit_price
         self.valid = false
@@ -187,6 +187,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
   def retrieve_header_names
     [
      "Item Description",
+     "Item Number",
      "Item Code",
      "Preferred Vendor",
      "Required By Date",

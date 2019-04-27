@@ -69,6 +69,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
   def default_headers
     [
      "Item Description",
+     "Item Number",
      "Item Code",
      "Preferred Vendor",
      "Required By Date",
