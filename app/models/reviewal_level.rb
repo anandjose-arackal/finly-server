@@ -37,6 +37,8 @@ class ReviewalLevel < ApplicationRecord
   scope :with_policy_ids, -> (ids) {where policy_id: ids}
   scope :with_policy_id, -> (ids) {where policy_id: ids}
   scope :with_associated_entity_type, -> (associated_entity_type) { where associated_entity_type: associated_entity_type}
+  scope :with_em_providers, -> { where associated_entity_type: Constants::EM_PROVIDER }
+  scope :with_vp_providers, -> { where associated_entity_type: Constants::VP_PROVIDER }
 
   # alias_method :filter_associated_entity_type, :with_entity_type
   # alias_method :filter_policy, :with_policy_ids
