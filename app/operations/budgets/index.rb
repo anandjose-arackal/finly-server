@@ -25,7 +25,7 @@ class Budgets::Index < Budgets::Base
   end
 
   def validate
-    if budget.blank?
+    if budgets.blank?
       add_message :error, 'No Record found'
     end
   end

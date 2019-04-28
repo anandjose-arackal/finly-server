@@ -49,7 +49,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     begin
       self.parsed_data = ImportUtil.load_spreadsheet(file, headers, {skip_empty_lines: true})
     rescue Ole::Storage::FormatError => e
-      add_message :error, "File Format error. Please re-save your Excel sheet in 2003 format or greater."
+      add_message :error, "File Format error. Please re-save your Excel sheet in Microsoft 2007 format or greater."
     end
     self.payment_mode = params[:transfer_type]
     self.scheduled_at = params[:scheduled_at]

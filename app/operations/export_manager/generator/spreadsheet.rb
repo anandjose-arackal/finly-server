@@ -15,7 +15,7 @@ class ExportManager::Generator::Spreadsheet < ExportManager::Generator::Base
         f.write exporter.generate_xls
       end
     end
-    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day)
+    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 7.day), created_by_id: user.id, company_id: user.company_id
     {file_url: temp_file.file.url(:original, timestamp: false), success: true}
   end
 
