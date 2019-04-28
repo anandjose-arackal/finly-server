@@ -167,6 +167,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
           location = self.locations.find_by(id: delivery_location)
           item[:delivery_location_name] = location.name
         end
+        
         if preferred_vendor.present?
           if preferred_vendor.to_i.to_s == preferred_vendor
             all_rc = RateContracts::Index.(user, params)
@@ -179,6 +180,8 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
             end
           end
         end
+
+        item[:estimated_value] = quantity.to_i * unit_price.to_i
       end
 
       self.contents << item.values

@@ -5,7 +5,7 @@ json.bulk_items do
 		json.attachment_attributes nil
 		json.estimated_cost do
 			json.currency_id nil
-			json.value nil
+			json.value item[:estimated_value]
 			json.id nil
 		end
 
@@ -32,9 +32,11 @@ json.bulk_items do
 		json.rejected nil
 		json.status nil
 
+		json.item_code item[:single_item]&.item_code
+		json.item_number item[:single_item]&.item_number
 		json.product_details do
-			json.product_name item[:single_item].description
-			json.id item[:single_item].id
+			json.product_name item[:single_item]&.description
+			json.id item[:single_item]&.id
 		end
 	end
 end
