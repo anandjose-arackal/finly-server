@@ -257,6 +257,10 @@ class Invoice < ApplicationRecord
     end
   }
 
+  scope :filter_ids, ->(ids) {
+    where id: ids
+  }
+
   scope :filter_department_id, -> (ids) {
     where department_id: ids
   }

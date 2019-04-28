@@ -1,4 +1,5 @@
 class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
+  attr_accessor :input_data
 
   register_handle :invoices
   register_generator ExportManager::Generator::Spreadsheet
@@ -11,7 +12,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
                       invoice_number: {spreadsheet: true},
                       invoice_date: {spreadsheet: true},
                       vendor_name: {spreadsheet: true},
-                      vendor_id: {spreadsheet: true},
+                      vendor_ref_num: {spreadsheet: true},
                       #added_by: {spreadsheet: true},
                       total_amount: {spreadsheet: true},
                       total_payable: {spreadsheet: true},
@@ -21,6 +22,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
                   ]
 
   def input
+    return self.input_data unless self.input_data.nil?
+
     invoices_presenter = BankTransfer::InwardInvoices::Index.(user, params)
 
     unless invoices_presenter.success?
@@ -28,7 +31,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
       return
     end
 
-    invoices_presenter.invoices
+    self.input_data = invoices_presenter.invoices
   end
 
   def finly_ref_no(invoice)
@@ -55,7 +58,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
     invoice.vendor&.name
   end
 
-  def vendor_id(invoice)
+  def vendor_ref_num(invoice)
     invoice.vendor_id
   end
 
