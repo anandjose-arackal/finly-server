@@ -167,7 +167,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
           location = self.locations.find_by(id: delivery_location)
           item[:delivery_location_name] = location.name
         end
-        if preferred_vendor.presemt?
+        if preferred_vendor.present?
           if preferred_vendor.to_i.to_s == preferred_vendor
             all_rc = RateContracts::Index.(user, params)
             Rails.logger.fatal "FROM BulkValidateFileData RATECONTRACTS,\n #{all_rc.inspect}"
