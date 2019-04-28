@@ -6,7 +6,7 @@ json.bulk_items do
 		json.estimated_cost do
 			json.currency_id nil
 			json.value nil
-			jsnn.id nil
+			json.id nil
 		end
 
 		json.unit_cost do
@@ -31,7 +31,7 @@ json.bulk_items do
 		json.preferred_vendors []
 		json.rejected nil
 		json.status nil
-		
+
 		json.product_details do
 			json.product_name item[:single_item].description
 			json.id item[:single_item].id
