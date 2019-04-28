@@ -1,7 +1,8 @@
 class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::PurchaseRequests::Base
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
-                :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found
+                :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
+                :locations
 
   class Procurements::PurchaseRequests::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -41,6 +42,9 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
     Rails.logger.fatal "FROM BulkValidateFileData,\n #{params.inspect}"
 
     self.company_items = user.company.items
+
+    self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+    Rails.logger.fatal "FROM BulkValidateFileData LOCATION INIT,\n #{self.locations.inspect}"
     
   end
 
@@ -53,18 +57,19 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
   end
 
   def pre_process
-    # self.items_in_sheet = self.item_details.pluck(:item_number)
+    self.items_in_sheet = self.item_details.pluck(:item_number)
 
-    # self.list_of_items = self.company_items.where(item_number: self.items_in_sheet)
+    self.list_of_items = self.company_items.where(item_number: self.items_in_sheet)
 
-    # self.items_found = self.list_of_items.pluck(:item_number)
+    self.items_found = self.list_of_items.pluck(:item_number)
 
-    # self.items_not_found = (self.items_in_sheet - self.items_found)
+    self.items_not_found = (self.items_in_sheet - self.items_found)
   end
 
   def process
     self.item_details.each do |item|
       description = item[:description] || item["description"]
+      item_number = item[:item_number] || item["item_number"]
       item_code = item[:item_code] || item["item_code"]
       preferred_vendor = item[:preferred_vendor] || item["preferred_vendor"]
       required_by_date = item[:required_by_date] || item["required_by_date"]
@@ -78,19 +83,27 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       self.error_messages = []
       self.issue_item = {}
 
-      # if item_number.nil? or items_not_found.include? item_number
-      #   self.valid = false
-      #   self.error_messages << "Unable to find this item number in inventory list"
-      #   self.issue_item[:item_number] = "Unable to find this item number in inventory list"
-      # else
-      #   single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
-      #   item[:single_item] = single_item
-      # end
+      if item_number.nil? or items_not_found.include? item_number
+        self.valid = false
+        self.error_messages << "Unable to find this item number in inventory list"
+        self.issue_item[:item_number] = "Unable to find this item number in inventory list"
+      else
+        single_item = self.list_of_items.map {|item| item if item.item_number.downcase == item_number.downcase}&.compact&.first
+        item[:single_item] = single_item
+      end
 
       unless validate_amount unit_price
         self.valid = false
         self.error_messages << "Unit Price entered has non-numeric characters."
         self.issue_item[:unit_price] = "Unit Price entered has non-numeric characters."
+      end
+
+      if preferred_vendor.present?
+        unless preferred_vendor.to_i.to_s == preferred_vendor
+          self.valid = false
+          self.error_messages << "Please input the ID of the Preferred Vendor from the Items Sheet"
+          self.issue_item[:preferred_vendor] = "Please input the ID of the Preferred Vendor from the Items Sheet."
+        end
       end
 
       # Removing it for now
@@ -105,17 +118,16 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         self.error_messages << "Please input the quantity."
         self.issue_item[:quantity] = "Please input the quantity."
       end
-
       if required_by_date.blank?
         self.valid = false
         self.error_messages << "Please provide the Required delivery date of the item."
         self.issue_item[:required_by_date] = "Please provide the Required delivery date of the item."
       end
 
-      if validate_date required_by_date
+      unless validate_date required_by_date
         self.valid = false
-        self.error_messages << "Please provide the Required delivery date of the item."
-        self.issue_item[:required_by_date] = "Please provide the Required delivery date of the item."
+        self.error_messages << "Required delivery date provided is not a valid date."
+        self.issue_item[:required_by_date] = "Required delivery date provided is not a valid date."
       end
 
       # if department_id.blank?
@@ -124,6 +136,23 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       #   self.issue_item[:quantity] = "Please provide the department for which the item would be purchased."
       # end
 
+      if delivery_location.blank?
+        self.valid = false
+        self.error_messages << "Please provide the delivery location for this item."
+        self.issue_item[:delivery_location] = "Please provide the delivery location for this item."
+      end
+
+      if self.locations.present? && delivery_location.present?
+        location_ids = self.locations.pluck(:id)
+        Rails.logger.fatal "FROM BulkValidateFileData LOCATIONs,\n #{location_ids}"
+        Rails.logger.fatal "FROM BulkValidateFileData LOCATION CHECK,\n #{location_ids.include?(delivery_location.to_i) }"
+        unless location_ids.include? delivery_location.to_i
+          self.valid = false
+          self.error_messages << "Company delivery location was not found. Please recheck the excel sheet and input the correct delivery location id."
+          self.issue_item[:delivery_location] = "Company delivery location was not found. Please recheck the excel sheet and input the correct delivery location id."
+        end
+      end
+
       unless validate_amount quantity
         self.valid = false
         self.error_messages << "Quantity entered has non-numeric characters."
@@ -131,6 +160,29 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
+
+      if valid
+        Rails.logger.fatal "FROM BulkValidateFileData LOCATION VALID,\n #{self.locations.inspect}"
+        if self.locations.present? && delivery_location.present?
+          location = self.locations.find_by(id: delivery_location)
+          item[:delivery_location_name] = location.name
+        end
+        
+        if preferred_vendor.present?
+          if preferred_vendor.to_i.to_s == preferred_vendor
+            all_rc = RateContracts::Index.(user, params)
+            Rails.logger.fatal "FROM BulkValidateFileData RATECONTRACTS,\n #{all_rc.inspect}"
+            rc = all_rc&.rate_contracts
+            if rc.present?
+              item[:preferred_vendor_name] = rc.find_by(vendor_id: preferred_vendor)&.vendor&.name
+            else
+              item[:preferred_vendor_name] = ""
+            end
+          end
+        end
+
+        item[:estimated_value] = quantity.to_i * unit_price.to_i
+      end
 
       self.contents << item.values
 
@@ -187,6 +239,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
   def retrieve_header_names
     [
      "Item Description",
+     "Item Number",
      "Item Code",
      "Preferred Vendor",
      "Required By Date",

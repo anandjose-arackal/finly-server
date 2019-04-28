@@ -21,13 +21,46 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
     # adding Item to excel sheet
     item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code"]
     item_contents = []
+    rcv = 0
+    brcv = 0
     company.items.where(active: true).each do |item|
-      item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
+      list = [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
+      if item.rate_contract_vendors.present?
+        rcv  = item.rate_contract_vendors.count
+        brcv = (rcv > brcv) ? rcv : brcv
+        item.rate_contract_vendors.each do |rc|
+          list << rc[:vendor_id]
+          list << rc[:vendor_name]
+        end
+        Rails.logger.fatal "FROM GenerateImportSample RC item_contents,\n #{list.inspect}"
+      end
+      item_contents << list
+    end
+    if brcv > 0
+      brcv.times do |i|
+        item_headers << "Preferred Vendor ID #{i}"
+        item_headers << "Preferred Vendor Name #{i}"
+      end
     end
     self.sheets << {
         item_headers: item_headers,
         item_contents: item_contents,
         name: "Inventory Items"
+    }
+
+    location_headers = ["Location ID", "Location Name"]
+    location_contents = []
+    locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+    if locations.present?
+      locations.each do |location|
+        location_contents << [location.id, location.name]
+      end
+    end
+
+    self.sheets << {
+      item_headers: location_headers,
+      item_contents: location_contents,
+      name: 'Delivery Location'
     }
 
     # # adding departments to the excel sheet
@@ -69,6 +102,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
   def default_headers
     [
      "Item Description",
+     "Item Number",
      "Item Code",
      "Preferred Vendor",
      "Required By Date",
