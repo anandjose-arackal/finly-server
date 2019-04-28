@@ -29,7 +29,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
         rcv  = item.rate_contract_vendors.count
         brcv = (rcv > brcv) ? rcv : brcv
         item.rate_contract_vendors.each do |rc|
-          item_contents << [rc.vendor_id, rc.vendor_name]
+          item_contents << [rc[:vendor_id], rc[:vendor_name]]
         end
       end
     end
