@@ -76,7 +76,7 @@ class Invoice < ApplicationRecord
 
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false
+  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV/'
 
   belongs_to :address, optional: true
   belongs_to :amount, optional: true
@@ -255,6 +255,10 @@ class Invoice < ApplicationRecord
       ids = self.awaiting_action_items(user_id)&.pluck(:id)
       with_id(ids)
     end
+  }
+
+  scope :filter_ids, ->(ids) {
+    where id: ids
   }
 
   scope :filter_department_id, -> (ids) {
@@ -558,9 +562,9 @@ class Invoice < ApplicationRecord
     }
   end
 
-  def generate_sequential_id?
-    self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
-  end
+  # def generate_sequential_id?
+  #   self.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+  # end
 
   def as_json
     {
