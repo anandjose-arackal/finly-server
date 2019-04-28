@@ -100,4 +100,9 @@ class Navbar::Master::Base
     {name: 'Finly Collect', id: 'collect', url: '/collect'}
   end
 
+  def finly_insights
+    return nil unless RequestStoreUtil.current_company.feature_subscription.budgeting_system # && RequestStoreUtil.current_user.is_budget_manager?
+    {name: 'Finly Insights', id: 'insights', url: '/insights'}
+  end
+
 end
