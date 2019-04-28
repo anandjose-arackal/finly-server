@@ -21,8 +21,22 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
     # adding Item to excel sheet
     item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code"]
     item_contents = []
+    rcv = 0
+    brcv = 0
     company.items.where(active: true).each do |item|
       item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
+      if item.rate_contract_vendors.present?
+        rcv  = item.rate_contract_vendors.count
+        brcv = (rcv > brcv) ? rcv : brcv
+        item.rate_contract_vendors.each do |rc|
+          item_contents << [rc.vendor_id, rc.vendor_name]
+        end
+      end
+    end
+    if brcv > 0
+      brcv.times do |i|
+        item_headers << ["Preferred Vendor ID #{i}", "Preferred Vendor Name #{i}"]
+      end
     end
     self.sheets << {
         item_headers: item_headers,

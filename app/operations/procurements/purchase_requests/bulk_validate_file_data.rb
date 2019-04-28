@@ -98,6 +98,14 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         self.issue_item[:unit_price] = "Unit Price entered has non-numeric characters."
       end
 
+      if preferred_vendor.present?
+        unless preferred_vendor.to_i.to_s == preferred_vendor
+          self.valid = false
+          self.error_messages << "Please input the ID of the Preferred Vendor from the Items Sheet"
+          self.issue_item[:preferred_vendor] = "Please input the ID of the Preferred Vendor from the Items Sheet."
+        end
+      end
+
       # Removing it for now
       # if unit_of_measurement.blank?
       #   self.valid = false
@@ -158,6 +166,18 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         if self.locations.present? && delivery_location.present?
           location = self.locations.find_by(id: delivery_location)
           item[:delivery_location_name] = location.name
+        end
+        if preferred_vendor.presemt?
+          if preferred_vendor.to_i.to_s == preferred_vendor
+            all_rc = RateContracts::Index.(user, params)
+            Rails.logger.fatal "FROM BulkValidateFileData RATECONTRACTS,\n #{all_rc.inspect}"
+            rc = all_rc&.rate_contracts
+            if rc.present?
+              item[:preferred_vendor_name] = rc.find_by(vendor_id: preferred_vendor)&.vendor&.name
+            else
+              item[:preferred_vendor_name] = ""
+            end
+          end
         end
       end
 

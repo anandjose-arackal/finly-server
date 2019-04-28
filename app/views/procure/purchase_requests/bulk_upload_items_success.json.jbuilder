@@ -24,8 +24,8 @@ json.bulk_items do
 			json.id item[:delivery_location]
 		end
 		json.preferred_vendor do
-			json.vendor_name item[:preferred_vendor]
-			json.vendor_id nil
+			json.vendor_name item[:preferred_vendor_name]
+			json.vendor_id item[:preferred_vendor]
 		end
 
 		json.preferred_vendors []
