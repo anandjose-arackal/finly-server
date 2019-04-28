@@ -29,7 +29,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     def init
       # Todo temp workaround because of frontend format issue - START
       if params[:filter_ids]
-        db/migrate/20190427100405_add_invoice_id_to_all_invoices.rb = params[:filter_ids].first.split(",")
+        params[:filter_ids] = params[:filter_ids].first.split(",")
       end
       # Todo temp workaround because of frontend format issue - END
       self.invoices = params[:invoices]
