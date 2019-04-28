@@ -24,8 +24,14 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_user
     has_scope :filter_year
     has_scope :filter_month
+    has_scope :filter_ids, type: :array
 
     def init
+      # Todo temp workaround because of frontend format issue - START
+      if params[:filter_ids]
+        params[:filter_ids] = params[:filter_ids].first.split(",")
+      end
+      # Todo temp workaround because of frontend format issue - END
       self.invoices = params[:invoices]
       self.invoices = apply_scopes(self.invoices, params)
       self.paginated_invoices = self.invoices.paginate(page: params[:page], per_page: (params[:per_page] || 30))
