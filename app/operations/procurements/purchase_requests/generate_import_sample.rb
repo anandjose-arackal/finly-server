@@ -24,16 +24,17 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
     rcv = 0
     brcv = 0
     company.items.where(active: true).each do |item|
-      item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
+      list = [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
       if item.rate_contract_vendors.present?
         rcv  = item.rate_contract_vendors.count
         brcv = (rcv > brcv) ? rcv : brcv
         item.rate_contract_vendors.each do |rc|
-          item_contents << rc[:vendor_id]
-          item_contents << rc[:vendor_name]
+          list << rc[:vendor_id]
+          list << rc[:vendor_name]
         end
-        Rails.logger.fatal "FROM GenerateImportSample RC item_contents,\n #{item_contents.inspect}"
+        Rails.logger.fatal "FROM GenerateImportSample RC item_contents,\n #{list.inspect}"
       end
+      item_contents << list
     end
     if brcv > 0
       brcv.times do |i|
