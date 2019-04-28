@@ -204,7 +204,9 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       if self.valid
-        self.requested_amount += amount.to_f
+        payable_amount = calculate_tds(inclusive_of_taxes, amount, tds_slab_id, tax)
+        # self.requested_amount += amount.to_f
+        self.requested_amount += payable_amount.to_f
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
@@ -281,6 +283,33 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   #   end
   #   true
   # end
+
+  def calculate_tds(inclusive_of_taxes, original_amount, tds_slab_id, tax)
+    net_amount = 0
+    if inclusive_of_taxes
+
+      # calculate_inclusive_taxes
+      gross_amount = TaxCalculationUtils.inclusive_tax_amount(original_amount.to_i, (tax.to_i))
+      # calculate_tds
+      tds = TdsRatesList.find(tds_slab_id).tds rescue 0
+      new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
+      tds_amount = gross_amount - new_gross_amount
+
+      net_amount = original_amount.to_i - tds_amount
+
+    else 
+
+      # calculate_exclusive_taxes
+      net_amount = TaxCalculationUtils.exclusive_tax_amount(original_amount.to_i, (tax.to_i))
+      tax_amount = net_amount - original_amount.to_i
+      # calculate_tds
+      tds = TdsRatesList.find(tds_slab_id).tds rescue 0
+      new_gross_amount = TaxCalculationUtils.tds_amount(original_amount.to_i, tds.to_i)
+      tds_amount = original_amount.to_i - new_gross_amount
+
+      net_amount = original_amount.to_i + tax_amount - tds_amount
+    end
+  end
 
   def validate_amount(amount)
     if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer
