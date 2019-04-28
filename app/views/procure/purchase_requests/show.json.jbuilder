@@ -38,7 +38,7 @@ json.result do
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id
-            json.item_code line_item&.item&.item_code
+            json.item_code line_item&.item&.item_number
           end
           json.preferred_vendor do
             json.vendor_name line_item&.vendor&.name
