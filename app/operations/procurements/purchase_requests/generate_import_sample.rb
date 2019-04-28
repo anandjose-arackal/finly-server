@@ -29,13 +29,16 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
         rcv  = item.rate_contract_vendors.count
         brcv = (rcv > brcv) ? rcv : brcv
         item.rate_contract_vendors.each do |rc|
-          item_contents << [rc[:vendor_id], rc[:vendor_name]]
+          item_contents << rc[:vendor_id]
+          item_contents << rc[:vendor_name]
         end
+        Rails.logger.fatal "FROM GenerateImportSample RC item_contents,\n #{item_contents.inspect}"
       end
     end
     if brcv > 0
       brcv.times do |i|
-        item_headers << ["Preferred Vendor ID #{i}", "Preferred Vendor Name #{i}"]
+        item_headers << "Preferred Vendor ID #{i}"
+        item_headers << "Preferred Vendor Name #{i}"
       end
     end
     self.sheets << {
