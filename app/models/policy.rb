@@ -146,7 +146,6 @@ class Policy < ApplicationRecord
       ActiveRecord::Base.transaction do
         self.policy_department_mappings.destroy_all
         params[:policy_department_mappings_attributes].each do |department_hash|
-          binding.pry
           department = self.company.departments.find_by_id department_hash[:department_id]
           result = self.policy_department_mappings.create!(department_id: department_hash[:department_id], enabled: true)
           if department.root.present?
