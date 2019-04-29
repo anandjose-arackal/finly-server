@@ -6,7 +6,7 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
 
   class Procurements::PurchaseRequests::PurchaseRequestEditConfig::EditConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :departments, :policies, :reviewal_chains, :purchase_request
+    attr_accessor :locations, :departments, :policies, :reviewal_chains, :purchase_request, :cost_centers, :department_mappings
 
     def init
       self.purchase_request = params[:purchase_request]
@@ -23,7 +23,9 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
       # params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
       self.policies = Policy::VendorPayments::Index.(user, params).policies
+      self.cost_centers = user.company.cost_centers
       self.reviewal_chains = []
+      self.department_mappings = []
       params[:reviewal_document] = purchase_request
 
       self.policies.each do |policy|
@@ -43,12 +45,20 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
             reviewal_chain: policy_chain
         }
         self.reviewal_chains.push(chain)
+        self.department_mappings.push(get_department_mapping(policy))
       end
     end
 
     def get_reviewal_chain
       op = ::ReviewalManager::ReviewalChain.(user, params)
       op.chain
+    end
+
+    def get_department_mapping(policy)
+      {
+        policy_id: policy.id,
+        departments: policy.departments.as_json
+      }
     end
   end
 

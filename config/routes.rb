@@ -3485,6 +3485,9 @@ Rails.application.routes.draw do
     end
 
     # adding routes for purchase requests
+    put 'purchase_requests/bulk_approve', to: 'purchase_requests#bulk_approve'
+    put 'purchase_requests/bulk_reject', to: 'purchase_requests#bulk_reject'
+    put 'purchase_requests/bulk_take_control', to: 'purchase_requests#bulk_take_control'
     resources :purchase_requests do
       get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
       post 'create_and_submit', to: "purchase_requests#create_and_submit", as: :create_and_submit
@@ -3504,6 +3507,9 @@ Rails.application.routes.draw do
         get 'count', to: "purchase_requests#count", as: :count
       end
     end
+    post 'purchase_request/bulk_upload_items', to: 'purchase_requests#bulk_upload_items'
+    get 'purchase_request/template_bulk_import_items', to: 'purchase_requests#template_bulk_import_items'
+
 
     post 'payments/create_bulk_advance', to: 'payments#bulk_create_advance', as: :bulk_create_advance
     resources :payments, only: [:show]

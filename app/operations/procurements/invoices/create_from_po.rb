@@ -180,7 +180,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           inventory_line_item_id: item.inventory_line_item_id,
           department_id: item.department_id,
           cost_center_id: item.cost_center_id,
-          tax_rate_id: item.tax_rate_id
+          tax_rate_id: item.tax_rate_id,
+          category_id: item.category_id
       }
     end
     

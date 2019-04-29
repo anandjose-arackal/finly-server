@@ -1,6 +1,6 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
-              :payment_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
+              :payment_term_id, :procurement_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
               :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note
 json.vendor @result.purchase_order.vendor.as_json
 
@@ -21,6 +21,8 @@ json.vendor do
         json.name bank_account.name
         json.account_number bank_account.account_number
         json.ifsc bank_account.ifsc
+        json.selected @result.purchase_order.bank_account&.id == bank_account.id
+        json.default bank_account.default_account
       end
     end
   end
@@ -89,6 +91,8 @@ json.items do
     
     json.item_number item.inventory_line_item&.item_number rescue nil
     json.gl_code item.inventory_line_item&.item_code rescue nil
+    json.category_name item.category&.name
+    json.category_id item.category_id
 
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
