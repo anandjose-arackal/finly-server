@@ -162,12 +162,26 @@ class NotifierType < ApplicationRecord
              {key: :invoice_comment, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
 
-             # Others
+# Others
              {key: :system_alert, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
              {key: :user_otp, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
-  ]
+            # Vendors
+             {key: :vendor_submit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :vendor_approve, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :vendor_reject, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :vendor_unapprove, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :vendor_retract, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :vendor_take_control, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :vendor_return_control, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true}]
 
   scope :with_name, ->(name) {where name: name}
 

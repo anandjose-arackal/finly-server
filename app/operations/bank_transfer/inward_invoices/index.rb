@@ -8,7 +8,9 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     has_scope :filter_payable_invoices
     has_scope :invoice_date, using: [:from, :to], type: :hash
+    has_scope :filter_invoice_date
     has_scope :due_date, using: [:from, :to], type: :hash
+    has_scope :filter_due_date
     has_scope :filter_invoice_number
     has_scope :filter_by_created_at
     has_scope :filter_vendor_id
@@ -22,8 +24,14 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_user
     has_scope :filter_year
     has_scope :filter_month
+    has_scope :filter_ids, type: :array
 
     def init
+      # Todo temp workaround because of frontend format issue - START
+      if params[:filter_ids]
+        params[:filter_ids] = params[:filter_ids].first.split(",")
+      end
+      # Todo temp workaround because of frontend format issue - END
       self.invoices = params[:invoices]
       self.invoices = apply_scopes(self.invoices, params)
       self.paginated_invoices = self.invoices.paginate(page: params[:page], per_page: (params[:per_page] || 30))

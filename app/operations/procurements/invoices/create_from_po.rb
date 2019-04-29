@@ -1,7 +1,7 @@
 class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice, :po_revision, :previous_invoices, :advance,
-                :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance
+                :po_advance, :po_prev_adjusted_advance, :po_adjusted_advance, :last_invoice, :proforma_advance, :custom_fields
 
   def personalizer
     {
@@ -26,6 +26,9 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.previous_invoices = (self.procurement.invoices.present?) ? self.procurement.invoices.includes(:invoice_items) : nil
 
     self.invoice_params = set_invoice_parameters
+
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
+
   end
 
   def validate
@@ -61,11 +64,17 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     self.invoice = self.procurement.invoices.build(self.invoice_params)
     
     self.invoice.company_id = user.company.id
+    
+    validate_custom_fields_invoice
+    return if has_errors?
+    
     if self.invoice.save
       if (params[:document_type].present? && params[:document_type] == 'proforma_invoice')
         self.invoice.proforma_invoice_id = self.invoice.id
       end
+      # self.invoice.advance_amount_required = (self.po_advance.present?) ? true : false
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
+      # self.invoice.advance_amount_required = false
       self.invoice.save
 
 
@@ -108,7 +117,7 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
 
     self.advance = self.purchase_order.advance_amount
 
-    receiving_account = self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
+    receiving_account = self.purchase_order&.bank_account || self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment. CHANGED.
     invoice_items_attributes = []
 
     # The idea is, twofold
@@ -169,7 +178,10 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
           gst_type_id: self.purchase_order.gst_type_id,
           comment: item.comment,
           inventory_line_item_id: item.inventory_line_item_id,
-          tax_rate_id: item.tax_rate_id
+          department_id: item.department_id,
+          cost_center_id: item.cost_center_id,
+          tax_rate_id: item.tax_rate_id,
+          category_id: item.category_id
       }
     end
     
@@ -220,7 +232,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       cost_center_id: self.purchase_order.cost_center_id,
       invoice_items_attributes: invoice_items_attributes,
       policy_id: self.purchase_order.policy_id,
-      gstin_location_id: self.purchase_order.gstin_location_id
+      gstin_location_id: self.purchase_order.gstin_location_id,
+      cost_allocation_items: self.purchase_order.cost_allocation_items
     }
 
     if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
@@ -234,6 +247,28 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
     end
     return invoice_params
   end
+
+  def validate_custom_fields_invoice
+    set_fields = set_custom_fields_invoice self.invoice, self.custom_fields, false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.invoice)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+  end
+
+  def set_custom_fields_invoice(invoice, data, save)
+    custom_fields = {custom_fields: data}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
+  end
+  
 end
 
 

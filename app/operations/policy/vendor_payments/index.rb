@@ -49,9 +49,13 @@ class Policy::VendorPayments::Index < Policy::Base
   def post_process
     self.policy_user_roles = self.policy_user_roles.where(user_id: user.id)&.distinct
     self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.with_application(current_app)&.exclude_deleted if policy_user_roles.present?
-    # d'uh
+    # d'uh, need to clean this operation
     if user.vp_admin_or_auditor?
-      self.policies = user.company&.policies.with_application(current_app)&.exclude_deleted
+      if user&.enforce_policy_enabled?
+        self.policies = user.company&.policies.where.not(default: true).with_application(current_app)&.exclude_deleted
+      else
+        self.policies = user.company&.policies.with_application(current_app)&.exclude_deleted
+      end
     end
   end
 
@@ -76,6 +80,7 @@ class Policy::VendorPayments::Index < Policy::Base
       self.policies = policies.where(id: policy_user_roles&.pluck(:policy_id)) if params.present? && params.has_key?(:filter_role_id)
       # Jugaad as we do not have policy admin in place
       # It's the company admin
+      # Admin can see all policies in organizational account irrespective of enforce policy 
       self.admin_policies = user.company.policies.with_application(current_app)&.exclude_deleted
     end
   end

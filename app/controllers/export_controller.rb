@@ -83,6 +83,20 @@ class ExportController < BaseControllers::WebBase
     end
   end
 
+  def money_request
+    respond_to do |format|
+      format.csv {
+        @money_request = Export::MoneyRequest::AsCsv.(current_user, params)
+        send_data @money_request.data, filename: "#{@money_request.money_request_name}.csv"
+      }
+      format.xls {
+        @money_request = Export::MoneyRequest::AsXml.(current_user, params)
+        @header = @money_request.header
+        @data = @money_request.data
+      }
+    end
+  end
+
   def payment_file
 
   end

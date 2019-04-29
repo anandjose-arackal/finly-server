@@ -5,7 +5,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   # register_actions [:more_details_button, :send_mail, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :make_payment, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove]
 
-  register_actions [:more_details_button, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove, :take_control, :return_control]
+  register_actions [:more_details_button, :export_items, :submit, :reject, :approve, :remind, :retract, :remind_approver, :save_btn, :save_and_submit, :delete, :more_actions, :audit_trail, :download, :send_btn, :export_po_items, :update_btn, :unapprove, :take_control, :return_control, :forward]
 
 
   def initialize(user = nil, params = {})
@@ -80,7 +80,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
       if (invoice.processing? && invoice.get_reviewers.exclude?(user))
         return true
       end
-      if invoice.processing? && !invoice.action_users(:return_control).include?(user) && invoice.action_users(:approve).include?(user)
+      if invoice.processing? && !invoice.action_users(:return_control).include?(user) && !invoice.action_users(:approve).include?(user)
         return true
       end
     end
@@ -187,4 +187,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
     invoice.created_by_user_id.eql? user.id
   end
 
+  def forward
+    invoice.processing? && invoice.get_reviewers.include?(user)
+  end
 end

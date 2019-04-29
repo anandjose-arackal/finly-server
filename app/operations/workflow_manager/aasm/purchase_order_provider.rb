@@ -26,6 +26,10 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
       transitions :from => :approved, :to => :processing
     end
 
+    event :forward do
+      transitions :from => :processing, :to => :processing, guard: :user_can_review?
+    end
+
     event :take_control do
       transitions :from => :processing, :to => :processing
     end
@@ -73,23 +77,23 @@ class WorkflowManager::Aasm::PurchaseOrderProvider < WorkflowManager::Aasm::Base
   end
 
   def previous_state
-    ps = self.document.trails.where(action_id: [5,7,33])
+    ps = self.document.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
     ps.last.action_id
   end
 
   def is_approve?(state=false)
     ps_id = previous_state
-    state = ( ps_id == 5 ) ? true : false
+    state = ( ps_id == TrailAction.id_for(:approve) ) ? true : false
   end
 
   def is_auto_approve?(state=false)
     ps_id = previous_state
-    state = ( ps_id == 7 ) ? true : false
+    state = ( ps_id == TrailAction.id_for(:auto_approve) ) ? true : false
   end
 
   def is_send_to_vendor?(state=false)
     ps_id = previous_state
-    state = ( ps_id == 33 ) ? true : false
+    state = ( ps_id == TrailAction.id_for(:send_to_vendor) ) ? true : false
   end
 
   #

@@ -47,7 +47,8 @@ class TrailAction < ApplicationRecord
         :confirm_booking,
         :reject_booking_request,
         :request_selection,
-        :retract_booking
+        :retract_booking,
+        :forward
     ]
   end
 end

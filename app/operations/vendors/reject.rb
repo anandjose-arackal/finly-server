@@ -15,5 +15,6 @@ class Vendors::Reject < Vendors::Base
 
   def post_process
     add_message :success, "You've rejected reviewal of vendor"
+    Event::EVendors::Reject.(user, document: self.vendor)
   end
 end

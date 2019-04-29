@@ -1,6 +1,7 @@
 json.result do
   json.purchase_request do
     json.id @result.purchase_request.id
+    json.purchase_request_number @result.purchase_request.order_number
     json.description @result.purchase_request&.description
     json.note @result.purchase_request&.note
     # json.total_amount @result.purchase_request.calculate_total_amount
@@ -17,6 +18,10 @@ json.result do
       json.name @result.purchase_request&.department&.name
       json.id @result.purchase_request&.department_id
     end
+    json.cost_center do
+      json.name @result.purchase_request&.cost_center&.name
+      json.id @result.purchase_request&.cost_center&.id
+    end
     json.policy do 
       json.name @result.purchase_request.policy&.name
       json.id @result.purchase_request&.policy_id
@@ -29,14 +34,16 @@ json.result do
           json.id line_item.id
           json.status line_item&.status&.name
           json.rejected line_item.rejected
+          json.unit_of_measurement line_item.unit_of_measurement
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id
           end
           json.preferred_vendor do        
-            json.name line_item&.vendor&.name
-            json.id line_item.vendor_id
+            json.vendor_name line_item&.vendor&.name
+            json.vendor_id line_item.vendor_id
           end
+          json.preferred_vendors line_item&.item&.rate_contract_vendors
           json.required_by_date line_item&.required_by_date&.to_date
           json.delivery_location do  
             json.name line_item&.delivery_location&.name
@@ -44,7 +51,6 @@ json.result do
           end
           json.purpose line_item.purpose
           json.quantity line_item.quantity
-          json.unit_type "each"
           json.estimated_cost do
             json.currency_id line_item&.estimated_amount&.currency_id
             json.value line_item&.estimated_amount&.value
@@ -55,14 +61,13 @@ json.result do
             json.value line_item&.per_unit_estimated_amount&.value
             json.id line_item&.per_unit_estimated_amount_id
           end
-          json.attachments_attributes do
-            json.array!(line_item.attachments) do |attachment|
-              json.uid attachment.id
-              json.name attachment&.file_file_name
-              json.url attachment&.attachment&.url
-              # As required by frontend
-              json.status 'done'
-            end unless line_item.attachments.blank?
+          json.attachment_attributes do
+            # json.uid line_item.attachment&.id
+            # json.name line_item.attachment&.file_file_name
+            # json.url line_item.attachment&.file&.url
+            # # As required by frontend
+            # json.status 'done'
+            json.merge! line_item.attachment.as_json(array: true)
           end
         end
       else
@@ -105,6 +110,6 @@ json.result do
         end
       end
     end
-    json.reviewal_chain @result.purchase_request.get_reviewal_chain
+    json.reviewal_chain @result.reviewal_chain
   end
 end

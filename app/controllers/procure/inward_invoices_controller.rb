@@ -22,6 +22,11 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
     respond
   end
 
+  def bulk_forward
+    @result = Procurements::Invoices::BulkForward.(current_user, params)
+    respond
+  end
+
   def show
     @result = Procurements::Invoices::Show.(current_user, params)
     respond
@@ -91,6 +96,28 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
   def template_destroy
     @result = Procurements::Invoices::Templates::Destroy.(current_user, params)
     respond response: @result.success? ? :success : :failure
+  end
+
+  def template_bulk_import_items
+    @result = Procurements::Invoices::Templates::GenerateImportSample.(current_user, params)
+    respond
+  end
+
+  def bulk_upload_items
+    @result = Procurements::Invoices::BulkUploadLineItems.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_failure'
+        }
+      end
+    end
   end
 
   def bulk_approve

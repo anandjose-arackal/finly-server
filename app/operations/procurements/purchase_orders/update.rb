@@ -7,7 +7,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
                 :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation,
-                :gstin_location
+                :gstin_location, :cost_allocation_items
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -35,7 +35,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.vendor = ::BankTransfer::Vendors::Index.(user, {without_bank_accounts: true}).vendors.with_ids(vendor_id).first rescue nil
 
     self.department = user.company.departments.find_by(id: purchase_order_params[:department_id])
-    # self.purchase_order_params[:policy_id] = 457
+
+    # Check if department and cost center are to be saved globally for the po or individually for each item
+    self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
   end
 
   def validate
@@ -87,7 +89,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
-    if self.department.blank?
+    if self.department.blank? && !self.cost_allocation_items
       add_message :error, "Please select a department"
     end
 
@@ -103,6 +105,37 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     if self.bank_account.blank?
       add_message :error, 'Please select the bank account of the vendor.'
       return
+    end
+
+    # Removing hard check for department and cc line item wise
+
+    # if self.cost_allocation_items
+    #   arr = self.purchase_order_params[:items_attributes].pluck(:department_id)
+
+    #   if arr.collect {|a| a.blank? }.include? true
+    #     add_message :error, "Please select a Department for which the item would be purchased."
+    #     return
+    #   end
+
+    #   arr = self.purchase_order_params[:items_attributes].pluck(:cost_center_id)
+
+
+    #   if arr.collect {|a| a.blank? }.include? true
+    #     add_message :error, "Please select a Cost Center for which the item would be purchased."
+    #     return
+    #   end
+    # else
+    #   self.purchase_order_params[:items_attributes].each do |item|
+    #     item[:department_id] = self.purchase_order_params[:department_id]
+    #     item[:cost_center_id] = self.purchase_order_params[:cost_center_id]
+    #   end
+    # end
+
+    unless self.cost_allocation_items
+      self.purchase_order_params[:items_attributes].each do |item|
+        item[:department_id] = self.purchase_order_params[:department_id]
+        item[:cost_center_id] = self.purchase_order_params[:cost_center_id]
+      end
     end
 
     if StringUtils.to_bool( self.purchase_order_params[:advance_amount_required] ) 
@@ -171,7 +204,6 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
-
 
       # purchase_order.save
       purchase_order.process_line_item_calculation(self.skip_adv_calculation)

@@ -1,6 +1,18 @@
 class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_orders
 
+  def pre_validate
+    super
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate the transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
+  end
+
   def init
     purchase_order_ids = params[:ids] || params[:purchase_order_ids]
 
@@ -9,7 +21,7 @@ class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::
       return
     end
 
-    self.purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids)
+    self.purchase_orders = user.company.purchase_orders.with_procurement_id(user.company.procurements.with_ids(purchase_order_ids).pluck(:id))
   end
 
   def validate
@@ -18,7 +30,7 @@ class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::
     end
     accept_po = []
     self.purchase_orders.each do |purchase_order|
-      valid = (purchase_order.can_approve?) ? true : false
+      valid = (purchase_order.can_really_approve?) ? true : false
 
       if valid
         accept_po << purchase_order.id

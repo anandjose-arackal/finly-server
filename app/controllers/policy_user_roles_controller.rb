@@ -5,6 +5,11 @@ class PolicyUserRolesController < BaseControllers::WebBase
     respond
   end
 
+  def forwardable_users
+    @result = PolicyUserRoles::ForwardableUsers.(current_user, params)
+    respond
+  end
+
   def create
     @result = PolicyUserRoles::Create.(current_user, params)
     respond

@@ -1,0 +1,69 @@
+<% content_for :body do %>
+  <head>
+    <title>Forwarded Purchase Orders</title>
+  </head>
+  <body style="background-color: #f3f3f3; height: auto;">
+  <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
+    <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;">Forwarded Purchase Orders</p>
+  </div>
+  <div style="width: 100%; height: auto; margin: auto; background-color: white;">
+    <!--<p style="font-size: 20px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">Abhinash1354@gmail.com</span> has shared 'New Expense Report' with you.</p>-->
+
+    <% if @data.result[:success].length > 0 %>
+      <div style="text-align: left;">Purchase Orders Forwarded:</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>PO #</th>
+          <th>Created By</th>
+          <th>Sub Department</th>
+          <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.result[:success].each_with_index do |po_details, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= po_details[:po_number] %></td>
+            <td><%= po_details[:user] %></td>
+            <td><%= po_details[:sub_department] %></td>
+            <td>&#8377;<%= po_details[:amount]&.to_d.round(2) rescue 0 %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <% if @data.result[:error].length > 0 && @data.display_errors %>
+      <div style="text-align: left;">Purchase Orders Couldn't Be Forwarded</div>
+      <table style="width: 100%;">
+        <thead>
+        <tr>
+          <th>#</th>
+          <th>PO #</th>
+          <th>Created By</th>
+          <th>Sub Department</th>
+          <th>Amount</th>
+          <th>Error</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @data.result[:error].each_with_index do |po_details, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= po_details[:po_number] %></td>
+            <td><%= po_details[:user] %></td>
+            <td><%= po_details[:sub_department] %></td>
+            <td>&#8377;<%= po_details[:amount]&.to_d.round(2) rescue 0 %></td>
+            <td><%= po_details[:error].join(", ") %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    <% end %>
+    <br>
+  </div>
+  </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>

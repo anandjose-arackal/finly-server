@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: purchase_request_item_statuses
+#
+#  id         :bigint(8)        not null, primary key
+#  name       :string(255)
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class PurchaseRequestItemStatus < ApplicationRecord
 
   include Seedable
@@ -14,7 +24,8 @@ class PurchaseRequestItemStatus < ApplicationRecord
         :order_initiated,
         :cancelled,
         :issued_from_inventory,
-        :po_created
+        :po_created,
+        :rejection_in_progress
     ]
   end
 

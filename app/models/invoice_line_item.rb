@@ -42,6 +42,8 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :gst_type, optional: true
   belongs_to :tax_rate, optional: true
+  belongs_to :cost_center, optional: true
+  belongs_to :department, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -53,6 +55,10 @@ class InvoiceLineItem < ApplicationRecord
   validates :description, presence: true
   validates :quantity, presence: true
   validates :rate, presence: true
+
+  # removing for now
+  # validates_presence_of :unit_of_measurement
+  validates_presence_of :department
 
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
@@ -75,7 +81,8 @@ class InvoiceLineItem < ApplicationRecord
   scope :with_budgetable_category_ids, -> (category_ids) {
     if category_ids.present?
       category_ids = [category_ids] unless category_ids.is_a?(Array)
-      ids = joins(:inventory_line_item).where("inventory_line_items.category_id IN (?)", category_ids).pluck('invoice_line_items.id')
+      # ids = joins(:inventory_line_item).where("inventory_line_items.category_id IN (?)", category_ids).pluck('invoice_line_items.id')
+      ids = joins(:inventory_line_item).where("items.category_id IN (?)", category_ids).pluck('items.id')
       where(id: ids)
     end
   }
