@@ -147,10 +147,12 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
       #   self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
       # end
 
-      unless self.category_ids.include? category_id.to_i
-        self.valid = false
-        self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
-        self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+      if category_id.present?
+        unless self.category_ids.include? category_id.to_i
+          self.valid = false
+          self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+          self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        end
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
