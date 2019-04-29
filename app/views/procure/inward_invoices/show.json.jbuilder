@@ -228,7 +228,8 @@ end
 
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
-    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address
+    json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
   end
 end
 
