@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
-                :all_departments, :all_departments_ids
+                :all_departments, :all_departments_ids, :category_ids
 
   class Procurements::PurchaseOrders::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -46,6 +46,9 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.all_departments = Company::Departments::Index.(user, params)
     self.all_departments_ids = self.all_departments&.policy_department_filter_mapping&.pluck(:id)
      Rails.logger.fatal "FROM BulkValidateFileData DEPARTMENT IDS,\n #{self.all_departments_ids.inspect}"
+
+    category = current_company.categories.inward_invoice_items_only
+    self.category_ids = category.pluck(:id) rescue []
     
   end
 
@@ -74,6 +77,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       department_id = item[:department_id] || item["department_id"]
       comment = item[:comment] || item["comment"]
       item_code = item[:item_code] || item[:item_code]
+      category_id = item[:category_id] || item["category_id"]
       hsn_sac = item[:hsn_sac] || item[:hsn_sac]
       quantity = item[:quantity] || item[:quantity]
       unit_of_measurement = item[:unit_of_measurement] || item["unit_of_measurement"]
@@ -140,6 +144,12 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         self.issue_item[:quantity] = "Quantity entered has non-numeric characters."
       end
 
+      unless self.category_ids.include? category_id.to_i
+        self.valid = false
+        self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+      end
+
       # unless validate_hsn_sac hsn_sac
       #   self.valid = false
       #   self.error_messages << "HSN/SAC is invalid. Please recheck."
@@ -200,6 +210,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
      "Cost Center ID",
      "Comment",
      "Item code",
+     "Category ID",
      "HSN/SAC",
      "Quantity",
      "Unit of measurement",

@@ -44,6 +44,9 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
     self.company_items = user.company.items
     self.all_departments = Company::Departments::Index.(user, params)
     self.all_departments_ids = self.all_departments&.policy_department_filter_mapping&.pluck(:id)
+
+    category = current_company.categories.inward_invoice_items_only
+    self.category_ids = category.pluck(:id) rescue []
     
   end
 
@@ -72,6 +75,7 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
       department_id = item[:department_id] || item["department_id"]
       comment = item[:comment] || item["comment"]
       item_code = item[:item_code] || item['item_code']
+      category_id = item[:category_id] || item["category_id"]
       hsn_sac = item[:hsn_sac] || item['hsn_sac']
       quantity = item[:quantity] || item['quantity']
       unit_of_measurement = item[:unit_of_measurement] || item["unit_of_measurement"]
@@ -117,7 +121,13 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
         self.issue_item[:department_id] = "Please provide the department for which the item would be purchased."
       end
 
-      if department_id.present?
+      if self.all_departments_ids.blank?
+        self.valid = false
+        self.error_messages << "You do not seem to be part of any policy and department. Please make the changes from the Organization Account from the main menu."
+        self.issue_item[:department_id] = "You do not seem to be part of any policy and department. Please make the changes from the Organization Account from the main menu."
+      end
+
+      if department_id.present? && self.all_departments_ids.present?
         unless (self.all_departments_ids.include?(department_id.to_i))
           self.valid = false
           self.error_messages << "Department does not exist for this policy or you are not authorized to make purchases for this department."
@@ -136,6 +146,12 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
       #   self.error_messages << "HSN/SAC is invalid. Please recheck."
       #   self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
       # end
+
+      unless self.category_ids.include? category_id.to_i
+        self.valid = false
+        self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+      end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
@@ -191,6 +207,7 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
      "Cost Center ID",
      "Comment",
      "Item code",
+     "Category ID",
      "HSN/SAC",
      "Quantity",
      "Unit of measurement",

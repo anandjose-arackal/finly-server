@@ -46,6 +46,9 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
     self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
     Rails.logger.fatal "FROM BulkValidateFileData LOCATION INIT,\n #{self.locations.inspect}"
     
+    category = current_company.categories.inward_invoice_items_only
+    self.category_ids = category.pluck(:id) rescue []
+
   end
 
   def validate
@@ -71,6 +74,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       description = item[:description] || item["description"]
       item_number = item[:item_number] || item["item_number"]
       item_code = item[:item_code] || item["item_code"]
+      category_id = item[:category_id] || item["category_id"]
       preferred_vendor = item[:preferred_vendor] || item["preferred_vendor"]
       required_by_date = item[:required_by_date] || item["required_by_date"]
       delivery_location = item[:delivery_location] || item["delivery_location"]
@@ -159,6 +163,12 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         self.issue_item[:quantity] = "Quantity entered has non-numeric characters."
       end
 
+      unless self.category_ids.include? category_id.to_i
+        self.valid = false
+        self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+      end
+
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
       if valid
@@ -241,6 +251,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
      "Item Description",
      "Item Number",
      "Item Code",
+     "Category ID",
      "Preferred Vendor",
      "Required By Date",
      "Delivery Location",

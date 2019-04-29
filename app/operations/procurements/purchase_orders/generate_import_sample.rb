@@ -55,6 +55,17 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
         name: "Cost Centers"
     }
 
+    category_headers = ["ID", "Category Name"]
+    category_contents = []
+    current_company.categories&.inward_invoice_items_only.each do |category|
+      category_contents << [category.id, category.name]
+    end
+    self.sheets << {
+      item_headers: category_headers,
+      item_contents: category_contents,
+      name: "Categories"
+    }
+
   end
 
   def success
@@ -71,6 +82,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
      "Cost Center ID",
      "Comment",
      "Item code",
+     "Category ID",
      "HSN/SAC",
      "Quantity",
      "Unit of measurement",
