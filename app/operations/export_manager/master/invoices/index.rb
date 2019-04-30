@@ -1,11 +1,12 @@
-class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
+class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscriber
   attr_accessor :input_data
 
-  register_handle :invoices
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  bus ExportManager::Master::BaseMaster
+  subscribe :invoices
+  generators ExportManager::Generator::Spreadsheet
+  processor ExportManager::Processor::Synchronous
   validate :input
-  register_fields [
+  fields [
                       finly_ref_no: {spreadsheet: true},
                       #po_number: {spreadsheet: true},
                       invoice_type: {spreadsheet: true},
