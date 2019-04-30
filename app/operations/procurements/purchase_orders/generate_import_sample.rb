@@ -16,10 +16,10 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
         }
     ]
     # adding Item to excel sheet
-    item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code"]
+    item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code", "Default Category Name", "Default Category ID"]
     item_contents = []
     company.items.where(active: true).each do |item|
-      item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
+      item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code, item.category&.name, item.category_id]
     end
     self.sheets << {
         item_headers: item_headers,
@@ -55,6 +55,17 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
         name: "Cost Centers"
     }
 
+    category_headers = ["ID", "Category Name"]
+    category_contents = []
+    current_company.categories&.inward_invoice_items_only.each do |category|
+      category_contents << [category.id, category.name]
+    end
+    self.sheets << {
+      item_headers: category_headers,
+      item_contents: category_contents,
+      name: "Categories"
+    }
+
   end
 
   def success
@@ -71,6 +82,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
      "Cost Center ID",
      "Comment",
      "Item code",
+     "Category ID",
      "HSN/SAC",
      "Quantity",
      "Unit of measurement",

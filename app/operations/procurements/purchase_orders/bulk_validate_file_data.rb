@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
-                :all_departments, :all_departments_ids
+                :all_departments, :all_departments_ids, :category_ids, :category, :cost_centers
 
   class Procurements::PurchaseOrders::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -46,6 +46,11 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
     self.all_departments = Company::Departments::Index.(user, params)
     self.all_departments_ids = self.all_departments&.policy_department_filter_mapping&.pluck(:id)
      Rails.logger.fatal "FROM BulkValidateFileData DEPARTMENT IDS,\n #{self.all_departments_ids.inspect}"
+
+    self.category = current_company.categories.inward_invoice_items_only
+    self.category_ids = category.pluck(:id) rescue []
+
+    self.cost_centers = user.company.cost_centers
     
   end
 
@@ -72,8 +77,10 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       description = item[:description] || item["description"]
       item_number = item[:item_number] || item["item_number"]
       department_id = item[:department_id] || item["department_id"]
+      cost_center_id = item[:cost_center_id] || item["cost_center_id"]
       comment = item[:comment] || item["comment"]
       item_code = item[:item_code] || item[:item_code]
+      category_id = item[:category_id] || item["category_id"]
       hsn_sac = item[:hsn_sac] || item[:hsn_sac]
       quantity = item[:quantity] || item[:quantity]
       unit_of_measurement = item[:unit_of_measurement] || item["unit_of_measurement"]
@@ -140,11 +147,35 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
         self.issue_item[:quantity] = "Quantity entered has non-numeric characters."
       end
 
+      if category_id.present?
+        unless self.category_ids.include? category_id.to_i
+          self.valid = false
+          self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+          self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        end
+      end
+
       # unless validate_hsn_sac hsn_sac
       #   self.valid = false
       #   self.error_messages << "HSN/SAC is invalid. Please recheck."
       #   self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
       # end
+
+      if valid
+        item[:category_name] = self.category.find_by(id: category_id)&.name
+        item[:category_id] = self.category.find_by(id: category_id)&.id
+
+        if department_id.present? && self.all_departments_ids.present?
+          item[:department_name] = self.all_departments.policy_department_filter_mapping&.find_by(id: department_id)&.name
+          item[:department_id] = self.all_departments.policy_department_filter_mapping&.find_by(id: department_id)&.id
+        end
+
+        if cost_center_id.present? && self.cost_centers.present?
+          item[:cost_center_name] = self.cost_centers.where(id: cost_center_id)&.first&.name
+          item[:cost_center_id] = self.cost_centers.where(id: cost_center_id)&.first&.id
+        end
+
+      end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
@@ -200,6 +231,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
      "Cost Center ID",
      "Comment",
      "Item code",
+     "Category ID",
      "HSN/SAC",
      "Quantity",
      "Unit of measurement",
