@@ -40,11 +40,15 @@ json.bulk_items do
 		end
 
 		if item[:category_id].present?
-			json.category_name item[:category_name]
-			json.category_id item[:category_id]
+			json.category do	
+				json.name item[:category_name]
+				json.id item[:category_id]
+			end
 		else
-			json.category_name item[:single_item].category&.name
-			json.category_id item[:single_item].category_id
+			json.category do
+				json.name item[:single_item].category&.name
+				json.id item[:single_item].category_id
+			end
 		end
 	end
 end
