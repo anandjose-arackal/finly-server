@@ -14,7 +14,7 @@ class Vendors::Counts < Vendors::Base
 
   def success
     params[:data] = self.data
-    Vendors::Counts::CountsPresenter.(user, params, messages)
+    Vendors::Counts::CountsPresenter.new(user, params, messages)
   end
 
   class Vendors::Counts::CountsPresenter < BaseOperation::BasePresenter::SuccessPresenter
