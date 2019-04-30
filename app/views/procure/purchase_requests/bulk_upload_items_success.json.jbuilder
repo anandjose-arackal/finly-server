@@ -21,11 +21,11 @@ json.bulk_items do
 
 		json.delivery_location do
 			json.name item[:delivery_location_name]
-			json.id item[:delivery_location]
+			json.id item[:delivery_location].to_i
 		end
 		json.preferred_vendor do
 			json.vendor_name item[:preferred_vendor_name]
-			json.vendor_id item[:preferred_vendor]
+			json.vendor_id item[:preferred_vendor].to_i
 		end
 
 		json.preferred_vendors []
@@ -42,7 +42,7 @@ json.bulk_items do
 		if item[:category_id].present?
 			json.category do	
 				json.name item[:category_name]
-				json.id item[:category_id]
+				json.id item[:category_id].to_i
 			end
 		else
 			json.category do
