@@ -178,6 +178,8 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         if self.locations.present? && delivery_location.present?
           location = self.locations.find_by(id: delivery_location)
           item[:delivery_location_name] = location.name
+          item[:delivery_location_id] = location.id
+
         end
         
         if preferred_vendor.present?
@@ -187,8 +189,10 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
             rc = all_rc&.rate_contracts
             if rc.present?
               item[:preferred_vendor_name] = rc.find_by(vendor_id: preferred_vendor)&.vendor&.name
+              item[:preferred_vendor_id] = rc.find_by(vendor_id: preferred_vendor)&.vendor&.id
             else
               item[:preferred_vendor_name] = ""
+              item[:preferred_vendor_id] = nil
             end
           end
         end
@@ -196,6 +200,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         item[:estimated_value] = quantity.to_i * unit_price.to_i
 
         item[:category_name] = self.category.find_by(id: category_id)&.name
+        item[:category_id] = self.category.find_by(id: category_id)&.id
       end
 
       self.contents << item.values

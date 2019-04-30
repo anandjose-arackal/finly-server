@@ -160,13 +160,16 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
 
       if valid
         item[:category_name] = self.category.find_by(id: category_id)&.name
+        item[:category_id] = self.category.find_by(id: category_id)&.id
 
         if department_id.present? && self.all_departments_ids.present?
           item[:department_name] = self.all_departments.policy_department_filter_mapping&.find_by(id: department_id)&.name
+          item[:department_id] = self.all_departments.policy_department_filter_mapping&.find_by(id: department_id)&.id
         end
 
         if cost_center_id.present? && self.cost_centers.present?
           item[:cost_center_name] = self.cost_centers.where(id: cost_center_id)&.first&.name
+          item[:cost_center_id] = self.cost_centers.where(id: cost_center_id)&.first&.id
         end
 
       end
