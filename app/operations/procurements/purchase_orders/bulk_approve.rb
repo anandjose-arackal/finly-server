@@ -21,7 +21,7 @@ class Procurements::PurchaseOrders::BulkApprove < Procurements::PurchaseOrders::
       return
     end
 
-    self.purchase_orders = user.company.purchase_orders.with_procurement_id(user.company.procurements.with_ids(purchase_order_ids).pluck(:id))
+    self.purchase_orders = user.company.purchase_orders.with_id(purchase_order_ids)
   end
 
   def validate
