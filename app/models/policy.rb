@@ -145,9 +145,9 @@ class Policy < ApplicationRecord
     begin
       ActiveRecord::Base.transaction do
         self.policy_department_mappings.destroy_all
-        params[:policy_department_mappings_attributes].each do |department_hash|
-          department = self.company.departments.find_by_id department_hash[:department_id]
-          result = self.policy_department_mappings.create!(department_id: department_hash[:department_id], enabled: true)
+        params[:policy_department_mappings_attributes].each do |department_id|
+          department = self.company.departments.find_by_id department_id
+          result = self.policy_department_mappings.create!(department_id: department_id, enabled: true)
           if department.root.present?
             if self.policy_department_mappings.where(department_id: department.root.id).blank?
               result = self.policy_department_mappings.create!(department_id: department.root.id, enabled: true)
@@ -166,9 +166,9 @@ class Policy < ApplicationRecord
     begin
       ActiveRecord::Base.transaction do
         self.policy_location_mappings.destroy_all
-        params[:policy_location_mappings_attributes].each do |location_hash|
-          location = self.company.locations.find_by_id location_hash[:location_id]
-          result = self.policy_location_mappings.create!(location_id: location_hash[:location_id], enabled: true)
+        params[:policy_location_mappings_attributes].each do |location_id|
+          location = self.company.locations.find_by_id location_id
+          result = self.policy_location_mappings.create!(location_id: location_id, enabled: true)
           if location.root.present?
             if self.policy_location_mappings.where(location_id: location.root.id).blank?
               result = self.policy_location_mappings.create!(location_id: location.root.id, enabled: true)
