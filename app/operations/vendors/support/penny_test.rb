@@ -41,7 +41,7 @@ class Vendors::Support::PennyTest < Vendors::Base
   end
 
   def success
-    params[:account_name] = self.bank_account_master
+    params[:bank_account_master] = self.bank_account_master
     Vendors::Support::PennyTest::TestPresenter.new(user, params, messages)
   end
 

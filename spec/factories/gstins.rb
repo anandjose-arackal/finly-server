@@ -10,11 +10,12 @@
 #  constitution_of_business :string(255)
 #  taxpayer_type            :string(255)
 #  status                   :string(255)
-#  api_response             :text(65535)
+#  api_response             :text(16777215)
 #  api_provider             :string(255)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  address                  :text(65535)
+#  trade_name               :string(255)
 #
 
 FactoryBot.define do
