@@ -9,9 +9,7 @@ class ApiApplicationController < BaseControllers::ApiBase
 
   protected
   def validate_user_admin
-    unless current_user&.company_admin?
-      head(401)
-    end
+    head(401) unless current_user&.company_admin?
   end
 
   def append_params

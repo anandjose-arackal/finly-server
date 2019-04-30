@@ -7,20 +7,20 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [
-                      finly_ref_no: {spreadsheet: true},
-                      #po_number: {spreadsheet: true},
-                      invoice_type: {spreadsheet: true},
-                      invoice_number: {spreadsheet: true},
-                      invoice_date: {spreadsheet: true},
-                      vendor_name: {spreadsheet: true},
-                      vendor_ref_num: {spreadsheet: true},
-                      #added_by: {spreadsheet: true},
-                      total_amount: {spreadsheet: true},
-                      total_payable: {spreadsheet: true},
-                      total_tax: {spreadsheet: true},
-                      narration: {spreadsheet: true},
-                      nature_of_expense: {spreadsheet: true},
-                  ]
+             finly_ref_no: {spreadsheet: true},
+             #po_number: {spreadsheet: true},
+             invoice_type: {spreadsheet: true},
+             invoice_number: {spreadsheet: true},
+             invoice_date: {spreadsheet: true},
+             vendor_name: {spreadsheet: true},
+             vendor_ref_num: {spreadsheet: true},
+             #added_by: {spreadsheet: true},
+             total_amount: {spreadsheet: true},
+             total_payable: {spreadsheet: true},
+             total_tax: {spreadsheet: true},
+             narration: {spreadsheet: true},
+             nature_of_expense: {spreadsheet: true},
+         ]
 
   def input
     return self.input_data unless self.input_data.nil?
