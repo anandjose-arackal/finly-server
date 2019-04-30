@@ -43,7 +43,7 @@ json.bulk_items do
 			json.category_name item[:category_name]
 			json.category_id item[:category_id]
 		else
-			json.category_name item[:single_item].category_name
+			json.category_name item[:single_item].category&.name
 			json.category_id item[:single_item].category_id
 		end
 	end
