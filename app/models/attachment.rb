@@ -23,6 +23,8 @@ class Attachment < ApplicationRecord
   belongs_to :creator, optional: true, class_name: "User"
   belongs_to :company, optional: true
 
+  before_create :add_creator, :add_company
+
   CONTENT_TYPES = {content_type: []}
 
   has_attached_file :file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
@@ -71,5 +73,13 @@ class Attachment < ApplicationRecord
     if ids.present? && resource_id.present?
       attachments = user.attachments.with_ids(ids).update_all(resource_id: resource_id)
     end
+  end
+
+  def add_creator
+    self.creator_id = RequestStore.store[:current_user]&.id
+  end
+
+  def add_company
+    self.company_id = self.creator.company_id
   end
 end
