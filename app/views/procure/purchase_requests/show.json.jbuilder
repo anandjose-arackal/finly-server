@@ -26,12 +26,6 @@ json.result do
       json.name @result.purchase_request.policy&.name
       json.id @result.purchase_request&.policy_id
     end
-    json.pr_item_categories do
-      json.array!(current_company.categories.inward_invoice_items_only) do |category|
-        json.id category.id
-        json.name category.name
-      end
-    end
     json.total_cost @result.purchase_request.calculate_total_amount
     json.total_items @result.line_items_count
     json.line_items do
