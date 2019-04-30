@@ -38,5 +38,13 @@ json.bulk_items do
 			json.product_name item[:single_item]&.description
 			json.id item[:single_item]&.id
 		end
+
+		if item[:category_id].present?
+			json.category_name item[:category_name]
+			json.category_id item[:category_id]
+		else
+			json.category_name item[:single_item].category_name
+			json.category_id item[:single_item].category_id
+		end
 	end
 end

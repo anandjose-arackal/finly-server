@@ -2,7 +2,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
-                :locations
+                :locations, :category_ids, :category
 
   class Procurements::PurchaseRequests::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -46,7 +46,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
     self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
     Rails.logger.fatal "FROM BulkValidateFileData LOCATION INIT,\n #{self.locations.inspect}"
     
-    category = current_company.categories.inward_invoice_items_only
+    self.category = current_company.categories.inward_invoice_items_only
     self.category_ids = category.pluck(:id) rescue []
 
   end
@@ -194,6 +194,8 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         end
 
         item[:estimated_value] = quantity.to_i * unit_price.to_i
+
+        item[:category_name] = self.category.find_by(id: category_id)&.name
       end
 
       self.contents << item.values

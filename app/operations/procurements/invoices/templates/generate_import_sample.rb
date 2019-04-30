@@ -16,10 +16,10 @@ class Procurements::Invoices::Templates::GenerateImportSample < Procurements::In
         }
     ]
     # adding Item to excel sheet
-    item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code"]
+    item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code", "Default Category Name", "Default Category ID"]
     item_contents = []
     company.items.where(active: true).each do |item|
-      item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
+      item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code, item.category&.name, item.category_id]
     end
     self.sheets << {
         item_headers: item_headers,
