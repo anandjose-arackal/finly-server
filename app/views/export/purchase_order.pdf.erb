@@ -63,9 +63,9 @@
         <% end %>
       </div>
     <% end %>
-    <div class="col col-xs-12 no-padding">
+    <!-- <div class="col col-xs-12 no-padding">
       <p class="text-center"><%= @result.purchase_order&.procurement&.note %></p>
-    </div>
+    </div> -->
   </div>
   <div class="col col-xs-12 no-padding body-container">
     <div class="col col-xs-4 vendor-details">
@@ -98,7 +98,7 @@
     <div class="col col-xs-4 billing-address">
       <h4 class="section-title">Billing Address</h4>
       <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-        <%= @result.purchase_order.location.name %>
+        <%= @result.purchase_order.company.name %>
       </div>
       <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
         <% if @result.purchase_order.billing_address.present? %>
@@ -119,13 +119,13 @@
     <div class="col col-xs-4 shipping-address">
       <h4 class="section-title">Shipping Address</h4>
       <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-        <%= @result.purchase_order.delivery_location.name %>
+        <%= @result.purchase_order.company.name %>
       </div>
       <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
         <% if @result.purchase_order.shipping_address.present? %>
-          <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
+            <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
         <% else %>
-          <%= @result.purchase_order.delivery_location.address %>
+            <%= @result.purchase_order.delivery_location.address %>
         <% end %>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
@@ -178,7 +178,6 @@
         <% end %>
       </div>
       <div class="col col-xs-4 no-padding">
-
         <table class="table table-responsive table-document-items-summary fs-12">
           <tbody>
           <tr>
@@ -208,21 +207,20 @@
   </div>
 
   <% unless @result.purchase_order.note.blank? %>
-  <div class="col col-xs-12 notes-container mg-top-5">
-    <h4 class="section-title">Note to Vendor</h4>
-    <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
-      <% if @result.purchase_order.note.blank? %>
-        <%= simple_format "<i>Empty </i>", {}, wrapper_tag: "div" %>
-      <% else %>
-        <%= simple_format @result.purchase_order.note, {}, wrapper_tag: "div" %>
-      <% end %>
+    <div class="col col-xs-12 notes-container mg-top-5">
+      <h4 class="section-title">Note to Vendor</h4>
+      <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
+        <% if @result.purchase_order.note.blank? %>
+          <%= simple_format "<i>Empty </i>", {}, wrapper_tag: "div" %>
+        <% else %>
+          <%= simple_format @result.purchase_order.note, {}, wrapper_tag: "div" %>
+        <% end %>
+      </div>
     </div>
-  </div>
   <% end %>
   <div class="text-center font-dark-small" style="margin-top: 50%; padding-top: 80%">
     Please refer the next page for the terms and conditions
   </div>
-
   <div class="page-break"></div>
 
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
@@ -232,33 +230,32 @@
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
       <% unless (@company.id == 137 || @company.id == 156) %>
-      <ul>
-        <% approved_users = [] %>
-        <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
-          <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
-            <% unless approved_users.include?(trail.action_user) %>
-              <% approved_users.push(trail.action_user) %>
-              <li>
-                <div class="text center font-light-gray"><%= trail.action_user.name %></div>
-                <div class="text-center font-dark-gray">
-                  <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
-                </div>
-              </li>
+        <ul>
+          <% approved_users = [] %>
+          <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
+            <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
+              <% unless approved_users.include?(trail.action_user) %>
+                <% approved_users.push(trail.action_user) %>
+                <li>
+                  <div class="text center font-light-gray"><%= trail.action_user.name %></div>
+                  <div class="text-center font-dark-gray">
+                    <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
+                  </div>
+                </li>
+              <% end %>
             <% end %>
           <% end %>
-        <% end %>
-      </ul>
-      <ul>
-
-        <li>
-          <div class="text center font-light-gray"><%= @result.purchase_order.user.name %></div>
-          <div class="text-center font-dark-gray">
-            <%= "Initiated By" %>
-          </div>
-        </li>
-      </ul>
+        </ul>
+        <ul>
+          <li>
+            <div class="text center font-light-gray"><%= @result.purchase_order.user.name %></div>
+            <div class="text-center font-dark-gray">
+              <%= "Initiated By" %>
+            </div>
+          </li>
+        </ul>
       <% end %>
-      <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
+      <!-- <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p> -->
     </div>
   </div>
 </div>
@@ -430,6 +427,11 @@
     body{
       font-family: 'Open Sans', sans-serif !important;
     }
+    .page-break {
+      display: block;
+      clear: both;
+      page-break-after: always;
+    }
     .fs-12{
       font-size: 12px !important;
     }
@@ -515,6 +517,7 @@
       color: cornflowerblue !important;
       -webkit-print-color-adjust: exact;
     }
+    .mg
     .mg-botm-5{
       margin-bottom: 5px;
     }
