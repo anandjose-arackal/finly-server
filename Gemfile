@@ -253,5 +253,5 @@ group :test do
 end
 
 group :production do
-  # gem 'elastic-apm', '~> 2.1.2'
+  gem 'elastic-apm', '~> 2.1.2'
 end
