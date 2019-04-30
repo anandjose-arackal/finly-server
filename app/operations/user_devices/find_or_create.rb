@@ -73,7 +73,7 @@ class UserDevices::FindOrCreate < BaseOperation
       return
     end
 
-    client = config_class.completed.find_by(attributes.except(:timestamp_s))
+    client = config_class.completed.find_by_attributes(attributes)
     client = config_class.create(attributes) unless client
     client
 

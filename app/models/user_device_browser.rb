@@ -49,6 +49,12 @@ class UserDeviceBrowser < ApplicationRecord
   belongs_to :status, class_name: 'UserDeviceStatus'
 
   scope :completed, -> {where status_id: UserDeviceStatus.id_for(:complete)}
+  scope :find_by_attributes, -> (attributes) {
+    # While hash is being sent as integer / empty for few attributes, it is being stored in different format (string, nil). Because of this the device was not being identified correctly.
+    # This corrects and re-formats to ensure it is matching with the model attribute types
+    reformatted_attributes = self.new(attributes.except(:timestamp_s)).attributes.with_indifferent_access.except(:timestamp, :id, :created_at, :updated_at, :status_id)
+    find_by reformatted_attributes
+  }
 
   delegate :incomplete?, :attribute_mismatch?, :complete?, to: :status
 
