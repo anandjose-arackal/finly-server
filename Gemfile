@@ -132,6 +132,7 @@ gem 'bootbox-rails', '0.5.0'
 # gem 'bootbox-rails'
 
 gem 'sidekiq', '~> 5.2.3'
+gem 'scout_apm', '~> 2.4'
 
 gem 'paranoia', '~> 2.4'
 

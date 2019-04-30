@@ -155,7 +155,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
           render pdf: "PO-#{@result.purchase_order.po_number}",
                  layout: "pdf/paginated_bootstrap.html.erb",
                  print_media_type: true,
-                 margin: { :bottom => 5 },
+                 margin: { :bottom => 12 },
                  dpi: 650,
                  # header: { left: '[page] of [topage]' },
                  footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
@@ -165,7 +165,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
         render pdf: "PO-#{@result.purchase_order.po_number}",
                layout: "pdf/paginated_bootstrap.html.erb",
                print_media_type: true,
-               margin: { :bottom => 5 },
+               margin: { :bottom => 12 },
                footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
         # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
