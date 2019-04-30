@@ -78,7 +78,7 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   def get_attachment_ids(params)
     if params.dig(:purchase_request, :attachments_attributes).present?
       attachment_ids = []
-      params.dig(:purchase_request, :attachments_attributes).each{ |k, v| attachment_ids << v[:id] }
+      params.dig(:purchase_request, :attachments_attributes).each{ |kv| attachment_ids << kv[:id] }
       return attachment_ids
     end
   end
