@@ -55,13 +55,13 @@ class Vendors::Index < Vendors::Base
       VendorStatus.all.map do |status|
         case status.id
         when VendorStatus.id_for(:draft), VendorStatus.id_for(:retracted), VendorStatus.id_for(:rejected)
-          result[:open] += vendor_status_counts[status.id]
+          result[:open] += (vendor_status_counts[status.id] || 0)
         when VendorStatus.id_for(:awaiting_approval)
-          result[:processing] += vendor_status_counts[status.id]
+          result[:processing] += (vendor_status_counts[status.id] || 0)
         when VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved) 
-          result[:approved] += vendor_status_counts[status.id]
+          result[:approved] += (vendor_status_counts[status.id] || 0)
         when VendorStatus.id_for(:deactivated)
-          result[:deactivated] += vendor_status_counts[status.id]
+          result[:deactivated] += (vendor_status_counts[status.id] || 0)
         end
       end
 
