@@ -9,6 +9,9 @@ class Vendors::Counts < Vendors::Base
     end
   end
 
+  def validate
+  end
+
   def success
     params[:data] = self.data
     Vendors::Counts::CountsPresenter.(user, params, messages)
