@@ -41,6 +41,10 @@ json.result do
           json.status line_item&.status&.name
           json.rejected line_item.rejected
           json.unit_of_measurement line_item.unit_of_measurement
+          
+          json.category_name line_item.category&.name
+          json.category_id line_item.category_id
+
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id
