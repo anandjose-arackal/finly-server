@@ -24,6 +24,8 @@
 #  product_type_id     :integer          default(1)
 #  item_number         :string(255)
 #  unit_of_measurement :string(255)
+#  user_id             :integer
+#  active              :boolean          default(TRUE)
 #
 
 class Item < ApplicationRecord

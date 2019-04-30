@@ -2,27 +2,28 @@
 #
 # Table name: bank_accounts
 #
-#  id                 :integer          not null, primary key
-#  yes_bank_vendor_id :integer
-#  account_number     :string(255)
-#  ifsc               :string(255)
-#  name               :string(255)
-#  address_1          :string(255)
-#  address_2          :string(255)
-#  address_3          :string(255)
-#  pin_code           :string(255)
-#  country            :string(255)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  account_owner_id   :integer
-#  account_owner_type :string(255)
-#  company_id         :integer
-#  reimbursable       :boolean
-#  default_account    :boolean          default(FALSE)
-#  is_deleted         :boolean          default(FALSE)
-#  disabled           :boolean          default(FALSE)
-#  deleted_at         :datetime
-#  on_hold            :boolean          default(FALSE)
+#  id                     :integer          not null, primary key
+#  yes_bank_vendor_id     :integer
+#  account_number         :string(255)
+#  ifsc                   :string(255)
+#  name                   :string(255)
+#  address_1              :string(255)
+#  address_2              :string(255)
+#  address_3              :string(255)
+#  pin_code               :string(255)
+#  country                :string(255)
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  account_owner_id       :integer
+#  account_owner_type     :string(255)
+#  company_id             :integer
+#  reimbursable           :boolean
+#  default_account        :boolean          default(FALSE)
+#  is_deleted             :boolean          default(FALSE)
+#  disabled               :boolean          default(FALSE)
+#  deleted_at             :datetime
+#  on_hold                :boolean          default(FALSE)
+#  bank_account_master_id :integer
 #
 
 class BankAccount < ApplicationRecord

@@ -4,16 +4,14 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
 
   attr_accessor :account_number, :bank_transaction, :company, :transfer_request,
                 :ifsc, :bank_transaction_id, :bank_transaction, :full_name, :error_message,
-                :name
+                :name, :bank_account_master
 
   class BankTransfer::BankAccounts::CheckValidity::AccountNumberCheckPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :full_name, :account_number, :ifsc
+    attr_accessor :full_name, :bank_account_master
 
     def init
-      self.full_name = params[:full_name]
-      self.account_number = params[:account_number]
-      self.ifsc = params[:ifsc]
+      self.bank_account_master = params[:bank_account_master]
     end
 
   end
@@ -64,41 +62,54 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
   end
 
   def process
-    handle = self.object_id
-    params = {
-        account_number: self.account_number,
-        ifsc: self.ifsc,
-        company_id: self.company.id,
-        bank_transaction_id: self.bank_transaction.id
-    }
-    YesBankTransferProvider.perform_async(handle, params)
-    timeout = 30
-    now = Time.now
-    while (Time.now - now) < timeout
-      result = Resque.reserve(handle)
-      next if result.blank?
+    # first check if this bad boy is there in the Bank Account Master first, and then make
+    # a call to the API to verify if this account is legit
+    self.bank_account_master = BankAccountMaster.find_by(account_number: self.account_number, ifsc: self.ifsc)
+    if self.bank_account_master.blank?
+      handle = self.object_id
+      params = {
+          account_number: self.account_number,
+          ifsc: self.ifsc,
+          company_id: self.company.id,
+          bank_transaction_id: self.bank_transaction.id
+      }
+      YesBankTransferProvider.perform_async(handle, params)
+      timeout = 30
+      now = Time.now
+      while (Time.now - now) < timeout
+        result = Resque.reserve(handle)
+        next if result.blank?
 
-      args = result.args.first
-      success = args&.dig('success')
-      message = args&.dig('message')
-      return 0 unless success
+        puts result.args.first
 
-      self.bank_transaction_id = args["bank_transaction_id"]
-      self.full_name = args["full_name"]
-      self.error_message = args["messages"]
-    end
+        args = result.args.first
+        self.bank_transaction_id = args["bank_transaction_id"]
+        self.full_name = args["full_name"]
+        self.error_message = args["messages"]
 
+        break
+      end
 
-    if self.full_name.present?
-      # #todo - this should create a bank account in the Bank Account Master first
+      # now checking if the retrieving of the name was a success
+      if self.full_name.present?
+        # create the bank account master object with the account details and then
+        # return the same
+        self.bank_account_master = BankAccountMaster.create(
+            account_number: self.account_number,
+            ifsc: self.ifsc,
+            account_name: self.full_name
+        )
+      else
+        add_message :error, error_message
+        return
+      end
     else
-      add_message :error, error_message
-      return
+      self.full_name = self.bank_account_master.account_name
     end
   end
 
   def success
-    params[:full_name] = self.full_name
+    params[:bank_account_master] = self.bank_account_master
     BankTransfer::BankAccounts::CheckValidity::AccountNumberCheckPresenter.new(user, params, messages)
   end
 

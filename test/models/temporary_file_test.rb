@@ -10,6 +10,8 @@
 #  expires_on        :datetime
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  created_by_id     :integer
+#  company_id        :integer
 #
 
 require 'test_helper'

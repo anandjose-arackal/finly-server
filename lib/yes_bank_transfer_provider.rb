@@ -29,6 +29,7 @@ class YesBankTransferProvider
         Resque.enqueue(queue, {success: false, message: 'Company not found'})
         return
       end
+
       op = YesBankApi::Transfer::BankTransfer.({
           transfer_request: transfer_request,
           bank_transaction: bank_transaction
