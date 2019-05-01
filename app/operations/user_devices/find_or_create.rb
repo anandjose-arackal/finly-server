@@ -57,7 +57,7 @@ class UserDevices::FindOrCreate < BaseOperation
     user_device = user.user_devices.valid.find_by(client: client)
     return user_device if user_device.present?
     # If not found
-    user_device = user.user_devices.build company: user.company, client: client, status_id: UserDeviceStatus.id_for(:unverified)
+    user_device = UserDevice.new user:user, company: user.company, client: client, status_id: UserDeviceStatus.id_for(:unverified)
     unless client.complete?
       user_device.status_id = client.status_id
       user_device.message = client.message
@@ -73,8 +73,8 @@ class UserDevices::FindOrCreate < BaseOperation
       return
     end
 
-    client = config_class.completed.find_by_attributes(attributes)
-    client = config_class.create(attributes) unless client
+    client = config_class.completed.with_attributes(attributes)&.first
+    client = config_class.create(attributes) unless client.present?
     client
 
     # unless client

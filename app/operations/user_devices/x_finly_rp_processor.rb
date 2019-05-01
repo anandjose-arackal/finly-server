@@ -5,6 +5,8 @@ class UserDevices::XFinlyRPProcessor
 
     client_klass = client.class
     request_properties = properties_from_request
+    return nil if request_properties.blank? or request_properties[client_klass.client_id.to_s].blank?
+
     x_finly_rp = attributes_for client_klass, request_properties[client_klass.client_id.to_s]
     RequestStoreUtil.set_x_finly_rp_attributes x_finly_rp
 

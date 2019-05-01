@@ -43,6 +43,16 @@ Gatekeeper::Checker.new 'On New Request' do
 
     end
 
+    rule 'X-Finly-RP is required for all web requests' do
+      next if RequestStoreUtil.x_finly_rp_attributes.present?
+
+      message 'X-Finly-RP not sent'
+      session_status_id UserSessionStatus.id_for(:blocked)
+      response_code 401
+      level 10
+      fail
+    end
+
     rule 'Session should timeout after 30 minute of inactivity' do
       session = RequestStoreUtil.current_session
 
@@ -148,6 +158,7 @@ Gatekeeper::Checker.new 'On New Request' do
     end
 
     section 'Verified Device' do
+
       section 'X-Finly-RP property mismatch' do
         [
             :user_agent, :timezone, :fingerprint, :language, :system_language,
