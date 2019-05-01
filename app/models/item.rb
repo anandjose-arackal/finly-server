@@ -112,7 +112,7 @@ class Item < ApplicationRecord
       user: user,
       active: active,
       item_expense_type_id: item_expense_type_id,
-      item_expense_type_name: item_expense_type.name,
+      item_expense_type_name: item_expense_type&.name,
     }
   end
 
