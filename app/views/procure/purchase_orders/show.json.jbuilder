@@ -3,7 +3,7 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
               :payment_term_id, :procurement_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
               :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note
 json.vendor @result.purchase_order.vendor.as_json
-
+json.created_from_purchase_request @result.created_from_purchase_request 
 json.vendor do
   json.extract! @result.purchase_order&.vendor
 

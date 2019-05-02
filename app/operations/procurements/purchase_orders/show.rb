@@ -26,7 +26,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations, :department_editable, :cost_center_editable, :cost_allocation_items
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations, :department_editable, :cost_center_editable, :cost_allocation_items, :created_from_purchase_request
 
     def init
       self.purchase_order = params[:purchase_order]
@@ -49,6 +49,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       else
         self.sub_departments = purchase_order.user.company.departments.leaves
       end
+      self.created_from_purchase_request = purchase_order.items.pluck(:purchase_request_item_id).uniq.present? rescue false
 
       self.cost_centers = user.company.cost_centers
       self.tax_rates = user.company.tax_rates
