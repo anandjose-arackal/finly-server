@@ -9,6 +9,7 @@ json.id payment.id
 json.external_id payment.external_reference_id
 json.note payment.note
 json.payment_mode payment.payment_mode
+json.credited_at payment.reference_resource&.created_at&.strftime("%Y-%m-%d, %H:%M:%s")
 json.system_messages do
   json.array! (payment.system_messages)
 end
