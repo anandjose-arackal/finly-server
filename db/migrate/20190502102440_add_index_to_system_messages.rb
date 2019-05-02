@@ -22,5 +22,11 @@ class AddIndexToSystemMessages < ActiveRecord::Migration[5.2]
     add_index :procurements, :procurement_type
     add_index :procurement_attachments, [:procurement_document_id, :procurement_document_type], name: "index_procurement_attachments_on_procurement_document"
     add_index :invoices, :controlling_level_id
+
+    add_index :categories, :name
+    add_index :categories, :active
+
+    add_index :yes_bank_vendors, :vendor_id
+    add_index :bank_transactions, :unique_request_number
   end
 end
