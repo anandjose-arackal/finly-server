@@ -2861,6 +2861,7 @@ Rails.application.routes.draw do
   post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
 
   get 'users/get_managers', to: 'users#get_managers'
+  get 'users/invite_config', to: 'users#invite_config'
 
   #Backbone partials
   get 'users/user_profile'
