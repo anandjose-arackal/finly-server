@@ -34,6 +34,7 @@ json.result do
           json.id line_item.id
           json.status line_item&.status&.name
           json.rejected line_item.rejected
+          json.present_litem_state line_item&.status&.name
           json.unit_of_measurement line_item.unit_of_measurement  
 
           json.category do
@@ -44,8 +45,9 @@ json.result do
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id
+            json.item_code line_item&.item&.item_number
           end
-          json.preferred_vendor do        
+          json.preferred_vendor do
             json.vendor_name line_item&.vendor&.name
             json.vendor_id line_item.vendor_id
           end
