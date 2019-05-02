@@ -13,6 +13,7 @@ class ProcurementMailer < ApplicationMailer
              pdf: "purchase-order-#{@document.po_number}",
              encoding: 'UTF-8',
              template: "export/purchase_order",
+             margin: { :bottom => 12 },
              layout: "pdf/paginated_bootstrap.html.erb",
              # print_media_type: true
          ),
@@ -50,6 +51,7 @@ class ProcurementMailer < ApplicationMailer
              encoding: 'UTF-8',
              template: "export/purchase_order",
              layout: "pdf/paginated_bootstrap.html.erb",
+             margin: { :bottom => 12 },
              # layout: "pdf.html.erb",
              footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
              # print_media_type: true
@@ -78,6 +80,7 @@ class ProcurementMailer < ApplicationMailer
              encoding: 'UTF-8',
              template: "export/inward_invoice",
              layout: "pdf/paginated_bootstrap.html.erb",
+             margin: { :bottom => 12 },
              # layout: "pdf.html.erb",
              footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
              # print_media_type: true
@@ -99,10 +102,53 @@ class ProcurementMailer < ApplicationMailer
     end
   end
 
+  def purchase_order_bulk_forward(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_po'
+    end
+  end
+
+  def purchase_order_bulk_take_control(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_take_control'
+    end
+  end
+
+  def purchase_order_bulk_reject(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'template_bulk_reject'
+    end
+  end
+
   def invoice_bulk_approval(presenter)
     @data = presenter
     if presenter.success?
       mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_approval_invoices'
+    end
+  end
+
+
+  def invoice_bulk_forward(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_forward_invoices'
+    end
+  end
+
+  def invoice_bulk_take_control(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_take_control_invoices'
+    end
+  end
+
+  def invoice_bulk_reject(presenter)
+    @data = presenter
+    if presenter.success?
+      mail to: presenter.to, bcc: 'kumar.abinash@finly.io', subject: presenter.subject, template_name: 'bulk_reject_invoices'
     end
   end
 

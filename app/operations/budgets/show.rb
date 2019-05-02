@@ -10,9 +10,10 @@ class Budgets::Show < Budgets::Base
   end
 
   def validate
-    if self.budget.blank?
-      add_message :error, 'Budget not found'
-    end
+    # Validate if record is present
+    return if record_not_present
+    # Validate if user is associated with the budget
+    validate_association
   end
 
   def pre_process
@@ -38,6 +39,25 @@ class Budgets::Show < Budgets::Base
       self.spent_amount = processor_instance.spent_amount
       self.spent_entities = processor_instance.spent_entities
     end
+  end
+
+  def validate_presence
+    if self.budget.blank? || (self.budget.company_id != user.company_id)
+      add_message :error, 'Budget not found'
+      return false
+    end
+    true
+  end
+
+  def record_not_present
+    !validate_presence
+  end
+
+  def validate_association
+    return if budget.validate_if_admin?(user)
+    return if budget.validate_if_owner?(user)
+    return if budget.validate_if_manager?(user)
+    raise_unauthorized_exception
   end
 
 end

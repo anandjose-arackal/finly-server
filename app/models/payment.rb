@@ -48,7 +48,7 @@
 #
 
 class Payment < ApplicationRecord
-  include PostOperationExecution, SoftDeletable
+  include PostOperationExecution, SoftDeletable, MathUtil
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'
@@ -161,6 +161,18 @@ class Payment < ApplicationRecord
 
   scope :with_receiving_user_type, -> (type) {
     where receiving_user_type: type
+  }
+
+  scope :with_company_id, -> (company_id) {
+    where company_id: company_id
+  }
+
+  scope :filter_api_initiated, -> (api_initiated) {
+    if StringUtils.to_bool(api_initiated)
+      where api_initiated: api_initiated
+    else
+      where('api_initiated IS ? OR api_initiated = ?', nil, false)
+    end
   }
 
   # Personal are card transactions from own wallet to own card
@@ -567,6 +579,58 @@ class Payment < ApplicationRecord
     }
   end
 
+  def parent_details
+    case self.parent_type
+    when 'BeneficiaryPayment'
+      BeneficiaryPayment.find_by(id: self.parent_id).as_json
+    when 'Invoice'
+      Invoice.find_by(id: self.parent_id).as_json
+    when 'PurchaseOrder'
+      # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
+      PurchaseOrder.find_by(id: self.parent_id).as_json2 # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
+    else
+      if self.invoice.present?
+        self.invoice.as_json
+      else
+        fallback_info
+      end
+    end
+  end
+
+
+  def get_payable_amount
+    case self.parent_type
+    when 'BeneficiaryPayment'
+      precision_value self.parent.balance_due&.value
+    when 'Invoice'
+      precision_value self.parent.balance_due&.value
+    when 'PurchaseOrder'
+      # PurchaseOrder.find_by(id: self.parent_id).as_json(tree: true) # because somewhere we got as_json for PO already. running on deadline. dont have time to remodify.
+      precision_value self.parent.advance_amount&.value
+    else
+      if self.invoice.present?
+        precision_value self.invoice.balance_due&.value
+      else
+        self.amount_value
+      end
+    end
+  end
+
+  def fallback_info
+    {
+      raw_amount: precision_value(self.amount_value),
+      original_amount: precision_value(self.amount_value),
+      invoice: {
+        net_amount: precision_value(self.amount&.value),
+        roundoff_amount: 0,
+        balance_due: self.amount&.value
+      }
+    }
+  end
+      
+      
+      
+
   private
 
   def initiating_account_presence
@@ -623,5 +687,17 @@ class Payment < ApplicationRecord
 
   def budget_trail_destroy
     BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+    reset_status
+  end
+
+  def reset_status
+    case self.parent_type
+    when 'Invoice'
+      parent_details = initiating_user.company.inward_invoices.non_beneficiary.find_by(id: self.parent_id)
+      parent_details.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+    when 'PurchaseOrder'
+      parent_details = initiating_user.company.purchase_orders.find_by(id: self.parent_id)
+      parent_details.update(advance_amount_status_id: AdvanceAmountStatus.id_for(:to_be_processed))
+    end
   end
 end

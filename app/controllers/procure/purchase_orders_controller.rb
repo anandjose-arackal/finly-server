@@ -42,6 +42,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def reopen
+    @result = Procurements::PurchaseOrders::Reopen.(current_user, params)
+    respond
+  end
+
   def approve
     @result = Procurements::PurchaseOrders::Approve.(current_user, params)
     respond
@@ -52,8 +57,55 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def bulk_forward
+    @result = Procurements::PurchaseOrders::BulkForward.(current_user, params)
+    respond
+  end
+
   def bulk_approve
     @result = Procurements::PurchaseOrders::BulkApprove.(current_user, params)
+    respond
+  end
+
+  def bulk_take_control
+    @result = Procurements::PurchaseOrders::BulkTakeControl.(current_user, params)
+    respond
+  end
+
+  def bulk_reject
+    @result = Procurements::PurchaseOrders::BulkReject.(current_user, params)
+    respond
+  end
+
+  def take_control
+    @result = Procurements::PurchaseOrders::TakeControl.(current_user, params)
+    respond
+  end
+
+  def return_control
+    @result = Procurements::PurchaseOrders::ReturnControl.(current_user, params)
+    respond
+  end
+
+  def bulk_upload_items
+    @result = Procurements::PurchaseOrders::BulkUploadLineItems.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_failure'
+        }
+      end
+    end
+  end
+
+  def template_bulk_import_items
+    @result = Procurements::PurchaseOrders::GenerateImportSample.(current_user, params)
     respond
   end
 
@@ -77,6 +129,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def mark_send_to_vendor
+    @result = Procurements::PurchaseOrders::MarkSendToVendor.(current_user, params)
+    @respond
+  end
+
   def export_items
     @result = Procurements::PurchaseOrders::ExportItems.(current_user, params)
     respond
@@ -87,12 +144,19 @@ class Procure::PurchaseOrdersController < ApplicationController
     @result = Procurements::PurchaseOrders::Show.(current_user, params)
     @purchase_order = @result.purchase_order
     @company = @purchase_order.company
+
+    if params[:origin] == 'download_action'
+      @purchase_order.trails.create action_user: current_user,
+                                     action_id: TrailAction.id_for(:downloaded),
+                                     action_level: @purchase_order.trails.last.action_level
+    end
+    
     respond_to do |format|
       format.pdf {
           render pdf: "PO-#{@result.purchase_order.po_number}",
                  layout: "pdf/paginated_bootstrap.html.erb",
                  print_media_type: true,
-                 margin: { :bottom => 5 },
+                 margin: { :bottom => 12 },
                  dpi: 650,
                  # header: { left: '[page] of [topage]' },
                  footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
@@ -102,7 +166,7 @@ class Procure::PurchaseOrdersController < ApplicationController
         render pdf: "PO-#{@result.purchase_order.po_number}",
                layout: "pdf/paginated_bootstrap.html.erb",
                print_media_type: true,
-               margin: { :bottom => 5 },
+               margin: { :bottom => 12 },
                footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
         # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
@@ -117,6 +181,31 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def advance_payments
     @result = Procurements::PurchaseOrders::AdvancePayments.(current_user, params)
+    respond
+  end
+
+  def po_advances
+    @result = Procurements::PurchaseOrders::PoAdvances.(current_user, params)
+    respond
+  end
+
+  def po_advance_ticket
+    @result = Procurements::Payments::CreatePoAdvanceTicket.(current_user, params)
+    respond
+  end
+
+  def po_with_advance
+    @result = Procurements::PurchaseOrders::PoWithAdvance.(current_user, params)
+    respond
+  end
+
+  def po_with_advance_count
+    @result = Procurements::PurchaseOrders::PoWithAdvanceCount.(current_user, params)
+    render json: { count: @result.count.as_json, status_count: @result.status_count.as_json }
+  end
+
+  def create_po_revisions
+    @result = Procurements::PurchaseOrders::CreatePoRevisions.(current_user, params)
     respond
   end
 

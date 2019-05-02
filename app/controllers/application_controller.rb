@@ -3,7 +3,7 @@ require 'require_all'
 # Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
-  include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
+  include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper, BankPaymentRequestsHelper
   # include AbstractController::Callbacks
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers

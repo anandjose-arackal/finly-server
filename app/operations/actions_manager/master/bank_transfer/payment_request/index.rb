@@ -5,11 +5,13 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManag
 
 
   def new_orders
-    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_initiator?
+    # user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_initiator?
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor? || user.is_bank_payment_request_reviewer? || user.is_bank_payment_request_initiator?
   end
 
   def bulk_actions
-    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer?
+    # user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer?
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor? || user.is_bank_payment_request_reviewer?
   end
 
   def export_sap
@@ -17,35 +19,37 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManag
   end
 
   def mark_as_credited
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor?
   end
 
   def credit_payment_order
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor?
   end
 
   def approve_selected
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_reviewer?
   end
 
   def approve_pending
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_reviewer?
   end
 
   def upload_utr
-    true
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor?
   end
 
   def bulk_downloads
-    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_auditor? || user.vendor_payments_initiator?
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor? || user.is_bank_payment_request_reviewer? || user.vendor_payments_auditor? || user.is_bank_payment_request_initiator?
   end
 
   def download_payment_files
-    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_auditor? || user.vendor_payments_initiator?
+    # user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_auditor? || user.vendor_payments_initiator?
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor? || user.is_bank_payment_request_reviewer? || user.vendor_payments_auditor? || user.is_bank_payment_request_initiator?
   end
 
   def download_pending
-    user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_auditor? || user.vendor_payments_initiator?
+    # user.vendor_payments_admin? || user.vendor_payments_creditor? || user.vendor_payment_reviewer? || user.vendor_payments_auditor? || user.vendor_payments_initiator?
+    user.vendor_payments_admin? || user.is_bank_payment_request_creditor? || user.is_bank_payment_request_reviewer? || user.vendor_payments_auditor? || user.is_bank_payment_request_initiator?
   end
 
   def download_selected
@@ -77,6 +81,7 @@ class ActionsManager::Master::BankTransfer::PaymentRequest::Index < ActionsManag
   end
 
   def take_control
+    # user.vendor_payments_admin?
     user.vendor_payments_admin?
   end
 

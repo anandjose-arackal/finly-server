@@ -22,7 +22,10 @@
 #
 
 class BranchLocation < ApplicationRecord
-  include SoftDeletable
+  include SoftDeletable, AncestrySupport
+
+  has_ancestry
+
   belongs_to :company, optional: true
   belongs_to :state, optional: true
   has_many :company_location_departments
@@ -35,6 +38,8 @@ class BranchLocation < ApplicationRecord
 
   has_many :budget_rule_branch_location_mappings
   has_many :budget_rules, through: :budget_rule_branch_location_mappings
+
+  scope :with_ids, -> (ids) { where id: ids }
 
   def address
     address = ""
@@ -54,5 +59,39 @@ class BranchLocation < ApplicationRecord
       address += (self.pin)
     end
     address
+  end
+
+  # def as_json
+  #   {
+  #     id: self.id,
+  #     name: self.name,
+  #     gstin: self.gstin,
+  #     pan: self.pan,
+  #     address_1: self.address_1,
+  #     address_2: self.address_2,
+  #     city: self.city,
+  #     country: self.country,
+  #     pin: self.pin,
+  #     address: self.address,
+  #     location_code: self.location_code,
+  #     parent: [self.parent&.id, self.parent&.name]&.compact
+  #   }
+  # end
+
+  def as_json2
+    {
+      id: self.id,
+      name: location_name,
+    }
+  end
+
+  def as_json(options={})
+    args = { id: self.id, name: self.name, gstin: self.gstin, pan: self.pan, address_1: self.address_1, address_2: self.address_2, city: self.city, country: self.country, pin: self.pin, address: self.address, location_code: self.location_code, state_code: self.state&.code, billable: self.billable_location, shippable: self.shippable_location }
+    args[:name] = options&.dig(:tree) ? location_name : name
+    args
+  end
+
+  def location_name
+    self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
   end
 end

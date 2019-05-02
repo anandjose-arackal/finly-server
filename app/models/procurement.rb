@@ -32,8 +32,10 @@ class Procurement < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: "YesBankVendor"
 
   has_one :purchase_order, dependent: :destroy
+  has_many :po_revisions, class_name: 'PurchaseOrder', dependent: :destroy, foreign_key: :revised_po_id
   has_many :inward_documents, dependent: :destroy
   has_many :invoices, dependent: :destroy
+  has_many :proforma_invoices, class_name: 'Invoice', dependent: :destroy, foreign_key: :proforma_invoice_id
   has_many :bill_of_supplies, dependent: :destroy
   has_many :delivery_challans, dependent: :destroy
   has_many :e_way_bills, dependent: :destroy
@@ -71,9 +73,45 @@ class Procurement < ApplicationRecord
   scope :filter_procurement_name, -> (name) {
     where "procurements.name LIKE ?", "%#{name}%"
   }
+
+  scope :filter_policy_id, -> (policy_id) {
+    filtered_ids = PurchaseOrder.filter_policy_id(policy_id).pluck(:procurement_id)
+    filtered_ids += Invoice.filter_policy_id(policy_id).pluck(:procurement_id)
+    where(id: filtered_ids)
+  }
+
+  scope :filter_location_id, -> (location_id) {
+    filtered_ids = PurchaseOrder.filter_location_id(location_id).pluck(:procurement_id)
+    filtered_ids += Invoice.filter_location_id(location_id).pluck(:procurement_id)
+    where(id: filtered_ids)
+  }
+
   scope :filter_po_number, -> (po_number) {
     filtered_ids = PurchaseOrder.filter_po_number(po_number).pluck(:procurement_id)
     where id: filtered_ids
+  }
+
+  scope :filter_doc_number, -> (doc_number) {
+    filtered_ids = InwardDocument.filter_doc_number(doc_number).pluck(:procurement_id)
+    where id: filtered_ids
+  }
+
+  scope :filter_delivery_date, -> (delivery_date) {
+    date = Date.parse(delivery_date) rescue nil
+
+    if date
+      filtered_ids = InwardDocument.filter_delivery_date(date).pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
+  scope :filter_received_date, -> (received_date) {
+    date = Date.parse(received_date) rescue nil
+
+    if date
+      filtered_ids = InwardDocument.filter_received_date(date).pluck(:procurement_id)
+      where id: filtered_ids
+    end
   }
 
   scope :filter_invoice_serial, -> (invoice_id) {
@@ -94,15 +132,14 @@ class Procurement < ApplicationRecord
     where id: filtered_ids
   }
 
-  scope :filter_submission_date, -> (submission_date) {
-    date = Date.parse(submission_date) rescue nil
-
-    if date
-      purchase_order_ids = Trail.with_parent_type('PurchaseOrder').with_action_id(TrailAction.id_for(:submit)).filter_date(date).pluck(:parent_id)
-      filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
-
-      where id: filtered_ids
-    end
+  scope :filter_submission_date, -> (date_from, date_to) {
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date.strftime("%d-%m-%Y") if date_to.blank?
+    date_from = DateTime.parse(date_from).beginning_of_day unless date_from.is_a?(Date)
+    date_to = DateTime.parse(date_to).end_of_day unless date_to.is_a?(Date)
+    purchase_order_ids = Trail.with_parent_type('PurchaseOrder').with_action_id(TrailAction.id_for(:submit)).filter_date_range(date_from, date_to).pluck(:parent_id)
+    filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
+    where id: filtered_ids
   }
 
   scope :filter_creation_date_from, -> (creation_date){
@@ -117,6 +154,21 @@ class Procurement < ApplicationRecord
     if date
       where("created_at <= ?", date.end_of_day)
     end
+  }
+
+  
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from created_at) = ?', month)
   }
 
   scope :filter_department, -> (department_name, user_id) {
@@ -164,6 +216,15 @@ class Procurement < ApplicationRecord
     end
   }
 
+  scope :filter_location, -> (location, user_id) {
+    user = User.find_by id: user_id
+    if user.present?
+      filtered_ids = user.company.purchase_orders.filter_delivery_location(location).pluck(:procurement_id)
+      # filtered_ids = user.company.purchase_orders.joins(:delivery_location).where('name LIKE ?', '%#{location}%').pluck(:procurement_id)
+      where id: filtered_ids
+    end
+  }
+
   scope :filter_payment_term, -> (payment_term_name, user_id){
     user = User.find_by id: user_id
 
@@ -181,7 +242,7 @@ class Procurement < ApplicationRecord
     if user.present?
       category_ids = user.company.categories.inward_invoice_line_items_only.filter_search(category_name).pluck(:id)
 
-      inventory_line_item_ids = user.company.inventory_line_items.with_category_id(category_ids)
+      inventory_line_item_ids = user.company.items.with_category_id(category_ids)
 
       purchase_order_ids = PurchaseOrderItem.with_inventory_line_item(inventory_line_item_ids).pluck(:purchase_order_id)
 
@@ -201,14 +262,15 @@ class Procurement < ApplicationRecord
 
   # scope :filter_vendor_name, -> (name) {
   #   vendor_ids = YesBankVendor.filter_name_search(name).pluck(:id)
-  #
+  
   #   procurement_ids = PurchaseOrder.with_vendor_ids(vendor_ids).pluck(:procurement_id)
   #   procurement_ids += Invoice.with_procurement.with_vendor_ids(vendor_ids).pluck(:procurement_id)
-  #
+  
   #   where(id: procurement_ids)
   # }
 
   scope :filter_status_tags, -> (ids) {
+
     all_status_tag_ids = StatusTag.all.pluck(:id)
     status_tag_ids = all_status_tag_ids & ids.map(&:to_i)
 
@@ -230,7 +292,7 @@ class Procurement < ApplicationRecord
   }
 
   scope :filter_awaiting_approval, -> (user) {
-    if user.vendor_payments_reviewer?
+    if user.vendor_payments_reviewer? || user.vendor_payments_admin?
       # level_ids = []
 
       # policy_ids = user.company.policies.with_application(:vp).pluck(:id)
@@ -274,7 +336,9 @@ class Procurement < ApplicationRecord
 
       # where(id: procurement_ids.uniq)
       procurement_ids = PurchaseOrder.awaiting_action_items(user).pluck(:procurement_id).compact
-      procurement_ids += Invoice.awaiting_action_items(user).pluck(:procurement_id).compact
+      # Removed, since procurements is only used for purchase orders
+      # For invoices(PO/NPO) api/bank_transfer/inward_invoices.json is used
+      # procurement_ids += Invoice.awaiting_action_items(user).pluck(:procurement_id).compact
       where(id: procurement_ids.uniq)
     end
   }
@@ -290,6 +354,41 @@ class Procurement < ApplicationRecord
     )
   }
 
+  scope :filter_location_id, -> (location_id) {
+    filtered_ids = PurchaseOrder.where(location_id: location_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_cost_center_id, -> (cost_center_id) {
+    filtered_ids = PurchaseOrder.where(cost_center_id: cost_center_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_department_id, -> (department_id) {
+    filtered_ids = PurchaseOrder.where(department_id: department_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_sub_department_id, -> (sub_department_id) {
+    filtered_ids = PurchaseOrder.where(sub_department_id: sub_department_id).pluck(:procurement_id).uniq
+    where id: filtered_ids
+  }
+
+  scope :filter_grn_due_today, -> (required) {
+    if StringUtils.to_bool(required)
+      filtered_ids = InwardDocument.where("DATE(delivery_date) = ?", Date.today).pluck(:procurement_id).uniq
+      where(id: filtered_ids)
+    end
+  }
+
+  scope :filter_grn_overdue, -> (required) {
+    if StringUtils.to_bool(required)
+      filtered_ids = InwardDocument.where("DATE(delivery_date) < ?", Date.today).pluck(:procurement_id).uniq
+      where(id: filtered_ids)
+    end
+  }
+
+
   def awaiting_action?(user)
     # Ideal method:
     # First check if controlling user is present and return
@@ -299,11 +398,27 @@ class Procurement < ApplicationRecord
       if user
         # Find document level reviewer mappings
         dlrm = purchase_order.document_level_reviewer_mappings.with_level_ids(purchase_order.level&.id)
+
+        #new
         if dlrm.present?
-          dlrm.pluck(:reviewer_id).include? user.id
+          if dlrm.first.forwarded
+            dlrm.pluck(:forwarded_to_id).include?(user.id)
+          elsif dlrm.first.taken_control
+            dlrm.pluck(:taken_control_by_id).include?(user.id)
+          else
+            dlrm.pluck(:reviewer_id).include?(user.id)
+          end
         else
-          purchase_order.level&.reviewers&.include? user
+          false
         end
+        #new ..
+
+
+        # if dlrm.present?
+        #   dlrm.pluck(:reviewer_id).include? user.id
+        # else
+        #   purchase_order.level&.reviewers&.include? user
+        # end
       else
         false
       end
@@ -418,7 +533,7 @@ class Procurement < ApplicationRecord
 
     data.sort_by!{ |doc| doc.created_at}.reverse!
   end
-
+  
   def attached_documents
     attachments = []
     if self.purchase_order.present?
@@ -446,6 +561,13 @@ class Procurement < ApplicationRecord
 
   def po_procurement?
     self.procurement_type == 'purchase_order'
+  end
+
+  def as_json
+    {
+      id: self.id,
+      purchase_order_id: self.purchase_order&.id
+    }
   end
 
 end

@@ -34,6 +34,8 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   belongs_to :taken_control_by, class_name: 'User', optional: true
   belongs_to :action_taken_by, class_name: 'User', optional: true
   belongs_to :action, class_name: 'TrailAction', optional: true
+  belongs_to :forwarded_to, class_name: 'User', optional: true
+  belongs_to :forwarded_by, class_name: 'User', optional: true
 
   scope :with_level_ids, -> (ids) {where level_id: ids}
   scope :with_level_id, -> (ids) {where level_id: ids}
@@ -45,6 +47,8 @@ class DocumentLevelReviewerMapping < ApplicationRecord
   scope :with_document_type, -> (document_type) {where document_reviewer_mappable_type: document_type}
   scope :with_taken_control, -> { where taken_control: true }
   scope :with_taken_control_by_id, -> (ids) {where taken_control_by_id: ids}
+  scope :with_forwarded, -> {where forwarded: true}
+  scope :with_forwarded_to_id, -> (ids) {where forwarded_to_id: ids}
   scope :with_level_number, -> (number) {where level_number: number}
   scope :with_provider_name, -> (name) {where provider_name: name}
   scope :with_action_id, -> (action_id) {where action_id: action_id}

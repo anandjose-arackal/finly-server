@@ -43,6 +43,7 @@ class BankPaymentRequest < ApplicationRecord
   belongs_to :controlling_for_user, optional: true, class_name: "User"
   belongs_to :controlling_for_user_role, optional: true, class_name: "UserRole"
   belongs_to :policy, optional: true
+  belongs_to :company, optional: true
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
@@ -57,7 +58,7 @@ class BankPaymentRequest < ApplicationRecord
 
   default_scope {order(created_at: :desc)}
 
-  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, to: :status
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
@@ -75,6 +76,35 @@ class BankPaymentRequest < ApplicationRecord
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not id: id}
   scope :approved, -> {where status_id: BankPaymentRequestStatus.id_for(:approved)}
+  scope :downloadable, -> {where status_id: [BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited), BankPaymentRequestStatus.id_for(:auto_approved)]}
+
+  scope :filter_status, -> (status){
+    case status
+    when 'draft', :draft
+      where status_id: BankPaymentRequest.status_ids(:open, :rejected, :retracted)
+    when 'processing', :processing
+      where status_id: BankPaymentRequestStatus.id_for(:processing)
+    when 'approved', :approved
+      where status_id: BankPaymentRequest.status_ids(:approved, :auto_approved)
+    when 'credited', :credited
+      where status_id: BankPaymentRequestStatus.id_for(:credited)
+    when 'failed', :failed
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+    when 'scheduled', :scheduled
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
+    when 'pending', :pending
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+    when 'awaiting_approval', :awaiting_approval
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      # all
+    end
+  }
+
   scope :filter_status_id, -> (status_id) {
     case status_id
     when 1, '1' # i.e. open
@@ -138,7 +168,7 @@ class BankPaymentRequest < ApplicationRecord
     end
   }
 
-  scope :include_for_index, -> {includes({payment_order: [:payment_order_status, :initiating_user,
+scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings, :dlrms, {dlrms: [:level, :reviewer], document_level_reviewer_mappings: [:level, :reviewer], owner: [:role_mapping], payment_order: [:payment_order_status, :initiating_user,
                                                           {payments: [
                                                               {amount: [:currency]},
                                                               {receiving_account: :account_owner}, :payment_status, :reference_resource,
@@ -168,7 +198,26 @@ class BankPaymentRequest < ApplicationRecord
     joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
   }
 
-  scope :filter_controlling_user, -> (user_id) {self.awaiting_action_items(user_id)}
+
+  scope :filter_year, -> (year) {
+    if year.blank?
+      year = Date.today.year
+    end
+    where('extract(year from bank_payment_requests.created_at) = ?', year)
+  }
+
+  scope :filter_month, -> (month) {
+    if month.blank?
+      month = Date.today.month
+    end
+    where('extract(month from bank_payment_requests.created_at) = ?', month)
+  }
+
+  # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
+  scope :filter_controlling_user, -> (user_id) {
+    # self.awaiting_action_items(user_id)
+    self.where(controlling_user_id: user_id, status_id: BankPaymentRequestStatus.id_for(:processing))
+  }
 
   # scope :filter_controlling_user, -> (user_id) {
   #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
@@ -235,6 +284,8 @@ class BankPaymentRequest < ApplicationRecord
     end
   end
 
+  before_save :add_company
+
   def can_submit?
     open? || retracted? || rejected?
   end
@@ -243,8 +294,34 @@ class BankPaymentRequest < ApplicationRecord
     processing?
   end
 
+  def can_really_approve?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user)
+    #   processing?
+    # else
+    #   false
+    # end
+  end
+
   def can_reject?
     processing?
+  end
+
+  def can_really_reject?
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_retract?
@@ -257,6 +334,15 @@ class BankPaymentRequest < ApplicationRecord
 
   def can_take_control?
     processing?
+  end
+
+  def can_really_take_control?(user=nil)
+    # work with this method, dont want to modify the older method since,
+    # it is used other places and dont want to modify unless sure if this check works in other ppls work.
+    user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
+    return false if self.action_users(:approve).include?(user)
+    processing? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
   end
 
   # def can_return_control?
@@ -346,6 +432,32 @@ class BankPaymentRequest < ApplicationRecord
     self.payment_order.amount_requested&.value
   end
 
+  # For user role as bank payment request initiator
+  def is_initiating_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), self)
+  end
+
+  def is_reviewing_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), self)
+  end
+
+  def is_crediting_user?(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), self)
+  end
+
+  def add_company
+    self.company_id = self.owner.company_id
+  end
+
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
   private
 
   def self.status_ids(*statuses)
@@ -373,7 +485,62 @@ class BankPaymentRequest < ApplicationRecord
     BankPaymentRequestStatus.ids_for(:approved, :credited, :pending, :creation_in_progress, :auto_approved)
   end
 
+  def self.auditor_associated_status_ids
+    self.status_ids(:processing, :retracted, :rejected, :approved, :credited, :pending, :creation_in_progress, :auto_approved)
+  end
+
   def generate_name
     "PR_#{self.owner.name.downcase.split.join('_')}_#{Time.now.strftime("%d.%m.%y")}"
   end
+
+
+
+  def self.role_based_associated_status_ids(user)
+    BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
+  end
+
+  def self.open_status_ids(user)
+    BankPaymentRequestStatus.ids_for([:open, :draft])
+  end
+
+  def self.role_based_statuses(user)
+    statuses = []
+    if user.policy_user_roles.pluck(:user_role_id).uniq.present?
+      user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
+        if (UserRole.id_for(:bank_payment_request_initiator) == role_id.to_i)
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :credited, :pending]
+        elsif (UserRole.id_for(:bank_payment_request_reviewer) == role_id.to_i)
+          statuses += [:processing, :approved, :pending, :auto_approved, :credited]
+        elsif UserRole.id_for(:bank_payment_request_creditor) == role_id.to_i
+          statuses += [:approved, :pending, :creation_in_progress, :auto_approved, :credited]
+        elsif UserRole.id_for(:admin) == role_id.to_i
+          statuses += [:retracted, :processing, :approved, :rejected, :auto_approved, :creation_in_progress, :pending, :credited]
+        end
+      end
+    end
+    return statuses.uniq
+  end
+
+  def self.roles
+    # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
+    [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor]
+  end
+
+  ####################### Overridden Methods ########################
+  def self.role_based_creditor_associated_items(user, role_id, options={})
+    purs = user.policy_user_roles.with_role_id(role_id)
+
+    bank_payment_requests = BankPaymentRequest.none
+
+    purs.each do |pur|
+      pur_bank_payment_requests = BankPaymentRequest.all.
+        where(policy_id: pur.policy_id).
+        where("max_payment_amount > ? AND max_payment_amount <= ?", pur.min_amount, pur.max_amount)
+
+      bank_payment_requests = bank_payment_requests.or(pur_bank_payment_requests)
+    end
+
+    bank_payment_requests = bank_payment_requests.where("#{self.document_status_attribute} in (?)", self.finance_associated_status_ids)
+  end
+  ####################### Overridden Methods ends ###################
 end

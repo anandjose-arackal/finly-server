@@ -38,7 +38,7 @@ class Company < ApplicationRecord
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
   has_many :bank_transactions
-  has_many :inventory_line_items
+  has_many :items
   has_many :payment_terms
   has_many :tds_slabs, class_name: "TdsRatesList"
   has_many :tax_rates
@@ -88,6 +88,7 @@ class Company < ApplicationRecord
   has_many :procurement_attachments
   has_many :document_number_configs
   has_many :purchase_orders
+  has_many :purchase_requests
   has_many :inward_documents # purchase order inward documents
   has_many :field_customizations, as: :scopable
 
@@ -96,6 +97,9 @@ class Company < ApplicationRecord
 
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
+  has_many :bank_payment_requests
+  has_many :attachments, dependent: :nullify
+
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -330,6 +334,14 @@ class Company < ApplicationRecord
     self.feature_subscription.budgeting_system
   end
 
+  def vendor_empanelment_workflow_enabled?
+    self.feature_subscription.vendor_empanelment_workflow
+  end
+
+  def purchase_requisition_enabled?
+    self.feature_subscription.purchase_requisition_system
+  end
+
   def auto_retry_payment_enabled?
     self.configuration.auto_retry_payment
   end
@@ -394,6 +406,15 @@ class Company < ApplicationRecord
     Policy.with_id(policy_ids)
   end
 
+  def dep_subdept_mapping
+    result = {}
+    departments = user.company.departments
+    sub_departments = user.company.departments.only_sub_departments
+    departments.each do |department|
+
+    end
+  end
+
   private
 
   def init_config_present
@@ -436,6 +457,12 @@ class Company < ApplicationRecord
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+
+    # Seed Default list of vendor types
+    default_vendor_types = %w( Contractors Vendors )
+    default_vendor_types.each do |vendor_type|
+      self.vendor_types.build({name: vendor_type}).save
+    end
 
     # creating budget configurations
     self.build_enforce_budget_configuration(enforce_purchase_order_budget: false, enforce_payment_budget: false,

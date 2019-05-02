@@ -6,6 +6,11 @@ class PolicyUserRolesController < ApplicationController
     respond
   end
 
+  def forwardable_users
+    @result = PolicyUserRoles::ForwardableUsers.(current_user, params)
+    respond
+  end
+
   def create
     @result = PolicyUserRoles::Create.(current_user, params)
     respond
@@ -18,6 +23,11 @@ class PolicyUserRolesController < ApplicationController
 
   def destroy
     @result = PolicyUserRoles::Destroy.(current_user, params)
+    respond
+  end
+
+  def vp_role_config
+    @result = ActionsManager::Processor.(current_user, params)
     respond
   end
 end

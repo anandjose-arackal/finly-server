@@ -24,7 +24,19 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
       add_message :error, result.messages[:error]
       return
     end
-    Expense.with_report_id(result.reports.pluck(:id)).include_details
+
+    reports = result.reports
+
+    if params[:filtered]
+      reports = reports.processed
+    else
+      id = params[:id] || params[:report_id]
+      id = id.split(',')
+      reports = reports.with_id(id)
+    end
+    report_ids = reports.pluck(:id)
+
+    Expense.with_report_id(report_ids).include_details
   end
 
 
@@ -54,34 +66,16 @@ class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::Ba
 
   # Jugaad for stanza to handle their direct and indirect employee GL Codes
   STANZA_INDIRECT_GL_MAPPING = {
-      '217002': '306003',
-      '202001': '327003',
-      '202002': '327004',
-      '202004': '327002',
-      '204001': nil,
-      '204003': nil,
-      '204005': nil,
-      '204002': nil,
-      '204004': nil,
-      '204006': nil,
-      '205003': nil,
-      '206001': '329001',
-      '206002': '332001',
-      '206003': '332003',
-      '206004': nil,
-      '206005': nil,
-      '216001': '305001',
-      '210002': '336001',
-      '306006': '306006',
-      '211001': nil,
-      '211004': '333006',
-      '211002': '333003',
-      '321001': '321001',
-      '321002': '321002',
-      '321003': '321003',
-      '321004': '321004',
-      '210003': '321005',
-      '210004': '321006'
+      "210004": 321006,
+      "202005": 321002,
+      "221001": 321001,
+      "217002": 306003,
+      "211002": 321004,
+      "321005": 321003,
+      "211004": 333006,
+      "217003": 306005,
+      "216001": 305001,
+      "210003": 321005
   }
 
   def gl_code(expense)

@@ -15,10 +15,18 @@ class Budgets::Index < Budgets::Base
   end
 
   def init
-    if params[:include_children]
-      self.budgets = user.company.budgets.reorder(end_date: :desc)
-    else
-      self.budgets = user.company.budgets.roots.reorder(end_date: :desc)
+    if user.is_budget_manager?
+      if params[:include_children]
+        self.budgets = user.company.budgets.reorder(end_date: :desc)
+      else
+        self.budgets = user.company.budgets.roots.reorder(end_date: :desc)
+      end
+    end
+  end
+
+  def validate
+    if budgets.blank?
+      add_message :error, 'No Record found'
     end
   end
 

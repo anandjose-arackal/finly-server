@@ -31,7 +31,30 @@ class UserRole < ApplicationRecord
       travel_manager: 6,
       purchaser: 7,
       receiver: 8,
-      creditor: 9
+      creditor: 9,
+      purchase_request_initiator: 10,
+      purchase_request_reviewer: 11,
+      purchase_order_initiator: 12,
+      purchase_order_reviewer: 13,
+      goods_receiver: 14,
+      invoice_initiator: 15,
+      invoice_reviewer: 16,
+      bank_payment_request_initiator: 17,
+      bank_payment_request_reviewer: 18,
+      bank_payment_request_creditor: 19,
+      item_master_manager: 20,
+      inventory_manager: 21,
+      vendor_creator: 22,
+      vendor_reviewer: 23,
+      policy_admin: 24,
+      vendor_manager: 25,
+      bank_payment_request_auditor: 26,
+      budget_manager: 27,
+      non_po_initiator: 28,
+      purchase_request_auditor: 29,
+      purchase_order_auditor: 30,
+      invoice_auditor: 31,
+      vendor_auditor: 32
   }
 
   VALUES_EM = {
@@ -54,7 +77,55 @@ class UserRole < ApplicationRecord
       travel_manager: 6,
       purchaser: 7,
       receiver: 8,
-      creditor: 9
+      creditor: 9,
+      purchase_request_initiator: 10,
+      purchase_request_reviewer: 11,
+      purchase_order_initiator: 12,
+      purchase_order_reviewer: 13,
+      goods_receiver: 14,
+      invoice_initiator: 15,
+      invoice_reviewer: 16,
+      bank_payment_request_initiator: 17,
+      bank_payment_request_reviewer: 18,
+      bank_payment_request_creditor:19,
+      item_master_manager: 20,
+      inventory_manager: 21,
+      vendor_creator: 22,
+      vendor_reviewer: 23,
+      policy_admin: 24,
+      vendor_manager: 25,
+      bank_payment_request_auditor: 26,
+      budget_manager: 27,
+      non_po_initiator: 28,
+      purchase_request_auditor: 29,
+      purchase_order_auditor: 30,
+      invoice_auditor: 31,
+      vendor_auditor: 32
+  }
+
+
+  # This is used for segregating VP specific policies
+  # Do not put user specific roles like :initiator, :creaditor, :admin, :reviewer here
+  VP_ROLES = {
+    purchase_request_initiator: 10,
+    purchase_request_reviewer: 11,
+    purchase_order_initiator: 12,
+    purchase_order_reviewer: 13,
+    goods_receiver: 14,
+    invoice_initiator: 15,
+    invoice_reviewer: 16,
+    bank_payment_request_initiator: 17,
+    bank_payment_request_reviewer: 18,
+    bank_payment_request_creditor: 19,
+    item_master_manager: 20,
+    inventory_manager: 21,
+    vendor_creator: 22,
+    vendor_reviewer: 23,
+    policy_admin: 24,
+    vendor_manager: 25,
+    bank_payment_request_auditor: 26,
+    budget_manager: 27,
+    non_po_initiator: 28
   }
 
   def self.seed_data
@@ -76,6 +147,14 @@ class UserRole < ApplicationRecord
   def self.id_for(role)
     role == :finance_manager if role == :finance
     VALUES[role]
+  end
+
+  def self.ids_for(*roles)
+    role_ids = []
+    roles.each do |role|
+      role_ids << self.id_for(role)
+    end
+    role_ids.compact
   end
 
   def self.name_for(role_id)

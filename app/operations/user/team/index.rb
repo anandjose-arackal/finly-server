@@ -23,6 +23,8 @@ class User::Team::Index < User::Team::Base
   has_scope :filter_vendor_payments
   has_scope :yes_bank_account_transfer
   has_scope :filter_vendor_payments_reviewers
+  # has_scope :reviewer_type
+  # has_scope :policy_id
   has_scope :filter_em_reviewers
   has_scope :filter_unassigned_travel_for_policy
   has_scope :filter_unassigned_finance_for_policy
@@ -111,7 +113,11 @@ class User::Team::Index < User::Team::Base
         # approves_to_association = :has_approves_to
         # NEW CODE
         level_ids = LevelReviewerMapping.non_deleted.with_reviewer_id(user.id).pluck(:level_id)
-        policy_ids = ReviewalLevel.with_id(level_ids).pluck(:policy_id)
+        if vendor_payments?
+          policy_ids = ReviewalLevel.with_vp_providers.with_id(level_ids).pluck(:policy_id)
+        elsif expense_management?
+          policy_ids = ReviewalLevel.with_em_providers.with_id(level_ids).pluck(:policy_id)
+        end
         user_ids = PolicyUserMapping.non_deleted.where(policy_id: policy_ids).pluck(:user_id)
         user_ids += LevelUserReviewerMapping.with_reviewer_id(user.id).pluck(:user_id)
       when UserRole.id_for(:travel_manager)
@@ -174,7 +180,7 @@ class User::Team::Index < User::Team::Base
   private
   def admin_team
     clear_messages
-    if user.company_admin? || user.auditor?
+    if user.company_admin? || user.auditor? || user.vendor_payments_admin?
       return user.company.users
     elsif user.policy_admin?
       users = user.company.users

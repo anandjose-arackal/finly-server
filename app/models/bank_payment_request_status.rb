@@ -39,7 +39,31 @@ class BankPaymentRequestStatus < ApplicationRecord
     self.id == BankPaymentRequestStatus.id_for(:approved)
   end
 
+  def auto_approved?
+    self.id == BankPaymentRequestStatus.id_for(:auto_approved)
+  end
+
   def credited?
     self.id == BankPaymentRequestStatus.id_for(:credited)
+  end
+
+  def self.status_ids_for_owner
+    [
+      BankPaymentRequestStatus.id_for(:open),
+      BankPaymentRequestStatus.id_for(:rejected),
+      BankPaymentRequestStatus.id_for(:retracted)
+    ]
+  end
+
+  def self.status_ids_for_reviewer
+    [
+      BankPaymentRequestStatus.id_for(:processing)
+    ]
+  end
+
+  def self.status_ids_for_creditor
+    [
+      BankPaymentRequestStatus.id_for(:approved)
+    ]
   end
 end

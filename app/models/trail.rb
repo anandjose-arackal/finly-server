@@ -85,13 +85,18 @@ class Trail < ApplicationRecord
     where created_at: (date.beginning_of_day..date.end_of_day)
   }
 
+  scope :filter_date_range, -> (from, to) {
+    where created_at: (from.beginning_of_day..to.end_of_day)
+  }
+
   def as_json(user)
     {
-        action_type: self.action.name,
-        action_user: self.action_user&.as_json,
+        action_type: self.action&.name,
+        action_user: self.action_user&.json_for_trail,
         body: generate_trail_body,
         created_at_date: self.created_at.strftime("%d-%b-%Y"),
         created_at_time: self.created_at.strftime("%I:%M%p"),
+        created_at: self.created_at,
         note: self.note
     }
   end
@@ -106,6 +111,21 @@ class Trail < ApplicationRecord
       if user_name.nil? && action_id == TrailAction.id_for(:auto_approve)
         user_name = "Your"
       end
+    end
+
+    if self.action_id == TrailAction.id_for(:auto_approve)
+      body = "#{self.parent_type} was auto approved. Initiated by #{user_name}"
+      return body
+    end
+
+    if self.action_id == TrailAction.id_for(:send_to_vendor)
+      body = "#{user_name} has sent the #{self.parent_type} to vendor."
+      return body
+    end
+
+    if self.action_id == TrailAction.id_for(:revision)
+      body = "#{user_name} has created a revision for this #{self.parent_type}."
+      return body
     end
 
     body += user_name
@@ -145,15 +165,23 @@ class Trail < ApplicationRecord
         action = ""
       when TrailAction.id_for(:reimbursement_confirmed)
         action = " confirmed reimbursement"
-      when TrailAction.id_for(:closed)
+      when TrailAction.id_for(:closed), TrailAction.id_for(:close)
         action = " closed"
       when TrailAction.id_for(:void)
         action = " voided"
+      when TrailAction.id_for(:send_to_vendor)
+        action = " has sent to vendor"
+      when TrailAction.id_for(:revision)
+        action = " created a revision for this"
+      when TrailAction.id_for(:reopen)
+        action = " reopened"
+      when TrailAction.id_for(:forward)
+        action = " forwarded"
       else
         action = ""
     end
 
-    body += action + " the #{self.parent_type}."
+    body += action + " the #{self.parent_type}."    
 
     body
   end

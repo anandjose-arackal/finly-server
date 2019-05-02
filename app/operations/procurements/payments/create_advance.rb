@@ -1,3 +1,6 @@
+# This will create a payment ticket for advance payment for an already existing puchase order which is NOT LINKED to a procurement
+# This will generate a new individual payment order and payment
+
 class Procurements::Payments::CreateAdvance < Procurements::Payments::Base
 
   attr_accessor :purchase_order, :scheduled_at, :payment_mode, :policy_id,
