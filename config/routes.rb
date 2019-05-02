@@ -414,6 +414,7 @@
 #                                                         PUT    /admin_users/companies/:id(.:format)                                                                                admin_users/companies#update
 #                                                         DELETE /admin_users/companies/:id(.:format)                                                                                admin_users/companies#destroy
 #                               admin_users_company_types GET    /admin_users/company_types(.:format)                                                                                admin_users/companies#company_types
+#           admin_users_company_import_data_configuration POST   /admin_users/companies#import_data_configuration
 #                                 admin_users_users_count GET    /admin_users/users/count(.:format)                                                                                  admin_users/users#count
 #                          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)                                                                 admin_users/users#update_status
 #                         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)                                                                admin_users/users#update_mapping
@@ -2109,6 +2110,7 @@
 #                                         PATCH  /admin_users/companies/:id(.:format)                        admin_users/companies#update
 #                                         PUT    /admin_users/companies/:id(.:format)                        admin_users/companies#update
 #                                         DELETE /admin_users/companies/:id(.:format)                        admin_users/companies#destroy
+#
 #          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)         admin_users/users#update_status
 #         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)        admin_users/users#update_mapping
 #        admin_users_user_destroy_mapping DELETE /admin_users/users/:user_id/destroy_mapping(.:format)       admin_users/users#destroy_mapping
@@ -2544,6 +2546,7 @@ Rails.application.routes.draw do
     resources :companies do
       post 'dcode_check', to: 'companies#check_dcode'
       post 'configure_payu', to: 'companies#configure_payu'
+      post 'import_data_configuration', to: 'companies#import_data_configuration'
     end
     get 'company_types', to: 'companies#company_types'
     get 'users/count', to: 'users#count'
@@ -3482,6 +3485,8 @@ Rails.application.routes.draw do
 
       resources :quotations, only: %i[index create update destroy]
     end
+    post 'purchase_order/bulk_upload_items', to: 'purchase_orders#bulk_upload_items'
+    get 'purchase_order/template_bulk_import_items', to: 'purchase_orders#template_bulk_import_items'
     get 'po_advances', to: 'purchase_orders#po_advances', as: :po_advances
     post 'po_advance_ticket', to: 'purchase_orders#po_advance_ticket', as: :po_advance_ticket
     get 'po_with_advance', to: 'purchase_orders#po_with_advance', as: :po_with_advance
@@ -3493,6 +3498,9 @@ Rails.application.routes.draw do
     end
 
     # adding routes for purchase requests
+    put 'purchase_requests/bulk_approve', to: 'purchase_requests#bulk_approve'
+    put 'purchase_requests/bulk_reject', to: 'purchase_requests#bulk_reject'
+    put 'purchase_requests/bulk_take_control', to: 'purchase_requests#bulk_take_control'
     resources :purchase_requests do
       get 'edit_config', to: "purchase_requests#edit_config", as: :edit_config
       post 'create_and_submit', to: "purchase_requests#create_and_submit", as: :create_and_submit
@@ -3509,8 +3517,12 @@ Rails.application.routes.draw do
         get 'approved_items', to: 'purchase_requests#approved_items'
         patch 'bulk_reject_approved_items', to: "purchase_requests#bulk_reject_approved_items", as: :bulk_reject_approved_items
         patch 'issue_from_inventory', to: "purchase_requests#issue_from_inventory", as: :issue_from_inventory
+        get 'count', to: "purchase_requests#count", as: :count
       end
     end
+    post 'purchase_request/bulk_upload_items', to: 'purchase_requests#bulk_upload_items'
+    get 'purchase_request/template_bulk_import_items', to: 'purchase_requests#template_bulk_import_items'
+
 
     post 'payments/create_bulk_advance', to: 'payments#bulk_create_advance', as: :bulk_create_advance
     resources :payments, only: [:show]
@@ -3532,6 +3544,8 @@ Rails.application.routes.draw do
     put 'inward_invoices/bulk_approve', to: 'inward_invoices#bulk_approve'
     put 'inward_invoices/bulk_reject', to: 'inward_invoices#bulk_reject'
     put 'inward_invoices/bulk_take_control', to: 'inward_invoices#bulk_take_control'
+    post 'inward_invoices/bulk_upload_items', to: 'inward_invoices#bulk_upload_items'
+    get 'inward_invoices/template_bulk_import_items', to: 'inward_invoices#template_bulk_import_items'
     put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
@@ -3584,11 +3598,13 @@ Rails.application.routes.draw do
     get 'vp/awaiting_action', to: 'vendor_payments#awaiting_action'
     get 'vp/configs', to: 'vendor_payments#configs'
     get 'vp/purchase_orders', to: 'vendor_payments#purchase_orders'
+    get 'vp/purchase_requests', to: 'vendor_payments#purchase_requests'
     get 'vp/payment_tickets', to: 'vendor_payments#payment_tickets'
     get 'vp/po_invoices', to: 'vendor_payments#po_invoices'
     get 'vp/non_po_invoices', to: 'vendor_payments#non_po_invoices'
     get 'vp/po_advances', to: 'vendor_payments#po_advances'
     get 'vp/grns', to: 'vendor_payments#grns'
+    get 'vp/vendors', to: 'vendor_payments#vendors'
 
     get 'vp/budgets', to: 'vendor_payments#budgets'
   end
@@ -3609,6 +3625,8 @@ Rails.application.routes.draw do
   resources :vendors do
     put 'approve', to: "vendors#approve"
     put 'submit', to: "vendors#submit"
+    put 'deactivate', to: "vendors#deactivate"
+    put 'reactivate', to: "vendors#reactivate"
     put 'reject', to: "vendors#reject"
     put 'retract', to: "vendors#retract"
     put 'take_control', to: "vendors#take_control"

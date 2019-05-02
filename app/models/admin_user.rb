@@ -69,6 +69,14 @@ class AdminUser < ApplicationRecord
     self.admin_user_role_mappings.call_center.present?
   end
 
+  def company_admin?
+    true
+  end
+
+  def vp_admin_or_auditor?
+    true
+  end
+
   # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
     find_by(email: conditions[:username])

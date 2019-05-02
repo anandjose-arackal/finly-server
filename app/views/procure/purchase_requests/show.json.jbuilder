@@ -18,6 +18,10 @@ json.result do
       json.name @result.purchase_request&.department&.name
       json.id @result.purchase_request&.department_id
     end
+    json.cost_center do
+      json.name @result.purchase_request&.cost_center&.name
+      json.id @result.purchase_request&.cost_center&.id
+    end
     json.policy do 
       json.name @result.purchase_request.policy&.name
       json.id @result.purchase_request&.policy_id
@@ -30,7 +34,13 @@ json.result do
           json.id line_item.id
           json.status line_item&.status&.name
           json.rejected line_item.rejected
-          json.unit_type line_item.unit_of_measurement
+          json.unit_of_measurement line_item.unit_of_measurement  
+
+          json.category do
+            json.name line_item.category&.name
+            json.id line_item.category_id
+          end
+
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id
@@ -39,6 +49,7 @@ json.result do
             json.vendor_name line_item&.vendor&.name
             json.vendor_id line_item.vendor_id
           end
+          json.preferred_vendors line_item&.item&.rate_contract_vendors
           json.required_by_date line_item&.required_by_date&.to_date
           json.delivery_location do  
             json.name line_item&.delivery_location&.name
@@ -46,7 +57,6 @@ json.result do
           end
           json.purpose line_item.purpose
           json.quantity line_item.quantity
-          json.unit_type "each"
           json.estimated_cost do
             json.currency_id line_item&.estimated_amount&.currency_id
             json.value line_item&.estimated_amount&.value
@@ -106,6 +116,6 @@ json.result do
         end
       end
     end
-    json.reviewal_chain @result.purchase_request.get_reviewal_chain
+    json.reviewal_chain @result.reviewal_chain
   end
 end

@@ -14,7 +14,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def save_btn
-    # If admin but not initiator, cannot save in draft stage
+    # If admin but not initiator, cannot edit/save in draft stage
     if user.vendor_payments_admin? && !user.is_purchase_request_initiator?  && ( purchase_request.retracted? || purchase_request.rejected? || purchase_request.awaiting_approval? )
       return true
     end
@@ -26,10 +26,14 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
       end 
     end
 
-    if user.is_purchase_request_initiator? 
+    if user.is_purchase_request_initiator? && document_owner? 
       if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
         return true
       end 
+    end
+
+    if purchase_request.is_reviewing_user?
+      purchase_request.action_users(:approve).include?(user)
     end
   end
 

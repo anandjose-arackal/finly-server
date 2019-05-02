@@ -48,20 +48,8 @@
 #  template_name                :string(255)
 #  resource_template_id         :integer
 #  deleted_at                   :datetime
-#  advance_amount_id            :integer
-#  due_date                     :date
-#  advance_amount_status_id     :integer
-#  bank_account_id              :integer
-#  revised_po_id                :integer
-#  revision_of_id               :integer
-#  revision_number              :integer          default(0)
-#  note                         :text(65535)
-#  advance_tds_slab_id          :integer
-#  advance_tds_amount_id        :integer
-#  advance_amount_required      :boolean          default(FALSE)
-#  requested_advance_amount_id  :integer
-#  gstin_location_id            :bigint(8)
 #  submitted_at                 :datetime
+#  approved_at                  :datetime
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -365,11 +353,13 @@ class PurchaseOrder < ApplicationRecord
     shipped
   end
 
-  def all_items_accepted?
+  def all_items_accepted?(inward_document = nil)
     shipped = true
     self.items.each do |item|
       next if ( item.inventory_line_item.product_type_id == ProductType.id_for(:service) )
-      unless item.quantity == item.accepted
+      # Commenting this fetch for value for now.
+      # previously_delivered = inward_document.items.detect {|iw| iw if iw.purchase_order_item_id == item.id}.previously_delivered rescue 0
+      unless item.quantity == (item.accepted + 0)
         shipped = false
         break
       end
@@ -409,13 +399,15 @@ class PurchaseOrder < ApplicationRecord
 
   def can_really_approve?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing?
-    elsif self.action_users(:approve).include?(user)
-      processing?
-    else
-      false
-    end
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user)
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_reject?
@@ -424,17 +416,20 @@ class PurchaseOrder < ApplicationRecord
 
   def can_really_reject?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing?
-    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
-      processing?
-    else
-      false
-    end
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     processing? && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
@@ -739,15 +734,21 @@ class PurchaseOrder < ApplicationRecord
     [
         :purchase_order_initiator,
         :purchase_order_reviewer,
+        :purchase_order_auditor,
         :bank_payment_request_initiator,
         :bank_payment_request_reviewer,
-        :bank_payment_request_creditor
+        :bank_payment_request_creditor,
+        :bank_payment_request_auditor
     ]
   end
 
   def self.role_based_associated_status_ids(user)
     self.status_ids(*self.role_based_statuses(user))
     # PurchaseOrderStatus.ids_for(*self.role_based_statuses(user))
+  end
+
+  def self.open_status_ids(user)
+    PurchaseOrderStatus.ids_for([:open, :draft])
   end
 
   def self.role_based_statuses(user)
@@ -783,7 +784,7 @@ class PurchaseOrder < ApplicationRecord
     {
       # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
 
-      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, purchase_request_item_id: pr_item.id, rate: pr_item&.item&.rate, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement
+      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id
     }
   end
 

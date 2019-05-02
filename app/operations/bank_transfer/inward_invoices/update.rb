@@ -1,13 +1,13 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement,
-                :gstin_location
+                :gstin_location, :cost_allocation_items
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
-    self.custom_fields = params&.dig(:invoice, :custom_fields)
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:invoice, :custom_fields)
 
 
     self.document_reviewer_mappings_params = params[:document_reviewer_mappings]
@@ -31,12 +31,20 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       end
     end
 
+    # Check if department and cost center are to be saved globally for the non-po invoice or individually for each item
+    self.cost_allocation_items = StringUtils.to_bool(self.inward_invoice_params[:cost_allocation_items])
+    # self.inward_invoice_params.delete(:cost_allocation_items)
 
   end
 
   def validate
     if self.inward_invoice.blank?
       add_message :error, "Invoice not found"
+      return
+    end
+
+    if self.inward_invoice_params[:invoice_number].blank?
+      add_message :error, "Invoice number is required. You can input alphanumeric characters, dash and forward slash. No spaces allowed."
       return
     end
 
@@ -58,8 +66,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         add_message :error, "Please add the advance amount to be adjusted for this Invoice."
         return
       end
-      if self.inward_invoice_params[:po_adjusted_advance_attributes][:value].to_i > self.inward_invoice.po_advance
-        add_message :error, "Error: Adjusted advance entered is more than the required Purchase Order advance."
+      possible_adjustment = (self.inward_invoice.po_advance - self.inward_invoice.po_prev_adjusted_advance) rescue 0
+      if self.inward_invoice_params[:po_adjusted_advance_attributes][:value].to_i > possible_adjustment
+        add_message :error, "Error: Adjusted advance entered is more than the required Purchase Order advance.\n Maximum adjustment for this Invoice can be - \"#{possible_adjustment}\""
         return
       end
     else
@@ -129,12 +138,44 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
     end
 
-    arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:unit_of_measurement)
+    # arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:unit_of_measurement)
 
-    if arr.collect {|a| a.blank?}.include? true
-      add_message :error, "Please mention the Unit of Measurement for the items supplied."
-      return
+    # if arr.collect {|a| a.blank?}.include? true
+    #   add_message :error, "Please mention the Unit of Measurement for the items supplied."
+    #   return
+    # end
+
+    # Removing hard check for department and cc line item wise
+    # if self.inward_invoice.invoice_type_id == InwardInvoiceType.id_for(:non_po_invoice)
+    #   if self.cost_allocation_items
+    #     arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:department_id)
+
+    #     if arr.collect {|a| a.blank? }.include? true
+    #       add_message :error, "Please select a Department for which the item would be purchased."
+    #       return
+    #     end
+
+    #     arr = self.inward_invoice_params[:invoice_items_attributes].pluck(:cost_center_id)
+
+    #     if arr.collect {|a| a.blank? }.include? true
+    #       add_message :error, "Please select a Cost Center for which the item would be purchased."
+    #       return
+    #     end
+    #   else
+    #     self.inward_invoice_params[:invoice_items_attributes].each do |item|
+    #       item[:department_id] = self.inward_invoice_params[:department_id]
+    #       item[:cost_center_id] = self.inward_invoice_params[:cost_center_id]
+    #     end
+    #   end
+    # end
+
+    unless self.cost_allocation_items
+      self.inward_invoice_params[:invoice_items_attributes].each do |item|
+        item[:department_id] = self.inward_invoice_params[:department_id]
+        item[:cost_center_id] = self.inward_invoice_params[:cost_center_id]
+      end
     end
+
   end
 
   def pre_process

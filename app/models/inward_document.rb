@@ -18,7 +18,6 @@
 #  is_deleted                  :boolean          default(FALSE), not null
 #  user_id                     :integer
 #  deleted_at                  :datetime
-#  grn_number                  :string(255)
 #
 
 class InwardDocument < ApplicationRecord

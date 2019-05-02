@@ -66,11 +66,6 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
     respond
   end
 
-  def bulk_reject
-    @result = Procurements::PurchaseOrders::BulkReject.(current_user, params)
-    respond
-  end
-
   def bulk_take_control
     @result = Procurements::PurchaseOrders::BulkTakeControl.(current_user, params)
     respond
@@ -88,6 +83,28 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
 
   def return_control
     @result = Procurements::PurchaseOrders::ReturnControl.(current_user, params)
+    respond
+  end
+
+  def bulk_upload_items
+    @result = Procurements::PurchaseOrders::BulkUploadLineItems.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_failure'
+        }
+      end
+    end
+  end
+
+  def template_bulk_import_items
+    @result = Procurements::PurchaseOrders::GenerateImportSample.(current_user, params)
     respond
   end
 
@@ -138,7 +155,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
           render pdf: "PO-#{@result.purchase_order.po_number}",
                  layout: "pdf/paginated_bootstrap.html.erb",
                  print_media_type: true,
-                 margin: { :bottom => 5 },
+                 margin: { :bottom => 12 },
                  dpi: 650,
                  # header: { left: '[page] of [topage]' },
                  footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
@@ -148,7 +165,7 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
         render pdf: "PO-#{@result.purchase_order.po_number}",
                layout: "pdf/paginated_bootstrap.html.erb",
                print_media_type: true,
-               margin: { :bottom => 5 },
+               margin: { :bottom => 12 },
                footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }}
         # header: { html: { template: 'export/header_pagination.html.erb' }}
       }

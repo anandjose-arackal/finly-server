@@ -11,6 +11,14 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
     load_custom_fields_config
     params[:custom_fields_config] = self.custom_fields_config
 
+    procurement_enabled = user.company.procurement_enabled?
+    params[:tabs] = {
+      invoices: procurement_enabled,
+      po_advances: procurement_enabled,
+      beneficaries: true,
+      import: true
+    }
+
   end
 
   # def authorize
@@ -38,9 +46,8 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
   end
 
 
-
   class BankTransfer::PaymentRequest::ConfigurationDataPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs, :custom_fields_config
+    attr_accessor :departments, :cost_centers, :categories, :policies, :tds_slabs, :custom_fields_config, :tabs
     
     def init
       self.departments = params[:departments]
@@ -49,7 +56,7 @@ class BankTransfer::PaymentRequest::ConfigurationData < BankTransfer::PaymentReq
       self.cost_centers = params[:cost_centers]
       self.tds_slabs = params[:tds_slabs]
       self.custom_fields_config = params[:custom_fields_config]
-
+      self.tabs = params[:tabs]
     end
 
   end

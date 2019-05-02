@@ -36,7 +36,10 @@ class ExportField < ApplicationRecord
       22 => "Distance Expense Locations",
       23 => "Expense Type",
       24 => "Expense Reimbursement",
-      25 => "Spent from Account"
+      25 => "Spent from Account",
+      26 => "Policy",
+      27 => "Report Submission Date",
+      29 => "Report Creation Date"
   }
 
   def self.id_for(name_in_sym)

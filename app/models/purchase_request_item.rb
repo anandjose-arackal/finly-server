@@ -49,6 +49,9 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :status, optional: true, class_name: 'PurchaseRequestItemStatus', foreign_key: :status_id
   belongs_to :purchase_order, optional: true
+  belongs_to :department, optional: true
+  belongs_to :cost_center, optional: true
+  belongs_to :category, optional: true
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
   has_many :trails, as: :parent
 
@@ -87,6 +90,22 @@ class PurchaseRequestItem < ApplicationRecord
     joins(:purchase_request).where('purchase_requests.order_number = ?', order_number)
   }
 
+  scope :search_item_name, -> (item_name) {
+    joins(:item).where('items.description LIKE ?', "%#{item_name}%")
+  }
+
+  scope :search_order_number, -> (order_number) {
+    joins(:purchase_request).where('purchase_requests.order_number LIKE ?', "%#{order_number}%")
+  }
+
+  scope :search_preferred_vendor, -> (vendor_name) {
+    joins(:vendor).where('yes_bank_vendors.name LIKE ?', "%#{vendor_name}%")
+  }
+
+  scope :search_delivery_location, -> (location_name) {
+    joins(purchase_request: :location).where('branch_locations.name LIKE ?', "%#{location_name}%")
+  }
+
 
   def update_estimated_amount
     quantity = self.quantity
@@ -101,7 +120,7 @@ class PurchaseRequestItem < ApplicationRecord
   def add_attachment
     # Can be put into AR transaction
     params = RequestStore[:params]
-    line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes)
+    line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes) rescue nil
     if line_item_attributes.present?
       line_item_attributes.each do |position, line_item|
         attachment_id = line_item.dig(:attachment_attributes, :id) rescue nil

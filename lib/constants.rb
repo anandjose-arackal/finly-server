@@ -13,6 +13,8 @@ module Constants
   OTP_RESEND_INTERVAL = 60
 
   PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
+  EM_PROVIDER = %w( ReportProvider MoneyRequestProvider TravelRequestProvider TravelRequestBookingProvider )
+  VP_PROVIDER = %w( PurchaseOrderProvider InvoiceProvider BankPaymentRequestProvider PurchaseRequestProvider YesBankVendorProvider )
 
   # todo - needs to be edited once we get the account details.
   if Rails.env.production?
@@ -88,7 +90,7 @@ module Constants
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = %w(abhinandan.k@finly.io rakesh.g@finly.io)
+    TRANSCRIBER_EMAILS = %w(rakesh.g@finly.io)
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end

@@ -28,6 +28,5 @@ class Autocomplete::Vendors < BaseOperation
     def init
       self.vendors = params[:vendors]
     end
-
   end
 end

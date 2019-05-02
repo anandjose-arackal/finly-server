@@ -2,7 +2,7 @@
   <div class="col col-xs-12 header-container">
     <div class="col col-xs-8 no-padding company-details">
       <div class="col col-xs-12 no-padding logo">
-        <img src="<%="http:"+@company.configuration.logo.url(:thumb) %>" width="120" height="auto">
+        <img src="<%=@company.configuration.logo.url(:thumb) %>" width="120" height="auto">
       </div>
       <div class="col col-xs-12 no-padding address fs-12 mg-top-5">
         <br>
@@ -46,26 +46,26 @@
     </div>
     <% field_configurations = FieldConfiguration.with_id(@result.purchase_order.custom_fields.pluck(:field_configuration_id)) %>
     <% if field_configurations.present? && field_configurations.pluck(:printable).include?(true) %>
-        <div class="col col-xs-12 no-padding">
-          <% @result.purchase_order.custom_fields.each do |custom_field| %>
-              <% if custom_field.field_configuration.printable %>
-                  <div class="col col-xs-3 no-padding mg-botm-8">
-                    <div class="col col-xs-12 no-padding font-light-gray mg-botm-2"><%= custom_field.field_configuration.field_name %></div>
-                    <div class="col col-xs-12 no-padding font-dark-gray">
-                      <% if custom_field.value_type == 'FieldDropDownSelection' %>
-                          <%= custom_field.value.value.name %>
-                      <% else %>
-                          <%= custom_field.value&.value || '--' %>
-                      <% end %>
-                    </div>
-                  </div>
-              <% end %>
+      <div class="col col-xs-12 no-padding">
+        <% @result.purchase_order.custom_fields.each do |custom_field| %>
+          <% if custom_field.field_configuration.printable %>
+            <div class="col col-xs-3 no-padding mg-botm-8">
+              <div class="col col-xs-12 no-padding font-light-gray mg-botm-2"><%= custom_field.field_configuration.field_name %></div>
+              <div class="col col-xs-12 no-padding font-dark-gray">
+                <% if custom_field.value_type == 'FieldDropDownSelection' %>
+                  <%= custom_field.value.value.name %>
+                <% else %>
+                  <%= custom_field.value&.value || '--' %>
+                <% end %>
+              </div>
+            </div>
           <% end %>
-        </div>
+        <% end %>
+      </div>
     <% end %>
-    <div class="col col-xs-12 no-padding">
+    <!-- <div class="col col-xs-12 no-padding">
       <p class="text-center"><%= @result.purchase_order&.procurement&.note %></p>
-    </div>
+    </div> -->
   </div>
   <div class="col col-xs-12 no-padding body-container">
     <div class="col col-xs-4 vendor-details">
@@ -87,6 +87,10 @@
         <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.gstin_location&.gstin %></div>
       </div>
       <div class="col col-xs-12 no-padding">
+        <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Point of Contact</div>
+        <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.poc_name} - #{@result.purchase_order&.gstin_location&.poc_mobile_number}" %></div>
+      </div>
+      <div class="col col-xs-12 no-padding">
         <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">Location</div>
         <div class="col col-xs-12 no-padding font-dark-gray"><%= "#{@result.purchase_order&.gstin_location&.location} - #{@result.purchase_order&.gstin_location&.state&.name}" %></div>
       </div>
@@ -94,13 +98,13 @@
     <div class="col col-xs-4 billing-address">
       <h4 class="section-title">Billing Address</h4>
       <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-        <%= @result.purchase_order.location.name %>
+        <%= @result.purchase_order.company.name %>
       </div>
       <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
         <% if @result.purchase_order.billing_address.present? %>
-            <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
+          <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
         <% else %>
-            <%= @result.purchase_order.location.address %>
+          <%= @result.purchase_order.location.address %>
         <% end %>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
@@ -115,7 +119,7 @@
     <div class="col col-xs-4 shipping-address">
       <h4 class="section-title">Shipping Address</h4>
       <div class="col col-xs-12 no-padding font-dark-gray mg-botm-8">
-        <%= @result.purchase_order.delivery_location.name %>
+        <%= @result.purchase_order.company.name %>
       </div>
       <div class="col col-xs-12 no-padding font-light-gray mg-botm-8">
         <% if @result.purchase_order.shipping_address.present? %>
@@ -134,8 +138,7 @@
       </div>
     </div>
   </div><br> <br>
-  <div class="col col-xs-12 line-items-container mg-top-5">
-    <h4 class="section-title">Document Line Items</h4>
+  <div class="col col-xs-12 line-items-container mg-top-5" style="padding-top: 25px">
     <div class="col col-xs-12 no-padding">
       <table class="table table-responsive table-document-items">
         <thead>
@@ -152,16 +155,16 @@
         </thead>
         <tbody>
         <% @result.purchase_order.items.each_with_index do |item, index| %>
-            <tr>
-              <td class="font-light-gray"><%= index + 1 %></td>
-              <td class="font-dark-gray fw-bold"><%= item.description %></td>
-              <td class="font-light-gray"><%= item.comment %></td>
-              <td class="text-center font-light-gray"><%= item.quantity %></td>
-              <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
-              <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
-              <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
-              <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= item.total_amount&.value&.to_d.round(2) rescue 0 %></td>
-            </tr>
+          <tr>
+            <td class="font-light-gray"><%= index + 1 %></td>
+            <td class="font-dark-gray fw-bold"><%= item.description %></td>
+            <td class="font-light-gray"><%= item.comment %></td>
+            <td class="text-center font-light-gray"><%= item.quantity %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.rate %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.discount_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="text-right currency"><i class='fa fa-rupee'></i><%= item.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
+            <td class="text-right fw-bold currency"><i class='fa fa-rupee'></i><%= item.total_amount&.value&.to_d.round(2) rescue 0 %></td>
+          </tr>
         <% end %>
         </tbody>
       </table>
@@ -169,13 +172,12 @@
     <div class="col col-xs-12 no-padding">
       <div class="col col-xs-8 no-padding">
         <% if @result.taxes_applicable_flag %>
-            <div class="taxes_as_applicable" style="vertical-align: bottom;">
-              *Taxes as Applicable
-            </div>
+          <div class="taxes_as_applicable" style="vertical-align: bottom;">
+            *Taxes as Applicable
+          </div>
         <% end %>
       </div>
       <div class="col col-xs-4 no-padding">
-
         <table class="table table-responsive table-document-items-summary fs-12">
           <tbody>
           <tr>
@@ -188,9 +190,9 @@
           </tr>
           <tr>
             <% if @result.taxes_applicable_flag %>
-                <td class="font-light-gray text-left">Tax*</td>
+              <td class="font-light-gray text-left">Tax*</td>
             <% else %>
-                <td class="font-light-gray text-left">Tax</td>
+              <td class="font-light-gray text-left">Tax</td>
             <% end %>
             <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
           </tr>
@@ -205,54 +207,55 @@
   </div>
 
   <% unless @result.purchase_order.note.blank? %>
-      <div class="col col-xs-12 notes-container mg-top-5">
-        <h4 class="section-title">Note to Vendor</h4>
-        <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
-          <% if @result.purchase_order.note.blank? %>
-              <%= simple_format "<i>Empty </i>", {}, wrapper_tag: "div" %>
-          <% else %>
-              <%= simple_format @result.purchase_order.note, {}, wrapper_tag: "div" %>
-          <% end %>
-        </div>
+    <div class="col col-xs-12 notes-container mg-top-5">
+      <h4 class="section-title">Note to Vendor</h4>
+      <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
+        <% if @result.purchase_order.note.blank? %>
+          <%= simple_format "<i>Empty </i>", {}, wrapper_tag: "div" %>
+        <% else %>
+          <%= simple_format @result.purchase_order.note, {}, wrapper_tag: "div" %>
+        <% end %>
       </div>
+    </div>
   <% end %>
-
-
+  <div class="text-center font-dark-small" style="margin-top: 50%; padding-top: 80%">
+    Please refer the next page for the terms and conditions
+  </div>
+  <div class="page-break"></div>
 
   <div class="col col-xs-12 terms-and-conditions-container mg-top-5">
-    <h4 class="section-title">Terms and Conditions</h4>
+    <h4 class="terms-condition-tittle">Terms and Conditions</h4>
     <div class="col col-xs-12 no-padding term-text font-light-gray mg-top-5 mg-botm-8">
       <div><%= @result.purchase_order.procurement_term_text.html_safe %></div>
     </div>
     <div class="col col-xs-12 no-padding approval-flow mg-top-5 mg-botm-8">
-      <% unless @company.id == 137 %>
-          <ul>
-            <% approved_users = [] %>
-            <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
-                <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
-                    <% unless approved_users.include?(trail.action_user) %>
-                        <% approved_users.push(trail.action_user) %>
-                        <li>
-                          <div class="text center font-light-gray"><%= trail.action_user.name %></div>
-                          <div class="text-center font-dark-gray">
-                            <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
-                          </div>
-                        </li>
-                    <% end %>
-                <% end %>
+      <% unless (@company.id == 137 || @company.id == 156) %>
+        <ul>
+          <% approved_users = [] %>
+          <% @result.purchase_order.trails.printable_trails.only_approve.each do |trail| %>
+            <% if trail.action_id == TrailAction.id_for(:approve) && trail.action_user_id.present? %>
+              <% unless approved_users.include?(trail.action_user) %>
+                <% approved_users.push(trail.action_user) %>
+                <li>
+                  <div class="text center font-light-gray"><%= trail.action_user.name %></div>
+                  <div class="text-center font-dark-gray">
+                    <%= trail.action_user.profile.signature_title.present? ? trail.action_user.profile.signature_title : "Approved" %>
+                  </div>
+                </li>
+              <% end %>
             <% end %>
-          </ul>
-          <ul>
-
-            <li>
-              <div class="text center font-light-gray"><%= @result.purchase_order.user.name %></div>
-              <div class="text-center font-dark-gray">
-                <%= "Initiated By" %>
-              </div>
-            </li>
-          </ul>
+          <% end %>
+        </ul>
+        <ul>
+          <li>
+            <div class="text center font-light-gray"><%= @result.purchase_order.user.name %></div>
+            <div class="text-center font-dark-gray">
+              <%= "Initiated By" %>
+            </div>
+          </li>
+        </ul>
       <% end %>
-      <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p>
+      <!-- <p class="font-light-gray mg-top-5 mg-botm-8 text-center">This is a computer generated document. No signature is required.</p> -->
     </div>
   </div>
 </div>
@@ -278,6 +281,10 @@
     }
     .font-dark-gray{
       font-weight: bold;
+      color: #474747 !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .font-dark-small{
       color: #474747 !important;
       -webkit-print-color-adjust: exact;
     }
@@ -420,6 +427,11 @@
     body{
       font-family: 'Open Sans', sans-serif !important;
     }
+    .page-break {
+      display: block;
+      clear: both;
+      page-break-after: always;
+    }
     .fs-12{
       font-size: 12px !important;
     }
@@ -500,6 +512,12 @@
       color: cornflowerblue !important;
       -webkit-print-color-adjust: exact;
     }
+    .terms-condition-tittle{
+      font-size: 24px;
+      color: cornflowerblue !important;
+      -webkit-print-color-adjust: exact;
+    }
+    .mg
     .mg-botm-5{
       margin-bottom: 5px;
     }

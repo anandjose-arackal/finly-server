@@ -113,7 +113,11 @@ class User::Team::Index < User::Team::Base
         # approves_to_association = :has_approves_to
         # NEW CODE
         level_ids = LevelReviewerMapping.non_deleted.with_reviewer_id(user.id).pluck(:level_id)
-        policy_ids = ReviewalLevel.with_id(level_ids).pluck(:policy_id)
+        if vendor_payments?
+          policy_ids = ReviewalLevel.with_vp_providers.with_id(level_ids).pluck(:policy_id)
+        elsif expense_management?
+          policy_ids = ReviewalLevel.with_em_providers.with_id(level_ids).pluck(:policy_id)
+        end
         user_ids = PolicyUserMapping.non_deleted.where(policy_id: policy_ids).pluck(:user_id)
         user_ids += LevelUserReviewerMapping.with_reviewer_id(user.id).pluck(:user_id)
       when UserRole.id_for(:travel_manager)

@@ -23,19 +23,24 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
   def invoice_attributes
     params.require(:invoice).permit(:note, :tax, :gst_type_id, :tds, :tds_type_id, :category_id, :cost_center_id, :tds_slab_id, :payment_term_id, :gstin_location_id,
-                                    :department_id, :sub_department_id, :policy_id, :billing_address, :shipping_address,
-                                     :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount, :location_id, :delivery_location_id, :transaction_service_period_from, :transaction_service_period_to,
-                                     :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id, :vendor_id, :advance_amount_required,
-                                     original_amount_attributes: [:value, :currency_id],
-                                     freight_amount_attributes: [:value, :currency_id],
-                                     advance_amount_attributes: [:value, :currency_id],
-                                     po_adjusted_advance_attributes: [:value, :currency_id],
-                                     proforma_advance_attributes: [:value, :currency_id],
-                                     attachments: [],
-                                     invoice_attachments_attributes: [:attached_file, :description, :remove_file],
-                                     invoice_items_attributes: [:quantity, :unit_of_measurement, :rate, :tax, :tax_rate_id, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac, :comment, :_destroy,
-                                     :inventory_line_item_id],
-                                     custom_fields: [])
+                                    :department_id, :sub_department_id, :policy_id, :billing_address, :shipping_address, :cost_allocation_items,
+                                    :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount, :location_id,
+                                    :delivery_location_id, :transaction_service_period_from, :transaction_service_period_to,
+                                    :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id,
+                                    :vendor_id, :advance_amount_required, :narration,
+                                    original_amount_attributes: [:value, :currency_id],
+                                    freight_amount_attributes: [:value, :currency_id],
+                                    advance_amount_attributes: [:value, :currency_id],
+                                    po_adjusted_advance_attributes: [:value, :currency_id],
+                                    proforma_advance_attributes: [:value, :currency_id],
+                                    attachments: [],
+                                    invoice_attachments_attributes: [:attached_file, :description, :remove_file],
+                                    invoice_items_attributes: [
+                                        :quantity, :unit_of_measurement, :department_id,
+                                        :cost_center_id, :rate, :tax, :tax_rate_id, :discount,
+                                        :category_id, :description, :id, :remove_line_item,
+                                        :hsn_sac, :comment, :_destroy, :inventory_line_item_id
+                                    ], custom_fields: [])
   end
 
   def calculate_tax_and_discounts(invoice, invoice_params)

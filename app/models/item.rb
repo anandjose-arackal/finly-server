@@ -37,8 +37,10 @@ class Item < ApplicationRecord
   belongs_to :tax_rate, optional: true
   belongs_to :supply_item_type, optional: true
   belongs_to :product_type, optional: true, class_name: "ProductType", foreign_key: :product_type
+  belongs_to :user, optional: true
+  belongs_to :item_expense_type, optional: true
 
-  has_many :rate_contracts, foreign_key: :item_id
+  has_many :rate_contract_line_items, foreign_key: :item_id
   # LineItem and Branch Location Mapping
   has_many :branch_locations
   has_many :inventory_line_item_location_mappings, through: :branch_locations
@@ -67,6 +69,11 @@ class Item < ApplicationRecord
         end
 
   scope :with_id, -> (id) { where id: id }
+
+  scope :filter_active, -> (active) {
+    active = StringUtils.to_bool(active)
+    where active: active
+  }
 
   delegate :po_item?, :non_po_item?, to: :supply_item_type
 
@@ -97,10 +104,15 @@ class Item < ApplicationRecord
       tax: tax,
       account: account,
       item_code: item_code,
+      gl_code: item_code,
       supply_item_type_id: supply_item_type_id,
       item_type: supply_item_type.as_json,
       product_type: product_type_id,
-      rate_contract_vendors: rate_contract_vendors
+      rate_contract_vendors: rate_contract_vendors,
+      user: user,
+      active: active,
+      item_expense_type_id: item_expense_type_id,
+      item_expense_type_name: item_expense_type&.name,
     }
   end
 
@@ -124,6 +136,10 @@ class Item < ApplicationRecord
     self.product_type_id.present?
   end
 
+  def rate_contract_vendors
+    rate_contract_line_items.joins(:rate_contract).map{|line_item| { vendor_id: line_item.rate_contract.vendor.id, vendor_name: line_item.rate_contract.vendor.name }}
+  end
+
   private
 
   def budget_trail_entry
@@ -133,7 +149,4 @@ class Item < ApplicationRecord
     end
   end
 
-  def rate_contract_vendors
-    rate_contracts.joins(:vendor).map{|rate_contract| {vendor_id: rate_contract.vendor.id, vendor_name: rate_contract.vendor.name}}
-  end
 end
