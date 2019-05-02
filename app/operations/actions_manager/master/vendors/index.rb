@@ -4,7 +4,7 @@ class ActionsManager::Master::Vendors::Index < ActionsManager::Master::Base
 
 
   def create
-    user.is_vendor_initiator?
+    user.is_vendor_initiator? || user.vendor_payments_admin?
   end
 
   def bulk_actions
