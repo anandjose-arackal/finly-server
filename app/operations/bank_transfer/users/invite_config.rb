@@ -35,11 +35,13 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
 
   class BankTransfer::Users::InviteConfig::InviteConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :admin_policies, :role_groups
+    attr_accessor :admin_policies, :role_groups, :company, :user
 
     def init
       self.admin_policies = params[:admin_policies]
       self.role_groups = params[:role_groups]
+      self.company  = user.company
+      self.user = user
     end
   end
 
@@ -87,7 +89,13 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
           {
             key: 'bank_payment_request_auditor',
             label: 'Payment Ticket Auditor'
-          },
+          }
+        ]
+      }
+
+     data << {
+        name: 'Inventory',
+        roles: [
           {
             key: 'inventory_manager',
             label: 'Inventory Manager'
@@ -97,7 +105,7 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
             label: 'Item Master Manager'
           }
         ]
-      }
+      } 
     end
     if feature_subscription.vendor_empanelment_workflow
       data << {
