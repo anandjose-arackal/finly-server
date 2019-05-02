@@ -128,7 +128,6 @@ gem 'bootbox-rails', '0.5.0'
 # gem 'bootbox-rails'
 
 gem 'sidekiq', '~> 5.2.3'
-gem 'scout_apm', '~> 2.4'
 
 gem 'paranoia', '~> 2.4'
 
@@ -254,4 +253,6 @@ end
 
 group :production do
   gem 'elastic-apm', '~> 2.1.2'
+  gem "skylight", '~> 3.1'
+  gem 'scout_apm', '~> 2.4'
 end
