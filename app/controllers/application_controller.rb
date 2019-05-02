@@ -342,7 +342,7 @@ class ApplicationController < ActionController::Base
     user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
     if user_session.nil?
       if doorkeeper_token.scopes.include?('web')
-        doorkeeper_token.update(status_id: UserSessionStatus.id_for(:expired), message: 'UserSession does not exist')
+        doorkeeper_token.update(status_id: UserSessionStatus.id_for(:blocked), message: 'UserSession does not exist')
         head 401
         return false
       else

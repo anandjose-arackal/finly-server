@@ -10,6 +10,20 @@ RSpec.describe 'AdminBypass Event' do
     @user1 = create :em_user, company: @company
     @user2 = create :em_user, company: @company
     @admin_user = create :admin_user_admin, authorized_ip: @authorized_ip
+    @fingerprint = random_fingerprint
+
+    client_properties = RequestHelper::DEFAULT_DATA.deep_dup
+    client_properties[:fingerprint] = @fingerprint
+
+    @headers = authentication_headers_for(:web)
+    @headers[:HTTP_USER_AGENT] = @user_agent
+    @headers[:REMOTE_ADDR] = @authorized_ip
+
+    @user_device_browser = create :user_device_browser, client_properties
+    @device = create :user_device_verified, client: @user_device_browser, company: @company, user: @user1
+    @user_ip = create :user_ip_verified, ip: @authorized_ip, user: @user1
+    @user_agent_client = create :user_agent_client_verified, user: @user1, user_agent: @user_agent
+
 
     @doorkeeper_application = create :doorkeeper_application, scopes: 'admin_bypass web'
   end
@@ -21,9 +35,11 @@ RSpec.describe 'AdminBypass Event' do
           RSpec::Mocks.with_temporary_scope do
             @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id
             @session = create :user_session, access_token: @token, ip: @authorized_ip, admin_user: @admin_user,
-                              user_agent: @user_agent,
+                              user_agent: @user_agent, user_device: @device, user_ip: @user_ip, user_agent_client: @user_agent_client,
                               started_at: 5.minutes.ago, last_request_at: 4.minutes.ago, scopes: 'admin_bypass web'
-            @headers = {'Authorization': "Bearer #{@token.token}"}
+            headers = @headers.deep_dup
+            headers['Authorization'] = "Bearer #{@token.token}"
+
 
             @before_session_event_count = UserSessionEvent.count
             allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@authorized_ip)
@@ -33,7 +49,7 @@ RSpec.describe 'AdminBypass Event' do
             @time = Time.now
             allow(Time).to receive(:now).and_return(@time)
 
-            get '/menu_data', headers: @headers
+            get '/menu_data', headers: headers
           end
         end
 
@@ -61,8 +77,10 @@ RSpec.describe 'AdminBypass Event' do
             @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id
             @user_ip = create :user_ip, ip: @authorized_ip, user: @user1
             @session = create :user_session, access_token: @token, ip: @authorized_ip,
+                              user_device: @device, user_ip: @user_ip, user_agent_client: @user_agent_client,
                               user_agent: @user_agent, admin_user: @admin_user
-            @headers = {'Authorization': "Bearer #{@token.token}"}
+            headers = @headers.deep_dup
+            headers['Authorization'] = "Bearer #{@token.token}"
 
             @before_session_event_count = UserSessionEvent.count
             allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@authorized_ip)
@@ -70,7 +88,7 @@ RSpec.describe 'AdminBypass Event' do
             allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
 
             allow(Time).to receive(:now).and_return(Time.now + 31.minutes)
-            get '/menu_data', headers: @headers
+            get '/menu_data', headers: headers
           end
         end
 
@@ -84,17 +102,17 @@ RSpec.describe 'AdminBypass Event' do
         end
 
         it 'should set the UserSessionEvents status as revoked' do
-          expect(UserSessionEvent.last.status_id).to eq(UserSessionStatus.id_for(:revoked))
+          expect(UserSessionEvent.last.status_id).to eq(UserSessionStatus.id_for(:expired))
           expect(UserSessionEvent.last.message).to_not be_nil
         end
 
         it 'should set the UserSession status as revoked' do
-          expect(UserSessionEvent.last.user_session.status_id).to eq(UserSessionStatus.id_for(:revoked))
+          expect(UserSessionEvent.last.user_session.status_id).to eq(UserSessionStatus.id_for(:expired))
           expect(UserSessionEvent.last.user_session.message).to_not be_nil
         end
 
         it 'should set the AccessToken status as revoked' do
-          expect(UserSessionEvent.last.user_session.access_token.status_id).to eq(UserSessionStatus.id_for(:revoked))
+          expect(UserSessionEvent.last.user_session.access_token.status_id).to eq(UserSessionStatus.id_for(:expired))
           expect(UserSessionEvent.last.user_session.access_token.message).to_not be_nil
         end
       end
@@ -105,8 +123,11 @@ RSpec.describe 'AdminBypass Event' do
         RSpec::Mocks.with_temporary_scope do
           @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id
           @session = create :user_session, access_token: @token, ip: @authorized_ip,
+                            user_device: @device, user_ip: @user_ip, user_agent_client: @user_agent_client,
                             user_agent: @user_agent, admin_user: @admin_user
-          @headers = {'Authorization': "Bearer #{@token.token}"}
+          headers = @headers.deep_dup
+          headers['Authorization'] = "Bearer #{@token.token}"
+          headers[:REMOTE_ADDR] = @unauthorized_ip
 
           @before_session_event_count = UserSessionEvent.count
           @before_gatekeeper_block_count = GatekeeperBlock.count
@@ -114,7 +135,7 @@ RSpec.describe 'AdminBypass Event' do
           allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@unauthorized_ip)
           allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
 
-          get '/menu_data', headers: @headers
+          get '/menu_data', headers: headers
         end
       end
 
@@ -153,8 +174,10 @@ RSpec.describe 'AdminBypass Event' do
       RSpec::Mocks.with_temporary_scope do
         @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id
         @session = create :user_session, access_token: @token, ip: @authorized_ip, status_id: UserSessionStatus.id_for(:revoked),
+                          user_device: @device, user_ip: @user_ip, user_agent_client: @user_agent_client,
                           message: 'Revoke Reason', user_agent: @user_agent, admin_user: @admin_user
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
 
         @before_session_event_count = UserSessionEvent.count
         allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@authorized_ip)
@@ -162,7 +185,7 @@ RSpec.describe 'AdminBypass Event' do
         allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
 
         allow(Time).to receive(:now).and_return(Time.now)
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
     end
 
@@ -182,13 +205,14 @@ RSpec.describe 'AdminBypass Event' do
     end
 
   end
-  
+
   describe '> Non existent user session' do
     before :all do
       RSpec::Mocks.with_temporary_scope do
-        @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user2.id, 
+        @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user2.id,
                         admin_user_id: @admin_user.id
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
 
         @before_session_event_count = UserSessionEvent.count
         @before_session_count = UserSession.count
@@ -197,7 +221,7 @@ RSpec.describe 'AdminBypass Event' do
         allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
 
         allow(Time).to receive(:now).and_return(Time.now)
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
     end
 
@@ -205,27 +229,17 @@ RSpec.describe 'AdminBypass Event' do
       expect(response.status).to eq(401)
     end
 
-    it 'should create a UserSession' do
-      expect(@before_session_count + 1).to eq(UserSession.count)
+    it 'should not create a UserSession' do
+      expect(@before_session_count).to eq(UserSession.count)
     end
 
-    it 'should set the UserSession status as blocked' do
-      expect(UserSession.last.status_id).to eq(UserSessionStatus.id_for(:blocked))
-      expect(UserSession.last.message).to_not be_nil
-    end
-
-    it 'should create a UserSessionEvent' do
-      expect(@before_session_event_count + 1).to eq(UserSessionEvent.count)
-    end
-
-    it 'should set the UserSessionEvents status as blocked' do
-      expect(UserSessionEvent.last.status_id).to eq(UserSessionStatus.id_for(:blocked))
-      expect(UserSessionEvent.last.message).to_not be_nil
+    it 'should not create a UserSessionEvent' do
+      expect(@before_session_event_count).to eq(UserSessionEvent.count)
     end
 
     it 'should set the AccessToken status as blocked' do
-      expect(UserSessionEvent.last.user_session.access_token.status_id).to eq(UserSessionStatus.id_for(:blocked))
-      expect(UserSessionEvent.last.user_session.access_token.message).to_not be_nil
+      expect(@token.reload.status_id).to eq(UserSessionStatus.id_for(:blocked))
+      expect(@token.message).to_not be_nil
     end
     # With old access tokens > Create a user session
     # With new access token

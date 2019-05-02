@@ -7,14 +7,19 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
     @user2 = create :em_user, company: @company, expired_at: nil, otp_verified: true
     @admin_user = create :admin_user_admin
     @user_agent = Faker::Internet.user_agent
+    @fingerprint = random_fingerprint
+
+    client_properties = RequestHelper::DEFAULT_DATA.deep_dup
+    client_properties[:fingerprint] = @fingerprint
 
     @ip = random_ip
 
-    @user_device_browser = create :user_device_browser
+    @user_device_browser = create :user_device_browser, client_properties
     @doorkeeper_application = create :doorkeeper_application
+    @headers = authentication_headers_for(:web, fingerprint: @fingerprint)
   end
 
-  describe 'Update-able request' do
+  describe '> update-able request' do
     before :all do
       RSpec::Mocks.with_temporary_scope do
         @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id
@@ -22,11 +27,14 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @user_ip = create :user_ip_verified, ip: @ip, user: @user1
         @user_agent_client = create :user_agent_client_verified, user_id: @user1.id, user_agent: @user_agent
 
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
+
         @old_last_request_at = DateTime.now - 10.minutes
 
         @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
-                          started_at: 15.minutes.ago, last_request_at: @old_last_request_at, user_agent: @user_agent,
+                          started_at: 15.minutes.ago, last_request_at: @old_last_request_at,
+                          user_agent: @user_agent,
                           user_agent_client: @user_agent_client, user_device: @device
 
         @before_session_event_count = UserSessionEvent.count
@@ -37,8 +45,12 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @time = DateTime.now
         allow(DateTime).to receive(:now).and_return(@time)
 
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
+    end
+
+    it 'should respond 200' do
+      expect(response).to have_http_status(:ok)
     end
 
     it 'should update last_updated_at of the user' do
@@ -46,7 +58,7 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
     end
   end
 
-  describe 'AdminUser Access' do
+  describe '> AdminUser Access' do
     before :all do
       RSpec::Mocks.with_temporary_scope do
         @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id
@@ -54,7 +66,9 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @user_ip = create :user_ip_unverified, ip: @ip, user: @user1
         @user_agent_client = create :user_agent_client_unverified, user_id: @user1.id, user_agent: @user_agent
 
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
+
         @old_last_request_at = DateTime.now - 5.minutes
 
         @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
@@ -69,8 +83,12 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @time = DateTime.now
         allow(DateTime).to receive(:now).and_return(@time)
 
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
+    end
+
+    it 'should respond 200' do
+      expect(response).to have_http_status(:ok)
     end
 
     it 'should update last_updated_at of the user' do
@@ -78,7 +96,7 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
     end
   end
 
-  describe 'Locked session' do
+  describe '> Blocked session' do
     before :all do
       RSpec::Mocks.with_temporary_scope do
         @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id
@@ -86,7 +104,9 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @user_ip = create :user_ip_verified, ip: @ip, user: @user1
         @user_agent_client = create :user_agent_client_verified, user_id: @user1.id, user_agent: @user_agent
 
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
+
         @old_last_request_at = DateTime.now - 10.minutes
 
         @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
@@ -101,11 +121,15 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @time = DateTime.now
         allow(DateTime).to receive(:now).and_return(@time)
 
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
     end
 
-    it 'should update last_updated_at of the user' do
+    it 'should respond 401' do
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'should not update last_updated_at of the user' do
       expect(@session.reload.last_request_at.strftime("%I:%M %p, %d %b %Y")).to eq(@old_last_request_at.strftime("%I:%M %p, %d %b %Y"))
     end
   end
@@ -118,7 +142,9 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @user_ip = create :user_ip_verified, ip: @ip, user: @user1
         @user_agent_client = create :user_agent_client_verified, user_id: @user1.id, user_agent: @user_agent
 
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
+
         @old_last_request_at = DateTime.now - 10.minutes
 
         @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
@@ -133,11 +159,15 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @time = DateTime.now
         allow(DateTime).to receive(:now).and_return(@time)
 
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
     end
 
-    it 'should update last_updated_at of the user' do
+    it 'should respond 401' do
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'should not update last_updated_at of the user' do
       expect(@session.reload.last_request_at.strftime("%I:%M %p, %d %b %Y")).to eq(@old_last_request_at.strftime("%I:%M %p, %d %b %Y"))
     end
   end
@@ -151,7 +181,9 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @user_ip = create :user_ip_verified, ip: @ip, user: @user1
         @user_agent_client = create :user_agent_client_verified, user_id: @user1.id, user_agent: @user_agent
 
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
+
         @old_last_request_at = DateTime.now - 10.minutes
 
         @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
@@ -166,11 +198,15 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @time = DateTime.now
         allow(DateTime).to receive(:now).and_return(@time)
 
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
     end
 
-    it 'should update last_updated_at of the user' do
+    it 'should respond 401' do
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'should not update last_updated_at of the user' do
       expect(@session.reload.last_request_at.strftime("%I:%M %p, %d %b %Y")).to eq(@old_last_request_at.strftime("%I:%M %p, %d %b %Y"))
     end
   end
@@ -183,7 +219,9 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @user_ip = create :user_ip_verified, ip: @ip, user: @user1
         @user_agent_client = create :user_agent_client_verified, user_id: @user1.id, user_agent: @user_agent
 
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
+
         @old_last_request_at = DateTime.now - 10.minutes
 
         @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
@@ -198,11 +236,15 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @time = DateTime.now
         allow(DateTime).to receive(:now).and_return(@time)
 
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
     end
 
-    it 'should update last_updated_at of the user' do
+    it 'should respond 401' do
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'should not update last_updated_at of the user' do
       expect(@session.reload.last_request_at.strftime("%I:%M %p, %d %b %Y")).to eq(@old_last_request_at.strftime("%I:%M %p, %d %b %Y"))
     end
   end
@@ -215,7 +257,9 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @user_ip = create :user_ip_unverified, ip: @ip, user: @user1
         @user_agent_client = create :user_agent_client_verified, user_id: @user1.id, user_agent: @user_agent
 
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
+
         @old_last_request_at = DateTime.now - 10.minutes
 
         @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
@@ -230,11 +274,15 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @time = DateTime.now
         allow(DateTime).to receive(:now).and_return(@time)
 
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
     end
 
-    it 'should update last_updated_at of the user' do
+    it 'should respond 401' do
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'should not update last_updated_at of the user' do
       expect(@session.reload.last_request_at.strftime("%I:%M %p, %d %b %Y")).to eq(@old_last_request_at.strftime("%I:%M %p, %d %b %Y"))
     end
   end
@@ -247,7 +295,9 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @user_ip = create :user_ip_verified, ip: @ip, user: @user1
         @user_agent_client = create :user_agent_client_unverified, user_id: @user1.id, user_agent: @user_agent
 
-        @headers = {'Authorization': "Bearer #{@token.token}"}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
+
         @old_last_request_at = DateTime.now - 10.minutes
 
         @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
@@ -262,11 +312,15 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
         @time = DateTime.now
         allow(DateTime).to receive(:now).and_return(@time)
 
-        get '/menu_data', headers: @headers
+        get '/menu_data', headers: headers
       end
     end
 
-    it 'should update last_updated_at of the user' do
+    it 'should respond 401' do
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'should not update last_updated_at of the user' do
       expect(@session.reload.last_request_at.strftime("%I:%M %p, %d %b %Y")).to eq(@old_last_request_at.strftime("%I:%M %p, %d %b %Y"))
     end
   end
