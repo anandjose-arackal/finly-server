@@ -153,6 +153,13 @@ json.comments do
   end
 end
 
+json.po_item_categories do
+  json.array!(current_company.categories.inward_invoice_items_only) do |category|
+    json.id category.id
+    json.name category.name
+  end
+end
+
 json.policies do
   json.array! @result.policies do |policy|
     json.extract! policy, :id, :name

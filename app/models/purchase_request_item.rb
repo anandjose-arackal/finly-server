@@ -51,6 +51,7 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :purchase_order, optional: true
   belongs_to :department, optional: true
   belongs_to :cost_center, optional: true
+  belongs_to :category, optional: true
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
 
   has_many :trails, as: :parent

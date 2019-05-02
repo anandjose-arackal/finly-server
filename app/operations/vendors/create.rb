@@ -50,11 +50,6 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-    # validate policy
-
-
-
-
     unless vendor_parameters[:pan].present?
       add_message :error, "Please provide PAN to proceed"
       return
@@ -77,14 +72,28 @@ class Vendors::Create < Vendors::Base
     # as authorized and add the bank account to their existing list
     if self.vendor_parameters[:bank_accounts_attributes].present?
       self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
-        ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], account_owner_type: "YesBankVendor")
+        ba = user.company.bank_accounts.find_by(account_number: account_params[:account_number], ifsc: account_params[:ifsc], account_owner_type: "YesBankVendor")
         if ba.present?
-          other_vendor = ba.account_owner
-          self.similar_vendors.push(other_vendor)
-          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{other_vendor.business_name} - #{other_vendor.vendor_id}"
+          existing_vendor = ba.account_owner
+          if existing_vendor.authorized
+            add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
+            break
+          else
+            self.similar_vendors.push(existing_vendor)
+            self.vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
+          end
         end
       end
     end
+
+    # There should be only one unique vendor inside similar vendors
+    similar_vendor_ids = self.similar_vendors.map(&:id).uniq.reject {|id| id.blank? }
+    if similar_vendor_ids.length > 1
+      add_message :error, "There are other vendors present with the provided bank accounts"
+      return
+    end
+
+    self.vendor = self.similar_vendors.first rescue nil
   end
 
   def pre_process
@@ -128,17 +137,56 @@ class Vendors::Create < Vendors::Base
   end
 
   def process
-    if self.vendor.present? && vendor.is_a?(YesBankVendor)
-      if self.vendor_parameters[:bank_accounts_attributes].present?
-        self.vendor_parameters[:bank_accounts_attributes].each do |account_params|
-          bank_account = self.vendor.bank_accounts.build(account_params)
-          unless bank_account.save
-            add_message :error, bank_account.errors.full_messages
-          end
-        end
-      end
+    if self.vendor.present? && self.vendor.is_a?(YesBankVendor)
+      # if self.vendor_parameters[:bank_accounts_attributes].present?
+      #   self.vendor_parameters[:bank_accounts_attributes].each do |account_params|
+      #     bank_account = self.vendor.bank_accounts.build(account_params)
+      #     unless bank_account.save
+      #       add_message :error, bank_account.errors.full_messages
+      #     end
+      #   end
+      # end
       # also mark the vendor as authorized now
-      self.vendor.update(authorized: true)
+      self.vendor.assign_attributes(vendor_parameters)
+      self.vendor.authorized = true
+      self.vendor.status_id = VendorStatus.id_for(:auto_approved)
+
+      if user.company.vendor_empanelment_workflow_enabled?
+        self.vendor.update(status_id: VendorStatus.id_for(:draft))
+
+        # Create Document Level Reviewer Mapping
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.vendor
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
+        end
+        return
+      else
+        self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+      end
+
+
+      if self.vendor.save
+        if user.company.vendor_empanelment_workflow_enabled?
+          self.vendor.update(status_id: VendorStatus.id_for(:draft))
+
+          # Create Document Level Reviewer Mapping
+          # For setting level specific reviewers from reviewal chain for a document
+          params[:reviewal_document] = self.vendor
+
+          document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+          unless document_reviewer_mappings_op.success?
+            add_message :error, document_reviewer_mappings_op.messages[:error]
+          end
+          return
+        else
+          self.vendor.update(status_id: VendorStatus.id_for(:auto_approved))
+        end  
+      else
+        add_message :error, vendor.errors.full_messages
+      end
     else
       self.vendor = user.company.yes_bank_vendors.build(vendor_parameters)
       self.vendor.authorized = true
