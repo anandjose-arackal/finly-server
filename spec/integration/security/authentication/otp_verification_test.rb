@@ -1,6 +1,19 @@
 require 'rails_helper'
 RSpec.describe 'OtpVerification' do
 
+  before :each do
+    setup_rack_attack_cache_store
+    avoid_test_overlaps_in_cache
+  end
+
+  def setup_rack_attack_cache_store
+    Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  def avoid_test_overlaps_in_cache
+    Rails.cache.clear
+  end
+
   describe '> Browser' do
     before :all do
       @company = create :company

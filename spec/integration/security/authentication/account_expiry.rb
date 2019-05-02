@@ -21,6 +21,19 @@ RSpec.describe 'UserAuthentication > Expiry' do
     @headers[:HTTP_USER_AGENT] = @user_agent
   end
 
+  before :each do
+    setup_rack_attack_cache_store
+    avoid_test_overlaps_in_cache
+  end
+
+  def setup_rack_attack_cache_store
+    Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  def avoid_test_overlaps_in_cache
+    Rails.cache.clear
+  end
+
   describe '> Expired User' do
 
     before :all do
@@ -268,8 +281,6 @@ RSpec.describe 'UserAuthentication > Expiry' do
       allow_any_instance_of(UserDevice).to receive(:status_id).and_return(UserDeviceStatus.id_for(:verified))
       allow_any_instance_of(UserIp).to receive(:status_id).and_return(UserIpStatus.id_for(:verified))
       allow_any_instance_of(UserAgentClient).to receive(:status_id).and_return(UserAgentClientStatus.id_for(:verified))
-
-      Rack::Attack.cache.prefix = 'rack::attack::clear'
 
       expect do
         post '/oauth/token.json', params: {

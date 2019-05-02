@@ -26,7 +26,16 @@ RSpec.describe 'UserAuthentication > Password' do
   end
 
   before :each do
-    Rack::Attack.cache.prefix = Faker::Name.first_name
+    setup_rack_attack_cache_store
+    avoid_test_overlaps_in_cache
+  end
+
+  def setup_rack_attack_cache_store
+    Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  def avoid_test_overlaps_in_cache
+    Rails.cache.clear
   end
 
   describe '> Unauthorized domain' do
