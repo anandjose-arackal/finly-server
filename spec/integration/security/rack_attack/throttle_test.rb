@@ -50,7 +50,7 @@ RSpec.describe 'Rack::Attack' do
     [
         {key: :lookup, path: '/lookup.json', method: :get},
         {key: :token, path: '/oauth/token.json', method: :post},
-        {key: :send_otp, path: '/resend.json', method: :post},
+        {key: :send_otp, path: '/otp/resend.json', method: :post},
         {key: :verify_otp, path: '/otp/verify.json', method: :post},
         {key: :set_password, path: '/users/password.json', method: :post}
     ].each do |request_props|
