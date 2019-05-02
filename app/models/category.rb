@@ -117,10 +117,9 @@ class Category < ApplicationRecord
   end
 
   def as_json(options={})
-    {
-        id: id,
-        name: name
-    }
+    args = { id: id }
+    args[:name] = options.dig(:tree) ? full_category_name : name
+    args
   end
 
   private
@@ -130,4 +129,8 @@ class Category < ApplicationRecord
   #     errors.add(:category, "must belong to at least one application")
   #   end
   # end
+
+  def full_category_name
+    self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
+  end
 end
