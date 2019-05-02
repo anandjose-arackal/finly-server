@@ -30,25 +30,29 @@ class YesBankTransferProvider
         return
       end
 
-      # temporary jugaad to test this shizzle out
-      Resque.enqueue(queue, {success: true, full_name: "Sreeram N R", bank_transaction_id: bank_transaction.id})
-      return
+      # # temporary jugaad to test this shizzle out
+      # Resque.enqueue(queue, {success: true, full_name: "Sreeram N R", bank_transaction_id: bank_transaction.id})
+      # return
 
       ########################################
       op = YesBankApi::Transfer::BankTransfer.({
           transfer_request: transfer_request,
           bank_transaction: bank_transaction
       })
+
       # return the balance given by the API
-      if op.success?
-        full_name = self.bank_transaction.beneficiary_full_name
+      if op.success? && !bank_transaction.beneficiary_full_name.blank?
+        full_name = bank_transaction.beneficiary_full_name
         Resque.enqueue(queue, {success: true, full_name: full_name, bank_transaction_id: bank_transaction.id})
       else
-        error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error) || "Could not reach beneficiary bank servers. Please try again later"
+        error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error)
+        if op.messages&.dig(:error).blank?
+          error_message = "Could not reach beneficiary bank servers. Please try again later"
+        end
         Resque.enqueue(queue, {success: false, full_name: "", bank_transaction_id: nil, messages: error_message})
       end
     rescue Exception => e
-      Resque.enqueue(queue, {success: false, full_name: 0, bank_transaction_id: nil, messages: e.message})
+      Resque.enqueue(queue, {success: false, full_name: "", bank_transaction_id: nil, messages: e.message})
     end
   end
 
