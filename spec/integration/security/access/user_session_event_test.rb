@@ -5,12 +5,24 @@ RSpec.describe 'UserSessionEvent' do
     @company = create :company
     @user1 = create :em_user, company: @company
     @user2 = create :em_user, company: @company
+    @user_agent = Faker::Internet.user_agent
 
     @ip = random_ip
+    @fingerprint = random_fingerprint
 
-    @user_device_browser = create :user_device_browser
+    client_properties = RequestHelper::DEFAULT_DATA.deep_dup
+    client_properties[:fingerprint] = @fingerprint
+
+    @headers = authentication_headers_for(:web)
+    @headers[:HTTP_USER_AGENT] = @user_agent
+    @headers[:REMOTE_ADDR] = @authorized_ip
+
+    @user_device_browser = create :user_device_browser, client_properties
+    @device = create :user_device_verified, client: @user_device_browser, company: @company, user: @user1
+    @user_ip = create :user_ip_verified, ip: @authorized_ip, user: @user1
+    @user_agent_client = create :user_agent_client_verified, user: @user1, user_agent: @user_agent
+
     @doorkeeper_application = create :doorkeeper_application
-    @device = create :user_device, client: @user_device_browser, company: @company, user: @user1
   end
 
   describe '> Active UserSession' do
@@ -22,8 +34,9 @@ RSpec.describe 'UserSessionEvent' do
             @user_ip = create :user_ip, ip: @ip, user: @user1
             @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip,
                               started_at: 15.minutes.ago, last_request_at: 10.minutes.ago
-            @headers = {'Authorization': "Bearer #{@token.token}"}
-            @user_agent = Faker::Internet.user_agent
+
+            headers = @headers.deep_dup
+            headers['Authorization'] = "Bearer #{@token.token}"
 
             @before_session_event_count = UserSessionEvent.count
             allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@ip)
@@ -32,7 +45,7 @@ RSpec.describe 'UserSessionEvent' do
             @time = Time.now
             allow(Time).to receive(:now).and_return(@time)
 
-            get '/menu_data', headers: @headers
+            get '/menu_data', headers: headers
           end
         end
 
@@ -60,15 +73,16 @@ RSpec.describe 'UserSessionEvent' do
             @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id
             @user_ip = create :user_ip, ip: @ip, user: @user1
             @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip
-            @headers = {'Authorization': "Bearer #{@token.token}"}
-            @user_agent = Faker::Internet.user_agent
+
+            headers = @headers.deep_dup
+            headers['Authorization'] = "Bearer #{@token.token}"
 
             @before_session_event_count = UserSessionEvent.count
             allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@ip)
             allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@ip)
 
             allow(Time).to receive(:now).and_return(Time.now + 31.minutes)
-            get '/menu_data', headers: @headers
+            get '/menu_data', headers: headers
           end
         end
 
@@ -104,7 +118,10 @@ RSpec.describe 'UserSessionEvent' do
           @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id
           @user_ip = create :user_ip, ip: @ip, user: @user1
           @session = create :user_session, access_token: @token, ip: @ip, user_ip: @user_ip
-          @headers = {'Authorization': "Bearer #{@token.token}"}
+
+          headers = @headers.deep_dup
+          headers['Authorization'] = "Bearer #{@token.token}"
+
           @user_agent = Faker::Internet.user_agent
 
           @before_session_event_count = UserSessionEvent.count
@@ -112,7 +129,7 @@ RSpec.describe 'UserSessionEvent' do
           allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(Faker::Internet.ip_v4_address)
           allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
 
-          get '/menu_data', headers: @headers
+          get '/menu_data', headers: headers
         end
       end
 
@@ -153,8 +170,9 @@ RSpec.describe 'UserSessionEvent' do
         @user_ip = create :user_ip, ip: @ip, user: @user1
         @session = create :user_session, access_token: @token, ip: @ip, status_id: UserSessionStatus.id_for(:revoked),
                           message: 'Revoke Reason', user_ip: @user_ip
-        @headers = {'Authorization': "Bearer #{@token.token}"}
-        @user_agent = Faker::Internet.user_agent
+
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token.token}"
 
         @before_session_event_count = UserSessionEvent.count
         allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@ip)
