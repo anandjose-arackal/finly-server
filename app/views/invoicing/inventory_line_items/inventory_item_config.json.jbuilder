@@ -1,5 +1,13 @@
 json.categories do
-  json.array! @result.categories
+  json.array! @result.categories do |category|
+    json.merge!(category.as_json(tree: true))
+  end
+end
+
+json.filter_categories do
+  json.array! @result.filter_categories do |category|
+    json.merge!(category.as_json)
+  end
 end
 
 json.tax_rates do
