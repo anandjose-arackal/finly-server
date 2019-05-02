@@ -3,7 +3,7 @@
 # email: comma separated emails
 # mobile: comma separated mobile numbers
 
-class User::Invite::Create < User::Invite::Base
+class User::Invite::CreateEm < User::Invite::Base
 
   attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type, :policy_roles
 

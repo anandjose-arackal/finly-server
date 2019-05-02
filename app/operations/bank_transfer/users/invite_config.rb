@@ -47,6 +47,15 @@ class BankTransfer::Users::InviteConfig < BankTransfer::Users::Base
 
   def group_roles
     data =  []
+    data << {
+        name: "Administrator",
+        roles: [
+            {
+                key: 'admin',
+                label: 'Admin'
+            }
+        ]
+    }
     if feature_subscription.procurement
       data << {
         name: 'Purchase Order',
