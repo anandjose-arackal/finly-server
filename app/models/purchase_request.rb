@@ -45,7 +45,7 @@ class PurchaseRequest < ApplicationRecord
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
 
-  before_create :add_creator, :add_company, :set_initial_status
+  before_save :add_company
 
   accepts_nested_attributes_for :purchase_request_items, :attachments, allow_destroy: true
 
@@ -125,17 +125,10 @@ class PurchaseRequest < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
-  def add_creator
-    self.creator_id = RequestStore.store[:current_user]&.id
-  end
-
   def add_company
     self.company_id = self.creator.company_id
   end
 
-  def set_initial_status
-    self.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
-  end
 
 
   def as_json

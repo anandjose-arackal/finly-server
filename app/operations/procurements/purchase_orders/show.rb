@@ -26,7 +26,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_order, :actions, :reviewal_chains, :policies, :departments, :budgets, :cost_centers,
-                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations, :department_editable, :cost_center_editable, :cost_allocation_items
+                  :sub_departments, :tax_rates, :locations, :taxes_applicable_flag, :procurement, :tds_slabs, :gstin_locations
 
     def init
       self.purchase_order = params[:purchase_order]
@@ -38,11 +38,6 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
       self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
       self.gstin_locations = self.purchase_order.vendor&.gstin_locations
-      self.department_editable = !self.purchase_order.items.pluck(:purchase_request_item_id).uniq.present? rescue true
-      self.cost_center_editable = !self.purchase_order.items.pluck(:purchase_request_item_id).uniq.present? rescue true
-      if department_editable || cost_center_editable
-        self.cost_allocation_items = true
-      end 
 
       if purchase_order.user.departments.present?
         self.sub_departments = purchase_order.user.departments.leaves

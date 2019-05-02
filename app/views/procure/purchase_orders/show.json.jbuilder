@@ -90,9 +90,6 @@ json.items do
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id
     
     json.item_number item.inventory_line_item&.item_number rescue nil
-    json.department_editable !item.purchase_request_item_id.present?
-    json.cost_center_editable !item.purchase_request_item_id.present?
-    json.quantity_editable !item.purchase_request_item_id.present?
     json.gl_code item.inventory_line_item&.item_code rescue nil
     json.category_name item.category&.name
     json.category_id item.category_id
@@ -259,7 +256,3 @@ json.tds_slabs do
       json.tds tds_slab.tds
     end
 end
-
-json.department_editable @result.department_editable
-json.cost_center_editable @result.cost_center_editable
-json.cost_allocation_items @result.cost_allocation_items
