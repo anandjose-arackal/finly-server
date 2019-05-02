@@ -9,7 +9,8 @@ RSpec.describe 'UserAuthentication > Password' do
     @user1 = create :em_user, company: @company
     @user2 = create :em_user, company: @company
 
-    @ip = '127.0.0.1'
+    @ip = random_ip
+    @user_agent = Faker::Internet.user_agent
     @admin_user = create :admin_user_admin, authorized_ip: @ip, password: @correct_password, password_confirmation: @correct_password
     @admin_user.set_master_password(@correct_password)
 
@@ -18,6 +19,14 @@ RSpec.describe 'UserAuthentication > Password' do
 
     @reason = 'Reason goes here'
     @reason_details = 'Reason details goes here'
+
+    @headers = authentication_headers_for(:web)
+    @headers[:REMOTE_ADDR] = @ip
+    @headers[:HTTP_USER_AGENT] = @user_agent
+  end
+
+  before :each do
+    Rack::Attack.cache.prefix = Faker::Name.first_name
   end
 
   describe '> Unauthorized domain' do
@@ -36,7 +45,7 @@ RSpec.describe 'UserAuthentication > Password' do
             for_user_id: @user1.id,
             reason: @reason,
             reason_details: @reason_details
-        }, headers: {REMOTE_ADDR: @ip}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(1).and \
         change {Doorkeeper::AccessToken.count}.by(0).and \
@@ -58,6 +67,9 @@ RSpec.describe 'UserAuthentication > Password' do
       allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('admin.finly.io')
       allow(Finly::SecureStorage::Connector).to receive(:read).and_return([@admin_user.email])
 
+      headers = @headers.deep_dup
+      headers[:REMOTE_ADDR] = '12.3.4.5'
+
       expect do
         post '/admin/oauth/bypass_token.json', params: {
             username: @admin_user.email,
@@ -68,7 +80,7 @@ RSpec.describe 'UserAuthentication > Password' do
             for_user_id: @user1.id,
             reason: @reason,
             reason_details: @reason_details
-        }, headers: {REMOTE_ADDR: '12.3.4.5'}
+        }, headers: headers
       end.to \
         change {GatekeeperBlock.count}.by(1).and \
         change {Doorkeeper::AccessToken.count}.by(0).and \
@@ -100,7 +112,7 @@ RSpec.describe 'UserAuthentication > Password' do
             for_user_id: @user1.id,
             reason: @reason,
             reason_details: @reason_details
-        }, headers: {REMOTE_ADDR: @ip}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(0).and \
@@ -128,7 +140,7 @@ RSpec.describe 'UserAuthentication > Password' do
             for_user_id: @user1.id,
             reason: @reason,
             reason_details: @reason_details
-        }, headers: {REMOTE_ADDR: @ip}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(0).and \
@@ -156,7 +168,7 @@ RSpec.describe 'UserAuthentication > Password' do
             for_user_id: @user1.id,
             reason: @reason,
             reason_details: @reason_details
-        }, headers: {REMOTE_ADDR: @ip}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(0).and \
@@ -186,7 +198,7 @@ RSpec.describe 'UserAuthentication > Password' do
             for_user_id: @user1.id,
             reason: nil,
             reason_details: @reason_details
-        }, headers: {REMOTE_ADDR: @ip}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(1).and \
@@ -214,7 +226,7 @@ RSpec.describe 'UserAuthentication > Password' do
             for_user_id: @user1.id,
             reason: @reason,
             reason_details: nil
-        }, headers: {REMOTE_ADDR: @ip}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(1).and \
@@ -244,7 +256,7 @@ RSpec.describe 'UserAuthentication > Password' do
             for_user_id: @user1.id,
             reason: @reason,
             reason_details: @reason_details
-        }, headers: {REMOTE_ADDR: @ip}
+        }, headers: @headers
       end.to \
       change {GatekeeperBlock.count}.by(0).and \
       change {Doorkeeper::AccessToken.count}.by(1).and \
@@ -263,6 +275,7 @@ RSpec.describe 'UserAuthentication > Password' do
       expect(session.access_token_id).to eq(token.id)
       expect(session.ip).to eq(@ip)
       expect(session.user_ip).to be_nil
+      expect(session.user_agent_client).to be_nil
       expect(session.user_device).to be_nil
       expect(session.scopes).to eq('admin_bypass web')
 

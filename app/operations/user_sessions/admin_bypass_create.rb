@@ -12,7 +12,6 @@ class UserSessions::AdminBypassCreate < UserSessions::Create
     args[:status_id] = UserSessionStatus.id_for(self.status)
     args[:message] = params[:message]
     enrich_user args
-    enrich_device args
     enrich_admin_user args
     enrich_request args
     enrich_access args

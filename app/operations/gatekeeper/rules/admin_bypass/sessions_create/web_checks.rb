@@ -3,7 +3,7 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
   premise :admin_bypass_login_attempt do
     section 'Domain check' do
       rule 'Only admin.finly.io can be used for accessing admin panel' do
-        next unless RequestStoreUtil.current_request.domain == 'admin.finly.io'
+        next if RequestStoreUtil.current_request.domain == 'admin.finly.io'
 
         level 10
         response_code 401
@@ -37,12 +37,12 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
         fail
       end
 
-      rule 'Associated device is required for all requests' do
-        if RequestStoreUtil.current_user_device.blank?
-          response_code 401
-          fail
-        end
-      end
+      # rule 'Associated device is required for all requests' do
+      #   if RequestStoreUtil.current_user_device.blank?
+      #     response_code 401
+      #     fail
+      #   end
+      # end
 
       section 'If device is available' do
         before do
