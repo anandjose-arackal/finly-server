@@ -13,6 +13,7 @@ class ProcurementMailer < ApplicationMailer
              pdf: "purchase-order-#{@document.po_number}",
              encoding: 'UTF-8',
              template: "export/purchase_order",
+             margin: { :bottom => 12 },
              layout: "pdf/paginated_bootstrap.html.erb",
              # print_media_type: true
          ),
@@ -50,6 +51,7 @@ class ProcurementMailer < ApplicationMailer
              encoding: 'UTF-8',
              template: "export/purchase_order",
              layout: "pdf/paginated_bootstrap.html.erb",
+             margin: { :bottom => 12 },
              # layout: "pdf.html.erb",
              footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
              # print_media_type: true
@@ -78,6 +80,7 @@ class ProcurementMailer < ApplicationMailer
              encoding: 'UTF-8',
              template: "export/inward_invoice",
              layout: "pdf/paginated_bootstrap.html.erb",
+             margin: { :bottom => 12 },
              # layout: "pdf.html.erb",
              footer: { html: { template: 'layouts/partials/_po_footer.html.erb' }},
              # print_media_type: true
