@@ -265,8 +265,12 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
     all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
-    payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
-    where(payment_order_id: payment_order_ids)
+    if all_payments.where(id: payment_ids).any?
+      payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
+      where(payment_order_id: payment_order_ids)
+    else
+      BankPaymentRequest.none
+    end
   }
 
   scope :filter_vendor_id, -> (vendor_id) {
