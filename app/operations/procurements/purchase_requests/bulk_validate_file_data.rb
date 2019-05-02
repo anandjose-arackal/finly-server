@@ -2,7 +2,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
-                :locations
+                :locations, :category_ids, :category
 
   class Procurements::PurchaseRequests::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -46,6 +46,9 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
     self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
     Rails.logger.fatal "FROM BulkValidateFileData LOCATION INIT,\n #{self.locations.inspect}"
     
+    self.category = current_company.categories.inward_invoice_items_only
+    self.category_ids = category.pluck(:id) rescue []
+
   end
 
   def validate
@@ -71,6 +74,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
       description = item[:description] || item["description"]
       item_number = item[:item_number] || item["item_number"]
       item_code = item[:item_code] || item["item_code"]
+      category_id = item[:category_id] || item["category_id"]
       preferred_vendor = item[:preferred_vendor] || item["preferred_vendor"]
       required_by_date = item[:required_by_date] || item["required_by_date"]
       delivery_location = item[:delivery_location] || item["delivery_location"]
@@ -159,6 +163,14 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         self.issue_item[:quantity] = "Quantity entered has non-numeric characters."
       end
 
+      if category_id.present?
+        unless self.category_ids.include? category_id.to_i
+          self.valid = false
+          self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+          self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        end
+      end
+
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
 
       if valid
@@ -166,6 +178,8 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
         if self.locations.present? && delivery_location.present?
           location = self.locations.find_by(id: delivery_location)
           item[:delivery_location_name] = location.name
+          item[:delivery_location_id] = location.id
+
         end
         
         if preferred_vendor.present?
@@ -175,13 +189,18 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
             rc = all_rc&.rate_contracts
             if rc.present?
               item[:preferred_vendor_name] = rc.find_by(vendor_id: preferred_vendor)&.vendor&.name
+              item[:preferred_vendor_id] = rc.find_by(vendor_id: preferred_vendor)&.vendor&.id
             else
               item[:preferred_vendor_name] = ""
+              item[:preferred_vendor_id] = nil
             end
           end
         end
 
         item[:estimated_value] = quantity.to_i * unit_price.to_i
+
+        item[:category_name] = self.category.find_by(id: category_id)&.name
+        item[:category_id] = self.category.find_by(id: category_id)&.id
       end
 
       self.contents << item.values
@@ -241,6 +260,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
      "Item Description",
      "Item Number",
      "Item Code",
+     "Category ID",
      "Preferred Vendor",
      "Required By Date",
      "Delivery Location",

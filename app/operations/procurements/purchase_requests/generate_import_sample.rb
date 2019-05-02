@@ -19,12 +19,12 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
         }
     ]
     # adding Item to excel sheet
-    item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code"]
+    item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code", "Default Category Name", "Default Category ID"]
     item_contents = []
     rcv = 0
     brcv = 0
     company.items.where(active: true).each do |item|
-      list = [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code]
+      list = [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code, item.category&.name, item.category_id]
       if item.rate_contract_vendors.present?
         rcv  = item.rate_contract_vendors.count
         brcv = (rcv > brcv) ? rcv : brcv
@@ -91,6 +91,17 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
     #     name: "Cost Centers"
     # }
 
+    category_headers = ["ID", "Category Name"]
+    category_contents = []
+    current_company.categories&.inward_invoice_items_only.each do |category|
+      category_contents << [category.id, category.name]
+    end
+    self.sheets << {
+      item_headers: category_headers,
+      item_contents: category_contents,
+      name: "Categories"
+    }
+
   end
 
   def success
@@ -104,9 +115,10 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
      "Item Description",
      "Item Number",
      "Item Code",
-     "Preferred Vendor",
+     "Category ID",
+     "Preferred Vendor ID",
      "Required By Date",
-     "Delivery Location",
+     "Delivery Location ID",
      "Purpose",
      "Quantity",
      "Unit of measurement",
