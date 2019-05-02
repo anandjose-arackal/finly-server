@@ -34,7 +34,13 @@ json.result do
           json.id line_item.id
           json.status line_item&.status&.name
           json.rejected line_item.rejected
-          json.unit_of_measurement line_item.unit_of_measurement
+          json.unit_of_measurement line_item.unit_of_measurement  
+
+          json.category do
+            json.name line_item.category&.name
+            json.id line_item.category_id
+          end
+
           json.product_details do
             json.product_name line_item&.item&.description
             json.id line_item.item_id

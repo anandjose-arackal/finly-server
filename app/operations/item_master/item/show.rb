@@ -34,6 +34,7 @@ class ItemMaster::Item::Show < ItemMaster::Item::Base
     # Creator ID not present on Item table
     # return if item.validate_if_owner?(user)
     return if inventory_line_item.validate_if_manager?(user)
+    return if current_app == :fc
     raise_unauthorized_exception
   end
 

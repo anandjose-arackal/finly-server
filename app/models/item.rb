@@ -40,6 +40,7 @@ class Item < ApplicationRecord
   belongs_to :supply_item_type, optional: true
   belongs_to :product_type, optional: true, class_name: "ProductType", foreign_key: :product_type
   belongs_to :user, optional: true
+  belongs_to :item_expense_type, optional: true
 
   has_many :rate_contract_line_items, foreign_key: :item_id
   # LineItem and Branch Location Mapping
@@ -111,7 +112,9 @@ class Item < ApplicationRecord
       product_type: product_type_id,
       rate_contract_vendors: rate_contract_vendors,
       user: user,
-      active: active
+      active: active,
+      item_expense_type_id: item_expense_type_id,
+      item_expense_type_name: item_expense_type&.name,
     }
   end
 
