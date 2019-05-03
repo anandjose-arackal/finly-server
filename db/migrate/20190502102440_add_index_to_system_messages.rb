@@ -289,5 +289,8 @@ class AddIndexToSystemMessages < ActiveRecord::Migration[5.2]
     add_index :yes_bank_vendors, :policy_id
     add_index :yes_bank_vendors, :state_code_id
     add_index :yes_bank_vendors, :status_id
+
+    add_index :yes_bank_vendors, :authorized
+    add_index :bank_accounts, [:account_owner_type, :account_owner_id]
   end
 end
