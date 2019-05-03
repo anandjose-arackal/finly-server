@@ -468,6 +468,10 @@ GEM
       logstash-event (~> 1.2)
       sidekiq (>= 3.0, < 6)
     simpleconfig (2.0.1)
+    skylight (3.1.5)
+      skylight-core (= 3.1.5)
+    skylight-core (3.1.5)
+      activesupport (>= 4.2.0)
     slack-notifier (2.3.2)
     snowplow-tracker (0.6.1)
       contracts (~> 0.7, <= 0.11)
@@ -635,6 +639,7 @@ DEPENDENCIES
   sidekiq-logstash (~> 1.0.1)
   simpleconfig (~> 2.0.1)
   sinatra (~> 2.0.5)!
+  skylight (~> 3.1)
   slack-notifier (~> 2.3)
   snowplow-tracker (~> 0.6.1)
   spring (~> 2.0.0)

@@ -31,8 +31,10 @@ class InvoiceCalculationUtils
     end
 
     # If po invoice has po advance, then adjust the balance due
-    if self.invoice.po_advance.present? && self.invoice.po_adjusted_advance[:value].present? && self.invoice.advance_amount_required
-      self.balance_due_amount = self.balance_due_amount - self.invoice.po_adjusted_advance.value unless ( self.invoice.po_adjusted_advance.value > self.balance_due_amount )
+    unless self.invoice.class.name == 'OutwardInvoice'
+      if self.invoice.po_advance.present? && self.invoice.po_adjusted_advance[:value].present? && self.invoice.advance_amount_required
+        self.balance_due_amount = self.balance_due_amount - self.invoice.po_adjusted_advance.value unless ( self.invoice.po_adjusted_advance.value > self.balance_due_amount )
+      end
     end
 
     # assign TDS and advance amount

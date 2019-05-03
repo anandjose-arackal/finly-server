@@ -53,11 +53,12 @@ json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
-                :cost_allocation_items
+                :cost_allocation_items, :narration
 
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
-  json.po_number invoice.procurement&.purchase_order&.po_number
+  # json.po_number invoice.procurement&.purchase_order&.po_number
+  json.po_number invoice.po_number
 
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance

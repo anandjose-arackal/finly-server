@@ -3,9 +3,9 @@
 # email: comma separated emails
 # mobile: comma separated mobile numbers
 
-class User::Invite::Create < User::Invite::Base
+class User::Invite::CreateEm < User::Invite::Base
 
-  attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type
+  attr_accessor :invited_users, :emails, :numbers, :policy, :policy_id, :type, :policy_roles
 
   def pre_validate
     if params.blank? or user.blank?
@@ -16,8 +16,8 @@ class User::Invite::Create < User::Invite::Base
   def init
     self.invite_params = create_invite_params
     self.type = params[:invite_by]
+    self.policy_roles = params[:roles]
     type == 'email' if type.nil?
-
     case type
       when 'mobile', '1'
         self.numbers = invite_params[:mobile].delete(' ').split(',').collect(&:strip) rescue nil

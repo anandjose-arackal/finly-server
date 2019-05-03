@@ -104,7 +104,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
       if (purchase_request.awaiting_approval? && purchase_request.get_reviewers.exclude?(user))
         return true
       end
-      if purchase_request.awaiting_approval? && !purchase_request.action_users(:return_control).include?(user) && purchase_request.action_users(:approve).include?(user)
+      if purchase_request.awaiting_approval? && !purchase_request.action_users(:return_control).include?(user) && !purchase_request.action_users(:approve).include?(user)
         return true
       end
     end
