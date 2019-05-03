@@ -21,7 +21,8 @@ class Procurements::Grn::Pending::Index < Procurements::Base
   def process
     if user.vp_admin_or_auditor? || user.is_goods_receiver?
       if (params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')) || (params[:document_type] == 'grn_count')
-        received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
+        # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
+        received_pending_ids = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
         # pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
         pr_ids = user.company.procurements.pluck(:id)
         st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
