@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_27_100405) do
+ActiveRecord::Schema.define(version: 2019_04_30_164119) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -335,6 +335,20 @@ ActiveRecord::Schema.define(version: 2019_04_27_100405) do
     t.decimal "MYR", precision: 20, scale: 5
     t.datetime "deleted_at"
     t.index ["currency_id"], name: "index_amounts_on_currency_id"
+  end
+
+  create_table "api_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "base_url"
+    t.string "name"
+    t.string "username"
+    t.string "password"
+    t.string "client_id"
+    t.string "client_secret"
+    t.string "grant_type"
+    t.string "content_type"
+    t.string "token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "approval_routes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
@@ -970,6 +984,8 @@ ActiveRecord::Schema.define(version: 2019_04_27_100405) do
     t.string "location_code"
     t.string "ancestry"
     t.string "nature_of_office"
+    t.boolean "billable_location", default: true
+    t.boolean "shippable_location", default: true
     t.index ["ancestry"], name: "index_branch_locations_on_ancestry"
     t.index ["company_id"], name: "index_branch_locations_on_company_id"
     t.index ["state_id"], name: "index_branch_locations_on_state_id"
@@ -3071,6 +3087,7 @@ ActiveRecord::Schema.define(version: 2019_04_27_100405) do
     t.integer "proforma_advance"
     t.decimal "total_proforma_advance", precision: 20, scale: 2
     t.boolean "cost_allocation_items", default: false
+    t.text "narration"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
     t.index ["gstin_location_id"], name: "index_invoices_on_gstin_location_id"
@@ -3139,6 +3156,12 @@ ActiveRecord::Schema.define(version: 2019_04_27_100405) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "item_expense_types", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.decimal "tax", precision: 20, scale: 10
     t.decimal "discount", precision: 20, scale: 10
@@ -3162,9 +3185,11 @@ ActiveRecord::Schema.define(version: 2019_04_27_100405) do
     t.string "item_number"
     t.integer "user_id"
     t.boolean "active", default: true
+    t.integer "item_expense_type_id"
     t.index ["active"], name: "index_items_on_active"
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id"], name: "index_items_on_company_id"
+    t.index ["item_expense_type_id"], name: "index_items_on_item_expense_type_id"
     t.index ["product_type_id"], name: "index_items_on_product_type_id"
     t.index ["supply_item_type_id"], name: "index_items_on_supply_item_type_id"
     t.index ["tax_rate_id"], name: "index_items_on_tax_rate_id"
@@ -4554,7 +4579,9 @@ ActiveRecord::Schema.define(version: 2019_04_27_100405) do
     t.string "reject_note"
     t.integer "department_id"
     t.integer "cost_center_id"
+    t.integer "category_id"
     t.index ["approved"], name: "index_purchase_request_items_on_approved"
+    t.index ["category_id"], name: "index_purchase_request_items_on_category_id"
     t.index ["cost_center_id"], name: "index_purchase_request_items_on_cost_center_id"
     t.index ["delivery_location_id"], name: "index_purchase_request_items_on_delivery_location_id"
     t.index ["department_id"], name: "index_purchase_request_items_on_department_id"
