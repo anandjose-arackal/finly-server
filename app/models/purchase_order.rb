@@ -307,6 +307,8 @@ class PurchaseOrder < ApplicationRecord
     where('created_at >= ? && created_at <= ?', from, to)
   }
 
+  scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
+
   # before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry

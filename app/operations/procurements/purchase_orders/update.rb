@@ -62,6 +62,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       end
     end
 
+    if self.purchase_order_params[:delivery_date].blank?
+      add_message :error, "Please add an expected delivery date for the Purchase Order, i.e., when do you expect all added items to be delivered."
+      return
+    end
+
     if self.purchase_order.quotations.present?
       quotes = self.purchase_order.quotations
       selected_quotes = quotes.map { |q| q if q.selected }.compact

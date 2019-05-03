@@ -70,6 +70,13 @@ class Procurement < ApplicationRecord
       find_ordered(ordered_ids)
     end
   }
+
+  scope :order_by_expected_delivery_date, -> {
+    ids = self.pluck(:id).uniq
+    filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).order('delivery_date ASC').pluck(:procurement_id).uniq
+    find_ordered(filtered_ids)
+  }
+
   scope :filter_procurement_name, -> (name) {
     where "procurements.name LIKE ?", "%#{name}%"
   }

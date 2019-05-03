@@ -62,7 +62,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
   end
 
   def reject
-    if purchase_order.is_reviewing_user?
+    if purchase_order.is_reviewing_user? || admin_has_taken_control?
       purchase_order.processing? &&
           user_in_level?
     end
@@ -78,7 +78,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def approve
     ############# Reviewer logic start #########################
-    if purchase_order.is_reviewing_user? #|| user.vendor_payments_admin?
+    if purchase_order.is_reviewing_user? || admin_has_taken_control?
       if purchase_order.processing?
         last_trail = purchase_order.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
         if (purchase_order.get_reviewers.include?(user))
@@ -90,6 +90,9 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
               return true
             end
             if last_trail.action_id == TrailAction.id_for(:submit)
+              return true
+            end
+            if last_trail.action_id == TrailAction.id_for(:take_control)
               return true
             end
           end
@@ -325,6 +328,12 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def forward
     purchase_order.processing? && purchase_order.get_reviewers.include?(user)
+  end
+
+  def admin_has_taken_control?
+    # If the user is an admin and the admin has explicitly taken control of the document, 
+    # only then they can approve or reject
+    purchase_order.get_reviewers.include?(user) && user.vendor_payment_admin?
   end
 
 end
