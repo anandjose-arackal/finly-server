@@ -45,7 +45,7 @@ class PurchaseRequest < ApplicationRecord
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
 
-  before_save :add_company
+  before_validation :add_company
 
   accepts_nested_attributes_for :purchase_request_items, :attachments, allow_destroy: true
 
