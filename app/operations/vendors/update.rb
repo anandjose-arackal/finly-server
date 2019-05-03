@@ -75,7 +75,6 @@ class Vendors::Update < Vendors::Base
           add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
           break
         end          
-
         # vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
       end
     end
