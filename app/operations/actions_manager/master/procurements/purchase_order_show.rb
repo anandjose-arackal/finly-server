@@ -27,7 +27,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
 
   def mark_vendor_confirmed
     if purchase_order.is_initiating_user? || user.vendor_payments_admin?
-      (purchase_order.vendor_confirmed?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
+      (purchase_order.sent_to_vendor?) && (user_in_level? || document_owner? || user.vendor_payments_admin?)
     end
   end
 
