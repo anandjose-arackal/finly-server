@@ -15,8 +15,15 @@ class UserDevices::FindOrCreate < BaseOperation
     user_present?
   end
 
-  def process
+  def init
     self.device = client_from_request
+  end
+
+  def validate
+    if self.device.blank?
+      add_message :error, 'Unable to create device'
+      return
+    end
   end
 
   def success

@@ -341,24 +341,24 @@ class ApplicationController < ActionController::Base
   def verify_user_session(doorkeeper_token)
     user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
     if user_session.nil?
-      if doorkeeper_token.scopes.include?('web')
+      # if doorkeeper_token.scopes.include?('web')
         doorkeeper_token.update(status_id: UserSessionStatus.id_for(:blocked), message: 'UserSession does not exist')
         head 401
         return false
-      else
-        # todo better handle how existing logins are associated i.e mobile, API etc
-        # params[:user] = current_user
-        # params[:message] = 'User Session not found'
-        # params[:scope] = doorkeeper_token.scopes.to_s
-        # result = UserSessions::Create.(:authorized, params)
-        # unless result.success?
-        #   doorkeeper_token.update(status_id: UserSessionStatus.id_for(:expired), message: 'User Session does not exist')
-        #   head 401
-        # end
-        # user_session = result.session
-        # todo temp workaround
-        return true
-      end
+      # else
+      #   # todo better handle how existing logins are associated i.e mobile, API etc
+      #   # params[:user] = current_user
+      #   # params[:message] = 'User Session not found'
+      #   # params[:scope] = doorkeeper_token.scopes.to_s
+      #   # result = UserSessions::Create.(:authorized, params)
+      #   # unless result.success?
+      #   #   doorkeeper_token.update(status_id: UserSessionStatus.id_for(:expired), message: 'User Session does not exist')
+      #   #   head 401
+      #   # end
+      #   # user_session = result.session
+      #   # todo temp workaround
+      #   return true
+      # end
     end
     RequestStoreUtil.set_current_session user_session
 
