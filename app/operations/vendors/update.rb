@@ -67,9 +67,16 @@ class Vendors::Update < Vendors::Base
     # here if the account number being added already exists, update the particular record and
     # don't create a new account
     vendor_parameters[:bank_accounts_attributes]&.each_with_index do |bank_account, index|
-      ba = BankAccount.find_by(account_number: bank_account[:account_number])
+      # ba = BankAccount.find_by(account_number: bank_account[:account_number], account_owner_type)
+      ba = user.company.bank_accounts.find_by(account_number: bank_account[:account_number], account_owner_type: "YesBankVendor")
       if ba.present?
-        vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
+        existing_vendor = ba.account_owner
+        if existing_vendor.authorized
+          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
+          break
+        end          
+
+        # vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
       end
     end
 
