@@ -3464,6 +3464,7 @@ Rails.application.routes.draw do
       put 'remind', to: 'purchase_orders#remind'
       put 'void', to: 'purchase_orders#void'
       put 'mark_send_to_vendor', to: 'purchase_orders#mark_send_to_vendor'
+      put 'mark_vendor_confirmed', to: 'purchase_orders#mark_vendor_confirmed'
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'

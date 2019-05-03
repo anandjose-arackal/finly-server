@@ -25,7 +25,11 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
 
     elsif is_send_to_vendor?
       self.po_previous_status = PurchaseOrderStatus.id_for(:sent_to_vendor)
-      end
+
+    elsif is_vendor_confirmed?
+      self.po_previous_status = PurchaseOrderStatus.id_for(:vendor_confirmed)
+    end
+
   end
 
   def validate
@@ -95,7 +99,7 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
   end
 
   def previous_state
-    ps = self.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
+    ps = self.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     ps.last.action_id
   end
 
@@ -112,6 +116,11 @@ class Procurements::InwardDocuments::Destroy < Procurements::InwardDocuments::Ba
   def is_send_to_vendor?(state=false)
     ps_id = previous_state
     state = ( ps_id == TrailAction.id_for(:send_to_vendor) ) ? true : false
+  end
+
+  def is_vendor_confirmed?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == TrailAction.id_for(:vendor_confirmed) ) ? true : false
   end
 
 end

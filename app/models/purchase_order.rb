@@ -113,7 +113,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :bank_account, optional: true
 
-  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
@@ -173,6 +173,7 @@ class PurchaseOrder < ApplicationRecord
         PurchaseOrderStatus.id_for(:approved),
         PurchaseOrderStatus.id_for(:auto_approved),
         PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:vendor_confirmed),
         PurchaseOrderStatus.id_for(:closed)
     ]
     where purchase_order_status_id: PurchaseOrderStatus.id_for(status_ids)
@@ -725,11 +726,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided)
   end
 
   def self.auditor_associated_status_ids
-    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised)
+    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
   end
 
   def self.roles
@@ -758,11 +759,11 @@ class PurchaseOrder < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if (UserRole.id_for(:purchase_order_initiator) == role_id.to_i)
-          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed]
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed]
         elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
-          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :closed, :voided]
+          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
+          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
         end
       end
     end
