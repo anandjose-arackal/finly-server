@@ -38,7 +38,7 @@ class Admin::Cards::Import < Admin::Base
         card.update(active: true)
         result_hash[i] = "Success!"
       else
-        add_message :error, card.errors.full_messages
+        result_hash[i] = card.errors.full_messages
       end
     end
   end
