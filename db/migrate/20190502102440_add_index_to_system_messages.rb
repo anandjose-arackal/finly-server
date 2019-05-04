@@ -1,7 +1,7 @@
 class AddIndexToSystemMessages < ActiveRecord::Migration[5.2]
   def change
-    add_index :system_messages, [:messagable_type, :messagable_id]
-    add_index :system_messages, :message_type
+    # add_index :system_messages, [:messagable_type, :messagable_id]
+    # add_index :system_messages, :message_type
     models = ApplicationRecord.descendants
     models.each do |model|
       next unless model <= SoftDeletable
