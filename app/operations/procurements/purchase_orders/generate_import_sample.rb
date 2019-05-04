@@ -18,7 +18,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
     # adding Item to excel sheet
     item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code", "Default Category Name", "Default Category ID"]
     item_contents = []
-    company.items.where(active: true).each do |item|
+    company.items.where(active: true).includes(:category).each do |item|
       item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code, item.category&.name, item.category_id]
     end
     self.sheets << {
@@ -95,6 +95,9 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
 
     # Create a temporary file to save it to s3 and provide the download link to frontend
     self.temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+    file.close
+
+    file.unlink
 
   end
 
