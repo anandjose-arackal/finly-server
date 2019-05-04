@@ -1,4 +1,4 @@
-class ExpressionEvaluator::Context::Date < ExpressionEvaluator::Context::Base
+class ExpressionEvaluator::Context::Fundamentals::Date < ExpressionEvaluator::Context::Base
 
   def month(options={})
     if options&.dig(:args).blank?
@@ -26,7 +26,7 @@ class ExpressionEvaluator::Context::Date < ExpressionEvaluator::Context::Base
     if format.blank?
       format = '%d/%b/%y'
     end
-    ExpressionEvaluator::Context::String.new(Date.today.strftime(format))
+    string_format(Date.today.strftime(format))
   end
 
 end
