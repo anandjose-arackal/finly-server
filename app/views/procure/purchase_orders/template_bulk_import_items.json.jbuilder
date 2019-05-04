@@ -1,1 +1,1 @@
-json.file_path @result.result_file_path
+json.file_path @result.xlsx_exporter&.export_file_path

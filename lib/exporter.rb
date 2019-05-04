@@ -3,7 +3,7 @@ require 'zip'
 # Usage Exporter is a parent class
 # Example: Exporter.new(user, spreadsheet: {headers: self.headers, contents: self.contents, filename: 'assign_card'}, pdf: {template: 'report.pdf.erb', filename: 'assign_card', local_variables: {report: self.report}}, messages)
 class Exporter < BaseOperation::BasePresenter::SuccessPresenter
-  attr_accessor :pdf_exporter, :spreadsheet_exporter, :zip_exporter, :xml_exporter
+  attr_accessor :pdf_exporter, :spreadsheet_exporter, :zip_exporter, :xml_exporter, :xlsx_exporter
 
   def init
     if params[:spreadsheet].present?
@@ -17,6 +17,9 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
     end
     if params[:xml].present?
       self.xml_exporter = Exporter::Xml.new user, params[:xml], messages
+    end
+    if params[:xlsx].present?
+      self.xlsx_exporter = Exporter::Xlsx.new user, params[:xlsx], messages
     end
   end
 
@@ -35,6 +38,9 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       if self.xml_exporter.present?
         format.xml {self.xml_exporter.render_xml controller}
       end
+      if self.xlsx_exporter.present?
+        format.json { render json: {file_path: self.xlsx_exporter.export_file_path} }
+      end
     end
   end
 
@@ -44,7 +50,6 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
     def init
       self.filename = params[:filename]
     end
-
   end
 
   # NOTE: THIS CAN BE USED INDEPENDENTLY. I.E THIS CAN BE INSTANTIATED AND USED like in the example below
@@ -79,7 +84,6 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
       controller.render pdf: self.filename, layout: self.layout, template: self.template, print_media_type: true, locals: local_variables
     end
-
   end
 
   # NOTE: THIS CAN BE USED INDEPENDENTLY. I.E THIS CAN BE INSTANTIATED AND USED like in the example below
@@ -163,7 +167,62 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
     end
     # Handle CSV END
+  end
 
+
+  class Exporter::Xlsx < Exporter::BaseSuccessPresenter
+    attr_accessor :headers, :contents, :template, :sheets, :export_file_path
+
+    def init
+      super
+      self.headers = params[:headers]
+      self.contents = params[:contents]
+      self.sheets = params[:sheets]
+
+      xlsx_file_path
+    end
+
+    def xlsx_file_path
+      # Create Temporary File
+
+      filename = filename || "template"
+      file = Tempfile.new([filename, '.xlsx'])
+
+      # Open Temporary file with WriteXLSX
+      workbook  = ::WriteXLSX.new(file.path)
+
+      # Write to xlsx file
+      self.sheets.each do |sheet|
+        worksheet = workbook.add_worksheet(sheet[:name])
+
+        sheet[:item_headers].each_with_index do |item, index|
+          worksheet.write( 0, index, item )
+        end
+
+        sheet[:item_contents].each_with_index do |items, index|
+          items.each_with_index do |item, inner_index|
+            worksheet.write((1 + index), inner_index, item)
+          end
+        end
+      end
+
+      # close xlsx file
+      workbook.close
+
+      # ActiveSupport::Duration should be sent for file expiry duration
+      if params[:expire_file_duration] && params[:expire_file_duration].instance_of?(ActiveSupport::Duration)
+        expire_file_duration = params[:expire_file_duration]
+      else
+        expire_file_duration = 7.days # Send duration
+      end
+
+      # Create a temporary file to save it to s3 and provide the download link to frontend
+      temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + expire_file_duration)
+      file.close
+      file.unlink
+
+      self.export_file_path = temp_file.file.url
+    end
   end
 
   class Exporter::AsZip < Exporter::BaseSuccessPresenter
