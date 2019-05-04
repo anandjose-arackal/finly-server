@@ -10,14 +10,14 @@ class ExpressionEvaluator::Transformer
   end
 
   def process(string, data=nil)
-    begin
+    # begin
       map = self.parser.parse(string)
-    rescue Parslet::ParseFailed
-      return nil
-    end
+    # rescue Parslet::ParseFailed
+    #   return nil
+    # end
     str_builder = ''
     map.each do |part|
-      begin
+      # begin
         string = ''
         if part[:text].present?
           string = part[:text] || ''
@@ -38,9 +38,9 @@ class ExpressionEvaluator::Transformer
           # todo math operations
         end
         str_builder += string if string.present?
-      rescue Exception
-        next
-      end
+      # rescue Exception
+      #   next
+      # end
     end
     str_builder
   end
@@ -51,9 +51,6 @@ class ExpressionEvaluator::Transformer
     method = equation[:method]
     options = {}
     options[:args] = equation[:args]
-    unless object.respond_to?(method)
-      return nil
-    end
     object.send(method, options)
   end
 

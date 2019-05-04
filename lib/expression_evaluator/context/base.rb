@@ -19,4 +19,18 @@ class ExpressionEvaluator::Context::Base
     ExpressionEvaluator::Context::Fundamentals::Integer.new(val)
   end
 
+  def list_format(val)
+    ExpressionEvaluator::Context::Fundamentals::List.new(val)
+  end
+
+  def send(method, options)
+    return nil unless respond_to?(method)
+
+    super(method, options)
+  end
+
+  def to_s
+    data.to_s
+  end
+
 end

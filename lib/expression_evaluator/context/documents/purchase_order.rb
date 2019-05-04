@@ -3,7 +3,7 @@ class ExpressionEvaluator::Context::Documents::PurchaseOrder < ExpressionEvaluat
   alias_method :purchase_order, :data
 
   def self.accept?(data=nil)
-    data and data.class.name == PurchaseOrder.name
+    data and data.class.name == ::PurchaseOrder.name
   end
 
   def cost_center(options={})
