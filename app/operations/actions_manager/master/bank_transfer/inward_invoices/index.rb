@@ -1,7 +1,7 @@
 class ActionsManager::Master::BankTransfer::InwardInvoices::Index < ActionsManager::Master::Base
 
   register_handle :inward_invoices_index
-  register_actions [:new_non_po_invoice, :bulk_actions, :approve_non_po_invoices, :reject_non_po_invoices, :control_non_po_invoices, :forward_approval, :export_as_xls, :export_as_csv]
+  register_actions [:new_non_po_invoice, :bulk_actions, :approve_non_po_invoices, :reject_non_po_invoices, :control_non_po_invoices, :forward_approval, :export_as_xls, :export_as_csv, :export_all]
 
   def add_vendor_invoice
     true
@@ -36,6 +36,10 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::Index < ActionsManag
   end
 
   def export_as_csv
+    true
+  end
+
+  def export_all
     true
   end
 
