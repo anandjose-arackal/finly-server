@@ -1,6 +1,6 @@
 class Procurements::PurchaseOrders::GenerateImportSample < Procurements::PurchaseOrders::Base
 
-  attr_accessor :company, :sample_type, :headers, :content, :sheets
+  attr_accessor :company, :sample_type, :headers, :content, :sheets, :temp_file
 
   def init
     self.company = user.company
@@ -66,10 +66,50 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
       name: "Categories"
     }
 
+
+
+
+    # Create Temporary File
+    file = Tempfile.new(['po_item_import', '.xlsx'])
+
+    # Open Temporary file with WriteXLSX
+    workbook  = ::WriteXLSX.new(file.path)
+
+    # Write to xlsx file
+    self.sheets.each do |sheet|
+      worksheet = workbook.add_worksheet(sheet[:name])
+
+      sheet[:item_headers].each_with_index do |item, index|
+        worksheet.write( 0, index, item )
+      end
+
+      sheet[:item_contents].each_with_index do |items, index|
+        items.each_with_index do |item, inner_index|
+          worksheet.write((1 + index), inner_index, item)
+        end
+      end
+    end
+
+    # close xlsx file
+    workbook.close
+
+    # Create a temporary file to save it to s3 and provide the download link to frontend
+    self.temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    params[:result_file_path] = temp_file.file.url
+    Procurements::PurchaseOrders::GenerateImportSample::GeneratePresenter.new(user, params, messages)
+    # self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+  end
+
+  class Procurements::PurchaseOrders::GenerateImportSample::GeneratePresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :result_file_path
+
+    def init
+      self.result_file_path = params[:result_file_path]
+    end
   end
 
   private
