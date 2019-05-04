@@ -35,30 +35,26 @@ class BankTransfer::Autocomplete::Vendors < BankTransfer::Autocomplete::Base
 
   class BankTransfer::Autocomplete::Vendors::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :bank_accounts, :account_owner, :actions,
-                  :custom_fields
+    attr_accessor :bank_accounts, :account_owner, :actions
 
     def init
       self.bank_accounts = params[:bank_accounts]
       self.account_owner = params[:account_owner]
 
-      self.actions = get_actions
+      # self.actions = get_actions
 
-      if self.account_owner.is_a?(YesBankVendor)
-        self.custom_fields = self.account_owner.custom_fields
-      end
     end
 
 
-    def get_actions
-      actions = {}
+    # def get_actions
+    #   actions = {}
 
-      if account_owner.is_a?(YesBankVendor)
-        actions[:create_beneficiaries] = user.permission.create_beneficiaries
-      end
+    #   if account_owner.is_a?(YesBankVendor)
+    #     actions[:create_beneficiaries] = user.permission.create_beneficiaries
+    #   end
 
-      actions
-    end
+    #   actions
+    # end
 
   end
 

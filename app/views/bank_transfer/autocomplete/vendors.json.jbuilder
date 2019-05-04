@@ -39,8 +39,4 @@ if @result.account_owner.is_a?(YesBankVendor)
 
 end
 
-json.actions @result.actions
-
-json.custom_fields do
-  json.array! @result.custom_fields
-end
+# json.actions @result.actions
