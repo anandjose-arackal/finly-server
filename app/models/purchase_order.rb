@@ -77,6 +77,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :total_before_tax, optional: true, class_name: "Amount"
   belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :taxable_amount, optional: true, class_name: "Amount"
   belongs_to :total_after_tax, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount", autosave: true
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
