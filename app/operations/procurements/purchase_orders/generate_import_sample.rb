@@ -46,7 +46,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
     # adding Cost Centers to the excel sheet
     cost_center_headers = ["ID", "Cost Center Name"]
     cost_center_contents = []
-    current_company.cost_centers.vendor_payments_only.each do |cost_center|
+    user.company.cost_centers.vendor_payments_only.each do |cost_center|
       cost_center_contents << [cost_center.id, cost_center.name]
     end
     self.sheets << {
@@ -57,7 +57,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
 
     category_headers = ["ID", "Category Name"]
     category_contents = []
-    current_company.categories&.inward_invoice_items_only.each do |category|
+    user.company.categories&.inward_invoice_items_only.each do |category|
       category_contents << [category.id, category.name]
     end
     self.sheets << {
