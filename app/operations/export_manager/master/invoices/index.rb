@@ -18,7 +18,6 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
                       total_payable: {spreadsheet: true},
                       total_tax: {spreadsheet: true},
                       narration: {spreadsheet: true},
-                      nature_of_expense: {spreadsheet: true},
                   ]
 
   def input
@@ -78,14 +77,12 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
     invoice.tax_amount&.value
   end
 
-  # Todo work-around for Swiggy
   def narration(invoice)
-    invoice.custom_fields.with_field_key(:narration).first&.string_value
+    invoice..narration.first&.string_value
   end
 
   def nature_of_expense(invoice)
     invoice.custom_fields.with_field_key(:nature_of_expense).first&.string_value
   end
-  # Todo work-around for Swiggy
 
 end

@@ -18,7 +18,7 @@
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  sequence_number          :integer
-#  payment_id               :bigint(8)
+#  payment_id               :bigint
 #
 
 require 'test_helper'
