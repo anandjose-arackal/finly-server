@@ -51,6 +51,9 @@
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
 #  vacation_delegate_enabled :boolean
+#  password_changed_at       :datetime
+#  last_activity_at          :datetime
+#  expired_at                :datetime
 #
 
 require 'rails_helper'
