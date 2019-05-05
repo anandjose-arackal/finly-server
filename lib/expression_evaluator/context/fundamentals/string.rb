@@ -1,33 +1,33 @@
 class ExpressionEvaluator::Context::Fundamentals::String < ExpressionEvaluator::Context::Base
 
-  def valid_data?
-    data.class.name == ::String
+  def self.accept?(data=nil)
+    data and data.class.name == ::String.name
   end
 
   def downcase(options = {})
-    string_format(data.downcase)
+    data.downcase
   end
 
   def upcase(options = {})
-    string_format(data.upcase)
+    data.upcase
   end
 
   def first(options={})
     size = options[:args]
     return nil if size.blank?
 
-    string_format(data.first(size.to_i))
+    data.first(size.to_i)
   end
 
   def last(options={})
     size = options[:args]
     return nil if size.blank?
 
-    string_format(data.last(size.to_i))
+    data.last(size.to_i)
   end
 
   def words_only(options={})
-    string_format(data.gsub(/\W/,''))
+    data.gsub(/\W/,'')
   end
 
 end

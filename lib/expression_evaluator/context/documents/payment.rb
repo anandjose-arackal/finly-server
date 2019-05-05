@@ -3,7 +3,7 @@ class ExpressionEvaluator::Context::Documents::Payment < ExpressionEvaluator::Co
   alias_method :payment, :data
 
   def self.accept?(data=nil)
-    data and data.class.name == Payment.name
+    data and data.class.name == ::Payment.name
   end
 
 end

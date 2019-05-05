@@ -23,7 +23,7 @@ class PurchaseRequest < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR-'
+  acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id

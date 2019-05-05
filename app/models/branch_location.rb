@@ -25,7 +25,7 @@ class BranchLocation < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :location_code, purpose: :branch_location, editable: false, prefix: 'LOC/'
+  acts_as_sequenced column: :location_code, purpose: :branch_location, editable: false, prefix: 'LOC'
   has_ancestry
 
   belongs_to :company, optional: true

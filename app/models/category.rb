@@ -21,6 +21,9 @@
 
 class Category < ApplicationRecord
   include AncestrySupport
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :category_code, purpose: :category, editable: false, prefix: 'CAT'
   has_ancestry
 
   belongs_to :company, optional: true

@@ -7,11 +7,11 @@ class ExpressionEvaluator::Context::Masters::Category < ExpressionEvaluator::Con
   end
 
   def name(options={})
-    string_format(data.name)
+    data.name
   end
 
   def ancestors(options={})
-    list_format(data.ancestors.map {|item| ExpressionEvaluator::Context::Masters::Category.new(item) })
+    data.ancestors
   end
 
 end

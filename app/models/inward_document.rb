@@ -24,7 +24,7 @@ class InwardDocument < ApplicationRecord
   include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :grn_number, purpose: :grn, editable: false, prefix: 'GRN-'
+  acts_as_sequenced column: :grn_number, purpose: :grn, editable: false, prefix: 'GRN'
 
   belongs_to :procurement, optional: true
   belongs_to :user, optional: true

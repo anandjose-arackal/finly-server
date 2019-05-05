@@ -16,7 +16,7 @@ class CostCenter < ApplicationRecord
   include SoftDeletable
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :cost_center_code, purpose: :cost_center, editable: false, prefix: 'CC/'
+  acts_as_sequenced column: :cost_center_code, purpose: :cost_center, editable: false, prefix: 'CC'
 
   belongs_to :company, optional: true
 

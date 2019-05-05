@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_03_125205) do
+ActiveRecord::Schema.define(version: 2019_05_04_130357) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -1547,6 +1547,7 @@ ActiveRecord::Schema.define(version: 2019_05_03_125205) do
     t.boolean "inward_invoice_line_items"
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
+    t.string "category_code"
     t.index ["active"], name: "index_categories_on_active"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"

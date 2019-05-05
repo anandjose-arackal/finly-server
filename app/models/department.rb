@@ -17,7 +17,7 @@ class Department < ApplicationRecord
   include SoftDeletable, AncestrySupport
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT/'
+  acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'
 
   has_ancestry
 

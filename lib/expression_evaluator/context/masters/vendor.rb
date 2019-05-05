@@ -6,8 +6,8 @@ class ExpressionEvaluator::Context::Masters::Vendor < ExpressionEvaluator::Conte
     data and data.class.name == YesBankVendor.name
   end
 
-  def vendor_type
-
+  def vendor_type(options={})
+    data.vendor_type&.name
   end
 
 end

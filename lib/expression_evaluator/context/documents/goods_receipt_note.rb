@@ -2,47 +2,24 @@ class ExpressionEvaluator::Context::Documents::GoodsReceiptNote < ExpressionEval
 
   alias_method :grn, :data
 
-  def self.accept?(data=nil)
+  def self.accept?(data = nil)
     data and data.class.name == InwardDocument.name
   end
 
-  def cost_center(options={})
-    type = options&.dig(:args)&.to_sym || :name
-    case type
-    when :id
-      return integer_format(self.purchase_order&.cost_center&.id)
-    when :name
-      return string_format(self.purchase_order&.cost_center&.name)
-    else
-      nil
-    end
+  def cost_center(options = {})
+    self.purchase_order.cost_center
   end
 
-  def department(options={})
-    type = options&.dig(:args)&.to_sym || :name
-    case type
-    when :id
-      return integer_format(self.purchase_order.department&.id)
-    when :name
-      return string_format(self.purchase_order.department&.name)
-    else
-      nil
-    end
+  def department(options = {})
+    purchase_order.department
   end
 
-  def location(options={})
-    type = options&.dig(:args)&.to_sym || :name
-    case type
-    when :id
-      return integer_format(self.purchase_order.location&.id)
-    when :name
-      return string_format(self.purchase_order.location&.name)
-    else
-      nil
-    end
+  def location(options = {})
+    self.purchase_order.location
   end
 
   protected
+
   def purchase_order
     self.grn&.procurement&.purchase_order
   end

@@ -8,19 +8,7 @@ class ExpressionEvaluator::Context::Base
   end
 
   def self.accept?(data=nil)
-    true
-  end
-
-  def string_format(val)
-    ExpressionEvaluator::Context::Fundamentals::String.new(val)
-  end
-
-  def integer_format(val)
-    ExpressionEvaluator::Context::Fundamentals::Integer.new(val)
-  end
-
-  def list_format(val)
-    ExpressionEvaluator::Context::Fundamentals::List.new(val)
+    false
   end
 
   def send(method, options)

@@ -1,32 +1,36 @@
 class ExpressionEvaluator::Context::Fundamentals::Date < ExpressionEvaluator::Context::Base
 
+  def self.accept?(data=nil)
+    true
+  end
+
   def month(options={})
     if options&.dig(:args).blank?
       options = {args: '%b'}
     end
-    date(options)
+    current_date(options)
   end
 
   def day(options={})
     if options&.dig(:args).blank?
       options = {args: '%d'}
     end
-    date(options)
+    current_date(options)
   end
 
   def year(options={})
     if options&.dig(:args).blank?
       options = {args: '%Y'}
     end
-    date(options)
+    current_date(options)
   end
 
-  def date(options = {})
+  def current_date(options = {})
     format = options&.dig(:args)
     if format.blank?
       format = '%d/%b/%y'
     end
-    string_format(Date.today.strftime(format))
+    Date.today.strftime(format)
   end
 
 end
