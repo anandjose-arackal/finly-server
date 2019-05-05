@@ -48,7 +48,7 @@ class Personalizer::Adapters::Company156::ExportManager156::Master156::Invoices:
     end
 
     invoices = invoices_presenter.invoices
-    self.input_data = InvoiceLineItem.with_invoice_id(invoices.pluck(:id))
+    self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').where(parent_id: invoices.pluck(:id))
   end
 
   def invoice_date(invoice_line_item)
