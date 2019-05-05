@@ -55,7 +55,7 @@ class ExportManager::Master::BaseMaster
 
   def self.register_handle(key)
     set_data_map[:key] = key
-    MASTERS[key] = self
+    # MASTERS[key] = self
   end
 
   def self.register_fields(fields)
