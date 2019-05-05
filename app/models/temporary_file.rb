@@ -13,6 +13,6 @@
 #
 
 class TemporaryFile < ApplicationRecord
-  has_attached_file :file
+  has_attached_file :file, :use_timestamp => false
   do_not_validate_attachment_file_type :file
 end

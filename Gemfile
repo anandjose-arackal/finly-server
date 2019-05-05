@@ -54,6 +54,7 @@ gem 'rubyzip', '~> 1.2.2'
 # gem to import from excel
 gem 'roo', '~> 2.7.1'
 gem 'roo-xls', '~> 1.2.0'
+gem 'write_xlsx', '~> 0.85.6'
 
 # Gem to show db schema in model file
 gem 'annotate', '~> 2.7.4'
