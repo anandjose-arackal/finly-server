@@ -46,6 +46,20 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
     end
   end
 
+  def success
+    params[:po_available] = self.po_available
+    Procurements::PurchaseOrders::Destroy::SuccessPresenter.new(user, params, messages)
+  end
+
+  class Procurements::PurchaseOrders::Destroy::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :po_available
+
+    def init
+      # Helps to know in frontend if they should redirect to procurement index or simply re-render the same procurement show page
+      self.po_available = params[:po_available]
+    end
+  end
+
   def post_process
     if po_available
       if self.procurement.po_revisions.reload.present?
