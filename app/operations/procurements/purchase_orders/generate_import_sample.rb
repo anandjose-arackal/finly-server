@@ -18,7 +18,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
     # adding Item to excel sheet
     item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code", "Default Category Name", "Default Category ID"]
     item_contents = []
-    company.items.where(active: true).each do |item|
+    company.items.where(active: true).includes(:category).each do |item|
       item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code, item.category&.name, item.category_id]
     end
     self.sheets << {
@@ -46,7 +46,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
     # adding Cost Centers to the excel sheet
     cost_center_headers = ["ID", "Cost Center Name"]
     cost_center_contents = []
-    current_company.cost_centers.vendor_payments_only.each do |cost_center|
+    user.company.cost_centers.vendor_payments_only.each do |cost_center|
       cost_center_contents << [cost_center.id, cost_center.name]
     end
     self.sheets << {
@@ -57,7 +57,7 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
 
     category_headers = ["ID", "Category Name"]
     category_contents = []
-    current_company.categories&.inward_invoice_items_only.each do |category|
+    user.company.categories&.inward_invoice_items_only.each do |category|
       category_contents << [category.id, category.name]
     end
     self.sheets << {
@@ -69,8 +69,18 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    # params[:result_file_path] = temp_file.file.url
+    # Procurements::PurchaseOrders::GenerateImportSample::GeneratePresenter.new(user, params, messages)
+    Exporter.new(user, {xlsx: {headers: self.headers, contents: self.content, sheets: self.sheets}, expire_file_duration: 1.day}, messages)
   end
+
+  # class Procurements::PurchaseOrders::GenerateImportSample::GeneratePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  #   attr_accessor :result_file_path
+
+  #   def init
+  #     self.result_file_path = params[:result_file_path]
+  #   end
+  # end
 
   private
 

@@ -111,7 +111,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
       # payment = ::Payment.new(payment_param)
       payment = self.bank_payment_request.payment_order.payments.build(payment_param)
-      if payment.save
+        if payment.save
         # perform the required calculations
         beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id])
         beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
@@ -146,7 +146,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       return ba
     else
       ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
-                                           company_id: self.company_id, name: order_details[:name]&.strip,
+                                           company_id: self.company_id, # name: order_details[:name]&.strip, because account number and IFSC are the only criteria against which we company
                                            account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
       business_name = order_details[:business_name] || order_details[:name]
       vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id, business_name: business_name)

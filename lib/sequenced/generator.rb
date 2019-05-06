@@ -69,15 +69,17 @@ module Sequenced
     private
 
     def base_relation
+      raise 'Company ID cannot be null for generating sequence' if record.company_id.nil?
+
       record.class.base_class.unscoped.where(company_id: record.company_id)
     end
 
     def process_prefix
-      @prefix ||= @config&.prefix
+      @prefix = @config&.prefix || @prefix
       # If prefix is lambda
       @prefix = @prefix.call(@record) if @prefix&.respond_to?(:call)
 
-      @prefix = ExpressionEvaluator::Transformer.(@prefix) unless @prefix.blank?
+      @prefix = ExpressionEvaluator::Transformer.(@prefix, @record) unless @prefix.blank?
     end
 
     def find_last_record

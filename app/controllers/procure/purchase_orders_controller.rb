@@ -105,7 +105,9 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
 
   def template_bulk_import_items
     @result = Procurements::PurchaseOrders::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def reject

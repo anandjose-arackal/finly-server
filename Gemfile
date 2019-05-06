@@ -58,9 +58,10 @@ gem 'rubyzip', '~> 1.2.2'
 # gem to import from excel
 gem 'roo', '~> 2.7.1'
 gem 'roo-xls', '~> 1.2.0'
+gem 'write_xlsx', '~> 0.85.6'
 
 # Gem to show db schema in model file
-gem 'annotate', '~> 2.7.4'
+gem 'annotate', '~> 2.7.5'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.2'
@@ -237,6 +238,7 @@ group :development do
   gem 'spring', '~> 2.0.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'spring-commands-rspec', '~> 1.0.4'
+  gem "lol_dba"
 end
 
 # gem 'backup'
