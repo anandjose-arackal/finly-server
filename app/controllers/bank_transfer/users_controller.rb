@@ -35,4 +35,9 @@ class BankTransfer::UsersController < ApplicationController
     respond
   end
 
+  def invite_config
+    @result = BankTransfer::Users::InviteConfig.(current_user, params)
+    respond
+  end
+
 end

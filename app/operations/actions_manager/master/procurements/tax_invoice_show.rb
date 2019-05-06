@@ -36,7 +36,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def reject
-    if invoice.is_reviewing_user?
+    if invoice.is_reviewing_user? || admin_has_taken_control?
       invoice.processing? && user_in_level?
     end
   end
@@ -46,7 +46,7 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
   end
 
   def approve
-    if invoice.is_reviewing_user?
+    if invoice.is_reviewing_user? || admin_has_taken_control?
       invoice.processing? && user_in_level?
     end
   end
@@ -189,5 +189,11 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
 
   def forward
     invoice.processing? && invoice.get_reviewers.include?(user)
+  end
+
+  def admin_has_taken_control?
+    # If the user is an admin and the admin has explicitly taken control of the document, 
+    # only then they can approve or reject
+    invoice.get_reviewers.include?(user) && user.vendor_payment_admin?
   end
 end

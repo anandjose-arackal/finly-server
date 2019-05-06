@@ -40,6 +40,7 @@ class BranchLocation < ApplicationRecord
   has_many :budget_rules, through: :budget_rule_branch_location_mappings
 
   scope :with_ids, -> (ids) { where id: ids }
+  scope :include_state, -> { includes :state }
 
   def address
     address = ""
