@@ -1,6 +1,7 @@
 class Personalizer::Adapters::Company2::ExportManager2::Master2::Invoices::Index < ExportManager::Master::BaseMaster
   attr_accessor :input_data
 
+  # register_handle :invoices
   register_generator ExportManager::Generator::Spreadsheet
   register_processor ExportManager::Processor::Synchronous
   validate :input

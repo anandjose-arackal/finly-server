@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_04_130357) do
+ActiveRecord::Schema.define(version: 2019_05_05_080752) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2281,6 +2281,7 @@ ActiveRecord::Schema.define(version: 2019_05_04_130357) do
     t.integer "cost_center_id"
     t.datetime "deleted_at"
     t.string "department_code"
+    t.string "code"
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["cost_center_id"], name: "index_departments_on_cost_center_id"
     t.index ["deleted_at"], name: "index_departments_on_deleted_at"

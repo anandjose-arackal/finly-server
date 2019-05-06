@@ -72,8 +72,8 @@ class ExportManager::RequestHandler < BaseOperation
   def init_master
     m = ExportManager::Master::BaseMaster::MASTERS[self.params[:type]]
     if m.present?
-      personalizer_klass = from_personalizer(m.to_s)
-      return personalizer_klass if personalizer_klass.present?
+      # personalizer_klass = from_personalizer(m.to_s)
+      # return personalizer_klass if personalizer_klass.present?
 
       return m if m.is_a?(Class)
       return Object.const_get(m)
