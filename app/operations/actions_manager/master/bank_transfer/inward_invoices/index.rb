@@ -1,70 +1,74 @@
 class ActionsManager::Master::BankTransfer::InwardInvoices::Index < ActionsManager::Master::Base
 
   register_handle :inward_invoices_index
-  register_actions [:new_non_po_invoice, :bulk_actions, :approve_non_po_invoices, :reject_non_po_invoices, :control_non_po_invoices, :forward_non_po_approval, :export_non_po_as_csv, :export_non_po_as_xls, :export_all, :approve_po_invoices, :control_po_invoices, :reject_po_invoices, :forward_po_approval, :export_po_as_xls, :export_po_as_csv]
-
-  def add_vendor_invoice
-    true
-  end
+  register_actions [:new_non_po_invoice, :bulk_non_po_actions, :approve_non_po_invoices, :reject_non_po_invoices, :control_non_po_invoices, :forward_non_po_approval, :export_non_po_as_csv, :export_non_po_as_xls, :export_all_non_po, :approve_po_invoices, :control_po_invoices, :reject_po_invoices, :forward_po_approval, :export_po_as_xls, :export_po_as_csv]
 
   def new_non_po_invoice
-    true
+    user.is_invoice_initiator??
   end
 
-  def bulk_actions
-    true
+  def bulk_non_po_actions
+    user.is_invoice_reviewer? || user.vendor_payments_admin? || user.is_invoice_initiator?
   end
 
   def approve_non_po_invoices
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin?
   end
 
   def reject_non_po_invoices
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin?
   end
 
   def control_non_po_invoices
-    true
+    user.vendor_payments_admin?
   end
 
   def forward_non_po_approval
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin?
   end
 
   def export_non_po_as_xls
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin? || user.is_invoice_initiator?
   end
 
   def export_non_po_as_csv
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin? || user.is_invoice_initiator?
   end
 
-  def export_all
-    true
+  def export_all_non_po
+    user.is_invoice_reviewer? || user.vendor_payments_admin? || user.is_invoice_initiator?
   end
 
   def approve_po_invoices
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin?
   end
 
   def control_po_invoices
-    true
+    user.vendor_payments_admin?
   end
 
   def reject_po_invoices
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin?
   end
 
   def forward_po_approval
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin?
   end
 
   def export_po_as_xls
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin? || user.is_invoice_initiator?
   end
 
   def export_po_as_csv
-    true
+    user.is_invoice_reviewer? || user.vendor_payments_admin? || user.is_invoice_initiator?
+  end
+
+  def bulk_po_actions
+    user.is_invoice_reviewer? || user.vendor_payments_admin? || user.is_invoice_initiator?
+  end
+
+  def export_all_po
+    user.is_invoice_reviewer? || user.vendor_payments_admin? || user.is_invoice_initiator?
   end
 
   
