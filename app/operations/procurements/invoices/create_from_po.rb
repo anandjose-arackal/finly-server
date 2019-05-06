@@ -233,7 +233,8 @@ class Procurements::Invoices::CreateFromPO < Procurements::Invoices::Base
       invoice_items_attributes: invoice_items_attributes,
       policy_id: self.purchase_order.policy_id,
       gstin_location_id: self.purchase_order.gstin_location_id,
-      cost_allocation_items: self.purchase_order.cost_allocation_items
+      cost_allocation_items: self.purchase_order.cost_allocation_items,
+      po_number: self.purchase_order.po_number
     }
 
     if self.advance.present? && (params[:document_type].blank? && params[:document_type] != 'proforma_invoice')
