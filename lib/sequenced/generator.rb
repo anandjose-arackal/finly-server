@@ -17,7 +17,7 @@ module Sequenced
       @sequenced_editable = options[:editable]
       @config = UniqueIdentifier.with_company_id(record.company_id).with_purpose_id(Purpose.id_for(options[:purpose]))&.first
       @start_at ||= @config&.sequence_start
-      @min_sequence_length = options[:min_length] || @config&.sequence_start&.length || 5
+      @min_sequence_length = @config&.sequence_start&.length || options[:min_length] || 5
       process_prefix
     end
 
