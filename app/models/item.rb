@@ -75,6 +75,10 @@ class Item < ApplicationRecord
     where active: active
   }
 
+  scope :supply_item_type, -> (item_type){
+    where(supply_item_type: item_type)
+  }
+
   delegate :po_item?, :non_po_item?, to: :supply_item_type
 
   def goods?
