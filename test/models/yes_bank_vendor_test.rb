@@ -2,32 +2,40 @@
 #
 # Table name: yes_bank_vendors
 #
-#  id                :integer          not null, primary key
-#  name              :string(255)
-#  company_id        :integer
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  email             :string(255)
-#  mobile_number     :string(255)
-#  authorized        :boolean
-#  description       :text(65535)
-#  is_deleted        :boolean          default(FALSE)
-#  pan               :string(255)
-#  tin               :string(255)
-#  gst               :string(255)
-#  gst_registered    :boolean
-#  state             :string(255)
-#  state_code_id     :integer
-#  created_by_id     :integer
-#  vendor_type_id    :integer
-#  address           :string(255)
-#  business_name     :string(255)
-#  payment_term_id   :integer
-#  currency_id       :integer
-#  tds_rates_list_id :integer
-#  vendor_id         :string(255)
-#  disabled          :boolean          default(FALSE)
-#  deleted_at        :datetime
+#  id                       :integer          not null, primary key
+#  name                     :string(255)
+#  company_id               :integer
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#  email                    :string(255)
+#  mobile_number            :string(255)
+#  authorized               :boolean
+#  description              :text(65535)
+#  is_deleted               :boolean          default(FALSE)
+#  pan                      :string(255)
+#  tin                      :string(255)
+#  gst                      :string(255)
+#  gst_registered           :boolean
+#  state                    :string(255)
+#  state_code_id            :integer
+#  created_by_id            :integer
+#  vendor_type_id           :integer
+#  address                  :string(255)
+#  business_name            :string(255)
+#  payment_term_id          :integer
+#  currency_id              :integer
+#  tds_rates_list_id        :integer
+#  vendor_id                :string(255)
+#  disabled                 :boolean          default(FALSE)
+#  deleted_at               :datetime
+#  vedor_code               :string(255)
+#  msme_registered          :boolean          default(FALSE)
+#  msme_registration_number :string(255)
+#  status_id                :integer
+#  policy_id                :integer
+#  controlling_level_id     :integer
+#  submitted_at             :datetime
+#  approved_at              :datetime
 #
 
 require 'test_helper'

@@ -75,11 +75,11 @@ module Sequenced
     end
 
     def process_prefix
-      @prefix ||= @config&.prefix
+      @prefix = @config&.prefix || @prefix
       # If prefix is lambda
       @prefix = @prefix.call(@record) if @prefix&.respond_to?(:call)
 
-      @prefix = ExpressionEvaluator::Transformer.(@prefix) unless @prefix.blank?
+      @prefix = ExpressionEvaluator::Transformer.(@prefix, @record) unless @prefix.blank?
     end
 
     def find_last_record

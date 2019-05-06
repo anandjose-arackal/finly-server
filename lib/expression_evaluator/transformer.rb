@@ -1,15 +1,15 @@
 class ExpressionEvaluator::Transformer
   attr_accessor :parser
 
-  def self.call(string)
-    self.new.process(string)
+  def self.call(string, data=nil)
+    self.new.process(string, data)
   end
 
   def initialize
     self.parser = ExpressionEvaluator::Parser.new
   end
 
-  def process(string)
+  def process(string, data=nil)
     begin
       map = self.parser.parse(string)
     rescue Parslet::ParseFailed
@@ -23,9 +23,11 @@ class ExpressionEvaluator::Transformer
           string = part[:text] || ''
         elsif part[:equation].present?
           equations = part[:equation]
-
           equation = equations.shift
-          object = ExpressionEvaluator::Provider.for(equation[:method])
+
+          object = ExpressionEvaluator::Provider.for(equation[:method], data)
+          next if object.nil?
+
           object = solve(object, equation)
           next if object.nil?
 
@@ -33,7 +35,7 @@ class ExpressionEvaluator::Transformer
             next if object.nil?
             object = solve(object, eq)
           end
-          string = object&.data
+          string = object&.to_s
         else
           # todo math operations
         end
@@ -51,10 +53,8 @@ class ExpressionEvaluator::Transformer
     method = equation[:method]
     options = {}
     options[:args] = equation[:args]
-    unless object.respond_to?(method)
-      return nil
-    end
-    object.send(method, options)
+    data = object.send(method, options) || ''
+    ExpressionEvaluator::Provider.for_data(data)
   end
 
 end
