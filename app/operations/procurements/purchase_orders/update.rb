@@ -42,8 +42,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def validate
     return if record_not_present
-    if purchase_order.sent_to_vendor?
-      add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+    if purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?
+      # add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+      add_message :error, "Cant update purchase order marked as '#{purchase_order.status.name.humanize.downcase}'"
       return
     end
 
