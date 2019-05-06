@@ -81,6 +81,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
             custom_fields[field.id] = [item[field_name.to_sym]].flatten
           elsif field.field_type_id == FieldType.id_for(:drop_down)
             custom_fields[field.id] = item[field_name.to_sym]
+          elsif field.field_type_id == FieldType.id_for(:text)
+            custom_fields[field.id] = item[field_name.to_sym]
           end
         end
       end

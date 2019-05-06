@@ -13,6 +13,7 @@ class Procurements::PurchaseRequests::Count < Procurements::PurchaseRequests::Ba
     result  = ::Procurements::PurchaseRequests::Index.(user, params)
     if result.success?
       self.statuses = result.purchase_requests.joins(:status).group('purchase_request_statuses.name').count
+      self.statuses['all'] = statuses.values.sum rescue nil
     end
   end
 

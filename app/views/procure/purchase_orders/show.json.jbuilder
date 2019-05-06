@@ -3,7 +3,7 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
               :payment_term_id, :procurement_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
               :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note
 json.vendor @result.purchase_order.vendor.as_json
-
+json.created_from_purchase_request @result.created_from_purchase_request 
 json.vendor do
   json.extract! @result.purchase_order&.vendor
 
@@ -90,9 +90,6 @@ json.items do
                   :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id
     
     json.item_number item.inventory_line_item&.item_number rescue nil
-    json.department_editable !item.purchase_request_item_id.present?
-    json.cost_center_editable !item.purchase_request_item_id.present?
-    json.quantity_editable !item.purchase_request_item_id.present?
     json.gl_code item.inventory_line_item&.item_code rescue nil
     json.category_name item.category&.name
     json.category_id item.category_id
@@ -259,7 +256,3 @@ json.tds_slabs do
       json.tds tds_slab.tds
     end
 end
-
-json.department_editable @result.department_editable
-json.cost_center_editable @result.cost_center_editable
-json.cost_allocation_items @result.cost_allocation_items

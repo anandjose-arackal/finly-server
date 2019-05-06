@@ -77,6 +77,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :total_before_tax, optional: true, class_name: "Amount"
   belongs_to :tax_amount, optional: true, class_name: "Amount"
+  belongs_to :taxable_amount, optional: true, class_name: "Amount"
   belongs_to :total_after_tax, optional: true, class_name: "Amount"
   belongs_to :discount_amount, optional: true, class_name: "Amount", autosave: true
   belongs_to :balance_amount, optional: true, class_name: "Amount", autosave: true
@@ -306,6 +307,8 @@ class PurchaseOrder < ApplicationRecord
     to = Date.parse(to) unless to.is_a?(Date)
     where('created_at >= ? && created_at <= ?', from, to)
   }
+
+  scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
 
   # before_save :calculate_line_items
   after_create :purchase_request_tasks
@@ -784,7 +787,7 @@ class PurchaseOrder < ApplicationRecord
     {
       # purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.item&.rate, tax: nil, tds: nil, discount: nil, tax_amount_id: nil, tds_amount_id: nil, discount_amount_id: nil, total_amount_id: pr_item.estimated_amount_id, delivery_date: nil, comment: nil, created_at: nil, updated_at: nil, delivered: 0, accepted: 0, rejected: 0, category_id: nil, cost_center_id: nil, is_deleted: false, account: nil, tax_rate_id: nil, deleted_at: nil, unit_of_measurement: nil
 
-      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id, cost_center_id: pr_item.purchase_request.cost_center_id
+      purchase_order_id: pr_item.purchase_order_id, inventory_line_item_id: pr_item.item_id, product_id: nil, description: pr_item&.item&.description, hsn_sac: pr_item&.item&.hsn_sac, quantity: pr_item.quantity, rate: pr_item&.per_unit_estimated_amount&.value, purchase_request_item_id: pr_item.id, tax_rate_id: pr_item&.item&.tax_rate_id, unit_of_measurement: pr_item.unit_of_measurement, department_id: pr_item.department_id
     }
   end
 
@@ -796,7 +799,6 @@ class PurchaseOrder < ApplicationRecord
     parameters = RequestStore.store[:params]
     if parameters[:associated_resource] == "purchase_request_item"
       item_ids = self.filter_purchase_request_item_ids(parameters, user)
-      associate_attributes_to_purchase_order(item_ids[0])
       # Status transition of PR
       perform_status_transition({document_name: 'purchase_request', status_to: 'po_created', user: user, params: parameters, item_ids: item_ids})
       associate_purchase_request_items(params: parameters, user: user, item_ids: item_ids)
@@ -830,11 +832,4 @@ class PurchaseOrder < ApplicationRecord
       end
     end
   end
-
-  def associate_attributes_to_purchase_order(id)
-    purchase_request = PurchaseRequestItem.find_by_id(id).purchase_request
-    self.update(department_id: purchase_request.department_id ,cost_center_id: purchase_request.cost_center_id) 
-  end
-
-
 end
