@@ -173,7 +173,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def pr_approved_items
-    return nil unless user.company.purchase_requisition_enabled? && (user.is_inventory_manager? || user.vp_admin_or_auditor?)
+    return nil unless user.company.purchase_requisition_enabled? && (user.is_inventory_manager? || user.vp_admin_or_auditor? || user.is_purchase_order_initiator?)
     { name: 'Approved Items', id: 'procure', url: 'po_approval_items/params={}'}
   end
 
