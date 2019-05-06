@@ -309,7 +309,7 @@ class PurchaseOrder < ApplicationRecord
 
   scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
 
-  # before_save :calculate_line_items
+  before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
