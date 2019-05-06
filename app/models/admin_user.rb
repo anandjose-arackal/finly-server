@@ -19,6 +19,7 @@
 #  last_name                 :string(255)
 #  mobile_number             :string(255)      not null
 #  encrypted_master_password :string(255)
+#  authorized_ip             :string(255)
 #
 
 require 'bcrypt'

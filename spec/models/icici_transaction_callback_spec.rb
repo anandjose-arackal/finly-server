@@ -2,7 +2,7 @@
 #
 # Table name: icici_transaction_callbacks
 #
-#  id         :bigint(8)        not null, primary key
+#  id         :bigint           not null, primary key
 #  AGGRNAME   :string(255)
 #  AGGRID     :string(255)
 #  URN        :string(255)
