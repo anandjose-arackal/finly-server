@@ -15,6 +15,9 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
       elsif is_send_to_vendor?
         self.po_previous_status = PurchaseOrderStatus.id_for(:sent_to_vendor)
+      
+      elsif is_vendor_confirmed?
+        self.po_previous_status = PurchaseOrderStatus.id_for(:vendor_confirmed)
       end
     end
         
@@ -40,6 +43,20 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
         self.po_available = false
         add_message :success, "Successfully Deleted Procurement"
       end
+    end
+  end
+
+  def success
+    params[:po_available] = self.po_available
+    Procurements::PurchaseOrders::Destroy::SuccessPresenter.new(user, params, messages)
+  end
+
+  class Procurements::PurchaseOrders::Destroy::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :po_available
+
+    def init
+      # Helps to know in frontend if they should redirect to procurement index or simply re-render the same procurement show page
+      self.po_available = params[:po_available]
     end
   end
 
@@ -81,9 +98,9 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
   def previous_state
     if self.procurement.po_revisions.present? && (self.procurement.po_revisions.count > 1)
-      ps = self.procurement.reload.po_revisions[-2].trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
+      ps = self.procurement.reload.po_revisions[-2].trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     else
-      ps = self.procurement.reload.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor)])
+      ps = self.procurement.reload.purchase_order.trails.where(action_id: [TrailAction.id_for(:approve), TrailAction.id_for(:auto_approve), TrailAction.id_for(:send_to_vendor), TrailAction.id_for(:vendor_confirmed)])
     end
     ps.last.action_id
   end
@@ -101,6 +118,11 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
   def is_send_to_vendor?(state=false)
     ps_id = previous_state
     state = ( ps_id == TrailAction.id_for(:send_to_vendor) ) ? true : false
+  end
+
+  def is_vendor_confirmed?(state=false)
+    ps_id = previous_state
+    state = ( ps_id == TrailAction.id_for(:vendor_confirmed) ) ? true : false
   end
 
 end

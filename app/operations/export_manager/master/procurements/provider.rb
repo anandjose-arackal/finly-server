@@ -175,7 +175,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def is_po_approved(procurement)
-    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :closed, :sent_to_vendor).include?(purchase_order(procurement)&.purchase_order_status_id) ? 'Yes' : 'No'
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :closed, :sent_to_vendor, :vendor_confirmed).include?(purchase_order(procurement)&.purchase_order_status_id) ? 'Yes' : 'No'
   end
 
   def po_approved_on(procurement)

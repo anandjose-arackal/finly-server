@@ -60,11 +60,11 @@ class Procurements::Show < Procurements::Base
     def get_actions
       actions = {}
       if po_revisions.present?
-        if (po_revisions.last.approved? || po_revisions.last.auto_approved? || po_revisions.last.sent_to_vendor? || po_revisions.last.all_items_accepted?) && (user_in_level? || document_owner? || user.is_invoice_initiator?)
+        if (po_revisions.last.approved? || po_revisions.last.auto_approved? || po_revisions.last.sent_to_vendor? || po_revisions.last.vendor_confirmed? || po_revisions.last.all_items_accepted?) && (user_in_level? || document_owner? || user.is_invoice_initiator?)
           actions[:add_document] = true
         end
       elsif purchase_order.present?
-        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.all_items_accepted?) && (user_in_level? || document_owner? || user.is_invoice_initiator?)
+        if (purchase_order.approved? || purchase_order.auto_approved? || purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed? || purchase_order.all_items_accepted?) && (user_in_level? || document_owner? || user.is_invoice_initiator?)
           actions[:add_document] = true
         end
       end
