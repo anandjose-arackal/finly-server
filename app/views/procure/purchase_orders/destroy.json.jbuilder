@@ -1,0 +1,1 @@
+json.redirect @result.po_available
