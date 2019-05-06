@@ -1,7 +1,6 @@
 class ExpressionEvaluator::Context::Fundamentals::Date < ExpressionEvaluator::Context::Base
 
   def self.accept?(data=nil)
-    true
   end
 
   def month(options={})

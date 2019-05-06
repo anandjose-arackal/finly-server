@@ -54,6 +54,8 @@ class ExpressionEvaluator::Transformer
     options = {}
     options[:args] = equation[:args]
     data = object.send(method, options) || ''
+    return data if data.class <= ExpressionEvaluator::Context::Base
+
     ExpressionEvaluator::Provider.for_data(data)
   end
 
