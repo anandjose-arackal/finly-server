@@ -5,7 +5,7 @@ class Procurements::PurchaseRequests::BulkUploadLineItems < Procurements::Purcha
                 :headers, :contents, :validate_operation
 
   def pre_validate
-    Rails.logger.fatal "FROM BulkUploadLineItems pre_validate,\n #{params.inspect}"
+    # Rails.logger.fatal "FROM BulkUploadLineItems pre_validate,\n #{params.inspect}"
     if user.blank?
       add_message :error, 'User not found'
       return
@@ -17,7 +17,7 @@ class Procurements::PurchaseRequests::BulkUploadLineItems < Procurements::Purcha
   end
 
   def init
-    Rails.logger.fatal "FROM BulkUploadLineItems start of init,\n #{params.inspect}"
+    # Rails.logger.fatal "FROM BulkUploadLineItems start of init,\n #{params.inspect}"
     self.file = params[:file]
     # headers = [:description, :item_number, :department_id, :cost_center_id, :comment, :item_code, :hsn_sac, :quantity, :unit_of_measurement, :rate, :discount, :tax, :total]
     headers = [:description, :item_number, :item_code, :category_id, :preferred_vendor, :required_by_date, :delivery_location, :purpose, :quantity, :unit_of_measurement, :unit_price, :total]
@@ -58,14 +58,23 @@ class Procurements::PurchaseRequests::BulkUploadLineItems < Procurements::Purcha
 
   # this method should create the temporary file that can be linked in the front end
   def failure
-    exporter = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents})
-    file = Tempfile.new("bulk_item_import_errors.xls")
-    open(file.path, 'wb') do |f|
-      f.write exporter.generate_xls
+    # exporter = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents})
+    # file = Tempfile.new("bulk_item_import_errors.xls")
+    # open(file.path, 'wb') do |f|
+    #   f.write exporter.generate_xls
+    # end
+    # temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 2.day)
+    # params[:result_file_path] = temp_file.file.url
+    result = Procurements::PurchaseRequests::GenerateImportSample.(user, {content: self.contents})
+
+    if result.success?
+      params[:result_file_path] = result.xlsx_exporter.export_file_path
+      Procurements::PurchaseRequests::BulkUploadLineItems::FailurePresenter.new(user, params, messages)
+    else
+      add_message :error, "Some Internal Error Occurred"
     end
-    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 2.day)
-    params[:result_file_path] = temp_file.file.url
-    Procurements::PurchaseRequests::BulkUploadLineItems::FailurePresenter.new(user, params, messages)
+
+    # Procurements::PurchaseRequests::BulkUploadLineItems::FailurePresenter.new(user, params, messages)
   end
 
   class Procurements::PurchaseRequests::BulkUploadLineItems::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -85,5 +94,4 @@ class Procurements::PurchaseRequests::BulkUploadLineItems < Procurements::Purcha
       self.result_file_path = params[:result_file_path]
     end
   end
-
 end
