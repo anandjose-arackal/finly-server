@@ -4,7 +4,7 @@ class ActionsManager::Master::BankTransfer::InwardInvoices::Index < ActionsManag
   register_actions [:new_non_po_invoice, :bulk_non_po_actions, :approve_non_po_invoices, :reject_non_po_invoices, :control_non_po_invoices, :forward_non_po_approval, :export_non_po_as_csv, :export_non_po_as_xls, :export_all_non_po, :approve_po_invoices, :control_po_invoices, :reject_po_invoices, :forward_po_approval, :export_po_as_xls, :export_po_as_csv]
 
   def new_non_po_invoice
-    user.is_invoice_initiator??
+    user.is_invoice_initiator?
   end
 
   def bulk_non_po_actions
