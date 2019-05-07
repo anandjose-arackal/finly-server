@@ -28,7 +28,7 @@ class IciciBankApi::Base < BaseHandler
   def decrypt_response(body)
     # enter logic to parse the encrypted response
     # first decrypt the response
-    path = Dir.home + '/certificates/icici_certificates_new/finly_icici_new.key'
+    path = Dir.home + '/certificates/icici_certificates_final/finly_icici_final.key'
     private_key = OpenSSL::PKey::RSA.new(File.read(path))
     decrypted_response = private_key.private_decrypt(Base64.decode64(body))
     parsed_response = JSON.parse(decrypted_response)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_02_102440) do
+ActiveRecord::Schema.define(version: 2019_05_07_081349) do
 
   create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "reconciliation_balance_id"
@@ -1423,6 +1423,7 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.boolean "inward_invoice_line_items"
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
+    t.string "category_code"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
   end
@@ -1805,6 +1806,7 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.datetime "updated_at", null: false
     t.boolean "is_deleted"
     t.datetime "deleted_at"
+    t.string "cost_center_code"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
   end
@@ -2137,6 +2139,8 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.string "ancestry"
     t.integer "cost_center_id"
     t.datetime "deleted_at"
+    t.string "department_code"
+    t.string "code"
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["cost_center_id"], name: "index_departments_on_cost_center_id"
     t.index ["deleted_at"], name: "index_departments_on_deleted_at"
@@ -3219,6 +3223,7 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.decimal "total_proforma_advance", precision: 20, scale: 2
     t.boolean "cost_allocation_items", default: false
     t.text "narration"
+    t.string "po_number"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["deleted_at"], name: "index_invoices_on_deleted_at"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
@@ -3226,6 +3231,7 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.index ["invoice_status_id"], name: "index_invoices_on_invoice_status_id"
     t.index ["invoice_type_id"], name: "index_invoices_on_invoice_type_id"
     t.index ["payment_term_id"], name: "index_invoices_on_payment_term_id"
+    t.index ["po_number"], name: "index_invoices_on_po_number"
     t.index ["proforma_invoice_id"], name: "index_invoices_on_proforma_invoice_id"
     t.index ["tax_type_id"], name: "index_invoices_on_tax_type_id"
     t.index ["transaction_service_period_from"], name: "index_invoices_on_transaction_service_period_from"
@@ -4626,8 +4632,8 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.boolean "is_deleted", default: false, null: false
     t.integer "cost_center_id"
     t.integer "sub_department_id"
-    t.text "billing_address"
-    t.text "shipping_address"
+    t.text "billing_address", limit: 16777215, collation: "utf8_bin"
+    t.text "shipping_address", limit: 16777215, collation: "utf8_bin"
     t.boolean "is_template", default: false
     t.string "template_name"
     t.integer "resource_template_id"

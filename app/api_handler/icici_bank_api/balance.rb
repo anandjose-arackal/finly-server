@@ -1,6 +1,6 @@
 class IciciBankApi::Balance < IciciBankApi::Base
 
-  attr_accessor :balance
+  attr_accessor :balance, :params
 
   class IciciBankApi::Balance::BalanceSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -22,6 +22,7 @@ class IciciBankApi::Balance < IciciBankApi::Base
 
   def initialize(company)
     self.company = company
+    self.params = {}
   end
 
   def self.call(company)
