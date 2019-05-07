@@ -4,15 +4,15 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
 
   def init
     self.company = user.company
+    self.content = params[:content] || []
   end
 
   def process
     self.headers = default_headers
-    self.content = []
     self.sheets = [
         {
             item_headers: self.headers,
-            item_contents: []
+            item_contents: self.content
         }
     ]
     # adding Item to excel sheet
@@ -66,41 +66,49 @@ class Procurements::PurchaseOrders::GenerateImportSample < Procurements::Purchas
       name: "Categories"
     }
 
+    # Tax Rates List
+    tax_rates_header = ["ID", "Tax Rate Name", "Tax %", "Internal ID"]
+    tax_rates_content = []
+
+    user.company.tax_rates.non_deleted.each do |tax_rate|
+      tax_rates_content << [tax_rate.id, tax_rate.name, tax_rate.rate, tax_rate.internal_id]
+    end
+
+    self.sheets << {
+      item_headers: tax_rates_header,
+      item_contents: tax_rates_content,
+      name: "Tax Rates"
+    }
+
   end
 
   def success
-    # params[:result_file_path] = temp_file.file.url
-    # Procurements::PurchaseOrders::GenerateImportSample::GeneratePresenter.new(user, params, messages)
     Exporter.new(user, {xlsx: {headers: self.headers, contents: self.content, sheets: self.sheets}, expire_file_duration: 1.day}, messages)
   end
-
-  # class Procurements::PurchaseOrders::GenerateImportSample::GeneratePresenter < BaseOperation::BasePresenter::SuccessPresenter
-  #   attr_accessor :result_file_path
-
-  #   def init
-  #     self.result_file_path = params[:result_file_path]
-  #   end
-  # end
 
   private
 
   def default_headers
-    [
-     "Description",
-     "Item number",
-     "Department ID",
-     "Cost Center ID",
-     "Comment",
-     "Item code",
-     "Category ID",
-     "HSN/SAC",
-     "Quantity",
-     "Unit of measurement",
-     "Rate",
-     "Discount",
-     "Tax",
-     "Total"
+    headers = [
+      "Description",
+      "Item number",
+      "Department ID",
+      "Cost Center ID",
+      "Comment",
+      "Item code",
+      "Category ID",
+      "HSN/SAC",
+      "Quantity",
+      "Unit of measurement",
+      "Rate",
+      "Discount",
+      "Tax Rate ID",
+      "Total"
     ]
+    if self.content.present?
+      headers.push "System Messages"
+    end
+    headers
   end
 
 end

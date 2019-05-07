@@ -4,6 +4,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
 
   def init
     self.company = user.company
+    self.content = params[:content] || []
   end
 
   def validate
@@ -11,11 +12,10 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
 
   def process
     self.headers = default_headers
-    self.content = []
     self.sheets = [
         {
             item_headers: self.headers,
-            item_contents: []
+            item_contents: self.content
         }
     ]
     # adding Item to excel sheet
@@ -32,7 +32,7 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
           list << rc[:vendor_id]
           list << rc[:vendor_name]
         end
-        Rails.logger.fatal "FROM GenerateImportSample RC item_contents,\n #{list.inspect}"
+        # Rails.logger.fatal "FROM GenerateImportSample RC item_contents,\n #{list.inspect}"
       end
       item_contents << list
     end
@@ -63,34 +63,6 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
       name: 'Delivery Location'
     }
 
-    # # adding departments to the excel sheet
-    # department_headers = ["ID", "Department Name"]
-    # department_contents = []
-    # departments = Company::Departments::Index.(user, params)
-    # # current_company.departments.each do |department|
-    # if departments.policy_department_filter_mapping.present?
-    #   departments.policy_department_filter_mapping.each do |department|
-    #     department_contents << [department.id, department.name]
-    #   end
-    # end
-    # self.sheets << {
-    #     item_headers: department_headers,
-    #     item_contents: department_contents,
-    #     name: "Departments"
-    # }
-
-    # # adding Cost Centers to the excel sheet
-    # cost_center_headers = ["ID", "Cost Center Name"]
-    # cost_center_contents = []
-    # current_company.cost_centers.vendor_payments_only.each do |cost_center|
-    #   cost_center_contents << [cost_center.id, cost_center.name]
-    # end
-    # self.sheets << {
-    #     item_headers: cost_center_headers,
-    #     item_contents: cost_center_contents,
-    #     name: "Cost Centers"
-    # }
-
     category_headers = ["ID", "Category Name"]
     category_contents = []
     current_company.categories&.inward_invoice_items_only.each do |category|
@@ -105,26 +77,30 @@ class Procurements::PurchaseRequests::GenerateImportSample < Procurements::Purch
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    self.response = Exporter.new(user, {xlsx: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
   end
 
   private
 
   def default_headers
-    [
-     "Item Description",
-     "Item Number",
-     "Item Code",
-     "Category ID",
-     "Preferred Vendor ID",
-     "Required By Date",
-     "Delivery Location ID",
-     "Purpose",
-     "Quantity",
-     "Unit of measurement",
-     "Estimated Unit Price",
-     "Estimated Total"
+    headers = [
+      "Item Description",
+      "Item Number",
+      "Item Code",
+      "Category ID",
+      "Preferred Vendor ID",
+      "Required By Date",
+      "Delivery Location ID",
+      "Purpose",
+      "Quantity",
+      "Unit of measurement",
+      "Estimated Unit Price",
+      "Estimated Total"
     ]
+    if self.content.present?
+      headers.push "System Messages"
+    end
+    headers
   end
 
 end
