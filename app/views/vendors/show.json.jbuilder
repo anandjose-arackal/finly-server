@@ -40,6 +40,7 @@ json.bank_accounts do
     json.confirm_account_number bank_account.account_number
     json.ifsc bank_account.ifsc
     json.id bank_account.id
+    json.card_id bank_account.id
     json.name bank_account.name
     json.default bank_account.default_account
   end
