@@ -3,7 +3,7 @@ json.locations do
     json.merge! location.as_json(tree: true)
     # json.id location.id
     # json.name location.name
-  end
+  end unless @result.locations.blank?
 end
 
 json.departments do
