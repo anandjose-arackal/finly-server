@@ -1,6 +1,6 @@
 class YesBankBalanceProvider
   include Sidekiq::Worker
-  sidekiq_options queue: :payments_critical_queue
+  sidekiq_options queue: :yes_bank_balance_queue
 
   # LOGGER = Logger.new(STDOUT)
 
@@ -9,12 +9,6 @@ class YesBankBalanceProvider
     begin
       company = Company.find_by_id(company_id)
       if company.blank?
-        # Respond failure
-        Resque.enqueue(queue, {success: false, message: 'Company not found'})
-        return
-      end
-      user = company.users.first
-      if user.blank?
         # Respond failure
         Resque.enqueue(queue, {success: false, message: 'Company not found'})
         return
