@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_02_102440) do
+ActiveRecord::Schema.define(version: 2019_05_05_080752) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -1447,6 +1447,7 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.boolean "inward_invoice_line_items"
     t.string "ancestry"
     t.boolean "outward_invoice_line_items"
+    t.string "category_code"
     t.index ["ancestry"], name: "index_categories_on_ancestry"
     t.index ["company_id"], name: "index_categories_on_company_id"
   end
@@ -1829,6 +1830,7 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.datetime "updated_at", null: false
     t.boolean "is_deleted"
     t.datetime "deleted_at"
+    t.string "cost_center_code"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
   end
@@ -2161,6 +2163,8 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.string "ancestry"
     t.integer "cost_center_id"
     t.datetime "deleted_at"
+    t.string "department_code"
+    t.string "code"
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["cost_center_id"], name: "index_departments_on_cost_center_id"
     t.index ["deleted_at"], name: "index_departments_on_deleted_at"
@@ -4519,8 +4523,8 @@ ActiveRecord::Schema.define(version: 2019_05_02_102440) do
     t.boolean "is_deleted", default: false, null: false
     t.integer "cost_center_id"
     t.integer "sub_department_id"
-    t.text "billing_address"
-    t.text "shipping_address"
+    t.text "billing_address", limit: 16777215, collation: "utf8_bin"
+    t.text "shipping_address", limit: 16777215, collation: "utf8_bin"
     t.boolean "is_template", default: false
     t.string "template_name"
     t.integer "resource_template_id"
