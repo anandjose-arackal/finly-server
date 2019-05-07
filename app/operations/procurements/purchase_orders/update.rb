@@ -260,13 +260,13 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
       # Create track
 
-      if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
-        document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
-
-        if document_number_op.success?
-          self.purchase_order.update(po_number: document_number_op.document_number)
-        end
-      end
+      # if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
+      #   document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
+      #
+      #   if document_number_op.success?
+      #     self.purchase_order.update(po_number: document_number_op.document_number)
+      #   end
+      # end
 
       # AS OF NOW MULTIPLE ADVANCE PAYMENT CREATION CANCELLED
       # TO BE TAKEN UP LATER

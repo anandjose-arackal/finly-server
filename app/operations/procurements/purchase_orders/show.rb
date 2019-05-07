@@ -11,12 +11,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   def process
-    if self.purchase_order.po_number.blank?
-      op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
-      if op.success?
-        self.purchase_order.po_number = op.document_number
-      end
-    end
+    # if self.purchase_order.po_number.blank?
+    #   op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
+    #   if op.success?
+    #     self.purchase_order.po_number = op.document_number
+    #   end
+    # end
   end
 
   def success
