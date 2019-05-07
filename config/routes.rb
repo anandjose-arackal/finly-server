@@ -2345,6 +2345,8 @@
 
 Rails.application.routes.draw do
 
+  get 'unique_identifiers/index'
+  get 'unique_identifiers/set'
   get 'qukickbooks_configurations/create'
   get 'qukickbooks_configurations/update'
   get 'qukickbooks_configurations/show'
@@ -3406,6 +3408,9 @@ Rails.application.routes.draw do
   get 'invoice/:invoice_id', to: 'invoicing/public_links#invoice_show', as: :public_invoice
 
   resources :addresses
+  resources :unique_identifiers, only: [:index, :update]
+  # get 'unique_identifiers', to: 'unique_identifiers#index'
+  # patch 'unique_identifiers', to: 'unique_identifiers#update'
 
   namespace :invoicing do
     resources :payment_receivables
