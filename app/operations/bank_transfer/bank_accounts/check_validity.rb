@@ -3,16 +3,15 @@
 class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Base
 
   attr_accessor :account_number, :bank_transaction, :company, :transfer_request,
-                :ifsc
+                :ifsc, :bank_transaction_id, :bank_transaction, :full_name, :error_message,
+                :name, :bank_account_master
 
   class BankTransfer::BankAccounts::CheckValidity::AccountNumberCheckPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :full_name, :account_number, :ifsc
+    attr_accessor :full_name, :bank_account_master
 
     def init
-      self.full_name = params[:full_name]
-      self.account_number = params[:account_number]
-      self.ifsc = params[:ifsc]
+      self.bank_account_master = params[:bank_account_master]
     end
 
   end
@@ -22,6 +21,7 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
   def init
     self.account_number = params[:account_number]
     self.ifsc = params[:ifsc]
+    self.name = params[:name]
     self.company = user.company
     # this will also create the bank transaction and TransferRequest non-persistent model
     # that is required for creating actually making the request with YesBank's servers
@@ -49,28 +49,67 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
       add_message :error, "IFSC cannot be empty"
       return
     end
+
+    if bank_transaction.blank?
+      add_message :error, "Invalid request, try again later"
+      return
+    end
+
+    if self.company.blank?
+      add_message :error, "Company cannot be blank"
+      return
+    end
   end
 
   def process
-    op = YesBankApi::Transfer::BankTransfer.({
-        transfer_request: self.transfer_request,
-        bank_transaction: self.bank_transaction
-    })
-    # now's the interesting bit. Based on the data sent by the API we have to handle the different cases
-    if op.success?
-      if bank_transaction.completed?
-        self.full_name = self.bank_transaction.beneficiary_full_name
+    # first check if this bad boy is there in the Bank Account Master first, and then make
+    # a call to the API to verify if this account is legit
+    self.bank_account_master = BankAccountMaster.find_by(account_number: self.account_number, ifsc: self.ifsc)
+    if self.bank_account_master.blank?
+      handle = self.object_id
+      params = {
+          account_number: self.account_number,
+          ifsc: self.ifsc,
+          company_id: self.company.id,
+          bank_transaction_id: self.bank_transaction.id
+      }
+      YesBankTransferProvider.perform_async(handle, params)
+      timeout = 30
+      now = Time.now
+      while (Time.now - now) < timeout
+        result = Resque.reserve(handle)
+        next if result.blank?
+
+        puts result.args.first
+
+        args = result.args.first
+        self.bank_transaction_id = args["bank_transaction_id"]
+        self.full_name = args["full_name"]
+        self.error_message = args["messages"]
+
+        break
+      end
+
+      # now checking if the retrieving of the name was a success
+      if self.full_name.present?
+        # create the bank account master object with the account details and then
+        # return the same
+        self.bank_account_master = BankAccountMaster.create(
+            account_number: self.account_number,
+            ifsc: self.ifsc,
+            account_name: self.full_name
+        )
       else
-        add_message :error, "Could not reach beneficiary bank servers. Please try again later"
+        add_message :error, error_message
+        return
       end
     else
-      error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error) || "Could not reach beneficiary bank servers. Please try again later"
-      add_message :error, error_message
+      self.full_name = self.bank_account_master.account_name
     end
   end
 
   def success
-    params[:full_name] = self.full_name
+    params[:bank_account_master] = self.bank_account_master
     BankTransfer::BankAccounts::CheckValidity::AccountNumberCheckPresenter.new(user, params, messages)
   end
 
