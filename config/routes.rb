@@ -2813,6 +2813,8 @@ Rails.application.routes.draw do
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/departments' => 'organization_account#departments'
   get 'organization_account/all_expense_types' => 'organization_account#all_expense_types'
+  get 'organization_account/configuration_index' => 'organization_account#configuration_index'
+  put 'organization_account/configuration_update' => 'organization_account#configuration_update'
 
 
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
