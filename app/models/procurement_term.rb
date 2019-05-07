@@ -21,4 +21,13 @@ class ProcurementTerm < ApplicationRecord
   validates :description, presence: true
 
   scope :with_default, -> {where(default: true)}
+
+  def as_json
+    {
+      id: id,
+      name: name,
+      description: description,
+      default: default
+    }
+  end
 end
