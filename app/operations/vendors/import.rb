@@ -34,6 +34,17 @@ class Vendors::Import < Vendors::Base
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       self.vendor_params = process_row(row)
+      p vendor_params
+      if vendor_params["vendor"]["vendor_type_id"].present?
+        vendor_type = company.vendor_types.find_by name: vendor_params["vendor"]["vendor_type_id"]
+        if vendor_type.present?
+          vendor_params["vendor"]["vendor_type_id"] = vendor_type.id
+        else
+          result_hash[i] = "Vendor Type not Exist"
+          next
+        end
+      end
+
       vendor = company.yes_bank_vendors.new(vendor_params["vendor"])
       if vendor.save
          result_hash[i] = "Success!"
@@ -70,7 +81,7 @@ class Vendors::Import < Vendors::Base
     business_name = row[import_fields[:business_name]].to_s
     pan = row[import_fields[:pan]].to_s
     state_code_id = nil
-    state_code_id = State.where("name LIKE ?", "%"+row[import_fields[:state]].to_s+"%").first&.id if !row[import_fields[:business_name]].to_s.blank?
+    state_code_id = State.where("name LIKE ?", "%"+row[import_fields[:state]].to_s+"%").first&.id if !row[import_fields[:state]].to_s.blank?
     description = row[import_fields[:description]].to_s
     address = row[import_fields[:address]].to_s
     created_by_id = self.company.users.only_admins&.first&.id
@@ -78,6 +89,17 @@ class Vendors::Import < Vendors::Base
     ifsc = row[import_fields[:ifsc]].to_s
     gstin = row[import_fields[:gstin]].to_s
     location = row[import_fields[:location]].to_s
+    code = row[import_fields[:vendor_id]].to_s
+    vendor_id = (code.blank? ? nil : code)
+    vendor_type_id = row[import_fields[:vendor_type]].to_s
+    state_code_id = nil
+    state_code_id = State.where("name LIKE ?", "%"+row[import_fields[:state]].to_s+"%").first&.id if !row[import_fields[:business_name]].to_s.blank?
+
+    gstin_state_id = nil
+    if gstin.present?
+     gstin_state_id = GstStateCode.where(state_code: gstin[0..1])&.first&.id
+    end
+
 
     params =  {"vendor"=>{"name"=> row[import_fields[:name]].to_s,
                           "authorized"=>"1",
@@ -92,6 +114,8 @@ class Vendors::Import < Vendors::Base
                           "address"=> address,
                           "status_id"=> 6,
                           "created_by_id"=> created_by_id,
+                          "vendor_id" => vendor_id,
+                          "vendor_type_id" => vendor_type_id
                           }}
 
     bank_params={"bank_accounts_attributes" =>[{"name"=>"#{business_name}'s Account",
@@ -100,7 +124,7 @@ class Vendors::Import < Vendors::Base
                                    "default_account"=>"1"}]}
     gstin_locations={"gstin_locations_attributes" => [{"location" =>location,
                                              "gstin"=>gstin,
-                                             "state_id"=> state_code_id}]}
+                                             "state_id"=> gstin_state_id}]}
 
     if account_number.present?
        params["vendor"]["bank_accounts_attributes"] = bank_params["bank_accounts_attributes"]
@@ -115,17 +139,19 @@ class Vendors::Import < Vendors::Base
   def import_fields
     {
        :name => 0,
-       :mobile_number => 1,
-       :email => 2,
+       :vendor_type => 1,
+       :vendor_id => 2,
        :business_name => 3,
-       :pan => 4,
-       :state => 5,
-       :description => 6,
-       :address => 7,
-       :gstin => 8,
-       :location => 9,
-       :account_number => 10,
-       :ifsc => 11
+       :mobile_number => 4,
+       :email => 5,
+       :pan => 6,
+       :state => 7,
+       :description => 8,
+       :address => 9,
+       :gstin => 10,
+       :location => 11,
+       :account_number => 12,
+       :ifsc => 13
     }
   end
 
@@ -140,6 +166,7 @@ class Vendors::Import < Vendors::Base
 
   def create_response_csv
     file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    FileUtils.mkdir_p "public/common/files/temp_files" unless  Dir.exist?("public/common/files/temp_files")
     CSV.open(file_name, 'wb') do |csv|
       self.header << 'Result'
       csv << header

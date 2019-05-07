@@ -2,7 +2,7 @@
 #
 # Table name: gstins
 #
-#  id                       :bigint(8)        not null, primary key
+#  id                       :bigint           not null, primary key
 #  gstin                    :string(255)
 #  legal_name_of_business   :string(255)
 #  state                    :string(255)

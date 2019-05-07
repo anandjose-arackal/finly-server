@@ -2,7 +2,7 @@
 #
 # Table name: purchase_requests
 #
-#  id                         :bigint(8)        not null, primary key
+#  id                         :bigint           not null, primary key
 #  description                :text(65535)
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
@@ -25,7 +25,7 @@ class PurchaseRequest < ApplicationRecord
   include Transitionable
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR-'
+  acts_as_sequenced column: :order_number, purpose: :purchase_request, editable: false, prefix: 'PR'
 
   # belongs_to :purchase_request_status, optional: true
   belongs_to :status, optional: true, class_name: 'PurchaseRequestStatus', foreign_key: :purchase_request_status_id
@@ -47,7 +47,7 @@ class PurchaseRequest < ApplicationRecord
 
   delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
 
-  before_save :add_company
+  before_validation :add_company
 
   accepts_nested_attributes_for :purchase_request_items, :attachments, allow_destroy: true
 

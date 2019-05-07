@@ -63,23 +63,41 @@ class AdminUsers::CompaniesController < ApplicationController
     @company_types = CompanyType.all
   end
 
+  def import_lrm
+    import_op = Policy::ApprovalWorkflows::Configs::ImportLevels.new(current_user, params)
+    @result = import_op.run
+    @response = {
+      success: true,
+      file_url: @result.file_url,
+      messages: @result.messages
+    }
+    respond_to do |format|
+     format.json {
+       render json: @response.as_json
+     }
+    end
+  end
+
   def import_data_configuration
     if params[:'data-target'].present?
       case params[:'data-target']
       when 'locations'
-          @result = Company::Locations::Import.(current_user, params)
+        @result = Company::Locations::Import.(current_user, params)
       when 'departments'
-          @result = Company::Departments::Import.(current_user,params)
+        @result = Company::Departments::Import.(current_user,params)
       when 'categories'
-          @result = Categories::Import.(current_user,params)
+        @result = Categories::Import.(current_user,params)
       when 'cost-centers'
-          @result = CostCenters::Import.(current_user,params)
+        @result = CostCenters::Import.(current_user,params)
       when 'tds-slab'
-          @result = TdsSlabs::Import.(current_user,params)
+        @result = TdsSlabs::Import.(current_user,params)
       when 'vendors'
-          @result = Vendors::Import.(current_user,params)
+        @result = Vendors::Import.(current_user,params)
       when 'item-master'
-          @result =  ItemMaster::Item::Import.(current_user, params)
+        @result =  ItemMaster::Item::Import.(current_user, params)
+      when 'lrms'
+        @result =  Policy::ApprovalWorkflows::Configs::ImportLevels.(current_user, params)
+      when 'lurms'
       end
     end
 
@@ -106,6 +124,5 @@ class AdminUsers::CompaniesController < ApplicationController
   end
 
   private
-
 
 end

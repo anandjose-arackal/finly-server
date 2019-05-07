@@ -54,9 +54,10 @@ gem 'rubyzip', '~> 1.2.2'
 # gem to import from excel
 gem 'roo', '~> 2.7.1'
 gem 'roo-xls', '~> 1.2.0'
+gem 'write_xlsx', '~> 0.85.6'
 
 # Gem to show db schema in model file
-gem 'annotate', '~> 2.7.4'
+gem 'annotate', '~> 2.7.5'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.2.2'
@@ -128,7 +129,6 @@ gem 'bootbox-rails', '0.5.0'
 # gem 'bootbox-rails'
 
 gem 'sidekiq', '~> 5.2.3'
-gem 'scout_apm', '~> 2.4'
 
 gem 'paranoia', '~> 2.4'
 
@@ -233,6 +233,7 @@ group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring', '~> 2.0.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem "lol_dba"
 end
 
 # gem 'backup'
@@ -254,4 +255,6 @@ end
 
 group :production do
   gem 'elastic-apm', '~> 2.1.2'
+  gem "skylight", '~> 3.1'
+  gem 'scout_apm', '~> 2.4'
 end

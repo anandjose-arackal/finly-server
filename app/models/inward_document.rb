@@ -22,11 +22,10 @@
 #
 
 class InwardDocument < ApplicationRecord
-  include SoftDeletable,
-          Transitionable
+  include SoftDeletable, Transitionable
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :grn_number, purpose: :grn, editable: false, prefix: 'GRN-'
+  acts_as_sequenced column: :grn_number, purpose: :grn, editable: false, prefix: 'GRN'
 
   belongs_to :procurement, optional: true
   belongs_to :user, optional: true
@@ -70,7 +69,6 @@ class InwardDocument < ApplicationRecord
         document_type: self.class.name,
         delivery_date: self.delivery_date&.strftime("%d-%m-%Y"),
         received_date: self.updated_at&.strftime("%d-%m-%Y")
-
     }
   end
 

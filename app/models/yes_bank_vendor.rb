@@ -28,6 +28,7 @@
 #  vendor_id                :string(255)
 #  disabled                 :boolean          default(FALSE)
 #  deleted_at               :datetime
+#  vedor_code               :string(255)
 #  msme_registered          :boolean          default(FALSE)
 #  msme_registration_number :string(255)
 #  status_id                :integer
@@ -35,7 +36,6 @@
 #  controlling_level_id     :integer
 #  submitted_at             :datetime
 #  approved_at              :datetime
-#  vedor_code               :string(255)
 #
 
 class YesBankVendor < ApplicationRecord

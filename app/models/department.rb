@@ -2,19 +2,23 @@
 #
 # Table name: departments
 #
-#  id             :integer          not null, primary key
-#  name           :string(255)
-#  company_id     :integer
-#  created_at     :datetime         not null
-#  updated_at     :datetime         not null
-#  is_deleted     :boolean          default(FALSE), not null
-#  ancestry       :string(255)
-#  cost_center_id :integer
-#  deleted_at     :datetime
+#  id              :integer          not null, primary key
+#  name            :string(255)
+#  company_id      :integer
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  is_deleted      :boolean          default(FALSE), not null
+#  ancestry        :string(255)
+#  cost_center_id  :integer
+#  deleted_at      :datetime
+#  department_code :string(255)
 #
 
 class Department < ApplicationRecord
   include SoftDeletable, AncestrySupport
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :department_code, purpose: :department, editable: false, prefix: 'DPT'
 
   has_ancestry
 
@@ -53,7 +57,7 @@ class Department < ApplicationRecord
   def as_json(options={})
     args = {id: self.id}
     args[:name] = options&.dig(:tree) ? full_dept_name : name
-    args[:cost_center] = self.cost_center
+    # args[:cost_center] = self.cost_center
     # if options&.dig(:tree)
     #   args[:name] = full_dept_name
     #   args[:cost_center] = self.cost_center

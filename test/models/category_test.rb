@@ -17,6 +17,7 @@
 #  inward_invoice_line_items  :boolean
 #  ancestry                   :string(255)
 #  outward_invoice_line_items :boolean
+#  category_code              :string(255)
 #
 
 

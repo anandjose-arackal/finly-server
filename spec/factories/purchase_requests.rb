@@ -2,7 +2,7 @@
 #
 # Table name: purchase_requests
 #
-#  id                         :bigint(8)        not null, primary key
+#  id                         :bigint           not null, primary key
 #  description                :text(65535)
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null

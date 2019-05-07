@@ -42,8 +42,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def validate
     return if record_not_present
-    if purchase_order.sent_to_vendor?
-      add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+    if purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?
+      # add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+      add_message :error, "Cant update purchase order marked as '#{purchase_order.status.name.humanize.downcase}'"
       return
     end
 
@@ -60,6 +61,11 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       if self.purchase_order.policy.blank?
         add_message :error, 'Policy not found.'
       end
+    end
+
+    if self.purchase_order_params[:delivery_date].blank?
+      add_message :error, "Please add an expected delivery date for the Purchase Order, i.e., when do you expect all added items to be delivered."
+      return
     end
 
     if self.purchase_order.quotations.present?
