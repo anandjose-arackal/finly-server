@@ -42,14 +42,29 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  cost_center_id               :integer
 #  sub_department_id            :integer
-#  billing_address              :text(65535)
-#  shipping_address             :text(65535)
+#  billing_address              :text(16777215)
+#  shipping_address             :text(16777215)
 #  is_template                  :boolean          default(FALSE)
 #  template_name                :string(255)
 #  resource_template_id         :integer
 #  deleted_at                   :datetime
 #  submitted_at                 :datetime
 #  approved_at                  :datetime
+#  advance_amount_id            :integer
+#  due_date                     :date
+#  advance_amount_status_id     :integer
+#  bank_account_id              :integer
+#  revised_po_id                :integer
+#  revision_of_id               :integer
+#  revision_number              :integer          default(0)
+#  note                         :text(65535)
+#  advance_tds_slab_id          :integer
+#  advance_tds_amount_id        :integer
+#  advance_amount_required      :boolean          default(FALSE)
+#  requested_advance_amount_id  :integer
+#  gstin_location_id            :bigint
+#  cost_allocation_items        :boolean          default(FALSE)
+#  internal_note                :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -113,7 +128,7 @@ class PurchaseOrder < ApplicationRecord
 
   belongs_to :bank_account, optional: true
 
-  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, :voided?, to: :status
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :vendor_confirmed?, :closed?, :voided?, to: :status
 
   accepts_nested_attributes_for :items, :purchase_request_items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount, :advance_amount, :requested_advance_amount
@@ -173,6 +188,7 @@ class PurchaseOrder < ApplicationRecord
         PurchaseOrderStatus.id_for(:approved),
         PurchaseOrderStatus.id_for(:auto_approved),
         PurchaseOrderStatus.id_for(:sent_to_vendor),
+        PurchaseOrderStatus.id_for(:vendor_confirmed),
         PurchaseOrderStatus.id_for(:closed)
     ]
     where purchase_order_status_id: PurchaseOrderStatus.id_for(status_ids)
@@ -306,6 +322,8 @@ class PurchaseOrder < ApplicationRecord
     to = Date.parse(to) unless to.is_a?(Date)
     where('created_at >= ? && created_at <= ?', from, to)
   }
+
+  scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
 
   # before_save :calculate_line_items
   after_create :purchase_request_tasks
@@ -723,11 +741,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def self.finance_associated_status_ids
-    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :closed, :voided)
+    PurchaseOrderStatus.ids_for(:approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided)
   end
 
   def self.auditor_associated_status_ids
-    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised)
+    self.status_ids(:retracted, :rejected, :processing, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided, :po_revised)
   end
 
   def self.roles
@@ -756,11 +774,11 @@ class PurchaseOrder < ApplicationRecord
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
       user.policy_user_roles.pluck(:user_role_id).uniq.each do |role_id|
         if (UserRole.id_for(:purchase_order_initiator) == role_id.to_i)
-          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed]
+          statuses += [:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed]
         elsif (UserRole.id_for(:purchase_order_reviewer) == role_id.to_i)
-          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :closed, :voided]
+          statuses += [:processing, :approved, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
         elsif UserRole.id_for(:admin) == role_id.to_i
-          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided]
+          statuses += [:processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :vendor_confirmed, :closed, :voided]
         end
       end
     end

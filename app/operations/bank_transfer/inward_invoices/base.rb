@@ -27,7 +27,7 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                     :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount, :location_id,
                                     :delivery_location_id, :transaction_service_period_from, :transaction_service_period_to,
                                     :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id,
-                                    :vendor_id, :advance_amount_required, :narration,
+                                    :vendor_id, :advance_amount_required, :po_number, :narration,
                                     original_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],

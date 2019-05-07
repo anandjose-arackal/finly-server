@@ -46,9 +46,6 @@
 #                                         user_invitation PATCH  /users/invitation(.:format)                                                                                         devise/invitations#update
 #                                                         PUT    /users/invitation(.:format)                                                                                         devise/invitations#update
 #                                                         POST   /users/invitation(.:format)                                                                                         devise/invitations#create
-#                                   user_password_expired GET    /users/password_expired(.:format)                                                                                   devise/password_expired#show
-#                                                         PATCH  /users/password_expired(.:format)                                                                                   devise/password_expired#update
-#                                                         PUT    /users/password_expired(.:format)                                                                                   devise/password_expired#update
 #                              native_oauth_authorization GET    /oauth/authorize/native(.:format)                                                                                   doorkeeper/authorizations#show
 #                                     oauth_authorization GET    /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#new
 #                                                         DELETE /oauth/authorize(.:format)                                                                                          doorkeeper/authorizations#destroy
@@ -553,7 +550,6 @@
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                                           api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                                                junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                                                users#menu_data
-#                                          nav_bar_config GET    /nav_bar/config(.:format)                                                                                           nav_bar#show
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                                                        admin_users/oauth/token#create {:format=>"json"}
 #                                admin_oauth_bypass_token POST   /admin/oauth/bypass_token(.:format)                                                                                 admin_users/oauth/bypass_token#create {:format=>"json"}
 #                                    preview_registration POST   /welcome/preview(.:format)                                                                                          registrations#preview
@@ -566,7 +562,6 @@
 #                                 policies_policy_members GET    /policies/policy_members(.:format)                                                                                  policies#policy_members
 #                                    policies_create_rule GET    /policies/create_rule(.:format)                                                                                     policies#create_rule
 #                         policies_policy_member_settings GET    /policies/policy_member_settings(.:format)                                                                          policies#policy_member_settings
-#                                       policies_index_vp GET    /policies/index_vp(.:format)                                                                                        policies#index_vp
 #                                        policies_details GET    /policies/details(.:format)                                                                                         policies#details
 #                                       policies_personal GET    /policies/personal(.:format)                                                                                        policies#show_personal
 #                                                policies GET    /policies(.:format)                                                                                                 policies#index
@@ -593,8 +588,6 @@
 #                                                         PATCH  /policies/:policy_id/policy_user_roles/:id(.:format)                                                                policy_user_roles#update
 #                                                         PUT    /policies/:policy_id/policy_user_roles/:id(.:format)                                                                policy_user_roles#update
 #                                                         DELETE /policies/:policy_id/policy_user_roles/:id(.:format)                                                                policy_user_roles#destroy
-#                               policy_department_mapping GET    /policies/:policy_id/department_mapping(.:format)                                                                   policies#department_mapping
-#                                 policy_location_mapping GET    /policies/:policy_id/location_mapping(.:format)                                                                     policies#location_mapping
 #                                                         GET    /policies(.:format)                                                                                                 policies#index
 #                                                         POST   /policies(.:format)                                                                                                 policies#create
 #                                              new_policy GET    /policies/new(.:format)                                                                                             policies#new
@@ -681,6 +674,7 @@
 #                                     delete_export_field DELETE /remove_export_field(.:format)                                                                                      organization_account#remove_export_column
 #                                                  people GET    /people(.:format)                                                                                                   people#people
 #                                           verify_mobile GET    /users/verify(.:format)                                                                                             otp#edit
+#                                    update_mobile_number POST   /otp/update(.:format)                                                                                               otp#update
 #                                              verify_otp POST   /otp/verify(.:format)                                                                                               otp#verify
 #                                              resend_otp POST   /otp/resend(.:format)                                                                                               otp#resend
 #                                            card_details POST   /cards/details(.:format)                                                                                            cards#details
@@ -805,7 +799,6 @@
 #                                                         PATCH  /expenses/:id(.:format)                                                                                             expenses#update
 #                                                         PUT    /expenses/:id(.:format)                                                                                             expenses#update
 #                                                         DELETE /expenses/:id(.:format)                                                                                             expenses#destroy
-#                                        configs_loc_dept GET    /configs/loc_dept(.:format)                                                                                         configurations#loc_dept
 #                                     expenses_unreported POST   /expenses/unreported(.:format)                                                                                      expenses#unreported
 #                                         receipts_export GET    /receipts/export(.:format)                                                                                          receipts#export
 #                                        receipt_add_note POST   /receipts/:receipt_id/add_note(.:format)                                                                            receipts#add_note
@@ -1182,7 +1175,6 @@
 #                                    non_po_action_config GET    /non_po_action_config(.:format)                                                                                     procure/purchase_orders#actions_configuration
 #                               procurement_action_config GET    /procurement_action_config(.:format)                                                                                procure/procurements#actions_configuration
 #                                   vp_user_action_config GET    /vp_user_action_config(.:format)                                                                                    bank_transfer/users#actions_configuration
-#                                 policy_user_role_config GET    /policy_user_role_config(.:format)                                                                                  policy_user_roles#vp_role_config
 #                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                                                       bank_transfer/payment_orders#count
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                                                     bank_transfer/payment_orders#balance
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                                                             bank_transfer/payment_orders#index
@@ -1219,7 +1211,6 @@
 #                      bank_transfer_bulk_credit_validate PATCH  /bank_transfer/bulk_credit_validate(.:format)                                                                       bank_transfer/bank_payment_requests#bulk_credit_validate
 #                               bank_transfer_bulk_credit PATCH  /bank_transfer/bulk_credit(.:format)                                                                                bank_transfer/bank_payment_requests#bulk_credit
 #                        bank_transfer_sample_import_file GET    /bank_transfer/sample_import_format(.:format)                                                                       bank_transfer/bank_payment_requests#sample_import_file
-#                              bank_transfer_generate_otp POST   /bank_transfer/generate_otp(.:format)                                                                               bank_transfer/bank_payment_requests#generate_otp
 #          bank_transfer_bank_payment_request_edit_config GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/edit_config(.:format)                                 bank_transfer/bank_payment_requests#edit_config
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)                                     bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)                                      bank_transfer/bank_payment_requests#review
@@ -1508,7 +1499,6 @@
 #                                                 procure GET    /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_show
 #                                                         PATCH  /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_update
 #                                                         DELETE /procure/purchase_orders/templates/:id(.:format)                                                                    procure/purchase_orders#template_destroy
-#                                                         DELETE /procure/purchase_orders/:id/delete(.:format)                                                                       procure/purchase_orders#destroy
 #                        procure_purchase_order_send_mail POST   /procure/purchase_orders/:purchase_order_id/send_mail(.:format)                                                     procure/purchase_orders#send_mail
 #                           procure_purchase_order_submit PUT    /procure/purchase_orders/:purchase_order_id/submit(.:format)                                                        procure/purchase_orders#submit
 #                          procure_purchase_order_retract PUT    /procure/purchase_orders/:purchase_order_id/retract(.:format)                                                       procure/purchase_orders#retract
@@ -1567,12 +1557,10 @@
 #                           procure_inward_invoice_submit PUT    /procure/inward_invoices/:inward_invoice_id/submit(.:format)                                                        procure/inward_invoices#submit
 #                          procure_inward_invoice_retract PUT    /procure/inward_invoices/:inward_invoice_id/retract(.:format)                                                       procure/inward_invoices#retract
 #                          procure_inward_invoice_approve PUT    /procure/inward_invoices/:inward_invoice_id/approve(.:format)                                                       procure/inward_invoices#approve
-#                        procure_inward_invoice_unapprove PUT    /procure/inward_invoices/:inward_invoice_id/unapprove(.:format)                                                     procure/inward_invoices#unapprove
 #                           procure_inward_invoice_reject PUT    /procure/inward_invoices/:inward_invoice_id/reject(.:format)                                                        procure/inward_invoices#reject
 #                            procure_inward_invoice_close PUT    /procure/inward_invoices/:inward_invoice_id/close(.:format)                                                         procure/inward_invoices#close
 #                 procure_inward_invoice_save_as_template POST   /procure/inward_invoices/:inward_invoice_id/save_as_template(.:format)                                              procure/inward_invoices#template_create
 #                   procure_inward_invoice_apply_template POST   /procure/inward_invoices/:inward_invoice_id/apply_template(.:format)                                                procure/inward_invoices#template_apply
-#                           procure_inward_invoice_delete DELETE /procure/inward_invoices/:inward_invoice_id/delete(.:format)                                                        procure/inward_invoices#destroy
 #                                 procure_inward_invoices GET    /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#index
 #                                                         POST   /procure/inward_invoices(.:format)                                                                                  procure/inward_invoices#create
 #                              new_procure_inward_invoice GET    /procure/inward_invoices/new(.:format)                                                                              procure/inward_invoices#new
@@ -2914,6 +2902,7 @@ Rails.application.routes.draw do
   get 'pending_invites/initiate_activation', to: 'pending_invites#initiate_activation', as: :initiate_activation
   get 'pending_invites/activate_employee' => 'pending_invites#activate_employee', as: :activate_employee
   get 'pending_invites/send_otp', to: 'pending_invites#send_otp', as: :send_otp
+  post 'pending_invites_vp', to: 'pending_invites#create_vp', as: :create_vp
   patch 'pending_invites/manager_sign_up', to: 'pending_invites#manager_sign_up', as: :manager_activation_sign_up
   post 'users/update_default_password', to: 'users#update_default_password', as: :update_default_password
   get 'edit_default_password', to: 'users#edit_default_password', as: :edit_default_password
@@ -3303,7 +3292,7 @@ Rails.application.routes.draw do
     get 'users/count', to: 'users#count'
     get 'users/managers', to: 'users#get_managers'
     get 'users/categories', to: 'users#categories'
-
+    get 'users/invite_config', to: 'users#invite_config'
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
     end
@@ -3319,6 +3308,8 @@ Rails.application.routes.draw do
     resources :vendor_types
 
     resources :inward_invoices
+
+    get 'autocomplete/vendors/:id', to: 'autocomplete#vendors'
   end
 
 
@@ -3477,6 +3468,7 @@ Rails.application.routes.draw do
       put 'remind', to: 'purchase_orders#remind'
       put 'void', to: 'purchase_orders#void'
       put 'mark_send_to_vendor', to: 'purchase_orders#mark_send_to_vendor'
+      put 'mark_vendor_confirmed', to: 'purchase_orders#mark_vendor_confirmed'
       post 'save_as_template', to: 'purchase_orders#template_create'
       post 'apply_template', to: 'purchase_orders#template_apply'
       put 'make_advance_payment', to: 'purchase_orders#create_payment'

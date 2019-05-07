@@ -2,7 +2,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
-                :all_departments, :all_departments_ids, :category_ids, :category, :cost_centers
+                :all_departments, :all_departments_ids, :category_ids, :category, :cost_centers, :tax_rates
 
   class Procurements::PurchaseOrders::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -26,7 +26,6 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       self.headers = params[:headers]
       self.issues = params[:issues]
     end
-
   end
 
   def init
@@ -49,6 +48,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
     self.category = current_company.categories.inward_invoice_items_only
     self.category_ids = category.pluck(:id) rescue []
+    self.tax_rates = user.company.tax_rates.non_deleted
 
     self.cost_centers = user.company.cost_centers
     
@@ -86,7 +86,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       unit_of_measurement = item[:unit_of_measurement] || item["unit_of_measurement"]
       rate = item[:rate] || item["rate"]
       discount = item[:discount] || item["discount"]
-      tax = item[:tax] || item["tax"]
+      tax_rate_id = item[:tax_rate_id] || item["tax_rate_id"]
       total = item[:total] || item["total"]
 
       self.error_messages = []
@@ -94,6 +94,11 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
       if item_number.nil? or items_not_found.include? item_number
         self.valid = false
+        if item_number.blank?
+          item[:item_number] = "---error---"
+        else
+          item[:item_number] += "---error---"
+        end
         self.error_messages << "Unable to find this item number in inventory list"
         self.issue_item[:item_number] = "Unable to find this item number in inventory list"
       else
@@ -102,6 +107,11 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       end
 
       unless validate_amount rate
+        if rate.blank?
+          item[:rate] = "---error---"
+        else
+          item[:rate] += "---error---"
+        end
         self.valid = false
         self.error_messages << "Rate entered has non-numeric characters."
         self.issue_item[:rate] = "Rate entered has non-numeric characters."
@@ -116,11 +126,13 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
       if quantity.blank?
         self.valid = false
+        item[:quantity] = "---error---"
         self.error_messages << "Please input the quantity."
         self.issue_item[:quantity] = "Please input the quantity."
       end
 
       if department_id.blank?
+        item[:department_id] = "---error---"
         self.valid = false
         self.error_messages << "Please provide the department for which the item would be purchased."
         self.issue_item[:department_id] = "Please provide the department for which the item would be purchased."
@@ -133,8 +145,9 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       end
 
       if department_id.present? && self.all_departments_ids.present?
-        Rails.logger.fatal "FROM BulkValidateFileData DEPARTMENT CHECK,\n #{self.all_departments_ids.include?(department_id.to_i) }"
+        # Rails.logger.fatal "FROM BulkValidateFileData DEPARTMENT CHECK,\n #{self.all_departments_ids.include?(department_id.to_i) }"
         unless (self.all_departments_ids.include?(department_id.to_i) )
+          item[:department_id] += "---error---"
           self.valid = false
           self.error_messages << "Department does not exist for this policy or you are not authorized to make purchases for this department."
           self.issue_item[:department_id] = "Department does not exist for this policy or you are not authorized to make purchases for this department."
@@ -142,6 +155,11 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       end
 
       unless validate_amount quantity
+        if quantity.blank?
+          item[:quantity] = "---error---"
+        else
+          item[:quantity] += "---error---"
+        end
         self.valid = false
         self.error_messages << "Quantity entered has non-numeric characters."
         self.issue_item[:quantity] = "Quantity entered has non-numeric characters."
@@ -149,6 +167,7 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
 
       if category_id.present?
         unless self.category_ids.include? category_id.to_i
+          item[:category_id] += "---error---"
           self.valid = false
           self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
           self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
@@ -160,6 +179,14 @@ class Procurements::PurchaseOrders::BulkValidateFileData < Procurements::Purchas
       #   self.error_messages << "HSN/SAC is invalid. Please recheck."
       #   self.issue_item[:hsn_sac] = "HSN/SAC is invalid. Please recheck."
       # end
+      if tax_rate_id.present?
+        unless self.tax_rates.pluck(:id).include? tax_rate_id.to_i
+          item[:tax_rate_id] += "---error---"
+          self.valid = false
+          self.error_messages << "Invalid Tax Rate ID"
+          self.issue_item[:quantity] = "Invalid Tax Rate ID"
+        end
+      end
 
       if valid
         item[:category_name] = self.category.find_by(id: category_id)&.name

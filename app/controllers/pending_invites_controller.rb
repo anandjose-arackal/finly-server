@@ -19,7 +19,16 @@ class PendingInvitesController < BaseControllers::WebBase
 
   def create
 
-    @result = User::Invite::Create.(current_user, params)
+    @result = User::Invite::CreateEm.(current_user, params)
+    if @result.present? and @result.success?
+      respond(response: :success)
+    else
+      respond
+    end
+  end
+
+  def create_vp
+    @result = User::Invite::CreateVp.(current_user, params)
     if @result.present? and @result.success?
       respond(response: :success)
     else

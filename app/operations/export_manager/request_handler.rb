@@ -5,6 +5,7 @@
 # Master -> Data provider which loads and provides all the necessary data used for generating the export. Can be overridden company-wise
 # Generator -> Handles generation of export using config + provider
 # Processor -> Email, Direct Download, FTP etc
+Dir["#{Rails.root}/app/operations/export_manager/master/**/*.rb"].each {|file| require file}
 class ExportManager::RequestHandler < BaseOperation
   attr_accessor :master, :type, :processor
 
@@ -76,5 +77,40 @@ class ExportManager::RequestHandler < BaseOperation
     return nil if self.master.processor.blank?
     self.master.processor.new(user, params, master)
   end
+
+  def from_personalizer(klass_name)
+    base_path = "#{Rails.root}/lib/personalizer/adapters/company#{user.company_id}/export_manager#{user.company_id}/master#{user.company_id}/"
+    klass_name_s = klass_name.to_s
+    klass_name_s.gsub!('::ExportManager::Master::', '')
+    master_name = klass_name_s.gsub!('ExportManager::Master::', '')
+    klass_name_s = klass_name_s.split('::').map(&:underscore)
+    path = base_path + klass_name_s.join('/') + '.rb'
+
+    return nil unless File.exists?(path)
+    load path
+    Object.const_get("Personalizer::Adapters::Company#{user.company_id}::ExportManager#{user.company_id}::Master#{user.company_id}::#{master_name}")
+  end
+
+  # def init_config
+  #   return {} if self.type.blank?
+  #   type = self.params[:type]
+  #   fields_arr = self.fields
+  #   if fields_arr.size == 1 and fields_arr.first.is_a?(Hash)
+  #     fields = fields_arr.first
+  #   else
+  #     fields = {}
+  #     fields_arr.each do |field|
+  #       if field.is_a?(Hash)
+  #         fields[field.keys.first] = field.values.first
+  #       elsif field.is_a?(Symbol)
+  #         fields[field] = DEFAULT_CONFIG
+  #       end
+  #     end
+  #   end
+  #   company_config = {}
+  #   company_config_items = user.company.export_configs.with_field_name(type)
+  #   company_config_items&.map {|item| company_config[item[:key]] = {spreadsheet: item[:spreadsheet], pdf: item[:pdf]}}
+  #   fields.merge company_config
+  # end
 
 end

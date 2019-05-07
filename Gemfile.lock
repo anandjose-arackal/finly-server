@@ -88,8 +88,8 @@ GEM
       activerecord (>= 3.2.6)
     ancestry (3.0.5)
       activerecord (>= 3.2.0)
-    annotate (2.7.4)
-      activerecord (>= 3.2, < 6.0)
+    annotate (2.7.5)
+      activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 13.0)
     arel (9.0.0)
     autoprefixer-rails (9.4.10.2)
@@ -297,6 +297,10 @@ GEM
     logstash-event (1.2.02)
     logstash-logger (0.26.1)
       logstash-event (~> 1.2)
+    lol_dba (2.1.5)
+      actionpack (>= 3.0)
+      activerecord (>= 3.0)
+      railties (>= 3.0)
     loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -528,8 +532,13 @@ GEM
     wicked_pdf (1.1.0)
     will_paginate (3.1.7)
     wkhtmltopdf-binary (0.12.4)
+    write_xlsx (0.85.6)
+      rubyzip (>= 1.0.0)
+      zip-zip
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    zip-zip (0.3)
+      rubyzip (>= 1.0.0)
     zxcvbn-js (4.4.3)
       execjs
 
@@ -540,7 +549,7 @@ DEPENDENCIES
   aasm (~> 5.0.1)
   amoeba (~> 3.1.0)
   ancestry (~> 3.0.5)
-  annotate (~> 2.7.4)
+  annotate (~> 2.7.5)
   autoprefixer-rails (~> 9.4.4)
   awesome_print (~> 1.8.0)
   aws-sdk-s3 (~> 1.30.0)
@@ -601,6 +610,7 @@ DEPENDENCIES
   lograge (~> 0.10.0)
   logstash-event (~> 1.2.02)
   logstash-logger (~> 0.26.1)
+  lol_dba
   maxminddb (~> 0.1.22)
   memory_profiler (~> 0.9.12)
   mocha (~> 1.8.0)
@@ -650,6 +660,7 @@ DEPENDENCIES
   wicked_pdf (~> 1.1.0)
   will_paginate (~> 3.1.6)
   wkhtmltopdf-binary (~> 0.12.4)
+  write_xlsx (~> 0.85.6)
 
 RUBY VERSION
    ruby 2.6.0p0
