@@ -1,8 +1,9 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
               :payment_term_id, :procurement_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
-              :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note
+              :billing_address, :shipping_address, :note, :gstin_location_id, :internal_note
 json.vendor @result.purchase_order.vendor.as_json
+json.cost_allocation_items @result.cost_allocation_items
 json.created_from_purchase_request @result.created_from_purchase_request 
 json.vendor do
   json.extract! @result.purchase_order&.vendor
