@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '3.11.0'
 
-if ['aws_production', 'background_production'].include?(fetch(:stage)&.to_s)
+if ['aws_production', 'background_production', 'yes_bank_balance_poller'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
 end
 
@@ -21,7 +21,7 @@ set :branch, ENV['BRANCH'] || :master
   # set :deploy_to, '/home/viveka/app'
   # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
-  when :aws_production, :background_production
+  when :aws_production, :background_production, :yes_bank_balance_poller
     branch = fetch :branch
     unless ['master', :master].include?(branch)
       raise 'This branch cannot be deploy to production. Please select the correct branch'
@@ -63,8 +63,9 @@ set :branch, ENV['BRANCH'] || :master
 set :pty, false
 linked_files = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/gstin_verification_config.yml}
 case fetch(:stage)
-when :itzcash_production, :aws_production, :background_production
+when :itzcash_production, :aws_production, :background_production, :yes_bank_balance_poller
   linked_files << "config/sidekiq.yml"
+  linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
   linked_files << "config/elastic_apm.yml"
   # linked_files << "config/sentry.yml"
 when :development_3, :migrated_test, :migrated_test_2, :uat, :development, :development_2
