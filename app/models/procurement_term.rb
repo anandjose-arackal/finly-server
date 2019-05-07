@@ -22,7 +22,7 @@ class ProcurementTerm < ApplicationRecord
 
   scope :with_default, -> {where(default: true)}
 
-  def as_json
+  def as_json(options = {})
     {
       id: id,
       name: name,
