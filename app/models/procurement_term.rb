@@ -19,4 +19,6 @@ class ProcurementTerm < ApplicationRecord
 
   validates :name, presence: true
   validates :description, presence: true
+
+  scope :with_default, -> {where(default: true)}
 end
