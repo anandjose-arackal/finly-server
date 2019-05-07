@@ -70,11 +70,14 @@ end
 set :pty, false
 linked_files = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/gstin_verification_config.yml}
 case fetch(:stage)
-when :itzcash_production, :aws_production, :background_production, :yes_bank_balance_poller
+when :itzcash_production, :aws_production, :background_production
+  linked_files << "config/sidekiq.yml"
+  linked_files << "config/elastic_apm.yml"
+  # linked_files << "config/sentry.yml"
+when :yes_bank_balance_poller
   linked_files << "config/sidekiq.yml"
   linked_files << "config/sidekiq_yes_bank_balance_poller.yml"
   linked_files << "config/elastic_apm.yml"
-  # linked_files << "config/sentry.yml"
 when :development_3, :migrated_test, :migrated_test_2, :uat, :development, :development_2
   linked_files << "config/sidekiq.yml"
 end
