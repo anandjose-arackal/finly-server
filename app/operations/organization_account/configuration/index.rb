@@ -1,4 +1,4 @@
-class OrganizationAccount::Configuration::Index < BaseOperation
+class OrganizationAccount::Configuration::Index < OrganizationAccount::Configuration::Base
 
   
 end
