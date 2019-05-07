@@ -1,5 +1,5 @@
 class Procurements::Configs::Terms::Update < Procurements::Configs::Terms::Base
-  attr_accessor :procurement_term, :procurement_term_params, :procurement_terms
+  attr_accessor :procurement_term, :procurement_term_params, :procurement_terms, :default_term
   def init
     self.procurement_term_params = procurement_term_parameters
     # self.procurement_term = user.company.procurement_terms.find_by id: params[:id]
