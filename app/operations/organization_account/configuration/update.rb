@@ -13,7 +13,7 @@ class OrganizationAccount::Configuration::Update < OrganizationAccount::Configur
       if user.company.enforce_policy.blank?
         user.company.create_enforce_policy(enabled: true)
       else
-        user.company.update_enforce_policy(enabled: enforce_policy)
+        user.company.enforce_policy.update(enabled: enforce_policy)
       end
     end
   end
