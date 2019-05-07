@@ -109,9 +109,9 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       custom_fields = payment_param[:custom_fields]
       payment_param.delete(:custom_fields)
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
-      # payment = ::Payment.new(payment_param)
-      payment = self.bank_payment_request.payment_order.payments.build(payment_param)
-        if payment.save
+      payment = ::Payment.new(payment_param)
+      # payment = self.bank_payment_request.payment_order.payments.build(payment_param)
+      if payment.save
         # perform the required calculations
         beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id])
         beneficiary_payment.update(status_id: BeneficiaryPaymentStatus.id_for(:unpaid))
