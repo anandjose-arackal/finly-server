@@ -15,7 +15,9 @@ set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.6.0' # Edit this if you are using MRI Ruby
 
-set :sidekiq_config => File.join(shared_path, 'config', 'sidekiq_yes_bank_balance_poller.yml')
+set :sidekiq_config, -> {File.join(shared_path, 'config', 'sidekiq_yes_bank_balance_poller.yml')}
+set :sidekiq_pid, -> {File.join(shared_path, 'tmp', 'pids', 'sidekiq_yes_bank_balance.pid')}
+set :sidekiq_log, -> {File.join(shared_path, 'log', 'sidekiq_yes_bank_balance.log')}
 set :sidekiq_roles, :sidekiq_app
 # role-based syntax
 # ==================
@@ -37,7 +39,6 @@ set :sidekiq_roles, :sidekiq_app
 # For available Capistrano configuration variables see the documentation page.
 # http://capistranorb.com/documentation/getting-started/configuration/
 # Feel free to add new variables to customise your setup.
-
 
 
 # Custom SSH Options

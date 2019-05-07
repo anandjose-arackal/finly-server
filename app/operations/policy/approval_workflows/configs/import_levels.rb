@@ -1,18 +1,14 @@
 class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflows::Configs::Base
-  attr_accessor :file, :result_hash, :policy, :sheet, :company, :level, :missing_params
+  attr_accessor :file, :result_hash, :policy, :sheet, :company, :level, :missing_params, :sheets
 
   def validate
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
-      self.sheet = ImportUtil.open_spreadsheet(file)
-      self.header = sheet.row(1)
+      self.sheets = ImportUtil.open_spreadsheet(file)
+      self.header = sheets.row(1)
     end
-    (2..sheet.last_row).each do |i|
-      row = sheet.row(i)
-      validate_params(row)
-      result_hash[i] = "#{missing_params.to_sentence} cannot be blank" if missing_params.present?
-    end
+
     if result_hash.size > 0
       add_message :error, 'Sheet have some errors. Fix and retry'
     end
@@ -21,21 +17,48 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
   def process
     self.company = Company.find params[:company_id]
     self.result_hash = {}
-    (2..sheet.last_row).each do |i|
-      row = sheet.row(i)
-      self.params  =  process_row(row)
-      self.policy = get_policy(params[:policy_name], params[:application])
-      params[:providers].each do |provider|
-        self.level = get_level(params[:level_name], params[:level_number], provider)
-        reviewer = company.users.where(mobile_number: params[:reviewer_id]).or(company.users.where(email: params[:reviewer_id])).first
-        if reviewer
-          if reviewer.policies.pluck(:id).exclude?(policy.id)
-            self.policy.user_mapping.create(user: reviewer)
-          end
-          self.level.level_reviewer_mappings.create(reviewer_id: reviewer.id, threshold: params[:threshold], exception: params[:exception], wo_exception: params[:wo_exception])
-          result_hash[i] = 'Reviewer Mapping created'
+    sheets.each_with_pagename do |name, sheet|
+      self.result_hash[name] = {}
+      application = get_application(name)
+      provider = name
+      (2..sheet.last_row).each do |i|
+        row = sheet.row(i)
+        self.params  =  process_row(row)
+        if params[:policy_name].present?
+          self.policy = get_policy(params[:policy_name], application)
         else
-          result_hash[i] = 'Reviewer not found'
+          self.policy = company.policies.default.first
+        end
+        if params[:department_code].present?
+          department = company.departments.find_by department_code: params[:department_code]
+          create_policy_dept_mapping(policy, department) if department.present?
+        end
+
+        if params[:location_code].present?
+          location = company.locations.find_by location_code: params[:location_code]
+          create_policy_location_mapping(policy, location)
+        end
+        row_length = row.size
+        lower_index = 3
+        while(lower_index < row_length)
+          level_name = row[lower_index+1].to_s
+          level_number = row[lower_index+2].to_i
+          reviewer_id = clean_up_data row[lower_index+3].to_s
+          threshold = row[lower_index+4].to_i
+          if level_name.present? && level_number.present? && reviewer_id.present? && threshold.present?
+            self.level = get_level(level_name, level_number, provider)
+            reviewer = company.users.where(mobile_number: reviewer_id).or(company.users.where(email: reviewer_id)).first
+            if reviewer
+              if reviewer.policies.pluck(:id).exclude?(policy.id)
+                self.policy.user_mapping.create(user: reviewer)
+              end
+              self.level.level_reviewer_mappings.create(reviewer_id: reviewer.id, threshold: threshold)
+              result_hash[name][i] = 'Reviewer Mapping created'
+            else
+              result_hash[name][i] = 'Reviewer not found'
+            end
+          end
+          lower_index += 4
         end
       end
     end
@@ -74,51 +97,22 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
   private
 
   def process_row(row)
-    level_number = row[import_fields[:level_number]].to_s.to_i
-    level_name = row[import_fields[:level_name]].to_i.to_s
-    threshold = row[import_fields[:threshold]].to_i
-    reviewer_id = clean_up_data(row[import_fields[:reviewer]])
-    exception = row[import_fields[:exception]].to_s.downcase == 'y' ? true : false
-    wo_exception = row[import_fields[:wo_exception]].to_s.downcase == 'y' ? true : false
     policy_name = row[import_fields[:policy_name]].to_s
-    application = row[import_fields[:application]].to_s.downcase
-    providers = []
-    providers << 'ReportProvider' if row[import_fields[:report]].to_s.upcase == 'Y'
-    providers << 'MoneyRequestProvider' if row[import_fields[:money_request]].to_s.upcase == 'Y'
-    providers << 'TravelRequestProvider' if row[import_fields[:travel_request]].to_s.upcase == 'Y'
-    providers << 'BankPaymentRequestProvider' if row[import_fields[:bank_payment_request]].to_s.upcase == 'Y'
-    providers << 'InvoiceProvider' if row[import_fields[:invoice]].to_s.upcase == 'Y'
-    providers << 'PurchaseOrderProvider' if row[import_fields[:purchase_order]].to_s.upcase == 'Y'
+    department_code = row[import_fields[:department_code]].to_s
+    location_code = row[import_fields[:location_code]].to_s
 
     params = {
-        level_number: level_number,
-        level_name: level_name,
-        threshold: threshold,
-        reviewer_id: reviewer_id,
-        exception: exception,
-        wo_exception: wo_exception,
         policy_name: policy_name,
-        application: application,
-        providers: providers
-    }
+        department_code: department_code,
+        location_code: location_code,
+        }
   end
 
   def import_fields
     {
-        :level_number => 0,
-        :level_name => 1,
-        :reviewer => 2,
-        :threshold => 3,
-        :exception => 4,
-        :wo_exception => 5,
-        :policy_name => 6,
-        :application => 7,
-        :report => 8,
-        :money_request => 9,
-        :travel_request => 10,
-        :bank_payment_request => 11,
-        :invoice => 12,
-        :purchase_order => 13
+        :policy_name => 0,
+        :department_code => 1,
+        :location_code => 2,
     }
   end
 
@@ -145,18 +139,39 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
     level = self.policy.levels.create(name: level_name, level_number: level_number, associated_entity_type: provider)
   end
 
+  def get_application(name)
+    %w(ReportProvider MoneyRequestProvider TravelRequestProvider).include?(name) ? 'em' : 'vp'
+  end
+
+  def create_policy_dept_mapping(policy,department)
+    return if policy.policy_department_mappings.where(department.id).first.present?
+    policy.policy_department_mappings.create(department_id: department.id)
+  end
+
+  def create_policy_location_mapping(policy,location)
+    return if policy.policy_location_mappings.where(location.id).first.present?
+    policy.policy_location_mappings.create(location_id: location.id)
+  end
+
   def create_response_csv
-    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
-    CSV.open(file_name, 'wb') do |csv|
-      self.header << 'Result'
-      csv << header
-      (2..sheet.last_row).each do |i|
-        row = sheet.row(i)
-        row = row.map(&:to_s)
-        row << result_hash[i]
-        csv << row
+    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.xls".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    FileUtils.mkdir_p "public/common/files/temp_files" unless  Dir.exist?("public/common/files/temp_files")
+    workbook  = ::WriteXLSX.new(file_name)
+    sheets.each_with_pagename do |name, sheet|
+      worksheet = workbook.add_worksheet(name)
+
+      self.header.each_with_index do |item, index|
+        worksheet.write( 0, index, item )
+      end
+      (2..sheet.last_row).each do |index|
+        items = sheet.row(index)
+        items << result_hash[name][index]
+        items.each_with_index do |item, inner_index|
+          worksheet.write((1 + index), inner_index, item)
+        end
       end
     end
+    workbook.close
     return file_name.gsub('public', '')
   end
 
