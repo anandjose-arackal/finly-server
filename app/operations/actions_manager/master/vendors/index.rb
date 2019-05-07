@@ -8,7 +8,6 @@ class ActionsManager::Master::Vendors::Index < ActionsManager::Master::Base
   end
 
   def bulk_actions
-    user.vendor_payments_admin? || user.is_vendor_reviewer? || user.is_vendor_manager?
+    user.company.vendor_empanelment_workflow_enabled? && (user.vendor_payments_admin? || user.is_vendor_reviewer? || user.is_vendor_manager?)
   end
-  
 end

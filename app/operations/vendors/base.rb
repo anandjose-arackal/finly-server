@@ -26,9 +26,9 @@ class Vendors::Base < BaseOperation
     params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description, :pan, :tin, :gst, :state, :state_code_id, :gst_registered, :vendor_type_id,
                                    :business_name, :address, :payment_term_id, :currency_id, :policy_id,
                                    vendor_tds_rates_attributes: [:id, :tds_rates_list_id, :_destroy],
-                                   bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :_destroy],
+                                   bank_accounts_attributes: [:id, :account_number, :ifsc, :name, :default_account, :bank_account_master_id, :_destroy],
                                    vendor_attachments_attributes: [:id, :attached_file, :attachment_type, :_destroy],
-                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation, :_destroy]
+                                   gstin_locations_attributes: [:id, :gstin_id, :gstin, :location, :state_id, :poc_name, :poc_email, :poc_mobile_number, :poc_fax, :poc_designation, :address, :_destroy]
     ) 
   end
 

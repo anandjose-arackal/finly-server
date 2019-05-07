@@ -2,7 +2,7 @@
 #
 # Table name: purchase_request_items
 #
-#  id                           :bigint           not null, primary key
+#  id                           :bigint(8)        not null, primary key
 #  purchase_request_id          :integer
 #  item_id                      :integer
 #  vendor_id                    :integer
@@ -22,7 +22,6 @@
 #  reject_note                  :string(255)
 #  department_id                :integer
 #  cost_center_id               :integer
-#  category_id                  :integer
 #
 
 FactoryBot.define do
