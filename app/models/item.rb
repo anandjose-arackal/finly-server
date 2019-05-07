@@ -99,6 +99,7 @@ class Item < ApplicationRecord
       hsn_sac: hsn_sac,
       category_name: category&.name,
       category_id: category_id,
+      category_gl_code: category&.gl_code,
       rate: rate,
       description: description,
       discount: discount,
