@@ -24,10 +24,10 @@ module Seedable
     end
 
     def id_for(key)
-      return nil unless (self.values.include?(key&.to_sym) || self.values.include?(key&.to_s))
-
       val = SEEDABLE_CACHE&.dig(name, key)
-      seed_data if val.nil?
+      if val.nil? and (self.values.include?(key&.to_sym) || self.values.include?(key&.to_s))
+        seed_data
+      end
       SEEDABLE_CACHE&.dig(name, key)
     end
 
@@ -78,6 +78,9 @@ module Seedable
 
   # Load all values of all variables in SimpleConfig
   def self.refresh_all_caches
+    if Rails.env.development?
+      Rails.application.eager_load!
+    end
     seedable_classes = ObjectSpace.each_object(Class).select {|c| c.included_modules.include?(Seedable)}
     values = {}
     seedable_classes.each do |seedable_class|
