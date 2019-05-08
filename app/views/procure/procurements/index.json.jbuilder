@@ -69,6 +69,7 @@ json.results do
 
     po = p.po_revisions.last
     if po.present?
+      json.purchase_order_id po.id
       json.revision true
       json.revision_for po.revised_po_id
       json.revision_of po.revision_of_id
