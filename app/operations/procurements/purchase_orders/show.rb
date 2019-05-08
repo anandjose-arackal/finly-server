@@ -221,6 +221,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if purchase_order.validate_if_reviewer(user)
     # Since page lands on PO, check for invoice reviewer too. Else if user is invoice reviewer and not PO reviewer, page will break
     return if purchase_order&.procurement&.invoices&.joins(:document_level_reviewer_mappings)&.pluck('document_level_reviewer_mappings.reviewer_id').include?(user.id) rescue false
+    return if purchase_order.validate_if_auditor(user)
     raise_unauthorized_exception
   end
 end
