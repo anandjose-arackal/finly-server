@@ -29,7 +29,12 @@ class TaxRate < ApplicationRecord
         id: id,
         name: self.name,
         rate: self.rate,
-        internal_id: self.internal_id,
+        cgst: self.cgst,
+        sgst: self.sgst,
+        igst: self.igst,
+        sgst_internal_id: self.sgst_internal_id,
+        cgst_internal_id: self.cgst_internal_id,
+        igst_internal_id: self.igst_internal_id,
         display_name: "#{self.name} - #{self.rate}"
     }
   end
