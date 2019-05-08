@@ -81,12 +81,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   # end
 
   def po_advances
-    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor? || user.is_purchase_order_auditor?
     {name: 'PO Advances', id: 'payables', url: 'new_payment_po_advances/params={}'}
   end
 
   def po_invoices
-    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor? || user.is_invoice_auditor?
     {name: 'PO Invoices', id: 'payables', url: 'new_payment_invoices/params={"filter_invoice_type":"po_invoice"}'}
   end
 
@@ -96,7 +96,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def payment_tickets
-    return nil unless user.is_bank_payment_request_initiator? || user.is_bank_payment_request_reviewer? || user.is_bank_payment_request_creditor? || user.vp_admin_or_auditor?
+    return nil unless user.is_bank_payment_request_initiator? || user.is_bank_payment_request_reviewer? || user.is_bank_payment_request_creditor? || user.vp_admin_or_auditor? || user.is_bank_payment_request_auditor?
     {name: 'Payment Tickets', id: 'payables', url: 'orders'}
   end
 
