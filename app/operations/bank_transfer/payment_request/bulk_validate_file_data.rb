@@ -68,6 +68,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       invoice_date = item[:invoice_date] || item[:date]
       invoice_due_date = item[:invoice_due_date] || item[:due_date]
       note = item[:note]
+      external_reference_id = item[:external_reference_id]
+      custom_fields_key = item[:custom_fields] || item["custom_fields"]
 
       # generating custom field data
       custom_fields = {}
@@ -79,11 +81,13 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
             custom_fields[field.id] = [item[field_name.to_sym]].flatten
           elsif field.field_type_id == FieldType.id_for(:drop_down)
             custom_fields[field.id] = item[field_name.to_sym]
+          elsif field.field_type_id == FieldType.id_for(:text)
+            custom_fields[field.id] = item[field_name.to_sym]
           end
         end
       end
 
-      item[:custom_fields] = custom_fields
+      item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
       
 
 
@@ -157,7 +161,14 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:ifsc] = 'Invalid IFSC'
       end
 
-      
+      if external_reference_id.present?
+        if ::Payment.with_company_id(user.company_id).find_by(external_reference_id: external_reference_id)
+          self.valid = false
+          self.error_messages << "This external reference ID is already taken"
+          self.issue_item[:external_reference_id] = "This external reference ID is already taken"
+        end
+      end
+
       # adding all invoice specific validations here for the payment
       # 
       # BENEFICIARY PAYMENTS WOULD NO LONGER REQUIRE INVOICES
@@ -178,8 +189,8 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
 
       unless invoice_number.blank? || validate_invoice_number(invoice_number)
         self.valid = false
-        self.error_messages << "Invoice number can only have letters, numbers, dashes and forward slash and no other special characters"
-        self.issue_item[:invoice_number] = "Invoice number can only have letters, numbers, dashes and forward slash and no other special characters"
+        self.error_messages << "Invoice number can only have letters, numbers, dashes, ampersand and forward slash and no other special characters"
+        self.issue_item[:invoice_number] = "Invoice number can only have letters, numbers, dashes, ampersand and forward slash and no other special characters"
       end
 
       unless validate_rate tax, 1, amount
@@ -195,7 +206,9 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       if self.valid
-        self.requested_amount += amount.to_f
+        payable_amount = calculate_tds(inclusive_of_taxes, amount, tds_slab_id, tax)
+        # self.requested_amount += amount.to_f
+        self.requested_amount += payable_amount.to_f
       end
 
       item[:errors] = self.error_messages.to_sentence if self.error_messages.present?
@@ -263,7 +276,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def validate_invoice_number(invoice_number)
-    ( /\A[a-zA-Z0-9\/-]*\Z/.match(invoice_number) ) ? true : false
+    ( /\A[a-zA-Z0-9\/\-\#\&]*\Z/.match(invoice_number) ) ? true : false
   end
 
   # def validate_amount(amount)
@@ -272,6 +285,33 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   #   end
   #   true
   # end
+
+  def calculate_tds(inclusive_of_taxes, original_amount, tds_slab_id, tax)
+    net_amount = 0
+    if inclusive_of_taxes
+
+      # calculate_inclusive_taxes
+      gross_amount = TaxCalculationUtils.inclusive_tax_amount(original_amount.to_i, (tax.to_i))
+      # calculate_tds
+      tds = TdsRatesList.find(tds_slab_id).tds rescue 0
+      new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
+      tds_amount = gross_amount - new_gross_amount
+
+      net_amount = original_amount.to_i - tds_amount
+
+    else 
+
+      # calculate_exclusive_taxes
+      net_amount = TaxCalculationUtils.exclusive_tax_amount(original_amount.to_i, (tax.to_i))
+      tax_amount = net_amount - original_amount.to_i
+      # calculate_tds
+      tds = TdsRatesList.find(tds_slab_id).tds rescue 0
+      new_gross_amount = TaxCalculationUtils.tds_amount(original_amount.to_i, tds.to_i)
+      tds_amount = original_amount.to_i - new_gross_amount
+
+      net_amount = original_amount.to_i + tax_amount - tds_amount
+    end
+  end
 
   def validate_amount(amount)
     if amount.blank? || (!/\A\d+\.\d+\z/.match(amount) && !/\A\d+\z/.match(amount)) # check if blank or not a positive float or not a positive integer

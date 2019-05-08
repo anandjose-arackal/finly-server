@@ -20,10 +20,18 @@ class Policy::Mappings::DepartmentMapping::Index < Policy::Base
 
   class Policy::Mappings::DepartmentMapping::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :policy
+    attr_accessor :policy, :department_mapping
 
     def init
       self.policy = params[:policy]
+      self.department_mapping = policy.company.departments.arrange_serializable(order: :name) do |parent, children|
+        {
+          id: parent.id,
+          name: parent.name,
+          ancestry: parent.ancestry,
+          children: children
+        }
+      end
     end
   end
 

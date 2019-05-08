@@ -39,7 +39,7 @@ class ActionsManager::Processor < BaseOperation
 
     if self.result.present?
       unless self.result.valid?
-        add_message :error, m.messages[:error]
+        add_message :error, result.messages[:error]
         return
       end
       if self.result.has_errors?

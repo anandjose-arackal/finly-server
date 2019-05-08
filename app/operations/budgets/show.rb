@@ -54,7 +54,7 @@ class Budgets::Show < Budgets::Base
   end
 
   def validate_association
-    return if bugdet.validate_if_admin?(user)
+    return if budget.validate_if_admin?(user)
     return if budget.validate_if_owner?(user)
     return if budget.validate_if_manager?(user)
     raise_unauthorized_exception

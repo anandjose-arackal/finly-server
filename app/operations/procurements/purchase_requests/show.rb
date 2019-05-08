@@ -24,12 +24,13 @@ class Procurements::PurchaseRequests::Show < Procurements::PurchaseRequests::Bas
   end
 
   class Procurements::PurchaseRequests::Show::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_request, :line_items_count, :line_items, :policies, :reviewal_chains
+    attr_accessor :purchase_request, :line_items_count, :line_items, :policies, :reviewal_chain
 
     def init
       self.purchase_request = params[:purchase_request]
       self.line_items_count = purchase_request&.purchase_request_items&.count
       self.line_items  = purchase_request&.purchase_request_items
+      self.reviewal_chain = purchase_request.get_reviewal_chain if !purchase_request.draft? && !purchase_request.retracted? && !purchase_request.rejected?
 
       # self.policies = Policy::VendorPayments::Index.(user, params).policies
       # self.reviewal_chains = []

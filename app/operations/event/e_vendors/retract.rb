@@ -40,7 +40,7 @@ class Event::EVendors::Retract < Event::EVendors::Base
     if user.id == document.created_by.id
       "Vendor retracted : #{self.document.business_name}"
     else
-      "#{document.created_by.business_name} has retracted the vendor: #{self.document.business_name}"
+      "#{document.created_by.name} has retracted the vendor: #{self.document.business_name}"
     end
   end
 
@@ -48,7 +48,7 @@ class Event::EVendors::Retract < Event::EVendors::Base
     if user.id == document.created_by.id
       "You have successfully retracted the vendor: #{self.document.business_name}"
     else
-      "#{document.created_by.business_name} has retracted the vendor '#{self.document.business_name}'."
+      "#{document.created_by.name} has retracted the vendor '#{self.document.business_name}'."
     end
   end
 end

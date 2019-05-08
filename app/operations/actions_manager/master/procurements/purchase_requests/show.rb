@@ -14,7 +14,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def save_btn
-    # If admin but not initiator, cannot save in draft stage
+    # If admin but not initiator, cannot edit/save in draft stage
     if user.vendor_payments_admin? && !user.is_purchase_request_initiator?  && ( purchase_request.retracted? || purchase_request.rejected? || purchase_request.awaiting_approval? )
       return true
     end
@@ -26,10 +26,14 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
       end 
     end
 
-    if user.is_purchase_request_initiator? 
+    if user.is_purchase_request_initiator? && document_owner? 
       if purchase_request.draft? || purchase_request.rejected? || purchase_request.retracted?
         return true
       end 
+    end
+
+    if purchase_request.is_reviewing_user?
+      purchase_request.action_users(:approve).include?(user)
     end
   end
 
@@ -58,29 +62,30 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def approve
-    ############# Reviewer logic start #########################
-    if purchase_request.is_reviewing_user? || user.vendor_payments_admin?
-      if purchase_request.awaiting_approval?
-        last_trail = purchase_request.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
-        if (purchase_request.get_reviewers.include?(user))
-          if purchase_request.action_users(:approve).include?(user)
-            if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:approve)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:take_control)
-              return true
-            end
-            if last_trail.action_id == TrailAction.id_for(:submit)
-              return true
-            end
-          end
-        end
-      end
-    end
-    ############# Reviewer logic end #########################
+    # ############# Reviewer logic start #########################
+    # if purchase_request.is_reviewing_user? || user.vendor_payments_admin?
+    #   if purchase_request.awaiting_approval?
+    #     last_trail = purchase_request.trails.where.not(action_id: TrailAction.id_for(:update)).last rescue nil
+    #     if (purchase_request.get_reviewers.include?(user))
+    #       if purchase_request.action_users(:approve).include?(user)
+    #         if (last_trail.action_id == TrailAction.id_for(:unapprove)) && (last_trail.action_user_id == user.id)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:approve)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:take_control)
+    #           return true
+    #         end
+    #         if last_trail.action_id == TrailAction.id_for(:submit)
+    #           return true
+    #         end
+    #       end
+    #     end
+    #   end
+    # end
+    # ############# Reviewer logic end #########################
+    purchase_request.get_reviewers.include?(user) && PurchaseRequest.status_ids(:awaiting_approval).include?(purchase_request.purchase_request_status_id)
   end
 
   def unapprove
@@ -99,7 +104,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
       if (purchase_request.awaiting_approval? && purchase_request.get_reviewers.exclude?(user))
         return true
       end
-      if purchase_request.awaiting_approval? && !purchase_request.action_users(:return_control).include?(user) && purchase_request.action_users(:approve).include?(user)
+      if purchase_request.awaiting_approval? && !purchase_request.action_users(:return_control).include?(user) && !purchase_request.action_users(:approve).include?(user)
         return true
       end
     end
@@ -123,11 +128,13 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
   end
 
   def reject_pr_line_item
-    if user.vendor_payments_admin? || user.is_purchase_request_initiator?
-      if purchase_request.awaiting_approval?
+    if user.vendor_payments_admin?
+      if purchase_request.awaiting_approval? && purchase_request.action_users(:return_control).include?(user)
         return true
       end
     end
+
+    #****************** Reviewer Start *********************
     if purchase_request.is_reviewing_user?
       if user_in_level?
         if purchase_request.awaiting_approval?
@@ -135,6 +142,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
         end
       end
     end
+    #***************** Reviewer End ************************
   end
 
   def create_and_submit

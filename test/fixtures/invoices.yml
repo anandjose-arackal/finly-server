@@ -79,6 +79,7 @@
 #  proforma_invoice_id             :integer
 #  proforma_advance                :integer
 #  total_proforma_advance          :decimal(20, 2)
+#  cost_allocation_items           :boolean          default(FALSE)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

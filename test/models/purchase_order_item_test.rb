@@ -30,10 +30,9 @@
 #  account                  :string(255)
 #  tax_rate_id              :integer
 #  deleted_at               :datetime
-#  submitted_at             :datetime
-#  approved_at              :datetime
 #  unit_of_measurement      :string(255)
 #  purchase_request_item_id :integer
+#  department_id            :integer
 #
 
 require 'test_helper'

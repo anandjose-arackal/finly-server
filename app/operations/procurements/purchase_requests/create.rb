@@ -10,6 +10,19 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
       add_message :error, 'You do not have permission for this action'
       return
     end
+
+    # arr = self.purchase_request_params[:purchase_request_items_attributes].keys.collect {|pr| self.purchase_request_params[:purchase_request_items_attributes][pr]["department_id"].blank? }
+    # if arr.include? true
+    #   add_message :error, "Please select a Department for which the item would be purchased."
+    #   return
+    # end
+
+    # arr  = self.purchase_request_params[:purchase_request_items_attributes].keys.collect {|pr| self.purchase_request_params[:purchase_request_items_attributes][pr]["cost_center_id"].blank? }
+    # if arr.include? true
+    #   add_message :error, "Please select a Cost Center for which the item would be purchased."
+    #   return
+    # end
+    
   end
 
   def process
@@ -17,7 +30,7 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
     self.purchase_request.creator_id = user.id
     self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
     #Update purchase request line items state to :draft
-    if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft))
+    if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft), department_id: purchase_request.department_id)
       pr_attachment_ids = get_attachment_ids(params)
       # line_item_attachment_ids = get_line_item_attachment_ids(params)
 

@@ -1,8 +1,32 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
-              :payment_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
-              :billing_address, :shipping_address, :note, :gstin_location_id
+              :payment_term_id, :procurement_term_id, :procurement_term_text, :policy_id, :department_id, :sub_department_id, :cost_center_id,
+              :billing_address, :shipping_address, :note, :gstin_location_id, :cost_allocation_items, :internal_note
 json.vendor @result.purchase_order.vendor.as_json
+
+json.vendor do
+  json.extract! @result.purchase_order&.vendor
+
+  json.selected_bank_account do
+    json.account_number @result.purchase_order.bank_account&.account_number
+    json.ifsc @result.purchase_order.bank_account&.ifsc
+    json.name @result.purchase_order.bank_account&.name
+    json.id @result.purchase_order.bank_account&.id
+  end
+
+  if @result.purchase_order.vendor&.bank_accounts.present?
+    json.bank_accounts do
+      json.array!(@result.purchase_order.vendor&.bank_accounts) do |bank_account|
+        json.id bank_account.id
+        json.name bank_account.name
+        json.account_number bank_account.account_number
+        json.ifsc bank_account.ifsc
+        json.selected @result.purchase_order.bank_account&.id == bank_account.id
+        json.default bank_account.default_account
+      end
+    end
+  end
+end
 
 json.actions @result.actions
 
@@ -63,10 +87,12 @@ json.items do
   json.array! @result.purchase_order.items do |item|
     json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
                   :unit_of_measurement,
-                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
+                  :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id, :department_id, :cost_center_id
     
     json.item_number item.inventory_line_item&.item_number rescue nil
     json.gl_code item.inventory_line_item&.item_code rescue nil
+    json.category_name item.category&.name
+    json.category_id item.category_id
 
     json.tax_amount do
       json.value item.tax_amount&.value&.round(2)
@@ -121,6 +147,13 @@ json.comments do
 
       json.id comment.user&.id
     end
+  end
+end
+
+json.po_item_categories do
+  json.array!(current_company.categories.inward_invoice_items_only) do |category|
+    json.id category.id
+    json.name category.name
   end
 end
 
@@ -198,15 +231,20 @@ json.tax_rates do
 end
 
 json.locations do
+  # json.array! @result.locations do |location|
+    # json.extract! location, :id, :name, :gstin, :pan
+    # json.address location.address
   json.array! @result.locations do |location|
-    json.extract! location, :id, :name, :gstin, :pan
-    json.address location.address
+    json.merge! location.as_json(tree: true)
   end
+
+
+  # end
 end
 
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
-    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address
     json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
   end
 end

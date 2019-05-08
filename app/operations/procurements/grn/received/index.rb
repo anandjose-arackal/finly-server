@@ -9,7 +9,8 @@ class Procurements::Grn::Received::Index < Procurements::Base
   def process
     if user.vp_admin_or_auditor? || user.is_goods_receiver?
       if (params[:filter_status_tags].present? and (filter_procurement_type == 'purchase_order')) || (params[:document_type] == 'grn_count')
-        received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
+        # received_pending_ids = [StatusTag.id_for(:shipment_received), StatusTag.id_for(:receiving_shipment)]
+        received_pending_ids = [StatusTag.id_for(:shipment_received)]
         pr_ids = user.company.procurements.joins(:inward_documents).pluck(:id)
         st_ids = StatusTag.where(id: received_pending_ids).pluck(:id)
         proc_ids = ProcurementStatusTaggable.select('DISTINCT procurement_id, status_tag_id').with_procurement_ids(pr_ids).with_status_tag_ids(st_ids).pluck(:procurement_id)

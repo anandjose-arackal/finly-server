@@ -1,0 +1,16 @@
+---
+base_url: https://commonapi.mastersindia.co
+authentication:
+  headers:
+  - Content-Type: application/json
+  params:
+  - username: veekshith.rai@finly.io
+  - password: Veek@123#
+  - client_id: pwvTXWlwizCcfzUYzq
+  - client_secret: TkKJ8ZVYFHvVtutBfSxizimc
+  - grant_type: password
+search:
+  headers:
+  - Content-Type: application/json
+  - Authorization: Bearer a3881af1d0e91d71b5f3d3809ea2341822c76ffe
+  - client_id: pwvTXWlwizCcfzUYzq

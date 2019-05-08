@@ -128,6 +128,11 @@ class Trail < ApplicationRecord
       return body
     end
 
+    if self.action_id == TrailAction.id_for(:vendor_confirmed)
+      body = "#{user_name} marked the #{self.parent_type} that all details in this document is confirmed by vendor."
+      return body
+    end
+
     body += user_name
 
     case self.action_id
@@ -175,6 +180,8 @@ class Trail < ApplicationRecord
         action = " created a revision for this"
       when TrailAction.id_for(:reopen)
         action = " reopened"
+      when TrailAction.id_for(:forward)
+        action = " forwarded"
       else
         action = ""
     end

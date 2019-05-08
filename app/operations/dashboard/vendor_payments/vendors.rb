@@ -2,7 +2,9 @@ class Dashboard::VendorPayments::Vendors < Dashboard::VendorPayments::Base
   attr_accessor :vendors
 
   def init
-    self.vendors = Vendors::Index.(user, params).vendors
+    params[:non_deleted] = true
+    params[:authorized] = true
+    self.vendors = ::Vendors::Index.(user, params).vendors
   end
 
   def success
@@ -44,7 +46,7 @@ class Dashboard::VendorPayments::Vendors < Dashboard::VendorPayments::Base
           data: [
             {
               title: "Awaiting Approval",
-              count: YesBankVendor.awaiting_action_items(user),
+              count: YesBankVendor.awaiting_action_items(user).count,
               filters: [
                 {filter_status_id: 'awaiting_approval'}
               ]

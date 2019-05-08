@@ -64,7 +64,7 @@ class Policy < ApplicationRecord
   scope :include_user_mapping, -> { includes :user_mapping }
   scope :with_company_id, -> (company_id) {where company_id: company_id}
   scope :with_policy_user_roles, -> { joins(:policy_user_roles) }
-  scope :with_policy_id, -> (policy_id){ where "policies.id = ? ", policy_id }
+  scope :with_policy_id, -> (policy_id){ where "policies.id = ? ", policy_id }
   scope :with_purchase_order_initiator_role, -> {
     where("policy_user_roles.user_role_id", UserRole.id_for(:purchase_order_initiator))
   }
@@ -145,27 +145,41 @@ class Policy < ApplicationRecord
     begin
       ActiveRecord::Base.transaction do
         self.policy_department_mappings.destroy_all
-        params[:policy_department_mappings_attributes].each do |policy_department|
-          result = self.policy_department_mappings.create!(department_id: policy_department[:department_id], enabled: policy_department[:enabled])
+        params[:policy_department_mappings_attributes].each do |department_id|
+          department = self.company.departments.find_by_id department_id
+          result = self.policy_department_mappings.create!(department_id: department_id, enabled: true)
+          if department.root.present?
+            if self.policy_department_mappings.where(department_id: department.root.id).blank?
+              result = self.policy_department_mappings.create!(department_id: department.root.id, enabled: true)
+            end
+          end
         end
       end
     rescue
-      false
+      return false
     end
+    true
   end
 
-  def update_location_department_mapping(params)
+  def update_policy_location_mapping(params)
     # Creating new record on every update as it was required to be like this only
     begin
       ActiveRecord::Base.transaction do
         self.policy_location_mappings.destroy_all
-        params[:policy_location_mappings_attributes].each do |policy_location|
-          result = self.policy_location_mappings.create!(location_id: policy_location[:location_id], enabled: policy_location[:enabled])
+        params[:policy_location_mappings_attributes].each do |location_id|
+          location = self.company.locations.find_by_id location_id
+          result = self.policy_location_mappings.create!(location_id: location_id, enabled: true)
+          if location.root.present?
+            if self.policy_location_mappings.where(location_id: location.root.id).blank?
+              result = self.policy_location_mappings.create!(location_id: location.root.id, enabled: true)
+            end
+          end
         end
       end
     rescue
-      false
+      return false
     end
+    true
   end
 
   private

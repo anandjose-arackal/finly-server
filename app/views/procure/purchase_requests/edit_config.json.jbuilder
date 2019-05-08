@@ -1,5 +1,5 @@
 json.locations do
-  json.array!(@result.locations) do |location|
+  json.array!(@result.locations.include_state) do |location|
     json.merge! location.as_json(tree: true)
     # json.id location.id
     # json.name location.name
@@ -18,6 +18,17 @@ json.policies do
   json.array!(@result.policies) do |policy|
     json.id policy.id
     json.name policy.name
+  end
+end
+
+json.department_mappings @result.department_mappings
+
+json.cost_centers @result.cost_centers.as_json
+
+json.pr_item_categories do
+  json.array!(current_company.categories.inward_invoice_items_only) do |category|
+    json.id category.id
+    json.name category.name
   end
 end
 

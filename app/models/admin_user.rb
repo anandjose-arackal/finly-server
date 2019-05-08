@@ -19,6 +19,7 @@
 #  last_name                 :string(255)
 #  mobile_number             :string(255)      not null
 #  encrypted_master_password :string(255)
+#  authorized_ip             :string(255)
 #
 
 require 'bcrypt'
@@ -66,6 +67,14 @@ class AdminUser < ApplicationRecord
 
   def call_center?
     self.admin_user_role_mappings.call_center.present?
+  end
+
+  def company_admin?
+    true
+  end
+
+  def vp_admin_or_auditor?
+    true
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate

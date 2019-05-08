@@ -12,6 +12,7 @@ class ExportManager::Master::BaseMaster
       vendor_details: '::ExportManager::Master::Vendors::DetailsIndex',
       purchase_order_items: '::ExportManager::Master::PurchaseOrders::PurchaseOrderItems::Index',
       non_po_items: '::ExportManager::Master::Invoices::InvoiceLineItems::Index',
+      invoices: 'ExportManager::Master::Invoices::Index',
       tally_expense_voucher_xls: '::ExportManager::Master::TallyVouchers::Expenses'
   }.with_indifferent_access
 

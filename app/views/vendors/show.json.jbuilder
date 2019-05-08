@@ -40,6 +40,7 @@ json.bank_accounts do
     json.confirm_account_number bank_account.account_number
     json.ifsc bank_account.ifsc
     json.id bank_account.id
+    json.card_id bank_account.id
     json.name bank_account.name
     json.default bank_account.default_account
   end
@@ -47,7 +48,7 @@ end
 
 json.gstin_locations do 
   json.array!(@result.vendor.gstin_locations) do |gstin_location|
-    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location, :address
     if gstin_location.gstin_master.present?
       json.result do
         json.extract! gstin_location.gstin_master, :id, :gstin, :legal_name_of_business, :state, :date_of_registration,
@@ -88,7 +89,7 @@ if @result.vendor.policy.present?
 end
 
 json.edit_config do
-  json.vendor_approval_workflow @result.edit_config.vendor_approval_workflow
+  json.vendor_approval_workflow @result.edit_config&.vendor_approval_workflow
   json.codes do
     json.array! @result.edit_config.states, :id, :name
   end

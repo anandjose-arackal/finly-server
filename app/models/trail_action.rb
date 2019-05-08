@@ -38,6 +38,7 @@ class TrailAction < ApplicationRecord
         :credit,
         :send_to_vendor,
         :reopen,
+        :vendor_confirmed,
 
         # TravelRequestBookingActions
         :confirm_selection,
@@ -47,7 +48,8 @@ class TrailAction < ApplicationRecord
         :confirm_booking,
         :reject_booking_request,
         :request_selection,
-        :retract_booking
+        :retract_booking,
+        :forward
     ]
   end
 end

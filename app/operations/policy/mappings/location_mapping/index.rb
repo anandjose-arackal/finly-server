@@ -20,10 +20,17 @@ class Policy::Mappings::LocationMapping::Index < Policy::Base
 
   class Policy::Mappings::LocationMapping::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :policy
+    attr_accessor :policy, :location_mapping
 
     def init
       self.policy = params[:policy]
+      self.location_mapping = policy.company.locations.arrange_serializable(order: :name) do |parent, children|
+        { id: parent.id,
+          name: parent.name,
+          ancestry: parent.ancestry,
+          children: children
+        }
+      end
     end
   end
 

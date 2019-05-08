@@ -1,5 +1,4 @@
 # Vendor Submit will first create the vendor & Then submit it
-
 class Vendors::CreateAndSubmit < Vendors::Base
 
   class Vendors::CreateAndSubmit::SubmitPresenter < BaseOperation::BasePresenter::SuccessPresenter

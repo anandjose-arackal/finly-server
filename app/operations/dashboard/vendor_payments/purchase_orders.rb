@@ -69,6 +69,13 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               filters: [
                 {filter_po_status: PurchaseOrderStatus.id_for(:sent_to_vendor)}
               ]
+            },
+            {
+              title: "Vendor Confirmed",
+              count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
+              filters: [
+                {filter_po_status: PurchaseOrderStatus.id_for(:vendor_confirmed)}
+              ]
             }
           ]
         }
@@ -111,19 +118,19 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
         self.counts.push(personal_data)
       end
 
-      if user.is_purchase_order_reviewer?
-        reviewer_data = {
-          type: "reviewer",
-          data: [
-            {
-              title: "Awaiting Approval",
-              count: PurchaseOrder.awaiting_action_items(user)&.count,
-              filters: [{filter_awaiting_approval: true}]
-            }
-          ]
-        }
-        self.counts.push(reviewer_data)
-      end
+      # if user.is_purchase_order_reviewer?
+      #   reviewer_data = {
+      #     type: "reviewer",
+      #     data: [
+      #       {
+      #         title: "Awaiting Approval",
+      #         count: PurchaseOrder.awaiting_action_items(user)&.count,
+      #         filters: [{filter_awaiting_approval: true}]
+      #       }
+      #     ]
+      #   }
+      #   self.counts.push(reviewer_data)
+      # end
     end
   end
 end

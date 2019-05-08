@@ -7,11 +7,14 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '172.32.152.12', user: 'centos', roles: %w{web app db}
-server '172.32.62.170', user: 'centos', roles: %w{web app}
-server '172.33.23.223', user: 'centos', roles: %w{web app}
-server '172.32.19.108', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
-server '172.33.215.128', user: 'centos', roles: %w{sidekiq_app}
+server 'm1.finly.io', user: 'centos', roles: %w{web app db}
+server 'm2.finly.io', user: 'centos', roles: %w{web app}
+server 'm3.finly.io', user: 'centos', roles: %w{web app}
+server 'm4.finly.io', user: 'centos', roles: %w{web app}
+server 'm5.finly.io', user: 'centos', roles: %w{web app}
+server 'm6.finly.io', user: 'centos', roles: %w{web app}
+server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
+server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app}
 
 set :stage, 'production'
 # set :stage, 'staging'

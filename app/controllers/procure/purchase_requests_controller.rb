@@ -101,4 +101,48 @@ class Procure::PurchaseRequestsController < ApplicationController
     respond
   end
 
+  def count
+    @result = Procurements::PurchaseRequests::Count.(current_user, params)
+    respond
+  end
+
+  def bulk_approve
+    @result = Procurements::PurchaseRequests::BulkApprove.(current_user, params)
+    respond
+  end
+
+  def bulk_take_control
+    @result = Procurements::PurchaseRequests::BulkTakeControl.(current_user, params)
+    respond
+  end
+
+  def bulk_reject
+    @result = Procurements::PurchaseRequests::BulkReject.(current_user, params)
+    respond
+  end
+
+  def bulk_upload_items
+    @result = Procurements::PurchaseRequests::BulkUploadLineItems.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_success'
+        }
+      end
+    else
+      respond_to do |format|
+        format.json {
+          render 'bulk_upload_items_failure'
+        }
+      end
+    end
+  end
+
+  def template_bulk_import_items
+    @result = Procurements::PurchaseRequests::GenerateImportSample.(current_user, params)
+    respond_to do |format|
+      format.json {}
+    end    
+  end
+
 end

@@ -28,6 +28,7 @@
 #  vendor_id                :string(255)
 #  disabled                 :boolean          default(FALSE)
 #  deleted_at               :datetime
+#  vedor_code               :string(255)
 #  msme_registered          :boolean          default(FALSE)
 #  msme_registration_number :string(255)
 #  status_id                :integer
@@ -35,10 +36,7 @@
 #  controlling_level_id     :integer
 #  submitted_at             :datetime
 #  approved_at              :datetime
-#  vedor_code               :string(255)
 #
-
-
 
 class YesBankVendor < ApplicationRecord
   include Transitionable
@@ -98,8 +96,8 @@ class YesBankVendor < ApplicationRecord
   scope :with_id, -> (ids) {where id: ids}
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
-  scope :non_deleted, -> {where deleted_at: nil}
-  scope :authorized, -> { where authorized: true}
+  scope :non_deleted, -> {where deleted_at: nil }
+  scope :authorized, -> { where authorized: true }
   scope :approved, -> {where status_id: [VendorStatus.id_for(:approved), VendorStatus.id_for(:auto_approved)]}
   scope :filter_active, -> { where.not(status_id: VendorStatus.id_for(:deactivated))}
 
@@ -107,7 +105,7 @@ class YesBankVendor < ApplicationRecord
 
   scope :filter_search, -> (term) do
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ? OR yes_bank_vendors.business_name like ? OR yes_bank_vendors.vendor_id like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}", "%#{term}%", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
@@ -135,8 +133,7 @@ class YesBankVendor < ApplicationRecord
     elsif status_id == 'awaiting_approval'
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
-        ids = self.awaiting_action_items(user_id)&.pluck(:id)
-        with_id(ids)
+        self.awaiting_action_items(user_id)
       end
     else
       where status_id: status_id
@@ -145,7 +142,7 @@ class YesBankVendor < ApplicationRecord
   scope :filter_policy_id, -> (policy_id) {where policy_id: policy_id}
   scope :filter_created_by_id, -> (user_id) {where created_by_id: user_id}
   scope :filter_business_name, -> (term) {where("business_name like ?", "%#{term}%")}
-  scope :filter_vendor_id, -> (vendor_id) {where(vendor_id: vendor_id)}
+  scope :filter_vendor_id, -> (vendor_id) {where("yes_bank_vendors.vendor_id like ?", "%#{vendor_id}%")}
   scope :filter_account_details, -> (term) {
     bank_account_ids = BankAccount.where(account_owner_type: "YesBankVendor").where("bank_accounts.account_number like ? OR bank_accounts.ifsc like ? OR bank_accounts.name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:account_owner_id)
     where id: bank_account_ids
@@ -163,7 +160,7 @@ class YesBankVendor < ApplicationRecord
   }
 
   scope :include_details, -> {
-    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy)
+    includes(:status, :created_by, :bank_accounts, :vendor_type, :status, :policy, :gstin_locations)
   }
 
   scope :includes_for_show, -> {
@@ -176,8 +173,22 @@ class YesBankVendor < ApplicationRecord
   scope :sort_created_at, -> (type) { ['asc', 'desc'].include?(type) ? reorder(created_at: type.to_sym) : reorder(created_at: :asc) }
   scope :sort_updated_at, -> (type) { ['asc', 'desc'].include?(type) ? reorder(updated_at: type.to_sym) : reorder(updated_at: :asc) }
 
+  scope :filter_gstin, -> (gstin) {
+    v = GstinLocation.find_by(gstin: gstin)&.vendor_id
+    where id: v
+  }
+
+  scope :filter_pan, -> (pan) {
+    where pan: pan
+  }
 
   # Scopes for ordering ends
+
+  before_validation do
+    if self.business_name.blank?
+      self.business_name = self.name
+    end
+  end
 
   after_create do
     if self.vendor_account.blank?
@@ -209,7 +220,8 @@ class YesBankVendor < ApplicationRecord
         state: state,
         state_code_id: state_code_id,
         tds_id: tds_rates_list_id,
-        bank_accounts: bank_accounts
+        bank_accounts: bank_accounts,
+        state_code: state_code&.state_code
     }
   end
 
@@ -239,7 +251,11 @@ class YesBankVendor < ApplicationRecord
   end
 
   def self.roles
-    [:vendor_creator, :vendor_reviewer, :vendor_manager, :admin]
+    [:vendor_creator, :vendor_reviewer, :vendor_manager, :vendor_auditor, :admin]
+  end
+
+  def self.open_status_ids(user)
+    VendorStatus.ids_for([:open, :draft])
   end
 
   def self.role_based_associated_status_ids(user)
@@ -276,13 +292,15 @@ class YesBankVendor < ApplicationRecord
 
   def can_really_approve?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      awaiting_approval? rescue false
-    elsif self.action_users(:approve).include?(user)
-      awaiting_approval? rescue false
-    else
-      false
-    end
+    return false if user.blank?
+    (awaiting_approval? rescue false) && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   awaiting_approval? rescue false
+    # elsif self.action_users(:approve).include?(user)
+    #   awaiting_approval? rescue false
+    # else
+    #   false
+    # end
   end
 
   def can_reject?
@@ -291,17 +309,20 @@ class YesBankVendor < ApplicationRecord
 
   def can_really_reject?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      awaiting_approval? rescue false
-    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
-      awaiting_approval? rescue false
-    else
-      false
-    end
+    return false if user.blank?
+    (awaiting_approval? rescue false) && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   awaiting_approval? rescue false
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   awaiting_approval? rescue false
+    # else
+    #   false
+    # end
   end
 
   def can_take_control?(user=nil)
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     (awaiting_approval? rescue false) && user.vendor_payment_admin? && ( self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end

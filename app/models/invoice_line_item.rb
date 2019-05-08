@@ -28,6 +28,7 @@
 #  tax_rate_id            :integer
 #  cost_center_id         :integer
 #  unit_of_measurement    :string(255)
+#  department_id          :integer
 #
 
 class InvoiceLineItem < ApplicationRecord
@@ -42,6 +43,8 @@ class InvoiceLineItem < ApplicationRecord
   belongs_to :inventory_line_item, optional: true, class_name: 'Item'
   belongs_to :gst_type, optional: true
   belongs_to :tax_rate, optional: true
+  belongs_to :cost_center, optional: true
+  belongs_to :department, optional: true
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -53,8 +56,10 @@ class InvoiceLineItem < ApplicationRecord
   validates :description, presence: true
   validates :quantity, presence: true
   validates :rate, presence: true
-  validates_presence_of :unit_of_measurement
 
+  # removing for now
+  # validates_presence_of :unit_of_measurement
+  validates_presence_of :department, if: :check_outward_invoice?
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -89,6 +94,12 @@ class InvoiceLineItem < ApplicationRecord
     #   where(cost_center_id: cost_center_ids)
     # end
   }
+
+  scope :with_invoice_id, -> (invoice_id) {where invoice_id: invoice_id}
+
+  def check_outward_invoice?
+    return true if self.parent_type != 'OutwardInvoice'
+  end
 
   private
 

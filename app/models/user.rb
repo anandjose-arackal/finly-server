@@ -51,6 +51,9 @@
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
 #  vacation_delegate_enabled :boolean
+#  password_changed_at       :datetime
+#  last_activity_at          :datetime
+#  expired_at                :datetime
 #
 
 class User < ApplicationRecord
@@ -1135,7 +1138,11 @@ class User < ApplicationRecord
       policy = Policy.with_company_id(self.company_id).find_by_id document.policy_id
       data = policy.policy_user_roles.where(user_id: self.id, user_role_id: role_id) rescue nil
     else
-      data = self.company.policies.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+      if self.enforce_policy_enabled?
+        data = self.company.policies.exclude_deleted.where.not(default: true).joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+      else
+        data = self.company.policies.exclude_deleted.joins(:policy_user_roles)&.where("(policy_user_roles.user_id = ?) && (policy_user_roles.user_role_id = ?)", self.id, role_id.to_i)
+      end
     end
     data.present?
   end
@@ -1204,6 +1211,10 @@ class User < ApplicationRecord
 
   def is_goods_receiver?(document=nil)
     self.has_policy_role?(UserRole.id_for(:goods_receiver), document)
+  end
+
+  def is_inventory_manager?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
   end
 
   # ************ User Role for vendor payments ******************

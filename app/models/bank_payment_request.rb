@@ -60,7 +60,7 @@ class BankPaymentRequest < ApplicationRecord
 
   default_scope {order(created_at: :desc)}
 
-  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing? , :auto_approved?, to: :status
   # delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
@@ -79,6 +79,34 @@ class BankPaymentRequest < ApplicationRecord
   scope :without_id, -> (id) {where.not id: id}
   scope :approved, -> {where status_id: BankPaymentRequestStatus.id_for(:approved)}
   scope :downloadable, -> {where status_id: [BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited), BankPaymentRequestStatus.id_for(:auto_approved)]}
+
+  scope :filter_status, -> (status){
+    case status
+    when 'draft', :draft
+      where status_id: BankPaymentRequest.status_ids(:open, :rejected, :retracted)
+    when 'processing', :processing
+      where status_id: BankPaymentRequestStatus.id_for(:processing)
+    when 'approved', :approved
+      where status_id: BankPaymentRequest.status_ids(:approved, :auto_approved)
+    when 'credited', :credited
+      where status_id: BankPaymentRequestStatus.id_for(:credited)
+    when 'failed', :failed
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+    when 'scheduled', :scheduled
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
+    when 'pending', :pending
+      joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+    when 'awaiting_approval', :awaiting_approval
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      # all
+    end
+  }
+
   scope :filter_status_id, -> (status_id) {
     case status_id
     when 1, '1' # i.e. open
@@ -188,7 +216,10 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   }
 
   # scope :filter_controlling_user, -> (user_id) {where controlling_user_id: user_id}
-  scope :filter_controlling_user, -> (user_id) {self.awaiting_action_items(user_id)}
+  scope :filter_controlling_user, -> (user_id) {
+    # self.awaiting_action_items(user_id)
+    self.where(controlling_user_id: user_id, status_id: BankPaymentRequestStatus.id_for(:processing))
+  }
 
   # scope :filter_controlling_user, -> (user_id) {
   #   # ids = self.class.awaiting_action_items(user_id).map(&:id)
@@ -236,8 +267,12 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
     all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
-    payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
-    where(payment_order_id: payment_order_ids)
+    if all_payments.where(id: payment_ids).any?
+      payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
+      where(payment_order_id: payment_order_ids)
+    else
+      BankPaymentRequest.none
+    end
   }
 
   scope :filter_vendor_id, -> (vendor_id) {
@@ -267,13 +302,15 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   def can_really_approve?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing?
-    elsif self.action_users(:approve).include?(user)
-      processing?
-    else
-      false
-    end
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user)
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_reject?
@@ -282,13 +319,15 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   def can_really_reject?
     user = user.present? ? user : RequestStore.store[:current_user]
-    if self.action_users(:take_control).include?(user)
-      processing?
-    elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
-      processing?
-    else
-      false
-    end
+    return false if user.blank?
+    processing? && self.get_reviewers.include?(user)
+    # if self.action_users(:take_control).include?(user)
+    #   processing?
+    # elsif self.action_users(:approve).include?(user) # If user can approve, they can also reject
+    #   processing?
+    # else
+    #   false
+    # end
   end
 
   def can_retract?
@@ -307,6 +346,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     # work with this method, dont want to modify the older method since,
     # it is used other places and dont want to modify unless sure if this check works in other ppls work.
     user = user.present? ? user : RequestStore.store[:current_user]
+    return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     processing? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
   end
@@ -418,6 +458,12 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     self.company_id = self.owner.company_id
   end
 
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:bank_payment_request_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
   private
 
   def self.status_ids(*statuses)
@@ -459,6 +505,10 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
     BankPaymentRequestStatus.ids_for(self.role_based_statuses(user))
   end
 
+  def self.open_status_ids(user)
+    BankPaymentRequestStatus.ids_for([:open, :draft])
+  end
+
   def self.role_based_statuses(user)
     statuses = []
     if user.policy_user_roles.pluck(:user_role_id).uniq.present?
@@ -479,7 +529,7 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   def self.roles
     # {'1'=> 'admin', '17'=> 'bank_payment_request_initiator', '18'=> 'bank_payment_request_reviewer', '19'=> 'bank_payment_request_creditor'}
-    [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor]
+    [:admin, :bank_payment_request_initiator, :bank_payment_request_reviewer, :bank_payment_request_creditor, :bank_payment_request_auditor]
   end
 
   ####################### Overridden Methods ########################

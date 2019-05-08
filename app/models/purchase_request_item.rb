@@ -2,7 +2,7 @@
 #
 # Table name: purchase_request_items
 #
-#  id                           :bigint(8)        not null, primary key
+#  id                           :bigint           not null, primary key
 #  purchase_request_id          :integer
 #  item_id                      :integer
 #  vendor_id                    :integer
@@ -20,6 +20,9 @@
 #  rejected                     :boolean
 #  unit_of_measurement          :string(255)
 #  reject_note                  :string(255)
+#  department_id                :integer
+#  cost_center_id               :integer
+#  category_id                  :integer
 #
 
     # table_name => purchase_request_items
@@ -39,7 +42,7 @@
 
 
 class PurchaseRequestItem < ApplicationRecord
-  include Transitionable
+  # include Transitionable
 
   belongs_to :purchase_request, optional: true
   belongs_to :item, optional: true
@@ -49,7 +52,11 @@ class PurchaseRequestItem < ApplicationRecord
   belongs_to :vendor, optional: true, class_name: 'YesBankVendor'
   belongs_to :status, optional: true, class_name: 'PurchaseRequestItemStatus', foreign_key: :status_id
   belongs_to :purchase_order, optional: true
+  belongs_to :department, optional: true
+  belongs_to :cost_center, optional: true
+  belongs_to :category, optional: true
   has_one :attachment, inverse_of: :resource, foreign_key: :resource_id, as: :resource, dependent: :destroy
+  has_many :trails, as: :parent
 
   validates :item, :quantity, :per_unit_estimated_amount, :required_by_date, :delivery_location, :purpose, presence: true
 
@@ -60,6 +67,10 @@ class PurchaseRequestItem < ApplicationRecord
   scope :with_ids, -> (ids) { where id: ids }
   scope :with_id, -> (id) { where id: id }
   scope :non_rejected, -> { where rejected: [nil, false] }
+  scope :rejected, -> { where rejected: true }
+  scope :issued_from_inventory, -> { where status_id: PurchaseRequestItemStatus.id_for(:issued_from_inventory)}
+  scope :po_created, -> { where status_id: PurchaseRequestItemStatus.id_for(:po_created) }
+  scope :approved, -> { where status_id: PurchaseRequestItemStatus.id_for(:approved) }
 
   scope :item_id, -> (id) {
     where item_id: id
@@ -79,7 +90,23 @@ class PurchaseRequestItem < ApplicationRecord
   }
 
   scope :order_number, -> (order_number) {
-    where order_number: order_number
+    joins(:purchase_request).where('purchase_requests.order_number = ?', order_number)
+  }
+
+  scope :search_item_name, -> (item_name) {
+    joins(:item).where('items.description LIKE ?', "%#{item_name}%")
+  }
+
+  scope :search_order_number, -> (order_number) {
+    joins(:purchase_request).where('purchase_requests.order_number LIKE ?', "%#{order_number}%")
+  }
+
+  scope :search_preferred_vendor, -> (vendor_name) {
+    joins(:vendor).where('yes_bank_vendors.name LIKE ?', "%#{vendor_name}%")
+  }
+
+  scope :search_delivery_location, -> (location_name) {
+    joins(purchase_request: :location).where('branch_locations.name LIKE ?', "%#{location_name}%")
   }
 
 
@@ -96,7 +123,7 @@ class PurchaseRequestItem < ApplicationRecord
   def add_attachment
     # Can be put into AR transaction
     params = RequestStore[:params]
-    line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes)
+    line_item_attributes = params.dig(:purchase_request, :purchase_request_items_attributes) rescue nil
     if line_item_attributes.present?
       line_item_attributes.each do |position, line_item|
         attachment_id = line_item.dig(:attachment_attributes, :id) rescue nil

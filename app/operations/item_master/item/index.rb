@@ -9,6 +9,7 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
     has_scope :search
     has_scope :filter_category_id
     has_scope :filter_item_type, type: :array #todo undo this after implementation
+    has_scope :filter_active
 
     def init
       self.inventory_line_items = apply_scopes(params[:inventory_line_items], params)
@@ -18,9 +19,9 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
   end
 
   def init
-    if user.has_policy_role?(UserRole.id_for(:item_master_manager)) || user.vp_admin_or_auditor? || user.is_purchase_request_initiator?
+    # if user.has_policy_role?(UserRole.id_for(:item_master_manager)) || user.vp_admin_or_auditor? || user.is_purchase_request_initiator? || current_app == :fc || user.is_purchase_order_initiator? || user.is_invoice_initiator?
       self.inventory_line_items = user.company.items
-    end
+    # end
   end
 
   def validate
