@@ -83,6 +83,7 @@ class Admin::BankTransfer::GetBulkStatus < Admin::Base
 
   def create_response_csv
     file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    FileUtils.mkdir_p "public/common/files/temp_files" unless  Dir.exist?("public/common/files/temp_files")
     CSV.open(file_name, 'wb') do |csv|
       self.header += ['Bank Reference', 'Status', 'Amount','Errors']
       csv << header

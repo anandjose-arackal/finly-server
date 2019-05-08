@@ -140,7 +140,9 @@ class Procure::PurchaseRequestsController < ApplicationController
 
   def template_bulk_import_items
     @result = Procurements::PurchaseRequests::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end    
   end
 
 end

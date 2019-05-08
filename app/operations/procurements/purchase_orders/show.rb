@@ -104,6 +104,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         if user_in_level? || document_owner?
           actions[:send_mail] = {url: Rails.application.routes.url_helpers.procure_configs_send_mail_path, method: "POST"}
           actions[:mark_send_to_vendor] = {url: Rails.application.routes.url_helpers.procure_purchase_order_mark_send_to_vendor_path(purchase_order_id: purchase_order.id), method: "PUT"}
+          actions[:mark_vendor_confirmed] = {url: Rails.application.routes.url_helpers.procure_purchase_order_mark_vendor_confirmed_path(purchase_order_id: purchase_order.id), method: "PUT"}
 
           # todo
           if purchase_order.can_unapprove?(user)
@@ -123,7 +124,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         actions[:download] = true
       end
 
-      if purchase_order.sent_to_vendor?
+      if purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?
         if user_in_level? || document_owner?
           actions[:po_revision] = {url: Rails.application.routes.url_helpers.procure_purchase_order_create_po_revisions_path(purchase_order_id: purchase_order.id), method: "GET"}
           actions[:close] = {
@@ -220,6 +221,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     return if purchase_order.validate_if_reviewer(user)
     # Since page lands on PO, check for invoice reviewer too. Else if user is invoice reviewer and not PO reviewer, page will break
     return if purchase_order&.procurement&.invoices&.joins(:document_level_reviewer_mappings)&.pluck('document_level_reviewer_mappings.reviewer_id').include?(user.id) rescue false
+    return if purchase_order.validate_if_auditor(user)
     raise_unauthorized_exception
   end
 end

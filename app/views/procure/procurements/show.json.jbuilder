@@ -166,7 +166,7 @@ json.payment_terms do
 end
 
 json.procurement_terms do
-  json.array! @result.procurement_terms, :id, :name, :description
+  json.array! @result.procurement_terms
 end
 
 json.policies do

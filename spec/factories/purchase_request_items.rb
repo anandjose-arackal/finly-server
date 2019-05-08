@@ -20,6 +20,8 @@
 #  rejected                     :boolean
 #  unit_of_measurement          :string(255)
 #  reject_note                  :string(255)
+#  department_id                :integer
+#  cost_center_id               :integer
 #
 
 FactoryBot.define do

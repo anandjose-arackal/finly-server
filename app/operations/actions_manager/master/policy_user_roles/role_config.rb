@@ -9,31 +9,32 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   ]
 
   def purchase_request_initiator
-    true
+    user.company.purchase_requisition_enabled?
   end
 
   def purchase_request_reviewer
-    true
+    user.company.purchase_requisition_enabled?
   end
 
   def purchase_order_initiator
+    user.company.procurement_enabled?
     true
   end
 
   def purchase_order_reviewer
-    true
+    user.company.procurement_enabled?
   end
 
   def goods_receiver
-    true
+    user.company.procurement_enabled?
   end
 
   def invoice_initiator
-    true
+    user.company.procurement_enabled?
   end
 
   def invoice_reviewer
-    true
+    user.company.procurement_enabled?
   end
 
   def bank_payment_request_initiator
@@ -57,11 +58,11 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def vendor_creator
-    true
+    user.company.vendor_empanelment_workflow_enabled?
   end
 
   def vendor_reviewer
-    true
+    user.company.vendor_empanelment_workflow_enabled?
   end
 
   def policy_admin
@@ -69,22 +70,22 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
 
   def vendor_manager
-    true
+    user.company.vendor_empanelment_workflow_enabled?
   end
 
   def bank_payment_request_auditor
   end
 
   def budget_manager
-    true
+    user.company.budgeting_system_enabled?
   end
 
   def non_po_initiator
-    true
+    user.company.procurement_enabled?
   end
 
   def purchase_order_auditor
-    true
+    user.company.procurement_enabled?
   end
 
   def bank_payment_request_auditor
@@ -92,14 +93,14 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
   end
   
   def purchase_request_auditor
-    true
+    user.company.purchase_requisition_enabled?
   end
 
   def invoice_auditor
-    true
+    user.company.procurement_enabled?
   end
 
   def vendor_auditor
-    true
+    user.company.vendor_empanelment_workflow_enabled?
   end
 end

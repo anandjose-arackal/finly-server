@@ -110,6 +110,7 @@ class Admin::Users::Import < Admin::Base
         "last_name".humanize,
         "email".humanize,
         "mobile_number".humanize,
+        "employee_id".humanize,
         "dob".humanize,
         "address_1".humanize,
         "address_2".humanize,
@@ -117,14 +118,9 @@ class Admin::Users::Import < Admin::Base
         "state_id".humanize,
         "city".humanize,
         "gender".humanize,
-        "manager_role".humanize,
-        "finance_manager_role".humanize,
-        "admin_role".humanize,
-        "reporting_manager".humanize,
-        "reporting_finance_manager".humanize,
-        "approves_to".humanize,
-        "approves_finance_to".humanize,
         "company_id".humanize,
+        "department_code".humanize,
+        "location_code".humanize,
         "mothers_maiden_name".humanize,
         "expense_management".humanize,
         "disburse ".humanize,
@@ -157,6 +153,7 @@ class Admin::Users::Import < Admin::Base
 
   def create_response_csv
     file_name = "common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    FileUtils.mkdir_p "public/common/files/temp_files" unless  Dir.exist?("public/common/files/temp_files")
     CSV.open(file_name, 'wb') do |csv|
       self.header << 'Result'
       csv << header
@@ -201,78 +198,12 @@ class Admin::Users::Import < Admin::Base
       end
     end
 
-
-    # creating role mapping attributes
-    role_mapping_attributes = [{user_role_id: UserRole.employee_id,
-                                purpose_id: Purpose.id_for(:expense_management)}]
-    if row[import_fields[:manager_role]] and row[import_fields[:manager_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.manager_id,
-                                  purpose_id: Purpose.id_for(:expense_management)}
-    end
-    if row[import_fields[:finance_manager_role]] and row[import_fields[:finance_manager_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.finance_manager_id,
-                                  purpose_id: Purpose.id_for(:expense_management)}
-    end
-    if row[import_fields[:admin_role]] and row[import_fields[:admin_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.admin_id,
-                                  purpose_id: Purpose.id_for(:expense_management)}
-    end
-
     # adding a default initiator role for vendor payments
     role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator),
                                 purpose_id: Purpose.id_for(:vendor_payments)}
 
-    manager = finance_manager = approves_to = approves_finance_to = nil
-    manager_email = finance_manager_email = approves_to_email = approves_finance_to_email = nil
-    manager_email = ImportUtil.cleanup_email(row[import_fields[:reporting_manager]]) if row[import_fields[:reporting_manager]].present?
-    finance_manager_email = ImportUtil.cleanup_email(row[import_fields[:reporting_finance_manager]]) if row[import_fields[:reporting_finance_manager]].present?
-    approves_to_email = ImportUtil.cleanup_email(row[import_fields[:approves_to]]) if row[import_fields[:approves_to]].present?
-    approves_finance_to_email = ImportUtil.cleanup_email(row[import_fields[:approves_finance_to]]) if row[import_fields[:approves_finance_to]].present?
     user_email = ImportUtil.cleanup_email(row[import_fields[:email]])
     company_id = row[import_fields[:company_id]].to_i rescue nil
-
-    # creating team mapping attributes
-    if manager_email
-      manager = User.find_by(email: manager_email) rescue nil
-      if manager.nil?
-        manager = User.find_by(mobile_number: manager_email) rescue nil
-      end
-      unless manager&.manager? and manager.company_id == company_id
-        errors << "Reporting Manager not found / isn't a manager"
-        manager = nil
-      end
-    end
-    if finance_manager_email
-      finance_manager = User.find_by(email: finance_manager_email) rescue nil
-      if finance_manager.nil?
-        finance_manager = User.find_by(mobile_number: finance_manager_email) rescue nil
-      end
-      unless finance_manager&.finance_manager? and finance_manager.company_id == company_id
-        errors << "Reporting Finance Manager not found / isn't a finance manager"
-        finance_manager = nil
-      end
-    end
-    if approves_to_email
-      approves_to = User.find_by(email: approves_to_email) rescue nil
-      if approves_to.nil?
-        approves_to = User.find_by(mobile_number: approves_to_email)
-      end
-      unless approves_to&.manager? and approves_to.company_id == company_id
-        errors << "Approves to not found / isn't a manager"
-        approves_to = nil
-      end
-    end
-    if approves_finance_to_email
-      approves_finance_to = User.find_by(email: approves_finance_to_email) rescue nil
-      if approves_finance_to.nil?
-        approves_finance_to = User.find_by(mobile_number: approves_finance_to_email) rescue nil
-      end
-      unless approves_finance_to&.finance_manager? and approves_finance_to.company_id == company_id
-        errors << "Approves finance to not found / isn't a finance manager"
-        approves_finance_to = nil
-      end
-    end
-
     pin_code = row[import_fields[:pin_code]].to_i.to_s if row[import_fields[:pin_code]]
     pin_code ||= nil
     mobile = row[import_fields[:mobile_number]].to_i.to_s if row[import_fields[:mobile_number]]
@@ -286,40 +217,25 @@ class Admin::Users::Import < Admin::Base
     # generating a password for the user
     generated_password = generate_default_password
     company = Company.find_by(id: row[import_fields[:company_id]])
+    department_id = company&.departments&.find_by code: row[import_fields[:department_code]]
+    location_id = company&.locations.&find_by location_code: row[import_fields[:location_code]]
 
+    user_department_mappings_attributes = [{ department_id: department_i}]
+    user_branch_location_mappings_attributes = [{branch_location_id: location_id}]
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
                     email: user_email,
                     mobile_number: mobile,
                     password: generated_password,
                     password_confirmation: generated_password,
-                    role_mapping_attributes: role_mapping_attributes,
-                    team_mapping_attributes: [
-                                              {
-                                               default: true, manager: manager,
-                                               finance_manager: finance_manager,
-                                               approves_to: approves_to,
-                                               approves_finance_to: approves_finance_to,
-                                               policy_id: (company.policies.default.first.id rescue nil),
-                                               purpose_id: Purpose.id_for(:expense_management)
-                                              },
-                                              {
-                                                default: true,
-                                                manager: nil,
-                                                finance_manager: nil,
-                                                approves_to: nil,
-                                                approves_finance_to: nil,
-                                                policy_id: company.policies.first.id,
-                                                purpose_id: Purpose.id_for(:vendor_payments)
-                                              }
-                                              ],
                     profile_attributes: {address_1: row[import_fields[:address_1]],
                                          address_2: row[import_fields[:address_2]],
                                          pin_code: pin_code,
                                          date_of_birth: row[import_fields[:dob]],
                                          state_id: row[import_fields[:state_id]],
                                          gender: row[import_fields[:gender]],
-                                         city: row[import_fields[:city]]
+                                         city: row[import_fields[:city]],
+                                         employee_id: row[import_fields[:employee_id]]
                     },
                     company_id: row[import_fields[:company_id]],
                     mothers_maiden_name: row[import_fields[:mothers_maiden_name]],
@@ -331,41 +247,38 @@ class Admin::Users::Import < Admin::Base
                     }
     }
 
-    # # i.e. add cards only when the user
-    # if row[import_fields[:card_serial_id]].present?
-    #   user_params[:cards_attributes] = [{proxy: row[import_fields[:card_serial_id]],
-    #                                      ending_number: row[import_fields[:card_ending_numbers]],
-    #                                      company_id: row[import_fields[:company_id]]
-    #                                     }]
-    # end
+    if department_id.present?
+      user_params[:user_department_mappings_attributes] = user_department_mappings_attributes
+    end
+
+    if location_id.present?
+      user_params[:user_branch_location_mappings_attributes] = user_branch_location_mappings_attributes
+    end
+
     return user_params
   end
 
-  def import_fields
+  def import_fields    # # i.e. add cards only when the user
     {
         :first_name => 0,
         :last_name => 1,
         :email => 2,
         :mobile_number => 3,
         :dob => 4,
-        :address_1 => 5,
-        :address_2 => 6,
-        :pin_code => 7,
-        :state_id => 8,
-        :city => 9,
-        :gender => 10,
-        :manager_role => 11,
-        :finance_manager_role => 12,
-        :admin_role => 13,
-        :reporting_manager => 14,
-        :reporting_finance_manager => 15,
-        :approves_to => 16,
-        :approves_finance_to => 17,
-        :company_id => 18,
-        :mothers_maiden_name => 19,
-        :expense_management => 20,
-        :disburse => 21,
-        :vendor_payments => 22
+        :employee_id => 5,
+        :address_1 => 6,
+        :address_2 => 7,
+        :pin_code => 8,
+        :state_id => 9,
+        :city => 10,
+        :gender => 11,
+        :location_code => 12,
+        :department_code => 13,
+        :company_id => 14,
+        :mothers_maiden_name => 15,
+        :expense_management => 16,
+        :disburse => 17,
+        :vendor_payments => 18
     }
   end
 

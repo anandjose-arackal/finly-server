@@ -101,7 +101,9 @@ class Procure::InwardInvoicesController < ApplicationController
 
   def template_bulk_import_items
     @result = Procurements::Invoices::Templates::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def bulk_upload_items

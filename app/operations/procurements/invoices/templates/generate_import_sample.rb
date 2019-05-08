@@ -4,21 +4,22 @@ class Procurements::Invoices::Templates::GenerateImportSample < Procurements::In
 
   def init
     self.company = user.company
+    self.content = params[:content] || []
   end
 
   def process
     self.headers = default_headers
-    self.content = []
+    # self.content = []
     self.sheets = [
         {
             item_headers: self.headers,
-            item_contents: []
+            item_contents: self.content
         }
     ]
     # adding Item to excel sheet
-    item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code", "Default Category Name", "Default Category ID"]
+    item_headers = ["Item Number", "Description", "Rate", "HSN/SAC", "Item Code", "Default Category Name", "Default Category ID", "Default Tax Rate"]
     item_contents = []
-    company.items.where(active: true).each do |item|
+    company.items.where(active: true).includes(:category).each do |item|
       item_contents << [item.item_number, item.description, item.rate, item.hsn_sac, item.item_code, item.category&.name, item.category_id]
     end
     self.sheets << {
@@ -65,31 +66,51 @@ class Procurements::Invoices::Templates::GenerateImportSample < Procurements::In
       item_contents: category_contents,
       name: "Categories"
     }
+
+    # Tax Rates List
+    tax_rates_header = ["ID", "Tax Rate Name", "Tax %", "Internal ID"]
+    tax_rates_content = []
+
+    user.company.tax_rates.non_deleted.each do |tax_rate|
+      tax_rates_content << [tax_rate.id, tax_rate.name, tax_rate.rate, tax_rate.internal_id]
+    end
+
+    self.sheets << {
+      item_headers: tax_rates_header,
+      item_contents: tax_rates_content,
+      name: "Tax Rates"
+    }
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    # self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
+    Exporter.new(user, {xlsx: {headers: self.headers, contents: self.content, sheets: self.sheets}, expire_file_duration: 1.day}, messages)
   end
 
   private
 
   def default_headers
-    [
-     "Description",
-     "Item number",
-     "Department ID",
-     "Cost Center ID",
-     "Comment",
-     "Item code",
-     "Category ID",
-     "HSN/SAC",
-     "Quantity",
-     "Unit of measurement",
-     "Rate",
-     "Discount",
-     "Tax",
-     "Total"
+    headers = [
+      "Description",
+      "Item number",
+      "Department ID",
+      "Cost Center ID",
+      "Comment",
+      "Item code",
+      "Category ID",
+      "HSN/SAC",
+      "Quantity",
+      "Unit of measurement",
+      "Rate",
+      "Discount",
+      "Tax Rate ID",
+      "Total"
     ]
+    if self.content.present?
+      headers.push "System Messages"
+    end
+    headers
+    
   end
 
 end

@@ -13,7 +13,7 @@ class SupplyItemType < ApplicationRecord
   include Seedable
 
   def self.values
-    [:po_item, :non_po_item]
+    [:po_item, :non_po_item, :po_non_po_item]
   end
 
   def non_po_item?
@@ -25,9 +25,15 @@ class SupplyItemType < ApplicationRecord
   end
 
   def as_json
-    {
+    data = {
         id: id,
         name: name.humanize.split(" ").map(&:capitalize).join(" ")
     }
+
+    if id == SupplyItemType.id_for(:po_non_po_item)
+      data[:name] = "PO / Non PO Item"
+    end
+
+    data
   end
 end

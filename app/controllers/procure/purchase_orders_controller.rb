@@ -106,7 +106,9 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def template_bulk_import_items
     @result = Procurements::PurchaseOrders::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def reject
@@ -131,6 +133,11 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def mark_send_to_vendor
     @result = Procurements::PurchaseOrders::MarkSendToVendor.(current_user, params)
+    @respond
+  end
+
+  def mark_vendor_confirmed
+    @result = Procurements::PurchaseOrders::MarkVendorConfirmed.(current_user, params)
     @respond
   end
 

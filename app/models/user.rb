@@ -51,6 +51,9 @@
 #  delegation_enabled        :boolean
 #  gl_config                 :text(65535)
 #  vacation_delegate_enabled :boolean
+#  password_changed_at       :datetime
+#  last_activity_at          :datetime
+#  expired_at                :datetime
 #
 
 class User < ApplicationRecord
@@ -1174,12 +1177,20 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
   end
 
+  def is_purchase_order_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_order_auditor), document)
+  end
+
   def is_purchase_request_initiator?(document=nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_initiator), document)
   end
 
   def is_purchase_request_reviewer?(document=nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
+  end
+
+  def is_purchase_request_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_request_auditor), document)
   end
 
   def is_bank_payment_request_initiator?(document=nil)

@@ -19,11 +19,18 @@
 #  contact_mobile_number :string(255)
 #  is_deleted            :boolean          default(FALSE), not null
 #  deleted_at            :datetime
+#  location_code         :string(255)
+#  ancestry              :string(255)
+#  nature_of_office      :string(255)
+#  billable_location     :boolean          default(TRUE)
+#  shippable_location    :boolean          default(TRUE)
 #
 
 class BranchLocation < ApplicationRecord
   include SoftDeletable, AncestrySupport
+  include Sequenced::ActsAsSequenced
 
+  acts_as_sequenced column: :location_code, purpose: :branch_location, editable: false, prefix: 'LOC'
   has_ancestry
 
   belongs_to :company, optional: true
