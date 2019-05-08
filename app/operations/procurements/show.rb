@@ -43,7 +43,7 @@ class Procurements::Show < Procurements::Base
       self.procurement_trail = get_procurement_trail
       self.locations = user.company.locations
       self.payment_terms = user.company.payment_terms
-      self.procurement_terms = user.company.procurement_terms
+      self.procurement_terms = Procurements::Configs::Terms::Index.(user, params).terms
       self.status_tags = self.procurement.status_tags.reverse
       self.actions = get_actions
       # params[:filter_role_id] = [UserRole.id_for(:purchase_order_initiator), UserRole.id_for(:invoice_initiator), UserRole.id_for(:goods_receiver)]

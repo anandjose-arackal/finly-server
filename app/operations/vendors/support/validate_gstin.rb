@@ -155,71 +155,127 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   end
 
 
+  # def authenticate
+  #   # return true
+  #   path = "#{Rails.root}/config/gstin_verification_config.yml"
+  #   config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
+  #   data = {}
+  #   config_data[:authentication][:params].each do |p|
+  #     data[p.keys.first] = p.values.first
+  #   end
+
+  #   url = config_data[:base_url] + "/oauth/access_token"
+  #   headers = config_data[:authentication][:headers]
+
+  #   auth_connection = Faraday.new(url: url) do |req|
+  #     req.adapter Faraday.default_adapter
+
+  #     headers.each do |header|
+  #       req.headers[header.keys.first] = header.values.first
+  #     end
+  #   end
+
+  #   Rails.logger.info "Making GSTIN Authentication API Call"
+  #   auth_response = auth_connection.post {|req| req.body = data.to_json }
+
+  #   # {
+  #   #   "access_token": "0d08781040a8568c752a5cdbcdfba391bb10d679",
+  #   #   "expires_in": 14400,
+  #   #   "token_type": "bearer"
+  #   # }
+
+  #   if auth_response.status.present? && auth_response.status == 200
+  #     auth_response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(auth_response.body)
+  #     if auth_response_body.keys.include?("error")
+  #       return false
+  #     else
+  #       access_token = auth_response_body[:access_token]
+
+  #       if Rails.env.production? || Rails.env.staging?
+  #         path = '/home/centos/app/shared/config/gstin_verification_config.yml'
+  #       end
+
+  #       d = YAML::load_file(path) #Load
+
+  #       d['search']['headers'][1]['Authorization'] = "Bearer #{access_token}"
+  #       File.open(path, 'w') {|f| f.write d.to_yaml }
+  #       return true
+  #     end
+  #   else
+  #     return false
+  #   end
+  # end
+
   def authenticate
     # return true
-    path = "#{Rails.root}/config/gstin_verification_config.yml"
-    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
-    data = {}
-    config_data[:authentication][:params].each do |p|
-      data[p.keys.first] = p.values.first
-    end
+    config_data = ApiToken.with_name('gstin_masters_india').first rescue nil
 
-    url = config_data[:base_url] + "/oauth/access_token"
-    headers = config_data[:authentication][:headers]
+    return false if config_data.blank?
+
+    data = {
+      username: config_data.username,
+      password: config_data.password,
+      client_id: config_data.client_id,
+      client_secret: config_data.client_secret,
+      grant_type: config_data.grant_type
+    }
+
+    url = config_data.base_url + "/oauth/access_token"
 
     auth_connection = Faraday.new(url: url) do |req|
       req.adapter Faraday.default_adapter
 
-      headers.each do |header|
-        req.headers[header.keys.first] = header.values.first
-      end
+      req.headers['Content-Type'] = config_data.content_type
     end
 
     Rails.logger.info "Making GSTIN Authentication API Call"
     auth_response = auth_connection.post {|req| req.body = data.to_json }
-
-    # {
-    #   "access_token": "0d08781040a8568c752a5cdbcdfba391bb10d679",
-    #   "expires_in": 14400,
-    #   "token_type": "bearer"
-    # }
 
     if auth_response.status.present? && auth_response.status == 200
       auth_response_body = ActiveSupport::HashWithIndifferentAccess.new JSON.parse(auth_response.body)
       if auth_response_body.keys.include?("error")
         return false
       else
-        access_token = auth_response_body[:access_token]
+        token = auth_response_body[:access_token]
 
-        if Rails.env.production? || Rails.env.staging?
-          path = '/home/centos/app/shared/config/gstin_verification_config.yml'
+        if config_data.update(token: token)
+          true
+        else
+          false
         end
-
-        d = YAML::load_file(path) #Load
-
-        d['search']['headers'][1]['Authorization'] = "Bearer #{access_token}"
-        File.open(path, 'w') {|f| f.write d.to_yaml }
-        return true
       end
     else
-      return false
+      false
     end
   end
 
-  def setup_connection
-    path = "#{Rails.root}/config/gstin_verification_config.yml"
-    config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
-    # url = config_data[:base_url] + '/searchgstin'
-    url = config_data[:base_url] + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
-    headers = config_data[:search][:headers]
+  # def setup_connection
+  #   path = "#{Rails.root}/config/gstin_verification_config.yml"
+  #   config_data = ActiveSupport::HashWithIndifferentAccess.new YAML.load_file(path)
+  #   url = config_data[:base_url] + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
+  #   headers = config_data[:search][:headers]
 
+  #   self.connection = Faraday.new(url: url) do |req|
+  #     req.adapter Faraday.default_adapter # make requests with Net::HTTP
+
+  #     headers.each do |header|
+  #       req.headers[header.keys.first] = header.values.first
+  #     end
+  #   end
+  # end
+
+  def setup_connection
+    config_data = ApiToken.with_name('gstin_masters_india').first rescue nil
+
+    return false if config_data.blank?
+
+    url = config_data.base_url + "/commonapis/searchgstin?gstin=#{gstin_params[:gstin]}"
     self.connection = Faraday.new(url: url) do |req|
-      # req.url = url
       req.adapter Faraday.default_adapter # make requests with Net::HTTP
 
-      headers.each do |header|
-        req.headers[header.keys.first] = header.values.first
-      end
+      req.headers['Content-Type'] = config_data.content_type
+      req.headers['client_id'] = config_data.client_id
+      req.headers['Authorization'] = "Bearer #{config_data.token}"
     end
   end
 

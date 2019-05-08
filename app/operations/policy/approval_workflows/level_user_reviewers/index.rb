@@ -2,7 +2,7 @@ class Policy::ApprovalWorkflows::LevelUserReviewers::Index < Policy::ApprovalWor
   attr_accessor :lurms
 
   def authorized_user_types
-    [:admin]
+    [:admin, :vendor_payments_admin]
   end
 
   def init

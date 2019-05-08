@@ -3,6 +3,16 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields, :invoice_old_attachments, :invoice_current_attachments, :document_reviewer_mappings_params, :po_revision, :purchase_order, :procurement,
                 :gstin_location, :cost_allocation_items
 
+
+  def personalizer
+    {
+        post_process: {
+            after: Personalizer::Process.new([:procurements, :invoices, :update], :post_process, self)
+        }
+    }
+  end
+
+
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
@@ -299,7 +309,6 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
   def post_process
     add_message :success, "Invoice updated"
-
   end
 
   private
