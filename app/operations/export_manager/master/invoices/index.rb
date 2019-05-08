@@ -205,11 +205,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
   end
 
   def city_name(invoice_line_item)
-    invoice_line_item.parent.location.name
+    invoice_line_item.parent.location&.name
   end
 
   def city_code(invoice_line_item)
-    invoice_line_item.parent.location.location_code
+    invoice_line_item.parent.location&.location_code
   end
 
   def department_name(invoice_line_item)
