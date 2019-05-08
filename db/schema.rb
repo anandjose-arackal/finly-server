@@ -4377,6 +4377,7 @@ ActiveRecord::Schema.define(version: 2019_05_08_054353) do
     t.integer "company_id"
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.boolean "default", default: false
     t.index ["company_id"], name: "index_procurement_terms_on_company_id"
     t.index ["deleted_at"], name: "index_procurement_terms_on_deleted_at"
   end
