@@ -124,7 +124,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def create_purchase_order
-    return nil unless user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_purchase_order_initiator? || user.vendor_payments_admin?
     {name: 'New Purchase Order', id: 'create', url: 'procurements/params={"action":"new_procurement"}'}
   end
 
@@ -133,17 +133,17 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   # end
 
   def create_non_po_invoice
-    return nil unless user.is_invoice_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_invoice_initiator? || user.vendor_payments_admin?
     {name: 'New Non PO Invoice', id: 'create', url: 'new_payment_invoices/params={"action":"new_invoice","filter_invoice_type":"non_po_invoice"}'}
   end
 
   def create_payment_ticket
-    return nil unless user.is_bank_payment_request_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_bank_payment_request_initiator? || user.vendor_payments_admin?
     {name: 'New Payment Ticket', id: 'create', url: 'new_payment_ticket/params={}'}
   end
 
   def create_purchase_request
-    return nil unless user.is_purchase_request_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_purchase_request_initiator? || user.vendor_payments_admin?
     {name: 'New Purchase Request', id: 'create', url: 'purchase_request/params={}'}
   end
 
@@ -163,7 +163,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def pr_awaiting_approval
-    return nil unless user.is_purchase_request_reviewer? || user.is_purchase_order_initiator? || user.vp_admin_or_auditor?
+    return nil unless user.is_purchase_request_reviewer? || user.is_purchase_order_initiator? || user.vendor_payments_admin?
     { name: 'PRs Awaiting Approval', id: 'requests', url: 'purchase_requests/params={"filter_awaiting_approval":"1"}' }
   end
 
