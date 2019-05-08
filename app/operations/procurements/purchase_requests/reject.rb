@@ -1,5 +1,12 @@
 class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::Base
 
+  def validate
+    super
+    if params[:reject_note].blank?
+      add_message :error, 'Please add reject note'
+    end
+  end
+
   def process
     # Transactions are tied to one database connection. Hence process only required operations
     begin
@@ -12,6 +19,7 @@ class Procurements::PurchaseRequests::Reject < Procurements::PurchaseRequests::B
           add_message :error, op.messages[:error]
           raise ActiveRecord::Rollback
         end
+        self.purchase_request.update(reject_note: params[:reject_note])
         self.workflow_output = op.workflow_output
 
         raise ActiveRecord::Rollback unless reject_all_line_items
