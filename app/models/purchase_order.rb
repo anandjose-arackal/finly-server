@@ -569,6 +569,12 @@ class PurchaseOrder < ApplicationRecord
     user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
   end
 
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:purchase_order_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
 
   private
 
