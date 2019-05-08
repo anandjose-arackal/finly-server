@@ -523,12 +523,14 @@ class Invoice < ApplicationRecord
   end
 
   def awaiting_action(user)
-    awaiting_action = false
-    if self.level&.reviewers&.include? user
-      awaiting_action = true
-      return awaiting_action
-    end
-    awaiting_action
+    # awaiting_action = false
+    # if self.level&.reviewers&.include? user
+    #   awaiting_action = true
+    #   return awaiting_action
+    # end
+    # awaiting_action
+    return false if user.blank?
+    self.get_reviewers.include? user
   end
 
   # this method updates the invoice status based on the associated
