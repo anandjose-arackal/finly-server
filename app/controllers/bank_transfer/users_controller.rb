@@ -55,9 +55,10 @@ class BankTransfer::UsersController < ApplicationController
 
     operation = nil
     success_message = nil
+
     case type
-      when 'enforce_policy'
-        operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
+      when "enforce_policy", :enforce_policy
+        operation = User::Configuration::EnforcePolicy::Update.(current_user, params)
         success_message = 'Configuration Updated'
     end
   end
