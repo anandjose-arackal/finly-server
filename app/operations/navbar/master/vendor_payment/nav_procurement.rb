@@ -54,7 +54,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def po_company
-    return nil unless user.vp_admin_or_auditor?
+    return nil unless user.vp_admin_or_auditor? || user.is_purchase_order_auditor?
     {name: 'Company POs', id: 'procure', url: 'procurements'}
   end
 
@@ -168,12 +168,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def pr_company
-    return nil unless user.vp_admin_or_auditor?
+    return nil unless user.vp_admin_or_auditor? || user.is_purchase_request_auditor?
     { name: 'Company PRs', id: 'requests', url: 'purchase_requests' }
   end
 
   def pr_approved_items
-    return nil unless user.company.purchase_requisition_enabled? && (user.is_inventory_manager? || user.vp_admin_or_auditor?)
+    return nil unless user.company.purchase_requisition_enabled? && (user.is_inventory_manager? || user.vp_admin_or_auditor? || user.is_purchase_request_auditor?)
     { name: 'Approved Items', id: 'procure', url: 'po_approval_items/params={}'}
   end
 
