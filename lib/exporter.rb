@@ -201,7 +201,16 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
         sheet[:item_contents].each_with_index do |items, index|
           items.each_with_index do |item, inner_index|
-            worksheet.write((1 + index), inner_index, item)
+            if item.present? && (item.to_s.index("---error---") || item.to_s.index("---warning---"))
+              format = workbook.add_format
+
+              color = item.to_s.index('---error---') ? 'red' : 'yellow'
+              item = item.to_s.index('---error---') ? item.to_s.split("---error---")[0] : item.to_s.split('---warning---')[0]
+              format.set_bg_color(color)
+              worksheet.write((1 + index), inner_index, item, format)
+            else
+              worksheet.write((1 + index), inner_index, item)
+            end
           end
         end
       end

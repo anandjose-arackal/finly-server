@@ -101,6 +101,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
   validate :input
   fields [
                       finly_ref_no: {spreadsheet: true},
+                      po_number: {spreadsheet: true},
                       invoice_type: {spreadsheet: true},
                       invoice_no: {spreadsheet: true},
                       vendor_name: {spreadsheet: true},
@@ -129,6 +130,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
                       total_amount: {spreadsheet: true},
                       tax_amount: {spreadsheet: true},
                       tax_rate: {spreadsheet: true},
+                      tax_type: {spreadsheet: true},
                   ]
 
   def input
@@ -143,6 +145,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
 
     invoices = invoices_presenter.invoices
     self.input_data = InvoiceLineItem.where(parent_type: 'Invoice').where(parent_id: invoices.pluck(:id))
+  end
+
+  def po_number(invoice_line_item)
+    invoice_line_item.parent&.procurement&.purchase_order&.po_number
   end
 
   def invoice_date(invoice_line_item)
@@ -210,11 +216,11 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
   end
 
   def city_name(invoice_line_item)
-    invoice_line_item.parent.location.name
+    invoice_line_item.parent.location&.name
   end
 
   def city_code(invoice_line_item)
-    invoice_line_item.parent.location.location_code
+    invoice_line_item.parent.location&.location_code
   end
 
   def department_name(invoice_line_item)
@@ -271,6 +277,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
 
   def tax_rate(invoice_line_item)
     invoice_line_item.tax_rate&.rate
+  end
+
+  def tax_type(invoice_line_item)
+    invoice_line_item.tax_rate&.name
   end
 
 

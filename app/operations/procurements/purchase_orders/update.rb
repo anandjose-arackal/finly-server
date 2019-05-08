@@ -42,8 +42,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
   def validate
     return if record_not_present
-    if purchase_order.sent_to_vendor?
-      add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+    if purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?
+      # add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+      add_message :error, "Cant update purchase order marked as '#{purchase_order.status.name.humanize.downcase}'"
       return
     end
 
@@ -259,13 +260,13 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
       # Create track
 
-      if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
-        document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
-
-        if document_number_op.success?
-          self.purchase_order.update(po_number: document_number_op.document_number)
-        end
-      end
+      # if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
+      #   document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
+      #
+      #   if document_number_op.success?
+      #     self.purchase_order.update(po_number: document_number_op.document_number)
+      #   end
+      # end
 
       # AS OF NOW MULTIPLE ADVANCE PAYMENT CREATION CANCELLED
       # TO BE TAKEN UP LATER

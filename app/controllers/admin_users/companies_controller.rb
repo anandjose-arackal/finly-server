@@ -94,6 +94,9 @@ class AdminUsers::CompaniesController < BaseControllers::AdminBase
         @result = Vendors::Import.(current_user,params)
       when 'item-master'
         @result =  ItemMaster::Item::Import.(current_user, params)
+      when 'lrms'
+        @result =  Policy::ApprovalWorkflows::Configs::ImportLevels.(current_user, params)
+      when 'lurms'
       end
     end
 

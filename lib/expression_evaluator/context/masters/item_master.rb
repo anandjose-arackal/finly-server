@@ -7,7 +7,7 @@ class ExpressionEvaluator::Context::Masters::ItemMaster < ExpressionEvaluator::C
   end
 
   def category(options={})
-    ExpressionEvaluator::Context::Masters::Category.new(data.category)
+    data.category
   end
 
 end

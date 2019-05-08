@@ -135,6 +135,11 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
     @respond
   end
 
+  def mark_vendor_confirmed
+    @result = Procurements::PurchaseOrders::MarkVendorConfirmed.(current_user, params)
+    @respond
+  end
+
   def export_items
     @result = Procurements::PurchaseOrders::ExportItems.(current_user, params)
     respond

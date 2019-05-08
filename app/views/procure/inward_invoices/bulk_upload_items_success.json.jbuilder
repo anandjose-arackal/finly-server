@@ -9,7 +9,7 @@ json.bulk_items do
 		end
 
 		json.rate item[:rate]
-		json.tax item[:tax]
+		json.tax_rate_id item[:tax_rate_id]
 		json.discount item[:discount]
 
 		json.quantity item[:quantity]

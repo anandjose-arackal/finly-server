@@ -69,6 +69,13 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               filters: [
                 {filter_po_status: PurchaseOrderStatus.id_for(:sent_to_vendor)}
               ]
+            },
+            {
+              title: "Vendor Confirmed",
+              count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
+              filters: [
+                {filter_po_status: PurchaseOrderStatus.id_for(:vendor_confirmed)}
+              ]
             }
           ]
         }

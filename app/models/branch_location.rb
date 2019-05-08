@@ -89,14 +89,27 @@ class BranchLocation < ApplicationRecord
   def as_json2
     {
       id: self.id,
-      name: location_name,
+      name: full_name,
     }
   end
 
   def as_json(options={})
-    args = { id: self.id, name: self.name, gstin: self.gstin, pan: self.pan, address_1: self.address_1, address_2: self.address_2, city: self.city, country: self.country, pin: self.pin, address: self.address, location_code: self.location_code, state_code: self.state&.code, billable: self.billable_location, shippable: self.shippable_location }
-    args[:name] = options&.dig(:tree) ? location_name : name
-    args
+    {
+        id: self.id,
+        name: self.full_name,
+        gstin: self.gstin,
+        pan: self.pan,
+        address_1: self.address_1,
+        address_2: self.address_2,
+        city: self.city,
+        country: self.country,
+        pin: self.pin,
+        address: self.address,
+        location_code: self.location_code,
+        state_code: self.state&.code,
+        billable: self.billable_location,
+        shippable: self.shippable_location
+    }
   end
 
   def location_name
