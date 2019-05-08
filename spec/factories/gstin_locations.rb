@@ -15,6 +15,7 @@
 #  poc_fax           :string(255)
 #  poc_designation   :string(255)
 #  location          :string(255)
+#  address           :text(65535)
 #
 
 FactoryBot.define do

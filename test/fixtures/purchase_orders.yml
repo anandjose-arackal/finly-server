@@ -42,8 +42,8 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  cost_center_id               :integer
 #  sub_department_id            :integer
-#  billing_address              :text(16777215)
-#  shipping_address             :text(16777215)
+#  billing_address              :text(65535)
+#  shipping_address             :text(65535)
 #  is_template                  :boolean          default(FALSE)
 #  template_name                :string(255)
 #  resource_template_id         :integer
@@ -62,7 +62,7 @@
 #  advance_tds_amount_id        :integer
 #  advance_amount_required      :boolean          default(FALSE)
 #  requested_advance_amount_id  :integer
-#  gstin_location_id            :bigint
+#  gstin_location_id            :bigint(8)
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
 #

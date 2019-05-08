@@ -123,7 +123,9 @@ class Category < ApplicationRecord
   def as_json(options={})
     {
         id: id,
-        name: name
+        name: name,
+        gl_code: gl_code
+
     }
   end
 

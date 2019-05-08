@@ -43,7 +43,7 @@ class  ActionsManager::Master::Vendors::Show < ActionsManager::Master::Base
   end
 
   def edit
-    (user.is_vendor_manager? || user.vendor_payment_admin?) || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
+    (user.is_vendor_manager? || user.vendor_payment_admin? || user.permission.create_beneficiaries) || (vendor.created_by_id == user.id && YesBankVendor.status_ids(:retracted, :draft, :rejected).include?(vendor.status_id)) || (vendor.get_reviewers.include?(user) && vendor.awaiting_approval?)
   end
 
   def take_control
