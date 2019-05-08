@@ -23,7 +23,7 @@ class Policy::VendorPayments::Index < Policy::Base
     # Admin can only see policies in which he is document initiator on any VP document's --> create/edit page
     #Hence segregating on the basis of api params
     if user.vendor_payments_admin? || user.vendor_payments_auditor?
-      if user&.enforce_policy_enabled?
+      if user.company&.enforce_policy_enabled? || user&.enforce_policy_enabled?
         # if params.dig(:menu, :main) == 'policies'
           # ids = user.company&.policies.with_application(current_app).exclude_deleted.where&.not(default: true)&.pluck(:id)
         # else
@@ -37,7 +37,7 @@ class Policy::VendorPayments::Index < Policy::Base
         # end
       end
     else
-      if user&.enforce_policy_enabled?
+      if user.company.enforce_policy_enabled? || user&.enforce_policy_enabled?
         ids = user.company.policies.joins(:policy_user_roles).where.not(default: true).where('policy_user_roles.user_id = ?', user.id).pluck(:id)&.uniq
       else
         ids = user&.policy_user_roles.pluck(:policy_id)&.uniq
@@ -51,7 +51,7 @@ class Policy::VendorPayments::Index < Policy::Base
     self.policies = Policy.where(id: policy_user_roles&.pluck(:policy_id)&.uniq)&.with_application(current_app)&.exclude_deleted if policy_user_roles.present?
     # d'uh, need to clean this operation
     if user.vp_admin_or_auditor?
-      if user&.enforce_policy_enabled?
+      if user.company.enforce_policy_enabled? || user&.enforce_policy_enabled?
         self.policies = user.company&.policies.where.not(default: true).with_application(current_app)&.exclude_deleted
       else
         self.policies = user.company&.policies.with_application(current_app)&.exclude_deleted

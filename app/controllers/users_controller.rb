@@ -192,10 +192,6 @@ class UsersController < ApplicationController
     respond
   end
 
-  def enforce_policy
-    
-  end
-
   private
 
   def update_handler(type = nil)

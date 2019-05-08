@@ -40,4 +40,26 @@ class BankTransfer::UsersController < ApplicationController
     respond
   end
 
+  def update
+    update_handler(params[:type])
+  end
+
+
+  private
+
+  def update_handler(type = nil)
+    unless type
+      respond(response: :failure, message: 'Error while updating data')
+      return
+    end
+
+    operation = nil
+    success_message = nil
+    case type
+      when 'enforce_policy'
+        operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
+        success_message = 'Configuration Updated'
+    end
+  end
+
 end
