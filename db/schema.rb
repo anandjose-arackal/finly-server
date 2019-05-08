@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_07_085240) do
+ActiveRecord::Schema.define(version: 2019_05_07_093400) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -372,6 +372,20 @@ ActiveRecord::Schema.define(version: 2019_05_07_085240) do
     t.index ["deleted_at"], name: "index_amounts_on_deleted_at"
   end
 
+  create_table "api_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "base_url"
+    t.string "name"
+    t.string "username"
+    t.string "password"
+    t.string "client_id"
+    t.string "client_secret"
+    t.string "grant_type"
+    t.string "content_type"
+    t.string "token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "approval_routes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "purpose_id", null: false
     t.integer "level", null: false
@@ -531,6 +545,14 @@ ActiveRecord::Schema.define(version: 2019_05_07_085240) do
     t.index ["finly_database_balance_id"], name: "index_balance_tally_ledgers_on_finly_database_balance_id"
   end
 
+  create_table "bank_account_masters", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "account_number"
+    t.string "ifsc"
+    t.string "account_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "bank_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "yes_bank_vendor_id"
     t.string "account_number"
@@ -552,6 +574,7 @@ ActiveRecord::Schema.define(version: 2019_05_07_085240) do
     t.boolean "disabled", default: false
     t.datetime "deleted_at"
     t.boolean "on_hold", default: false
+    t.integer "bank_account_master_id"
     t.index ["account_number"], name: "index_bank_accounts_on_account_number"
     t.index ["account_owner_id", "account_owner_type"], name: "index_bank_accounts_on_account_owner_id_and_account_owner_type"
     t.index ["company_id"], name: "index_bank_accounts_on_company_id"
@@ -1532,7 +1555,7 @@ ActiveRecord::Schema.define(version: 2019_05_07_085240) do
     t.index ["user_id"], name: "index_cash_on_hands_on_user_id"
   end
 
-  create_table "categories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "categories", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "company_id", null: false
     t.string "name", null: false
     t.string "gl_code"
@@ -3152,6 +3175,7 @@ ActiveRecord::Schema.define(version: 2019_05_07_085240) do
     t.string "poc_fax"
     t.string "poc_designation"
     t.string "location"
+    t.text "address"
     t.index ["gstin_id"], name: "index_gstin_locations_on_gstin_id"
     t.index ["state_id"], name: "index_gstin_locations_on_state_id"
     t.index ["vendor_id"], name: "index_gstin_locations_on_vendor_id"
@@ -4818,6 +4842,7 @@ ActiveRecord::Schema.define(version: 2019_05_07_085240) do
     t.integer "company_id"
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.boolean "default", default: false
     t.index ["company_id"], name: "index_procurement_terms_on_company_id"
     t.index ["deleted_at"], name: "index_procurement_terms_on_deleted_at"
   end

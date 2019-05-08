@@ -1,7 +1,7 @@
 class AddGrnNumberToInwardDocument < ActiveRecord::Migration[5.2]
   def change
     Purpose.seed_data
-    Seedable.init_global_variables
+    Seedable.refresh_all_caches
 
     add_column :inward_documents, :grn_number, :string, index: true
     company_ids = InwardDocument.all.pluck(:company_id).uniq

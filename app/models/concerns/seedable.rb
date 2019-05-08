@@ -24,10 +24,10 @@ module Seedable
     end
 
     def id_for(key)
+      return nil unless (self.values.include?(key&.to_sym) || self.values.include?(key&.to_s))
+
       val = SEEDABLE_CACHE&.dig(name, key)
-      if val.nil? and (self.values.include?(key&.to_sym) || self.values.include?(key&.to_s))
-        seed_data
-      end
+      seed_data if val.nil?
       SEEDABLE_CACHE&.dig(name, key)
     end
 
