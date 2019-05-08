@@ -2,8 +2,8 @@ module Seedable
   extend ActiveSupport::Concern
 
   included do
-    scope :with_id, -> (id) { where id: id }
-    scope :with_name, -> (name) { where name: name }
+    scope :with_id, -> (id) {where id: id}
+    scope :with_name, -> (name) {where name: name}
   end
 
   class_methods do
@@ -17,18 +17,22 @@ module Seedable
         keys = keys.first
       end
       ids = []
-      fetch_items.each do |key, value|
-        ids << value if keys.include? key&.to_sym&.downcase
+      keys.each do |key|
+        ids << id_for(key)
       end
-      ids
+      ids.reject {|item| item.blank?}
     end
 
     def id_for(key)
-      return fetch_items[key]
+      val = SEEDABLE_CACHE&.dig(name, key)
+      if val.nil? and (self.values.include?(key&.to_sym) || self.values.include?(key&.to_s))
+        seed_data
+      end
+      SEEDABLE_CACHE&.dig(name, key)
     end
 
     def name_for(id)
-      self.fetch_items.key(id)&.to_s
+      SEEDABLE_CACHE[name]&.key(id)&.to_s
     end
 
     def seed_data
@@ -38,22 +42,17 @@ module Seedable
           self.create name: name
         end
       end
+      refresh_cache
       # todo handle destroying data if it should not exist in database
     end
+
     alias_method :sync_data, :seed_data
 
-    # Checks if RequestStore contains the values. If not found, then loads RequestStore with the respective values
-    def fetch_items
-      # SimpleConfigUtil.seedable_for(self.name)
-      if SimpleConfig.for(:application).exists? :seedable
-        val = SimpleConfig.for(:application).seedable[self.name]
-        return val if val.present?
+    def refresh_cache
+      SEEDABLE_CACHE[name] = {}.with_indifferent_access
+      as_hash&.each do |key, val|
+        SEEDABLE_CACHE[name][key] = val
       end
-      as_hash
-    end
-
-    def reload_to_simple_config
-
     end
 
     # Generates a hash out of all the values in {name: id} format
@@ -70,7 +69,7 @@ module Seedable
 
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name
@@ -78,17 +77,11 @@ module Seedable
   end
 
   # Load all values of all variables in SimpleConfig
-  def self.init_global_variables
-    if Rails.env.development?
-      Rails.application.eager_load!
-    end
-    seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
+  def self.refresh_all_caches
+    seedable_classes = ObjectSpace.each_object(Class).select {|c| c.included_modules.include?(Seedable)}
     values = {}
     seedable_classes.each do |seedable_class|
-      values[seedable_class.name] = seedable_class.as_hash rescue nil
-    end
-    SimpleConfig.for :application do
-      set :seedable, values.with_indifferent_access
+      seedable_class.refresh_cache
     end
   end
 
