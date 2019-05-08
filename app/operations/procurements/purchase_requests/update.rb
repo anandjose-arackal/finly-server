@@ -55,7 +55,7 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
 
   def success
     params[:purchase_request] = self.purchase_request
-    Procurements::PurchaseRequests::Create::UpdatePresenter.new(user, params, messages)
+    Procurements::PurchaseRequests::Update::UpdatePresenter.new(user, params, messages)
   end
 
   class Procurements::PurchaseRequests::Update::UpdatePresenter < BaseOperation::BasePresenter::SuccessPresenter
