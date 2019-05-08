@@ -19,9 +19,9 @@ class ItemMaster::Item::Index < ItemMaster::Item::Base
   end
 
   def init
-    if user.has_policy_role?(UserRole.id_for(:item_master_manager)) || user.vp_admin_or_auditor? || user.is_purchase_request_initiator? || current_app == :fc
+    # if user.has_policy_role?(UserRole.id_for(:item_master_manager)) || user.vp_admin_or_auditor? || user.is_purchase_request_initiator? || current_app == :fc || user.is_purchase_order_initiator? || user.is_invoice_initiator?
       self.inventory_line_items = user.company.items
-    end
+    # end
   end
 
   def validate
