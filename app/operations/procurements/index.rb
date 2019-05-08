@@ -14,7 +14,7 @@ class Procurements::Index < Procurements::Base
       # return
       # end
 
-    if user.vp_admin_or_auditor?
+    if user.vendor_payments_admin?
       admin_restricted_status_ids = [PurchaseOrderStatus.id_for(:open)]
       self.procurements = user.company.procurements.with_ids(::PurchaseOrder.role_based_admin_associated_items(user, UserRole.id_for(:admin), {admin_restricted_status_ids: admin_restricted_status_ids})&.pluck(:procurement_id)&.uniq).or(user.procurements)
       return

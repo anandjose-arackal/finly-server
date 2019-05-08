@@ -203,6 +203,7 @@ class Procurements::Invoices::Show < Procurements::Invoices::Base
     return if invoice.validate_if_owner(user)
     return if invoice.validate_if_admin(user)
     return if invoice.validate_if_reviewer(user)
+    return if invoice.validate_if_auditor(user)
     # Need to check dlrms as above conditions are breaking
     #Quick fix
     return if user.is_invoice_reviewer?
