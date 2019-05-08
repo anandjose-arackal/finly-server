@@ -210,7 +210,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
 
-      # purchase_order.save
+      purchase_order.save
       purchase_order.process_line_item_calculation(self.skip_adv_calculation)
       purchase_order.save
 
