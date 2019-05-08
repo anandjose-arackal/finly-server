@@ -132,8 +132,7 @@ json.results do
       json.invoice_amount invoice.net_amount
       json.invoice_advance invoice.proforma_advance&.value
     end
-
-    vendor = po.present? ? po.vendor : invoice&.vendor
+    vendor = p.purchase_order.present? ? p.purchase_order.vendor : invoice&.vendor
     if vendor.present?
       json.vendor vendor.as_json
     end
