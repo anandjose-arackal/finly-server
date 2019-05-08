@@ -1,6 +1,6 @@
 class IciciBankApi::Base < BaseHandler
 
-  attr_accessor :company_details, :company, :parsed_response
+  attr_accessor :company_details, :company, :parsed_response, :decrypted_response
 
   def init
     self.company = user&.company if self.company.blank?
@@ -30,7 +30,7 @@ class IciciBankApi::Base < BaseHandler
     # first decrypt the response
     path = Dir.home + '/certificates/icici_certificates_final/finly_icici_final.key'
     private_key = OpenSSL::PKey::RSA.new(File.read(path))
-    decrypted_response = private_key.private_decrypt(Base64.decode64(body))
+    self.decrypted_response = private_key.private_decrypt(Base64.decode64(body))
     parsed_response = JSON.parse(decrypted_response)
     return parsed_response
   end
@@ -58,7 +58,7 @@ class IciciBankApi::Base < BaseHandler
       puts "Encrypted Response: "
       ap self.response.body
 
-      puts "Unencrypted Response: "
+      puts "Decrypted Response: "
       ap decrypt_response(self.response.body)
 
       # now parse the response and store it in the parsed_response

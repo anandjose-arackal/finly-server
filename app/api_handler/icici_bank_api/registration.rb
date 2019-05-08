@@ -1,9 +1,19 @@
+# this is a one time call, which will happen at the time of onboarding the client
 class IciciBankApi::Registration < IciciBankApi::Base
 
   attr_accessor :company
 
   def init
     super
+  end
+
+  def initialize(company)
+    self.company = company
+    self.params = {}
+  end
+
+  def self.call(company)
+    self.new(company).run
   end
 
   def icici_bank_action
@@ -16,10 +26,10 @@ class IciciBankApi::Registration < IciciBankApi::Base
 
   def raw_api_params
     {
-        AGGRID: self.company_details[:AGGR_ID],
-        AGGRNAME: self.company_details[:AGGR_NAME],
-        CORPID: self.company_details[:CORP_ID],
-        USERID: self.company_details[:USER_ID],
+        AGGRID: self.company_details["AGGR_ID"],
+        AGGRNAME: self.company_details["AGGR_NAME"],
+        CORPID: self.company_details["CORP_ID"],
+        USERID: self.company_details["USER_ID"],
         ALIASID: self.company.icici_bank_config.alias_id,
         URN: self.company.icici_bank_config.urn
     }
@@ -39,7 +49,7 @@ class IciciBankApi::Registration < IciciBankApi::Base
       when 500
 
       when 200
-        self.parsed_response = JSON.parse(self.response.body)
+        self.parsed_response = JSON.parse(self.decrypted_response)
     end
   end
 
