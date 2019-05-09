@@ -13,6 +13,7 @@ class ExpressionEvaluator::Provider
       ExpressionEvaluator::Context::Masters::CostCenter,
       ExpressionEvaluator::Context::Masters::Department,
       ExpressionEvaluator::Context::Masters::Location,
+      ExpressionEvaluator::Context::Fundamentals::List,
       ExpressionEvaluator::Context::Fundamentals::String,
       ExpressionEvaluator::Context::Fundamentals::Integer,
       ExpressionEvaluator::Context::Fundamentals::Date,

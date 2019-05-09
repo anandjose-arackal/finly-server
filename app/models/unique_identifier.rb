@@ -17,9 +17,17 @@ class UniqueIdentifier < ApplicationRecord
 
   scope :with_company_id, ->(id) { where company_id: id }
   scope :with_purpose_id, ->(id) { where purpose_id: id }
+  scope :include_for_index, -> { includes :purpose }
 
   validates :purpose, presence: true
   validates :company_id, presence: true
   validates :sequence_start, presence: true
+
+  def as_json(options={})
+    {
+        prefix: prefix,
+        sequence_start: sequence_start
+    }
+  end
 
 end

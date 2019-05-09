@@ -1,11 +1,19 @@
 class ExpressionEvaluator::Context::Fundamentals::List < ExpressionEvaluator::Context::Base
 
-  def valid_data?
-    data.respond_to?(:each)
+  def self.accept?(data=nil)
+    data and data.respond_to?(:each)
   end
 
   def map(options = {})
-    ExpressionEvaluator::Context::Fundamentals::List::Mapper.new(data)
+    list = []
+    data.each do |item|
+      if item.class <= ExpressionEvaluator::Context::Base
+        list << item
+      else
+        list << ExpressionEvaluator::Provider.for_data(item)
+      end
+    end
+    ExpressionEvaluator::Context::Fundamentals::List::Mapper.new(list)
   end
 
   def join(options = {})

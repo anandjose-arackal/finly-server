@@ -106,7 +106,6 @@ class Vendors::Import < Vendors::Base
                           "mobile_number"=> mobile_number,
                           "email"=> email ,
                           "currency_id"=>"1",
-                          "vendor_id"=> "",
                           "business_name"=> business_name,
                           "pan"=> pan,
                           "state_code_id"=> state_code_id,
