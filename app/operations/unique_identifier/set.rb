@@ -2,7 +2,7 @@ class UniqueIdentifier::Set < BaseOperation
   attr_accessor :unique_identifier
 
   def authorized_user_types
-    [:admin]
+    [:vendor_payments_admin]
   end
 
   def pre_validate
