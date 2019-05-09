@@ -36,30 +36,33 @@ class Vendors::Update < Vendors::Base
       end
     end
 
-    unless vendor_parameters[:pan].present?
-      add_message :error, "Please provide PAN to proceed"
-      return
-    else
-      validate_attachment(vendor_parameters, :pan)
-    end
+    if user.company_id == 156
 
-    # Remove Empty gstin locations
-    vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
-      unless gst.keys.present?
-        vendor_parameters[:gstin_locations_attributes].delete_at(index)
+      unless vendor_parameters[:pan].present?
+        add_message :error, "Please provide PAN to proceed"
+        return
+      else
+        validate_attachment(vendor_parameters, :pan)
       end
-    end
+
+      # Remove Empty gstin locations
+      vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+        unless gst.keys.present?
+          vendor_parameters[:gstin_locations_attributes].delete_at(index)
+        end
+      end
 
 
-    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
-      validate_attachment(vendor_parameters, :msme_certificate)
-    end
+      if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+        validate_attachment(vendor_parameters, :msme_certificate)
+      end
 
-    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
-      validate_attachment(vendor_parameters, :gstin)
-      validate_gstin(vendor_parameters)
-      # validate_business_name(vendor_parameters)
-      # validate_pan(vendor_parameters)
+      if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
+        validate_attachment(vendor_parameters, :gstin)
+        validate_gstin(vendor_parameters)
+        # validate_business_name(vendor_parameters)
+        # validate_pan(vendor_parameters)
+      end
     end
   end
 
