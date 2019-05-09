@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
   attr_accessor :file, :parsed_data, :response_presenter, :errors_found,
                 :result_data, :order_details, :bank_payment_request_params,
                 :requested_amount, :payment_mode, :scheduled_at, :bank_payment_request,
-                :headers, :contents, :validate_operation, :policy_id, :policy
+                :headers, :contents, :validate_operation, :policy_id, :policy, :upload
 
   def pre_validate
     Rails.logger.fatal "FROM BulkCreateFromFile pre_validate,\n #{params.inspect}"
@@ -108,11 +108,20 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
     # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
     op = BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
     # op = BankTransfer::PaymentRequest::AddPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-
+    
+    # save uploaded attachment to the payment ticket
+    params[:id] = self.bank_payment_request.id
+    params[:bank_payment_request] = { attached_file: params[:file], description: params[:description], allow_delete: false }
+    update_attachment = BankTransfer::PaymentRequest::Update::UpdateAttachment.(current_user, params)
+    if update_attachment.success?
+      # self.upload = update_attachment
+      add_message :success, "File was saved."
+    end
   end
 
   def success
     params[:bank_payment_request_id] = self.bank_payment_request.id
+    # params[:upload] = self.upload
     BankTransfer::PaymentRequest::BulkCreateFromFile::SuccessPresenter.new(user, params, messages)
   end
 
@@ -174,6 +183,7 @@ class BankTransfer::PaymentRequest::BulkCreateFromFile < BankTransfer::PaymentRe
             value: self.requested_amount,
             currency_id: 1
         },
+        description: params[:description],
         beneficiary_type_id: 2,
         policy_id: self.policy_id,
         payment_order_attributes: payment_order_attributes,

@@ -74,6 +74,7 @@ json.attachments do
     json.file_type attachment.file_format(attachment.attached_file)
     json.content_type attachment.attached_file.content_type
     json.file_name attachment.attached_file.original_filename
+    json.allow_delete attachment.allow_delete
   end
 end
 

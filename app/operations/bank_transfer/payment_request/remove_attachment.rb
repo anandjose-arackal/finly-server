@@ -19,6 +19,11 @@ class BankTransfer::PaymentRequest::RemoveAttachment < BankTransfer::PaymentRequ
       add_message :error, "Attachment not found"
       return
     end
+
+    unless self.attachment.allow_delete
+      add_message :error, "Deletion of this attachment is restricted. Please contact customer support."
+      return
+    end
   end
 
   def process
