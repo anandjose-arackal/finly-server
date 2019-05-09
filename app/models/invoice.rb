@@ -523,12 +523,14 @@ class Invoice < ApplicationRecord
   end
 
   def awaiting_action(user)
-    awaiting_action = false
-    if self.level&.reviewers&.include? user
-      awaiting_action = true
-      return awaiting_action
-    end
-    awaiting_action
+    # awaiting_action = false
+    # if self.level&.reviewers&.include? user
+    #   awaiting_action = true
+    #   return awaiting_action
+    # end
+    # awaiting_action
+    return false if user.blank?
+    self.get_reviewers.include? user
   end
 
   # this method updates the invoice status based on the associated
@@ -703,6 +705,12 @@ class Invoice < ApplicationRecord
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     (processing? rescue false) && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
+  end
+
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:invoice_auditor), user_id: user.id).present? rescue false
+    end
   end
 
   private

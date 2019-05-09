@@ -52,7 +52,8 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
               if reviewer.policies.pluck(:id).exclude?(policy.id)
                 self.policy.user_mapping.create(user: reviewer)
               end
-              self.level.level_reviewer_mappings.create(reviewer_id: reviewer.id, threshold: threshold)
+              mapping_exist = self.level.level_reviewer_mappings.where(policy_id: policy.id, reviewer_id: reviewer.id, threshold: threshold).first
+              self.level.level_reviewer_mappings.create(reviewer_id: reviewer.id, threshold: threshold) unless mapping_exist.present?
               result_hash[name][i] = 'Reviewer Mapping created'
             else
               result_hash[name][i] = 'Reviewer not found'

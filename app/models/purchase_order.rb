@@ -329,7 +329,7 @@ class PurchaseOrder < ApplicationRecord
 
   scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
 
-  # before_save :calculate_line_items
+  before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
@@ -571,6 +571,12 @@ class PurchaseOrder < ApplicationRecord
   def is_reviewing_user?(user = nil)
     user = user.present? ? user : RequestStore.store[:current_user]
     user.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), self)
+  end
+
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:purchase_order_auditor), user_id: user.id).present? rescue false
+    end
   end
 
   def generate_sequential_id?

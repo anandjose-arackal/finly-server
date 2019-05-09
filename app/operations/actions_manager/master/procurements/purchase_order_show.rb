@@ -160,7 +160,7 @@ class ActionsManager::Master::Procurements::PurchaseOrderShow < ActionsManager::
     if po_modifiable?
       unless procurement.po_revisions.pluck(:revision_of_id).include? purchase_order.id
         # Admin
-        (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.closed? && !purchase_order.sent_to_vendor? && !purchase_order.vendor_confirmed?) &&
+        (user.vendor_payment_admin? && (!purchase_order.voided? && !purchase_order.approved? && !purchase_order.auto_approved? && !purchase_order.closed? && !purchase_order.sent_to_vendor? && !purchase_order.vendor_confirmed?) &&
             !((purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?))) ||
             # Doc owner
             (document_owner? && (purchase_order.open? || purchase_order.retracted? || purchase_order.rejected?)) ||
