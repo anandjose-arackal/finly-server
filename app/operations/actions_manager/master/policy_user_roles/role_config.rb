@@ -18,7 +18,6 @@ class ActionsManager::Master::PolicyUserRoles::RoleConfig < ActionsManager::Mast
 
   def purchase_order_initiator
     user.company.procurement_enabled?
-    true
   end
 
   def purchase_order_reviewer
