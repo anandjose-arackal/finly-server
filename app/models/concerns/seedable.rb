@@ -78,9 +78,7 @@ module Seedable
 
   # Load all values of all variables in SimpleConfig
   def self.refresh_all_caches
-    if Rails.env.development?
-      Rails.application.eager_load!
-    end
+    Rails.application.eager_load!
     seedable_classes = ObjectSpace.each_object(Class).select {|c| c.included_modules.include?(Seedable)}
     values = {}
     seedable_classes.each do |seedable_class|
