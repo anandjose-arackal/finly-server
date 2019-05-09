@@ -1,5 +1,7 @@
 class TaxRates::Index < TaxRates::Base
 
+  attr_accessor :tax_rates
+
   class TaxRates::Index::TaxRatesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :tax_rates
