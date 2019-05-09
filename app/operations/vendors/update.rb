@@ -74,6 +74,7 @@ class Vendors::Update < Vendors::Base
       ba = user.company.bank_accounts.find_by(account_number: bank_account[:account_number], account_owner_type: "YesBankVendor")
       if ba.present?
         existing_vendor = ba.account_owner
+        next if existing_vendor.id == self.vendor.id
         if existing_vendor.authorized
           add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
           break
