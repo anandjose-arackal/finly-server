@@ -75,14 +75,14 @@ Rails.application.configure do
   # end
 
   config.mailer_config = config_for(:mailer_config)
-  config.action_mailer.default_url_options = {host: config.mailer_config['email_host']}
+  config.action_mailer.default_url_options = {host: config.mailer_config['host']}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-      address: config.mailer_config['email_address'],
-      port: config.mailer_config['email_port'],
-      domain: config.mailer_config['email_domain'],
-      user_name: config.mailer_config['email_user_name'],
-      password: config.mailer_config['email_password'],
+      address: config.mailer_config['address'],
+      port: config.mailer_config['port'],
+      domain: config.mailer_config['domain'],
+      user_name: config.mailer_config['username'],
+      password: config.mailer_config['password'],
       # ssl:                  true,
       # tls:                  true,
       authentication: :plain,

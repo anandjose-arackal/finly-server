@@ -21,7 +21,6 @@ config/mailer_config.yml
 config/redis_config.yml
 config/gstin_verification_config.yml
 .rubocop.yml
-config/gstin_verification_config.yml
 
 
 # Ignore all logfiles and tempfiles.
