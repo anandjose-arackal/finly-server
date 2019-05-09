@@ -17,9 +17,15 @@ class TaxRate < ApplicationRecord
   include SoftDeletable
   belongs_to :company, optional: true
 
+  validates :rate, presence: true
+
   scope :with_name, -> (name) {where name: name}
   scope :with_rate, -> (rate) {where rate: rate}
   scope :with_internal_id, -> (ids) {where internal_id: ids}
+
+  after_create do
+    self.update(igst: self.rate, cgst: (self.rate / 2), sgst: (self.rate / 2))
+  end
 
   def as_json
     {
@@ -32,7 +38,7 @@ class TaxRate < ApplicationRecord
         sgst_internal_id: self.sgst_internal_id,
         cgst_internal_id: self.cgst_internal_id,
         igst_internal_id: self.igst_internal_id,
-        display_name: "#{self.name} - #{self.rate}"
+        display_name: "#{self.rate} - #{self.name}"
     }
   end
 end
