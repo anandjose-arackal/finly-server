@@ -4,6 +4,8 @@ module Seedable
   included do
     scope :with_id, -> (id) {where id: id}
     scope :with_name, -> (name) {where name: name}
+
+    refresh_cache
   end
 
   class_methods do
@@ -78,7 +80,8 @@ module Seedable
 
   # Load all values of all variables in SimpleConfig
   def self.refresh_all_caches
-    Rails.application.eager_load!
+    Rails.application.eager_load! if Rails.env.development?
+
     seedable_classes = ObjectSpace.each_object(Class).select {|c| c.included_modules.include?(Seedable)}
     values = {}
     seedable_classes.each do |seedable_class|
