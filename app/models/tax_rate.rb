@@ -27,7 +27,7 @@ class TaxRate < ApplicationRecord
     self.update(igst: self.rate, cgst: (self.rate / 2), sgst: (self.rate / 2))
   end
 
-  def as_json
+  def as_json(options = {})
     {
         id: id,
         name: self.name,
