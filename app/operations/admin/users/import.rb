@@ -198,9 +198,17 @@ class Admin::Users::Import < Admin::Base
       end
     end
 
+    role_mapping_attributes = []
+    if row[import_fields[:expense_management]]  == 'Y'
+     role_mapping_attributes << {user_role_id: UserRole.employee_id,
+                                   purpose_id: Purpose.id_for(:expense_management)}
+    end
     # adding a default initiator role for vendor payments
+
+    if row[import_fields[:vendor_payments]]  == 'Y'
     role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator),
                                 purpose_id: Purpose.id_for(:vendor_payments)}
+    end
 
     user_email = ImportUtil.cleanup_email(row[import_fields[:email]])
     company_id = row[import_fields[:company_id]].to_i rescue nil
@@ -218,9 +226,9 @@ class Admin::Users::Import < Admin::Base
     generated_password = generate_default_password
     company = Company.find_by(id: row[import_fields[:company_id]])
     department_id = company&.departments&.find_by code: row[import_fields[:department_code]]
-    location_id = company&.locations.&find_by location_code: row[import_fields[:location_code]]
+    location_id = company&.locations&.find_by location_code: row[import_fields[:location_code]]
 
-    user_department_mappings_attributes = [{ department_id: department_i}]
+    user_department_mappings_attributes = [{ department_id: department_id}]
     user_branch_location_mappings_attributes = [{branch_location_id: location_id}]
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
@@ -246,14 +254,6 @@ class Admin::Users::Import < Admin::Base
                         yes_bank_account_transfer: vendor_payments
                     }
     }
-
-    if department_id.present?
-      user_params[:user_department_mappings_attributes] = user_department_mappings_attributes
-    end
-
-    if location_id.present?
-      user_params[:user_branch_location_mappings_attributes] = user_branch_location_mappings_attributes
-    end
 
     return user_params
   end
