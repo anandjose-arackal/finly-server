@@ -162,6 +162,8 @@ class NotifierType < ApplicationRecord
               configurable_push_notification: true, configurable_mailer: true},
              {key: :invoice_comment, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
+             {key: :invoice_credit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
 
 
               # Vendors

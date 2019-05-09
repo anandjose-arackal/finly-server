@@ -99,10 +99,26 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
 
     end
 
-    # Sending email to procurement initiators about payments against it
-    payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id)).where.not(purchase_order_id: nil)
+    # Sending email to original document initiators about payments against it
+    # payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id)).where.not(purchase_order_id: nil)
+    payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id))
     payments.each do |payment|
-      Event::EPurchaseOrder::Credit.(user, {payment: payment})
+      case payment.parent_type
+      when 'Invoice'        
+        document_owner = payment.invoice.created_by
+        Event::EInvoice::Credit.(document_owner, {payment: payment})
+      when 'PurchaseOrder'
+        document_owner = payment.purchase_order.user
+        Event::EPurchaseOrder::Credit.(document_owner, {payment: payment})
+      when 'Beneficiary'
+        document_owner = payment.invoice.created_by
+        Event::EBankPaymentRequest::Credit.(document_owner, {payment: payment})
+      else
+        document_owner = user
+        Event::EBankPaymentRequest::Credit.(document_owner, {payment: payment})
+      end
+      Rails.logger.fatal "User from mark_as_credited #{user.inspect}" 
+      Rails.logger.fatal "document_owner from mark_as_credited #{document_owner.inspect}" 
     end
   end
 end
