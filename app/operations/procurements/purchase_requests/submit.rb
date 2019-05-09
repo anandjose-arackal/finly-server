@@ -21,7 +21,22 @@ class Procurements::PurchaseRequests::Submit < Procurements::PurchaseRequests::B
         op = WorkflowManager::Base.(user, params)
         if op.success?
           # Submit the line items too
-          unless purchase_request&.status&.name&.to_sym&.present? && purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym), rejected: false)
+          purchase_request_status = purchase_request&.status&.name
+          if purchase_request_status.present?
+            # if purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym), rejected: false)
+            if purchase_request_status == 'auto_approved'
+              trail_action = 'auto_approve'
+            elsif purchase_request_status == 'approved'
+              trail_action = 'approve'
+            end
+            purchase_request.purchase_request_items.each do |item|
+              item.status_id = PurchaseRequestItemStatus.id_for(purchase_request&.status&.name&.to_sym)
+              item.rejected = false
+              if item.save
+                trail = item.trails.create(action_user: user, action_id: TrailAction.id_for(trail_action))
+              end
+            end
+          else
             raise
           end
         else

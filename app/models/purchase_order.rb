@@ -835,7 +835,13 @@ class PurchaseOrder < ApplicationRecord
 
       # Update Purchase request item statuses
        # TODO- create status change trail 
-      PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
+      # PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
+      PurchaseRequestItem.with_ids(item_ids).each do |purchase_request_item|
+        purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(:po_created)
+        if purchase_request_item.save
+          Trail.create(parent_type: 'PurchaseRequestItem', parent_id: purchase_request_item.id, action_user_id: user.id, action_id: TrailAction.id_for(:po_created))
+        end
+      end
 
       document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
       # Status transition of PR to po_created if all of its line items are either rejected or issued_from_inventory or have PO created against them
@@ -853,4 +859,5 @@ class PurchaseOrder < ApplicationRecord
       end
     end
   end
+
 end

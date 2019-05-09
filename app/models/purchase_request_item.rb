@@ -70,7 +70,7 @@ class PurchaseRequestItem < ApplicationRecord
   scope :rejected, -> { where rejected: true }
   scope :issued_from_inventory, -> { where status_id: PurchaseRequestItemStatus.id_for(:issued_from_inventory)}
   scope :po_created, -> { where status_id: PurchaseRequestItemStatus.id_for(:po_created) }
-  scope :approved, -> { where status_id: PurchaseRequestItemStatus.id_for(:approved) }
+  scope :approved, -> { where status_id: [PurchaseRequestItemStatus.id_for(:approved), PurchaseRequestItemStatus.id_for(:auto_approved)] }
 
   scope :item_id, -> (id) {
     where item_id: id

@@ -49,7 +49,10 @@ class TrailAction < ApplicationRecord
         :reject_booking_request,
         :request_selection,
         :retract_booking,
-        :forward
+        :forward,
+        # Purchase Request
+        :po_created,
+        :po_deleted
     ]
   end
 end
