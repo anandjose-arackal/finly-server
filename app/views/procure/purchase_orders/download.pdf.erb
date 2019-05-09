@@ -68,7 +68,7 @@
     </div> -->
   </div>
 
-  <% if @result.purchase_order.vendor&.address&.blank? %>
+  <% if @result.purchase_order.gstin_location&.address&.blank? %>
 
     <div class="col col-xs-12 no-padding body-container">
       <div class="col col-xs-4 vendor-details">
@@ -178,7 +178,7 @@
           <div class="col col-xs-12 no-padding font-dark-gray"><%= @result.purchase_order.vendor.business_name %></div>
         </div>
         <div class="col col-xs-12 no-padding mg-botm-8">
-          <div class="col col-xs-12 no-padding font-light-gray mg-botm-8"><%= @result.purchase_order.vendor.address %></div>
+          <div class="col col-xs-12 no-padding font-light-gray mg-botm-8"><%= @result.purchase_order.gstin_location&.address %></div>
         </div>
         <div class="col col-xs-12 no-padding">
           <div class="col col-xs-12 no-padding font-light-gray mg-botm-2">GST Number</div>
