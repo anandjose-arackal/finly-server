@@ -38,6 +38,8 @@ class Policy < ApplicationRecord
   has_many :departments, through: :policy_department_mappings
   has_many :policy_location_mappings, dependent: :destroy
   has_many :locations, class_name: 'BranchLocation', through: :policy_location_mappings
+  has_many :policy_cost_center_mappings, dependent: :destroy
+  has_many :cost_centers, through: :policy_cost_center_mappings
 
 
   has_one :distance_expense_config
