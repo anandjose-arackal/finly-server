@@ -200,6 +200,15 @@ class YesBankVendor < ApplicationRecord
     self.business_name.blank? ? self.name : self.business_name
   end
 
+  def generate_sequential_id?
+    # if the vendor is authorized or if the vendor already has a vendor ID from the frontend,
+    # do NOT generate a custom sequential ID for them
+    if self.authorized || self.vendor_id.present?
+      return false
+    end
+    true
+  end
+
   def as_json(options={})
     display_name = self.business_name || self.name
     {
