@@ -69,6 +69,7 @@ class Policy < ApplicationRecord
     where("policy_user_roles.user_role_id", UserRole.id_for(:purchase_order_initiator))
   }
 
+  # scope :include_pur, -> {includes :policy_user_roles}
   scope :with_invoice_initiator_role, -> {
     where("policy_user_roles.user_role_id", UserRole.id_for(:invoice_initiator))
   }
