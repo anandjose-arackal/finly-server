@@ -20,7 +20,8 @@ class Statements::AsSpreadsheet < Statements::Base
         'Note',
     ]
     self.contents = []
-    result.scoped_finly_transactions.success.sort_date_asc.all.each do |finly_transaction|
+    debugger
+    result.scoped_finly_transactions.success.sort_date_asc.all.find_each(batch_size: 10000) do |finly_transaction|
       transaction_detail = finly_transaction.transaction_detail
       credit_amount = nil
       debit_amount = nil
