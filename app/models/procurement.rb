@@ -383,14 +383,18 @@ class Procurement < ApplicationRecord
 
   scope :filter_grn_due_today, -> (required) {
     if StringUtils.to_bool(required)
-      filtered_ids = InwardDocument.where("DATE(delivery_date) = ?", Date.today).pluck(:procurement_id).uniq
+      # earlier we only had procs with grn, now we have po's which are approved as well in grn index. so changing the filter
+      # filtered_ids = InwardDocument.where("DATE(delivery_date) = ?", Date.today).pluck(:procurement_id).uniq
+      filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).where("DATE(delivery_date) = ?", Date.today).pluck(:procurement_id).uniq
       where(id: filtered_ids)
     end
   }
 
   scope :filter_grn_overdue, -> (required) {
     if StringUtils.to_bool(required)
-      filtered_ids = InwardDocument.where("DATE(delivery_date) < ?", Date.today).pluck(:procurement_id).uniq
+      # earlier we only had procs with grn, now we have po's which are approved as well in grn index. so changing the filter
+      # filtered_ids = InwardDocument.where("DATE(delivery_date) < ?", Date.today).pluck(:procurement_id).uniq
+      filtered_ids = RequestStore.store[:current_user].company.purchase_orders.with_procurement_id(ids).where("DATE(delivery_date) < ?", Date.today).pluck(:procurement_id).uniq
       where(id: filtered_ids)
     end
   }

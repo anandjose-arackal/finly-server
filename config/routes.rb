@@ -3386,6 +3386,7 @@ Rails.application.routes.draw do
     get 'users/invite_config', to: 'users#invite_config'
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
+      get 'policies', to: 'users#policies'
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options

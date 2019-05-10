@@ -15,6 +15,11 @@ class BankTransfer::UsersController < BaseControllers::WebBase
     respond
   end
 
+  def policies
+    @result = BankTransfer::Users::Policies.(current_user, params)
+    respond
+  end
+
   def get_managers
     @result = BankTransfer::Users::GetManagers.(current_user, params)
     respond

@@ -1267,6 +1267,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
   end
 
+  def is_purchase_order_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_order_auditor), document)
+  end
+
   def is_purchase_request_initiator?(document=nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_initiator), document)
   end
@@ -1275,12 +1279,20 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
   end
 
+  def is_purchase_request_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_request_auditor), document)
+  end
+
   def is_bank_payment_request_initiator?(document=nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), document)
   end
 
   def is_bank_payment_request_reviewer?(document=nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), document)
+  end
+
+  def is_bank_payment_request_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor), document)
   end
 
   def is_bank_payment_request_creditor?(document=nil)
@@ -1293,6 +1305,10 @@ class User < ApplicationRecord
 
   def is_invoice_reviewer?(document=nil)
     self.has_policy_role?(UserRole.id_for(:invoice_reviewer), document)
+  end
+
+  def is_invoice_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:invoice_auditor), document)
   end
 
   def is_budget_manager?(document=nil)

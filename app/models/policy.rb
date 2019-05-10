@@ -69,6 +69,7 @@ class Policy < ApplicationRecord
     where("policy_user_roles.user_role_id", UserRole.id_for(:purchase_order_initiator))
   }
 
+  # scope :include_pur, -> {includes :policy_user_roles}
   scope :with_invoice_initiator_role, -> {
     where("policy_user_roles.user_role_id", UserRole.id_for(:invoice_initiator))
   }
@@ -121,15 +122,15 @@ class Policy < ApplicationRecord
   end
 
   def distance_expense_enabled?
-    self.distance_expense_config.enabled
+    self&.distance_expense_config&.enabled
   end
 
   def time_expense_enabled?
-    self.time_expense_config.enabled
+    self&.time_expense_config&.enabled
   end
 
   def per_diem_expense_enabled?
-    self.per_diem_expense_config.enabled
+    self&.per_diem_expense_config&.enabled
   end
 
   def as_json(options = {})

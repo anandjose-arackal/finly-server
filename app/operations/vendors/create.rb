@@ -50,22 +50,32 @@ class Vendors::Create < Vendors::Base
       end
     end
 
-    unless vendor_parameters[:pan].present?
-      add_message :error, "Please provide PAN to proceed"
-      return
-    else
-      validate_attachment(vendor_parameters, :pan)
+
+    if user.company_id == 156
+      unless vendor_parameters[:pan].present?
+        add_message :error, "Please provide PAN to proceed"
+        return
+      else
+        validate_attachment(vendor_parameters, :pan)
+      end
+
+    if vendor_parameters[:pan].present?
+      existing_pan = user.company.yes_bank_vendors.find_by pan: vendor_parameters[:pan]
+      if existing_pan.present?
+        add_message :error, "Another Vendor existed with this PAN"
+      end
     end
 
     if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
       validate_attachment(vendor_parameters, :msme_certificate)
     end
 
-    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
-      validate_attachment(vendor_parameters, :gstin)
-      validate_gstin(vendor_parameters)
-      # validate_business_name(vendor_parameters)
-      # validate_pan(vendor_parameters)
+      if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
+        validate_attachment(vendor_parameters, :gstin)
+        validate_gstin(vendor_parameters)
+        # validate_business_name(vendor_parameters)
+        # validate_pan(vendor_parameters)
+      end
     end
 
     # checking if a particular bank account already exists, if it does, just mark that respective vendor

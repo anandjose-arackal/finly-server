@@ -97,6 +97,7 @@ class AdminUsers::CompaniesController < BaseControllers::AdminBase
       when 'lrms'
         @result =  Policy::ApprovalWorkflows::Configs::ImportLevels.(current_user, params)
       when 'lurms'
+        @result = Policy::ApprovalWorkflows::Configs::ImportReviewers.(current_user, params)
       end
     end
 
