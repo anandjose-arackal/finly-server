@@ -52,7 +52,7 @@ default: &default
     path: 'TransactionOTP'
   icici_bank_transaction_initiate:
     base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
-    path: 'Create'
+    path: 'TransactionOTP'
   icici_bank_balance_inquiry:
     base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'BalanceInquiry'
@@ -166,7 +166,7 @@ production:
     path: 'TransactionOTP'
   icici_bank_transaction_initiate:
     base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
-    path: 'Create'
+    path: 'TransactionOTP'
   icici_bank_balance_inquiry:
     base: 'https://apigwuat.icicibank.com:8443/api/Corporate/CIB/v1'
     path: 'BalanceInquiry'
