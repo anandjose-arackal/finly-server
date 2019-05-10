@@ -325,6 +325,10 @@ class PurchaseOrder < ApplicationRecord
 
   scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
 
+  scope :includes_for_index, -> {
+    includes(:procurement, :sub_department, :user, :balance_amount, :delivery_location, :vendor, :purchase_order_status)
+  }
+
   before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
