@@ -56,7 +56,7 @@ class Department < ApplicationRecord
 
   def as_json(options={})
     args = {id: self.id}
-    args[:name] = full_name
+    args[:name] = options&.dig(:tree) ? full_name : name
     # args[:cost_center] = self.cost_center
     # if options&.dig(:tree)
     #   args[:name] = full_name

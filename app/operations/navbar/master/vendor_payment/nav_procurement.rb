@@ -101,7 +101,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   end
 
   def manage
-    {name: 'Manage', id: 'manage', url: 'beneficiaries'}
+    {name: 'Manage', id: 'manage', url: 'vendor'}
   end
 
   def manage_vendors
