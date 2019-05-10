@@ -330,7 +330,7 @@ class PurchaseOrder < ApplicationRecord
   scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
 
   scope :includes_for_index, -> {
-    includes(:procurement, :sub_department, :user, :balance_amount, :delivery_location, :vendor, :purchase_order_status)
+    includes(:procurement, :user, :balance_amount, :vendor, :status)
   }
 
   before_save :calculate_line_items
@@ -367,6 +367,11 @@ class PurchaseOrder < ApplicationRecord
   end
 
   template_merge :procurement_id, :user_id, :vendor_id
+
+  def awaiting_action(user)
+    return false if user.blank?
+    self.get_reviewers.include? user
+  end
 
   def all_items_shipped?
     shipped = true

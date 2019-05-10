@@ -69,7 +69,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
       page = params[:page] || 1
       per_page = params[:per_page] || 30
     
-      self.paginated_purchase_orders = self.purchase_orders.paginate(page: page, per_page: per_page)
+      self.paginated_purchase_orders = self.purchase_orders.paginate(page: page, per_page: per_page).includes_for_index
     end
   end
 end
