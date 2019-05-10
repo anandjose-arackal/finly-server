@@ -110,18 +110,18 @@ class Company::Locations::Import < Company::Locations::Base
   end
 
   def create_response_csv
-    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
-    FileUtils.mkdir_p "public/common/files/temp_files" unless  Dir.exist?("public/common/files/temp_files")
-    CSV.open(file_name, 'wb') do |csv|
-      self.header << 'Result'
-      csv << header
-      (2..sheet.last_row).each do |i|
-        row = sheet.row(i)
-        row = row.map(&:to_s)
-        row << result_hash[i]
-        csv << row
-      end
-    end
-    return file_name.gsub('public', '')
+   file = Tempfile.new("bulk_import_locations_result.csv")
+           CSV.open(file.path, 'wb') do |csv|
+             self.header << 'Result'
+             csv << header
+             (2..sheet.last_row).each do |i|
+               row = sheet.row(i)
+               row = row.map(&:to_s)
+               row << result_hash[i]
+               csv << row
+             end
+           end
+       temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+       return temp_file.file.url
   end
 end
