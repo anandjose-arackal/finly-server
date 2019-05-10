@@ -1,5 +1,5 @@
 class ItemMaster::Item::Import < ItemMaster::Item::Base
-  attr_accessor :file_url, :file, :result_hash, :params, :missing_params, :sheet, :header, :item_params, :company,
+  attr_accessor :file_url, :file, :result_hash, :params, :missing_params, :sheet, :header, :item_params, :company,:item_expense_types,:supply_item_types
 
   def pre_validate
     if user.blank? || params.blank?
@@ -31,6 +31,8 @@ class ItemMaster::Item::Import < ItemMaster::Item::Base
   end
 
   def process
+    self.item_expense_types = ItemExpenseType.all
+    self.supply_item_types = SupplyItemType.all
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       self.item_params = process_row(row)
@@ -70,13 +72,24 @@ class ItemMaster::Item::Import < ItemMaster::Item::Base
     item_code = row[import_fields[:item_code]].to_s
     discount = row[import_fields[:discount]].to_f&.round(2)
     rate = row[import_fields[:rate]].to_f&.round(2)
+    item_expense_type_id = item_expense_types.where(name: row[import_fields[:item_expense_type]].to_s&.downcase)&.first&.id
 
+    supply_item_type_id = nil
+    if row[import_fields[:po_item]].to_s&.upcase  == "Y" && row[import_fields[:non_po_item]].to_s&.upcase  == "Y"
+      supply_item_type_id = supply_item_types.find_by_name("po_non_po_item").id
+    elsif row[import_fields[:po_item]].to_s&.upcase == "Y"
+      supply_item_type_id = supply_item_types.find_by_name("po_item").id
+    elsif row[import_fields[:non_po_item]].to_s&.upcase == "Y"
+      supply_item_type_id = supply_item_types.find_by_name("non_po_item").id
+    end
 
     params ={
       description: description,
       category_id: category_id,
       hsn_sac: hsn_sac,
       item_code: item_code,
+      item_expense_type_id: item_expense_type_id,
+      supply_item_type_id: supply_item_type_id,
       discount: discount,
       rate: rate
     }
@@ -88,8 +101,11 @@ class ItemMaster::Item::Import < ItemMaster::Item::Base
        :category => 1,
        :hsn_sac => 2,
        :item_code => 3,
-       :discount => 4,
-       :rate => 5
+       :item_expense_type => 4,
+       :po_item => 5,
+       :non_po_item => 6,
+       :discount => 7,
+       :rate => 8
     }
   end
 
@@ -107,18 +123,18 @@ class ItemMaster::Item::Import < ItemMaster::Item::Base
   end
 
   def create_response_csv
-    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
-    FileUtils.mkdir_p "public/common/files/temp_files" unless  Dir.exist?("public/common/files/temp_files")
-    CSV.open(file_name, 'wb') do |csv|
-      self.header << 'Result'
-      csv << header
-      (2..sheet.last_row).each do |i|
-        row = sheet.row(i)
-        row = row.map(&:to_s)
-        row << result_hash[i]
-        csv << row
-      end
-    end
-    return file_name.gsub('public', '')
+     file = Tempfile.new("bulk_import_items_result.csv")
+       CSV.open(file.path, 'wb') do |csv|
+         self.header << 'Result'
+         csv << header
+         (2..sheet.last_row).each do |i|
+           row = sheet.row(i)
+           row = row.map(&:to_s)
+           row << result_hash[i]
+           csv << row
+         end
+       end
+       temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+     return temp_file.file.url
   end
 end
