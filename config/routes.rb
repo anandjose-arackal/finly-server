@@ -2356,6 +2356,8 @@
 
 Rails.application.routes.draw do
 
+  get 'unique_identifiers/index'
+  get 'unique_identifiers/set'
   get 'qukickbooks_configurations/create'
   get 'qukickbooks_configurations/update'
   get 'qukickbooks_configurations/show'
@@ -3396,6 +3398,7 @@ Rails.application.routes.draw do
     get 'users/invite_config', to: 'users#invite_config'
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
+      get 'policies', to: 'users#policies'
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
@@ -3418,6 +3421,9 @@ Rails.application.routes.draw do
   get 'invoice/:invoice_id', to: 'invoicing/public_links#invoice_show', as: :public_invoice
 
   resources :addresses
+  resources :unique_identifiers, only: [:index, :update]
+  # get 'unique_identifiers', to: 'unique_identifiers#index'
+  # patch 'unique_identifiers', to: 'unique_identifiers#update'
 
   namespace :invoicing do
     resources :payment_receivables
