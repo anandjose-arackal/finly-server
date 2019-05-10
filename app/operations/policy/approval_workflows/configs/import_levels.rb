@@ -155,8 +155,7 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
   end
 
   def create_response_csv
-    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.xls".gsub(Regexp.union([' ', '-', ':', '+']), '')
-    FileUtils.mkdir_p "public/common/files/temp_files" unless  Dir.exist?("public/common/files/temp_files")
+    file = Tempfile.new("bulk_import_lrm_result.xls")
     workbook  = ::WriteXLSX.new(file_name)
     sheets.each_with_pagename do |name, sheet|
       worksheet = workbook.add_worksheet(name)
@@ -173,7 +172,8 @@ class Policy::ApprovalWorkflows::Configs::ImportLevels < Policy::ApprovalWorkflo
       end
     end
     workbook.close
-    return file_name.gsub('public', '')
+    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+    return temp_file.file.url
   end
 
   def clean_up_data(text)
