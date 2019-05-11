@@ -107,6 +107,8 @@ class Vendors::Update < Vendors::Base
     if self.vendor_parameters&.dig(:vendor_attachments_attributes)
 
     end
+
+    self.vendor_parameters.delete(:override_vendor_id)
   end
 
   def process

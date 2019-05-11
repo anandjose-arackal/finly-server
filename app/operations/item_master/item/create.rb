@@ -37,6 +37,7 @@ class ItemMaster::Item::Create < ItemMaster::Item::Base
     unless self.override_item_number
       self.inventory_item_parameters.delete(:item_number)
     end
+    self.inventory_item_parameters.delete(:override_item_number)
   end
 
   def process

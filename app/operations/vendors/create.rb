@@ -151,6 +151,7 @@ class Vendors::Create < Vendors::Base
     unless self.override_vendor_id
       self.vendor_parameters.delete(:vendor_id)
     end
+    self.vendor_parameters.delete(:override_vendor_id)
   end
 
   def process
