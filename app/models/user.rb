@@ -759,32 +759,32 @@ class User < ApplicationRecord
   end
 
   def min_password_score
-    # level_3_req = UserRole.ids_for(
-    #     :admin,
-    #     :finance_manager,
-    #     :creditor,
-    #     :bank_payment_request_creditor
-    # )
-    #
-    # level_2_req = UserRole.ids_for(
-    #     :auditor,
-    #     :manager,
-    #     :reviewer,
-    #     :purchase_request_reviewer,
-    #     :purchase_order_reviewer,
-    #     :invoice_reviewer,
-    #     :bank_payment_request_reviewer,
-    #     :item_master_manager,
-    #     :inventory_manager,
-    #     :vendor_reviewer,
-    #     :policy_admin,
-    #     :vendor_manager,
-    #     :bank_payment_request_auditor,
-    #     :budget_manager
-    # )
-    #
-    # return 3 if role_mapping.role(level_3_req).present?
-    # return 2 if role_mapping.role(level_2_req).present?
+    level_3_req = UserRole.ids_for(
+        :admin,
+        :finance_manager,
+        :creditor,
+        :bank_payment_request_creditor
+    )
+
+    level_2_req = UserRole.ids_for(
+        :auditor,
+        :manager,
+        :reviewer,
+        :purchase_request_reviewer,
+        :purchase_order_reviewer,
+        :invoice_reviewer,
+        :bank_payment_request_reviewer,
+        :item_master_manager,
+        :inventory_manager,
+        :vendor_reviewer,
+        :policy_admin,
+        :vendor_manager,
+        :bank_payment_request_auditor,
+        :budget_manager
+    )
+
+    return 3 if role_mapping.role(level_3_req).present?
+    return 2 if role_mapping.role(level_2_req).present?
     1
   end
 
