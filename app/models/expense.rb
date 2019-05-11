@@ -1096,6 +1096,18 @@ class Expense < ApplicationRecord
     true
   end
 
+  def custom_fields_label_values
+    field_label_values = {}
+    if self.custom_fields.empty?
+      field_label_values = {}
+    else
+      self.custom_fields.each do |field|
+        field_label_values[field.field_configuration_id.to_s] = {value: field.string_value, label: field.field_configuration.field_name}
+      end
+    end
+    field_label_values
+  end
+
   private
 
   # cannot add an expense with future date
