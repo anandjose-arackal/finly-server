@@ -1,6 +1,4 @@
-class Procure::PurchaseRequestsController < ApplicationController
-
-  before_action -> { finly_authorize! :web}
+class Procure::PurchaseRequestsController < WebBase
 
   def index
     @result = Procurements::PurchaseRequests::Index.(current_user, params)

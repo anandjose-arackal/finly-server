@@ -1,5 +1,4 @@
-class UniqueIdentifiersController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class UniqueIdentifiersController < WebBase
 
   def index
     @result = UniqueIdentifier::Index.(current_user, params)

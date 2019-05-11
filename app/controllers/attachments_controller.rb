@@ -1,6 +1,4 @@
-class AttachmentsController < ApplicationController
-
-  before_action -> { finly_authorize! :web}
+class AttachmentsController < WebBase
 
   def index
     @result = Attachments::Index.(current_user, params)

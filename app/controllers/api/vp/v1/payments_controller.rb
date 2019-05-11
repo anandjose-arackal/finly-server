@@ -1,7 +1,4 @@
-class Api::Vp::V1::PaymentsController < ApplicationController
-  protect_from_forgery with: :null_session
-
-  before_action -> { finly_authorize! :api }
+class Api::Vp::V1::PaymentsController < ApiBase
 
   def index
     @result = BankTransfer::Payments::Index.(current_user, params)
