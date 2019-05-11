@@ -162,6 +162,23 @@ class Policy < ApplicationRecord
     end
     true
   end
+  def update_policy_cost_center_mapping(params)
+    # Creating new record on every update as it was required to be like this only
+    begin
+      ActiveRecord::Base.transaction do
+        self.policy_cost_center_mappings.destroy_all
+        binding.pry
+        params[:policy_cost_center_mappings_attributes].each do |cost_center_id|
+          cost_center = self.company.cost_centers.find_by_id cost_center_id
+          result = self.policy_cost_center_mappings.create!(cost_center_id: cost_center_id, enabled: true)
+        end
+      end
+    rescue
+      return false
+    end
+    true
+  end
+
 
   def update_policy_location_mapping(params)
     # Creating new record on every update as it was required to be like this only

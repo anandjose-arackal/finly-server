@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_09_051538) do
+ActiveRecord::Schema.define(version: 2019_05_11_120226) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -4245,6 +4245,7 @@ ActiveRecord::Schema.define(version: 2019_05_09_051538) do
     t.integer "policy_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "enabled"
   end
 
   create_table "policy_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -4577,6 +4578,7 @@ ActiveRecord::Schema.define(version: 2019_05_09_051538) do
     t.boolean "cost_allocation_items", default: false
     t.text "internal_note"
     t.integer "taxable_amount_id"
+    t.text "vendor_address"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -5268,6 +5270,23 @@ ActiveRecord::Schema.define(version: 2019_05_09_051538) do
     t.index ["company_id"], name: "index_tally_configurations_on_company_id"
   end
 
+  create_table "tax_per_items", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "document_type"
+    t.bigint "document_id"
+    t.string "tax_rate_type"
+    t.bigint "tax_rate_id"
+    t.integer "cgst_id"
+    t.integer "sgst_id"
+    t.integer "igst_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cgst_id"], name: "index_tax_per_items_on_cgst_id"
+    t.index ["document_type", "document_id"], name: "index_tax_per_items_on_document_type_and_document_id"
+    t.index ["igst_id"], name: "index_tax_per_items_on_igst_id"
+    t.index ["sgst_id"], name: "index_tax_per_items_on_sgst_id"
+    t.index ["tax_rate_type", "tax_rate_id"], name: "index_tax_per_items_on_tax_rate_type_and_tax_rate_id"
+  end
+
   create_table "tax_rates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "name"
     t.decimal "rate", precision: 20, scale: 5
@@ -5277,6 +5296,12 @@ ActiveRecord::Schema.define(version: 2019_05_09_051538) do
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false, null: false
     t.datetime "deleted_at"
+    t.decimal "cgst", precision: 10, scale: 5
+    t.decimal "sgst", precision: 10, scale: 5
+    t.decimal "igst", precision: 10, scale: 5
+    t.string "igst_internal_id"
+    t.string "cgst_internal_id"
+    t.string "sgst_internal_id"
     t.index ["company_id"], name: "index_tax_rates_on_company_id"
     t.index ["deleted_at"], name: "index_tax_rates_on_deleted_at"
   end
