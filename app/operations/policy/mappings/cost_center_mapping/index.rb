@@ -20,11 +20,12 @@ class Policy::Mappings::CostCenterMapping::Index < Policy::Base
 
   class Policy::Mappings::CostCenterMapping::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :policy, :cost_center_mapping
+    attr_accessor :policy, :cost_center_mapping, :cost_centers
 
     def init
       self.policy = params[:policy]
       self.cost_center_mapping = policy.cost_centers
+      self.cost_centers = policy.company.cost_centers
     end
   end
 
