@@ -91,7 +91,7 @@
 #
 # end
 
-class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
+class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscriber
   attr_accessor :input_data
 
   bus ExportManager::Master::BaseMaster
@@ -100,38 +100,38 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseMaster
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [
-                      finly_ref_no: {spreadsheet: true},
-                      po_number: {spreadsheet: true},
-                      invoice_type: {spreadsheet: true},
-                      invoice_no: {spreadsheet: true},
-                      vendor_name: {spreadsheet: true},
-                      vendor_ref_no: {spreadsheet: true},
-                      # vendor_gst: {spreadsheet: true},
-                      # po_number: {spreadsheet: true},
-                      transaction_period_from: {spreadsheet: true},
-                      transaction_period_to: {spreadsheet: true},
-                      category: {spreadsheet: true},
-                      quantity: {spreadsheet: true},
-                      rate: {spreadsheet: true},
-                      narration: {spreadsheet: true},
-                      city_name: {spreadsheet: true},
-                      city_code: {spreadsheet: true},
-                      department_name: {spreadsheet: true},
-                      department_code: {spreadsheet: true},
-                      gst_group: {spreadsheet: true},
-                      hsn_sac: {spreadsheet: true},
-                      # tds_nature: {spreadsheet: true},
-                      cost_center: {spreadsheet: true},
-                      nature_of_expense: {spreadsheet: true},
-                      nature_of_office: {spreadsheet: true},
-                      item_code: {spreadsheet: true},
-                      description: {spreadsheet: true},
-                      unit_of_measurement: {spreadsheet: true},
-                      total_amount: {spreadsheet: true},
-                      tax_amount: {spreadsheet: true},
-                      tax_rate: {spreadsheet: true},
-                      tax_type: {spreadsheet: true},
-                  ]
+             finly_ref_no: {spreadsheet: true},
+             po_number: {spreadsheet: true},
+             invoice_type: {spreadsheet: true},
+             invoice_no: {spreadsheet: true},
+             vendor_name: {spreadsheet: true},
+             vendor_ref_no: {spreadsheet: true},
+             # vendor_gst: {spreadsheet: true},
+             # po_number: {spreadsheet: true},
+             transaction_period_from: {spreadsheet: true},
+             transaction_period_to: {spreadsheet: true},
+             category: {spreadsheet: true},
+             quantity: {spreadsheet: true},
+             rate: {spreadsheet: true},
+             narration: {spreadsheet: true},
+             city_name: {spreadsheet: true},
+             city_code: {spreadsheet: true},
+             department_name: {spreadsheet: true},
+             department_code: {spreadsheet: true},
+             gst_group: {spreadsheet: true},
+             hsn_sac: {spreadsheet: true},
+             # tds_nature: {spreadsheet: true},
+             cost_center: {spreadsheet: true},
+             nature_of_expense: {spreadsheet: true},
+             nature_of_office: {spreadsheet: true},
+             item_code: {spreadsheet: true},
+             description: {spreadsheet: true},
+             unit_of_measurement: {spreadsheet: true},
+             total_amount: {spreadsheet: true},
+             tax_amount: {spreadsheet: true},
+             tax_rate: {spreadsheet: true},
+             tax_type: {spreadsheet: true},
+         ]
 
   def input
     return self.input_data unless self.input_data.nil?
