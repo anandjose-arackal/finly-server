@@ -1,7 +1,7 @@
 class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsManager::Master::Base
 
   register_handle :purchase_request_show
-  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :delete_pr_line_item, :reject_pr_line_item, :return_control, :add_new_line_item ]
+  register_actions [ :save_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :delete_pr_line_item, :reject_pr_line_item, :return_control, :add_new_line_item, :delete_pr ]
 
   def initialize(user=nil, params=nil)
     super
@@ -199,5 +199,8 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control_by_id == user.id
   end
 
+  def delete_pr
+    purchase_request.open? || purchase_request.retracted? || purchase_request.rejected?
+  end
 
 end
