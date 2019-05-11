@@ -8,12 +8,12 @@ unless Rails.env.production?
   Rack::Attack.safelist_ip('::1')
 end
 
-# Todo untested
-# WHITELISTED_IPS = Finly::SecureStorage::Connector.read('core/whitelisted_ip_list')
-# Rack::Attack.safelist('allow API requests from known IPs') do |req|
-#   WHITELISTED_IPS.include?(req.ip)
-# end
-# Todo untested
+if Rails.env.production?
+  whitelisted_ips = Finly::SecureStorage::Connector.read('core/whitelisted_ip_list')
+  Rack::Attack.safelist('allow API requests from known IPs') do |req|
+    whitelisted_ips.include?(req.ip)
+  end
+end
 
 # Request Throttling Start
 # 120rpm
