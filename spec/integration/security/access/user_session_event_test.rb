@@ -15,11 +15,11 @@ RSpec.describe 'UserSessionEvent' do
 
     @headers = authentication_headers_for(:web)
     @headers[:HTTP_USER_AGENT] = @user_agent
-    @headers[:REMOTE_ADDR] = @authorized_ip
+    @headers[:REMOTE_ADDR] = @ip
 
     @user_device_browser = create :user_device_browser, client_properties
     @device = create :user_device_verified, client: @user_device_browser, company: @company, user: @user1
-    @user_ip = create :user_ip_verified, ip: @authorized_ip, user: @user1
+    @user_ip = create :user_ip_verified, ip: @ip, user: @user1
     @user_agent_client = create :user_agent_client_verified, user: @user1, user_agent: @user_agent
 
     @doorkeeper_application = create :doorkeeper_application

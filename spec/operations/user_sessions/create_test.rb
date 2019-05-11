@@ -220,7 +220,7 @@ RSpec.describe 'UserSessions::Create' do
             @username = @user1.email
             @issue_string = 'Issue issue'
 
-            allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post'}))
+            allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post', user_agent: @user_agent}))
             allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({success?: false, messages: {error: [@issue_string]}}))
             allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
 
@@ -233,10 +233,12 @@ RSpec.describe 'UserSessions::Create' do
           expect(@result.success?).to eq(true)
         end
 
-        it 'should set UserSession as failed' do
-          expect(@result.session.status_id).to eq(UserSessionStatus.id_for(:failed))
-          expect(@result.session.message).to eq(@issue_string)
-        end
+        # todo Temporary as frontend dev is not available
+        # it 'should set UserSession as failed' do
+        #   expect(@result.session.status_id).to eq(UserSessionStatus.id_for(:failed))
+        #   expect(@result.session.message).to eq(@issue_string)
+        # end
+        # todo Temporary as frontend dev is not available
       end
 
       describe '> With user with FailurePresenter from UserIps::FindOrCreate' do
@@ -290,24 +292,6 @@ RSpec.describe 'UserSessions::Create' do
       end
     end
 
-    describe '> Admin' do
-      before :all do
-        @status = :authorized
-        @doorkeeper_application = create :doorkeeper_application
-        @token = create(:doorkeeper_token, application_id: @doorkeeper_application.id)
-        @admin_user = create :admin_user
-      end
-
-      describe '> with user and admin' do
-        UserSessionCreateHelper.init_with_user(self)
-        UserSessionCreateHelper.user_session_property_check(self)
-        UserSessionCreateHelper.user_presence_check(self)
-
-        it 'should assign admin_user to the user session' do
-          expect(@result.session.admin_user).to eq(@admin_user)
-        end
-      end
-    end
   end
 
 end

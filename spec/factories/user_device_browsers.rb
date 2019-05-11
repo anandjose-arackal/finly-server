@@ -79,10 +79,24 @@ FactoryBot.define do
     is_mobile {false}
     status_id {UserDeviceStatus.id_for(:unverified)}
 
-    UserDeviceStatus.all.each do |status|
-      factory :"user_device_browser_#{status.name}" do
-        status_id {status.id}
-      end
+    factory :"user_device_browser_unverified" do
+      status_id {UserDeviceStatus.id_for(:unverified)}
+    end
+
+    factory :"user_device_browser_verified" do
+      status_id {UserDeviceStatus.id_for(:verified)}
+    end
+
+    factory :"user_device_browser_incomplete" do
+      status_id {UserDeviceStatus.id_for(:incomplete)}
+    end
+
+    factory :"user_device_browser_attribute_mismatch" do
+      status_id {UserDeviceStatus.id_for(:attribute_mismatch)}
+    end
+
+    factory :"user_device_browser_complete" do
+      status_id {UserDeviceStatus.id_for(:complete)}
     end
 
     factory :user_device_browser_mobile do
