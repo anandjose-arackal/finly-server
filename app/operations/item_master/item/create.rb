@@ -1,6 +1,6 @@
 class ItemMaster::Item::Create < ItemMaster::Item::Base
 
-  attr_accessor :inventory_line_item, :inventory_item_parameters
+  attr_accessor :inventory_line_item, :inventory_item_parameters, :override_item_number
 
   def personalizer
     {
@@ -12,6 +12,7 @@ class ItemMaster::Item::Create < ItemMaster::Item::Base
 
   def init
     self.inventory_item_parameters = inventory_item_params
+    self.override_item_number = self.inventory_item_parameters[:override_item_number]
   end
 
   def validate
@@ -29,6 +30,12 @@ class ItemMaster::Item::Create < ItemMaster::Item::Base
           add_message :error, "You don't have permission for this action"
         end
       end
+    end
+  end
+
+  def pre_process
+    unless self.override_item_number
+      self.inventory_item_parameters.delete(:item_number)
     end
   end
 
