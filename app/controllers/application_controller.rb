@@ -393,9 +393,7 @@ class ApplicationController < ActionController::Base
     ['otp/resend', 'otp/verify', 'users/password', 'notifications/unread'].each {|path| return false if request.path.include?(path)}
     return false if current_user.expired?
     return false unless current_user.otp_verified
-    return false unless user_session.user_device.status_id == UserDeviceStatus.id_for(:verified)
-    return false unless user_session.user_ip.status_id == UserIpStatus.id_for(:verified)
-    return false unless user_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:verified)
+    return false unless user_session.verified?
 
     true
   end

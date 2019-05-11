@@ -84,6 +84,17 @@ class UserSession < ApplicationRecord
     self.user_device&.update_attributes(status_id: UserDeviceStatus.id_for(:verified), verification_mode: verification_mode, verified_at: DateTime.now)
   end
 
+  def verified?
+    # Todo temporary workaround as user device, ip, client verification is only implemented for the web
+    return true unless web?
+
+    return false unless user_session.user_device.status_id == UserDeviceStatus.id_for(:verified)
+    return false unless user_session.user_ip.status_id == UserIpStatus.id_for(:verified)
+    return false unless user_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:verified)
+
+    true
+  end
+
   # def scopes
   #   access_token&.scopes.to_s.split(/\W+/)
   # end
