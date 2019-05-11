@@ -9,9 +9,8 @@ unless Rails.env.production?
 end
 
 if Rails.env.production?
-  whitelisted_ips = Finly::SecureStorage::Connector.read('core/whitelisted_ip_list')
   Rack::Attack.safelist('allow API requests from known IPs') do |req|
-    whitelisted_ips.include?(req.ip)
+    Finly::SecureStorage::Connector.read('core/whitelisted_ip_list').include?(req.ip)
   end
 end
 
