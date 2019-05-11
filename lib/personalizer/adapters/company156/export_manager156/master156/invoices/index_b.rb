@@ -24,7 +24,7 @@ class Personalizer::Adapters::Company156::ExportManager156::Master156::Invoices:
                       department_code: {spreadsheet: true},
                       gst_group: {spreadsheet: true},
                       hsn_sac: {spreadsheet: true},
-                      # tds_nature: {spreadsheet: true},
+                      tds_nature: {spreadsheet: true},
                       cost_center: {spreadsheet: true},
                       nature_of_expense: {spreadsheet: true},
                       nature_of_office: {spreadsheet: true},
@@ -176,6 +176,10 @@ class Personalizer::Adapters::Company156::ExportManager156::Master156::Invoices:
 
   def tax_rate(invoice_line_item)
     invoice_line_item.tax_rate&.rate
+  end
+
+  def tds_nature(invoice_line_item)
+    invoice_line_item.invoice.tds_slab&.name
   end
 
 
