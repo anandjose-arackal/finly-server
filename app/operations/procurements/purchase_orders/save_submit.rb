@@ -1,3 +1,5 @@
+# This operation would save and then submit the PO in one API call
+
 class Procurements::PurchaseOrders::SaveSubmit < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :flag_save, :flag_submit
 
