@@ -61,9 +61,16 @@ class Vendors::Create < Vendors::Base
         validate_attachment(vendor_parameters, :pan)
       end
 
-      if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
-        validate_attachment(vendor_parameters, :msme_certificate)
+    if vendor_parameters[:pan].present?
+      existing_pan = user.company.yes_bank_vendors.find_by pan: vendor_parameters[:pan]
+      if existing_pan.present?
+        add_message :error, "Another Vendor existed with this PAN"
       end
+    end
+
+    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+      validate_attachment(vendor_parameters, :msme_certificate)
+    end
 
       if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
         validate_attachment(vendor_parameters, :gstin)
