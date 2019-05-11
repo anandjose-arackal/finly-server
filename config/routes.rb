@@ -3469,6 +3469,7 @@ Rails.application.routes.draw do
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
       get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
+      put 'save_submit', to: 'purchase_orders#save_submit'
 
       resources :quotations, only: %i[index create update destroy]
     end
