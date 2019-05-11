@@ -1,4 +1,4 @@
-class UniqueIdentifiersController < WebBase
+class UniqueIdentifiersController < BaseControllers::WebBase
 
   def index
     @result = UniqueIdentifier::Index.(current_user, params)

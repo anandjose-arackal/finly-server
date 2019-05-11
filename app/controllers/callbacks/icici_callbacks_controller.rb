@@ -1,4 +1,4 @@
-class Callbacks::IciciCallbacksController < PublicBase
+class Callbacks::IciciCallbacksController < BaseControllers::PublicBase
 
   # todo - add IP whitelisting to this API
 

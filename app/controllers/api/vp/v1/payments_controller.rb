@@ -1,4 +1,4 @@
-class Api::Vp::V1::PaymentsController < ApiBase
+class Api::Vp::V1::PaymentsController < BaseControllers::ApiBase
 
   def index
     @result = BankTransfer::Payments::Index.(current_user, params)

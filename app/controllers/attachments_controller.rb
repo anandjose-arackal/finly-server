@@ -1,4 +1,4 @@
-class AttachmentsController < WebBase
+class AttachmentsController < BaseControllers::WebBase
 
   def index
     @result = Attachments::Index.(current_user, params)

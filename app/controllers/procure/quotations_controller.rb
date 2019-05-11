@@ -1,4 +1,4 @@
-class Procure::QuotationsController < WebBase
+class Procure::QuotationsController < BaseControllers::WebBase
 
   def index
     @result = Procurements::PurchaseOrders::Quotations::Index.(current_user, params)

@@ -1,4 +1,4 @@
-class TaxRatesController < WebBase
+class TaxRatesController < BaseControllers::WebBase
 
   def create
     @result = TaxRates::Create.(current_user, params)

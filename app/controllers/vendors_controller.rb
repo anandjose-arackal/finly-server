@@ -1,4 +1,4 @@
-class VendorsController < WebBase
+class VendorsController < BaseControllers::WebBase
 
   def filter_config
     @result = Vendors::FilterConfig.(current_user, params)
