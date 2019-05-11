@@ -30,4 +30,10 @@ class PolicyUserRolesController < ApplicationController
     @result = ActionsManager::Processor.(current_user, params)
     respond
   end
+
+  def bulk_assign
+    @result = PolicyUserRoles::BulkAssign.(current_user, params)
+    respond
+  end
+
 end
