@@ -2781,6 +2781,7 @@ Rails.application.routes.draw do
     resources :policy_user_roles
     get 'department_mapping', to: 'policies#department_mapping'
     get 'location_mapping', to: 'policies#location_mapping'
+    get 'cost_center_mapping', to: 'policies#cost_center_mapping'
   end
 
   resources :user_permissions do

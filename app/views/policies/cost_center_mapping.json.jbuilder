@@ -1,1 +1,1 @@
-json.cost_center_mapping json.cost_center_mapping.as_json
+json.cost_center_mapping @result.cost_center_mapping.as_json
