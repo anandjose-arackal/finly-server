@@ -1,6 +1,5 @@
-class Chrome::V1::ReceiptEmailController < ApplicationController
+class Chrome::V1::ReceiptEmailController < BaseControllers::ChromeBase
 
-  before_action -> { finly_authorize! :chrome}
 
   def show
     @result = Receipt::ReceiptEmails::Show.(current_user, params)

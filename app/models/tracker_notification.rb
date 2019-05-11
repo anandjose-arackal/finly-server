@@ -12,7 +12,9 @@
 #  updated_at :datetime         not null
 #
 
+# Used for tracking notification API's which will help us understand how long the user's tab was open
 class TrackerNotification < ApplicationRecord
-  belongs_to :user, optional: true
-  belongs_to :company, optional: true
+  belongs_to :user
+  belongs_to :company
+  belongs_to :status
 end

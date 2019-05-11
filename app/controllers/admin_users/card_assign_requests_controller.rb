@@ -1,7 +1,6 @@
-class AdminUsers::CardAssignRequestsController < ApplicationController
+class AdminUsers::CardAssignRequestsController < BaseControllers::AdminBase
 
   before_action :set_tokens_in_header_admin, only: [:export, :download_kycs]
-  before_action -> { finly_authorize! :admin }
 
   def index
     @result = Admin::Cards::AssignRequests::Index.(current_user, params)

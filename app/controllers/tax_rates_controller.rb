@@ -1,6 +1,4 @@
-class TaxRatesController < ApplicationController
-
-  before_action -> {finly_authorize! :web}
+class TaxRatesController < BaseControllers::WebBase
 
   def create
     @result = TaxRates::Create.(current_user, params)

@@ -1,4 +1,4 @@
-class Authorizer::AgreementsController < ApplicationController
+class Authorizer::AgreementsController < BaseControllers::PublicBase
   def index
     @result = Agreements::AgreementAuthorizer::Index.(params)
     if @result.failure?

@@ -3,19 +3,20 @@ class TransactionsMsgQueuePoller
   def self.run
 
 
+    unless File.exists?('config/aws_config.yml')
+      raise 'aws_config.yml not found'
+    end
+
     ####################### Initializing the client and other details for pulling messages from AWS Queue #########
-    region_name = ENV["aws_region_name"]
-    access_key_id = ENV["aws_access_key_id"]
-    secret_access_key = ENV["aws_secret_access_key"]
+    aws_config = Rails.application.config_for(:aws_config)
+    region_name = aws_config["aws_region_name"]
+    access_key_id = aws_config["aws_access_key_id"]
+    secret_access_key = aws_config["aws_secret_access_key"]
 
     sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
 
-    queue_url_base = ENV["sqs_queue_url_base"]
-    if Rails.env.production?
-      queue_name = "TransactionMessageQueue"
-    else
-      queue_name = "TestTransactionQueue"
-    end
+    queue_url_base = aws_config["sqs_queue_url_base"]
+    queue_name = aws_config["transaction_poller_queue"]
 
     queue_url = queue_url_base + queue_name
     delimiter = '$'

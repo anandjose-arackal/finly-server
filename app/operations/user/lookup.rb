@@ -50,9 +50,8 @@ class User::Lookup < User::Base
   def success
     params[:registered] = self.registered
     if selected_user.present?
-      number = selected_user.mobile_number
       params[:id] = selected_user.id
-      params[:mobile_number] = "XXXXXXX#{number[(number.length - 3)..number.length]}"
+      params[:mobile_number] = selected_user.obfuscated_mobile_number
     end
     params[:verified] = self.verified
     params[:otp_verified] = self.otp_verified

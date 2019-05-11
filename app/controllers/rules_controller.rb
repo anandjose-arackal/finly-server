@@ -1,7 +1,6 @@
-class RulesController < ApplicationController
+class RulesController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = Policy::Rules::Create.(current_user, params)

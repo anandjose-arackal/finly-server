@@ -1,6 +1,5 @@
-class TravelRequestsController < ApplicationController
+class TravelRequestsController < BaseControllers::WebBase
 
-  before_action -> {finly_authorize! :web}
 
   def index
     @result = TravelRequests::Index.(current_user, params)
