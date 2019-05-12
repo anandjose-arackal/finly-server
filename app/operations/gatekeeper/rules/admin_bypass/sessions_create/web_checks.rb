@@ -5,6 +5,7 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
       rule 'Only admin.finly.io can be used for accessing admin panel' do
         next if RequestStoreUtil.current_request.domain == 'admin.finly.io'
 
+        message "Only admin.finly.io can be used for accessing admin panel. Attempted login with #{RequestStoreUtil.current_request.domain}"
         level 10
         response_code 401
         fail
