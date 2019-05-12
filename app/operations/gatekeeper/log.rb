@@ -93,6 +93,8 @@ class Gatekeeper::Log < BaseOperation
     level = params[:level]
     return if level < 2
 
+    user = self.user || params[:user]
+
     yellow = '#BDB76B'
     red = '#FF0000'
     color = level > 3 ? red : yellow
@@ -117,6 +119,7 @@ class Gatekeeper::Log < BaseOperation
           "short": false
       }
     end
+
 
     if user&.company.present?
       fields << {
