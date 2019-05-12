@@ -1,4 +1,4 @@
-class UserPermissionsController < ApplicationController
+class UserPermissionsController < BaseControllers::WebBase
 
   # place where a particular user's permissions are retreived
   def show

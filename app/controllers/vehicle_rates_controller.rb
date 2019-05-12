@@ -1,6 +1,4 @@
-class VehicleRatesController < ApplicationController
-
-  before_action -> { finly_authorize! :web }
+class VehicleRatesController < BaseControllers::WebBase
 
   def create
     @result = Policy::VehicleRates::Create.(current_user, params)

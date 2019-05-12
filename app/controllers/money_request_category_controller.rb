@@ -1,6 +1,5 @@
-class MoneyRequestCategoryController < ApplicationController
+class MoneyRequestCategoryController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = MoneyRequests::Category::Create.(current_user, params)

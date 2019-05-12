@@ -10,7 +10,6 @@ module Constants
   VALID_GSTIN = /\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1}/i
 
   ENDING_NUMBERS = /\d+$/
-
   OTP_RESEND_INTERVAL = 60
 
   PROVIDER_NAMES = %w( PurchaseOrderProvider InvoiceProvider ReportProvider MoneyRequestProvider BankPaymentRequestProvider TravelRequestProvider TravelRequestBookingProvider PurchaseRequestProvider)
@@ -58,7 +57,6 @@ module Constants
     ITZ_CASH_KYC_CARBON_COPY_EMAIL = []
   end
 
-  # MSG91 / SendOTP API keys ######
 
   JUNK_IP_ADDRESSES = ['112.79.161.34', '106.209.165.14', '101.56.173.244', '49.33.120.163',
                        '223.188.21.231', '171.60.98.166', '117.225.146.193', '47.30.242.175',
@@ -66,6 +64,7 @@ module Constants
                        '110.224.246.31', '60.243.218.194', '1.23.161.61', '103.252.166.139',
                        '59.94.176.171', '122.174.25.83', '157.48.20.22']
 
+  # MSG91 / SendOTP API keys ######
   VERIFICATION_API_KEY = "-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXa7hV1dQgYede4fqAltJYivA8Cia1IvrW0FzsNaUAUFCyTXDHO1IV5-Q63zwNbzxTFw=="
 
   # INVITATION_API_KEY = "-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXayCwFWmM0zwoMwaBcMbNlQA0U_wBnz1AjOcjMay1VbI7bl0STMKIVQVrVVOnRe0ahA=="

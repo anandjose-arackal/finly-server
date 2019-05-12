@@ -1,7 +1,6 @@
-class UserGroupsController < ApplicationController
+class UserGroupsController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = UserGroup::Create.(current_user, params)

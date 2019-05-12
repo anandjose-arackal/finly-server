@@ -1,5 +1,4 @@
-class VendorsController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class VendorsController < BaseControllers::WebBase
 
   def filter_config
     @result = Vendors::FilterConfig.(current_user, params)

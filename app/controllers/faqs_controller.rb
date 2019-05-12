@@ -1,5 +1,4 @@
-class FaqsController < ApplicationController
-  before_action -> { finly_authorize! :web}
+class FaqsController < BaseControllers::WebBase
   def index
     respond_to do |format|
       format.html {render partial: 'faqs'}

@@ -1,6 +1,5 @@
-class Procure::InwardInvoicesController < ApplicationController
+class Procure::InwardInvoicesController < BaseControllers::WebBase
 
-  before_action -> {finly_authorize! :web}
 
   # this action is to create one from a purchase order
   def create_from_po

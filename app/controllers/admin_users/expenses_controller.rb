@@ -1,7 +1,6 @@
-class AdminUsers::ExpensesController < ApplicationController
+class AdminUsers::ExpensesController < BaseControllers::AdminBase
 
 
-  before_action -> { finly_authorize! :admin}
 
   def index
     @result = Admin::Expenses::Index.(current_user, params)

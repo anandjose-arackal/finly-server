@@ -3,7 +3,6 @@ class SessionsController < Devise::SessionsController
   prepend_before_action :verify_signed_out_user, except: [:new, :create, :destroy]
   respond_to :json
 
-  before_action -> { finly_authorize! :web}
 
   def new
     super()

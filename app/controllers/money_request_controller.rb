@@ -1,6 +1,5 @@
-class MoneyRequestController < ApplicationController
+class MoneyRequestController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = MoneyRequests::Create.(current_user, params)

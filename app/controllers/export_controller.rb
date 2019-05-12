@@ -1,9 +1,8 @@
-class ExportController < ApplicationController
+class ExportController < BaseControllers::WebBase
   include MathUtil
 
   before_action :set_tokens_in_header
 
-  before_action -> {finly_authorize! :web}
 
   def report
     respond_to do |format|

@@ -16,7 +16,7 @@ require 'rails_helper'
 
 # Create
 
-RSpec.describe "Money Request Workflow -- " do
+RSpec.xdescribe "Money Request Workflow -- " do
   before(:all) do |example|
     @company = create(:company)
     # Create Users

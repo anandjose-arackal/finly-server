@@ -1,7 +1,6 @@
-class CardsController < ApplicationController
+class CardsController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   # params = {user_id: 1}
   def details

@@ -14,11 +14,27 @@ class ExportManager::Processor::Base
   end
 
   def init_generator
-    self.master_class.generators.each do |gen_config|
-      generator = gen_config[:generator]
-      if generator.accept?(params[:export_format], gen_config[:options])
-        return generator.new(user, params, master, gen_config[:options])
+    generators = self.master_class.generators
+    if generators.respond_to?(:each)
+      self.master_class.generators.each do |gen_config|
+        generator = generator_for gen_config
+        return generator if generator.present?
       end
+    else
+      return generator_for generators
+    end
+    nil
+  end
+
+  def generator_for(gen_config)
+    generator = gen_config
+    options = nil
+    if gen_config.respond_to?(:each)
+      generator = gen_config.first
+      options = gen_config.second
+    end
+    if generator.accept?(params[:export_format], options)
+      return generator.new(user, params, master, options)
     end
     nil
   end
