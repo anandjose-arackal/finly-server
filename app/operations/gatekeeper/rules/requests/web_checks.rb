@@ -17,7 +17,7 @@ Gatekeeper::Checker.new 'On New Request' do
       message 'Browser IP mismatch'
       session_status_id UserSessionStatus.id_for(:blocked)
       response_code 401
-      level 3
+      level 1
       fail
     end
 
