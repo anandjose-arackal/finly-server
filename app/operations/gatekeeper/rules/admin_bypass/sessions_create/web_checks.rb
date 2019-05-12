@@ -3,9 +3,11 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
   premise :admin_bypass_login_attempt do
     section 'Domain check' do
       rule 'Only admin.finly.io can be used for accessing admin panel' do
-        next if RequestStoreUtil.current_request.domain == 'admin.finly.io'
+        domain = RequestStoreUtil.current_request.domain
+        subdomain = RequestStoreUtil.current_request.subdomains(0)&.first
+        next if domain == 'finly.io' and subdomain == 'admin'
 
-        message "Only admin.finly.io can be used for accessing admin panel. Attempted login with #{RequestStoreUtil.current_request.domain}"
+        message "Only admin.finly.io can be used for accessing admin panel. Attempted login with domain: #{domain} subdomain: #{subdomain}"
         level 10
         response_code 401
         fail

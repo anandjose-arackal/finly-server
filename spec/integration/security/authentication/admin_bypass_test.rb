@@ -73,7 +73,8 @@ RSpec.describe 'UserAuthentication > Password' do
   describe '> Unauthorized IP' do
     it 'should throw 401' do
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
-      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('admin.finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
       allow(Finly::SecureStorage::Connector).to receive(:read).and_return([@admin_user.email])
 
       headers = @headers.deep_dup
@@ -108,7 +109,8 @@ RSpec.describe 'UserAuthentication > Password' do
   describe '> Invalid Admin Password' do
     it 'should throw 401 unless correct username is entered' do
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
-      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('admin.finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
       allow(Finly::SecureStorage::Connector).to receive(:read).and_return([@admin_user.email])
 
       expect do
@@ -136,7 +138,8 @@ RSpec.describe 'UserAuthentication > Password' do
 
     it 'should throw 401 unless correct admin password is entered' do
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
-      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('admin.finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
       allow(Finly::SecureStorage::Connector).to receive(:read).and_return([@admin_user.email])
 
       expect do
@@ -164,7 +167,8 @@ RSpec.describe 'UserAuthentication > Password' do
 
     it 'should throw 401 unless correct master password is entered' do
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
-      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('admin.finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
       allow(Finly::SecureStorage::Connector).to receive(:read).and_return([@admin_user.email])
 
       expect do
@@ -194,7 +198,8 @@ RSpec.describe 'UserAuthentication > Password' do
   describe '> Without reason' do
     it 'should throw a 401 without reason' do
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
-      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('admin.finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
       allow(Finly::SecureStorage::Connector).to receive(:read).and_return([@admin_user.email])
 
       expect do
@@ -222,7 +227,8 @@ RSpec.describe 'UserAuthentication > Password' do
 
     it 'should throw a 401 without reason details' do
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
-      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('admin.finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
       allow(Finly::SecureStorage::Connector).to receive(:read).and_return([@admin_user.email])
 
       expect do
@@ -252,7 +258,8 @@ RSpec.describe 'UserAuthentication > Password' do
   describe '> Valid Password' do
     it 'should return 200 with tokens when correct username and password is entered' do
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
-      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('admin.finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+      allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
       allow(Finly::SecureStorage::Connector).to receive(:read).and_return([@admin_user.email])
 
       expect do

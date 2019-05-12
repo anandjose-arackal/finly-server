@@ -21,6 +21,19 @@ Gatekeeper::Checker.new 'AdminBypass > Request' do
       fail
     end
 
+    section 'Domain check' do
+      rule 'Only admin.finly.io can be used for accessing admin panel' do
+        domain = RequestStoreUtil.current_request.domain
+        subdomain = RequestStoreUtil.current_request.subdomains(0)&.first
+        next if domain == 'finly.io' and subdomain == 'admin'
+
+        message "Only admin.finly.io can be used for accessing admin panel. Attempted login with domain: #{domain} subdomain: #{subdomain}"
+        level 10
+        response_code 401
+        fail
+      end
+    end
+
     rule 'User agent is required for the request' do
       if RequestStoreUtil.current_request.user_agent.nil?
         message 'User agent is blank in the request'
