@@ -52,6 +52,7 @@ class UserSessions::Events::Create < BaseOperation
     attributes[:view] = current_view
     attributes[:status_id] = RequestStoreUtil.current_session.status_id
     attributes[:message] = params[:message] || RequestStoreUtil.current_session.message
+    attributes[:ip] = RequestStoreUtil.current_request.remote_ip
     attributes
   end
 
