@@ -130,7 +130,7 @@ Rails.application.configure do
   config.action_mailer.default_url_options = {host: config.mailer_config['host']}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-      address: config.mailer_config['email_address'],
+      address: config.mailer_config['address'],
       port: config.mailer_config['port'],
       domain: config.mailer_config['domain'],
       user_name: config.mailer_config['username'],
