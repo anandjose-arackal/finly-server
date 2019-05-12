@@ -324,7 +324,6 @@ class ApplicationController < ActionController::Base
 
     doorkeeper_authorize! *scopes
 
-    binding.pry
     unless doorkeeper_token&.status_id == UserSessionStatus.id_for(:authorized)
       head 401
       return
