@@ -65,6 +65,7 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  vendor_address               :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord

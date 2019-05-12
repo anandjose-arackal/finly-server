@@ -6024,10 +6024,16 @@ ActiveRecord::Schema.define(version: 2019_05_12_122839) do
   end
 
   create_table "user_auth_failures", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
-    t.integer "user_id", null: false
+    t.integer "user_id"
     t.boolean "locked"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "ip"
+    t.string "username"
+    t.boolean "blank_username", default: false
+    t.boolean "blank_password", default: false
+    t.boolean "invalid_username", default: false
+    t.boolean "invalid_password", default: false
     t.index ["locked"], name: "index_user_auth_failures_on_locked"
     t.index ["user_id"], name: "index_user_auth_failures_on_user_id"
   end

@@ -32,7 +32,7 @@
 #  updated_at                  :datetime         not null
 #  access_token_id             :integer
 #  last_request_at             :datetime
-#  duration                    :bigint(8)
+#  duration                    :bigint
 #  status_id                   :integer
 #  message                     :string(255)
 #  login_username              :string(255)
@@ -41,7 +41,6 @@
 #  user_device_id              :integer
 #  user_agent                  :text(65535)
 #  user_ip_id                  :integer
-#  user_agent_id               :integer
 #  user_agent_client_id        :integer
 #  admin_user_id               :integer
 #  admin_access_reason         :text(65535)

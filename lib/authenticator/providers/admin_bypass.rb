@@ -1,7 +1,7 @@
 class Authenticator::Providers::AdminBypass < Authenticator::Providers::Base
 
-  def self.accept?(params)
-    scopes = params[:scope]&.split(" ")
+  def self.accept?(request)
+    scopes = request.params[:scope]&.split(" ")
     scopes&.size == 2 and scopes&.include?('admin_bypass') and scopes&.include?("web")
   end
 

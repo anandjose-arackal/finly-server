@@ -29,5 +29,13 @@ class AddGeoDataToUserIp < ActiveRecord::Migration[5.2]
       ip.accuracy_radius = data&.dig('location', 'accuracy_radius')
       ip.save
     end
+
+    add_column :user_auth_failures, :ip, :string, index: true
+    add_column :user_auth_failures, :username, :string, index: true
+    add_column :user_auth_failures, :blank_username, :boolean, index: true, default: false
+    add_column :user_auth_failures, :blank_password, :boolean, index: true, default: false
+    add_column :user_auth_failures, :invalid_username, :boolean, index: true, default: false
+    add_column :user_auth_failures, :invalid_password, :boolean, index: true, default: false
+    change_column_null :user_auth_failures, :user_id, true
   end
 end

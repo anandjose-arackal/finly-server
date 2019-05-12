@@ -1,12 +1,13 @@
 class Authenticator::Providers::Base
-  attr_accessor :params, :unauthenticated_user_obj, :authenticated_user, :failed, :blocked, :message
+  attr_accessor :request, :params, :unauthenticated_user_obj, :authenticated_user, :failed, :blocked, :message
 
-  def self.accept?(params)
+  def self.accept?(request)
     false
   end
 
-  def initialize(params)
-    self.params = params
+  def initialize(request)
+    self.request = request
+    self.params = request.params
   end
 
   def authenticate

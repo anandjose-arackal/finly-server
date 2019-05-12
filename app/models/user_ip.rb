@@ -2,7 +2,7 @@
 #
 # Table name: user_ips
 #
-#  id                                :bigint(8)        not null, primary key
+#  id                                :bigint           not null, primary key
 #  ip                                :string(255)      not null
 #  ip_type                           :string(255)      not null
 #  user_id                           :integer          not null
@@ -15,6 +15,17 @@
 #  verification_code_failed_attempts :integer
 #  created_at                        :datetime         not null
 #  updated_at                        :datetime         not null
+#  continent_name                    :string(255)
+#  continent_code                    :string(255)
+#  country_name                      :string(255)
+#  country_code                      :string(255)
+#  region_code                       :string(255)
+#  region_name                       :string(255)
+#  city                              :string(255)
+#  zip                               :string(255)
+#  latitude                          :decimal(20, 10)
+#  longitude                         :decimal(20, 10)
+#  accuracy_radius                   :integer
 #
 
 class UserIp < ApplicationRecord
