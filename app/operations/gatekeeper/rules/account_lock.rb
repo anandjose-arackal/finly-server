@@ -12,7 +12,7 @@ Gatekeeper::Checker.new 'AccountLock' do
           user.update(locked_at: DateTime.now)
           auth_failure.locked = true
 
-          message 'Too many failed password attempts. Locking the account'
+          message "#{user.id} - #{user.email} > Too many failed password attempts. Locking the account"
           response_code 401
           level 5
           fail
@@ -26,7 +26,7 @@ Gatekeeper::Checker.new 'AccountLock' do
         user = params[:user]
         if user.locked_at.present? && (Time.now - user.locked_at) < LOCKING_PERIOD
           # user.user_auth_failures.create locked: true
-          message 'Account has been temporarily locked. Please try after sometime'
+          message "#{user.id} - #{user.email} > Account has been temporarily locked"
           level 5
           response_code 401
           fail
