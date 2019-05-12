@@ -284,7 +284,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def tds_nature(invoice_line_item)
-    invoice_line_item.invoice.tds_slab&.name
+    invoice_line_item.parent.tds_slab&.name
   end
 
 
