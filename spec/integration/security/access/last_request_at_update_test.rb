@@ -17,6 +17,8 @@ RSpec.describe 'UserSession#LastRequestAt update test' do
     @user_device_browser = create :user_device_browser, client_properties
     @doorkeeper_application = create :doorkeeper_application
     @headers = authentication_headers_for(:web, fingerprint: @fingerprint)
+    @headers[:HTTP_USER_AGENT] = @user_agent
+    @headers[:REMOTE_ADDR] = @ip
   end
 
   describe '> update-able request' do

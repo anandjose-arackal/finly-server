@@ -22,4 +22,6 @@ class UserIp < ApplicationRecord
   belongs_to :user
   belongs_to :status, class_name: 'UserIpStatus'
 
+  scope :verified, -> {where status_id: UserIpStatus.id_for(:verified)}
+
 end

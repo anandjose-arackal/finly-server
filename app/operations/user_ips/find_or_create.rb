@@ -42,8 +42,26 @@ class UserIps::FindOrCreate < BaseOperation
       add_message :error, ip.errors.full_messages
       return
     end
+    enrich_ip(ip)
     ip.save
     ip
+  end
+
+  def enrich_ip(ip)
+    geo_ip = Geocoder.search(RequestStoreUtil.current_request.remote_ip)
+    geo_ip = geo_ip.first if geo_ip.respond_to?(:each)
+    data = geo_ip&.data
+    ip.continent_name = data&.dig('continent', 'names', 'en')
+    ip.continent_code = data&.dig('continent', 'code')
+    ip.country_name = data&.dig('country', 'names', 'en')
+    ip.country_code = data&.dig('country', 'iso_code')
+    ip.region_code = data&.dig('subdivisions')&.first&.dig('iso_code')
+    ip.region_name = data&.dig('subdivisions')&.first&.dig('names', 'en')
+    ip.city = data&.dig('city', 'names', 'en')
+    ip.zip = data&.dig('postal', 'code')
+    ip.latitude = data&.dig('location', 'latitude')
+    ip.longitude = data&.dig('location', 'longitude')
+    ip.accuracy_radius = data&.dig('location', 'accuracy_radius')
   end
 
 end

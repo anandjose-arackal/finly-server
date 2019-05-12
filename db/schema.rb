@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_08_131558) do
+ActiveRecord::Schema.define(version: 2019_05_12_122839) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -2204,6 +2204,64 @@ ActiveRecord::Schema.define(version: 2019_05_08_131558) do
     t.string "country", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "discussion_message_mentions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "discussion_message_id"
+    t.string "mention_type"
+    t.bigint "mention_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discussion_message_id"], name: "index_discussion_message_mentions_on_discussion_message_id"
+    t.index ["mention_type", "mention_id"], name: "index_discussion_message_mentions_on_mention_type_and_mention_id"
+  end
+
+  create_table "discussion_messages", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "discussion_id"
+    t.string "sender_type"
+    t.bigint "sender_id"
+    t.string "type"
+    t.string "subject"
+    t.text "body"
+    t.string "file_file_name"
+    t.string "file_content_type"
+    t.bigint "file_file_size"
+    t.datetime "file_updated_at"
+    t.boolean "draft"
+    t.boolean "delivered_to_all"
+    t.boolean "read_by_all"
+    t.string "notification_code"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discussion_id"], name: "index_discussion_messages_on_discussion_id"
+    t.index ["sender_type", "sender_id"], name: "index_discussion_messages_on_sender_type_and_sender_id"
+    t.index ["type"], name: "index_discussion_messages_on_type"
+  end
+
+  create_table "discussion_receipts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "discussion_id"
+    t.bigint "discussion_message_id"
+    t.string "receiver_type"
+    t.bigint "receiver_id"
+    t.boolean "is_read"
+    t.boolean "is_trashed"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_discussion_receipts_on_deleted_at"
+    t.index ["discussion_id"], name: "index_discussion_receipts_on_discussion_id"
+    t.index ["discussion_message_id"], name: "index_discussion_receipts_on_discussion_message_id"
+    t.index ["is_read"], name: "index_discussion_receipts_on_is_read"
+    t.index ["is_trashed"], name: "index_discussion_receipts_on_is_trashed"
+    t.index ["receiver_type", "receiver_id"], name: "index_discussion_receipts_on_receiver_type_and_receiver_id"
+  end
+
+  create_table "discussions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "discussable_type"
+    t.bigint "discussable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discussable_type", "discussable_id"], name: "index_discussions_on_discussable_type_and_discussable_id"
   end
 
   create_table "distance_expense_configs", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -6174,6 +6232,17 @@ ActiveRecord::Schema.define(version: 2019_05_08_131558) do
     t.integer "verification_code_failed_attempts"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "continent_name"
+    t.string "continent_code"
+    t.string "country_name"
+    t.string "country_code"
+    t.string "region_code"
+    t.string "region_name"
+    t.string "city"
+    t.string "zip"
+    t.decimal "latitude", precision: 20, scale: 10
+    t.decimal "longitude", precision: 20, scale: 10
+    t.integer "accuracy_radius"
     t.index ["ip"], name: "index_user_ips_on_ip"
     t.index ["ip_type"], name: "index_user_ips_on_ip_type"
     t.index ["status_id"], name: "index_user_ips_on_status_id"
@@ -7001,6 +7070,10 @@ ActiveRecord::Schema.define(version: 2019_05_08_131558) do
   add_foreign_key "delivery_challans", "users"
   add_foreign_key "departments", "companies"
   add_foreign_key "departments", "cost_centers"
+  add_foreign_key "discussion_message_mentions", "discussion_messages"
+  add_foreign_key "discussion_messages", "discussions"
+  add_foreign_key "discussion_receipts", "discussion_messages"
+  add_foreign_key "discussion_receipts", "discussions"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
   add_foreign_key "document_items", "items", column: "inventory_line_item_id"

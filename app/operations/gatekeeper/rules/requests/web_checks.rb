@@ -7,20 +7,21 @@ Gatekeeper::Checker.new 'On New Request' do
 
   premise :on_authenticated_request do
 
-    # Todo temporarily stopping this as one stanza living user's IP has been constantly changing
-    # rule 'Request IP has to match Session IP' do
-    #   request = RequestStoreUtil.current_request
-    #   session = RequestStoreUtil.current_session
-    #   next if request.remote_ip == session.ip
-    #   next if request.remote_ip == session.user_ip&.ip
-    #   next if Rails.env.development?
-    #
-    #   message 'Browser IP mismatch'
-    #   session_status_id UserSessionStatus.id_for(:blocked)
-    #   response_code 401
-    #   level 3
-    #   fail
-    # end
+    rule 'Request IP has to be a verified UserIP' do
+      request = RequestStoreUtil.current_request
+      session = RequestStoreUtil.current_session
+      next if request.remote_ip == session.ip
+      next if request.remote_ip == session.user_ip&.ip
+      # Allow the request as long as the request is from a verified IP
+      next if RequestStoreUtil.current_user.user_ips.find_by_ip(request.remote_ip).present?
+      next if Rails.env.development?
+
+      message 'Unverified IP'
+      session_status_id UserSessionStatus.id_for(:blocked)
+      response_code 401
+      level 3
+      fail
+    end
 
     rule 'User agent is required for the request' do
       if RequestStoreUtil.current_request.user_agent.nil?
