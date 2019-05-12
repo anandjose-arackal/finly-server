@@ -19,6 +19,7 @@ Gatekeeper::Checker.new 'AdminUserBypass > On Web Authentication' do
         admin_user = params[:admin_user]
         next if RequestStoreUtil.current_request.remote_ip == admin_user&.authorized_ip
 
+        message "Admin Panel > Unauthorized IP > Attempted IP: #{RequestStoreUtil.current_request.remote_ip}"
         level 10
         response_code 401
         fail
