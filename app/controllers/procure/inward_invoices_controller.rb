@@ -39,7 +39,7 @@ class Procure::InwardInvoicesController < ApplicationController
   end
 
   def save_submit
-    @result = Procurements::Invoice::SaveSubmit.(current_user, params)
+    @result = Procurements::Invoices::SaveSubmit.(current_user, params)
     if @result.success?
       respond
     else
