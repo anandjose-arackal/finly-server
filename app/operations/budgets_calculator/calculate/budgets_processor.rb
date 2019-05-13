@@ -54,8 +54,8 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
     payment_ids = trails.with_entity_type("Payment").pluck(:entity_id)
     payments = Payment.with_id(payment_ids)
     # expense_ids = trails.select {|mapping| mapping['entity_type'] == 'Expense'}&.first&.dig('entity_id_list')&.split(',')
-    expense_ids = trails.with_entity_type("Expense")
-    expenses = Expense.with_id(expense_ids).pluck(:entity_id)
+    expense_ids = trails.with_entity_type("Expense").pluck(:entity_id)
+    expenses = Expense.with_id(expense_ids)
     # purchase_order_item_ids = trails.select {|mapping| mapping['entity_type'] == 'PurchaseOrderItem'}&.first&.dig('entity_id_list')&.split(',')
     purchase_order_item_ids = trails.with_entity_type("PurchaseOrderItem").pluck(:entity_id)
     purchase_order_items = PurchaseOrderItem.with_id(purchase_order_item_ids).include_details
