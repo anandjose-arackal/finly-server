@@ -63,7 +63,7 @@ class PaymentOrder < ApplicationRecord
   belongs_to :amount_processed, optional: true, class_name: 'Amount'
   belongs_to :initiating_user, optional: true, class_name: 'User'
   belongs_to :currency, optional: true
-  belongs_to :bank_account_provider
+  belongs_to :bank_account_provider, optional: true
 
   serialize :post_operation_payload, Hash
 
