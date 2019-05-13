@@ -47,11 +47,11 @@ class IciciBankApi::Balance < IciciBankApi::Base
 
   def raw_api_params
     {
-        AGGRID: self.company_details[:AGGR_ID],
-        CORPID: self.company_details[:CORP_ID],
-        USERID: self.company_details[:USER_ID],
+        AGGRID: self.company_details["AGGR_ID"],
+        CORPID: self.company_details["CORP_ID"],
+        USERID: self.company_details["USER_ID"],
         URN: self.company.icici_bank_config.urn,
-        ACCOUNTNO: self.company_details[:DEBIT_ACC_NO]
+        ACCOUNTNO: self.company_details["DEBIT_ACC_NO"]
     }
   end
 

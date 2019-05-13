@@ -13,7 +13,7 @@ class BankTransferStatus < ApplicationRecord
   include Seedable
 
   def self.values
-    [:completed, :processing, :failed, :possible_failure, :open, :pending, :cancelled, :suspect]
+    [:completed, :processing, :failed, :possible_failure, :open, :pending, :cancelled, :suspect, :pending_for_processing]
   end
 
   def completed?
@@ -38,6 +38,14 @@ class BankTransferStatus < ApplicationRecord
 
   def possible_failure?
     self.id == BankTransferStatus.id_for(:possible_failure)
+  end
+
+  def pending_for_processing?
+    self.id == BankTransferStatus.id_for(:pending_for_processing)
+  end
+
+  def suspect?
+    self.id == BankTransferStatus.id_for(:suspect)
   end
 
 end

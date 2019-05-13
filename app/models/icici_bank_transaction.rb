@@ -38,6 +38,9 @@ class IciciBankTransaction < ApplicationRecord
   validates :unique_request_number, presence: true
   validates :amount_id, presence: true
 
+  delegate :amount_value, to: :amount
+  delegate :completed?, :processing?, :failed?, :retriable?, :open?, :possible_failure?, :pending_for_processing?, :suspect?, to: :transfer_status
+
   accepts_nested_attributes_for :amount
 
   def bank_reference_number
