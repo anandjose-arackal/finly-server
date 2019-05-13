@@ -77,7 +77,7 @@ class Policy::VendorPayments::Index < Policy::Base
       self.policy_user_roles = apply_scopes(policy_user_roles)
       # for admin on policies index, filter_role_id will not be present
       # On document show , show only those policies to which user has initiator role even if user is admin
-      if params.present? && params.has_key?(:filter_role_id)
+      if params.present? && params.has_key?(:filter_role_id) && self.policies.present? && self.policy_user_roles.present?
         self.policies = self.policies.where(id: policy_user_roles&.pluck(:policy_id)) 
       end
       # Jugaad as we do not have policy admin in place
