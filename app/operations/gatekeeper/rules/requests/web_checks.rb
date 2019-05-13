@@ -3,11 +3,20 @@ Gatekeeper::Checker.new 'On New Request' do
   before do
     skip unless RequestStoreUtil.current_session&.web?
     skip if RequestStoreUtil.current_session.admin_user_id.present?
+
+    skip if RequestStoreUtil.current_user.company_id == 2
   end
 
   premise :on_authenticated_request do
 
     rule 'Request IP has to be a verified UserIP' do
+      pass = false
+      [
+          'otp/resend',
+          'otp/verify',
+      ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+      next if pass
+
       request = RequestStoreUtil.current_request
       session = RequestStoreUtil.current_session
       next if request.remote_ip == session.ip

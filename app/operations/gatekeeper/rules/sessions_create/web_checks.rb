@@ -3,6 +3,8 @@ Gatekeeper::Checker.new 'On Web Authentication' do
   before do
     skip unless RequestStoreUtil.current_session&.web?
     skip if RequestStoreUtil.current_session&.admin_user_id.present?
+
+    skip if RequestStoreUtil.current_user.company_id == 2
   end
 
   premise :after_session_create do
