@@ -1,5 +1,6 @@
 class Procure::PurchaseOrdersController < BaseControllers::WebBase
-  before_action :set_tokens_in_header, only: [:download]
+
+  set_tokens_in_header :download
 
   def index
     @result = Procurements::PurchaseOrders::Index.(current_user, params)

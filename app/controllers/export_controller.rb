@@ -1,8 +1,7 @@
 class ExportController < BaseControllers::WebBase
   include MathUtil
 
-  before_action :set_tokens_in_header
-
+  set_tokens_in_header :report, :expense, :atm_transactions, :statement, :money_request, :index_template, :export_template, :processor
 
   def report
     respond_to do |format|
