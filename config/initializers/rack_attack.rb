@@ -9,9 +9,10 @@ unless Rails.env.production?
 end
 
 if Rails.env.production?
-  Rack::Attack.safelist('allow API requests from known IPs') do |req|
-    ['172.33.17.25', '172.33.81.48', '203.194.99.56', '35.200.179.35'].include?(req.ip)
-  end
+  Rack::Attack.safelist_ip('172.33.17.25')
+  Rack::Attack.safelist_ip('172.33.81.48')
+  Rack::Attack.safelist_ip('203.194.99.56')
+  Rack::Attack.safelist_ip('35.200.179.35')
 end
 
 # Request Throttling Start
