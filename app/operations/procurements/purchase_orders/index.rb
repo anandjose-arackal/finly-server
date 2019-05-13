@@ -71,5 +71,51 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     
       self.paginated_purchase_orders = self.purchase_orders.paginate(page: page, per_page: per_page).includes_for_index
     end
+
+    def get_counts
+      result = {
+        all: 0,
+        draft: 0,
+        processing: 0,
+        approved: 0,
+        awaiting_approval: 0,
+        sent_to_vendor: 0,
+        vendor_confirmed: 0,
+        closed: 0,
+        revised: 0,
+        voided: 0
+      }
+
+      po_status_ids = PurchaseOrder.status_ids(:open, :retracted, :processing, :approved, :rejected, :auto_approved, :sent_to_vendor, :closed, :voided, :po_revised, :vendor_confirmed)
+      po_status_counts = self.purchase_orders.where(purchase_order_status_id: po_status_ids)&.group(:purchase_order_status_id)&.count
+
+      result[:all] = self.purchase_orders.count
+
+      result[:awaiting_approval] = self.purchase_orders.awaiting_action_items(user).count
+
+      PurchaseOrderStatus.all.map do |status|
+        case status.id
+        when PurchaseOrderStatus.id_for(:open), PurchaseOrderStatus.id_for(:retracted), PurchaseOrderStatus.id_for(:rejected)
+          result[:draft] += (po_status_counts[status.id] || 0)
+        when PurchaseOrderStatus.id_for(:processing)
+          result[:processing] += (po_status_counts[status.id] || 0)
+        when PurchaseOrderStatus.id_for(:approved), PurchaseOrderStatus.id_for(:auto_approved) 
+          result[:approved] += (po_status_counts[status.id] || 0)
+        when PurchaseOrderStatus.id_for(:sent_to_vendor)
+          result[:sent_to_vendor] += (po_status_counts[status.id] || 0)
+        when PurchaseOrderStatus.id_for(:closed)
+          result[:closed] += (po_status_counts[status.id] || 0)
+        when PurchaseOrderStatus.id_for(:voided)
+          result[:voided] += (po_status_counts[status.id] || 0)
+        when PurchaseOrderStatus.id_for(:po_revised)
+          result[:revised] += (po_status_counts[status.id] || 0)
+        when PurchaseOrderStatus.id_for(:vendor_confirmed)
+          result[:vendor_confirmed] += (po_status_counts[status.id] || 0)
+        end
+      end
+
+      result[:awaiting_approval] = self.purchase_orders.awaiting_action_items(user).count
+      result
+    end
   end
 end
