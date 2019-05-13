@@ -295,6 +295,8 @@ class User < ApplicationRecord
       joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:invoice_reviewer)).distinct
     when 'BankPaymentRequestProvider', :BankPaymentRequestProvider
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).joins(:policy_user_roles).where("policy_user_roles.user_role_id = ?", UserRole.id_for(:bank_payment_request_reviewer)).distinct
+    when 'YesBankVendorProvider', :YesBankVendorProvider
+      joins(:user_panel_subscription).joins(:policy_user_roles).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('policy_user_roles.user_role_id = ?', UserRole.id_for(:vendor_reviewer)).distinct
     end
   }
 
@@ -783,6 +785,7 @@ class User < ApplicationRecord
   #       :budget_manager
   #   )
   #
+  #   return 1 if company_id == 2
   #   return 3 if role_mapping.role(level_3_req).present?
   #   return 2 if role_mapping.role(level_2_req).present?
   #   1
@@ -1200,6 +1203,8 @@ class User < ApplicationRecord
     return nil if email.nil?
 
     parts = email.split("@")
+    return nil if parts.blank?
+
     obfuscated = "X" * (parts.first.length - 2)
     "#{parts.first[0..2].concat(obfuscated)}@#{parts.second}"
   end

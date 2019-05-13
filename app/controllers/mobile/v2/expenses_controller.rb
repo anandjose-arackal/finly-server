@@ -27,6 +27,7 @@ class Mobile::V2::ExpensesController < BaseControllers::MobileBase
         @result = Expense::ExPerDiem::Create.(current_user, param)
       else
         respond response: :failure, message: 'Invalid input'
+        return
     end
 
     # @result = Expense::Manual::Create.(current_user, param)
