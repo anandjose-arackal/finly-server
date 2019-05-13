@@ -50,13 +50,17 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
     budgetable_entities << "PurchaseOrderItem" if self.budget.purchase_order
     budgetable_entities << "InvoiceLineItem" if self.budget.purchase_order
     budgetable_entities << "Payment" if self.budget.payment
-    payment_ids = trails.select {|mapping| mapping['entity_type'] == 'Payment'}&.first&.dig('entity_id_list')&.split(',')
+    # payment_ids = trails.select {|mapping| mapping['entity_type'] == 'Payment'}&.first&.dig('entity_id_list')&.split(',')
+    payment_ids = trails.with_entity_type("Payment").pluck(:entity_id)
     payments = Payment.with_id(payment_ids)
-    expense_ids = trails.select {|mapping| mapping['entity_type'] == 'Expense'}&.first&.dig('entity_id_list')&.split(',')
-    expenses = Expense.with_id(expense_ids)
-    purchase_order_item_ids = trails.select {|mapping| mapping['entity_type'] == 'PurchaseOrderItem'}&.first&.dig('entity_id_list')&.split(',')
+    # expense_ids = trails.select {|mapping| mapping['entity_type'] == 'Expense'}&.first&.dig('entity_id_list')&.split(',')
+    expense_ids = trails.with_entity_type("Expense")
+    expenses = Expense.with_id(expense_ids).pluck(:entity_id)
+    # purchase_order_item_ids = trails.select {|mapping| mapping['entity_type'] == 'PurchaseOrderItem'}&.first&.dig('entity_id_list')&.split(',')
+    purchase_order_item_ids = trails.with_entity_type("PurchaseOrderItem").pluck(:entity_id)
     purchase_order_items = PurchaseOrderItem.with_id(purchase_order_item_ids).include_details
-    invoice_item_ids = trails.select {|mapping| mapping['entity_type'] == 'InvoiceLineItem'}&.first&.dig('entity_id_list')&.split(',')
+    # invoice_item_ids = trails.select {|mapping| mapping['entity_type'] == 'InvoiceLineItem'}&.first&.dig('entity_id_list')&.split(',')
+    invoice_item_ids = trails.with_entity_type("InvoiceLineItem").pluck(:entity_id)
     invoice_items = InvoiceLineItem.with_id(invoice_item_ids)
     [expenses, payments, purchase_order_items, invoice_items]
   end
