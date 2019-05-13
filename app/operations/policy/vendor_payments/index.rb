@@ -8,9 +8,9 @@ class Policy::VendorPayments::Index < Policy::Base
   def authorize
   end
 
-  def authorized_user_types
-    [:vendor_payments_admin, :vendor_payments_creditor, :vendor_payments_reviewer, :vendor_payments_initiator]
-  end
+  # def authorized_user_types
+  #   # [:vendor_payments_admin, :vendor_payments_creditor, :vendor_payments_reviewer, :vendor_payments_initiator]
+  # end
 
   def validate
   end
