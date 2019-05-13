@@ -37,5 +37,11 @@ class AddGeoDataToUserIp < ActiveRecord::Migration[5.2]
     add_column :user_auth_failures, :invalid_username, :boolean, index: true, default: false
     add_column :user_auth_failures, :invalid_password, :boolean, index: true, default: false
     change_column_null :user_auth_failures, :user_id, true
+
+    UserRole.find_by(name: 'Admin')&.update(name: 'admin')
+    UserRole.find_by(name: 'Finance Manager')&.update(name: 'finance_manager')
+    UserRole.find_by(name: 'Manager')&.update(name: 'manager')
+    UserRole.find_by(name: 'Employee')&.update(name: 'employee')
+    UserRole.find_by(name: 'Auditor')&.update(name: 'auditor')
   end
 end
