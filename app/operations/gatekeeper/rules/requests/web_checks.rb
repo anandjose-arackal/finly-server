@@ -9,6 +9,7 @@ Gatekeeper::Checker.new 'On New Request' do
 
   premise :on_authenticated_request do
 
+    # todo temporary
     # rule 'Request IP has to be a verified UserIP' do
     #   pass = false
     #   [
