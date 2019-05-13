@@ -3563,6 +3563,7 @@ Rails.application.routes.draw do
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
       get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
+      put 'save_submit', to: 'purchase_orders#save_submit'
 
       resources :quotations, only: %i[index create update destroy]
     end
@@ -3640,6 +3641,7 @@ Rails.application.routes.draw do
       post 'save_as_template', to: 'inward_invoices#template_create'
       post 'apply_template', to: 'inward_invoices#template_apply'
       delete 'delete', to: 'inward_invoices#destroy'
+      put 'save_submit', to: 'inward_invoices#save_submit'
     end
 
     resources :delivery_challans

@@ -38,6 +38,15 @@ class Procure::InwardInvoicesController < ApplicationController
     respond
   end
 
+  def save_submit
+    @result = Procurements::Invoices::SaveSubmit.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'procure/inward_invoices/save_submit'
+    end
+  end
+
   def approve
     @result = Procurements::Invoices::Approve.(current_user, params)
     respond
