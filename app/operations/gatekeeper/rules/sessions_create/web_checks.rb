@@ -35,7 +35,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         [:timestamp, :user_agent, :timezone, :fingerprint,
          :language, :browser, :browser_version,
          :browser_engine, :browser_engine_version,
-         :os_name, :os_version].each do |property|
+         :os_name].each do |property|
           rule "#{property} is required for all web requests" do
             web = RequestStoreUtil.current_user_device.client
             next unless web.send(property).blank?
