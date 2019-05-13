@@ -1201,6 +1201,8 @@ class User < ApplicationRecord
     return nil if email.nil?
 
     parts = email.split("@")
+    return nil if parts.blank?
+
     obfuscated = "X" * (parts.first.length - 2)
     "#{parts.first[0..2].concat(obfuscated)}@#{parts.second}"
   end
