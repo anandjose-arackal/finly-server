@@ -61,6 +61,7 @@ class Procurements::PurchaseOrders::SaveSubmit < Procurements::PurchaseOrders::B
     op = Procurements::PurchaseOrders::Update.(user, params)
 
     op.messages.keys.each do |key|
+      next if (op.success? && key == :success) # Skip success key if po updated, otherwise different notifcation colors in frontend gets confusing
       add_message key, op.messages[key]      
     end
 
@@ -69,6 +70,8 @@ class Procurements::PurchaseOrders::SaveSubmit < Procurements::PurchaseOrders::B
 
   def call_submit(params)    
     op = Procurements::PurchaseOrders::Submit.(user, params)
+
+    add_message :error, "Purchase Order Saved But Error in Submission" unless op.success? # Custom message if PO saved but can't be submitted.
 
     op.messages.keys.each do |key|
       add_message key, op.messages[key]      

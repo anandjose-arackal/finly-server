@@ -61,6 +61,7 @@ class Procurements::Invoices::SaveSubmit < Procurements::Invoices::Base
     op = BankTransfer::InwardInvoices::Update.(user, params)
 
     op.messages.keys.each do |key|
+      next if (op.success? && key == :success) # Skip success key if invoice updated, otherwise different notifcation colors in frontend gets confusing
       add_message key, op.messages[key]      
     end
 
@@ -69,6 +70,8 @@ class Procurements::Invoices::SaveSubmit < Procurements::Invoices::Base
 
   def call_submit(params)    
     op = Procurements::Invoices::Submit.(user, params)
+    
+    add_message :error, "Invoice Saved But Error in Submission" unless op.success? # Custom message if Invoice saved but can't be submitted.
 
     op.messages.keys.each do |key|
       add_message key, op.messages[key]      
