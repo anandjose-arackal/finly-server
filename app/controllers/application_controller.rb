@@ -437,6 +437,7 @@ class ApplicationController < ActionController::Base
       access_token = request.cookies['access_token']
       if access_token.present?
         request.headers['Authorization'] = "Bearer #{access_token}"
+        RequestStoreUtil.set_skip_x_finly_rp_check
       end
     end
   end
