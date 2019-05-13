@@ -43,7 +43,7 @@ class BudgetsCalculator::Calculate::BudgetsProcessor
     trails = BudgetTrail.within_date(self.budget.start_date, self.budget.end_date).with_vendors(vendor_ids)
                  .with_departments_or_sub_departments(department_ids).with_locations(location_ids)
                  .with_categories(category_ids).with_cost_centers(cost_center_ids).with_users(user_ids)
-                 .select('entity_type, GROUP_CONCAT(DISTINCT entity_id SEPARATOR ",") AS entity_id_list').group(:entity_type).as_json
+                 # .select('entity_type, GROUP_CONCAT(DISTINCT entity_id SEPARATOR ",") AS entity_id_list').group(:entity_type).as_json
     budgetable_entities = []
     budgetable_entities << "Expense" if self.budget.expense
     # adding PO as well as PO Item because both will be considered for the
