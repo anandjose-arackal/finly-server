@@ -1,6 +1,6 @@
 class ReceiptsController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:export]
+  set_tokens_in_header :export
 
 
   def create

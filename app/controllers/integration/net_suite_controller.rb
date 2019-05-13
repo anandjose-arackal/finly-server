@@ -1,6 +1,6 @@
 class Integration::NetSuiteController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:invoices]
+  set_tokens_in_header :invoices
 
   def invoices
     @result = Integrations::NetSuite::Invoices.(current_user, params)
