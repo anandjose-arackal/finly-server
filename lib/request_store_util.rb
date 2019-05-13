@@ -53,6 +53,15 @@ class RequestStoreUtil
     RequestStore.store[:x_finly_rp_attributes] = attrs
   end
 
+  # Used for requesting gatekeeper to skip x_finly_rp_check
+  def self.set_skip_x_finly_rp_check
+    RequestStore.store[:skip_x_finly_rp_check] = true
+  end
+
+  def self.skip_x_finly_rp_check?
+    RequestStore.store[:skip_x_finly_rp_check]
+  end
+
   def self.to_hash
     {
         current_app: RequestStore.store[:current_app],
