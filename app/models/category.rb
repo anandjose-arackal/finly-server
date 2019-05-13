@@ -109,12 +109,12 @@ class Category < ApplicationRecord
     where('name like ?', "%#{term}%")
   }
 
-  scope :leaves, -> {
-    id = pluck(:id)
-    non_leaves = Category.where(ancestry: id).pluck(:ancestry)&.map {|item| item.to_i}
-    leaves = id - non_leaves
-    where id: leaves
-  }
+  # scope :leaves, -> {
+  #   id = pluck(:id)
+  #   non_leaves = Category.where(ancestry: id).pluck(:ancestry)&.map {|item| item.to_i}
+  #   leaves = id - non_leaves
+  #   where id: leaves
+  # }
 
   def gl_name
     gl_code || name
@@ -123,7 +123,9 @@ class Category < ApplicationRecord
   def as_json(options={})
     {
         id: id,
-        name: name
+        name: name,
+        gl_code: gl_code
+
     }
   end
 

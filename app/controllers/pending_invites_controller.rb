@@ -1,5 +1,6 @@
 class PendingInvitesController < BaseControllers::WebBase
 
+  skip_authentication_actions :edit, :accept
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)

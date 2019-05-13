@@ -1,6 +1,8 @@
 class Gatekeeper::Event
   include Supporters::ErrorTracker
 
+  ENABLED = true #Rails.env.production? || Rails.env.test?
+
   attr_accessor :event, :params
 
   def self.call(event, params = {})
@@ -13,15 +15,21 @@ class Gatekeeper::Event
   end
 
   def run
+    return success_verdict false unless ENABLED
+
     require_otp = false
     Gatekeeper::Registry.subscribers(event)&.each do |rule|
       result = rule.verdict(self.params)
       unless result.success?
-        Gatekeeper::Log.(result, params)
+        Gatekeeper::Log.(result, RequestStoreUtil.request_params)
         return result
       end
       require_otp ||= result.require_otp
     end
+    success_verdict require_otp
+  end
+
+  def success_verdict(require_otp)
     verdict = Gatekeeper::Checker::Verdict.success_verdict
     verdict.require_otp(require_otp)
     verdict

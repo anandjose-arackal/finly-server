@@ -1,6 +1,19 @@
 require 'rails_helper'
 RSpec.describe 'UserAuthentication > Password' do
 
+  before :each do
+    setup_rack_attack_cache_store
+    avoid_test_overlaps_in_cache
+  end
+
+  def setup_rack_attack_cache_store
+    Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  def avoid_test_overlaps_in_cache
+    Rails.cache.clear
+  end
+
   before :all do
     @company = create :company
     @user1 = create :em_user, company: @company
@@ -8,7 +21,7 @@ RSpec.describe 'UserAuthentication > Password' do
 
     @doorkeeper_application = create :doorkeeper_application
 
-    @correct_password = 'password'
+    @correct_password = 'FW1g$18j0t!k2'
     @wrong_password = 'wrong_password'
 
     @headers = authentication_headers_for(:web)

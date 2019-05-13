@@ -2,7 +2,7 @@
 #
 # Table name: user_device_browsers
 #
-#  id                     :bigint(8)        not null, primary key
+#  id                     :bigint           not null, primary key
 #  timestamp              :datetime
 #  user_agent             :string(255)
 #  timezone               :string(255)
@@ -49,6 +49,12 @@ class UserDeviceBrowser < ApplicationRecord
   belongs_to :status, class_name: 'UserDeviceStatus'
 
   scope :completed, -> {where status_id: UserDeviceStatus.id_for(:complete)}
+  scope :with_attributes, -> (attributes) {
+    # While hash is being sent as integer / empty for few attributes, it is being stored in different format (string, nil). Because of this the device was not being identified correctly.
+    # This corrects and re-formats to ensure it is matching with the model attribute types
+    reformatted_attributes = self.new(attributes.except(:timestamp_s)).attributes.with_indifferent_access.except(:timestamp, :id, :created_at, :updated_at, :status_id)
+    where reformatted_attributes
+  }
 
   delegate :incomplete?, :attribute_mismatch?, :complete?, to: :status
 
@@ -91,24 +97,24 @@ class UserDeviceBrowser < ApplicationRecord
   # }
 
   # Compares all attributes of current model with the hash provided in arguments. Returns the differences
-  def differences(attrs)
-    differences = []
-    [
-        :user_agent, :timezone, :fingerprint, :language, :system_language,
-        :browser, :browser_version, :browser_engine, :browser_engine_version,
-        :os_name, :os_version,
-        :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
-        :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
-        :silver_light_version,
-        :is_mime_types, :mime_types_list,
-        :fonts_list,
-        :is_local_storage, :is_session_storage, :is_cookie,
-        :plugins, :is_mobile
-    ].each do |attr|
-      differences << attr unless self.send(attr)&.to_s == attrs[attr]&.to_s
-    end
-    differences
-  end
+  # def differences(attrs)
+  #   differences = []
+  #   [
+  #       :user_agent, :timezone, :fingerprint, :language, :system_language,
+  #       :browser, :browser_version, :browser_engine, :browser_engine_version,
+  #       :os_name, :os_version,
+  #       :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
+  #       :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
+  #       :silver_light_version,
+  #       :is_mime_types, :mime_types_list,
+  #       :fonts_list,
+  #       :is_local_storage, :is_session_storage, :is_cookie,
+  #       :plugins, :is_mobile
+  #   ].each do |attr|
+  #     differences << attr unless self.send(attr).to_s == attrs[attr].to_s
+  #   end
+  #   differences
+  # end
 
   def self.client_id
     '13'
@@ -155,7 +161,7 @@ class UserDeviceBrowser < ApplicationRecord
   end
 
   def set_timestamp
-    self.timestamp = DateTime.strptime(self.timestamp_s, '%Q') if timestamp_s.present? and self.timestamp.blank?
+    self.timestamp = DateTime.strptime(self.timestamp_s.to_s, '%Q') if timestamp_s.present? and self.timestamp.blank?
   end
 
   def set_incomplete
@@ -167,7 +173,7 @@ class UserDeviceBrowser < ApplicationRecord
         :os_name, :os_version,
         :screen_width, :screen_height, :color_depth, :is_mobile
     ].each do |attr|
-      if self.send(attr).blank?
+      if self.send(attr).nil?
         incomplete_list << attr
       end
     end

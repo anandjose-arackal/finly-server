@@ -154,6 +154,7 @@ class User < ApplicationRecord
   has_many :expense_data_extracts, as: :sourcable
   has_many :receipt_email_parse_failures
   has_many :user_login_tracks, dependent: :destroy
+  has_many :user_auth_failures
   has_many :login_agreement_mappings
   has_many :agreements, through: :login_agreement_mappings
   has_many :card_assign_requests, foreign_key: :card_owner_id
@@ -754,24 +755,27 @@ class User < ApplicationRecord
   def password_complexity
     # Regexp extracted from https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
     return if password.blank? || password =~ /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/
+    return if min_password_score < 2
 
     errors.add :password, 'Complexity requirement not met. Please use: 1 uppercase, 1 lowercase, 1 digit and 1 special character'
   end
 
   def min_password_score
-    strict_password_requirements = UserRole.ids_for(
+    level_3_req = UserRole.ids_for(
         :admin,
         :finance_manager,
+        :creditor,
+        :bank_payment_request_creditor
+    )
+
+    level_2_req = UserRole.ids_for(
+        :auditor,
         :manager,
         :reviewer,
-        :auditor,
-        :purchaser,
-        :creditor,
         :purchase_request_reviewer,
         :purchase_order_reviewer,
         :invoice_reviewer,
         :bank_payment_request_reviewer,
-        :bank_payment_request_creditor,
         :item_master_manager,
         :inventory_manager,
         :vendor_reviewer,
@@ -781,8 +785,10 @@ class User < ApplicationRecord
         :budget_manager
     )
 
-    return 3 if role_mapping.role(strict_password_requirements).present?
-    2
+    return 1 if company_id == 2
+    return 3 if role_mapping.role(level_3_req).present?
+    return 2 if role_mapping.role(level_2_req).present?
+    1
   end
 
   # Expires user if password is weak, old passwords and inactivity
@@ -810,7 +816,7 @@ class User < ApplicationRecord
   end
 
   def weak_words
-    ['finly.io', 'finly', self.first_name, self.last_name, self.email, self.company&.name]
+    ['finly.io', 'finly', self.first_name, self.last_name, self.email, self.company&.name, self.company&.name&.split(/\W+/)]
   end
 
   def payments
@@ -1197,6 +1203,8 @@ class User < ApplicationRecord
     return nil if email.nil?
 
     parts = email.split("@")
+    return nil if parts.blank?
+
     obfuscated = "X" * (parts.first.length - 2)
     "#{parts.first[0..2].concat(obfuscated)}@#{parts.second}"
   end
@@ -1264,6 +1272,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
   end
 
+  def is_purchase_order_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_order_auditor), document)
+  end
+
   def is_purchase_request_initiator?(document=nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_initiator), document)
   end
@@ -1272,12 +1284,20 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
   end
 
+  def is_purchase_request_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:purchase_request_auditor), document)
+  end
+
   def is_bank_payment_request_initiator?(document=nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), document)
   end
 
   def is_bank_payment_request_reviewer?(document=nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), document)
+  end
+
+  def is_bank_payment_request_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor), document)
   end
 
   def is_bank_payment_request_creditor?(document=nil)
@@ -1290,6 +1310,10 @@ class User < ApplicationRecord
 
   def is_invoice_reviewer?(document=nil)
     self.has_policy_role?(UserRole.id_for(:invoice_reviewer), document)
+  end
+
+  def is_invoice_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:invoice_auditor), document)
   end
 
   def is_budget_manager?(document=nil)

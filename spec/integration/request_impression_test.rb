@@ -7,15 +7,23 @@ RSpec.describe 'RequestImpression Test' do
     @user2 = create :em_user, company: @company
 
     @ip = '1.2.3.4'
+    @user_agent = Faker::Internet.user_agent
+    @fingerprint = random_fingerprint
 
-    @user_device_browser = create :user_device_browser
+    client_properties = RequestHelper::DEFAULT_DATA.deep_dup
+    client_properties[:fingerprint] = @fingerprint
+
+    @user_device_browser = create :user_device_browser, client_properties
     @doorkeeper_application = create :doorkeeper_application
-    @device = create :user_device, client: @user_device_browser, company: @company, user: @user1
-    @user_ip = create :user_ip, ip: @ip, user: @user1
+    @device = create :user_device_verified, client: @user_device_browser, company: @company, user: @user1
+    @user_ip = create :user_ip_verified, ip: @ip, user: @user1
+    @user_agent_client = create :user_agent_client_verified, user: @user1, user_agent: @user_agent
     @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id
-    @user_session = create :user_session, access_token: @token,
+    @user_session = create :user_session, access_token: @token, user_agent: @user_agent,
                            status_id: UserSessionStatus.id_for(:authorized), ip: @ip,
-                           user_device_id: @device.id, user_ip_id: @user_ip.id
+                           user_device_id: @device.id, user_ip_id: @user_ip.id, user_agent_client_id: @user_agent_client.id
+    @headers = authentication_headers_for(:web, client_properties)
+    @headers[:HTTP_USER_AGENT] = @user_agent
   end
 
   describe '> Without Block' do
@@ -24,8 +32,11 @@ RSpec.describe 'RequestImpression Test' do
         RSpec::Mocks.with_temporary_scope do
           @before_impression_count = RequestImpression.count
           allow(UserSession).to receive(:find_by_access_token_id).and_return(@user_session)
+          headers = @headers.deep_dup
+          headers['Authorization'] = "Bearer #{@token.token}"
+          headers[:REMOTE_ADDR] = @ip
 
-          get '/features_subscribed', headers: {'Authorization': "Bearer #{@token.token}", REMOTE_ADDR: @ip}
+          get '/features_subscribed', headers: headers
           @request_impression = RequestImpression.last
         end
       end

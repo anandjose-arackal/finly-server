@@ -28,7 +28,10 @@ class UserAgentClients::FindOrCreate < BaseOperation
   def user_agent_from_request
     request = RequestStoreUtil.current_request
     ua_string = request.user_agent
-    return if ua_string.nil?
+    if ua_string.nil?
+      add_message :error, 'User agent not found'
+      return nil
+    end
 
     user_agent = user.user_agent_clients.find_by_user_agent(ua_string)
     return user_agent if user_agent.present?

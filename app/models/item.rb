@@ -89,6 +89,7 @@ class Item < ApplicationRecord
     self.product_type_id == ProductType.id_for(:service)
   end
 
+
   after_save :budget_trail_entry
 
   def as_json
@@ -99,6 +100,7 @@ class Item < ApplicationRecord
       hsn_sac: hsn_sac,
       category_name: category&.name,
       category_id: category_id,
+      category_gl_code: category&.gl_code,
       rate: rate,
       description: description,
       discount: discount,
@@ -137,6 +139,11 @@ class Item < ApplicationRecord
   end
 
   def generate_sequential_id?
+    # if the user is sending the vendor_id already and does
+    # not want default, do NOT generate one
+    if self.item_number.present?
+      return false
+    end
     self.product_type_id.present?
   end
 

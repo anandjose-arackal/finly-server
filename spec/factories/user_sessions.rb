@@ -2,47 +2,49 @@
 #
 # Table name: user_sessions
 #
-#  id                   :integer          not null, primary key
-#  user_id              :integer
-#  company_id           :integer
-#  ip                   :string(255)      not null
-#  ip_type              :string(255)
-#  referrer             :text(65535)
-#  referring_domain     :string(255)
-#  landing_page         :text(65535)
-#  app_version          :string(255)
-#  continent_name       :string(255)
-#  continent_code       :string(255)
-#  country_name         :string(255)
-#  country_code         :string(255)
-#  region_code          :string(255)
-#  region_name          :string(255)
-#  city                 :string(255)
-#  zip                  :string(255)
-#  latitude             :decimal(20, 10)
-#  longitude            :decimal(20, 10)
-#  utm_source           :string(255)
-#  utm_medium           :string(255)
-#  utm_term             :string(255)
-#  utm_content          :string(255)
-#  utm_campaign         :string(255)
-#  started_at           :datetime         not null
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  access_token_id      :integer
-#  last_request_at      :datetime
-#  duration             :bigint(8)
-#  status_id            :integer
-#  message              :string(255)
-#  login_username       :string(255)
-#  accuracy_radius      :integer
-#  username             :string(255)
-#  user_device_id       :integer
-#  client_type          :string(255)
-#  user_agent           :text(65535)
-#  user_ip_id           :integer
-#  user_agent_client_id :integer
-#  admin_user_id        :integer
+#  id                          :integer          not null, primary key
+#  user_id                     :integer
+#  company_id                  :integer
+#  ip                          :string(255)      not null
+#  ip_type                     :string(255)
+#  referrer                    :text(65535)
+#  referring_domain            :string(255)
+#  landing_page                :text(65535)
+#  app_version                 :string(255)
+#  continent_name              :string(255)
+#  continent_code              :string(255)
+#  country_name                :string(255)
+#  country_code                :string(255)
+#  region_code                 :string(255)
+#  region_name                 :string(255)
+#  city                        :string(255)
+#  zip                         :string(255)
+#  latitude                    :decimal(20, 10)
+#  longitude                   :decimal(20, 10)
+#  utm_source                  :string(255)
+#  utm_medium                  :string(255)
+#  utm_term                    :string(255)
+#  utm_content                 :string(255)
+#  utm_campaign                :string(255)
+#  started_at                  :datetime         not null
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  access_token_id             :integer
+#  last_request_at             :datetime
+#  duration                    :bigint
+#  status_id                   :integer
+#  message                     :string(255)
+#  login_username              :string(255)
+#  accuracy_radius             :integer
+#  username                    :string(255)
+#  user_device_id              :integer
+#  user_agent                  :text(65535)
+#  user_ip_id                  :integer
+#  user_agent_client_id        :integer
+#  admin_user_id               :integer
+#  admin_access_reason         :text(65535)
+#  admin_access_reason_details :text(65535)
+#  scopes                      :string(255)
 #
 
 FactoryBot.define do
@@ -69,10 +71,10 @@ FactoryBot.define do
     login_username {'asd'}
     accuracy_radius {'50'}
     username {'asd'}
-    client_type {'UserDeviceBrowser'}
+    scopes {'web'}
 
     factory :user_session_browser do
-      client_type {'UserDeviceBrowser'}
+      scopes {'web'}
     end
   end
 end

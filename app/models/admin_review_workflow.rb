@@ -9,7 +9,6 @@
 #
 
 class AdminReviewWorkflow < ApplicationRecord
-  include Seedable
 
   has_many :levels, class_name: 'AdminReviewWorkflowLevel', dependent: :destroy
 

@@ -23,24 +23,10 @@ class Oauth::TokenController < Doorkeeper::TokensController
       @user = current_user(response&.token)
       params[:user] = @user
       params[:response] = response
-      # Jugaad as frontend is not developed for capturing device_type
-      params[:temporary_client_type] = 'UserDeviceBrowser'
-      # Jugaad end as frontend is not developed for capturing device_type
-      sessions_result = UserSessions::Create.(:authorized, params)
-      if sessions_result.success? and sessions_result.session.status_id == UserSessionStatus.id_for(:authorized)
-        result = Gatekeeper::Event.(:after_session_create, params)
-        if result.success?
-          @user.otp_verified = !result.require_otp if @user.otp_verified
 
-          unless @user.expired?
-            @user.update(last_activity_at: DateTime.now)
-          end
-
-          on_create_success(response)
-          return
-        else
-          invalidate_session UserSessionStatus.id_for(:failed), (result.message || result.rule.description)
-        end
+      if create_user_sessions and on_session_create
+        on_create_success(response)
+        return
       end
 
       json_string = {error: 'invalid_grant', error_description: 'The email / mobile or password you entered is incorrect'}
@@ -152,5 +138,27 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def load_global_variables
     RequestStoreUtil.set_current_request request
+    RequestStoreUtil.set_request_params params
+  end
+
+  def create_user_sessions
+    sessions_result = UserSessions::Create.(:authorized, params)
+    sessions_result.success? and sessions_result.session.status_id == UserSessionStatus.id_for(:authorized)
+  end
+
+  def on_session_create
+    result = Gatekeeper::Event.(:after_session_create, params)
+    if result.success?
+      @user.otp_verified = !result.require_otp if @user.otp_verified
+
+      unless @user.expired?
+        @user.update(last_activity_at: DateTime.now)
+      end
+
+      return true
+    else
+      invalidate_session UserSessionStatus.id_for(:failed), (result.message || result.rule.description)
+      return false
+    end
   end
 end

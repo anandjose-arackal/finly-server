@@ -7,7 +7,6 @@ RSpec.describe 'UserAuthentication > Expiry' do
     @user = create :em_user, company: @company, last_activity_at: DateTime.now, password_changed_at: DateTime.now, otp_verified: true
     @user.update(password: @password, password_confirmation: @password)
     @doorkeeper_application = create :doorkeeper_application
-    @headers = authentication_headers_for(:web)
     @user_device_browser = create :user_device_browser
     @doorkeeper_application = create :doorkeeper_application
     @ip = random_ip
@@ -16,6 +15,23 @@ RSpec.describe 'UserAuthentication > Expiry' do
     @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user.id
     @request_impression = create :request_impression
     @user_agent = Faker::Internet.user_agent
+
+    @headers = authentication_headers_for(:web)
+    @headers[:REMOTE_ADDR] = @ip
+    @headers[:HTTP_USER_AGENT] = @user_agent
+  end
+
+  before :each do
+    setup_rack_attack_cache_store
+    avoid_test_overlaps_in_cache
+  end
+
+  def setup_rack_attack_cache_store
+    Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+  end
+
+  def avoid_test_overlaps_in_cache
+    Rails.cache.clear
   end
 
   describe '> Expired User' do
@@ -23,14 +39,13 @@ RSpec.describe 'UserAuthentication > Expiry' do
     before :all do
       RSpec::Mocks.with_temporary_scope do
         @user.expire!
-
         expect do
           post '/oauth/token.json', params: {
               email: @user.email,
               password: @password,
               client_id: @doorkeeper_application.uid,
               client_secret: @doorkeeper_application.secret
-          }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+          }, headers: @headers
         end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(1).and \
@@ -73,7 +88,9 @@ RSpec.describe 'UserAuthentication > Expiry' do
         allow(User::Verification::Otp::Create).to receive(:call).and_return(BaseOperation::BasePresenter::SuccessPresenter.new(@user, {}, nil))
 
         expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
-        headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token_value}"
+
         post '/otp/resend.json', headers: headers
         expect(response).to have_http_status(:ok)
         expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
@@ -81,7 +98,9 @@ RSpec.describe 'UserAuthentication > Expiry' do
 
       it 'should allow verify otp endpoint' do
         expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
-        headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token_value}"
+
         post '/otp/verify.json', headers: headers, params: {mobile_number: @user.mobile_number, verification_code: @user.otp}
         expect(response).to have_http_status(:ok)
         expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
@@ -102,7 +121,9 @@ RSpec.describe 'UserAuthentication > Expiry' do
       it 'should not allow any other endpoint' do
         @session.update(status_id: UserSessionStatus.id_for(:authorized))
         expect(@session.status_id).to eq(UserSessionStatus.id_for(:authorized))
-        headers = {'Authorization': "Bearer #{@token_value}", REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        headers = @headers.deep_dup
+        headers['Authorization'] = "Bearer #{@token_value}"
+
         get '/menu_data.json', headers: headers
         expect(response).to have_http_status(:unauthorized)
         expect(@session.reload.message).to eq('User is expired')
@@ -133,7 +154,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
             otp_verified: true,
             client_id: @doorkeeper_application.uid,
             client_secret: @doorkeeper_application.secret
-        }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(1).and \
@@ -176,7 +197,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
             otp_verified: true,
             client_id: @doorkeeper_application.uid,
             client_secret: @doorkeeper_application.secret
-        }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(1).and \
@@ -219,7 +240,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
             password: password,
             client_id: @doorkeeper_application.uid,
             client_secret: @doorkeeper_application.secret
-        }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(1).and \
@@ -255,6 +276,11 @@ RSpec.describe 'UserAuthentication > Expiry' do
       expect(@user.save(validate: false)).to be_truthy
       expect(@user.expired?).to be_falsey
       expect(@user.last_activity_at).to_not eq(old_last_activity)
+      expect(@user.valid_password?(password)).to be_truthy
+
+      allow_any_instance_of(UserDevice).to receive(:status_id).and_return(UserDeviceStatus.id_for(:verified))
+      allow_any_instance_of(UserIp).to receive(:status_id).and_return(UserIpStatus.id_for(:verified))
+      allow_any_instance_of(UserAgentClient).to receive(:status_id).and_return(UserAgentClientStatus.id_for(:verified))
 
       expect do
         post '/oauth/token.json', params: {
@@ -262,7 +288,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
             password: password,
             client_id: @doorkeeper_application.uid,
             client_secret: @doorkeeper_application.secret
-        }, headers: {REMOTE_ADDR: @ip, HTTP_USER_AGENT: @user_agent}
+        }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
         change {Doorkeeper::AccessToken.count}.by(1).and \
@@ -279,6 +305,8 @@ RSpec.describe 'UserAuthentication > Expiry' do
       expect(@body['otp_verified']).to be_truthy
       expect(@user.reload.expired?).to be_falsey
       expect(@user.last_activity_at).to_not eq(old_last_activity)
+
+      Rack::Attack.cache.prefix = 'rack::attack'
     end
   end
 

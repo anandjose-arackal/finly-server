@@ -209,6 +209,7 @@ RSpec.describe 'UserDevices::FindOrCreate' do
           end
         end
       end
+
       describe '> Existing UserDeviceBrowser' do
         # Create an existing UserDeviceBrowser
         before(:all) do
@@ -234,78 +235,80 @@ RSpec.describe 'UserDevices::FindOrCreate' do
 
         # New user, the existing device properties
         describe '> New UserDevice' do
-          [
-              :timestamp_s, :user_agent, :timezone, :fingerprint, :language,
-              :browser, :browser_version, :browser_engine, :browser_engine_version,
-              :os_name, :os_version,
-              :screen_width, :screen_height, :color_depth, :is_mobile
-          ].each do |item|
-            describe "> Incorrect #{item}"
-            before(:all) do
-              RSpec::Mocks.with_temporary_scope do
-                @before_device_count = UserDevice.count
-                @before_device_browser_count = UserDeviceBrowser.count
-                allow(RequestStoreUtil).to receive(:current_request).and_return(double(headers: authentication_headers_for(:web, fingerprint: @fingerprint, "#{item}": nil)))
-                @result = UserDevices::FindOrCreate.(@user3, {scope: ['web']})
-                @device = @result&.device
+          {
+              user_agent: Faker::Internet.user_agent, timezone: 'UAE', language: 'Tamil',
+              browser: 'Random browser version', browser_version: '1.1.1', browser_engine: '2.2.2', browser_engine_version: '3.3.3',
+              os_name: 'Maa OS', os_version: '0.01',
+              screen_width: '1090', screen_height: '1820', color_depth: '32'
+          }.each do |item, value|
+            describe "> Incorrect #{item}" do
+              before(:all) do
+                RSpec::Mocks.with_temporary_scope do
+                  @before_device_count = UserDevice.count
+                  @before_device_browser_count = UserDeviceBrowser.count
+                  allow(RequestStoreUtil).to receive(:current_request).and_return(double(headers: authentication_headers_for(:web, fingerprint: @fingerprint, "#{item}": value)))
+                  @result = UserDevices::FindOrCreate.(@user3, {scope: ['web']})
+                  @device = @result&.device
+                end
               end
-            end
 
-            it 'should succeed' do
-              expect(@result.success?).to eq(true)
-            end
+              it 'should succeed' do
+                expect(@result.success?).to eq(true)
+              end
 
-            it 'should create UserDeviceBrowser with status as attribute mismatch' do
-              expect(@before_device_browser_count + 1).to eq(UserDeviceBrowser.count)
-              expect(@device.client).to_not be_nil
-              expect(@device.client.status_id).to eq(UserDeviceStatus.id_for(:attribute_mismatch))
-              expect(@device.client.message).to_not be_nil
-            end
+              it 'should create new UserDeviceBrowser with status as complete' do
+                expect(@before_device_browser_count + 1).to eq(UserDeviceBrowser.count)
+                expect(@device.client).to_not be_nil
+                expect(@device.client.status_id).to eq(UserDeviceStatus.id_for(:complete))
+                expect(@device.client.message).to be_nil
+              end
 
-            it 'should create UserDevice with status as attribute mismatch' do
-              expect(@before_device_count + 1).to eq(UserDevice.count)
-              expect(@device).to_not be_nil
-              expect(@device.status_id).to eq(UserDeviceStatus.id_for(:attribute_mismatch))
-              expect(@device.message).to_not be_nil
+              it 'should create new UserDevice with status as unverified' do
+                expect(@before_device_count + 1).to eq(UserDevice.count)
+                expect(@device).to_not be_nil
+                expect(@device.status_id).to eq(UserDeviceStatus.id_for(:unverified))
+                expect(@device.message).to be_nil
+              end
             end
           end
         end
 
         # existing user, the existing device properties
         describe '> Existing UserDevice' do
-          [
-              :timestamp_s, :user_agent, :timezone, :fingerprint, :language,
-              :browser, :browser_version, :browser_engine, :browser_engine_version,
-              :os_name, :os_version,
-              :screen_width, :screen_height, :color_depth, :is_mobile
-          ].each do |item|
-            describe "> Incorrect #{item}"
-            before(:all) do
-              RSpec::Mocks.with_temporary_scope do
-                @before_device_count = UserDevice.count
-                @before_device_browser_count = UserDeviceBrowser.count
-                allow(RequestStoreUtil).to receive(:current_request).and_return(double(headers: authentication_headers_for(:web, fingerprint: @fingerprint, "#{item}": nil)))
-                @result = UserDevices::FindOrCreate.(@user1, {scope: ['web']})
-                @device = @result&.device
+          {
+              user_agent: Faker::Internet.user_agent, timezone: 'Dubai', language: 'Telugu',
+              browser: 'Random browser version - 2', browser_version: '2.1.1', browser_engine: '3.2.2', browser_engine_version: '4.3.3',
+              os_name: 'Dad OS', os_version: '1.01',
+              screen_width: '1190', screen_height: '1920', color_depth: '48'
+          }.each do |item, value|
+            describe "> Incorrect #{item}" do
+              before(:all) do
+                RSpec::Mocks.with_temporary_scope do
+                  @before_device_count = UserDevice.count
+                  @before_device_browser_count = UserDeviceBrowser.count
+                  allow(RequestStoreUtil).to receive(:current_request).and_return(double(headers: authentication_headers_for(:web, fingerprint: @fingerprint, "#{item}": value)))
+                  @result = UserDevices::FindOrCreate.(@user1, {scope: ['web']})
+                  @device = @result&.device
+                end
               end
-            end
 
-            it 'should succeed' do
-              expect(@result.success?).to eq(true)
-            end
+              it 'should succeed' do
+                expect(@result.success?).to eq(true)
+              end
 
-            it 'should create UserDeviceBrowser with status as attribute mismatch' do
-              expect(@before_device_browser_count + 1).to eq(UserDeviceBrowser.count)
-              expect(@device.client).to_not be_nil
-              expect(@device.client.status_id).to eq(UserDeviceStatus.id_for(:attribute_mismatch))
-              expect(@device.client.message).to_not be_nil
-            end
+              it 'should create new UserDeviceBrowser with status as complete' do
+                expect(@before_device_browser_count + 1).to eq(UserDeviceBrowser.count)
+                expect(@device.client).to_not be_nil
+                expect(@device.client.status_id).to eq(UserDeviceStatus.id_for(:complete))
+                expect(@device.client.message).to be_nil
+              end
 
-            it 'should create UserDevice with status as attribute mismatch' do
-              expect(@before_device_count + 1).to eq(UserDevice.count)
-              expect(@device).to_not be_nil
-              expect(@device.status_id).to eq(UserDeviceStatus.id_for(:attribute_mismatch))
-              expect(@device.message).to_not be_nil
+              it 'should create new UserDevice with status as unverified' do
+                expect(@before_device_count + 1).to eq(UserDevice.count)
+                expect(@device).to_not be_nil
+                expect(@device.status_id).to eq(UserDeviceStatus.id_for(:unverified))
+                expect(@device.message).to be_nil
+              end
             end
           end
         end

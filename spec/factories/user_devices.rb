@@ -2,7 +2,7 @@
 #
 # Table name: user_devices
 #
-#  id                           :bigint(8)        not null, primary key
+#  id                           :bigint           not null, primary key
 #  user_id                      :integer
 #  company_id                   :integer
 #  fingerprint                  :string(255)
@@ -22,7 +22,7 @@
 
 FactoryBot.define do
   factory :user_device do
-    fingerprint { SecureRandom.hex(32) }
+    fingerprint {SecureRandom.hex(32)}
     status_id {UserDeviceStatus.id_for(:unverified)}
     verification_mode {'otp'}
     verification_key {rand(10 ** 6)}
@@ -32,10 +32,24 @@ FactoryBot.define do
     verification_failed_attempts {0}
     message {nil}
 
-    UserDeviceStatus.all.each do |status|
-      factory :"user_device_#{status.name}" do
-        status_id {status.id}
-      end
+    factory :"user_device_unverified" do
+      status_id {UserDeviceStatus.id_for(:unverified)}
+    end
+
+    factory :"user_device_verified" do
+      status_id {UserDeviceStatus.id_for(:verified)}
+    end
+
+    factory :"user_device_incomplete" do
+      status_id {UserDeviceStatus.id_for(:incomplete)}
+    end
+
+    factory :"user_device_attribute_mismatch" do
+      status_id {UserDeviceStatus.id_for(:attribute_mismatch)}
+    end
+
+    factory :"user_device_complete" do
+      status_id {UserDeviceStatus.id_for(:complete)}
     end
   end
 end

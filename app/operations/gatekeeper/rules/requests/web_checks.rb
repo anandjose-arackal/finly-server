@@ -1,25 +1,37 @@
 Gatekeeper::Checker.new 'On New Request' do
 
   before do
-    skip unless RequestStoreUtil.current_session&.client_type == 'UserDeviceBrowser'
-    # skip if RequestStoreUtil.current_request.remote_ip == '::1' and not Rails.env.production?
+    skip unless RequestStoreUtil.current_session&.web?
+    skip if RequestStoreUtil.current_session.admin_user_id.present?
+
+    skip if RequestStoreUtil.current_user.company_id == 2
   end
 
   premise :on_authenticated_request do
 
-    rule 'Request IP has to match Session IP' do
-      request = RequestStoreUtil.current_request
-      session = RequestStoreUtil.current_session
-      next if request.remote_ip == session.ip
-      next if request.remote_ip == session.user_ip&.ip
-      next if Rails.env.development?
-
-      message 'Browser IP mismatch'
-      session_status_id UserSessionStatus.id_for(:blocked)
-      response_code 401
-      level 3
-      fail
-    end
+    # todo temporary
+    # rule 'Request IP has to be a verified UserIP' do
+    #   pass = false
+    #   [
+    #       'otp/resend',
+    #       'otp/verify',
+    #   ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+    #   next if pass
+    #
+    #   request = RequestStoreUtil.current_request
+    #   session = RequestStoreUtil.current_session
+    #   next if request.remote_ip == session.ip
+    #   next if request.remote_ip == session.user_ip&.ip
+    #   # Allow the request as long as the request is from a verified IP
+    #   next if RequestStoreUtil.current_user.user_ips.find_by_ip(request.remote_ip).present?
+    #   next if Rails.env.development?
+    #
+    #   message 'Unverified IP'
+    #   session_status_id UserSessionStatus.id_for(:blocked)
+    #   response_code 401
+    #   level 3
+    #   fail
+    # end
 
     rule 'User agent is required for the request' do
       if RequestStoreUtil.current_request.user_agent.nil?
@@ -44,14 +56,24 @@ Gatekeeper::Checker.new 'On New Request' do
 
     end
 
+    rule 'X-Finly-RP is required for all web requests' do
+      next if RequestStoreUtil.x_finly_rp_attributes.present?
+
+      message 'X-Finly-RP not sent'
+      session_status_id UserSessionStatus.id_for(:blocked)
+      response_code 401
+      level 10
+      fail
+    end
+
     rule 'Session should timeout after 30 minute of inactivity' do
       session = RequestStoreUtil.current_session
 
       if Time.now - Time.parse(session.last_request_at.to_s) > 30.minutes
         message 'Session timeout'
-        session_status_id UserSessionStatus.id_for(:revoked)
+        session_status_id UserSessionStatus.id_for(:expired)
         response_code 401
-        level 3
+        level 1
         fail
       end
     end
@@ -116,37 +138,64 @@ Gatekeeper::Checker.new 'On New Request' do
       end
     end
 
-    # section 'New Devices' do
-    #   section 'Unverified' do
-    #     before do
-    #       skip unless RequestStoreUtil.current_session.user_device.status_id == UserDeviceStatus.id_for(:unverified)
-    #     end
-    #     rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
-    #       pass = false
-    #       [
-    #           'otp/resend',
-    #           'otp/verify',
-    #       ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
-    #       next if pass
-    #
-    #       message 'New device is not OTP verified'
-    #       session_status_id UserSessionStatus.id_for(:blocked)
-    #       response_code 401
-    #       fail
-    #     end
-    #   end
-    #   section 'block :incomplete, :attribute_mismatch' do
-    #     before do
-    #       skip unless UserIpStatus.ids_for(:incomplete, :attribute_mismatch).include?(RequestStoreUtil.current_session.user_ip.status_id)
-    #     end
-    #     rule 'do not allow access' do
-    #       message "User Device is #{RequestStoreUtil.current_session.user_ip.status.name}"
-    #       session_status_id UserSessionStatus.id_for(:blocked)
-    #       response_code 401
-    #       fail
-    #     end
-    #   end
-    # end
+    section 'New Devices' do
+      section 'Unverified' do
+        before do
+          skip unless RequestStoreUtil.current_session.user_device.status_id == UserDeviceStatus.id_for(:unverified)
+        end
+        rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
+          pass = false
+          [
+              'otp/resend',
+              'otp/verify',
+          ].each {|pattern| pass = true if RequestStoreUtil.current_request.path.include?(pattern)}
+          next if pass
+
+          message 'New device is not OTP verified'
+          session_status_id UserSessionStatus.id_for(:blocked)
+          response_code 401
+          fail
+        end
+      end
+      section 'block :incomplete, :attribute_mismatch' do
+        before do
+          skip unless UserIpStatus.ids_for(:incomplete, :attribute_mismatch).include?(RequestStoreUtil.current_session.user_ip.status_id)
+        end
+        rule 'do not allow access' do
+          message "User Device is #{RequestStoreUtil.current_session.user_ip.status.name}"
+          session_status_id UserSessionStatus.id_for(:blocked)
+          response_code 401
+          fail
+        end
+      end
+    end
+
+    section 'Verified Device' do
+
+      section 'X-Finly-RP property mismatch' do
+        [
+            :user_agent, :timezone, :fingerprint, :language, :system_language,
+            :browser, :browser_version, :browser_engine, :browser_engine_version,
+            :os_name, :os_version,
+            :screen_width, :screen_height, :device_x_dpi, :device_y_dpi, :color_depth,
+            :java_enabled, :java_version, :flash_enabled, :flash_version, :silver_light_enabled,
+            :silver_light_version,
+            :is_mime_types, :mime_types_list,
+            :fonts_list,
+            :is_local_storage, :is_session_storage, :is_cookie,
+            :plugins, :is_mobile
+        ].each do |item|
+          rule "#{item} property mismatch" do
+            next if RequestStoreUtil.x_finly_rp_attributes[item].to_s == RequestStoreUtil.current_session.user_device.client.send(item).to_s
+
+            session_status_id UserSessionStatus.id_for(:blocked)
+            response_code 401
+            fail
+          end
+        end
+
+      end
+    end
 
     section 'New IP' do
       section 'Unverified' do

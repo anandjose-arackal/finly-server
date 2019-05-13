@@ -2,7 +2,7 @@
 #
 # Table name: user_agent_clients
 #
-#  id                                :bigint(8)        not null, primary key
+#  id                                :bigint           not null, primary key
 #  user_agent                        :string(255)      not null
 #  user_id                           :integer          not null
 #  status_id                         :integer          not null
@@ -27,12 +27,12 @@ FactoryBot.define do
     verification_code_failed_attempts {0}
     status_id {UserAgentClientStatus.id_for(:unverified)}
 
-    factory :user_agent_verified do
+    factory :user_agent_client_verified do
       status_id {UserAgentClientStatus.id_for(:verified)}
       verified_at {DateTime.now}
     end
 
-    factory :user_agent_unverified do
+    factory :user_agent_client_unverified do
       status_id {UserAgentClientStatus.id_for(:unverified)}
     end
   end

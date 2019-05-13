@@ -43,7 +43,7 @@ gem 'sinatra', '~> 2.0.5', require: nil, github: 'sinatra/sinatra', branch: 'mas
 
 gem 'request_store', '~> 1.4.1'
 gem 'simpleconfig', '~> 2.0.1'
-
+gem 'slack-notifier', '~> 2.3'
 # gems for quickbooks integration
 gem 'omniauth', '~> 1.9.0'
 gem 'omniauth-quickbooks', '~> 0.0.2'
@@ -241,6 +241,7 @@ group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'spring', '~> 2.0.0'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'spring-commands-rspec', '~> 1.0.4'
   gem "lol_dba"
 end
 

@@ -2,7 +2,6 @@ class DepartmentsController < BaseControllers::WebBase
 
 
   def index
-    p params
     @result = Company::Departments::Index.(current_user, params)
     respond
   end

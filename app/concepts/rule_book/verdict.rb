@@ -20,8 +20,13 @@ class RuleBook::Verdict < RuleBook::Rule
   def run
     self.rule.before_blocks.each do |before_block|
       instance_eval(&before_block)
+      executed! and return if self.skipped?
     end
-    instance_eval(&self.rule.block) unless self.skipped?
+    instance_eval(&self.rule.block)
+    executed!
+  end
+
+  def executed!
     self.executed = true
   end
 

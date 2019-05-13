@@ -152,9 +152,8 @@ class Admin::Users::Import < Admin::Base
   private
 
   def create_response_csv
-    file_name = "common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
-    FileUtils.mkdir_p "public/common/files/temp_files" unless  Dir.exist?("public/common/files/temp_files")
-    CSV.open(file_name, 'wb') do |csv|
+    file = Tempfile.new("bulk_import_users.csv")
+    CSV.open(file.path, 'wb') do |csv|
       self.header << 'Result'
       csv << header
       (2..sheet.last_row).each do |i|
@@ -164,7 +163,8 @@ class Admin::Users::Import < Admin::Base
         csv << row
       end
     end
-    return file_name.gsub('public', '')
+    temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
+    return temp_file.file.url
   end
 
   def retrieve_invite_type(row)
@@ -198,9 +198,17 @@ class Admin::Users::Import < Admin::Base
       end
     end
 
+    role_mapping_attributes = []
+    if row[import_fields[:expense_management]]  == 'Y'
+     role_mapping_attributes << {user_role_id: UserRole.employee_id,
+                                   purpose_id: Purpose.id_for(:expense_management)}
+    end
     # adding a default initiator role for vendor payments
+
+    if row[import_fields[:vendor_payments]]  == 'Y'
     role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator),
                                 purpose_id: Purpose.id_for(:vendor_payments)}
+    end
 
     user_email = ImportUtil.cleanup_email(row[import_fields[:email]])
     company_id = row[import_fields[:company_id]].to_i rescue nil
@@ -218,9 +226,9 @@ class Admin::Users::Import < Admin::Base
     generated_password = generate_default_password
     company = Company.find_by(id: row[import_fields[:company_id]])
     department_id = company&.departments&.find_by code: row[import_fields[:department_code]]
-    location_id = company&.locations.&find_by location_code: row[import_fields[:location_code]]
+    location_id = company&.locations&.find_by location_code: row[import_fields[:location_code]]
 
-    user_department_mappings_attributes = [{ department_id: department_i}]
+    user_department_mappings_attributes = [{ department_id: department_id}]
     user_branch_location_mappings_attributes = [{branch_location_id: location_id}]
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
@@ -246,14 +254,6 @@ class Admin::Users::Import < Admin::Base
                         yes_bank_account_transfer: vendor_payments
                     }
     }
-
-    if department_id.present?
-      user_params[:user_department_mappings_attributes] = user_department_mappings_attributes
-    end
-
-    if location_id.present?
-      user_params[:user_branch_location_mappings_attributes] = user_branch_location_mappings_attributes
-    end
 
     return user_params
   end

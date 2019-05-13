@@ -21,7 +21,7 @@ class UserSessionCreateHelper
         allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
 
         response = double({token: @token})
-        @result = UserSessions::Create.(@status, {user: @user1, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
+        @result = UserSessions::Create.(@status, {user: @user1, admin_user: @admin_user, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
       end
     end
   end
@@ -48,7 +48,7 @@ class UserSessionCreateHelper
 
         response = double({token: @token})
         block.call if block_given?
-        @result = UserSessions::Create.(@status, {user: nil, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
+        @result = UserSessions::Create.(@status, {user: nil, admin_user: @admin_user, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
       end
     end
   end
@@ -63,6 +63,7 @@ class UserSessionCreateHelper
       expect(@before_user_session_count + 1).to eq(UserSession.count)
       expect(@result.session.status_id).to eq(UserSessionStatus.id_for(@status))
       expect(@result.session.message).to eq(@message)
+      expect(@result.session.scopes).to eq('web')
     end
 
     instance.it 'should create new UserSessionEvent with the endpoint details' do
@@ -205,40 +206,40 @@ RSpec.describe 'UserSessions::Create' do
         UserSessionCreateHelper.user_presence_check(self)
       end
 
-      # todo enable this once frontend is sending the X-Finly-RP headers
-      # describe '> With user with FailurePresenter from UserDevices::FindOrCreate' do
-      #   before do
-      #     RSpec::Mocks.with_temporary_scope do
-      #       @before_user_session_count = UserSession.count
-      #       @before_session_event_count = UserSessionEvent.count
-      #
-      #       headers = {}
-      #       @controller = 'oauth/token'
-      #       @action = 'create'
-      #       @path = 'oauth/login'
-      #
-      #       @username = @user1.email
-      #       @issue_string = 'Issue issue'
-      #
-      #       allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post'}))
-      #       allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({success?: false, messages: {error: [@issue_string]}}))
-      #       allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
-      #
-      #       response = double({token: @token})
-      #       @result = UserSessions::Create.(@status, {user: @user1, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
-      #     end
-      #   end
-      #
-      #   it 'should succeed' do
-      #     expect(@result.success?).to eq(true)
-      #   end
-      #
-      #   it 'should set UserSession as failed' do
-      #     expect(@result.session.status_id).to eq(UserSessionStatus.id_for(:failed))
-      #     expect(@result.session.message).to eq(@issue_string)
-      #   end
-      # end
-      # todo enable this once frontend is sending the X-Finly-RP headers
+      describe '> With user with FailurePresenter from UserDevices::FindOrCreate' do
+        before do
+          RSpec::Mocks.with_temporary_scope do
+            @before_user_session_count = UserSession.count
+            @before_session_event_count = UserSessionEvent.count
+
+            headers = {}
+            @controller = 'oauth/token'
+            @action = 'create'
+            @path = 'oauth/login'
+
+            @username = @user1.email
+            @issue_string = 'Issue issue'
+
+            allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post', user_agent: @user_agent}))
+            allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({success?: false, messages: {error: [@issue_string]}}))
+            allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
+
+            response = double({token: @token})
+            @result = UserSessions::Create.(@status, {user: @user1, response: response, username: @username, scope: ['web'], controller: @controller, action: @action, message: @message})
+          end
+        end
+
+        it 'should succeed' do
+          expect(@result.success?).to eq(true)
+        end
+
+        # todo Temporary as frontend dev is not available
+        # it 'should set UserSession as failed' do
+        #   expect(@result.session.status_id).to eq(UserSessionStatus.id_for(:failed))
+        #   expect(@result.session.message).to eq(@issue_string)
+        # end
+        # todo Temporary as frontend dev is not available
+      end
 
       describe '> With user with FailurePresenter from UserIps::FindOrCreate' do
         before do
@@ -290,6 +291,7 @@ RSpec.describe 'UserSessions::Create' do
         end
       end
     end
+
   end
 
 end

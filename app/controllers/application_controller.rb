@@ -3,7 +3,7 @@ require 'require_all'
 # Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
-  include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper, Helpers::UserSessionsHelper
+  include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper, Helpers::UserSessionsHelper, BankPaymentRequestsHelper
   # include AbstractController::Callbacks
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
@@ -335,33 +335,68 @@ class ApplicationController < ActionController::Base
       RequestStoreUtil.set_authorized_scopes scopes
     end
 
+    verify_user_session(doorkeeper_token)
+  end
+
+  def verify_user_session(doorkeeper_token)
     user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
     if user_session.nil?
-      # todo better handle how existing logins are associated i.e mobile, API etc
-      params[:user] = current_user
-      params[:message] = 'User Session not found'
-      UserSessions::Create.(:blocked, params)
-      head 401
-      return
+      # if doorkeeper_token.scopes.include?('web')
+        doorkeeper_token.update(status_id: UserSessionStatus.id_for(:blocked), message: 'UserSession does not exist')
+        head 401
+        return false
+      # else
+      #   # todo better handle how existing logins are associated i.e mobile, API etc
+      #   # params[:user] = current_user
+      #   # params[:message] = 'User Session not found'
+      #   # params[:scope] = doorkeeper_token.scopes.to_s
+      #   # result = UserSessions::Create.(:authorized, params)
+      #   # unless result.success?
+      #   #   doorkeeper_token.update(status_id: UserSessionStatus.id_for(:expired), message: 'User Session does not exist')
+      #   #   head 401
+      #   # end
+      #   # user_session = result.session
+      #   # todo temp workaround
+      #   return true
+      # end
     end
-
     RequestStoreUtil.set_current_session user_session
 
     result = UserSessions::Events::Create.(current_user, params)
     RequestStoreUtil.set_current_event result.event
 
     unless user_session.authorized?
+      invalidate_session user_session.status_id, user_session.message
       head 401
       return
     end
 
+    UserDevices::XFinlyRPProcessor.from_client(user_session.user_device&.client)
+
     result = Gatekeeper::Event.(:on_authenticated_request, user: current_user)
     unless result.success?
       session_status = result.session_status_id || UserSessionStatus.id_for(:blocked)
-      invalidate_session session_status, result.message
+      invalidate_session session_status, (result.message || result.full_description)
+      return false
     end
 
+
+    return false unless last_request_at_changed?(user_session)
+
     user_session.update(last_request_at: DateTime.now)
+    true
+  end
+
+  def last_request_at_changed?(user_session)
+    return true if user_session.admin_user_id.present?
+
+    return false unless user_session.authorized?
+    ['otp/resend', 'otp/verify', 'users/password', 'notifications/unread'].each {|path| return false if request.path.include?(path)}
+    return false if current_user.expired?
+    return false unless current_user.otp_verified
+    return false unless user_session.verified?
+
+    true
   end
 
   def invalidate_session(status_id, reason)

@@ -2,7 +2,7 @@
 #
 # Table name: request_impressions
 #
-#  id               :bigint(8)        not null, primary key
+#  id               :bigint           not null, primary key
 #  ip               :string(255)      not null
 #  ip_type          :string(255)
 #  user_agent       :string(255)
@@ -36,7 +36,7 @@
 #  action           :string(255)
 #  view             :string(255)
 #  blocked          :boolean
-#  block_by         :string(255)
+#  blocked_by       :string(255)
 #  block_reason     :string(255)
 #  response_code    :decimal(10, )
 #  response_time    :decimal(10, )

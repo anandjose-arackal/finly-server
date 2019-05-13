@@ -69,6 +69,7 @@ json.results do
 
     po = p.po_revisions.last
     if po.present?
+      json.purchase_order_id po.id
       json.revision true
       json.revision_for po.revised_po_id
       json.revision_of po.revision_of_id
@@ -133,7 +134,7 @@ json.results do
       json.invoice_advance invoice.proforma_advance&.value
     end
 
-    vendor = po.present? ? po.vendor : invoice&.vendor
+    vendor = p.purchase_order.present? ? p.purchase_order.vendor : invoice&.vendor
     if vendor.present?
       json.vendor vendor.as_json
     end

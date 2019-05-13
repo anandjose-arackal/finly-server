@@ -48,6 +48,8 @@ FactoryBot.define do
     mobile_number {generate(:user_mobile_number)}
     last_activity_at {DateTime.now}
     password_changed_at {DateTime.now}
+    otp_verified {true}
+    default_password {false}
 
     # user_panel_subscription_attributes {{expense_management: true}}
     # role_mapping_attributes { {user_role_id: 4, purpose_id: 1} }

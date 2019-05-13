@@ -12,4 +12,8 @@ class BaseControllers::AdminBase < ApplicationController
       end
     end
   end
+
+  def verify_user_session(doorkeeper_token)
+    true
+  end
 end

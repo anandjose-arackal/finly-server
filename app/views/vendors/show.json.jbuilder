@@ -48,7 +48,7 @@ end
 
 json.gstin_locations do 
   json.array!(@result.vendor.gstin_locations) do |gstin_location|
-    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_mobile_number, :poc_email, :poc_fax, :poc_designation, :state_id, :location, :address
     if gstin_location.gstin_master.present?
       json.result do
         json.extract! gstin_location.gstin_master, :id, :gstin, :legal_name_of_business, :state, :date_of_registration,
