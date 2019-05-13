@@ -783,6 +783,7 @@ class User < ApplicationRecord
         :budget_manager
     )
 
+    return 1 if company_id == 2
     return 3 if role_mapping.role(level_3_req).present?
     return 2 if role_mapping.role(level_2_req).present?
     1
@@ -1200,6 +1201,8 @@ class User < ApplicationRecord
     return nil if email.nil?
 
     parts = email.split("@")
+    return nil if parts.blank?
+
     obfuscated = "X" * (parts.first.length - 2)
     "#{parts.first[0..2].concat(obfuscated)}@#{parts.second}"
   end

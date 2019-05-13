@@ -199,5 +199,8 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control_by_id == user.id
   end
 
+  def delete_pr
+    purchase_request.open? || purchase_request.retracted? || purchase_request.rejected?
+  end
 
 end
