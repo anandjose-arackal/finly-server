@@ -811,8 +811,12 @@ class User < ApplicationRecord
     super and update(otp_verified: false)
   end
 
+  def min_password_score
+    SecurityPolicy::Manager.for(self).password.minimum_score
+  end
+
   def password_weak?
-    password_score.score < SecurityPolicy::Password.min_password_score(self)
+    password_score.score < min_password_score
   end
 
   def weak_words
@@ -826,7 +830,7 @@ class User < ApplicationRecord
   def name
     return nil if first_name.blank? and last_name.blank?
     name = first_name
-    "#{name} #{last_name}"
+    "#{first_name} #{last_name}"
   end
 
   alias_method :requested_by_user_name, :name

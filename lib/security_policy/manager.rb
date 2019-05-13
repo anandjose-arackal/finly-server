@@ -11,6 +11,13 @@ class SecurityPolicy::Manager
     attr_accessor key
   end
 
+  def self.for(user)
+    if RequestStoreUtil.security_policy&.user == user
+      return RequestStoreUtil.security_policy
+    end
+    SecurityPolicy::Manager.new(user)
+  end
+
   def initialize(user)
     self.user = user
     self.user_roles = user.user_roles

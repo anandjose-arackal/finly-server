@@ -2,67 +2,48 @@ class SecurityPolicy::Config
 
   HIGH = {
       browser: {
-          client: {
-              otp_verify: true,
-          },
-          ip: {
-              otp_verify: true,
-          },
+          client: {otp_verify: true, },
+          ip: {otp_verify: true, },
           inactivity_timeout: 30.minutes,
       },
       password: {
-          min_score: 3,
+          minimum_score: 3,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,
           mandate_uppercase: true,
-          min_length: 8,
           expire_after: 90.days,
       },
   }
 
   MEDIUM = {
       browser: {
-          client: {
-              otp_verify: false,
-              tolerance: :match,
-          },
-          ip: {
-              otp_verify: false,
-              tolerance: :country, # verified, :city, :state, :country, :match, :all
-          },
+          client: {otp_verify: false, },
+          ip: {otp_verify: false, },
           inactivity_timeout: 3.hours,
       },
       password: {
-          min_score: 2,
+          minimum_score: 2,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,
           mandate_uppercase: true,
-          min_length: 8,
           expire_after: 90.days,
       },
   }
 
   LOW = {
       browser: {
-          client: {
-              otp_verify: false,
-              tolerance: :match,
-          },
-          ip: {
-              otp_verify: true,
-              tolerance: :country, # verified, :city, :state, :country, :match, :all
-          },
+          client: {otp_verify: false, },
+          ip: {otp_verify: true, },
           inactivity_timeout: 6.hours,
       },
       password: {
-          min_score: 1,
+          minimum_score: 1,
           mandate_special_character: false,
           mandate_numbers: false,
           mandate_lowercase: false,
           mandate_uppercase: false,
-          min_length: 8,
           expire_after: 90.days,
       },
   }
