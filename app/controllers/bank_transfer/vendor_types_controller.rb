@@ -1,5 +1,4 @@
-class BankTransfer::VendorTypesController < ApplicationController
-  before_action -> {finly_authorize! :web}
+class BankTransfer::VendorTypesController < BaseControllers::WebBase
 
   def index
     @result = BankTransfer::VendorTypes::Index.(current_user, params)

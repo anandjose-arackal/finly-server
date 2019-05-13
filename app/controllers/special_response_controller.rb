@@ -1,4 +1,4 @@
-class SpecialResponseController < ApplicationController
+class SpecialResponseController < BaseControllers::PublicBase
 
   # dummy action that just shows the page to upload a file
   def new

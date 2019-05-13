@@ -12,6 +12,7 @@
 
 
 class Currency < ApplicationRecord
+
   has_many :amounts
 
   # since default currency is INR
@@ -19,13 +20,13 @@ class Currency < ApplicationRecord
     1
   end
 
-  def as_json(options={})
-      {
-          id: self.id,
-          country: self.country,
-          country_code: self.country_code,
-          symbol: self.symbol
-      }
+  def as_json(options = {})
+    {
+        id: self.id,
+        country: self.country,
+        country_code: self.country_code,
+        symbol: self.symbol
+    }
   end
 
   CURRENCIES = [
@@ -75,8 +76,8 @@ class Currency < ApplicationRecord
           symbol: "₽"
       },
       {
-          :country=>"United Arab Emirates Dirham",
-          :country_code=>"AED",
+          :country => "United Arab Emirates Dirham",
+          :country_code => "AED",
           symbol: ""
       },
       {
@@ -836,11 +837,11 @@ class Currency < ApplicationRecord
   ]
 
   def self.id_for(country_code)
-      Currency.find_by(country_code: country_code)&.id
+    Currency.find_by(country_code: country_code)&.id
   end
 
   def self.currency_for(country_code)
-      Currency.find_by(country_code: country_code)
+    Currency.find_by(country_code: country_code)
   end
 
   def self.seed_data
@@ -852,4 +853,26 @@ class Currency < ApplicationRecord
       end
     end
   end
+
+  def self.refresh_cache
+    SEEDABLE_CACHE[name] = {}.with_indifferent_access
+    as_hash&.each do |key, val|
+      SEEDABLE_CACHE[name][key] = val
+    end
+  end
+
+  # Generates a hash out of all the values in {name: id} format
+  def self.as_hash
+    values = HashInsensitive.new
+
+    return values unless ApplicationRecord.connection.table_exists? self.table_name
+    self.all.each do |item|
+      values[item.country_code] = item.id
+    end
+
+    values.with_indifferent_access
+  end
+
+  refresh_cache
+
 end

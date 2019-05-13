@@ -68,11 +68,20 @@ when :uat
 end
 
 set :pty, false
-linked_files = %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/gstin_verification_config.yml}
+linked_files = %w{
+  config/database.yml
+  config/application.yml
+  config/data/bypass_authorized_users.yml
+  config/mailer_config.yml
+  config/aws_config.yml
+  config/yes_bank_config.yml
+  config/gstin_verification_config.yml
+  config/redis_config.yml
+}
 case fetch(:stage)
 when :itzcash_production, :aws_production, :background_production
-  linked_files << "config/sidekiq.yml"
-  linked_files << "config/elastic_apm.yml"
+  linked_files << 'config/sidekiq.yml'
+  linked_files << 'config/elastic_apm.yml'
   # linked_files << "config/sentry.yml"
 when :yes_bank_balance_poller
   linked_files << "config/sidekiq.yml"

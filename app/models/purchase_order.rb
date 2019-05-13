@@ -65,10 +65,15 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  vendor_address               :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
   include SoftDeletable, Templatable, Transitionable, MathUtil
+  include Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :po_number, purpose: :purchase_order, editable: false, prefix: 'PO/{fiscal_year_start}-{fiscal_year_end}/', min_length: 4
+
   belongs_to :company, optional: true
   belongs_to :user, optional: true
   belongs_to :procurement, optional: true
@@ -173,7 +178,7 @@ class PurchaseOrder < ApplicationRecord
       where user_id: user_ids
     end
   }
-  
+
   scope :with_budgetable_vendor_ids, -> (vendor_ids) {
     if vendor_ids.present?
       where vendor_id: vendor_ids
@@ -575,6 +580,10 @@ class PurchaseOrder < ApplicationRecord
     end
   end
 
+  def generate_sequential_id?
+    purchase_order_status_id != PurchaseOrderStatus.id_for(:open)
+  end
+
 
   private
 
@@ -834,7 +843,7 @@ class PurchaseOrder < ApplicationRecord
       item_ids = options[:item_ids]
 
       # Update Purchase request item statuses
-       # TODO- create status change trail 
+       # TODO- create status change trail
       PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
 
       document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil
@@ -853,4 +862,5 @@ class PurchaseOrder < ApplicationRecord
       end
     end
   end
+
 end

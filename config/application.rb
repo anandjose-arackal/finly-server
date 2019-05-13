@@ -14,13 +14,7 @@ module Finly
 
     config.time_zone = 'Kolkata'
     config.active_record.default_timezone = :local
-
-    config.before_configuration do
-      env_file = File.join(Rails.root, 'config', 'aws_details.yml')
-      YAML.load(File.open(env_file)).each do |key, value|
-        ENV[key.to_s] = value
-      end if File.exists?(env_file)
-    end
+    config.middleware.use Rack::Attack
 
     # config.autoload_paths += %W(#{config.root}/lib)
 

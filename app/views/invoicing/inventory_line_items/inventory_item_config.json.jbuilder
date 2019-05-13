@@ -1,5 +1,8 @@
 json.categories do
-  json.array! @result.categories
+  json.array! @result.categories.leaves.each do |cat|
+    json.id cat.id
+    json.name cat.full_name
+  end
 end
 
 json.tax_rates do

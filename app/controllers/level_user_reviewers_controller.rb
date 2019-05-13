@@ -1,5 +1,4 @@
-class LevelUserReviewersController < ApplicationController
-  before_action -> { finly_authorize! :web } 
+class LevelUserReviewersController < BaseControllers::WebBase
 
   # Create LURM (Override for reviewer in levels)
   def create

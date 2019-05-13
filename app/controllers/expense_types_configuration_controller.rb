@@ -1,6 +1,5 @@
-class ExpenseTypesConfigurationController < ApplicationController
+class ExpenseTypesConfigurationController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def show
     @result = ExpenseTypes::Show.(current_user, params)

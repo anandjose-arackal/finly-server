@@ -37,6 +37,23 @@ class User::Configuration::UpdatePassword < BaseOperation
 
   def post_process
     messages[:success] << "Password updated."
+    request = RequestStoreUtil.current_request
+
+    if user.email.present?
+      # Send Email
+      PasswordMailer.delay.notify_password_change(
+          {
+              to: user.email,
+              user_agent: request&.user_agent,
+              ip: request&.remote_ip,
+              timestamp: DateTime.now.strftime("%I:%M %p, %d %b %Y")
+          }
+      )
+    end
+    if user.mobile_number.present?
+      # Send SMS
+      Sms::UserPasswordChange.(user, {})
+    end
   end
 
   private

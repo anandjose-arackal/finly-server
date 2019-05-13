@@ -628,7 +628,7 @@ class Payment < ApplicationRecord
       }
     }
   end
-      
+
       
       
 

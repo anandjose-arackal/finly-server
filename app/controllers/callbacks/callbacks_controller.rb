@@ -1,8 +1,7 @@
-class Callbacks::CallbacksController < ApplicationController
+class Callbacks::CallbacksController < BaseControllers::ApiBase
 
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :api }
 
   def successful_vendor_payment
     body = {
