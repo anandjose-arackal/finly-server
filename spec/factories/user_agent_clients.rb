@@ -2,7 +2,7 @@
 #
 # Table name: user_agent_clients
 #
-#  id                                :bigint(8)        not null, primary key
+#  id                                :bigint           not null, primary key
 #  user_agent                        :string(255)      not null
 #  user_id                           :integer          not null
 #  status_id                         :integer          not null

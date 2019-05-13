@@ -2,7 +2,7 @@
 #
 # Table name: user_device_browsers
 #
-#  id                     :bigint(8)        not null, primary key
+#  id                     :bigint           not null, primary key
 #  timestamp              :datetime
 #  user_agent             :string(255)
 #  timezone               :string(255)

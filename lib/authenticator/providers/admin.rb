@@ -1,7 +1,7 @@
 class Authenticator::Providers::Admin < Authenticator::Providers::Base
 
-  def self.accept?(params)
-    scopes = params[:scope]
+  def self.accept?(request)
+    scopes = request.params[:scope]
     scopes = [scopes] unless scopes.respond_to?(:each)
     scopes&.size == 1 and scopes&.include?('admin')
   end

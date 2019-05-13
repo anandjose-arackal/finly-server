@@ -2,7 +2,7 @@
 #
 # Table name: request_impressions
 #
-#  id               :bigint(8)        not null, primary key
+#  id               :bigint           not null, primary key
 #  ip               :string(255)      not null
 #  ip_type          :string(255)
 #  user_agent       :string(255)
@@ -23,6 +23,7 @@
 #  zip              :string(255)
 #  latitude         :decimal(20, 10)
 #  longitude        :decimal(20, 10)
+#  accuracy_radius  :integer
 #  utm_source       :string(255)
 #  utm_medium       :string(255)
 #  utm_term         :string(255)
@@ -35,7 +36,7 @@
 #  action           :string(255)
 #  view             :string(255)
 #  blocked          :boolean
-#  block_by         :string(255)
+#  blocked_by       :string(255)
 #  block_reason     :string(255)
 #  response_code    :decimal(10, )
 #  response_time    :decimal(10, )
@@ -45,8 +46,6 @@
 #  user_ip_id       :integer
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
-#  accuracy_radius  :integer
-#  blocked_by       :string(255)
 #
 
 class RequestImpression < ApplicationRecord

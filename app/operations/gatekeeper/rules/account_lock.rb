@@ -7,7 +7,7 @@ Gatekeeper::Checker.new 'AccountLock' do
     premise :user_login_invalid_password do
       rule 'More than 5 failed attempts should lock the account' do
         user = params[:user]
-        auth_failure = user.user_auth_failures.build locked: false
+        auth_failure = user.user_auth_failures.build locked: false, ip: params[:ip], username: params[:username], invalid_password: true
         if user.user_auth_failures.within_time(Time.now - LOCKING_PERIOD).size >= 4 && !user.locked_at.present?
           user.update(locked_at: DateTime.now)
           auth_failure.locked = true
@@ -18,6 +18,24 @@ Gatekeeper::Checker.new 'AccountLock' do
           fail
         end
         auth_failure.save
+      end
+    end
+
+    premise :user_login_invalid_username do
+      rule 'Record invalid username' do
+        UserAuthFailure.create locked: false, username: params[:username], ip: params[:ip], invalid_username: true
+      end
+    end
+
+    premise :user_login_blank_username do
+      rule 'Record blank username' do
+        UserAuthFailure.create locked: false, username: params[:username], ip: params[:ip], blank_username: true
+      end
+    end
+
+    premise :user_login_blank_password do
+      rule 'Record blank password' do
+        UserAuthFailure.create locked: false, username: params[:username], ip: params[:ip], blank_password: true
       end
     end
 

@@ -7,7 +7,7 @@ RSpec.describe 'UserIps::FindOrCreate' do
     @company = create :company
     @user1 = create :em_user, company: @company
     @user2 = create :em_user, company: @company
-    @ip = Faker::Internet.ip_v4_address
+    @ip = '35.154.97.60'
     @ip_type = 'ipv4'
   end
 
@@ -34,6 +34,16 @@ RSpec.describe 'UserIps::FindOrCreate' do
 
       it 'should set the new UserIP as unverified' do
         expect(@result_ip.status_id).to eq(UserIpStatus.id_for(:unverified))
+      end
+
+      [
+          :continent_name, :continent_code, :country_name,
+          :country_code, :region_code, :region_name,
+          :city, :zip, :latitude, :longitude, :accuracy_radius,
+      ].each do |item|
+        it "should have set #{item}" do
+          expect(@result_ip.send(item)).to_not be_nil
+        end
       end
     end
 

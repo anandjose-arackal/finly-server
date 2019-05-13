@@ -2,7 +2,7 @@
 #
 # Table name: user_devices
 #
-#  id                           :bigint(8)        not null, primary key
+#  id                           :bigint           not null, primary key
 #  user_id                      :integer
 #  company_id                   :integer
 #  fingerprint                  :string(255)

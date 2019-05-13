@@ -19,7 +19,7 @@ class Authenticator::Processor
   end
 
   def fetch_provider
-    PROVIDERS.each {|provider| return provider.new(self.params) if provider.accept?(self.params)}
+    PROVIDERS.each {|provider| return provider.new(self.request) if provider.accept?(self.request)}
     nil
   end
 

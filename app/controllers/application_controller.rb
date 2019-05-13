@@ -366,6 +366,7 @@ class ApplicationController < ActionController::Base
     RequestStoreUtil.set_current_event result.event
 
     unless user_session.authorized?
+      invalidate_session user_session.status_id, user_session.message
       head 401
       return
     end
@@ -375,7 +376,7 @@ class ApplicationController < ActionController::Base
     result = Gatekeeper::Event.(:on_authenticated_request, user: current_user)
     unless result.success?
       session_status = result.session_status_id || UserSessionStatus.id_for(:blocked)
-      invalidate_session session_status, result.message
+      invalidate_session session_status, (result.message || result.full_description)
       return false
     end
 
