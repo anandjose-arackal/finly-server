@@ -1,4 +1,6 @@
-class TdsSlabsController < ApplicationController
+class TdsSlabsController < BaseControllers::WebBase
+
+  before_action -> {finly_authorize! :web}
 
   def create
     @result = TdsSlabs::Create.(current_user, params)

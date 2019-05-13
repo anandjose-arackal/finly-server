@@ -35,7 +35,7 @@ class BankTransfer::Users::Policies < BankTransfer::Users::Base
     def init
       self.policies = params[:policies]
       self.selected_user = params[:selected_user]
-      self.policies = self.policies.includes(policy_user_roles: [:user_role]).where(policy_user_roles: {user_id: user.id})
+      self.policies = self.policies.includes(policy_user_roles: [:user_role]).where(policy_user_roles: {user_id: self.selected_user&.id})
     end
   end
 end

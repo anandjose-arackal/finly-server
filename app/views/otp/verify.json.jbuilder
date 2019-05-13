@@ -1,0 +1,1 @@
+json.set_password_token @result.set_password_token

@@ -3,17 +3,22 @@ require 'require_all'
 # Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
-  include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper, BankPaymentRequestsHelper
+  include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper, Helpers::UserSessionsHelper, BankPaymentRequestsHelper
   # include AbstractController::Callbacks
   # include ActionController::Head
   include Doorkeeper::Rails::Helpers
+  include Helpers::RequestImpressionHelper
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
-  # protect_from_forgery with: :exception
+  protect_from_forgery with: :null_session
   # before_action :set_paper_trail_whodunnit
 
-  before_action :load_global_variables
+  around_action :save_request_impression
+  before_action :finly_authorize!
+
+  # before_action :load_global_variables
+  before_action :after_finly_authorize
   # before_action :set_raven_context
 
   before_action :initialize_query_logger
@@ -23,7 +28,7 @@ class ApplicationController < ActionController::Base
   before_action :store_location
 
   after_action :set_queries_counter
-  after_action :track_request
+  # after_action :track_request
 
   # handling exceptions and other errors through redirects to 404s and 500s
   # rescue_from ActiveRecord::RecordNotFound, with: :not_found
@@ -267,6 +272,7 @@ class ApplicationController < ActionController::Base
     RequestStoreUtil.set_request_params params
     RequestStoreUtil.set_current_app current_app
     RequestStoreUtil.set_current_device current_device
+    RequestStoreUtil.set_current_token doorkeeper_token
   end
 
   def respond_failure(message = nil)
@@ -303,24 +309,135 @@ class ApplicationController < ActionController::Base
     head(403)
   end
 
-  def finly_authorize!(*scopes)
+  def skip_finly_authorize?
+    scopes = *authentication_scope
+    scopes.delete(:public)
+    scopes.blank? or self.class.get_skip_authentication_actions.include?(action_name&.to_sym)
+  end
+
+  def finly_authorize!
+    scopes = *authentication_scope
+    scopes.delete(:public)
+    return if skip_finly_authorize?
+
+    set_tokens_in_header
+
     doorkeeper_authorize! *scopes
+
+    unless doorkeeper_token&.status_id == UserSessionStatus.id_for(:authorized)
+      head 401
+      return
+    end
+
+    load_global_variables
+
     if current_user.present?
       RequestStoreUtil.set_authorized_scopes scopes
     end
+
+    verify_user_session(doorkeeper_token)
+  end
+
+  def verify_user_session(doorkeeper_token)
+    user_session = UserSession.find_by_access_token_id(doorkeeper_token.id)
+    if user_session.nil?
+      # if doorkeeper_token.scopes.include?('web')
+        doorkeeper_token.update(status_id: UserSessionStatus.id_for(:blocked), message: 'UserSession does not exist')
+        head 401
+        return false
+      # else
+      #   # todo better handle how existing logins are associated i.e mobile, API etc
+      #   # params[:user] = current_user
+      #   # params[:message] = 'User Session not found'
+      #   # params[:scope] = doorkeeper_token.scopes.to_s
+      #   # result = UserSessions::Create.(:authorized, params)
+      #   # unless result.success?
+      #   #   doorkeeper_token.update(status_id: UserSessionStatus.id_for(:expired), message: 'User Session does not exist')
+      #   #   head 401
+      #   # end
+      #   # user_session = result.session
+      #   # todo temp workaround
+      #   return true
+      # end
+    end
+    RequestStoreUtil.set_current_session user_session
+
+    result = UserSessions::Events::Create.(current_user, params)
+    RequestStoreUtil.set_current_event result.event
+
+    unless user_session.authorized?
+      invalidate_session user_session.status_id, user_session.message
+      head 401
+      return
+    end
+
+    UserDevices::XFinlyRPProcessor.from_client(user_session.user_device&.client)
+
+    result = Gatekeeper::Event.(:on_authenticated_request, user: current_user)
+    unless result.success?
+      session_status = result.session_status_id || UserSessionStatus.id_for(:blocked)
+      invalidate_session session_status, (result.message || result.full_description)
+      return false
+    end
+
+
+    return false unless last_request_at_changed?(user_session)
+
+    user_session.update(last_request_at: DateTime.now)
+    true
+  end
+
+  def last_request_at_changed?(user_session)
+    return true if user_session.admin_user_id.present?
+
+    return false unless user_session.authorized?
+    ['otp/resend', 'otp/verify', 'users/password', 'notifications/unread'].each {|path| return false if request.path.include?(path)}
+    return false if current_user.expired?
+    return false unless current_user.otp_verified
+    return false unless user_session.verified?
+
+    true
+  end
+
+  def invalidate_session(status_id, reason)
+    RequestStoreUtil.current_session&.update(status_id: status_id, message: reason)
+    RequestStoreUtil.current_session_event&.update(status_id: status_id, message: reason)
+    doorkeeper_token&.update(status_id: status_id, message: reason)
+    head 401
+  end
+
+  @skip_authentication_actions = []
+
+  def self.skip_authentication_actions(*actions)
+    @skip_authentication_actions = [] if @skip_authentication_actions.nil?
+    @skip_authentication_actions += actions
+  end
+
+  def self.get_skip_authentication_actions
+    @skip_authentication_actions || []
+  end
+
+  def authentication_scope
+    raise "IMPORTANT!! Do not extend ApplicationController. Extend one of the BaseController's available in controllers/base_controller"
+  end
+
+  @required_header_token_actions = []
+
+  def self.required_header_token_actions
+    @required_header_token_actions ||= []
+  end
+
+  def self.set_tokens_in_header(*actions)
+    @required_header_token_actions = actions
   end
 
   def set_tokens_in_header
-    access_token = request.cookies['access_token']
-    if access_token.present?
-      request.headers['Authorization'] = "Bearer #{access_token}"
-    end
-  end
 
-  def set_tokens_in_header_admin
-    access_token = request.cookies['access_token_admin']
-    if access_token.present?
-      request.headers['Authorization'] = "Bearer #{access_token}"
+    if self.class.required_header_token_actions.include?(action_name) or self.class.required_header_token_actions.include?(action_name&.to_sym)
+      access_token = request.cookies['access_token']
+      if access_token.present?
+        request.headers['Authorization'] = "Bearer #{access_token}"
+      end
     end
   end
 
@@ -361,14 +478,14 @@ class ApplicationController < ActionController::Base
     FILE_LOGGER.info(log)
   end
 
-  def track_request
-    user_id = current_user&.id
-    # Track only if user is present
-    return if user_id.blank? or request.remote_ip.blank?
-    return unless current_user.class.name == User.name
-    # Create new visit in background
-    TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
-  end
+  # def track_request
+  #   user_id = current_user&.id
+  #   # Track only if user is present
+  #   return if user_id.blank? or request.remote_ip.blank?
+  #   return unless current_user.class.name == User.name
+  #   # Create new visit in background
+  #   TrackerListener.enqueue request, params, current_company&.id, current_user&.id, current_device, current_app
+  # end
 
   def init_elastic_apm
     return unless Rails.env.production?
@@ -382,6 +499,15 @@ class ApplicationController < ActionController::Base
     ElasticAPM.set_tag(:app, current_app)
     ElasticAPM.set_tag(:device, current_device)
     ElasticAPM.set_tag(:view, params&.dig(:view))
+  end
+
+  def after_finly_authorize
+    return if skip_finly_authorize?
+    result = Gatekeeper::Event.(:after_finly_authorize, params)
+    unless result.success?
+      invalidate_session UserSessionStatus.id_for(:revoked), result.message
+      return
+    end
   end
 
   # Used by sentry

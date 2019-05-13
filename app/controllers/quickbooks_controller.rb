@@ -1,7 +1,6 @@
-class QuickbooksController < ApplicationController
+class QuickbooksController < BaseControllers::WebBase
 
   before_action :add_company_to_params
-  before_action -> { finly_authorize! :web}
 
   def sync_report
     @result = Integrations::Quickbooks::InitiateReportsSync.(current_user, params)

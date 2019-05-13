@@ -1,6 +1,5 @@
-class TravelRequestsCommentsController < ApplicationController
+class TravelRequestsCommentsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def create
     @result = TravelRequests::Comment::Create.(current_user, params)

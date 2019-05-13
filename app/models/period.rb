@@ -10,6 +10,7 @@
 
 
 class Period < ApplicationRecord
+  include Seedable
 
   # VALUES = {day: 1, week: 2, fortnight: 3, month: 4, quarter: 5, year: 6}
   VALUES = {day: 1, week: 2, month: 3, quarter: 4, year: 5, hour: 6, fortnightly: 7}

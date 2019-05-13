@@ -1,6 +1,6 @@
-class Procure::PurchaseOrdersController < ApplicationController
-  before_action :set_tokens_in_header, only: [:download]
-  before_action -> { finly_authorize! :web }
+class Procure::PurchaseOrdersController < BaseControllers::WebBase
+
+  set_tokens_in_header :download
 
   def index
     @result = Procurements::PurchaseOrders::Index.(current_user, params)
