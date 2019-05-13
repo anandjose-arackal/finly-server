@@ -43,5 +43,7 @@ class AddGeoDataToUserIp < ActiveRecord::Migration[5.2]
     UserRole.find_by(name: 'Manager')&.update(name: 'manager')
     UserRole.find_by(name: 'Employee')&.update(name: 'employee')
     UserRole.find_by(name: 'Auditor')&.update(name: 'auditor')
+
+    change_column :user_device_browsers, :mime_types_list, :text
   end
 end

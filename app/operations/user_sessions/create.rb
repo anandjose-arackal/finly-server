@@ -71,6 +71,7 @@ class UserSessions::Create < BaseOperation
 
   def post_process
     RequestStoreUtil.set_current_user self.user
+    RequestStoreUtil.set_current_company self.user&.company
     RequestStoreUtil.set_current_session self.session
     RequestStoreUtil.set_current_event self.session.events.last
     RequestStoreUtil.set_current_device self.session.user_device

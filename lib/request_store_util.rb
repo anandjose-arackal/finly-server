@@ -11,10 +11,15 @@ class RequestStoreUtil
 
   def self.set_current_user(user)
     RequestStore.store[:current_user] = user
+    set_security_policy(user)
   end
 
   def self.set_current_company(company)
     RequestStore.store[:current_company] = company
+  end
+
+  def self.set_security_policy(user)
+    RequestStore.store[:security_policy] = SecurityPolicy::Manager.new(user)
   end
 
   def self.set_authorized_scopes(scopes)
@@ -157,6 +162,10 @@ class RequestStoreUtil
 
   def self.current_admin_user
     RequestStore.store[:current_admin_user]
+  end
+
+  def self.security_policy
+    RequestStore.store[:security_policy]
   end
 
   def self.x_finly_rp_attributes

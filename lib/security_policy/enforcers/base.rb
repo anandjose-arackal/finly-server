@@ -1,4 +1,4 @@
-class SecurityPolicy::Device::Base
+class SecurityPolicy::Enforcers::Base
   attr_accessor :user, :user_roles, :user_role_names
 
   def initialize(user, user_roles, user_role_names)

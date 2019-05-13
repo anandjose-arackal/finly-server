@@ -3,7 +3,7 @@ class SecurityPolicy::Manager
 
   ENFORCERS = {
       browser: SecurityPolicy::Enforcers::Browser,
-      ip_addr: SecurityPolicy::Enforcers::IpAddr,
+      gatekeeper: SecurityPolicy::Enforcers::Gatekeeper,
       password: SecurityPolicy::Enforcers::Password,
   }
 

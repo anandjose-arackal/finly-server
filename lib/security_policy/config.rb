@@ -1,10 +1,15 @@
 class SecurityPolicy::Config
 
   HIGH = {
-      device: {
-          browser: {otp_verification: true}
+      browser: {
+          client: {
+              otp_verify: true,
+          },
+          ip: {
+              otp_verify: true,
+          },
+          inactivity_timeout: 30.minutes,
       },
-      ip: {otp_verification: true},
       password: {
           min_score: 3,
           mandate_special_character: true,
@@ -13,15 +18,21 @@ class SecurityPolicy::Config
           mandate_uppercase: true,
           min_length: 8,
           expire_after: 90.days,
-          inactivity_timeout: 30.minutes
       },
   }
 
   MEDIUM = {
-      device: {
-          browser: {otp_verification: false}
+      browser: {
+          client: {
+              otp_verify: false,
+              tolerance: :match,
+          },
+          ip: {
+              otp_verify: false,
+              tolerance: :country, # verified, :city, :state, :country, :match, :all
+          },
+          inactivity_timeout: 3.hours,
       },
-      ip: {otp_verification: false},
       password: {
           min_score: 2,
           mandate_special_character: true,
@@ -29,16 +40,22 @@ class SecurityPolicy::Config
           mandate_lowercase: true,
           mandate_uppercase: true,
           min_length: 8,
-          expire_after: nil,
-          inactivity_timeout: 30.minutes
+          expire_after: 90.days,
       },
   }
 
   LOW = {
-      device: {
-          browser: {otp_verification: false}
+      browser: {
+          client: {
+              otp_verify: false,
+              tolerance: :match,
+          },
+          ip: {
+              otp_verify: true,
+              tolerance: :country, # verified, :city, :state, :country, :match, :all
+          },
+          inactivity_timeout: 6.hours,
       },
-      ip: {otp_verification: false},
       password: {
           min_score: 1,
           mandate_special_character: false,
@@ -46,8 +63,7 @@ class SecurityPolicy::Config
           mandate_lowercase: false,
           mandate_uppercase: false,
           min_length: 8,
-          expire_after: nil,
-          inactivity_timeout: 30.minutes
+          expire_after: 90.days,
       },
   }
 
@@ -91,8 +107,7 @@ class SecurityPolicy::Config
       non_po_initiator: LOW,
   }.with_indifferent_access
 
-  def self.config_for(user, *keys)
-    roles = user.user_roles.pluck(:name)
+  def self.config_for(roles, *keys)
     values = []
     roles.each do |role|
       values << ROLE_LEVELS[role]&.dig(*keys)

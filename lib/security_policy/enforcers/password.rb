@@ -1,31 +1,31 @@
-class SecurityPolicy::Password < SecurityPolicy::Device::Base
+class SecurityPolicy::Enforcers::Password < SecurityPolicy::Enforcers::Base
 
-  def min_password_score(user)
-    SecurityPolicy::Config.config_for(user, :password, :min_score).max
+  def min_password_score(options={})
+    SecurityPolicy::Config.config_for(user_role_names, :password, :min_score).max
   end
 
-  def mandate_special_chars?(user)
-    SecurityPolicy::Config.config_for(user, :password, :mandate_special_character).include?(true)
+  def mandate_special_chars?(options={})
+    SecurityPolicy::Config.config_for(user_role_names, :password, :mandate_special_character).include?(true)
   end
 
-  def mandate_numbers?(user)
-    SecurityPolicy::Config.config_for(user, :password, :mandate_numbers).include?(true)
+  def mandate_numbers?(options={})
+    SecurityPolicy::Config.config_for(user_role_names, :password, :mandate_numbers).include?(true)
   end
 
-  def mandate_uppercase?(user)
-    SecurityPolicy::Config.config_for(user, :password, :mandate_uppercase).include?(true)
+  def mandate_uppercase?(options={})
+    SecurityPolicy::Config.config_for(user_role_names, :password, :mandate_uppercase).include?(true)
   end
 
-  def mandate_lowercase?(user)
-    SecurityPolicy::Config.config_for(user, :password, :mandate_lowercase).include?(true)
+  def mandate_lowercase?(options={})
+    SecurityPolicy::Config.config_for(user_role_names, :password, :mandate_lowercase).include?(true)
   end
 
-  def min_length(user)
-    SecurityPolicy::Config.config_for(user, :password, :min_length).max
+  def min_length(options={})
+    SecurityPolicy::Config.config_for(user_role_names, :password, :min_length).max
   end
 
-  def expire_after?(user)
-    expire_after = SecurityPolicy::Config.config_for(user, :password, :expire_after).reject {|item| item.blank?}
+  def expire_after(options={})
+    expire_after = SecurityPolicy::Config.config_for(user_role_names, :password, :expire_after).reject {|item| item.blank?}
     expire_after.min
   end
 
