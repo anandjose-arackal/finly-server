@@ -279,7 +279,7 @@ class User < ApplicationRecord
   # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
   scope :only_vendor_payment_reviewers, -> {with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
 
-  scope :filter_vendor_payments_reviewers, -> (flag) { # passed argument is only for has scope, no effect here
+  scope :filter_vendor_payments_reviewers, -> (flag) {# passed argument is only for has scope, no effect here
     with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', Purpose.id_for(:vendor_payments))}
 
   # Use only for has_scope filter, scope to policy_user_roles
@@ -693,17 +693,17 @@ class User < ApplicationRecord
     end
   }
 
-  scope :filter_unassigned_non_po_initiator_for_policy, -> (policy_id){
+  scope :filter_unassigned_non_po_initiator_for_policy, -> (policy_id) {
     # policy = Policy.find_by_id policy_id
     # if policy.present?
     #   user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id(UserRole.id_for(:non_po_initiator)).pluck(:user_id)
     #   without_id(user_ids)
     # end
     role_ids = [UserRole.id_for(:non_po_initiator)]
-    filter_unassigned_roles_for_policy(policy_id, role_ids)    
+    filter_unassigned_roles_for_policy(policy_id, role_ids)
   }
 
-  scope :filter_unassigned_roles_for_policy, -> (policy_id, role_ids){
+  scope :filter_unassigned_roles_for_policy, -> (policy_id, role_ids) {
     policy = Policy.find_by_id policy_id
     if policy.present?
       user_ids = PolicyUserRole.with_policy_id(policy_id).with_role_id([role_ids]).pluck(:user_id)
@@ -754,10 +754,30 @@ class User < ApplicationRecord
 
   def password_complexity
     # Regexp extracted from https://stackoverflow.com/questions/19605150/regex-for-password-must-contain-at-least-eight-characters-at-least-one-number-a
-    return if password.blank? || password =~ /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/
-    return if min_password_score < 2
+    # return if password.blank? || password =~ /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/
+    return if password.blank?
+    requirement = []
+    fail = false
+    if security_policy.password.mandate_uppercase?
+      requirement << '1 uppercase'
+      fail = true unless password =~ /(?=.*?[A-Z])/
+    end
+    if security_policy.password.mandate_lowercase?
+      requirement << '1 lowercase'
+      fail = true unless password =~ /(?=.*?[a-z])/
+    end
+    if security_policy.password.mandate_numbers?
+      requirement << '1 digit'
+      fail = true unless password =~ /(?=.*?[0-9])/
+    end
+    if security_policy.password.mandate_special_chars?
+      requirement << '1 special character'
+      fail = true unless password =~ /(?=.*?[#?!@$%^&*-])/
+    end
 
-    errors.add :password, 'Complexity requirement not met. Please use: 1 uppercase, 1 lowercase, 1 digit and 1 special character'
+    if fail
+      errors.add :password, "Complexity requirement not met. Requirement: #{requirement.join(', ')}"
+    end
   end
 
   # def min_password_score
@@ -811,8 +831,12 @@ class User < ApplicationRecord
     super and update(otp_verified: false)
   end
 
+  def security_policy
+    SecurityPolicy::Manager.for(self)
+  end
+
   def min_password_score
-    SecurityPolicy::Manager.for(self).password.minimum_score
+    security_policy.password.minimum_score
   end
 
   def password_weak?
@@ -1248,87 +1272,87 @@ class User < ApplicationRecord
 
   # ********** User Roles for Vendor Payments ******************
 
-  def is_vendor_manager?(document=nil)
+  def is_vendor_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:vendor_manager), document)
   end
 
-  def is_vendor_initiator?(document=nil)
+  def is_vendor_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:vendor_creator), document)
   end
 
-  def is_vendor_creator?(document=nil)
+  def is_vendor_creator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:vendor_creator), document)
   end
 
-  def is_vendor_reviewer?(document=nil)
+  def is_vendor_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:vendor_reviewer), document)
   end
 
-  def is_item_master_manager?(document=nil)
+  def is_item_master_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:item_master_manager), document)
   end
 
-  def is_purchase_order_initiator?(document=nil)
+  def is_purchase_order_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_order_initiator), document)
   end
 
-  def is_purchase_order_reviewer?(document=nil)
+  def is_purchase_order_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_order_reviewer), document)
   end
 
-  def is_purchase_order_auditor?(document=nil)
+  def is_purchase_order_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_order_auditor), document)
   end
 
-  def is_purchase_request_initiator?(document=nil)
+  def is_purchase_request_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_initiator), document)
   end
 
-  def is_purchase_request_reviewer?(document=nil)
+  def is_purchase_request_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_reviewer), document)
   end
 
-  def is_purchase_request_auditor?(document=nil)
+  def is_purchase_request_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:purchase_request_auditor), document)
   end
 
-  def is_bank_payment_request_initiator?(document=nil)
+  def is_bank_payment_request_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_initiator), document)
   end
 
-  def is_bank_payment_request_reviewer?(document=nil)
+  def is_bank_payment_request_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_reviewer), document)
   end
 
-  def is_bank_payment_request_auditor?(document=nil)
+  def is_bank_payment_request_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_auditor), document)
   end
 
-  def is_bank_payment_request_creditor?(document=nil)
+  def is_bank_payment_request_creditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), document)
   end
 
-  def is_invoice_initiator?(document=nil)
+  def is_invoice_initiator?(document = nil)
     self.has_policy_role?(UserRole.id_for(:invoice_initiator), document)
   end
 
-  def is_invoice_reviewer?(document=nil)
+  def is_invoice_reviewer?(document = nil)
     self.has_policy_role?(UserRole.id_for(:invoice_reviewer), document)
   end
 
-  def is_invoice_auditor?(document=nil)
+  def is_invoice_auditor?(document = nil)
     self.has_policy_role?(UserRole.id_for(:invoice_auditor), document)
   end
 
-  def is_budget_manager?(document=nil)
+  def is_budget_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:budget_manager), document)
   end
 
-  def is_goods_receiver?(document=nil)
+  def is_goods_receiver?(document = nil)
     self.has_policy_role?(UserRole.id_for(:goods_receiver), document)
   end
 
-  def is_inventory_manager?(document=nil)
+  def is_inventory_manager?(document = nil)
     self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
   end
 

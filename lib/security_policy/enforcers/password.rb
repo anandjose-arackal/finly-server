@@ -1,7 +1,7 @@
 class SecurityPolicy::Enforcers::Password < SecurityPolicy::Enforcers::Base
 
   def minimum_score(options={})
-    SecurityPolicy::Config.config_for(user_role_names, :password, :min_score).max
+    SecurityPolicy::Config.config_for(user_role_names, :password, :minimum_score).max
   end
 
   def mandate_special_chars?(options={})
@@ -18,11 +18,6 @@ class SecurityPolicy::Enforcers::Password < SecurityPolicy::Enforcers::Base
 
   def mandate_lowercase?(options={})
     SecurityPolicy::Config.config_for(user_role_names, :password, :mandate_lowercase).include?(true)
-  end
-
-  def expire_after(options={})
-    expire_after = SecurityPolicy::Config.config_for(user_role_names, :password, :expire_after).reject {|item| item.blank?}
-    expire_after.min
   end
 
 end

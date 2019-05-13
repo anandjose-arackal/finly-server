@@ -17,6 +17,10 @@ class Gatekeeper::Event
   def run
     return success_verdict false unless ENABLED
 
+    unless RequestStoreUtil.security_policy.gatekeeper.enabled
+      return success_verdict false
+    end
+
     require_otp = false
     Gatekeeper::Registry.subscribers(event)&.each do |rule|
       result = rule.verdict(self.params)

@@ -2,8 +2,8 @@ class SecurityPolicy::Config
 
   HIGH = {
       browser: {
-          client: {otp_verify: true, },
-          ip: {otp_verify: true, },
+          client: {otp_verify: true},
+          ip: {otp_verify: false},
           inactivity_timeout: 30.minutes,
       },
       password: {
@@ -12,14 +12,17 @@ class SecurityPolicy::Config
           mandate_numbers: true,
           mandate_lowercase: true,
           mandate_uppercase: true,
-          expire_after: 90.days,
       },
+      account_lock: {
+          max_attempts: 5,
+          period: 30.minutes
+      }
   }
 
   MEDIUM = {
       browser: {
-          client: {otp_verify: false, },
-          ip: {otp_verify: false, },
+          client: {otp_verify: false},
+          ip: {otp_verify: false},
           inactivity_timeout: 3.hours,
       },
       password: {
@@ -28,14 +31,17 @@ class SecurityPolicy::Config
           mandate_numbers: true,
           mandate_lowercase: true,
           mandate_uppercase: true,
-          expire_after: 90.days,
       },
+      account_lock: {
+          max_attempts: 10,
+          period: 30.minutes
+      }
   }
 
   LOW = {
       browser: {
-          client: {otp_verify: false, },
-          ip: {otp_verify: true, },
+          client: {otp_verify: false},
+          ip: {otp_verify: false},
           inactivity_timeout: 6.hours,
       },
       password: {
@@ -44,8 +50,11 @@ class SecurityPolicy::Config
           mandate_numbers: false,
           mandate_lowercase: false,
           mandate_uppercase: false,
-          expire_after: 90.days,
       },
+      account_lock: {
+          max_attempts: 20,
+          period: 30.minutes
+      }
   }
 
   ROLE_LEVELS = {

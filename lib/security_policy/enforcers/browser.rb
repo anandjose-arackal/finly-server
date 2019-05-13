@@ -9,8 +9,8 @@ class SecurityPolicy::Enforcers::Browser < SecurityPolicy::Enforcers::Base
   end
 
   def inactivity_timeout(options={})
-    expire_after = SecurityPolicy::Config.config_for(user_role_names, :browser, :inactivity_timeout).reject {|item| item.blank?}
-    expire_after.min
+    inactivity_timeout = SecurityPolicy::Config.config_for(user_role_names, :browser, :inactivity_timeout).reject {|item| item.blank?}
+    inactivity_timeout.min
   end
 
 end
