@@ -286,7 +286,7 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
       # operation = BankTransfer::PaymentRequest::CreateBulkBeneficiaryTicket.(current_user, params)
       create_bulk_beneficiary_ticket(current_user, params)
     else
-      respond response: :failure, message: "WTF, tell me what type of ticket you want to create?"
+      respond response: :failure, message: "Invalid ticket type provided. Please provide one of either 'invoice', 'po_advance', 'beneficiary' or 'bulk_beneficiary'"
     end
   end
 

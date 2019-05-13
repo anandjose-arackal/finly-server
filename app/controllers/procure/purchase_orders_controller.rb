@@ -37,6 +37,15 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
     respond
   end
 
+  def save_submit
+    @result = Procurements::PurchaseOrders::SaveSubmit.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'procure/purchase_orders/save_submit'
+    end
+  end
+
   def retract
     @result = Procurements::PurchaseOrders::Retract.(current_user, params)
     respond
