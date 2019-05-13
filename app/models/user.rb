@@ -783,6 +783,7 @@ class User < ApplicationRecord
         :budget_manager
     )
 
+    return 1 if company_id == 2
     return 3 if role_mapping.role(level_3_req).present?
     return 2 if role_mapping.role(level_2_req).present?
     1
