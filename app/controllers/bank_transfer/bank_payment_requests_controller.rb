@@ -290,6 +290,10 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
     end
   end
 
+  def generate_otp
+    @result = BankTransfer::PaymentRequest::GenerateOtpForCredit.(current_user, params)
+    respond_success_failure
+  end
 
 
   private
@@ -427,11 +431,6 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
         format.json { render 'new_pr_failure' }
       end
     end
-  end
-
-  def generate_otp
-    @result = BankTransfer::PaymentRequest::GenerateOtpForCredit.(current_user, params)
-    respond
   end
 
   def create_bulk_beneficiary_ticket(current_user, params)

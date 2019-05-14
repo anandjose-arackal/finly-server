@@ -40,13 +40,13 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
   def validate
     # this validation is irrespective of the source and destination of the payment
     # i.e. checking for consistency of initiating and receiving account types etc.
-    op = PaymentProcessorRules::Event.(:validate_account_consistency, {crediting_payments: self.crediting_payments})
+    op = PaymentProcessorRules::Event.(:validate_account_consistency, {crediting_payments: self.crediting_payments, payment_order: self.payment_order})
 
-    # the below has been moved to the PaymentProcessor Rule engine
-    unless validate_account_consistency(payment_order, self.crediting_payments)
-      add_message :error, "Receiving and initiating accounts must be homogenous"
-      return
-    end
+    # # the below has been moved to the PaymentProcessor Rule engine
+    # unless validate_account_consistency(payment_order, self.crediting_payments)
+    #   add_message :error, "Receiving and initiating accounts must be homogenous"
+    #   return
+    # end
   end
 
   # here all the validations required for the respective payment order will happen
@@ -60,7 +60,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     # checking if total order amount is less than the company balance amount
     if payment_order.credit?
       # checking for the balance in the source account
-      op = PaymentProcessorRules::Event.(:check_source_account_balance, {crediting_payments: self.crediting_payments, source_account_adapter: self.source_account_adapter})
+      op = PaymentProcessorRules::Event.(:check_source_account_balance, {crediting_payments: self.crediting_payments, source_account_adapter: self.source_account_adapter, options: {payment_process: true}})
       unless op.success?
         add_message :error, op.messages
         return
@@ -90,7 +90,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     if payment_order.credit?
       valid = true
       payment_order.payments.each do |payment|
-        receiving_account_adapter = retrieve_adapter payment.receiving_account
+        receiving_account_adapter = retrieve_adapter payment.receiving_account, payment
         unless receiving_account_adapter.eligibility(payment.amount_value)
           valid = false
           # If the object exists, i.e only validator is not being called

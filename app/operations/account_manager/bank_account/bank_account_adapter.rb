@@ -22,6 +22,9 @@ class AccountManager::BankAccount::BankAccountAdapter < AccountManager::BaseAdap
     #     raise 'Invalid bank account provider'
     # end
 
+    return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+    # return AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
+
     case payment.company.feature_subscription.bank_service_provider
       when "YES"
         return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)

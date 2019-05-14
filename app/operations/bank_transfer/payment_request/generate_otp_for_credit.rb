@@ -17,7 +17,9 @@ class BankTransfer::PaymentRequest::GenerateOtpForCredit < BankTransfer::Payment
     unless id.is_a?(Array)
       id = id.split(",")
     end
-    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(id)
+
+    self.bank_payment_request = BankPaymentRequest.where(id: id).first
+    # self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(id).first
   end
 
   def validate
@@ -45,7 +47,8 @@ class BankTransfer::PaymentRequest::GenerateOtpForCredit < BankTransfer::Payment
   def process
     # save the OTP inside the bank payment request that was created
     send_mobile_otp
-    self.bank_payment_requests.update_all(otp: self.otp, otp_created_at: DateUtils.local_date_time, otp_attempts: 0)
+    self.bank_payment_request.update(otp: self.otp, otp_sent_at: DateUtils.local_date_time, otp_attempts: 0)
+    # self.bank_payment_requests.update_all(otp: self.otp, otp_created_at: DateUtils.local_date_time, otp_attempts: 0)
   end
 
   def post_process

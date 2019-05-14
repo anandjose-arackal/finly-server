@@ -21,6 +21,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   def init
     self.receiving_account_adapter = retrieve_adapter(payment.receiving_account, self.payment)
+    debugger
     self.source_account_adapter = retrieve_adapter(payment.initiating_account, self.payment)
     self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
     self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
@@ -69,14 +70,16 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
     ####################### Start Receiving account validations #####################
 
-    op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter})
+    op = PaymentProcessorRules::Event.(:check_receiving_account_creditable, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter,
+                                                                             source_account_adapter: self.source_account_adapter})
     unless op.success?
       add_message :error, op.message
       return
     end
 
     if self.payment.credit?
-      op = PaymentProcessorRules::Event.(:check_receiving_account_eligibility, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter})
+      op = PaymentProcessorRules::Event.(:check_receiving_account_eligibility, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter,
+                                                                                source_account_adapter: self.source_account_adapter})
       unless op.success?
         add_message :error, op.message
         return
@@ -84,7 +87,8 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     end
 
     if self.payment.debit?
-      op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter})
+      op = PaymentProcessorRules::Event.(:check_receiving_account_balance, {payment: self.payment, options: self.options, receiving_account_adapter: self.receiving_account_adapter,
+                                                                            source_account_adapter: self.source_account_adapter})
       unless op.success?
         add_message :error, op.message
         return

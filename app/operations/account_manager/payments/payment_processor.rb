@@ -31,6 +31,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   def init
     # create the payment order object and associated payments, if the payment request is present
     self.payment_request = params[:payment_request]
+    self.payment_order = params[:payment_order]
+    self.options = {}
     if payment_request.present?
       self.company = Company.find_by(id: company_id)
       self.options = {}

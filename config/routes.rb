@@ -3345,7 +3345,7 @@ Rails.application.routes.draw do
     get 'sample_import_format', to: 'bank_payment_requests#sample_import_file', as: :sample_import_file
     # patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_credit_validate
 
-    post 'generate_otp', to: 'bank_payment_requests#generate_otp', as: :generate_otp
+    patch 'generate_otp', to: 'bank_payment_requests#generate_otp', as: :generate_otp
     resources :bank_payment_requests do
       get 'edit_config', to: 'bank_payment_requests#edit_config', as: :edit_config
       post 'comment', to: 'bank_payment_requests#comment', as: :comment

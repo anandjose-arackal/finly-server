@@ -60,7 +60,7 @@ class AccountManager::BankAccount::BankAccountIciciBankAdapter < AccountManager:
       if bank_transaction.completed?
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
         store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
-      elsif bank_transaction.processing?
+      elsif bank_transaction.pending_for_processing?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
