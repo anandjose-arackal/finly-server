@@ -15,7 +15,9 @@ json.results do
     json.created_at_time po.created_at.strftime("%I:%m%p")
 
     # Status
-    json.po_status po.status&.name
+    json.status_id po.status&.id
+    json.status_name po.status&.name
+    json.status_display_name po.status&.display_name
     json.controlling_user po.get_reviewers.first&.name
     json.awaiting_action po.awaiting_action(@result.user)
 

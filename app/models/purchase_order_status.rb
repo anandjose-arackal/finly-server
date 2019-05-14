@@ -14,6 +14,10 @@ class PurchaseOrderStatus < ApplicationRecord
     %w( open retracted processing approved rejected auto_approved sent_to_vendor closed voided po_revised vendor_confirmed)
   end
 
+  def display_name
+    self.name&.split("_").map(&:capitalize).join(" ")
+  end
+
   def open?
     self.id == PurchaseOrderStatus.id_for(:open)
   end
