@@ -10,11 +10,11 @@ Gatekeeper::Checker.new 'AccountLock' do
         timeframe = Time.now - policy.account_lock.within_timeframe
 
         # Check if the user password was changed post the timeframe. If so, consider that as the timeframe
-        if user.password_changed_at and user.password_changed_at > timeframe
+        if user.password_changed_at && user.password_changed_at > timeframe
             timeframe = user.password_changed_at
         end
 
-        if user.user_auth_failures.not_verified.within_time(timeframe).size >= policy.account_lock.max_attempts && !user.locked_at.present?
+        if user.locked_at.blank? && user.user_auth_failures.not_verified.within_time(timeframe).size >= policy.account_lock.max_attempts
           user.update(locked_at: DateTime.now)
           auth_failure.locked = true
 

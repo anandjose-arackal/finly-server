@@ -110,10 +110,12 @@ Gatekeeper::Checker.new 'On Web Authentication' do
     section 'Active Session' do
       rule 'A user cannot have more than 2 active web sessions' do
         authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
-        if authorized_web_sessions.size > 2
-          authorized_web_sessions[0..-3].each do |session|
-            session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
-            session.access_token.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
+        policy = SecurityPolicy::Manager.for(user)
+        max_concurrent_sessions = policy.browser.concurrent_logins
+        if authorized_web_sessions.size > max_concurrent_sessions
+          authorized_web_sessions[0..-(max_concurrent_sessions + 1)].each do |session|
+            session.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")
+            session.access_token.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")
           end
         end
       end
