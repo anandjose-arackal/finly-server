@@ -13,4 +13,8 @@ class SecurityPolicy::Enforcers::Browser < SecurityPolicy::Enforcers::Base
     inactivity_timeout.min
   end
 
+  def concurrent_logins(options={})
+    SecurityPolicy::Config.config_for(user_role_names, :browser, :concurrent_logins).min
+  end
+
 end

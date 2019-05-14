@@ -5,6 +5,7 @@ class SecurityPolicy::Manager
       browser: SecurityPolicy::Enforcers::Browser,
       gatekeeper: SecurityPolicy::Enforcers::Gatekeeper,
       password: SecurityPolicy::Enforcers::Password,
+      account_lock: SecurityPolicy::Enforcers::AccountLock,
   }
 
   ENFORCERS.each do |key, klass|

@@ -1359,6 +1359,11 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
   end
 
+  def access_locked?
+    locked_at and locked_at < security_policy.account_lock.locking_period.ago
+  end
+  alias_method :locked?, :access_locked?
+
   # ************ User Role for vendor payments ******************
 
   def relevant

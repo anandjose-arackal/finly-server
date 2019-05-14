@@ -5,6 +5,7 @@ class SecurityPolicy::Config
           client: {otp_verify: true},
           ip: {otp_verify: false},
           inactivity_timeout: 30.minutes,
+          concurrent_logins: 5
       },
       password: {
           minimum_score: 3,
@@ -14,8 +15,9 @@ class SecurityPolicy::Config
           mandate_uppercase: true,
       },
       account_lock: {
-          max_attempts: 5,
-          period: 30.minutes
+          max_attempts: 10,
+          within_timeframe: 30.minutes,
+          locking_period: 30.minutes
       }
   }
 
@@ -24,6 +26,7 @@ class SecurityPolicy::Config
           client: {otp_verify: false},
           ip: {otp_verify: false},
           inactivity_timeout: 3.hours,
+          concurrent_logins: 10
       },
       password: {
           minimum_score: 2,
@@ -33,8 +36,9 @@ class SecurityPolicy::Config
           mandate_uppercase: true,
       },
       account_lock: {
-          max_attempts: 10,
-          period: 30.minutes
+          max_attempts: 20,
+          within_timeframe: 30.minutes,
+          locking_period: 30.minutes
       }
   }
 
@@ -42,7 +46,8 @@ class SecurityPolicy::Config
       browser: {
           client: {otp_verify: false},
           ip: {otp_verify: false},
-          inactivity_timeout: 6.hours,
+          inactivity_timeout: 8.hours,
+          concurrent_logins: 10
       },
       password: {
           minimum_score: 1,
@@ -53,7 +58,8 @@ class SecurityPolicy::Config
       },
       account_lock: {
           max_attempts: 20,
-          period: 30.minutes
+          within_timeframe: 30.minutes,
+          locking_period: 30.minutes
       }
   }
 
