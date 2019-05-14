@@ -331,13 +331,86 @@ class PurchaseOrder < ApplicationRecord
   scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
 
   scope :includes_for_index, -> {
-    includes(:procurement, :user, :balance_amount, :vendor, :status)
+    includes(:user, :balance_amount, :vendor, :status, procurement: [:status_tags])
   }
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
+
+  def status_tag_details
+    tag_ids = self.procurement.status_tags.pluck(:id)
+
+    data = {
+        grn: {},
+        invoice: {},
+        payment: {}
+    }
+
+    if tag_ids.include?(StatusTag.id_for(:payment_processed))
+      data[:payment][:status] = 'completed'
+      data[:procurement_status_text] = "Procurement Complete"
+    elsif tag_ids.include?(StatusTag.id_for(:payment_processing))
+      data[:payment][:status] = 'processing'
+      data[:procurement_status_text] = 'Payment Processing'
+    else
+      data[:payment][:status] = 'init'
+      data[:procurement_status_text] = 'Payment Pending'
+    end
+
+    if tag_ids.include?(StatusTag.id_for(:shipment_received))
+      data[:shipment][:status] = 'copmleted'
+      data[:procurement_status_text] = 'Shipment Received'
+    elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
+      data[:shipment][:status] = 'processing'
+      data[:status_message] = 'Awaiting Shipment'
+    else
+      data[:shipment][:status] = 'init'
+      data[:status_message] = 'Awaiting Shipment'
+      data[:status_text] = 'Shipment Pending'
+      data[:status_type] = 'shipment'
+    end
+
+    if tag_ids.include? StatusTag.id_for(:invoice_approved)
+      data[:invoice][:status] = 'complete'
+    elsif (tag_ids.include? StatusTag.id_for(:invoice_processing)) || (tag_ids.include? StatusTag.id_for(:invoice_received))
+      data[:invoice][:status] = 'processing'
+      data[:status_message] = 'Invoice Processing'
+      data[:status_text] = 'Invoice Approval is Pending'
+      data[:status_type] = 'invoice'
+    else
+      data[:invoice][:status] = 'init'
+      data[:status_type] = 'invoice'
+      if self.invoices.present?
+        data[:status_message] = 'Invoice Processing'
+        data[:status_text] = 'Invoice Approval is Pending'
+      else
+        data[:status_message] = 'Awaiting Invoice'
+        data[:status_text] = 'Invoice Upload Pending'
+      end
+
+    end
+
+    if procurement_type == 'purchase_order'
+      data[:purchase_order] = {}
+      if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
+        data[:purchase_order][:status] = 'complete'
+      elsif tag_ids.include? StatusTag.id_for(:po_processing)
+        data[:purchase_order][:status] = 'processing'
+        data[:status_message] = 'PO Processing'
+        data[:status_text] = 'PO Approval is Pending'
+        data[:status_type] = 'purchase_order'
+      else
+        data[:purchase_order][:status] = 'init'
+        data[:status_message] = 'PO Processing'
+        data[:status_text] = 'PO Approval is Pending'
+        data[:status_type] = 'purchase_order'
+      end
+    end
+
+    data
+  end
 
 
   template_config do
