@@ -12,6 +12,8 @@ class Admin::Users::Create < Admin::Users::Base
   def init
     id = params[:id] || params[:company_id]
     self.company = Company.find_by(id: id)
+    params[:user][:password] = "DefaultPassword!23"
+    params[:user][:password_confirmation] = "DefaultPassword!23"
     self.new_user_params = user_params
   end
 
