@@ -3558,6 +3558,7 @@ Rails.application.routes.draw do
     patch 'purchase_orders/templates/:id', to: 'purchase_orders#template_update'
     delete 'purchase_orders/templates/:id', to: 'purchase_orders#template_destroy'
     delete 'purchase_orders/:id/delete', to: 'purchase_orders#destroy'
+    get 'purchase_orders/counts', to: 'purchase_orders#counts'
 
     put 'purchase_orders/forward', to: 'purchase_orders#bulk_forward'
     resources :purchase_orders do
