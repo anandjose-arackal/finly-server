@@ -4,4 +4,8 @@ class BaseControllers::CollectBase < ApplicationController
   http_basic_authenticate_with :name => Finly::SecureStorage::Connector.read('core/finly_collect')&.dig('incoming', 'username'),
                                :password => Finly::SecureStorage::Connector.read('core/finly_collect')&.dig('incoming', 'password')
 
+  def authentication_scope
+    nil
+  end
+
 end
