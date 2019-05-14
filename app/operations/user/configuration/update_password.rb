@@ -1,10 +1,6 @@
 class User::Configuration::UpdatePassword < BaseOperation
   include Devise::Controllers::SignInOut
 
-  def authorized_user_types
-    [:employee]
-  end
-
   def pre_validate
     unless user.present?
       messages[:error] << 'User not found'
