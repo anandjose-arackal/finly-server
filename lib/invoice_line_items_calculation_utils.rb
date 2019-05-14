@@ -112,8 +112,16 @@ class InvoiceLineItemsCalculationUtils
       self.gross_amount = self.invoice_item_amount
       return
     end
-    # because the discount rate will always be known
-    self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+    # depending on the type of discount being sent
+    case item.parent.discount_type_id
+      # i.e. discount is given as a rate
+      when 1
+        self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+      when 2
+        self.discount_amount = item.discount.to_f
+      else
+        self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+    end
     self.gross_amount = self.invoice_item_amount - self.discount_amount
   end
 
@@ -123,8 +131,16 @@ class InvoiceLineItemsCalculationUtils
       self.after_discount_amount = self.invoice_item_amount
       return
     end
-    # because the discount is also always shown
-    self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f) / 100
+    # depending on the type of discount being sent
+    case item.parent.discount_type_id
+      # i.e. discount is given as a rate
+      when 1
+        self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+      when 2
+        self.discount_amount = item.discount.to_f
+      else
+        self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
+    end
     self.after_discount_amount = self.invoice_item_amount - self.discount_amount
   end
 
@@ -134,8 +150,24 @@ class InvoiceLineItemsCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax))
+    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.value))
     self.tax_amount = self.net_amount - self.gross_amount
+
+    # setting the SGST, CGST and IGST values for the invoice
+    case item.parent.gst_type_id
+      when GstType.id_for(:cgst_sgst)
+        item.cgst = self.tax_amount / 2
+        item.sgst = self.tax_amount / 2
+        item.igst = 0
+      when GstType.id_for(:igst)
+        item.igst = self.tax_amount
+        item.cgst = 0
+        item.sgst = 0
+      else
+        item.igst = 0
+        item.cgst = 0
+        item.sgst = 0
+    end
   end
 
   def calculate_inclusive_taxes(item)
@@ -144,7 +176,23 @@ class InvoiceLineItemsCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax))
+    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax_rate&.value))
     self.tax_amount = self.after_discount_amount - self.gross_amount
+
+    # setting the SGST, CGST and IGST values for the invoice
+    case item.parent.gst_type_id
+      when GstType.id_for(:cgst_sgst)
+        item.cgst = self.tax_amount / 2
+        item.sgst = self.tax_amount / 2
+        item.igst = 0
+      when GstType.id_for(:igst)
+        item.igst = self.tax_amount
+        item.cgst = 0
+        item.sgst = 0
+      else
+        item.igst = 0
+        item.cgst = 0
+        item.sgst = 0
+    end
   end
 end
