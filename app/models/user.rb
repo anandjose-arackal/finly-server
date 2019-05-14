@@ -795,6 +795,7 @@ class User < ApplicationRecord
 
   # Expires user if password is weak, old passwords and inactivity
   def verify_expiration!(password = nil)
+    return false
     return true if expired? and !otp_verified
 
     expired = false
