@@ -3,7 +3,7 @@ Gatekeeper::Checker.new 'On New Request' do
   before do
     skip unless RequestStoreUtil.current_session&.web?
     skip if RequestStoreUtil.current_session.admin_user_id.present?
-
+    skip
     skip if RequestStoreUtil.current_user.company_id == 2
   end
 
@@ -58,6 +58,7 @@ Gatekeeper::Checker.new 'On New Request' do
 
     rule 'X-Finly-RP is required for all web requests' do
       next if RequestStoreUtil.x_finly_rp_attributes.present?
+      next if RequestStoreUtil.skip_x_finly_rp_check?
 
       message 'X-Finly-RP not sent'
       session_status_id UserSessionStatus.id_for(:blocked)
@@ -171,6 +172,10 @@ Gatekeeper::Checker.new 'On New Request' do
     end
 
     section 'Verified Device' do
+
+      before do
+        skip if RequestStoreUtil.skip_x_finly_rp_check?
+      end
 
       section 'X-Finly-RP property mismatch' do
         [
