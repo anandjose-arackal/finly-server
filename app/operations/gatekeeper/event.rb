@@ -16,6 +16,7 @@ class Gatekeeper::Event
 
   def run
     return success_verdict false unless ENABLED
+    return success_verdict false if RequestStoreUtil&.current_user.class.name == AdminUser.name
 
     unless RequestStoreUtil.security_policy.gatekeeper.enabled
       return success_verdict false

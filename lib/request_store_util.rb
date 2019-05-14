@@ -11,7 +11,7 @@ class RequestStoreUtil
 
   def self.set_current_user(user)
     RequestStore.store[:current_user] = user
-    set_security_policy(user)
+    set_security_policy(user) if user.class.name == User.name
   end
 
   def self.set_current_company(company)
