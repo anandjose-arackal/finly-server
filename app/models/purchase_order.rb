@@ -377,7 +377,7 @@ class PurchaseOrder < ApplicationRecord
       data[:procurement_status_text] = 'Invoice Processing'
     else
       data[:invoice][:status] = 'init'
-      if self.invoices.present?
+      if self.procurement.invoices.present?
         data[:procurement_status_text] = 'Invoice Processing'
       else
         data[:procurement_status_text] = 'Awaiting Invoice'
