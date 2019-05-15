@@ -108,7 +108,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
     end
 
     section 'Active Session' do
-      rule 'A user cannot have more than 2 active web sessions' do
+      rule 'Too many concurrent sessions' do
         authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
         policy = SecurityPolicy::Manager.for(user)
         max_concurrent_sessions = policy.browser.concurrent_logins
