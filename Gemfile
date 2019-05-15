@@ -144,9 +144,10 @@ gem 'font-awesome-rails', '~> 4.7.0.4'
 
 gem 'has_scope', '~> 0.7.2'
 
-# gem 'sendgrid-ruby', '~> 5.3.0'
-# gem 'griddler', '~> 1.5.2'
-# gem 'griddler-sendgrid', '~> 1.1.0'
+gem 'sendgrid-ruby'#, '~> 5.3.0'
+gem 'griddler'#, '~> 1.5.2'
+gem 'griddler-sendgrid'#, '~> 1.1.0'
+
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
 # gem 'wkhtmltoimage-binary'
