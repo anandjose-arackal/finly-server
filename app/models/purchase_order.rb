@@ -360,13 +360,13 @@ class PurchaseOrder < ApplicationRecord
     end
 
     if tag_ids.include?(StatusTag.id_for(:shipment_received))
-      data[:shipment][:status] = 'copmleted'
+      data[:grn][:status] = 'copmleted'
       data[:procurement_status_text] = 'Shipment Received'
     elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
-      data[:shipment][:status] = 'processing'
+      data[:grn][:status] = 'processing'
       data[:procurement_status_text] = 'Receiving Shipment'
     else
-      data[:shipment][:status] = 'init'
+      data[:grn][:status] = 'init'
       data[:procurement_status_text] = 'Awaiting Shipment'
     end
 
