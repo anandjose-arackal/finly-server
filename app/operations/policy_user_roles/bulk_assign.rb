@@ -57,8 +57,14 @@ class PolicyUserRoles::BulkAssign < PolicyUserRoles::Base
   def process
     # Bulk insert into table, 
     # much faster  
-    sql = "INSERT INTO policy_user_roles (policy_id, user_id, user_role_id, created_at, updated_at) VALUES #{self.assignable}"
-    ActiveRecord::Base.connection.execute(sql)
+    begin
+      sql = "INSERT INTO policy_user_roles (policy_id, user_id, user_role_id, created_at, updated_at) VALUES #{self.assignable}"
+      ActiveRecord::Base.connection.execute(sql)
+    rescue => e
+      add_message :error, "Error while assigning multiple users to policies. Please try again later."
+      Rails.logger.fatal "Error occurred while bulk assigning - #{e.inspect}"
+      return
+    end
 
   end
 
