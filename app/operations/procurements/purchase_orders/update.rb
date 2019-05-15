@@ -219,7 +219,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
       # Set validation of DLRMs
       if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
-        dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidateBeforeUpdate.(user, {
+
+        dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(user, {
           reviewal_document: self.purchase_order,
           document_reviewer_mappings_params: document_reviewer_mappings_params
         })
