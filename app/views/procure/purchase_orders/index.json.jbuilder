@@ -21,6 +21,8 @@ json.results do
     json.controlling_user po.get_reviewers.first&.name
     json.awaiting_action po.awaiting_action(@result.user)
 
+    json.status_tag_details po.status_tag_details
+
     # Amount
     json.amount precision_value(po.balance_amount&.value || 0)
 

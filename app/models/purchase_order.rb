@@ -364,51 +364,25 @@ class PurchaseOrder < ApplicationRecord
       data[:procurement_status_text] = 'Shipment Received'
     elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
       data[:shipment][:status] = 'processing'
-      data[:status_message] = 'Awaiting Shipment'
+      data[:procurement_status_text] = 'Receiving Shipment'
     else
       data[:shipment][:status] = 'init'
-      data[:status_message] = 'Awaiting Shipment'
-      data[:status_text] = 'Shipment Pending'
-      data[:status_type] = 'shipment'
+      data[:procurement_status_text] = 'Awaiting Shipment'
     end
 
     if tag_ids.include? StatusTag.id_for(:invoice_approved)
-      data[:invoice][:status] = 'complete'
+      data[:invoice][:status] = 'completed'
     elsif (tag_ids.include? StatusTag.id_for(:invoice_processing)) || (tag_ids.include? StatusTag.id_for(:invoice_received))
       data[:invoice][:status] = 'processing'
-      data[:status_message] = 'Invoice Processing'
-      data[:status_text] = 'Invoice Approval is Pending'
-      data[:status_type] = 'invoice'
+      data[:procurement_status_text] = 'Invoice Processing'
     else
       data[:invoice][:status] = 'init'
-      data[:status_type] = 'invoice'
       if self.invoices.present?
-        data[:status_message] = 'Invoice Processing'
-        data[:status_text] = 'Invoice Approval is Pending'
+        data[:procurement_status_text] = 'Invoice Processing'
       else
-        data[:status_message] = 'Awaiting Invoice'
-        data[:status_text] = 'Invoice Upload Pending'
-      end
-
-    end
-
-    if procurement_type == 'purchase_order'
-      data[:purchase_order] = {}
-      if (tag_ids.include? StatusTag.id_for(:po_approved)) || (tag_ids.include? StatusTag.id_for(:po_sent))
-        data[:purchase_order][:status] = 'complete'
-      elsif tag_ids.include? StatusTag.id_for(:po_processing)
-        data[:purchase_order][:status] = 'processing'
-        data[:status_message] = 'PO Processing'
-        data[:status_text] = 'PO Approval is Pending'
-        data[:status_type] = 'purchase_order'
-      else
-        data[:purchase_order][:status] = 'init'
-        data[:status_message] = 'PO Processing'
-        data[:status_text] = 'PO Approval is Pending'
-        data[:status_type] = 'purchase_order'
+        data[:procurement_status_text] = 'Awaiting Invoice'
       end
     end
-
     data
   end
 
