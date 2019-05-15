@@ -1,7 +1,7 @@
 # File used to validate the current set of dlrms
 # Usually called before updating the document and setting the dlrms, and prevents user saving the document
 
-class ReviewalManager::DocumentReviewalMappings::ValidateBeforeUpdate < ReviewalManager::DocumentReviewalMappings::Base
+class ReviewalManager::DocumentReviewalMappings::ValidationUpdate < ReviewalManager::DocumentReviewalMappings::Base
   attr_accessor :document, :dlrms, :policy, :violations_present, :reviewal_levels, :document_reviewer_mappings_params
 
   def init

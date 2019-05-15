@@ -217,15 +217,27 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
 
-      # Set validation of DLRMs
-      if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
-        dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidateBeforeUpdate.(user, {
-          reviewal_document: self.purchase_order,
-          document_reviewer_mappings_params: document_reviewer_mappings_params
-        })
+      # # Set validation of DLRMs
+      # if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+      #   dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidateBeforeUpdate.(user, {
+      #     reviewal_document: self.purchase_order,
+      #     document_reviewer_mappings_params: document_reviewer_mappings_params
+      #   })
 
-        unless dlrm_validation_op.success?
-          add_message :error, dlrm_validation_op.messages[:error]
+      #   unless dlrm_validation_op.success?
+      #     add_message :error, dlrm_validation_op.messages[:error]
+      #     return
+      #   end
+      # end
+
+      if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+        # For setting level specific reviewers from reviewal chain for a document
+        params[:reviewal_document] = self.purchase_order
+        params[:document_reviewer_mappings] = document_reviewer_mappings_params
+
+        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+        unless document_reviewer_mappings_op.success?
+          add_message :error, document_reviewer_mappings_op.messages[:error]
           return
         end
       end
@@ -242,17 +254,17 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       #   self.bank_account.update_columns(purchase_order_id: purchase_order.id)
       # end
 
-      if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
-        # For setting level specific reviewers from reviewal chain for a document
-        params[:reviewal_document] = self.purchase_order
-        params[:document_reviewer_mappings] = document_reviewer_mappings_params
+      # if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+      #   # For setting level specific reviewers from reviewal chain for a document
+      #   params[:reviewal_document] = self.purchase_order
+      #   params[:document_reviewer_mappings] = document_reviewer_mappings_params
 
-        document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
-        unless document_reviewer_mappings_op.success?
-          add_message :error, document_reviewer_mappings_op.messages[:error]
-          return
-        end
-      end
+      #   document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      #   unless document_reviewer_mappings_op.success?
+      #     add_message :error, document_reviewer_mappings_op.messages[:error]
+      #     return
+      #   end
+      # end
 
       # purchase_order.save
       # purchase_order.save
