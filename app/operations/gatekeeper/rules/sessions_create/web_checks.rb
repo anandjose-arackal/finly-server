@@ -82,6 +82,8 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       end
 
       rule 'Unverified IPs need to be verified before proceeding' do
+        policy = RequestStoreUtil.security_policy
+        next unless policy.browser_client.ip.otp_verify?
         next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
         require_otp true
       end
@@ -97,6 +99,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
       rule 'Unverified UserAgent Clients need to be verified before proceeding' do
         next unless RequestStoreUtil.current_session&.user_agent_client.status_id == UserIpStatus.id_for(:unverified)
+        next unless policy.browser_client.user_agent.otp_verify?
         require_otp true
       end
     end
@@ -111,7 +114,7 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       rule 'Too many concurrent sessions' do
         authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
         policy = SecurityPolicy::Manager.for(user)
-        max_concurrent_sessions = policy.browser.concurrent_logins
+        max_concurrent_sessions = policy.browser_client.concurrent_logins
         if authorized_web_sessions.size > max_concurrent_sessions
           authorized_web_sessions[0..-(max_concurrent_sessions + 1)].each do |session|
             session.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")

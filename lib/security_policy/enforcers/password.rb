@@ -1,5 +1,8 @@
 class SecurityPolicy::Enforcers::Password < SecurityPolicy::Enforcers::Base
 
+  bus SecurityPolicy::Manager
+  subscribe :password
+
   def minimum_score(options={})
     SecurityPolicy::Config.config_for(user_role_names, :password, :minimum_score).max
   end

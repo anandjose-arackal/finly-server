@@ -1,14 +1,11 @@
 class SecurityPolicy::Manager
+  include EventBus::Bus
+
+  subscribers_path "#{Rails.root}/lib/security_policy/enforcers"
+
   attr_accessor :user, :user_roles, :user_role_names
 
-  ENFORCERS = {
-      browser: SecurityPolicy::Enforcers::Browser,
-      gatekeeper: SecurityPolicy::Enforcers::Gatekeeper,
-      password: SecurityPolicy::Enforcers::Password,
-      account_lock: SecurityPolicy::Enforcers::AccountLock,
-  }
-
-  ENFORCERS.each do |key, klass|
+  SecurityPolicy::Manager.subscribers.each do |key, klass|
     attr_accessor key
   end
 
@@ -27,8 +24,8 @@ class SecurityPolicy::Manager
   end
 
   def init_config
-    ENFORCERS.each do |key, klass|
-      self.send("#{key}=", klass.new(user, user_roles, user_role_names))
+    SecurityPolicy::Manager.subscribers.each do |key, klass|
+      self.send("#{key}=", klass&.first.new(user, user_roles, user_role_names))
     end
   end
 
