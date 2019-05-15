@@ -211,6 +211,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
 
+      # Set validation of DLRMs
+      dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
+        reviewal_document: self.purchase_order
+      })
+
+      unless dlrm_validation_op.success?
+        add_message :error, dlrm_validation_op.messages[:error]
+        return
+      end
+
       purchase_order.save
       purchase_order.process_line_item_calculation(self.skip_adv_calculation)
       purchase_order.save
