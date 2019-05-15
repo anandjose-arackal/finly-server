@@ -212,13 +212,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     if purchase_order.valid?
 
       # Set validation of DLRMs
-      dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::Validate.(user, {
-        reviewal_document: self.purchase_order
-      })
+      if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+        dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidateBeforeUpdate.(user, {
+          reviewal_document: self.purchase_order,
+          document_reviewer_mappings_params: document_reviewer_mappings_params
+        })
 
-      unless dlrm_validation_op.success?
-        add_message :error, dlrm_validation_op.messages[:error]
-        return
+        unless dlrm_validation_op.success?
+          add_message :error, dlrm_validation_op.messages[:error]
+          return
+        end
       end
 
       purchase_order.save
