@@ -612,8 +612,7 @@ class PurchaseOrder < ApplicationRecord
         item_quantity = (item.quantity || 0).to_f
         item_rate = (item.rate || 0).to_f
         item_amount = (item_quantity * item_rate)
-        debugger
-        item_tax = (item.tax_rate&.value || 0).to_f
+        item_tax = (item.tax_rate&.rate || 0).to_f
 
         case self.discount_type_id
           # i.e. discount is given as a rate
