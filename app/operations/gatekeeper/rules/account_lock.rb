@@ -14,7 +14,7 @@ Gatekeeper::Checker.new 'AccountLock' do
             timeframe = user.password_changed_at
         end
 
-        if user.locked_at.blank? && user.user_auth_failures.not_verified.within_time(timeframe).size >= policy.account_lock.max_attempts
+        if user.locked_at.blank? && user.user_auth_failures.within_time(timeframe).size >= policy.account_lock.max_attempts
           user.update(locked_at: DateTime.now)
           auth_failure.locked = true
 
@@ -50,7 +50,6 @@ Gatekeeper::Checker.new 'AccountLock' do
     premise :user_login_attempt do
       rule 'Do not allow locked accounts to login' do
         user = params[:user]
-        policy = SecurityPolicy::Manager.for(user)
         if user.access_locked?
           # user.user_auth_failures.create locked: true
           message "#{user.id} - #{user.email} > Account has been temporarily locked"

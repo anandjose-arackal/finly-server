@@ -1,6 +1,7 @@
 class SeedHelper
 
   # require "#{Rails.root}/spec/helpers/seed_helper.rb"
+  # SeedHelper.seed_test_data
 
   def self.seed_test_data
     ActiveRecord::Migration.change_column_null :admin_review_workflow_levels, :admin_user_id, true

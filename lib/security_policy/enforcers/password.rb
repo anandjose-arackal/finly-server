@@ -4,7 +4,7 @@ class SecurityPolicy::Enforcers::Password < SecurityPolicy::Enforcers::Base
   subscribe :password
 
   def minimum_score(options={})
-    SecurityPolicy::Config.config_for(user_role_names, :password, :minimum_score).max
+    SecurityPolicy::Config.config_for(user_role_names, :password, :minimum_score).max || 1
   end
 
   def mandate_special_chars?(options={})

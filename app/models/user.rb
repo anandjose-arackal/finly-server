@@ -1360,7 +1360,7 @@ class User < ApplicationRecord
   end
 
   def access_locked?
-    locked_at and locked_at < security_policy.account_lock.locking_period.ago
+    locked_at and locked_at > security_policy.account_lock.locking_period.ago
   end
   alias_method :locked?, :access_locked?
 

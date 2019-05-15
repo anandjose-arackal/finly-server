@@ -1,4 +1,4 @@
-class SecurityPolicy::Enforcers::Browser::Client < SecurityPolicy::Enforcers::Base
+class SecurityPolicy::Enforcers::BrowserClient < SecurityPolicy::Enforcers::Base
 
   bus SecurityPolicy::Manager
   subscribe :browser_client
@@ -17,4 +17,3 @@ class SecurityPolicy::Enforcers::Browser::Client < SecurityPolicy::Enforcers::Ba
   end
 
 end
-

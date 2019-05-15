@@ -1,4 +1,4 @@
-class SecurityPolicy::Enforcers::Browser::UserAgent < SecurityPolicy::Enforcers::Base
+class SecurityPolicy::Enforcers::BrowserUserAgent < SecurityPolicy::Enforcers::Base
 
   bus SecurityPolicy::Manager
   subscribe :browser_user_agent
