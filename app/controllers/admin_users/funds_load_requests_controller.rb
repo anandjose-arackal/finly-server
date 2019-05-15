@@ -1,5 +1,4 @@
-class AdminUsers::FundsLoadRequestsController < ApplicationController
-  before_action -> { finly_authorize! :admin}
+class AdminUsers::FundsLoadRequestsController < BaseControllers::AdminBase
 
   def index
     @result = Admin::FundsLoadRequests::Index.(current_user, params)

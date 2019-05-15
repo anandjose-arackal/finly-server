@@ -1,4 +1,4 @@
-class RegistrationsController < ApplicationController
+class RegistrationsController < BaseControllers::PublicBase
 
   # skip_before_filter :verify_authenticity_token, :only => [:download_resources]
 

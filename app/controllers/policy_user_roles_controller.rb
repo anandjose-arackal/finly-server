@@ -1,5 +1,4 @@
-class PolicyUserRolesController < ApplicationController
-  before_action -> { finly_authorize! :web}
+class PolicyUserRolesController < BaseControllers::WebBase
 
   def index
     @result = PolicyUserRoles::Index.(current_user, params)

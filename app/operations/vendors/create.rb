@@ -1,5 +1,6 @@
 class Vendors::Create < Vendors::Base
-  attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors
+  attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors,
+                :override_vendor_id
 
   class Vendors::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :vendor
@@ -21,6 +22,7 @@ class Vendors::Create < Vendors::Base
     # super()
     self.vendor_parameters = vendor_attributes
     self.similar_vendors = []
+    self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
   end
 
@@ -59,9 +61,16 @@ class Vendors::Create < Vendors::Base
         validate_attachment(vendor_parameters, :pan)
       end
 
-      if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
-        validate_attachment(vendor_parameters, :msme_certificate)
+    if vendor_parameters[:pan].present?
+      existing_pan = user.company.yes_bank_vendors.find_by pan: vendor_parameters[:pan]
+      if existing_pan.present?
+        add_message :error, "Another Vendor existed with this PAN"
       end
+    end
+
+    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+      validate_attachment(vendor_parameters, :msme_certificate)
+    end
 
       if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
         validate_attachment(vendor_parameters, :gstin)
@@ -137,6 +146,12 @@ class Vendors::Create < Vendors::Base
 
     # adding the created by user for this particular vendor
     vendor_parameters[:created_by_id] = user.id
+
+    # here we will set the vendor_id based on the override_vendor_id flag from the frontend
+    unless self.override_vendor_id
+      self.vendor_parameters.delete(:vendor_id)
+    end
+    self.vendor_parameters.delete(:override_vendor_id)
   end
 
   def process

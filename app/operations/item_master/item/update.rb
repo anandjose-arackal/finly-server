@@ -39,6 +39,10 @@ class ItemMaster::Item::Update < ItemMaster::Item::Base
     end
   end
 
+  def pre_process
+    self.inventory_item_parameters.delete(:override_item_number)
+  end
+
   def process
     unless self.inventory_item.update(self.inventory_item_parameters)
       add_message :error, self.inventory_item.errors.full_messages

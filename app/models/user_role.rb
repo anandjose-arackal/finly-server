@@ -9,6 +9,8 @@
 #
 
 class UserRole < ApplicationRecord
+  include Seedable
+
   has_many :users, through: :user_role_mappings
 
   scope :admin, -> { where(id: UserRole.id_for(:admin)) }
@@ -149,12 +151,15 @@ class UserRole < ApplicationRecord
     VALUES[role]
   end
 
-  def self.ids_for(*roles)
-    role_ids = []
-    roles.each do |role|
-      role_ids << self.id_for(role)
+  def self.ids_for(*keys)
+    if keys.present? and keys.first.class.name == Array.name
+      keys = keys.first
     end
-    role_ids.compact
+    ids = []
+    VALUES.each do |key, value|
+      ids << value if keys.include? key&.to_sym&.downcase
+    end
+    ids
   end
 
   def self.name_for(role_id)

@@ -1,6 +1,6 @@
-class Procure::PurchaseOrdersController < ApplicationController
-  before_action :set_tokens_in_header, only: [:download]
-  before_action -> { finly_authorize! :web }
+class Procure::PurchaseOrdersController < BaseControllers::WebBase
+
+  set_tokens_in_header :download
 
   def index
     @result = Procurements::PurchaseOrders::Index.(current_user, params)
@@ -35,6 +35,15 @@ class Procure::PurchaseOrdersController < ApplicationController
   def submit
     @result = Procurements::PurchaseOrders::Submit.(current_user, params)
     respond
+  end
+
+  def save_submit
+    @result = Procurements::PurchaseOrders::SaveSubmit.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'procure/purchase_orders/save_submit'
+    end
   end
 
   def retract

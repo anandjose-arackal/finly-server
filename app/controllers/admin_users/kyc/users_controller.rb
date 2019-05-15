@@ -1,7 +1,6 @@
-class AdminUsers::Kyc::UsersController < ApplicationController
+class AdminUsers::Kyc::UsersController < BaseControllers::AdminBase
 
-  before_action :set_tokens_in_header_admin, only: [:export, :download_kycs]
-  before_action -> { finly_authorize! :admin }
+  set_tokens_in_header :export, :download_kycs
 
   def index
     @result = Admin::KycProcesses::Users::Index.(current_user, params)

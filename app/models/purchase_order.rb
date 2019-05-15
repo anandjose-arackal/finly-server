@@ -65,6 +65,7 @@
 #  gstin_location_id            :bigint
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
+#  vendor_address               :text(65535)
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -177,7 +178,7 @@ class PurchaseOrder < ApplicationRecord
       where user_id: user_ids
     end
   }
-  
+
   scope :with_budgetable_vendor_ids, -> (vendor_ids) {
     if vendor_ids.present?
       where vendor_id: vendor_ids
@@ -842,7 +843,7 @@ class PurchaseOrder < ApplicationRecord
       item_ids = options[:item_ids]
 
       # Update Purchase request item statuses
-       # TODO- create status change trail 
+       # TODO- create status change trail
       PurchaseRequestItem.with_ids(item_ids).update_all(status_id: PurchaseRequestItemStatus.id_for(:po_created))
 
       document_ids = PurchaseRequestItem.with_ids(item_ids).pluck(:purchase_request_id) rescue nil

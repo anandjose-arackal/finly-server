@@ -12,6 +12,7 @@
 #  cost_center_id  :integer
 #  deleted_at      :datetime
 #  department_code :string(255)
+#  code            :string(255)
 #
 
 class Department < ApplicationRecord

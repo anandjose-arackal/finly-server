@@ -1,6 +1,5 @@
-class SettlementsController < ApplicationController
+class SettlementsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web}
 
   def create
     success_message = nil

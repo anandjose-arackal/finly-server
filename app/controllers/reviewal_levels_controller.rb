@@ -1,5 +1,4 @@
-class ReviewalLevelsController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class ReviewalLevelsController < BaseControllers::WebBase
 
   def create
     @result = ReviewalLevels::Create.(current_user, params)

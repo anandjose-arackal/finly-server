@@ -1,6 +1,5 @@
-class Chrome::V1::ExpensesController < ApplicationController
+class Chrome::V1::ExpensesController < BaseControllers::ChromeBase
 
-  before_action -> { finly_authorize! :chrome}
 
   def create
     formatted_param = RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse.(current_user, params)&.formatted_request

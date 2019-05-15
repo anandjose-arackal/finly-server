@@ -9,6 +9,9 @@ Devise.setup do |config|
 
   config.secret_key = '331c9d475ce3593d1b76f710e44e6b945bf33908345e63e409999d924add3931a63ee8b94de72ec69dbda632569ef50078321c576ce0a31e8f172dbb9be05a29'
 
+  # Devise-zxcvbn gem
+  config.min_password_score = 3
+
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
@@ -197,7 +200,7 @@ Devise.setup do |config|
 
   # ==> Configuration for :validatable
   # Range for password length.
-  # config.password_length = 6..128
+  config.password_length = 8..128
 
   # Email regex used to validate email formats. It simply asserts that
   # one (and only one) @ exists in the given string. This is mainly

@@ -1172,6 +1172,14 @@
 #                                                          PATCH  /tds_slabs/:id(.:format)                                                                                            tds_slabs#update
 #                                                          PUT    /tds_slabs/:id(.:format)                                                                                            tds_slabs#update
 #                                                          DELETE /tds_slabs/:id(.:format)                                                                                            tds_slabs#destroy
+#                                                tax_rates GET    /tax_rates(.:format)                                                                                                tax_rates#index
+#                                                          POST   /tax_rates(.:format)                                                                                                tax_rates#create
+#                                             new_tax_rate GET    /tax_rates/new(.:format)                                                                                            tax_rates#new
+#                                            edit_tax_rate GET    /tax_rates/:id/edit(.:format)                                                                                       tax_rates#edit
+#                                                 tax_rate GET    /tax_rates/:id(.:format)                                                                                            tax_rates#show
+#                                                          PATCH  /tax_rates/:id(.:format)                                                                                            tax_rates#update
+#                                                          PUT    /tax_rates/:id(.:format)                                                                                            tax_rates#update
+#                                                          DELETE /tax_rates/:id(.:format)                                                                                            tax_rates#destroy
 #                             company_add_balance_payments POST   /payments/companies/:company_id/add_balance(.:format)                                                               companies#add_balance
 #                                                          GET    /payments/companies(.:format)                                                                                       companies#index
 #                                                          POST   /payments/companies(.:format)                                                                                       companies#create
@@ -1340,6 +1348,7 @@
 #                                                          PATCH  /bank_transfer/inward_invoices/:id(.:format)                                                                        bank_transfer/inward_invoices#update
 #                                                          PUT    /bank_transfer/inward_invoices/:id(.:format)                                                                        bank_transfer/inward_invoices#update
 #                                                          DELETE /bank_transfer/inward_invoices/:id(.:format)                                                                        bank_transfer/inward_invoices#destroy
+#                                            bank_transfer GET    /bank_transfer/autocomplete/vendors/:id(.:format)                                                                   bank_transfer/autocomplete#vendors
 #                                      public_bank_account GET    /account/:account_number(.:format)                                                                                  invoicing/public_links#virtual_bank_account_show
 #                                           public_invoice GET    /invoice/:invoice_id(.:format)                                                                                      invoicing/public_links#invoice_show
 #                                                addresses GET    /addresses(.:format)                                                                                                addresses#index
@@ -1535,6 +1544,7 @@
 #                            procure_purchase_order_remind PUT    /procure/purchase_orders/:purchase_order_id/remind(.:format)                                                        procure/purchase_orders#remind
 #                              procure_purchase_order_void PUT    /procure/purchase_orders/:purchase_order_id/void(.:format)                                                          procure/purchase_orders#void
 #               procure_purchase_order_mark_send_to_vendor PUT    /procure/purchase_orders/:purchase_order_id/mark_send_to_vendor(.:format)                                           procure/purchase_orders#mark_send_to_vendor
+#             procure_purchase_order_mark_vendor_confirmed PUT    /procure/purchase_orders/:purchase_order_id/mark_vendor_confirmed(.:format)                                         procure/purchase_orders#mark_vendor_confirmed
 #                  procure_purchase_order_save_as_template POST   /procure/purchase_orders/:purchase_order_id/save_as_template(.:format)                                              procure/purchase_orders#template_create
 #                    procure_purchase_order_apply_template POST   /procure/purchase_orders/:purchase_order_id/apply_template(.:format)                                                procure/purchase_orders#template_apply
 #              procure_purchase_order_make_advance_payment PUT    /procure/purchase_orders/:purchase_order_id/make_advance_payment(.:format)                                          procure/purchase_orders#create_payment
@@ -1722,6 +1732,7 @@
 #                                     vendors_bulk_approve PUT    /vendors/bulk_approve(.:format)                                                                                     vendors#bulk_approve
 #                                      vendors_bulk_reject PUT    /vendors/bulk_reject(.:format)                                                                                      vendors#bulk_reject
 #                                vendors_bulk_take_control PUT    /vendors/bulk_take_control(.:format)                                                                                vendors#bulk_take_control
+#                                           vendors_counts GET    /vendors/counts(.:format)                                                                                           vendors#counts
 #                                           vendor_approve PUT    /vendors/:vendor_id/approve(.:format)                                                                               vendors#approve
 #                                            vendor_submit PUT    /vendors/:vendor_id/submit(.:format)                                                                                vendors#submit
 #                                        vendor_deactivate PUT    /vendors/:vendor_id/deactivate(.:format)                                                                            vendors#deactivate
@@ -2830,7 +2841,7 @@ Rails.application.routes.draw do
   get 'people' => 'people#people'
 
   get 'users/verify' => 'otp#edit', as: :verify_mobile
-  post 'otp/update' => 'otp#update', as: :update_mobile_number
+  # post 'otp/update' => 'otp#update', as: :update_mobile_number
   post 'otp/verify' => 'otp#verify', as: :verify_otp
   post 'otp/resend' => 'otp#resend', as: :resend_otp
 
@@ -3277,6 +3288,7 @@ Rails.application.routes.draw do
   # ROUTES FOR VENDOR PAYMENTS
   resources :cost_centers
   resources :tds_slabs
+  resources :tax_rates
 
 
   scope :payments do
@@ -3386,6 +3398,7 @@ Rails.application.routes.draw do
     get 'users/invite_config', to: 'users#invite_config'
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
+      get 'policies', to: 'users#policies'
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
@@ -3568,6 +3581,7 @@ Rails.application.routes.draw do
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
       get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
+      put 'save_submit', to: 'purchase_orders#save_submit'
 
       resources :quotations, only: %i[index create update destroy]
     end
@@ -3645,6 +3659,7 @@ Rails.application.routes.draw do
       post 'save_as_template', to: 'inward_invoices#template_create'
       post 'apply_template', to: 'inward_invoices#template_apply'
       delete 'delete', to: 'inward_invoices#destroy'
+      put 'save_submit', to: 'inward_invoices#save_submit'
     end
 
     resources :delivery_challans

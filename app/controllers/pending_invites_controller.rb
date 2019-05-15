@@ -1,6 +1,6 @@
-class PendingInvitesController < ApplicationController
+class PendingInvitesController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web} , except: [:edit, :accept]
+  skip_authentication_actions :edit, :accept
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)

@@ -1,5 +1,4 @@
-class BudgetsController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class BudgetsController < BaseControllers::WebBase
   def index
     @result = Budgets::Index.(current_user, params)
     respond

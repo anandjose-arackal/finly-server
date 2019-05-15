@@ -1,8 +1,9 @@
 class Generator
 
-  def self.new_transaction_id
+  def self.new_transaction_id(card)
     # 'FinlyTestRefTransId1'
-    'FinlyTest1'
+    # 'FinlyTest1'
+    card.proxy
   end
 
   def self.reference_id_for(account_1, account_2, date)
