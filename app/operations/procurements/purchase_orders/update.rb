@@ -7,7 +7,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
                 :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation,
-                :gstin_location, :cost_allocation_items
+                :gstin_location, :cost_allocation_items, :policy
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -38,6 +38,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     # Check if department and cost center are to be saved globally for the po or individually for each item
     self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
+
+    self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: purchase_order_params[:policy_id])
   end
 
   def validate
@@ -57,10 +59,14 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
-    unless self.purchase_order_params[:policy_id].present?
-      if self.purchase_order.policy.blank?
-        add_message :error, 'Policy not found.'
-      end
+    # unless self.purchase_order_params[:policy_id].present?
+    #   if self.purchase_order.policy.blank?
+    #     add_message :error, 'Policy not found.'
+    #   end
+    # end
+
+    if self.policy.blank?
+      add_message :error, 'Please select a policy.'
     end
 
     if self.purchase_order_params[:delivery_date].blank?
