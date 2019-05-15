@@ -221,6 +221,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     # Since page lands on PO, check for invoice reviewer too. Else if user is invoice reviewer and not PO reviewer, page will break
     return if purchase_order&.procurement&.invoices&.joins(:document_level_reviewer_mappings)&.pluck('document_level_reviewer_mappings.reviewer_id').include?(user.id) rescue false
     return if purchase_order.validate_if_auditor(user)
+    # Payment ticket credtor has access to inward invoice show, hence giving access to view purchase order too
+    return if user.has_policy_role?(UserRole.id_for(:bank_payment_request_creditor), purchase_order)
     raise_unauthorized_exception
   end
 end
