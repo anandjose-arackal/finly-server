@@ -66,7 +66,7 @@ class PaymentAgreementsController < BaseControllers::WebBase
   end
 
   def edit_config
-    @result = PaymentAgreements::PurchaseRequestEditConfig.(current_user, params)
+    @result = PaymentAgreements::EditConfig.(current_user, params)
     respond
   end
 

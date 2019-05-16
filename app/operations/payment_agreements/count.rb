@@ -1,4 +1,4 @@
-class PaymentAgreement::Count < PaymentAgreement::Base
+class PaymentAgreements::Count < PaymentAgreements::Base
 
   attr_accessor :statuses
 
@@ -10,7 +10,7 @@ class PaymentAgreement::Count < PaymentAgreement::Base
   end
 
   def process
-    result  = ::PaymentAgreement::Index.(user, params)
+    result  = ::PaymentAgreements::Index.(user, params)
     if result.success?
       self.statuses = result.purchase_requests.joins(:status).group('purchase_request_statuses.name').count
     end
@@ -18,10 +18,10 @@ class PaymentAgreement::Count < PaymentAgreement::Base
 
   def success
     params[:statuses] = self.statuses
-    PaymentAgreement::Count::CountPresenter.new(user, params, messages)    
+    PaymentAgreements::Count::CountPresenter.new(user, params, messages)    
   end
 
-  class PaymentAgreement::Count::CountPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class PaymentAgreements::Count::CountPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :statuses
 
