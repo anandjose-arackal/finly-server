@@ -1,5 +1,21 @@
+json.locations do
+  if @result.locations.present?
+    json.array!(@result.locations.include_state) do |location|
+      json.merge! location.as_json(tree: true)
+    end
+  end
+end
 
 
+json.departments do
+  json.array!(@result.departments) do |department|
+    json.merge! department.as_json(tree: true)
+  end
+end
+
+json.department_mappings @result.department_mappings
+
+json.cost_centers @result.cost_centers.as_json
 
 json.policies do
   json.array!(@result.policies) do |policy|
