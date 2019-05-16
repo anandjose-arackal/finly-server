@@ -1,4 +1,4 @@
-class Procurements::PurchaseOrders::Count < Procurements::Base
+class Procurements::PurchaseOrders::Counts < Procurements::Base
   attr_accessor :count, :status_count, :data
 
   def process
@@ -11,10 +11,10 @@ class Procurements::PurchaseOrders::Count < Procurements::Base
 
   def success
     params[:data] = self.data
-    Procurements::PurchaseOrders::Count::CountPresenter.new(user, params, messages)
+    Procurements::PurchaseOrders::Counts::CountPresenter.new(user, params, messages)
   end
 
-  class Procurements::PurchaseOrders::Count::CountPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::PurchaseOrders::Counts::CountPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :data
 
     def init
