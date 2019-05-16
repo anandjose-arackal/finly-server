@@ -3496,6 +3496,12 @@ Rails.application.routes.draw do
     resources :analytics, only: [:index]
   end
 
+  resources :payment_agreements do
+    collection do
+      get 'edit_config', to: 'payment_agreements#edit_config', as: :edit_config
+      get 'count', to: 'payment_agreements#count'
+    end
+  end
 
   scope :admin do
     namespace :admin_users do
