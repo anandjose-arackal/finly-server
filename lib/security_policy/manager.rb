@@ -20,6 +20,7 @@ class SecurityPolicy::Manager
     self.user = user
     self.user_roles = user.user_roles
     self.user_role_names = user.user_roles.pluck(:name)
+    self.user_role_names << 'employee' if self.user_role_names.blank?
     init_config
   end
 

@@ -69,6 +69,8 @@ Gatekeeper::Checker.new 'On New Request' do
       session = RequestStoreUtil.current_session
       policy = RequestStoreUtil.security_policy
 
+      next if policy.browser_client.inactivity_timeout.nil?
+
       if Time.now - Time.parse(session.last_request_at.to_s) > policy.browser_client.inactivity_timeout
         message 'Session timeout'
         session_status_id UserSessionStatus.id_for(:expired)

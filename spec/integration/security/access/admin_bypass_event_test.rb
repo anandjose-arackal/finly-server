@@ -40,7 +40,6 @@ RSpec.describe 'AdminBypass Event' do
             headers = @headers.deep_dup
             headers['Authorization'] = "Bearer #{@token.token}"
 
-
             @before_session_event_count = UserSessionEvent.count
             allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@authorized_ip)
             allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@authorized_ip)
