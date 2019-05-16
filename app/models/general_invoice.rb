@@ -1,0 +1,2 @@
+class GeneralInvoice < ApplicationRecord
+end
