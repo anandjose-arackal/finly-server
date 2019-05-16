@@ -1331,6 +1331,20 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:inventory_manager), document)
   end
 
+
+  # Agreement Based Payments Role
+  def is_payment_agreement_initiator?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:payment_agreement_initiator), document)
+  end
+
+  def is_payment_agreement_reviewer?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:payment_agreement_reviewer), document)
+  end
+
+  def is_payment_agreement_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:payment_agreement_auditor), document)
+  end
+
   # ************ User Role for vendor payments ******************
 
   def relevant
