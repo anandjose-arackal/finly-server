@@ -3306,6 +3306,8 @@ Rails.application.routes.draw do
     resources :vendor_types
 
     resources :inward_invoices
+
+    get 'autocomplete/vendors/:id', to: 'autocomplete#vendors'
   end
 
 
