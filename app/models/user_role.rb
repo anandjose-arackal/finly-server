@@ -56,7 +56,10 @@ class UserRole < ApplicationRecord
       purchase_request_auditor: 29,
       purchase_order_auditor: 30,
       invoice_auditor: 31,
-      vendor_auditor: 32
+      vendor_auditor: 32,
+      payment_agreement_initiator: 33,
+      payment_agreement_reviewer: 34,
+      payment_agreement_auditor: 35
   }
 
   VALUES_EM = {
@@ -102,12 +105,15 @@ class UserRole < ApplicationRecord
       purchase_request_auditor: 29,
       purchase_order_auditor: 30,
       invoice_auditor: 31,
-      vendor_auditor: 32
+      vendor_auditor: 32,
+      payment_agreement_initiator: 33,
+      payment_agreement_reviewer: 34,
+      payment_agreement_auditor: 35
   }
 
 
   # This is used for segregating VP specific policies
-  # Do not put user specific roles like :initiator, :creaditor, :admin, :reviewer here
+  # Do not put user specific roles like :initiator, :creditor, :admin, :reviewer here
   VP_ROLES = {
     purchase_request_initiator: 10,
     purchase_request_reviewer: 11,
