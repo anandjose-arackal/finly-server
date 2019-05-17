@@ -154,6 +154,14 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:advance_amount] = 'Invalid advance amount'
       end
 
+      if advance_amount.present? && validate_amount(advance_amount.to_s)
+        if advance_amount.to_f > amount.to_f
+          self.valid = false
+          self.error_messages << 'Advance amount is more than the original amount'
+          self.issue_item[:advance_amount] = 'Advance amount is more than the original amount'
+        end
+      end
+
       # check if the ifsc is present
       if ifsc.blank?
         self.valid = false
