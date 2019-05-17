@@ -1,4 +1,4 @@
-class Admin::Companies::PolicyUserRoles::Import < class PolicyUserRoles::Import
+class Admin::Companies::PolicyUserRoles::Import < PolicyUserRoles::Import
   attr_accessor :file_url, :file, :result_hash, :params, :missing_params, :sheet, :header, :policy_user_params, :company, :policy
 
   def pre_validate
