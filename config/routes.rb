@@ -3500,6 +3500,7 @@ Rails.application.routes.draw do
     collection do
       get 'edit_config', to: 'payment_agreements#edit_config', as: :edit_config
       get 'count', to: 'payment_agreements#count'
+      get 'policy_config', to: 'payment_agreements#policy_config'
     end
   end
 

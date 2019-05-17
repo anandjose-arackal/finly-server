@@ -6,7 +6,7 @@ class PaymentAgreements::EditConfig < PaymentAgreements::Base
 
   class PaymentAgreements::EditConfig::EditConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :departments, :policies, :reviewal_chains, :payment_agreement, :cost_centers, :department_mappings
+    attr_accessor :locations, :departments, :policies, :reviewal_chains, :payment_agreement, :cost_centers, :department_mappings, :location_mappings
 
     def init
       self.payment_agreement = params[:payment_agreement]

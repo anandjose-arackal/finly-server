@@ -81,4 +81,9 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
+  def policy_config
+    @result = PaymentAgreements::PolicyConfig.(current_user, params)
+    respond
+  end
+
 end
