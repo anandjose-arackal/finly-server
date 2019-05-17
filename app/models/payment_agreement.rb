@@ -9,7 +9,6 @@ class PaymentAgreement < ApplicationRecord
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
 
-  has_many :general_invoices, dependent: :destroy
-
+  has_many :general_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:general_invoice))}, class_name: 'Invoice', dependent: :destroy
 
 end

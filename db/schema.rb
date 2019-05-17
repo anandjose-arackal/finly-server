@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_17_072722) do
+ActiveRecord::Schema.define(version: 2019_05_17_101839) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3238,6 +3238,7 @@ ActiveRecord::Schema.define(version: 2019_05_17_072722) do
     t.boolean "cost_allocation_items", default: false
     t.text "narration"
     t.string "po_number"
+    t.integer "payment_agreement_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["controlling_level_id"], name: "index_invoices_on_controlling_level_id"
     t.index ["deleted_at"], name: "index_invoices_on_deleted_at"
