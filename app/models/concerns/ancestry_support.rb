@@ -9,4 +9,10 @@ module AncestrySupport
     self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
   end
 
+  def json_tree(options={})
+    json = as_json(options)
+    json[:children] = children&.map(&:json_tree)
+    json
+  end
+
 end
