@@ -33,7 +33,7 @@ RSpec.describe 'AdminBypass Event' do
       describe '> Valid Request' do
         before :all do
           RSpec::Mocks.with_temporary_scope do
-            @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id
+            @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id, scopes: 'admin_bypass web'
             @session = create :user_session, access_token: @token, ip: @authorized_ip, admin_user: @admin_user,
                               user_agent: @user_agent, user_device: @device, user_ip: @user_ip, user_agent_client: @user_agent_client,
                               started_at: 5.minutes.ago, last_request_at: 4.minutes.ago, scopes: 'admin_bypass web'
@@ -41,6 +41,8 @@ RSpec.describe 'AdminBypass Event' do
             headers['Authorization'] = "Bearer #{@token.token}"
 
             @before_session_event_count = UserSessionEvent.count
+            allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+            allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
             allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@authorized_ip)
             allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@authorized_ip)
             allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
@@ -73,11 +75,11 @@ RSpec.describe 'AdminBypass Event' do
       describe '> Timeout Request' do
         before :all do
           RSpec::Mocks.with_temporary_scope do
-            @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id
+            @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id, scopes: 'admin_bypass web'
             @user_ip = create :user_ip, ip: @authorized_ip, user: @user1
             @session = create :user_session, access_token: @token, ip: @authorized_ip,
                               user_device: @device, user_ip: @user_ip, user_agent_client: @user_agent_client,
-                              user_agent: @user_agent, admin_user: @admin_user
+                              user_agent: @user_agent, admin_user: @admin_user, scopes: 'admin_bypass web'
             headers = @headers.deep_dup
             headers['Authorization'] = "Bearer #{@token.token}"
 
@@ -85,8 +87,10 @@ RSpec.describe 'AdminBypass Event' do
             allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@authorized_ip)
             allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@authorized_ip)
             allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
+            allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+            allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
 
-            allow(Time).to receive(:now).and_return(Time.now + 31.minutes)
+            allow(Time).to receive(:now).and_return(Time.now + 91.minutes)
             get '/menu_data', headers: headers
           end
         end
@@ -120,10 +124,10 @@ RSpec.describe 'AdminBypass Event' do
     describe '> Mismatching IP' do
       before :all do
         RSpec::Mocks.with_temporary_scope do
-          @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id
+          @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, admin_user_id: @admin_user.id, scopes: 'admin_bypass web'
           @session = create :user_session, access_token: @token, ip: @authorized_ip,
                             user_device: @device, user_ip: @user_ip, user_agent_client: @user_agent_client,
-                            user_agent: @user_agent, admin_user: @admin_user
+                            user_agent: @user_agent, admin_user: @admin_user, scopes: 'admin_bypass web'
           headers = @headers.deep_dup
           headers['Authorization'] = "Bearer #{@token.token}"
           headers[:REMOTE_ADDR] = @unauthorized_ip
@@ -133,6 +137,8 @@ RSpec.describe 'AdminBypass Event' do
           allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@unauthorized_ip)
           allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@unauthorized_ip)
           allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
+          allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+          allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
 
           get '/menu_data', headers: headers
         end
@@ -171,10 +177,10 @@ RSpec.describe 'AdminBypass Event' do
   describe '> Revoked UserSession' do
     before :all do
       RSpec::Mocks.with_temporary_scope do
-        @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id
+        @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user1.id, scopes: 'admin_bypass web'
         @session = create :user_session, access_token: @token, ip: @authorized_ip, status_id: UserSessionStatus.id_for(:revoked),
                           user_device: @device, user_ip: @user_ip, user_agent_client: @user_agent_client,
-                          message: 'Revoke Reason', user_agent: @user_agent, admin_user: @admin_user
+                          message: 'Revoke Reason', user_agent: @user_agent, admin_user: @admin_user, scopes: 'admin_bypass web'
         headers = @headers.deep_dup
         headers['Authorization'] = "Bearer #{@token.token}"
 
@@ -182,6 +188,8 @@ RSpec.describe 'AdminBypass Event' do
         allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@authorized_ip)
         allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@authorized_ip)
         allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
+        allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+        allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
 
         allow(Time).to receive(:now).and_return(Time.now)
         get '/menu_data', headers: headers
@@ -209,7 +217,7 @@ RSpec.describe 'AdminBypass Event' do
     before :all do
       RSpec::Mocks.with_temporary_scope do
         @token = create :doorkeeper_token, application: @doorkeeper_application, resource_owner_id: @user2.id,
-                        admin_user_id: @admin_user.id
+                        admin_user_id: @admin_user.id, scopes: 'admin_bypass web'
         headers = @headers.deep_dup
         headers['Authorization'] = "Bearer #{@token.token}"
 
@@ -218,6 +226,8 @@ RSpec.describe 'AdminBypass Event' do
         allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return(@authorized_ip)
         allow_any_instance_of(ActionDispatch::Request).to receive(:remote_ip).and_return(@authorized_ip)
         allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
+        allow_any_instance_of(ActionDispatch::Request).to receive(:domain).and_return('finly.io')
+        allow_any_instance_of(ActionDispatch::Request).to receive(:subdomains).and_return(['admin'])
 
         allow(Time).to receive(:now).and_return(Time.now)
         get '/menu_data', headers: headers

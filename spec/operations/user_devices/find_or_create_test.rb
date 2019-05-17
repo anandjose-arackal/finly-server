@@ -276,7 +276,7 @@ RSpec.describe 'UserDevices::FindOrCreate' do
         # existing user, the existing device properties
         describe '> Existing UserDevice' do
           {
-              user_agent: Faker::Internet.user_agent, timezone: 'Dubai', language: 'Telugu',
+              user_agent: "Dummy User agent", timezone: 'Dubai', language: 'Telugu',
               browser: 'Random browser version - 2', browser_version: '2.1.1', browser_engine: '3.2.2', browser_engine_version: '4.3.3',
               os_name: 'Dad OS', os_version: '1.01',
               screen_width: '1190', screen_height: '1920', color_depth: '48'
