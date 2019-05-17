@@ -16,6 +16,9 @@ class SeedHelper
     seedable_classes.each do |klass|
       klass.seed_data #rescue nil
     end
+
+    Currency.seed_data
+    AdminReviewWorkflow.seed_data
   end
 
 end
