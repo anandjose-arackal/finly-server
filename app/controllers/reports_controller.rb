@@ -33,6 +33,11 @@ class ReportsController < ApplicationController
     respond
   end
 
+  def report_comments
+    @result = Reports::ReportComments.(current_user, params)
+    respond
+  end
+
   def destroy
     @result = Reports::Destroy.(current_user, params)
     respond response: :success

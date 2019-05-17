@@ -1,11 +1,11 @@
 expenses_sorted_by = params[:expenses_sorted_by] || 'category'
 json.expenses_sorted_by expenses_sorted_by
 if expenses_sorted_by == 'category'
-  sorted_expenses = @result.expenses_category_sorted
+  sorted_expenses = @result.paginated_expenses_category_sorted
 elsif expenses_sorted_by == 'date'
-  sorted_expenses = @result.expenses_date_sorted
+  sorted_expenses = @result.paginated_expenses_date_sorted
 else
-  sorted_expenses = @result.expenses_category_sorted
+  sorted_expenses = @result.paginated_expenses_category_sorted
 end
 
 json.has_custom_fields @result.has_custom_fields?
