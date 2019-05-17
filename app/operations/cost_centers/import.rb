@@ -12,7 +12,7 @@ class CostCenters::Import < CostCenters::Base
   end
 
   def init
-    self.company = Company.find_by_id params[:company_id].to_i
+    self.company = user.company
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
