@@ -7,10 +7,6 @@ class CostCenters::Import < CostCenters::Base
     end
   end
 
-  def user_model
-   [User, AdminUser]
-  end
-
   def init
     self.company = user.company
     self.file = params[:file]

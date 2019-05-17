@@ -28,7 +28,8 @@ class Admin::Companies::Base < Admin::Base
                                       :travel_request,
                                       :budgeting_system,
                                       :invoicing_system,
-                                      :vendor_empanelment_workflow
+                                      :vendor_empanelment_workflow,
+                                      :purchase_requisition_system
     ])
   end
 
