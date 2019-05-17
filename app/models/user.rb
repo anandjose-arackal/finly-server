@@ -813,9 +813,15 @@ class User < ApplicationRecord
   #   1
   # end
 
+  def password_expired?
+    return false if new_record?
+    expire_after = security_policy.password.expire_after
+    return false if expire_after.blank?
+    (password_changed_at || created_at) < expire_after.seconds.ago
+  end
+
   # Expires user if password is weak, old passwords and inactivity
   def verify_expiration!(password = nil)
-    return false
     return true if expired? and !otp_verified
 
     expired = false

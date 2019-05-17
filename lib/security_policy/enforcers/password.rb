@@ -23,4 +23,9 @@ class SecurityPolicy::Enforcers::Password < SecurityPolicy::Enforcers::Base
     SecurityPolicy::Config.config_for(user_role_names, :password, :mandate_lowercase).include?(true)
   end
 
+  def expire_after(options={})
+    SecurityPolicy::Config.config_for(user_role_names, :password, :expire_after).min
+
+  end
+
 end

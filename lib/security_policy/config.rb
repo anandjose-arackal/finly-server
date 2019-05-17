@@ -13,6 +13,7 @@ class SecurityPolicy::Config
           mandate_numbers: true,
           mandate_lowercase: true,
           mandate_uppercase: true,
+          expire_after: 90.days
       },
       account_lock: {
           max_attempts: 10,
@@ -34,6 +35,7 @@ class SecurityPolicy::Config
           mandate_numbers: true,
           mandate_lowercase: true,
           mandate_uppercase: true,
+          expire_after: 180.days
       },
       account_lock: {
           max_attempts: 20,
@@ -55,6 +57,7 @@ class SecurityPolicy::Config
           mandate_numbers: false,
           mandate_lowercase: false,
           mandate_uppercase: false,
+          expire_after: nil
       },
       account_lock: {
           max_attempts: 20,
