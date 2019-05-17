@@ -52,7 +52,7 @@ module Sequenced
       start_at = self.start_at.respond_to?(:call) ? self.start_at.call(record) : self.start_at
       return start_at unless (last_record = find_last_record)
 
-      last_sequence_value = last_record.send(column).scan(Constants::ENDING_NUMBERS).first&.to_i || 0
+      last_sequence_value = last_record.send(column).sub(@prefix, '').scan(Constants::ENDING_NUMBERS).first&.to_i || 0
       max(last_sequence_value + 1, start_at)
     end
 
