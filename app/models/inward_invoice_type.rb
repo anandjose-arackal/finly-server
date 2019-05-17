@@ -13,7 +13,7 @@ class InwardInvoiceType < ApplicationRecord
   include Seedable
 
   def self.values
-    [:tax_invoice, :advance, :non_po_invoice, :beneficiary, :proforma_invoice]
+    [:tax_invoice, :advance, :non_po_invoice, :beneficiary, :proforma_invoice, :general_invoice]
   end
 
   def tax_invoice?
@@ -34,6 +34,10 @@ class InwardInvoiceType < ApplicationRecord
 
   def proforma_invoice?
     self.id == InwardInvoiceType.id_for(:proforma_invoice)
+  end
+
+  def general_invoice
+    self.id == InwardInvoiceType.id_for(:general_invoice)
   end
 
 end
