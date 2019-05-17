@@ -7,12 +7,8 @@ class Categories::Import < Categories::Base
     end
   end
 
-  def user_model
-   [User, AdminUser]
-  end
-
   def init
-    self.company = Company.find_by_id params[:company_id].to_i
+    self.company = user.company
     self.file = params[:file]
     self.result_hash = {}
     if file.present?

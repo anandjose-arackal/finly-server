@@ -65,8 +65,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     #   end
     # end
 
-    if self.policy.blank?
-      add_message :error, 'Please select a policy.'
+    if self.policy.blank? && self.purchase_order.policy.blank?
+      add_message :error, 'Please select a policy'
     end
 
     if self.purchase_order_params[:delivery_date].blank?
