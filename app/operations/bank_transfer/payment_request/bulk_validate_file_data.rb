@@ -56,6 +56,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       business_name = item[:business_name] || item["business_name"]
       authorized = item[:authorized] || item["authorized"]
       amount = item[:original_amount]
+      advance_amount = item[:advance_amount]
       gst_type_id = item[:gst_type_id]
       inclusive_of_taxes = item[:inclusive_of_taxes]
       tax = item[:tax]
@@ -146,6 +147,21 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         self.issue_item[:original_amount] = 'Invalid amount'
       end
 
+      # Check if the advance amount is present and valid
+      unless advance_amount.blank? || validate_amount(advance_amount.to_s)
+        self.valid = false
+        self.error_messages << 'Invalid advance amount'
+        self.issue_item[:advance_amount] = 'Invalid advance amount'
+      end
+
+      if advance_amount.present? && validate_amount(advance_amount.to_s)
+        if advance_amount.to_f > amount.to_f
+          self.valid = false
+          self.error_messages << 'Advance amount is more than the original amount'
+          self.issue_item[:advance_amount] = 'Advance amount is more than the original amount'
+        end
+      end
+
       # check if the ifsc is present
       if ifsc.blank?
         self.valid = false
@@ -206,7 +222,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       if self.valid
-        payable_amount = calculate_tds(inclusive_of_taxes, amount, tds_slab_id, tax)
+        payable_amount = calculate_tds(inclusive_of_taxes, amount, advance_amount, tds_slab_id, tax)
         # self.requested_amount += amount.to_f
         self.requested_amount += payable_amount.to_f
       end
@@ -286,7 +302,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   #   true
   # end
 
-  def calculate_tds(inclusive_of_taxes, original_amount, tds_slab_id, tax)
+  def calculate_tds(inclusive_of_taxes, original_amount, advance_amount, tds_slab_id, tax)
     net_amount = 0
     if inclusive_of_taxes
 
@@ -297,7 +313,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
       tds_amount = gross_amount - new_gross_amount
 
-      net_amount = original_amount.to_i - tds_amount
+      net_amount = original_amount.to_i - tds_amount - advance_amount.to_i
 
     else 
 
@@ -309,7 +325,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       new_gross_amount = TaxCalculationUtils.tds_amount(original_amount.to_i, tds.to_i)
       tds_amount = original_amount.to_i - new_gross_amount
 
-      net_amount = original_amount.to_i + tax_amount - tds_amount
+      net_amount = original_amount.to_i + tax_amount - tds_amount - advance_amount.to_i
     end
   end
 
@@ -329,6 +345,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
         "Inclusive of Taxes? (Y/N)",
         "GST Type (1 - IGST ; 2 - CGST/SGST)",
         "Tax Rate",
+        "Advance Amount",
         "Discount Rate",
         "TDS Slab ID",
         "Category ID",

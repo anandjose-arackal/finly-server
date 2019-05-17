@@ -40,6 +40,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     self.payment_params = []
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
+      payment[:advance_amount] = (payment[:advance_amount].blank?) ? 0 : payment[:advance_amount]
       beneficiary_payment = retrieve_beneficiary_payment(payment, bank_account)
       payment[:date] = payment[:invoice_date] || payment[:date]
       payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
@@ -90,6 +91,10 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
               company_id: self.user.company_id,
               original_amount_attributes: {
                   value: payment[:original_amount],
+                  currency_id: 1
+              },
+              advance_amount_attributes: {
+                  value: payment[:advance_amount],
                   currency_id: 1
               }
           },
@@ -202,6 +207,10 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       tax: payment[:tax],
       original_amount_attributes: {
               value: payment[:original_amount],
+              currency_id: Currency.first.id
+      },
+      advance_amount_attributes: {
+              value: payment[:advance_amount],
               currency_id: Currency.first.id
       },
       invoice_number: payment[:invoice_number],
