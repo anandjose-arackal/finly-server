@@ -711,7 +711,22 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def self.role_based_initiator_associated_items(user, role_id, options={})
+    if role_id == UserRole.id_for(:invoice_initiator)
+      document_table_name = options[:document_table_name]
+      if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
+        document_table_name = 'inward_invoices'
+      end
+      document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
+    elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
+      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
+      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+    end
+  end
+
   private
+
+
 
   def set_defaults
     if self.invoice_status.blank?
