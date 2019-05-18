@@ -1,5 +1,6 @@
 class Vendors::Create < Vendors::Base
-  attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors
+  attr_accessor :vendor_parameters, :vendor, :account_owner_type, :similar_vendors,
+                :override_vendor_id
 
   class Vendors::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :vendor
@@ -21,6 +22,7 @@ class Vendors::Create < Vendors::Base
     # super()
     self.vendor_parameters = vendor_attributes
     self.similar_vendors = []
+    self.override_vendor_id = StringUtils.to_bool(vendor_parameters[:override_vendor_id])
     # setting account owner type as vendor
   end
 
@@ -129,9 +131,11 @@ class Vendors::Create < Vendors::Base
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank
-    vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
-      unless vtra[:tds_rates_list_id].present?
-        vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+    if vendor_parameters[:vendor_tds_rates_attributes].present?
+      vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
+        unless vtra[:tds_rates_list_id].present?
+          vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+        end
       end
     end
 
@@ -144,6 +148,12 @@ class Vendors::Create < Vendors::Base
 
     # adding the created by user for this particular vendor
     vendor_parameters[:created_by_id] = user.id
+
+    # here we will set the vendor_id based on the override_vendor_id flag from the frontend
+    unless self.override_vendor_id
+      self.vendor_parameters.delete(:vendor_id)
+    end
+    self.vendor_parameters.delete(:override_vendor_id)
   end
 
   def process

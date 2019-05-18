@@ -1,5 +1,4 @@
-class Procure::CommentsController < ApplicationController
-  before_action -> {finly_authorize! :web}
+class Procure::CommentsController < BaseControllers::WebBase
 
   def create
     @result = Procurements::Comments::Create.(current_user, params)

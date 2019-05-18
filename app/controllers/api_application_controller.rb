@@ -1,8 +1,7 @@
-class ApiApplicationController < ApplicationController
+class ApiApplicationController < BaseControllers::ApiBase
 
   before_action { block_foreign_hosts(WhitelistedIpType.id_for(:api)) if Rails.env.production? }
 
-  before_action -> { finly_authorize! :api }
   before_action :validate_user_admin
   before_action :append_params
 
@@ -10,9 +9,7 @@ class ApiApplicationController < ApplicationController
 
   protected
   def validate_user_admin
-    unless current_user&.company_admin?
-      head(401)
-    end
+    head(401) unless current_user&.company_admin?
   end
 
   def append_params

@@ -1,8 +1,6 @@
-class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationController
+class Api::Vp::BankTransfer::BankPaymentRequestsController < BaseControllers::ApiBase
 
   protect_from_forgery with: :null_session
-
-  before_action -> { finly_authorize! :api }
 
   def create
     params[:api_initiated] = true

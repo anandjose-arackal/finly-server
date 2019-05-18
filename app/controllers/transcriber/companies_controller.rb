@@ -1,7 +1,6 @@
-class Transcriber::CompaniesController < ApplicationController
+class Transcriber::CompaniesController < BaseControllers::AdminBase
 
 
-  before_action -> { finly_authorize! :admin}
   # before_action :transcriber_accounts
 
   def index

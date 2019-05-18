@@ -1,5 +1,4 @@
-class Procure::PaymentsController < ApplicationController
-  before_action -> {finly_authorize! :web}
+class Procure::PaymentsController < BaseControllers::WebBase
 
   def show
     @result = Procurements::Payments::Show.(current_user, params)

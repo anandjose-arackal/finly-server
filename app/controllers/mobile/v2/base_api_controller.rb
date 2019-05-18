@@ -1,4 +1,4 @@
-class Mobile::V2::BaseApiController < ApplicationController
+class Mobile::V2::BaseApiController < BaseControllers::MobileBase
   rescue_from NotAuthorizedException, with: :un_authorized
 
   def un_authorized

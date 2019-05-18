@@ -1,6 +1,5 @@
-class CardRestrictionsController < ApplicationController
+class CardRestrictionsController < BaseControllers::WebBase
   #
-  before_action -> { finly_authorize! :web}
 
   def create
 

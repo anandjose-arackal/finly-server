@@ -1,5 +1,4 @@
-class Procure::ProcurementsController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class Procure::ProcurementsController < BaseControllers::WebBase
 
   def index
     if params['filter_procurement_type'] == 'purchase_order'

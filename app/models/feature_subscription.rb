@@ -42,7 +42,7 @@ class FeatureSubscription < ApplicationRecord
   def d_code_enabled?
     if self.itz_cash_d_code_enabled || self.cards_enabled
       return true
-    elsif self.subscribable.itz_cash_property&.d_code&.present?
+    elsif self.subscribable&.itz_cash_property&.d_code&.present?
       return true
     end
     false

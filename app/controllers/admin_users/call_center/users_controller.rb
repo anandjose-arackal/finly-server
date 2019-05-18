@@ -1,6 +1,5 @@
-class AdminUsers::CallCenter::UsersController < ApplicationController
+class AdminUsers::CallCenter::UsersController < BaseControllers::AdminBase
 
-  before_action -> { finly_authorize! :admin}
 
   def search
     @result = Admin::CallCenter::Search.(current_user, params)

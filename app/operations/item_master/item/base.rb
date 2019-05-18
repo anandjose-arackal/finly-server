@@ -16,7 +16,7 @@ class ItemMaster::Item::Base < BaseOperation
   end
 
   def inventory_item_params
-    params.require(:inventory_item).permit(:rate, :unit_of_measurement, :tax_rate_id, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note, :item_code, :active, :account, :item_expense_type_id, :supply_item_type_id, :product_type_id, artifacts_attributes: [:id, :attachment, :_destroy])
+    params.require(:inventory_item).permit(:rate, :unit_of_measurement, :tax_rate_id, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note, :item_code, :active, :account, :item_expense_type_id, :supply_item_type_id, :product_type_id, :item_number, :override_item_number, artifacts_attributes: [:id, :attachment, :_destroy])
   end
 
   class ItemMaster::Item::Base::ItemPresenter < BaseOperation::BasePresenter::SuccessPresenter
