@@ -11,4 +11,10 @@ class PaymentAgreement < ApplicationRecord
 
   has_many :general_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:general_invoice))}, class_name: 'Invoice', dependent: :destroy
 
+  after_create :add_company, :add_user
+
+  def add_company
+    self.company_id = self.creator.id
+  end
+
 end

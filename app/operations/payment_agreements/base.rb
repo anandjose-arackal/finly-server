@@ -10,7 +10,7 @@ class PaymentAgreements::Base < BaseOperation
   end
 
   def payment_agreement_parameters
-    params.require(:payment_agreement).permit(:id )
+    params.require(:payment_agreement).permit(:id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :reject_note )
   end
 
 end
