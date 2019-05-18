@@ -142,6 +142,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     when 'BeneficiaryPayment'
       bp = BeneficiaryPayment.find_by(id: payment.parent_id)
       self.bp_params[:original_amount_attributes][:id] = bp.original_amount_id
+      self.bp_params[:advance_amount_attributes][:id] = bp.advance_amount_id
       bp.assign_attributes(self.bp_params)
       bp.calculate_tax_and_amount
       bp.save
@@ -211,6 +212,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     bp_payment[:inclusive_of_taxes] = self.payment_params[:invoice_attributes][:inclusive_of_taxes]
     bp_payment[:tax] = self.payment_params[:invoice_attributes][:tax]
     bp_payment[:original_amount_attributes] = self.payment_params[:invoice_attributes][:original_amount_attributes]
+    bp_payment[:advance_amount_attributes] = self.payment_params[:invoice_attributes][:advance_amount_attributes]
 
     self.bp_params = bp_payment
 

@@ -135,22 +135,22 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
 
   ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
-  aws_config = Rails.application.config_for(:aws_config)
-  config.paperclip_defaults = {
-      storage: :s3,
-      s3_region: aws_config["aws_region_name"],
-      s3_credentials: {
-          s3_host_name: aws_config["s3_host_name"],
-          bucket: aws_config["s3_attachment_bucket_name"],
-          s3_region: aws_config["aws_region_name"],
-          access_key_id: aws_config["aws_access_key_id"],
-          secret_access_key: aws_config["aws_secret_access_key"]
-      },
-      :s3_protocol => :https,
-      :s3_headers => {
-          :content_disposition => 'attachment'
-      }
-  }
+  # aws_config = Rails.application.config_for(:aws_config)
+  # config.paperclip_defaults = {
+  #     storage: :s3,
+  #     s3_region: aws_config["aws_region_name"],
+  #     s3_credentials: {
+  #         s3_host_name: aws_config["s3_host_name"],
+  #         bucket: aws_config["s3_attachment_bucket_name"],
+  #         s3_region: aws_config["aws_region_name"],
+  #         access_key_id: aws_config["aws_access_key_id"],
+  #         secret_access_key: aws_config["aws_secret_access_key"]
+  #     },
+  #     :s3_protocol => :https,
+  #     :s3_headers => {
+  #         :content_disposition => 'attachment'
+  #     }
+  # }
   #########################################################################################
 
 end
