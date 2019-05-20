@@ -111,6 +111,7 @@ class SecurityPolicy::Config
     roles.each do |role|
       values << ROLE_LEVELS[role]&.dig(*keys)
     end
+    values = values.reject {|value| value.blank?}
     values
   end
 

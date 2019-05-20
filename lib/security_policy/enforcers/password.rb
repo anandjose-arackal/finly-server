@@ -25,7 +25,6 @@ class SecurityPolicy::Enforcers::Password < SecurityPolicy::Enforcers::Base
 
   def expire_after(options={})
     SecurityPolicy::Config.config_for(user_role_names, :password, :expire_after).min
-
   end
 
 end

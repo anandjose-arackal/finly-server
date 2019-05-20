@@ -4,7 +4,7 @@ RSpec.describe 'UserAuthentication > Expiry' do
   before :all do
     @password = 'FW1g$18j0t!k19TJ'
     @company = create :company
-    @user = create :em_user, company: @company, last_activity_at: DateTime.now, password_changed_at: DateTime.now, otp_verified: true
+    @user = create :em_admin_user, company: @company, last_activity_at: DateTime.now, password_changed_at: DateTime.now, otp_verified: true
     @user.update(password: @password, password_confirmation: @password)
     @doorkeeper_application = create :doorkeeper_application
     @user_device_browser = create :user_device_browser
