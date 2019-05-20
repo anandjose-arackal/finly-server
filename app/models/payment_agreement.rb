@@ -16,4 +16,15 @@ class PaymentAgreement < ApplicationRecord
   accepts_nested_attributes_for :general_invoices, :attachments, allow_destroy: true
 
 
+  def as_json
+    {
+      id: self.id,
+      title: self.title,
+      policy: self.policy.name,
+      creator: self.creator.name,
+      status: self.status.name,
+      invoice_due_date: self.execution_date.to_date
+    }
+  end
+
 end
