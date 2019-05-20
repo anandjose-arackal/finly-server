@@ -38,3 +38,8 @@ json.reviewal_chains do
   end
 end
 json.reviewal_chain @result&.payment_agreement&.get_reviewal_chain
+
+
+json.payment_terms do
+  json.merge! @result.payment_terms.as_json
+end

@@ -74,4 +74,14 @@ class PaymentTerm < ApplicationRecord
   scope :filter_name, -> (name) {
     where("payment_terms.name LIKE ?", "%#{name}%")
   }
+
+  def as_json
+    {
+      id: self.id, 
+      name: self.name, 
+      days_after: self.days_after,
+      description: self.description,
+      default: self.default      
+    }
+  end
 end

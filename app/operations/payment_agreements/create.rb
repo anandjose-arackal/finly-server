@@ -6,18 +6,20 @@ class PaymentAgreements::Create < PaymentAgreements::Base
   end
 
   def validate
-    unless user.is_payment_agreement_initiator?
-      add_message :error, 'You do not have permission for this action'
-      return
-    end
+    # unless user.is_payment_agreement_initiator?
+    #   add_message :error, 'You do not have permission for this action'
+    #   return
+    # end
   end
 
   def process
     self.payment_agreement = PaymentAgreement.new(payment_agreement_params)
-    self.payment_agreement.creator_id = user.id
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
-
-    if self.payment_agreement.save
+    self.payment_agreement.creator_id = user.id
+    self.payment_agreement.company_id = user.company_id
+    if self.payment_agreement.save!
+      self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
+      self.payment_agreement.creator_id = user.id
       # Create document level reviewer mapping
       # For setting level specific reviewers from reviewal chain for a document
       params[:reviewal_document] = self.payment_agreement

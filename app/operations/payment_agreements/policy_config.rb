@@ -14,6 +14,7 @@ class PaymentAgreements::PolicyConfig < PaymentAgreements::Base
       self.departments = self.policy.departments&.leaves
       self.locations = self.policy.locations&.leaves
       self.policy_reviewal_chain = policy_reviewal_chain
+      self.payment_terms = user.company.payment_terms
     end
 
     def policy_reviewal_chain

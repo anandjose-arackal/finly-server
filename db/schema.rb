@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_17_101839) do
+ActiveRecord::Schema.define(version: 2019_05_18_113546) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3819,6 +3819,16 @@ ActiveRecord::Schema.define(version: 2019_05_17_101839) do
     t.boolean "has_mailer", null: false
     t.boolean "configurable_push_notification", null: false
     t.boolean "configurable_mailer", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "notify_users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "company_id"
+    t.integer "document_id"
+    t.string "document_type"
+    t.boolean "enabled"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

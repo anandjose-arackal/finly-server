@@ -157,6 +157,7 @@ class Invoice < ApplicationRecord
 
 
   has_many :trails, as: :parent
+  has_many :notify_users, as: :document
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
@@ -175,6 +176,7 @@ class Invoice < ApplicationRecord
   # accepts_nested_attributes_for :po_prev_adjusted_advance
   accepts_nested_attributes_for :po_adjusted_advance
   accepts_nested_attributes_for :proforma_advance
+  accepts_nested_attributes_for :notify_users, allow_destroy: true
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -420,6 +422,8 @@ class Invoice < ApplicationRecord
     where('extract(month from created_at) = ?', month)
   }
 
+
+  before_create :payment_agreement_updations
   after_create :set_defaults
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
@@ -712,6 +716,28 @@ class Invoice < ApplicationRecord
   end
 
   private
+
+  def payment_agreement_updations
+    parameters = RequestStore.store[:params]
+    # if parameters[:inward_invoice_type].present? && parameters[:inward_invoice_type] == 'general_invoice'
+      user = user.present? ? user : RequestStore.store[:current_user]
+      set_invoice_type
+      update_creator(user)
+      update_company(user)
+    # end
+  end
+
+  def set_invoice_type
+    self.invoice_type_id = InwardInvoiceType.id_for(:general_invoice)
+  end
+
+  def update_creator(user)
+    self.created_by_user_id = user.id
+  end
+
+  def update_company(user)
+    self.company_id = user.company_id
+  end
 
   def set_defaults
     if self.invoice_status.blank?
