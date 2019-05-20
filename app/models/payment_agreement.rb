@@ -20,10 +20,10 @@ class PaymentAgreement < ApplicationRecord
     {
       id: self.id,
       title: self.title,
-      policy: self.policy.name,
-      creator: self.creator.name,
-      status: self.status.name,
-      invoice_due_date: self.execution_date.to_date
+      policy: self.policy&.name,
+      created_by: self.creator&.name,
+      status: self.status&.name,
+      invoice_due_date: self.execution_date&.to_date
     }
   end
 
