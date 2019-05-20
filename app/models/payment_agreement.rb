@@ -16,6 +16,8 @@ class PaymentAgreement < ApplicationRecord
   accepts_nested_attributes_for :general_invoices, :attachments, allow_destroy: true
 
 
+  AGREEMENT_TYPES = {general_invoice: 'Invoice - General Invoice', rental_invoice: 'Invoice - Rental Invoice'}
+
   def as_json
     {
       id: self.id,

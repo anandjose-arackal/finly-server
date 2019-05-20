@@ -3498,9 +3498,10 @@ Rails.application.routes.draw do
 
   resources :payment_agreements do
     collection do
-      get 'edit_config', to: 'payment_agreements#edit_config', as: :edit_config
+      get 'document_config', to: 'payment_agreements#document_config', as: :document_config
       get 'count', to: 'payment_agreements#count'
       get 'policy_config', to: 'payment_agreements#policy_config'
+      get 'filter_config', to: 'payment_agreements#filter_config'
     end
   end
 

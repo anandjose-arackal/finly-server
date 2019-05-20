@@ -65,8 +65,8 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
-  def edit_config
-    @result = PaymentAgreements::EditConfig.(current_user, params)
+  def document_config
+    @result = PaymentAgreements::DocumentConfig.(current_user, params)
     respond
   end
 
@@ -83,6 +83,11 @@ class PaymentAgreementsController < BaseControllers::WebBase
 
   def policy_config
     @result = PaymentAgreements::PolicyConfig.(current_user, params)
+    respond
+  end
+
+  def filter_config
+    @result = PaymentAgreements::FilterConfig.(current_user, params)
     respond
   end
 
