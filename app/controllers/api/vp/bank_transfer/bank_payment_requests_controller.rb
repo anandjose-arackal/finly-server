@@ -2,6 +2,8 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < BaseControllers::Ap
 
   protect_from_forgery with: :null_session
 
+  before_action :decrypt_parameters
+
   def create
     params[:api_initiated] = true
     # reformat_params
