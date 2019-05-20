@@ -1,46 +1,46 @@
 class AddIndexToSystemMessages < ActiveRecord::Migration[5.2]
   def change
-    # add_index :system_messages, [:messagable_type, :messagable_id]
-    # add_index :system_messages, :message_type
-    # models = ApplicationRecord.descendants
-    # models.each do |model|
-    #   next unless model <= SoftDeletable
-    #   next if ActiveRecord::Base.connection.index_exists?(model.table_name, :deleted_at)
-    #   add_index model.table_name, :deleted_at
-    # end
-    # add_index :receipts, :created_at
-    # add_index :receipts, :parent_id
-    # add_index :payments, [ :reference_resource_type, :reference_resource_id], name: 'index_payments_on_reference_resource'
-    # add_index :payments, :created_at
-    # add_index :payments, :date
-    #
-    # add_index :bank_payment_requests, :created_at
-    # add_index :budget_trails, [:entity_type, :entity_id]
-    # add_index :expenses, :created_at
-    #
-    # add_index :bank_accounts, :created_at
-    # add_index :procurements, :procurement_type
-    # add_index :procurement_attachments, [:procurement_document_id, :procurement_document_type], name: "index_procurement_attachments_on_procurement_document"
-    # add_index :invoices, :controlling_level_id
-    #
-    # add_index :categories, :name
-    # add_index :categories, :active
-    #
-    # add_index :yes_bank_vendors, :vendor_id
-    # add_index :bank_transactions, :unique_request_number
-    #
-    # add_index :artifacts, :company_id
-    # add_index :artifacts, :creator_id
-    # add_index :artifacts, [:resource_id, :resource_type]
-    # add_index :attachments, :company_id
-    # add_index :attachments, :creator_id
-    # add_index :attachments, [:resource_id, :resource_type]
-    # add_index :bank_payment_requests, :company_id
-    # add_index :beneficiary_payments, :balance_due_id
-    # add_index :beneficiary_payments, :gross_amount_id
-    # add_index :beneficiary_payments, :net_amount_id
-    # add_index :beneficiary_payments, :tds_amount_id
-    # add_index :budget_modification_trails, :budget_modification_action_id, name: 'index_budget_modification_trails_on_action_id'
+    add_index :system_messages, [:messagable_type, :messagable_id]
+    add_index :system_messages, :message_type
+    models = ApplicationRecord.descendants
+    models.each do |model|
+      next unless model <= SoftDeletable
+      next if ActiveRecord::Base.connection.index_exists?(model.table_name, :deleted_at)
+      add_index model.table_name, :deleted_at
+    end
+    add_index :receipts, :created_at
+    add_index :receipts, :parent_id
+    add_index :payments, [ :reference_resource_type, :reference_resource_id], name: 'index_payments_on_reference_resource'
+    add_index :payments, :created_at
+    add_index :payments, :date
+
+    add_index :bank_payment_requests, :created_at
+    add_index :budget_trails, [:entity_type, :entity_id]
+    add_index :expenses, :created_at
+
+    add_index :bank_accounts, :created_at
+    add_index :procurements, :procurement_type
+    add_index :procurement_attachments, [:procurement_document_id, :procurement_document_type], name: "index_procurement_attachments_on_procurement_document"
+    add_index :invoices, :controlling_level_id
+
+    add_index :categories, :name
+    add_index :categories, :active
+
+    add_index :yes_bank_vendors, :vendor_id
+    add_index :bank_transactions, :unique_request_number
+
+    add_index :artifacts, :company_id
+    add_index :artifacts, :creator_id
+    add_index :artifacts, [:resource_id, :resource_type]
+    add_index :attachments, :company_id
+    add_index :attachments, :creator_id
+    add_index :attachments, [:resource_id, :resource_type]
+    add_index :bank_payment_requests, :company_id
+    add_index :beneficiary_payments, :balance_due_id
+    add_index :beneficiary_payments, :gross_amount_id
+    add_index :beneficiary_payments, :net_amount_id
+    add_index :beneficiary_payments, :tds_amount_id
+    add_index :budget_modification_trails, :budget_modification_action_id, name: 'index_budget_modification_trails_on_action_id'
     add_index :company_configurations, :default_card_expense_category_id
     add_index :company_kyc_trails, :action_id
     add_index :company_kyc_trails, [:action_resource_id, :action_resource_type], name: 'index_company_kyc_trails_on_action_resource'
