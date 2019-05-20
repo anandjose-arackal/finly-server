@@ -3502,6 +3502,7 @@ Rails.application.routes.draw do
       get 'count', to: 'payment_agreements#count'
       get 'policy_config', to: 'payment_agreements#policy_config'
       get 'filter_config', to: 'payment_agreements#filter_config'
+      get 'payment_agreement_action_config', to: 'payment_agreements#actions_configuration'
     end
   end
 

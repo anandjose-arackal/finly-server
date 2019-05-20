@@ -1,4 +1,4 @@
-class ActionsManager::Master::PaymentAgreements::Index < ActionsManager::Master::Base
+class ActionsManager::Master::PaymentAgreements::Show < ActionsManager::Master::Base
 
   register_handle :payment_agreement_show
   register_actions [ :edit_btn, :submit, :retract, :reject, :approve, :unapprove, :take_control, :return_control ]

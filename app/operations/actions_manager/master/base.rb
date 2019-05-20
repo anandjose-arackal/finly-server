@@ -34,7 +34,7 @@ class ActionsManager::Master::Base
     purchase_request_create: '::ActionsManager::Master::Procurements::PurchaseRequests::Create',
     purchase_request_index: '::ActionsManager::Master::Procurements::PurchaseRequests::Index',
     vendor_show: '::ActionsManager::Master::Vendors::Show',
-    vendors_index: '::ActionsManager::Master::Vendors::Index'
+    vendors_index: '::ActionsManager::Master::Vendors::Index',
     payment_agreement_index: '::ActionsManager::Master::PaymentAgreements::Index',
     payment_agreement_show: '::ActionsManager::Master::PaymentAgreements::Show'
 
