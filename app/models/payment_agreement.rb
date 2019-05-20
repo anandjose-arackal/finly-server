@@ -31,4 +31,7 @@ class PaymentAgreement < ApplicationRecord
     }
   end
 
+  def self.document_status_attribute
+    'status_id'
+  end
 end
