@@ -12,7 +12,7 @@ class PaymentAgreements::Count < PaymentAgreements::Base
   def process
     result  = ::PaymentAgreements::Index.(user, params)
     if result.success?
-      self.statuses = result.purchase_requests.joins(:status).group('purchase_request_statuses.name').count
+      self.statuses = result.payment_agreements.joins(:status).group('payment_agreement_statuses.name').count
     end
   end
 
