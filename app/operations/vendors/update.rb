@@ -30,9 +30,11 @@ class Vendors::Update < Vendors::Base
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank
-    vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
-      unless vtra[:tds_rates_list_id].present?
-        vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+    if vendor_parameters[:vendor_tds_rates_attributes].present?
+      vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
+        unless vtra[:tds_rates_list_id].present?
+          vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+        end
       end
     end
 

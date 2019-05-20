@@ -88,7 +88,7 @@ class Policy::ApprovalWorkflows::Configs::ImportReviewers < Policy::ApprovalWork
 
   def process_row(row)
     policy_name = row[import_fields[:policy_name]].to_s
-    user_email = row[import_fields[:user_email]].to_s
+    user_email = row[import_fields[:user_email]]
 
     params = {
         policy_name: policy_name,

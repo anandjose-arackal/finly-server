@@ -7,12 +7,8 @@ class PolicyUserRoles::Import < BaseOperation
     end
   end
 
-  def user_model
-   [User, AdminUser]
-  end
-
   def init
-    self.company = Company.find_by_id params[:company_id].to_i
+    self.company = user.company
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
@@ -42,7 +38,6 @@ class PolicyUserRoles::Import < BaseOperation
      end
 
      entity_user_id = clean_up_data policy_user_params[:user_id]
-     p  entity_user_id
      entity_user = company.users.where(mobile_number: entity_user_id).or(company.users.where(email: entity_user_id)).first
      unless entity_user.present?
        result_hash[i] = "User Not Found"
@@ -50,6 +45,7 @@ class PolicyUserRoles::Import < BaseOperation
      end
 
      policy_user_params[:roles].each do |k,v|
+     next if v != 'Y'
       role_id = user_roles.id_for(k)
       existing_mapping = policy.policy_user_roles.where(user_role_id: role_id, user_id: entity_user.id).first
       unless existing_mapping.present?
@@ -102,7 +98,7 @@ class PolicyUserRoles::Import < BaseOperation
         invoice_initiator: row[import_fields[:invoice_initiator]].to_s.upcase,
         invoice_reviewer: row[import_fields[:invoice_reviewer]].to_s.upcase,
         invoice_auditor: row[import_fields[:invoice_auditor]].to_s.upcase,
-        payment_ticket_initiator: row[import_fields[:payment_ticket_initiator]].to_s.upcase,
+        bank_payment_request_initiator: row[import_fields[:bank_payment_request_initiator]].to_s.upcase,
         payment_ticket_viewer: row[import_fields[:payment_ticket_viewer]].to_s.upcase,
         payment_ticket_creditor: row[import_fields[:payment_ticket_creditor]].to_s.upcase,
         payment_ticket_auditor: row[import_fields[:payment_ticket_auditor]].to_s.upcase,
@@ -129,7 +125,7 @@ class PolicyUserRoles::Import < BaseOperation
        :invoice_initiator => 9,
        :invoice_reviewer => 10,
        :invoice_auditor => 11,
-       :payment_ticket_initiator => 12,
+       :bank_payment_request_initiator => 12,
        :payment_ticket_viewer => 13,
        :payment_ticket_creditor => 14,
        :payment_ticket_auditor => 15,

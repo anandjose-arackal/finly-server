@@ -81,25 +81,27 @@ class AdminUsers::CompaniesController < BaseControllers::AdminBase
     if params[:'data-target'].present?
       case params[:'data-target']
       when 'locations'
-        @result = Company::Locations::Import.(current_user, params)
+        @result = Admin::Companies::Locations::Import.(current_user, params)
       when 'departments'
-        @result = Company::Departments::Import.(current_user,params)
+        @result = Admin::Companies::Departments::Import.(current_user,params)
       when 'categories'
-        @result = Categories::Import.(current_user,params)
+        @result = Admin::Companies::Categories::Import.(current_user,params)
       when 'cost-centers'
-        @result = CostCenters::Import.(current_user,params)
+        @result = Admin::Companies::CostCenters::Import.(current_user,params)
       when 'tds-slab'
-        @result = TdsSlabs::Import.(current_user,params)
+        @result = Admin::Companies::TdsSlabs::Import.(current_user,params)
       when 'vendors'
-        @result = Vendors::Import.(current_user,params)
+        @result = Admin::Companies::Vendors::Import .(current_user,params)
       when 'item-master'
-        @result =  ItemMaster::Item::Import.(current_user, params)
+        @result =  Admin::Companies::ItemMaster::Import .(current_user, params)
       when 'lrms'
         @result =  Policy::ApprovalWorkflows::Configs::ImportLevels.(current_user, params)
       when 'lurms'
         @result = Policy::ApprovalWorkflows::Configs::ImportReviewers.(current_user, params)
       when 'policy-roles'
-        @result =PolicyUserRoles::Import.(current_user, params)
+        @result = Admin::Companies::PolicyUserRoles::Import.(current_user, params)
+      when 'bank-accounts'
+        @result = Admin::Companies::BankAccounts::Import.(current_user, params)
       end
     end
 
