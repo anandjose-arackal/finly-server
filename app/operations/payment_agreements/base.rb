@@ -23,7 +23,8 @@ class PaymentAgreements::Base < BaseOperation
             :hsn_sac, :comment, :_destroy, :inventory_line_item_id
           ]
       ],
-
+      notify_users_attributes: [:id, :_destroy, :user_id]
+      
       )
   end
 
