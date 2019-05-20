@@ -4,3 +4,5 @@ json.policies do
     json.name policy.name
   end
 end
+
+json.payment_agreement_types @result.payment_agreement_types

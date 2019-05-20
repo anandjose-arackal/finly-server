@@ -4,12 +4,13 @@ class PaymentAgreements::DocumentConfig < PaymentAgreements::Base
 
   class PaymentAgreements::DocumentConfig::DocumentConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :policies, :payment_agreement
+    attr_accessor :policies, :payment_agreement, :payment_agreement_types
 
     def init
       self.payment_agreement = params[:payment_agreement]
       initiating_user = self.payment_agreement.present? ? payment_agreement.creator : user
       self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
+      self.payment_agreement_types = ::PaymentAgreement::AGREEMENT_TYPES
     end
   end
 
