@@ -19,6 +19,7 @@
 #  last_name                 :string(255)
 #  mobile_number             :string(255)      not null
 #  encrypted_master_password :string(255)
+#  authorized_ip             :string(255)
 #
 
 require 'bcrypt'
@@ -88,9 +89,7 @@ class AdminUser < ApplicationRecord
   end
 
   def name
-    return nil if first_name.blank? and last_name.blank?
-    name = first_name
-    "#{name} #{last_name}"
+    "#{first_name} #{last_name}"
   end
 
   def set_master_password(password)

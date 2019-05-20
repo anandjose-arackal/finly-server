@@ -57,7 +57,8 @@ json.invoice do
 
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
-  json.po_number invoice.procurement&.purchase_order&.po_number
+  # json.po_number invoice.procurement&.purchase_order&.po_number
+  json.po_number invoice.po_number
 
   json.po_advance invoice.po_advance
   json.po_prev_adjusted_advance invoice.po_prev_adjusted_advance
@@ -135,6 +136,7 @@ json.invoice do
 
       json.item_number item.inventory_line_item&.item_number rescue nil
       json.gl_code item.inventory_line_item&.item_code rescue nil
+      json.tds_applicable item.inventory_line_item&.tds_applicable
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
@@ -230,7 +232,8 @@ end
 
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
-    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address
+    json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
   end
 end
 

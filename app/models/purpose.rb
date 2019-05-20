@@ -16,7 +16,8 @@ class Purpose < ApplicationRecord
     [
         :expense_management, :vendor_payments, :invoice, :invoice_items, :outward_invoice,
         :outward_invoice_items, :collect, :travel_request, :report, :money_request, :procurement, :vendor,
-        :grn, :item_master, :rate_contract, :purchase_request
+        :grn, :item_master, :rate_contract, :purchase_request, :branch_location, :department, :cost_center,
+        :category, :purchase_order
     ]
   end
 

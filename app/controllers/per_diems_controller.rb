@@ -1,7 +1,6 @@
-class PerDiemsController < ApplicationController
+class PerDiemsController < BaseControllers::WebBase
 
 
-  before_action -> { finly_authorize! :web}
 
   def show
 

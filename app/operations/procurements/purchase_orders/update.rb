@@ -7,7 +7,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
                 :po_current_attachments, :document_reviewer_mappings_params, :document_number,
                 :vendor, :procurement, :bank_account, :original_purchase_order, :department, :skip_adv_calculation,
-                :gstin_location, :cost_allocation_items
+                :gstin_location, :cost_allocation_items, :policy
 
   def init
     self.purchase_order_params = purchase_order_parameters
@@ -38,12 +38,15 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
     # Check if department and cost center are to be saved globally for the po or individually for each item
     self.cost_allocation_items = StringUtils.to_bool(self.purchase_order_params[:cost_allocation_items])
+
+    self.policy = Policy::VendorPayments::Index.(current_user, params).policies.find_by(id: purchase_order_params[:policy_id])
   end
 
   def validate
     return if record_not_present
-    if purchase_order.sent_to_vendor?
-      add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+    if purchase_order.sent_to_vendor? || purchase_order.vendor_confirmed?
+      # add_message :error, "Cant update purchase order marked as 'sent to vendor'"
+      add_message :error, "Cant update purchase order marked as '#{purchase_order.status.name.humanize.downcase}'"
       return
     end
 
@@ -56,10 +59,19 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       return
     end
 
-    unless self.purchase_order_params[:policy_id].present?
-      if self.purchase_order.policy.blank?
-        add_message :error, 'Policy not found.'
-      end
+    # unless self.purchase_order_params[:policy_id].present?
+    #   if self.purchase_order.policy.blank?
+    #     add_message :error, 'Policy not found.'
+    #   end
+    # end
+
+    if self.policy.blank? && self.purchase_order.policy.blank?
+      add_message :error, 'Please select a policy'
+    end
+
+    if self.purchase_order_params[:delivery_date].blank?
+      add_message :error, "Please add an expected delivery date for the Purchase Order, i.e., when do you expect all added items to be delivered."
+      return
     end
 
     if self.purchase_order.quotations.present?
@@ -205,7 +217,32 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
 
-      # purchase_order.save
+      # Set validation of DLRMs
+      if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+        dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(user, {
+          reviewal_document: self.purchase_order,
+          document_reviewer_mappings_params: document_reviewer_mappings_params
+        })
+
+        unless dlrm_validation_op.success?
+          add_message :error, dlrm_validation_op.messages[:error]
+          return
+        end
+      end
+
+      # if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+      #   # For setting level specific reviewers from reviewal chain for a document
+      #   params[:reviewal_document] = self.purchase_order
+      #   params[:document_reviewer_mappings] = document_reviewer_mappings_params
+
+      #   document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      #   unless document_reviewer_mappings_op.success?
+      #     add_message :error, document_reviewer_mappings_op.messages[:error]
+      #     return
+      #   end
+      # end
+
+      purchase_order.save
       purchase_order.process_line_item_calculation(self.skip_adv_calculation)
       purchase_order.save
 
@@ -254,13 +291,13 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
       # Create track
 
-      if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
-        document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
-
-        if document_number_op.success?
-          self.purchase_order.update(po_number: document_number_op.document_number)
-        end
-      end
+      # if self.purchase_order.purchase_order_status_id == PurchaseOrderStatus.id_for(:open)
+      #   document_number_op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
+      #
+      #   if document_number_op.success?
+      #     self.purchase_order.update(po_number: document_number_op.document_number)
+      #   end
+      # end
 
       # AS OF NOW MULTIPLE ADVANCE PAYMENT CREATION CANCELLED
       # TO BE TAKEN UP LATER

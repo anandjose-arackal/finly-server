@@ -26,6 +26,8 @@
 #  deleted_at                   :datetime
 #  controlling_level_id         :integer
 #  approved_at                  :datetime
+#  company_id                   :integer
+#  max_payment_amount           :decimal(20, 5)
 #
 
 class BankPaymentRequest < ApplicationRecord
@@ -228,8 +230,8 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
 
   scope :processing, -> {where status_id: BankPaymentRequestStatus.id_for(:processing)}
 
-  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,:receiving_account,:initiating_user,{amount: :currency},
-  invoice:[ :invoice_items,:category, {custom_fields: :field_configuration}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
+  scope :includes_details, -> do includes(:level,:status, :owner, :policy,{requested_amount: :currency}, payment_order: [{amount_requested: :currency},payments:[:payment_status,:reference_resource,:system_messages,{receiving_account: :account_owner},:initiating_user,{amount: :currency},
+  invoice:[:invoice_attachments,:category, {invoice_items:[:category,:tax_rate,{amount: :currency},{net_amount: :currency},{tax_amount: :currency},{discount_amount: :currency}]}, {original_amount: :currency},{amount: :currency},{advance_amount: :currency}, {freight_amount: :currency},{net_amount: :currency},{gross_amount: :currency},{discount_amount: :currency},{tds_amount: :currency},{tax_amount: :currency}]]])
   end
 
   scope :include_attachments, -> {includes(payment_order: [:payment_order_attachments, payments: [invoice: [:invoice_attachments]]])}
@@ -265,8 +267,12 @@ scope :include_for_index, -> {includes(:level, :document_level_reviewer_mappings
   scope :filter_payment_ids, -> (payment_ids) {
     payment_ids = payment_ids.split(",").each {|e| e.strip!}
     all_payments = Payment.where(payment_order_id: self.pluck(:payment_order_id))
-    payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
-    where(payment_order_id: payment_order_ids)
+    if all_payments.where(id: payment_ids).any?
+      payment_order_ids = all_payments.where(id: payment_ids).pluck(:payment_order_id)
+      where(payment_order_id: payment_order_ids)
+    else
+      BankPaymentRequest.none
+    end
   }
 
   scope :filter_vendor_id, -> (vendor_id) {

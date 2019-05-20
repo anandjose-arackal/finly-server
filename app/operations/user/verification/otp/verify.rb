@@ -1,6 +1,15 @@
 class User::Verification::Otp::Verify < User::Verification::Otp::Base
 
-  attr_accessor :selected_user
+  attr_accessor :selected_user, :set_password_token
+
+  class User::Verification::Otp::Verify::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :set_password_token
+
+    def init
+      self.set_password_token = params[:set_password_token]
+    end
+
+  end
 
   def pre_validate
     if user.blank?
@@ -23,12 +32,13 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
 
   def validate
     if selected_user.otp_attempts >= 6
-      add_message :error, "You have reached the maximum number of attempts for OTP Verification. Please reset the OTP and try again"
+      selected_user.update(otp: nil)
+      add_message :error, 'You have reached the maximum number of attempts for OTP Verification. Please reset the OTP and try again'
       return
     end
 
     unless selected_user.otp == params[:verification_code]
-      add_message :error, "OTP entered does not match. Please enter the OTP sent to your mobile number"
+      add_message :error, 'Wrong OTP'
       selected_user.update_attribute(:otp_attempts, (selected_user.otp_attempts + 1))
       return
     end
@@ -43,6 +53,20 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
     # skipping validations because users from the mobile number invite flow won't have their details filled in yet
     selected_user.assign_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
     selected_user.save(validate: false)
+    RequestStoreUtil.current_session.verify(:otp)
+  end
+
+  def post_process
+    if selected_user.expired?
+      raw, enc = Devise.token_generator.generate(User, :reset_password_token)
+      self.set_password_token = raw
+      selected_user.update_attribute(:reset_password_token, enc)
+      selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
+    end
+  end
+
+  def success
+    User::Verification::Otp::Verify::SuccessPresenter.new(user, {set_password_token: self.set_password_token}, messages)
   end
 
 end

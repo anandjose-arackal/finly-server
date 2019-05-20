@@ -1,9 +1,8 @@
-class Api::Vp::BankTransfer::InventoryItemsController < ApplicationController
+class Api::Vp::BankTransfer::InventoryItemsController < BaseControllers::ApiBase
 
 
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :api }
 
 
   def index

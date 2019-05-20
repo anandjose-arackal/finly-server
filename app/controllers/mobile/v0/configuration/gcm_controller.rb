@@ -1,7 +1,6 @@
 class Mobile::V0::Configuration::GcmController <  Mobile::V0::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :mobile}
 
 
   def create

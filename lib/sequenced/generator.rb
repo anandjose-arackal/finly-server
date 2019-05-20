@@ -17,7 +17,7 @@ module Sequenced
       @sequenced_editable = options[:editable]
       @config = UniqueIdentifier.with_company_id(record.company_id).with_purpose_id(Purpose.id_for(options[:purpose]))&.first
       @start_at ||= @config&.sequence_start
-      @min_sequence_length = options[:min_length] || @config&.sequence_start&.length || 5
+      @min_sequence_length = @config&.sequence_start&.length || options[:min_length] || 5
       process_prefix
     end
 
@@ -52,7 +52,7 @@ module Sequenced
       start_at = self.start_at.respond_to?(:call) ? self.start_at.call(record) : self.start_at
       return start_at unless (last_record = find_last_record)
 
-      last_sequence_value = last_record.send(column).scan(Constants::ENDING_NUMBERS).first&.to_i || 0
+      last_sequence_value = last_record.send(column).sub(@prefix, '').scan(Constants::ENDING_NUMBERS).first&.to_i || 0
       max(last_sequence_value + 1, start_at)
     end
 
@@ -69,15 +69,17 @@ module Sequenced
     private
 
     def base_relation
+      raise 'Company ID cannot be null for generating sequence' if record.company_id.nil?
+
       record.class.base_class.unscoped.where(company_id: record.company_id)
     end
 
     def process_prefix
-      @prefix ||= @config&.prefix
+      @prefix = @config&.prefix || @prefix
       # If prefix is lambda
       @prefix = @prefix.call(@record) if @prefix&.respond_to?(:call)
 
-      @prefix = ExpressionEvaluator::Transformer.(@prefix) unless @prefix.blank?
+      @prefix = ExpressionEvaluator::Transformer.(@prefix, @record) unless @prefix.blank?
     end
 
     def find_last_record

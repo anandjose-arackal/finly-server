@@ -1,7 +1,6 @@
-class Invoicing::OutwardInvoicesController < ApplicationController
+class Invoicing::OutwardInvoicesController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:download]
-  before_action -> { finly_authorize! :web }
+  set_tokens_in_header :download
 
   def index
     @result = Invoicing::Invoice::Index.(current_user, params)

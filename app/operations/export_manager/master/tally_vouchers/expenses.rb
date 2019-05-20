@@ -1,11 +1,11 @@
-class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::BaseMaster
+class ExportManager::Master::TallyVouchers::Expenses < ExportManager::Master::BaseSubscriber
 
-  register_handle :tally_expense_voucher_xls
-  register_generator ExportManager::Generator::Spreadsheet
-  register_processor ExportManager::Processor::Synchronous
+  bus ExportManager::Master::BaseMaster
+  subscribe :tally_expense_voucher_xls
+  generators ExportManager::Generator::Spreadsheet
+  processor ExportManager::Processor::Synchronous
   validate :input
-  # Voucher type	Report name	Invoice date	Reference number	Employee Name	Expense Merchant	Expense Date	Expense Category Name	GL code	Expense Currency	Expense Amount	Department	Purpose
-  register_fields [
+  fields [
                       report_name: {spreadsheet: true},
                       reference_number: {spreadsheet: true},
                       employee_name: {spreadsheet: true},

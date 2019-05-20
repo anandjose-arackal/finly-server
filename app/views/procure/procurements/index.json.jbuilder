@@ -67,6 +67,50 @@ json.results do
       end
     end
 
+    po = p.po_revisions.last
+    if po.present?
+      json.purchase_order_id po.id
+      json.revision true
+      json.revision_for po.revised_po_id
+      json.revision_of po.revision_of_id
+      json.revision_number po.revision_number
+      json.po_number po.po_number
+      json.po_status po.status&.name
+      json.po_amount po.balance_amount
+      json.location po.delivery_location
+      json.po_bulk_actions do  
+      # json.can_approve po.can_approve?
+      json.can_approve po.can_really_approve?
+      # json.can_reject po.can_reject?
+      json.can_reject po.can_really_reject?
+      json.can_take_control po.can_take_control?
+      end
+
+      if po.items.present?
+        json.items do
+          json.array! po.items do |item|
+            json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :hsn_sac, :quantity,
+                          :rate, :tax, :tds, :discount, :delivery_date, :comment, :tax_rate_id
+            json.tax_amount do
+              json.value item.tax_amount&.value
+              json.id item.tax_amount&.id
+              json.currency_id item.tax_amount&.currency&.id
+            end
+            json.discount_amount do
+              json.value item.discount_amount&.value
+              json.id item.discount_amount&.id
+              json.currency_id item.discount_amount&.currency&.id
+            end
+            json.total_amount do
+              json.value item.total_amount&.value
+              json.id item.total_amount&.id
+              json.currency_id item.total_amount&.currency&.id
+            end
+          end
+        end
+      end
+    end
+
     invoice = p.invoices.last
     if invoice.present?
       json.invoice_bulk_actions do
@@ -90,7 +134,7 @@ json.results do
       json.invoice_advance invoice.proforma_advance&.value
     end
 
-    vendor = po.present? ? po.vendor : invoice&.vendor
+    vendor = p.purchase_order.present? ? p.purchase_order.vendor : invoice&.vendor
     if vendor.present?
       json.vendor vendor.as_json
     end
@@ -110,6 +154,7 @@ json.results do
       end
     end
 
+
     iwd = p.documents&.detect {|d| d.class.name == 'InwardDocument'}
 
     json.grn_delivery_date iwd&.delivery_date&.strftime("%d-%m-%Y") || nil
@@ -119,7 +164,7 @@ json.results do
       json.array! p.attached_documents do |attachment|
         json.extract! attachment, :id
         json.file_name attachment.file_file_name
-        json.url attachment.file.url
+        json.url attachment.file.url(:original)
       end
     end
   end

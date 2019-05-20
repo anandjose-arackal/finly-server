@@ -25,13 +25,13 @@ class Procurements::PurchaseRequests::BulkTakeControlProcessor < BackgroundOpera
         data_error[:messages] = op.messages[:error]
         data_error[:order_number] = pr&.order_number
         data_error[:department] = pr&.department&.name
-        data_error[:user] = pr&.user&.name
+        data_error[:user] = pr&.creator&.name
         data_error[:amount] = pr&.calculate_total_amount
         self.result[:error].push(data_error)
       else
         data_success[:order_number] = pr&.order_number
         data_success[:department] = pr&.department&.name
-        data_success[:user] = pr&.user&.name
+        data_success[:user] = pr&.creator&.name
         data_success[:amount] = pr&.calculate_total_amount
         self.result[:success].push(data_success)
       end

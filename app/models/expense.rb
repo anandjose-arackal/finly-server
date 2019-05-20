@@ -107,7 +107,7 @@ class Expense < ApplicationRecord
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
   validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', 'usage', 'none', nil]}
-  validates_presence_of :spent_from_id, message: 'Please select a Spend Account to create an expense', if: Proc.new { |exp| !exp.card_expense?}
+  validates_presence_of :spent_from_id, message: 'Please select a Spend Account to create an expense', if: Proc.new {|exp| !exp.card_expense?}
   validate :validate_usage_dates
   validate :no_future_date
   validate :valid_expense_type
@@ -333,9 +333,9 @@ class Expense < ApplicationRecord
                                                                       ExpenseType.id_for(:distance),
                                                                       ExpenseType.id_for(:time),
                                                                       ExpenseType.id_for(:per_diem)])}
-  
+
   scope :selected_expense_types, -> (expense_arrays) {where(expense_type_id: expense_arrays)} # handles multiple expense types for creating budget rules
-  
+
   scope :only_reimbursable_expenses, -> {where(reimbursable: true)}
   scope :spent_from_cash_on_hand, -> {
     where(from_cash_on_hand: true)
@@ -466,7 +466,7 @@ class Expense < ApplicationRecord
     distance_ids = DistanceExpense.where(id: self.only_distance_expenses.pluck(:id)).pluck(:id)
     per_diem_ids = PerDiemExpense.where(id: self.only_per_diem_expenses.pluck(:id)).pluck(:id)
     custom_fields = CustomField.where('(parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?)) OR (parent_type = ? AND parent_id IN (?))',
-                                       "ManualExpense", manual_ids, "CardExpense", card_ids, "TimeExpense", time_ids, "DistanceExpense", distance_ids, "PerDiemExpense", per_diem_ids)
+                                      "ManualExpense", manual_ids, "CardExpense", card_ids, "TimeExpense", time_ids, "DistanceExpense", distance_ids, "PerDiemExpense", per_diem_ids)
     relevant_field_drop_down_selection_ids = FieldDropDownSelection.where(id: custom_fields.where(value_type: "FieldDropDownSelection").pluck(:value_id), value_id: drop_down_id).pluck(:id)
     expense_data = custom_fields.where(value_type: "FieldDropDownSelection", value_id: relevant_field_drop_down_selection_ids).pluck(:parent_type, :parent_id)
 
@@ -478,15 +478,15 @@ class Expense < ApplicationRecord
     where(id: relevant_expense_ids)
   }
 
-  scope :include_spent_from_calculation, ->{ includes([{amount: [:currency]}], {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]})}
+  scope :include_spent_from_calculation, -> {includes([{amount: [:currency]}], {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]})}
 
   scope :include_details, -> {includes(
       [
           {amount: [:currency]}, :expense_status,
           :report,
           {user: [{policies: [
-          {vehicle_rates: [{rate: [:currency]},
-                           :distance_unit]}, :distance_expense_config]}]}, :expense_type, :category,
+              {vehicle_rates: [{rate: [:currency]},
+                               :distance_unit]}, :distance_expense_config]}]}, :expense_type, :category,
           {surcharge: [:currency]}, {tds_amount: [:currency]},
           {gst_amount: [:currency]}, :expense_tax_type, :gst_type, :tds_slab,
           {spent_from: [:user_pocket_type, {balance: [:currency]}, :base_currency]}, :receipts, :system_messages,
@@ -500,7 +500,7 @@ class Expense < ApplicationRecord
                               :distance_rate, :distance_unit]},
           {time_expense: [custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]]},
           {per_diem_expense: [{custom_fields: [{field_configuration: [:field_type, {drop_down_items: [dependent_field_configurations: [:drop_down_items]]}]}, :value]}, :per_diem]},
-          :payment
+          :payment, :system_messages, :duplicate_expenses
       ]
   )}
 
@@ -826,8 +826,8 @@ class Expense < ApplicationRecord
   end
 
   def partially_transcribed
-    if self.system_messages.errors.present?
-      return true
+    self.system_messages.each do |system_message|
+      return true if system_message.system_message_type_id == SystemMessageType.id_for(:error)
     end
     false
   end
@@ -1094,6 +1094,18 @@ class Expense < ApplicationRecord
     return false if reimbursable
     return false if card?
     true
+  end
+
+  def custom_fields_label_values
+    field_label_values = {}
+    if self.custom_fields.empty?
+      field_label_values = {}
+    else
+      self.custom_fields.each do |field|
+        field_label_values[field.field_configuration_id.to_s] = {value: field.string_value, label: field.field_configuration.field_name}
+      end
+    end
+    field_label_values
   end
 
   private

@@ -75,7 +75,7 @@ json.results do
     if po.present? || invoice.present?
       department = po&.department || invoice&.department
       cost_center = po&.cost_center || invoice&.cost_center
-      json.department department&.full_dept_name
+      json.department department&.full_name
       json.cost_center cost_center&.name
     end
 
@@ -86,12 +86,13 @@ json.results do
     end
 
     iwd = p.documents&.detect {|d| d.class.name == 'InwardDocument'}
+    po = p.documents&.detect {|d| d.class.name == 'PurchaseOrder'}
 
-    json.grn_delivery_date iwd&.delivery_date&.strftime("%d-%m-%Y") || nil
+    json.grn_delivery_date po&.delivery_date&.strftime("%d-%m-%Y") || nil
     json.grn_received_date iwd&.updated_at&.strftime("%d-%m-%Y") || nil
 
-    json.due_today iwd&.delivery_date == Date.today
-    json.overdue (iwd&.delivery_date.nil?) ? nil : iwd&.delivery_date < Date.today
+    json.due_today po&.delivery_date == Date.today
+    json.overdue (po&.delivery_date.nil?) ? nil : po&.delivery_date < Date.today
 
     json.attachments do
       json.array! p.attached_documents do |attachment|

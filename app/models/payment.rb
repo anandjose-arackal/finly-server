@@ -45,6 +45,7 @@
 #  department_id                  :integer
 #  location_id                    :integer
 #  deleted_at                     :datetime
+#  beneficiary_payment_id         :integer
 #
 
 class Payment < ApplicationRecord
@@ -627,7 +628,7 @@ class Payment < ApplicationRecord
       }
     }
   end
-      
+
       
       
 

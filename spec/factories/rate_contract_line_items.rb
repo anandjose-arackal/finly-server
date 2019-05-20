@@ -2,7 +2,7 @@
 #
 # Table name: rate_contract_line_items
 #
-#  id               :bigint(8)        not null, primary key
+#  id               :bigint           not null, primary key
 #  location_id      :integer
 #  item_id          :integer
 #  start_date       :datetime

@@ -1,2 +1,2 @@
-class RateContractLineItemsController < ApplicationController
+class RateContractLineItemsController < BaseControllers::WebBase
 end

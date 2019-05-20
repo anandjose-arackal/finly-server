@@ -40,6 +40,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
     self.payment_params = []
     self.payments_attributes.each do |payment|
       bank_account = retrieve_bank_account(payment)
+      payment[:advance_amount] = (payment[:advance_amount].blank?) ? 0 : payment[:advance_amount]
       beneficiary_payment = retrieve_beneficiary_payment(payment, bank_account)
       payment[:date] = payment[:invoice_date] || payment[:date]
       payment[:due_date] = payment[:invoice_due_date] || payment[:due_date]
@@ -91,6 +92,10 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
               original_amount_attributes: {
                   value: payment[:original_amount],
                   currency_id: 1
+              },
+              advance_amount_attributes: {
+                  value: payment[:advance_amount],
+                  currency_id: 1
               }
           },
           custom_fields: payment[:custom_fields]
@@ -109,8 +114,8 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       custom_fields = payment_param[:custom_fields]
       payment_param.delete(:custom_fields)
       payment_param[:payment_order_id] = self.bank_payment_request.payment_order.id
-      # payment = ::Payment.new(payment_param)
-      payment = self.bank_payment_request.payment_order.payments.build(payment_param)
+      payment = ::Payment.new(payment_param)
+      # payment = self.bank_payment_request.payment_order.payments.build(payment_param)
       if payment.save
         # perform the required calculations
         beneficiary_payment = self.beneficiary_payments.find(payment_param[:beneficiary_payment_id])
@@ -146,7 +151,7 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       return ba
     else
       ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
-                                           company_id: self.company_id, name: order_details[:name]&.strip,
+                                           company_id: self.company_id, # name: order_details[:name]&.strip, because account number and IFSC are the only criteria against which we company
                                            account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
       business_name = order_details[:business_name] || order_details[:name]
       vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id, business_name: business_name)
@@ -202,6 +207,10 @@ class BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground < BackgroundOp
       tax: payment[:tax],
       original_amount_attributes: {
               value: payment[:original_amount],
+              currency_id: Currency.first.id
+      },
+      advance_amount_attributes: {
+              value: payment[:advance_amount],
               currency_id: Currency.first.id
       },
       invoice_number: payment[:invoice_number],

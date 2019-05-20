@@ -19,11 +19,18 @@
 #  contact_mobile_number :string(255)
 #  is_deleted            :boolean          default(FALSE), not null
 #  deleted_at            :datetime
+#  location_code         :string(255)
+#  ancestry              :string(255)
+#  nature_of_office      :string(255)
+#  billable_location     :boolean          default(TRUE)
+#  shippable_location    :boolean          default(TRUE)
 #
 
 class BranchLocation < ApplicationRecord
   include SoftDeletable, AncestrySupport
+  include Sequenced::ActsAsSequenced
 
+  acts_as_sequenced column: :location_code, purpose: :branch_location, editable: false, prefix: 'LOC'
   has_ancestry
 
   belongs_to :company, optional: true
@@ -40,6 +47,7 @@ class BranchLocation < ApplicationRecord
   has_many :budget_rules, through: :budget_rule_branch_location_mappings
 
   scope :with_ids, -> (ids) { where id: ids }
+  scope :include_state, -> { includes :state }
 
   def address
     address = ""
@@ -81,14 +89,27 @@ class BranchLocation < ApplicationRecord
   def as_json2
     {
       id: self.id,
-      name: location_name,
+      name: full_name,
     }
   end
 
   def as_json(options={})
-    args = { id: self.id, name: self.name, gstin: self.gstin, pan: self.pan, address_1: self.address_1, address_2: self.address_2, city: self.city, country: self.country, pin: self.pin, address: self.address, location_code: self.location_code, state_code: self.state&.code, billable: self.billable_location, shippable: self.shippable_location }
-    args[:name] = options&.dig(:tree) ? location_name : name
-    args
+    {
+        id: self.id,
+        name: self.full_name,
+        gstin: self.gstin,
+        pan: self.pan,
+        address_1: self.address_1,
+        address_2: self.address_2,
+        city: self.city,
+        country: self.country,
+        pin: self.pin,
+        address: self.address,
+        location_code: self.location_code,
+        state_code: self.state&.code,
+        billable: self.billable_location,
+        shippable: self.shippable_location
+    }
   end
 
   def location_name

@@ -30,36 +30,41 @@ class Vendors::Update < Vendors::Base
     end
 
     # Remove tds from vendor params if tds_rates_list_id is blank
-    vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
-      unless vtra[:tds_rates_list_id].present?
-        vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+    if vendor_parameters[:vendor_tds_rates_attributes].present?
+      vendor_parameters[:vendor_tds_rates_attributes].each_with_index do |vtra, index|
+        unless vtra[:tds_rates_list_id].present?
+          vendor_parameters[:vendor_tds_rates_attributes].delete_at(index)
+        end
       end
     end
 
-    unless vendor_parameters[:pan].present?
-      add_message :error, "Please provide PAN to proceed"
-      return
-    else
-      validate_attachment(vendor_parameters, :pan)
-    end
+    if user.company_id == 156
 
-    # Remove Empty gstin locations
-    vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
-      unless gst.keys.present?
-        vendor_parameters[:gstin_locations_attributes].delete_at(index)
+      unless vendor_parameters[:pan].present?
+        add_message :error, "Please provide PAN to proceed"
+        return
+      else
+        validate_attachment(vendor_parameters, :pan)
       end
-    end
+
+      # Remove Empty gstin locations
+      vendor_parameters[:gstin_locations_attributes].each_with_index do |gst, index|
+        unless gst.keys.present?
+          vendor_parameters[:gstin_locations_attributes].delete_at(index)
+        end
+      end
 
 
-    if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
-      validate_attachment(vendor_parameters, :msme_certificate)
-    end
+      if vendor_parameters[:msme_registered].present? && (vendor_parameters[:msme_registered] == 1 || vendor_parameters[:msme_registered] == '1')
+        validate_attachment(vendor_parameters, :msme_certificate)
+      end
 
-    if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
-      validate_attachment(vendor_parameters, :gstin)
-      validate_gstin(vendor_parameters)
-      # validate_business_name(vendor_parameters)
-      # validate_pan(vendor_parameters)
+      if vendor_parameters[:gst_registered].present? && (vendor_parameters[:gst_registered] == 1 || vendor_parameters[:gst_registered] == '1')
+        validate_attachment(vendor_parameters, :gstin)
+        validate_gstin(vendor_parameters)
+        # validate_business_name(vendor_parameters)
+        # validate_pan(vendor_parameters)
+      end
     end
   end
 
@@ -67,9 +72,16 @@ class Vendors::Update < Vendors::Base
     # here if the account number being added already exists, update the particular record and
     # don't create a new account
     vendor_parameters[:bank_accounts_attributes]&.each_with_index do |bank_account, index|
-      ba = BankAccount.find_by(account_number: bank_account[:account_number])
+      # ba = BankAccount.find_by(account_number: bank_account[:account_number], account_owner_type)
+      ba = user.company.bank_accounts.find_by(account_number: bank_account[:account_number], account_owner_type: "YesBankVendor")
       if ba.present?
-        vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
+        existing_vendor = ba.account_owner
+        next if existing_vendor.id == self.vendor.id
+        if existing_vendor.authorized
+          add_message :error, "Bank account number #{ba.account_number} already belongs to vendor - #{existing_vendor.business_name} - #{existing_vendor.vendor_id}"
+          break
+        end          
+        # vendor_parameters[:bank_accounts_attributes][index][:id] = ba.id
       end
     end
 
@@ -97,6 +109,8 @@ class Vendors::Update < Vendors::Base
     if self.vendor_parameters&.dig(:vendor_attachments_attributes)
 
     end
+
+    self.vendor_parameters.delete(:override_vendor_id)
   end
 
   def process

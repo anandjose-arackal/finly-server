@@ -104,7 +104,7 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
       if (purchase_request.awaiting_approval? && purchase_request.get_reviewers.exclude?(user))
         return true
       end
-      if purchase_request.awaiting_approval? && !purchase_request.action_users(:return_control).include?(user) && purchase_request.action_users(:approve).include?(user)
+      if purchase_request.awaiting_approval? && !purchase_request.action_users(:return_control).include?(user) && !purchase_request.action_users(:approve).include?(user)
         return true
       end
     end
@@ -199,5 +199,8 @@ class ActionsManager::Master::Procurements::PurchaseRequests::Show < ActionsMana
     purchase_request.dlrms&.find_by(level_id: purchase_request.level&.id).taken_control_by_id == user.id
   end
 
+  def delete_pr
+    purchase_request.open? || purchase_request.retracted? || purchase_request.rejected?
+  end
 
 end

@@ -2,73 +2,86 @@
 #
 # Table name: invoices
 #
-#  id                           :integer          not null, primary key
-#  address_id                   :integer
-#  date                         :date
-#  due_date                     :date
-#  invoice_number               :text(65535)
-#  tax_type_id                  :integer
-#  discount                     :decimal(64, 12)
-#  discount_type_id             :integer
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  gross_amount_id              :integer
-#  net_amount_id                :integer
-#  inclusive_of_taxes           :boolean
-#  amount_id                    :integer
-#  tds                          :decimal(64, 12)
-#  tds_type_id                  :integer
-#  gst_type_id                  :integer
-#  payment_id                   :integer
-#  discount_amount_id           :integer
-#  tds_amount_id                :integer
-#  tax_amount_id                :integer
-#  tax                          :decimal(64, 12)
-#  category_id                  :integer
-#  original_amount_id           :integer
-#  advance_amount_id            :integer
-#  advance_type_id              :integer
-#  advance                      :decimal(20, 10)
-#  freight_amount_id            :integer
-#  freight_type_id              :integer
-#  freight                      :decimal(20, 10)
-#  roundoff_amount              :decimal(20, 10)
-#  balance_due_id               :integer
-#  taxable_amount_id            :integer
-#  cost_center_id               :integer
-#  tds_slab_id                  :integer
-#  invoice_status_id            :integer
-#  company_id                   :integer
-#  created_by_user_id           :integer
-#  paid_amount_id               :integer
-#  vendor_id                    :integer
-#  receiving_account_id         :integer
-#  receiving_account_type       :string(255)
-#  note                         :text(65535)
-#  procurement_id               :integer
-#  remaining_amount_id          :integer
-#  invoice_type_id              :integer
-#  location_id                  :integer
-#  delivery_location_id         :integer
-#  payment_term_id              :integer
-#  department_id                :integer
-#  sub_department_id            :integer
-#  policy_id                    :integer
-#  controlling_level_id         :integer
-#  controlling_user_id          :integer
-#  controlling_user_role_id     :integer
-#  controlling_for_user_id      :integer
-#  controlling_for_user_role_id :integer
-#  billing_address              :text(65535)
-#  shipping_address             :text(65535)
-#  is_template                  :boolean          default(FALSE)
-#  template_name                :string(255)
-#  is_deleted                   :boolean          default(FALSE)
-#  resource_template_id         :integer
-#  invoice_id                   :string(255)
-#  deleted_at                   :datetime
-#  submitted_at                 :datetime
-#  approved_at                  :datetime
+#  id                              :integer          not null, primary key
+#  address_id                      :integer
+#  date                            :date
+#  due_date                        :date
+#  invoice_number                  :text(65535)
+#  tax_type_id                     :integer
+#  discount                        :decimal(64, 12)
+#  discount_type_id                :integer
+#  created_at                      :datetime         not null
+#  updated_at                      :datetime         not null
+#  gross_amount_id                 :integer
+#  net_amount_id                   :integer
+#  inclusive_of_taxes              :boolean
+#  amount_id                       :integer
+#  tds                             :decimal(64, 12)
+#  tds_type_id                     :integer
+#  gst_type_id                     :integer
+#  payment_id                      :integer
+#  discount_amount_id              :integer
+#  tds_amount_id                   :integer
+#  tax_amount_id                   :integer
+#  tax                             :decimal(64, 12)
+#  category_id                     :integer
+#  original_amount_id              :integer
+#  advance_amount_id               :integer
+#  advance_type_id                 :integer
+#  advance                         :decimal(20, 10)
+#  freight_amount_id               :integer
+#  freight_type_id                 :integer
+#  freight                         :decimal(20, 10)
+#  roundoff_amount                 :decimal(20, 10)
+#  balance_due_id                  :integer
+#  taxable_amount_id               :integer
+#  cost_center_id                  :integer
+#  tds_slab_id                     :integer
+#  invoice_status_id               :integer
+#  company_id                      :integer
+#  created_by_user_id              :integer
+#  paid_amount_id                  :integer
+#  vendor_id                       :integer
+#  receiving_account_id            :integer
+#  receiving_account_type          :string(255)
+#  note                            :text(65535)
+#  procurement_id                  :integer
+#  remaining_amount_id             :integer
+#  invoice_type_id                 :integer
+#  location_id                     :integer
+#  delivery_location_id            :integer
+#  payment_term_id                 :integer
+#  department_id                   :integer
+#  sub_department_id               :integer
+#  policy_id                       :integer
+#  controlling_level_id            :integer
+#  controlling_user_id             :integer
+#  controlling_user_role_id        :integer
+#  controlling_for_user_id         :integer
+#  controlling_for_user_role_id    :integer
+#  billing_address                 :text(65535)
+#  shipping_address                :text(65535)
+#  is_template                     :boolean          default(FALSE)
+#  template_name                   :string(255)
+#  is_deleted                      :boolean          default(FALSE)
+#  resource_template_id            :integer
+#  invoice_id                      :string(255)
+#  deleted_at                      :datetime
+#  submitted_at                    :datetime
+#  approved_at                     :datetime
+#  po_adjusted_advance             :integer
+#  po_advance                      :integer
+#  po_prev_adjusted_advance        :integer
+#  advance_amount_required         :boolean          default(FALSE)
+#  gstin_location_id               :bigint
+#  transaction_service_period_from :date
+#  transaction_service_period_to   :date
+#  proforma_invoice_id             :integer
+#  proforma_advance                :integer
+#  total_proforma_advance          :decimal(20, 2)
+#  cost_allocation_items           :boolean          default(FALSE)
+#  narration                       :text(65535)
+#  po_number                       :string(255)
 #
 
 class Invoice < ApplicationRecord
@@ -76,7 +89,7 @@ class Invoice < ApplicationRecord
 
   include Sequenced::ActsAsSequenced
 
-  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV/'
+  acts_as_sequenced column: :invoice_id, purpose: :invoice, editable: false, prefix: 'INV'
 
   belongs_to :address, optional: true
   belongs_to :amount, optional: true
@@ -508,12 +521,14 @@ class Invoice < ApplicationRecord
   end
 
   def awaiting_action(user)
-    awaiting_action = false
-    if self.level&.reviewers&.include? user
-      awaiting_action = true
-      return awaiting_action
-    end
-    awaiting_action
+    # awaiting_action = false
+    # if self.level&.reviewers&.include? user
+    #   awaiting_action = true
+    #   return awaiting_action
+    # end
+    # awaiting_action
+    return false if user.blank?
+    self.get_reviewers.include? user
   end
 
   # this method updates the invoice status based on the associated
@@ -690,7 +705,28 @@ class Invoice < ApplicationRecord
     (processing? rescue false) && user.vendor_payment_admin? && (self.dlrms&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)
   end
 
+  def validate_if_auditor(user)
+    if self.policy.present? && self.policy.policy_user_roles.present?
+      self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:invoice_auditor), user_id: user.id).present? rescue false
+    end
+  end
+
+  def self.role_based_initiator_associated_items(user, role_id, options={})
+    if role_id == UserRole.id_for(:invoice_initiator)
+      document_table_name = options[:document_table_name]
+      if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
+        document_table_name = 'inward_invoices'
+      end
+      document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
+    elsif role_id == UserRole.id_for(:bank_payment_request_initiator)
+      policy_ids = PolicyUserRole.where(user_id: user.id, user_role_id: role_id).pluck(:policy_id)
+      user.company.inward_invoices.where(policy_id: policy_ids, invoice_status_id: finance_associated_status_ids)
+    end
+  end
+
   private
+
+
 
   def set_defaults
     if self.invoice_status.blank?

@@ -1,4 +1,4 @@
-class BankTransfer::UsersController < ApplicationController
+class BankTransfer::UsersController < BaseControllers::WebBase
 
   def index
     @result = BankTransfer::Users::Index.(current_user, params)
@@ -12,6 +12,11 @@ class BankTransfer::UsersController < ApplicationController
 
   def show
     @result = BankTransfer::Users::Show.(current_user, params)
+    respond
+  end
+
+  def policies
+    @result = BankTransfer::Users::Policies.(current_user, params)
     respond
   end
 
@@ -32,6 +37,11 @@ class BankTransfer::UsersController < ApplicationController
 
   def actions_configuration
     @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
+  def invite_config
+    @result = BankTransfer::Users::InviteConfig.(current_user, params)
     respond
   end
 

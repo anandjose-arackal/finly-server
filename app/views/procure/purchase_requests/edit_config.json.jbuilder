@@ -1,8 +1,10 @@
 json.locations do
-  json.array!(@result.locations) do |location|
-    json.merge! location.as_json(tree: true)
-    # json.id location.id
-    # json.name location.name
+  if @result.locations.present?
+    json.array!(@result.locations.include_state) do |location|
+      json.merge! location.as_json(tree: true)
+      # json.id location.id
+      # json.name location.name
+    end
   end
 end
 

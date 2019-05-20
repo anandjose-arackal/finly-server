@@ -79,6 +79,7 @@ class FinlyTransaction < ApplicationRecord
                                                                                         :vendor_payment,
                                                                                         :balance_clearance_outside_finly, :balance_clearance])}
   scope :include_for_export, -> {includes([:transaction_type, :payment_purpose, :amount, :closing_balance, :status,
+                                           {payment: [:original_payment_for_refund]},
                                            {transaction_detail: [:amount, :closing_balance, :opening_balance]},
                                            :associated_transaction, :system_messages])}
 

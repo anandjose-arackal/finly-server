@@ -1,6 +1,5 @@
-class FieldConfigurationController < ApplicationController
+class FieldConfigurationController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def index
     @result = FieldCustomization::Show.(current_user, params)
