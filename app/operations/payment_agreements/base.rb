@@ -12,9 +12,9 @@ class PaymentAgreements::Base < BaseOperation
   def payment_agreement_parameters
     params.require(:payment_agreement).permit(
 
-      :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :reject_note, :company_id, 
+      :id, :title, :policy_id, :agreement_date, :execution_date, :expiration_date, :renewal_date, :note, :no_expiration, :reject_note, 
 
-      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :invoice_status_id, :company_id, 
+      general_invoices_attributes: [:id, :_destroy, :department_id, :location_id, :cost_center_id, :payment_term_id, :auto_pay, :billing_type_id, :note, :invoice_status_id, 
 
         invoice_items_attributes: [
             :quantity, :unit_of_measurement, :department_id,

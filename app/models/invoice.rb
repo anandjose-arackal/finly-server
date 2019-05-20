@@ -423,8 +423,10 @@ class Invoice < ApplicationRecord
   }
 
 
-  before_create :payment_agreement_updations
-  after_create :set_defaults
+  # before_create :payment_agreement_updations
+  before_validation :update_company, :payment_agreement_updations
+  before_save :update_company
+  after_create :set_defaults, :set_invoice_type
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
@@ -719,12 +721,11 @@ class Invoice < ApplicationRecord
 
   def payment_agreement_updations
     parameters = RequestStore.store[:params]
-    # if parameters[:inward_invoice_type].present? && parameters[:inward_invoice_type] == 'general_invoice'
+    if parameters.dig(:payment_agreement, :general_invoices_attributes).present?
       user = user.present? ? user : RequestStore.store[:current_user]
-      set_invoice_type
       update_creator(user)
-      update_company(user)
-    # end
+      # update_company(user)
+    end
   end
 
   def set_invoice_type
@@ -735,8 +736,11 @@ class Invoice < ApplicationRecord
     self.created_by_user_id = user.id
   end
 
-  def update_company(user)
-    self.company_id = user.company_id
+  def update_company(user=nil)
+    user = user.present? ? user : RequestStore.store[:current_user]
+    if self.company_id.blank?
+      self.company_id = user.company_id
+    end
   end
 
   def set_defaults
