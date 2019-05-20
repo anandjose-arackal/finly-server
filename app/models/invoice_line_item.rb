@@ -101,6 +101,10 @@ class InvoiceLineItem < ApplicationRecord
     return true if self.parent_type != 'OutwardInvoice'
   end
 
+  def tds_applicable?
+    self.inventory_line_item.tds_applicable?
+  end
+
   private
 
   def budget_trail_entry

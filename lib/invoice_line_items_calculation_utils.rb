@@ -5,7 +5,7 @@ class InvoiceLineItemsCalculationUtils
 
   attr_accessor :invoice_item_amount, :payment_amount, :after_discount_amount,
                 :gross_amount, :net_amount, :invoice, :item_taxable_amount, :taxable_amount,
-                :discount_amount, :tax_amount, :after_tax_amount,
+                :discount_amount, :tax_amount, :after_tax_amount, :tds_applicable_amount,
                 :invoice_total, :roundoff_amount, :total_discount, :total_tax, :payment_amount
 
   # this method should take the invoice, payment object and the params object and
@@ -15,7 +15,7 @@ class InvoiceLineItemsCalculationUtils
     if invoice.blank?
       return
     end
-    self.invoice_total = self.total_discount = self.total_tax = self.taxable_amount = 0
+    self.invoice_total = self.total_discount = self.total_tax = self.taxable_amount = self.tds_applicable_amount = 0
     invoice.invoice_items.each_with_index do |item, index|
       self.item_taxable_amount = 0
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
@@ -25,6 +25,10 @@ class InvoiceLineItemsCalculationUtils
         calculate_discount_inclusive(item)
         calculate_inclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
+        # if the item is TDS deductible, add it to the tax applicable amount
+        if item.tds_applicable?
+          self.tds_applicable_amount += self.gross_amount
+        end
         # self.invoice_item_amount = self.gross_amount + self.discount_amount
         self.net_amount = self.invoice_item_amount - self.discount_amount
       else # calculate proactively
@@ -38,6 +42,9 @@ class InvoiceLineItemsCalculationUtils
       self.total_discount += self.discount_amount
       self.total_tax += self.tax_amount
       self.taxable_amount += self.item_taxable_amount
+      if item.tds_applicable?
+        self.tds_applicable_amount += self.item_taxable_amount
+      end
       # assign the respective calculated parameters to the payment params
       # invoice line item raw amount
       if item.amount.present?
@@ -102,7 +109,7 @@ class InvoiceLineItemsCalculationUtils
     end
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
-    InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, payment, invoice, payment_amount)
+    InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, self.tds_applicable_amount, payment, invoice, payment_amount)
     params
   end
 

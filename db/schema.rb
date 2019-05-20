@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_16_100732) do
+ActiveRecord::Schema.define(version: 2019_05_18_115532) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3321,6 +3321,7 @@ ActiveRecord::Schema.define(version: 2019_05_16_100732) do
     t.integer "user_id"
     t.boolean "active", default: true
     t.integer "item_expense_type_id"
+    t.boolean "tds_applicable", default: true
     t.index ["active"], name: "index_items_on_active"
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id"], name: "index_items_on_company_id"
