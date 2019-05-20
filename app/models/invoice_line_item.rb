@@ -102,7 +102,7 @@ class InvoiceLineItem < ApplicationRecord
   end
 
   def tds_applicable?
-    self.inventory_line_item.tds_applicable?
+    self.inventory_line_item&.tds_applicable?
   end
 
   private
