@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_18_113546) do
+ActiveRecord::Schema.define(version: 2019_05_20_071739) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -773,6 +773,13 @@ ActiveRecord::Schema.define(version: 2019_05_18_113546) do
     t.index ["transaction_amount_id"], name: "index_bill_of_supplies_on_transaction_amount_id"
     t.index ["user_id"], name: "index_bill_of_supplies_on_user_id"
     t.index ["vendor_id"], name: "index_bill_of_supplies_on_vendor_id"
+  end
+
+  create_table "billing_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.integer "company_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "booking_attachments", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
