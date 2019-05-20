@@ -28,7 +28,7 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
   def input
     op = ::Budgets::Show.(user, params)
     unless op.success?
-      add_message :error, result.messages[:error]
+      add_message :error, op.messages[:error]
       return
     end
     budget = op.budget
