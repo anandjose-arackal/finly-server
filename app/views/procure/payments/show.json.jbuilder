@@ -113,6 +113,8 @@ if payment.invoice.present?
         json.total_amount precision_value item.net_amount&.value
         json.hsn_sac item.hsn_sac
         json.taxable_amount precision_value item.taxable_amount&.value
+
+        json.tds_applicable item.inventory_line_item&.tds_applicable
       end
     end
   end
