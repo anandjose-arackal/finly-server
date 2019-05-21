@@ -27,4 +27,11 @@ class GstinLocation < ApplicationRecord
   validates :state_id, presence: true
 
   # belongs_to :location, class_name: "BranchLocation", optional: true
+
+  def as_json
+    {
+      id: self.id,
+      location: self.location
+    }
+  end
 end

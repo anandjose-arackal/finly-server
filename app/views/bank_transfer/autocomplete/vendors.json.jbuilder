@@ -39,4 +39,6 @@ if @result.account_owner.is_a?(YesBankVendor)
 
 end
 
+json.vendor_locations @result.account_owner.gstin_locations.as_json
+
 # json.actions @result.actions

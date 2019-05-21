@@ -9,8 +9,8 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
           {procure: [:po_initiator, :po_awaiting_approval, :po_team, :po_company, :pr_approved_items]},
           {receive: [:receive_pending, :receive_history]},
           {payables: [:po_advances, :po_invoices, :non_po_invoices, :payment_tickets]},
-          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts]},
-          {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request]}
+          {manage: [:manage_vendors, :manage_item_master, :manage_rate_contracts, :manage_payment_agreements]},
+          {create: [:create_purchase_order, :create_non_po_invoice, :create_payment_ticket, :create_purchase_request, :create_payment_agreement]}
       ]
   )
   register_structure(
@@ -119,6 +119,10 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
     {name: 'Rate Contracts', id: 'manage', url: 'catalogue/params={"tabName": "rate_contract"}'}
   end
 
+  def manage_payment_agreements
+    {name: 'Agreements', id: 'manage', url: 'agreements/params={"tabName": "agreements"}'}
+  end
+
   def create
     {name: 'Create', id: 'create', url: 'create'}
   end
@@ -145,6 +149,10 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
   def create_purchase_request
     return nil unless user.is_purchase_request_initiator? || user.vendor_payments_admin?
     {name: 'New Purchase Request', id: 'create', url: 'purchase_request/params={}'}
+  end
+
+  def create_payment_agreement
+    {name: 'New Agreements', id: 'create', url: 'agreements/params={}'}
   end
 
   def attachments
