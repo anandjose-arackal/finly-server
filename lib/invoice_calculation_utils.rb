@@ -102,6 +102,7 @@ class InvoiceCalculationUtils
       # the original amount entered
       calculate_discount_inclusive
       calculate_inclusive_taxes
+      self.tds_applicable_amount = self.gross_amount
       calculate_tds
       self.net_amount = self.after_discount_amount - self.tds_amount
       self.invoice_amount = self.original_amount # todo - gotta check the ramifications of this
@@ -111,6 +112,7 @@ class InvoiceCalculationUtils
       self.invoice_amount = self.invoice.original_amount&.value
       calculate_discount_exclusive
       calculate_exclusive_taxes
+      self.tds_applicable_amount = self.gross_amount
       calculate_tds
       self.net_amount = (self.gross_amount + self.tax_amount - self.tds_amount) rescue 0
       self.invoice_amount = self.invoice.original_amount&.value
