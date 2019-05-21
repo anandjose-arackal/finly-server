@@ -129,7 +129,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	    # Delegate payment creation to the background operation
       # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-			::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
 	end
 
