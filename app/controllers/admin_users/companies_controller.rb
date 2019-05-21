@@ -100,6 +100,8 @@ class AdminUsers::CompaniesController < BaseControllers::AdminBase
         @result = Policy::ApprovalWorkflows::Configs::ImportReviewers.(current_user, params)
       when 'policy-roles'
         @result = Admin::Companies::PolicyUserRoles::Import.(current_user, params)
+      when 'bank-accounts'
+        @result = Admin::Companies::BankAccounts::Import.(current_user, params)
       end
     end
 
