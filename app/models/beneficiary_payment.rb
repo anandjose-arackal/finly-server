@@ -73,6 +73,9 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
 
+  belongs_to :location, optional: true, class_name: "BranchLocation"
+  belongs_to :vendor_location, optional: true, class_name: "GstinLocation"
+
   belongs_to :company, optional: true
   belongs_to :gst_type, optional: true
   belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
