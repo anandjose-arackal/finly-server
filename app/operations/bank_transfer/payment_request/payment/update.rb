@@ -217,6 +217,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     bp_payment[:tax] = self.payment_params[:invoice_attributes][:tax]
     bp_payment[:original_amount_attributes] = self.payment_params[:invoice_attributes][:original_amount_attributes]
     bp_payment[:advance_amount_attributes] = self.payment_params[:invoice_attributes][:advance_amount_attributes]
+    bp_payment[:roundoff_amount] = self.payment_params[:invoice_attributes][:roundoff_amount]
 
     self.bp_params = bp_payment
 
