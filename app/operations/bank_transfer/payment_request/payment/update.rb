@@ -184,20 +184,24 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def calculate_tax_and_discounts
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      # InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
     end
     return
   end
 
   def recalculate_totals
     if payment.invoice.invoice_items.present?
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      # InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
     end
     self.payment.save
   end
