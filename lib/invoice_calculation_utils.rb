@@ -76,7 +76,8 @@ class InvoiceCalculationUtils
 
     # now calculating the final amount to be paid
     # assigning the final amount to the payment
-    self.payment_amount = payment_amount || self.balance_due_amount
+    # self.payment_amount = payment_amount || self.balance_due_amount
+    self.payment_amount = self.balance_due_amount
     if payment.present?
       if payment.amount.present?
         payment.amount.value = self.payment_amount
@@ -182,7 +183,8 @@ class InvoiceCalculationUtils
     end
 
     # adding the payment amount to the params if  the object is present
-    self.payment_amount = payment_amount || self.balance_due_amount
+    # self.payment_amount = payment_amount || self.balance_due_amount
+    self.payment_amount = self.balance_due_amount
 
     if payment.present?
       if payment.amount.present?
