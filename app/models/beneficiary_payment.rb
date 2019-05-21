@@ -181,9 +181,9 @@ class BeneficiaryPayment < ApplicationRecord
 
     self.roundoff_amount = self.roundoff_amount.to_f # even if it's nil, it gets converted to 0
     if self.roundoff_amount != 0
-      balance_due_amount = precision_value (net_amount + self.roundoff_amount), 0
+      balance_due_amount = precision_value (net_amount + self.roundoff_amount)
     else
-      balance_due_amount = precision_value net_amount, 0
+      balance_due_amount = precision_value net_amount
     end
 
     # assign the respective calculated amounts to the payment and invoice object
