@@ -13,6 +13,8 @@ json.departments do
   end
 end
 
+json.cost_centers @result.cost_centers.as_json
+
 json.reviewal_chains do
   json.array! @result.policy_reviewal_chain do |chain|
     json.policy_id chain[:policy_id]

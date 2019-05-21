@@ -4,7 +4,7 @@ class PaymentAgreements::PolicyConfig < PaymentAgreements::Base
 
   class PaymentAgreements::PolicyConfig::PolicyConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :departments, :policies, :reviewal_chains, :payment_agreement, :cost_centers, :department_mappings, :location_mappings, :policy, :policy_reviewal_chain, :payment_terms
+    attr_accessor :locations, :departments, :policies, :reviewal_chains, :payment_agreement, :cost_centers, :department_mappings, :location_mappings, :policy, :policy_reviewal_chain, :payment_terms, :cost_centers
 
     def init
       self.policy = params[:policy]
@@ -15,6 +15,7 @@ class PaymentAgreements::PolicyConfig < PaymentAgreements::Base
       self.locations = self.policy.locations&.leaves
       self.policy_reviewal_chain = policy_reviewal_chain
       self.payment_terms = user.company.payment_terms
+      self.cost_centers = self.policy.cost_centers
     end
 
     def policy_reviewal_chain
