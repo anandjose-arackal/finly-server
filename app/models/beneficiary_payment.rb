@@ -66,7 +66,7 @@ class BeneficiaryPayment < ApplicationRecord
   include MathUtil
   
   belongs_to :vendor,  class_name: 'YesBankVendor'
-  belongs_to :bank_account
+  belongs_to :bank_account, optional: true
   belongs_to :category, optional: true
   belongs_to :cost_center, optional: true
 
@@ -77,9 +77,9 @@ class BeneficiaryPayment < ApplicationRecord
   belongs_to :gst_type, optional: true
   belongs_to :tds_slab, optional: true, class_name: 'TdsRatesList'
 
-  belongs_to :status, class_name: 'BeneficiaryPaymentStatus'
+  belongs_to :status, optional: true, class_name: 'BeneficiaryPaymentStatus'
 
-  belongs_to :original_amount, class_name: "Amount"
+  belongs_to :original_amount, optional: true, class_name: "Amount"
   belongs_to :tax_amount, optional: true, class_name: "Amount"
   belongs_to :payable_amount, optional: true, class_name: "Amount"
   belongs_to :balance_due, optional: true, class_name: "Amount"
