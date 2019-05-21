@@ -721,7 +721,7 @@ class Invoice < ApplicationRecord
 
   def payment_agreement_updations
     parameters = RequestStore.store[:params]
-    if parameters.dig(:payment_agreement, :general_invoices_attributes).present?
+    if parameters.present? && parameters.dig(:payment_agreement, :general_invoices_attributes).present?
       user = user.present? ? user : RequestStore.store[:current_user]
       update_creator(user)
       # update_company(user)
