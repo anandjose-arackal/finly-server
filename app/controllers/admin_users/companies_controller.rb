@@ -1,7 +1,7 @@
 class AdminUsers::CompaniesController < BaseControllers::AdminBase
 
   # todo - temporary
-
+  set_tokens_in_header :export_data_configuration
 
   def new
     @states = State.all
@@ -124,6 +124,21 @@ class AdminUsers::CompaniesController < BaseControllers::AdminBase
       end
     else
       respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def export_data_configuration
+    if params[:'source'].present?
+      case params[:'source']
+      when 'locations'
+        @result = Admin::Companies::Locations::Exports::AsXml.(current_user, params)
+      when 'departments'
+        @result = Admin::Companies::Departments::Exports::AsXml.(current_user, params)
+      end
+      @header = @result.header
+       @data = @result.data
+    else
+
     end
   end
 
