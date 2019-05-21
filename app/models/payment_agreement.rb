@@ -17,7 +17,7 @@ class PaymentAgreement < ApplicationRecord
   accepts_nested_attributes_for :general_invoices, :notify_users, :attachments, allow_destroy: true
 
 
-  AGREEMENT_TYPES = {general_invoice: 'Invoice - General Invoice', rental_invoice: 'Invoice - Rental Invoice', beneficiary_payment: 'Payment - Beneficiary Payment', security_deposit: 'Payment - Security Deposit'}
+  AGREEMENT_TYPES = [{general_invoice: 'Invoice - General Invoice', rental_invoice: 'Invoice - Rental Invoice', beneficiary_payment: 'Payment - Beneficiary Payment', security_deposit: 'Payment - Security Deposit'}]
 
   def as_json
     {
