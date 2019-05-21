@@ -22,6 +22,7 @@ class PaymentAgreement < ApplicationRecord
   def as_json
     {
       id: self.id,
+      order_number: self.order_number,
       title: self.title,
       policy: self.policy&.name,
       created_by: self.creator&.name,
