@@ -54,6 +54,7 @@ class Company < ApplicationRecord
   has_many :invoice_attachments
   has_many :export_configs
   has_many :unique_identifiers
+  has_one :enforce_policy, as: :enforceable, dependent: :destroy
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail
@@ -415,6 +416,10 @@ class Company < ApplicationRecord
     departments.each do |department|
 
     end
+  end
+
+  def enforce_policy_enabled?
+    self.enforce_policy.enabled
   end
 
   private

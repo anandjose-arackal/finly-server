@@ -1,8 +1,9 @@
 class Procurements::PurchaseRequests::PurchaseRequestItems::BulkRejectProcessor < BackgroundOperation
-  attr_accessor :purchase_request_item_ids, :result, :purchase_request_item
+  attr_accessor :purchase_request_item_ids, :result, :purchase_request_item, :reject_note
 
   def init
     self.purchase_request_item_ids = params[:purchase_request_item_ids]
+    self.reject_note = params[:reject_note]
     self.result = {
         success: [],
         error: []
@@ -23,13 +24,14 @@ class Procurements::PurchaseRequests::PurchaseRequestItems::BulkRejectProcessor 
       self.purchase_request_item = PurchaseRequestItem.find_by id: id
       self.purchase_request_item.status_id = PurchaseRequestItemStatus.id_for(:rejected)
       self.purchase_request_item.rejected = true
+      self.purchase_request_item.reject_note = self.reject_note 
       unless purchase_request_item.save
         data_error[:messages] = op.messages[:error]
         data_error[:purchase_request_item_id] = purchase_request_item&.id
         self.result[:error].push(data_error)
         # If any line item fails, the status remains approved or auto_approved
         # Use that status to rollback
-        PurchaseRequestItem.where(id: purchase_request_item_ids).update_all(status_id: purchase_request_item.status_id, rejected: false)
+        PurchaseRequestItem.where(id: purchase_request_item_ids).update_all(status_id: purchase_request_item.status_id, rejected: false, reject_note: nil)
         break
       else
         data_success[:purchase_request_item_id] = purchase_request_item&.id

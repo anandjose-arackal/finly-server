@@ -2794,6 +2794,7 @@ Rails.application.routes.draw do
     resources :policy_user_roles
     get 'department_mapping', to: 'policies#department_mapping'
     get 'location_mapping', to: 'policies#location_mapping'
+    get 'cost_center_mapping', to: 'policies#cost_center_mapping'
   end
 
   resources :user_permissions do
@@ -2826,6 +2827,8 @@ Rails.application.routes.draw do
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/departments' => 'organization_account#departments'
   get 'organization_account/all_expense_types' => 'organization_account#all_expense_types'
+  get 'organization_account/configuration_index' => 'organization_account#configuration_index'
+  put 'organization_account/configuration_update' => 'organization_account#configuration_update'
 
 
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'

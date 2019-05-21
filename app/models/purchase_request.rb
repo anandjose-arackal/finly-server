@@ -192,12 +192,14 @@ class PurchaseRequest < ApplicationRecord
 
   def reject_purchase_request_items(options={}, user)
     rejected_item_ids = options[:rejected_purchase_request_items]
+    rejection_note = options[:reject_note]
     # Filter rejected ids
     filtered_rejected_item_ids = user.company.purchase_requests.joins(:purchase_request_items).where("purchase_request_items.id IN (?)", rejected_item_ids).pluck('purchase_request_items.id')
     # rejected_items = PurchaseRequestItem.with_ids(filtered_rejected_item_ids).update_all(rejected: true, status_id: PurchaseRequestItemStatus.id_for(:rejected)) unless filtered_rejected_item_ids.blank?
     PurchaseRequestItem.with_ids(filtered_rejected_item_ids).each do |item|
       item.rejected = true
       item.status_id = PurchaseRequestItemStatus.id_for(:rejected)
+      item.reject_note = rejection_note 
       unless item.save && PurchaseRequest.create_status_change_trail(item, user, action_id=TrailAction.id_for(:reject))
         return false
       end
