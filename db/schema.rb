@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_20_072426) do
+ActiveRecord::Schema.define(version: 2019_05_21_093549) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -705,6 +705,8 @@ ActiveRecord::Schema.define(version: 2019_05_20_072426) do
     t.text "invoice_number"
     t.date "invoice_date"
     t.date "invoice_due_date"
+    t.integer "payment_agreement_id"
+    t.string "note"
     t.index ["balance_due_id"], name: "index_beneficiary_payments_on_balance_due_id"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
     t.index ["category_id"], name: "index_beneficiary_payments_on_category_id"
