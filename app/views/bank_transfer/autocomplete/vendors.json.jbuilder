@@ -39,6 +39,8 @@ if @result.account_owner.is_a?(YesBankVendor)
 
 end
 if @result.account_owner.is_a?(YesBankVendor)
-  json.vendor_locations @result.account_owner.gstin_locations.as_json
+  json.vendor_locations do
+    json.merge! @result.account_owner.gstin_locations.as_json
+  end
 end
 # json.actions @result.actions
