@@ -73,6 +73,9 @@ class BankPaymentRequest < ApplicationRecord
       where(owner_id: user_ids)
     end
   }
+  scope :filter_payment_ticket_id, -> (id) {
+    where(id: id)
+  }
 
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
   scope :with_id, -> (id) {where id: id}

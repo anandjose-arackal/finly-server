@@ -157,12 +157,15 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     has_scope :filter_scheduled_date, using: [:from, :to], type: :hash
     has_scope :filter_controlling_user
     has_scope :filter_payment_ids
+    has_scope :filter_payment_ticket_id
     has_scope :filter_vendor_id
     has_scope :filter_month
     has_scope :filter_year
 
+
     def init
       self.payment_requests = params[:payment_requests]
+      set_scopes
       self.payment_requests = apply_scopes(payment_requests)
       per_page = params[:per_page] || 30
       page = params[:page] || 1
@@ -178,6 +181,18 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       # end
       self.paginated_payment_requests = self.payment_requests.paginate(page: page, per_page: per_page) rescue ::BankPaymentRequest.none
       self.paginated_payment_requests = self.paginated_payment_requests.include_for_index
+    end
+
+    def set_scopes
+      if params[:search_type].present? && params[:search_query].present?
+        if params[:search_type] == "filter_payment_ticket_id"
+          params[:filter_payment_ticket_id] = params[:search_query]
+        end
+
+        if params[:search_type] == "filter_payment_ids"
+          params[:filter_payment_ids] = params[:search_query]
+        end
+      end
     end
 
     def status_count
