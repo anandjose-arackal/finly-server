@@ -30,9 +30,9 @@ class RateContract < ApplicationRecord
   has_many :rate_contract_line_items, dependent: :destroy
   has_many :artifacts, as: :resource, dependent: :destroy
 
-  before_save :add_company
+  before_validation :add_company
 
-  validates :renewal_alert_period, :renewal_alert_number, presence: true
+  # validates :renewal_alert_period, :renewal_alert_number, presence: true
   validates :vendor, presence: true
 
   accepts_nested_attributes_for :rate_contract_line_items, allow_destroy: true
