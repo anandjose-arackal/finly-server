@@ -31,7 +31,9 @@ class GstinLocation < ApplicationRecord
   def as_json
     {
       id: self.id,
-      location: self.location
+      location: self.location,
+      gstin: self.gstin,
+      address: self.address
     }
   end
 end
