@@ -21,4 +21,10 @@ end
 
 json.payment_agreement_types @result.payment_agreement_types
 
+json.payment_terms do
+  json.merge! @result.payment_terms.as_json
+end
 
+json.billing_types do
+  json.merge! @result.billing_types.as_json
+end

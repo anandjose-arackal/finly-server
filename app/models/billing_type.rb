@@ -13,4 +13,11 @@ class BillingType < ApplicationRecord
     def one_time?
       self.id == BillingType.id_for(:one_time)
     end
+
+    def as_json
+      {
+        id: self.id,
+        name: self.name
+      }
+    end
 end
