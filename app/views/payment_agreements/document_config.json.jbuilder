@@ -5,4 +5,20 @@ json.policies do
   end
 end
 
+json.tax_rates do
+  json.array! @result.tax_rates do |tax_rate|
+    json.merge! tax_rate.as_json
+  end
+end
+
+json.tds_slabs do
+  json.array!(current_company.tds_slabs) do |tds_slab|
+    json.id tds_slab.id
+    json.name "#{tds_slab.tds}% - #{tds_slab.name} "
+    json.tds tds_slab.tds
+  end
+end
+
 json.payment_agreement_types @result.payment_agreement_types
+
+
