@@ -1,4 +1,4 @@
-class Admin::Companies::ItemMaster::Import < ItemMaster::Item::Import
+class Admin::Companies::ItemMasters::Import < ItemMaster::Item::Import
   attr_accessor :file_url, :file, :result_hash, :params, :missing_params, :sheet, :header, :item_params, :company,:item_expense_types,:supply_item_types
 
   def pre_validate
