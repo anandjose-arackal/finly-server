@@ -17,7 +17,7 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
     self.payment_agreement.creator_id = user.id
     self.payment_agreement.company_id = user.company_id
-    if self.payment_agreement.save!
+    if self.payment_agreement.save
       self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
       self.payment_agreement.creator_id = user.id
       # Create document level reviewer mapping
