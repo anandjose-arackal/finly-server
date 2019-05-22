@@ -307,25 +307,25 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     if inclusive_of_taxes
 
       # calculate_inclusive_taxes
-      gross_amount = TaxCalculationUtils.inclusive_tax_amount(original_amount.to_i, (tax.to_i))
+      gross_amount = TaxCalculationUtils.inclusive_tax_amount(original_amount.to_f, (tax.to_i))
       # calculate_tds
       tds = TdsRatesList.find(tds_slab_id).tds rescue 0
       new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
       tds_amount = gross_amount - new_gross_amount
 
-      net_amount = original_amount.to_i - tds_amount - advance_amount.to_i
+      net_amount = original_amount.to_f - tds_amount - advance_amount.to_f
 
     else 
 
       # calculate_exclusive_taxes
-      net_amount = TaxCalculationUtils.exclusive_tax_amount(original_amount.to_i, (tax.to_i))
-      tax_amount = net_amount - original_amount.to_i
+      net_amount = TaxCalculationUtils.exclusive_tax_amount(original_amount.to_f, (tax.to_i))
+      tax_amount = net_amount - original_amount.to_f
       # calculate_tds
       tds = TdsRatesList.find(tds_slab_id).tds rescue 0
-      new_gross_amount = TaxCalculationUtils.tds_amount(original_amount.to_i, tds.to_i)
-      tds_amount = original_amount.to_i - new_gross_amount
+      new_gross_amount = TaxCalculationUtils.tds_amount(original_amount.to_f, tds.to_i)
+      tds_amount = original_amount.to_f - new_gross_amount
 
-      net_amount = original_amount.to_i + tax_amount - tds_amount - advance_amount.to_i
+      net_amount = original_amount.to_f + tax_amount - tds_amount - advance_amount.to_f
     end
   end
 
