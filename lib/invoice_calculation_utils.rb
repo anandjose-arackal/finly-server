@@ -26,9 +26,9 @@ class InvoiceCalculationUtils
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
 
     if self.roundoff_amount != 0
-      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount), 0
+      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
     else
-      self.balance_due_amount = precision_value self.net_amount, 0
+      self.balance_due_amount = precision_value self.net_amount
     end
 
     # If po invoice has po advance, then adjust the balance due
@@ -76,7 +76,8 @@ class InvoiceCalculationUtils
 
     # now calculating the final amount to be paid
     # assigning the final amount to the payment
-    self.payment_amount = payment_amount || self.balance_due_amount
+    # self.payment_amount = payment_amount || self.balance_due_amount
+    self.payment_amount = self.balance_due_amount
     if payment.present?
       if payment.amount.present?
         payment.amount.value = self.payment_amount
@@ -120,9 +121,9 @@ class InvoiceCalculationUtils
     end
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
     if self.roundoff_amount != 0
-      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount), 0
+      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
     else
-      self.balance_due_amount = precision_value self.net_amount, 0
+      self.balance_due_amount = precision_value self.net_amount
     end
 
     # assign the respective calculated amounts to the payment and invoice object
@@ -184,7 +185,8 @@ class InvoiceCalculationUtils
     end
 
     # adding the payment amount to the params if  the object is present
-    self.payment_amount = payment_amount || self.balance_due_amount
+    # self.payment_amount = payment_amount || self.balance_due_amount
+    self.payment_amount = self.balance_due_amount
 
     if payment.present?
       if payment.amount.present?
