@@ -2,7 +2,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
   attr_accessor :purchase_orders
 
   def init
-    self.purchase_orders = Procurements::PurchaseOrders::Index.(user, params).purchase_orders
+    self.purchase_orders = Procurements::PurchaseOrders::Index.(user, params).purchase_orders.exclude_revision_of_po
   end
 
   def success
