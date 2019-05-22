@@ -1,0 +1,17 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:rev="http://www.kotak.com/schemas/CMS_Generic/Reversal_Request.xsd">
+   <soap:Header/>
+   <soap:Body>
+      <rev:Reversal>
+         <rev:Header>
+            <rev:Req_Id>{{REQUEST_ID}}</rev:Req_Id><!-- Duplicate Message Id check. -->
+            <rev:Msg_Src>{{MESSAGE_SOURCE}}</rev:Msg_Src> <!-- Initials of Entity eg. FINLY -->
+            <rev:Client_Code>{{CLIENT_CODE}}</rev:Client_Code><!-- Client Code should be a valid client in application -->
+            <rev:Date_Post>{{DATE}}</rev:Date_Post><!-- 2017-09-05T14:08:19.459+05:30 -->
+         </rev:Header>
+         <rev:Details>
+            <!--Zero or more repetitions:-->
+            <rev:Msg_Id>{{MESSAGE_ID}}</rev:Msg_Id>
+         </rev:Details>
+      </rev:Reversal>
+   </soap:Body>
+</soap:Envelope>
