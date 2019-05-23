@@ -12,13 +12,15 @@ class PaymentAgreement < ApplicationRecord
   has_many :general_invoices, -> { joins(:invoice_type).where('inward_invoice_types.id = ?', InwardInvoiceType.id_for(:general_invoice))}, class_name: 'Invoice', dependent: :destroy
   has_many :beneficiary_payments, dependent: :destroy
   has_many :notify_users, as: :document, dependent: :destroy 
+  has_many :security_deposits, dependent: :destroy
+
 
   has_many :attachments, as: :resource, dependent: :destroy
 
-  accepts_nested_attributes_for :general_invoices, :notify_users, :attachments, :beneficiary_payments, allow_destroy: true
+  accepts_nested_attributes_for :general_invoices, :notify_users, :attachments, :beneficiary_payments, :security_deposits, allow_destroy: true
 
 
-  AGREEMENT_TYPES = [{general_invoice: 'Invoice - General Invoice', rental_invoice: 'Invoice - Rental Invoice', beneficiary_payment: 'Payment - Beneficiary Payment', security_deposit: 'Payment - Security Deposit'}]
+  AGREEMENT_TYPES = [{general_invoice: 'Invoice - General Invoice'}, {rental_invoice: 'Invoice - Rental Invoice'}, {beneficiary_payment: 'Payment - Beneficiary Payment'}, {security_deposit: 'Payment - Security Deposit'}]
 
   def as_json
     {

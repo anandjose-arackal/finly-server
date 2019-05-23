@@ -11,4 +11,7 @@ json.results do
       end
     end
   end
+  json.count do
+    json.merge! @result.count
+  end
 end
