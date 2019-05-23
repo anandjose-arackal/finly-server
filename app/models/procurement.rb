@@ -538,6 +538,10 @@ class Procurement < ApplicationRecord
     self.documents.map(&:updated_at).sort!.reverse!.first
   end
 
+  def receive_last_updated_at
+    self.receive_documents.map(&:updated_at).sort!.reverse!.first
+  end
+
   def documents
     data = []
     data.push self.purchase_order if self.purchase_order.present?

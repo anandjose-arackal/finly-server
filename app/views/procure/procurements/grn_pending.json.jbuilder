@@ -3,7 +3,7 @@ json.results do
     json.extract! p, :id, :name, :note, :procurement_type, :transaction_id
 
     json.created_at p.created_at.strftime "%d %b %Y"
-    json.updated_at p.last_updated_at&.strftime "%d %b %Y"
+    json.updated_at p.receive_last_updated_at&.strftime "%d %b %Y"
 
 
     json.user do
