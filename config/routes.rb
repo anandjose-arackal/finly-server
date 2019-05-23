@@ -3500,6 +3500,13 @@ Rails.application.routes.draw do
   end
 
   resources :payment_agreements do
+    patch 'approve', to: 'payment_agreements#approve'
+    patch 'submit', to: "payment_agreements#submit", as: :submit
+    patch 'retract', to: "payment_agreements#retract", as: :retract
+    patch 'reject', to: "payment_agreements#reject", as: :reject
+    patch 'unapprove', to: "payment_agreements#unapprove", as: :unapprove
+    patch 'take_control', to: "payment_agreements#take_control", as: :take_control
+    patch 'return_control', to: "payment_agreements#return_control", as: :return_control
     collection do
       get 'document_config', to: 'payment_agreements#document_config', as: :document_config
       get 'count', to: 'payment_agreements#count'

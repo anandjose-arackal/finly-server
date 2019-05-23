@@ -13,7 +13,7 @@ class PaymentAgreements::Reject < PaymentAgreements::Base
   end
 
   def process
-    params[:document] = self.purchase_request
+    params[:document] = self.payment_agreement
     params[:aasm_event] = 'reject'
 
     op = WorkflowManager::Base.(user, params)
