@@ -82,6 +82,7 @@
 #  cost_allocation_items           :boolean          default(FALSE)
 #  narration                       :text(65535)
 #  po_number                       :string(255)
+#  bank_account_id                 :integer
 #
 
 class Invoice < ApplicationRecord

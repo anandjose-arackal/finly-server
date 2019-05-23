@@ -29,6 +29,9 @@
 #  cost_center_id         :integer
 #  unit_of_measurement    :string(255)
 #  department_id          :integer
+#  sgst                   :decimal(10, 5)
+#  cgst                   :decimal(10, 5)
+#  igst                   :decimal(10, 5)
 #
 
 class InvoiceLineItem < ApplicationRecord

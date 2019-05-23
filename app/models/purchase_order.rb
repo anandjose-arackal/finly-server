@@ -66,6 +66,8 @@
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
+#  discount_type_id             :integer
+#  taxable_amount_id            :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -614,6 +616,8 @@ class PurchaseOrder < ApplicationRecord
         item_rate = (item.rate || 0).to_f
         item_amount = (item_quantity * item_rate)
         item_tax = (item.tax_rate&.rate || 0).to_f
+
+        
 
         case self.discount_type_id
           # i.e. discount is given as a rate
