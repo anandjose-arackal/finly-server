@@ -33,7 +33,8 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
        transfer_status_id: BankTransferStatus.id_for(:open),
        account_name_check: true,
        amount_attributes: {
-           value: 0.1,
+           value: 1,
+           # value: 0.1,
            currency_id: Currency.first.id
        }
     )
