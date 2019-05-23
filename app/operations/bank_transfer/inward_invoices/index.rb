@@ -25,6 +25,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_year
     has_scope :filter_month
     has_scope :filter_ids, type: :array
+    has_scope :filter_policy_id
 
     def init
       # Todo temp workaround because of frontend format issue - START
