@@ -1,5 +1,5 @@
 class PaymentAgreements::Show < PaymentAgreements::Base
-  attr_accessor :payment_agreement, :policies, :reviewal_chains
+  attr_accessor :payment_agreement, :policies, :reviewal_chains, :general_invoices, :rental_invoices, :security_deposits, :beneficiary_payments
   
   def init
     pa_id = params[:id] || params[:payment_agreement_id]
@@ -15,19 +15,30 @@ class PaymentAgreements::Show < PaymentAgreements::Base
   end
 
   def process
-
+    self.general_invoices = self.payment_agreement.general_invoices
+    self.rental_invoices = self.payment_agreement.rental_invoices
+    self.security_deposits = self.payment_agreement.security_deposits
+    self.beneficiary_payments = self.payment_agreement.beneficiary_payments
   end
 
   def success
     params[:payment_agreement] = self.payment_agreement
+    params[:general_invoices] = self.general_invoices
+    params[:rental_invoices] = self.rental_invoices
+    params[:security_deposits] = self.security_deposits
+    params[:beneficiary_payments] = self.beneficiary_payments
     Procurements::PurchaseRequests::Show::ShowPresenter.new(user, params, messages)
   end
 
   class Procurements::PurchaseRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment_agreement, :reviewal_chain
+    attr_accessor :payment_agreement, :reviewal_chain, :general_invoices, :rental_invoices, :security_deposits, :beneficiary_payments
 
     def init
       self.payment_agreement = params[:payment_agreement]
+      self.general_invoices = params[:general_invoices]
+      self.rental_invoices = params[:rental_invoices]
+      self.security_deposits  = params[:security_deposits]
+      self.beneficiary_payments = params[:beneficiary_payments]
       self.reviewal_chain = payment_agreement.get_reviewal_chain if !payment_agreement.draft? && !payment_agreement.retracted? && !payment_agreement.rejected?
 
     end

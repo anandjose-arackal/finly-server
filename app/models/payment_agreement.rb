@@ -39,7 +39,7 @@ class PaymentAgreement < ApplicationRecord
       created_at: self.created_at.to_date,
       agreement_date: self.agreement_date&.to_date,
       execution_date: self.execution_date&.to_date,
-      expiry_date: self.expiry_date&.to_date,
+      expiration_date: self.expiration_date&.to_date,
       no_expiration: self.no_expiration,
       renewal_date: self.renewal_date&.to_date,
       note: self.note

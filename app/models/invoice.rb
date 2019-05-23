@@ -730,7 +730,16 @@ class Invoice < ApplicationRecord
   end
 
   def set_invoice_type
-    self.invoice_type_id = InwardInvoiceType.id_for(:general_invoice)
+    # This method is valid if there are multiple invoices of the same type
+    parameters = RequestStore.store[:params]
+    if parameters.present?
+      if parameters.dig(:payment_agreement, :general_invoices_attributes).present?
+        self.update(invoice_type_id: InwardInvoiceType.id_for(:general_invoice))
+      elsif parameters.dig(:payment_agreement, :rental_invoices_attributes).present?
+        self.update(invoice_type_id: InwardInvoiceType.id_for(:rental_invoice))
+      end
+    end
+
   end
 
   def update_creator(user)

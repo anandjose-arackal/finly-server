@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_22_121753) do
+ActiveRecord::Schema.define(version: 2019_05_23_105014) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3253,6 +3253,7 @@ ActiveRecord::Schema.define(version: 2019_05_22_121753) do
     t.string "po_number"
     t.integer "payment_agreement_id"
     t.integer "bank_account_id"
+    t.integer "vendor_location_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["controlling_level_id"], name: "index_invoices_on_controlling_level_id"
     t.index ["deleted_at"], name: "index_invoices_on_deleted_at"
@@ -6301,6 +6302,7 @@ ActiveRecord::Schema.define(version: 2019_05_22_121753) do
     t.text "admin_access_reason"
     t.text "admin_access_reason_details"
     t.string "scopes"
+    t.string "admin_access_requested_by"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"

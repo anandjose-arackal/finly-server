@@ -9,7 +9,7 @@ json.results do
     json.merge! @result.general_invoices.as_json
   end
 
-  json.rental_invoice_details
+  json.rental_invoice_details do
     json.merge! @result.rental_invoices.as_json
   end
 
