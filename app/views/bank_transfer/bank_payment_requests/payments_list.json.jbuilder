@@ -1,6 +1,10 @@
 json.payments do
   json.array!(@result.paginated_payments.include_for_index) do |payment|
-    json.owner_name payment.receiving_account&.account_owner&.name
+    if payment.receiving_account&.account_owner&.is_a?(YesBankVendor)
+      json.owner_name payment.receiving_account&.account_owner&.display_name
+    else
+      json.owner_name payment.receiving_account&.account_owner&.name
+    end
     json.name payment.receiving_account&.name
     json.account_number payment.receiving_account&.account_number
     json.ifsc payment.receiving_account&.ifsc

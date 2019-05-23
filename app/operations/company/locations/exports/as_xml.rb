@@ -1,7 +1,3 @@
-# action to export a report as xml
-# params:
-# report_ids: ids of the report to be exported
-
 class Company::Locations::Exports::AsXml < Company::Locations::Exports::Base
 
   attr_accessor :locations, :result, :export_name
