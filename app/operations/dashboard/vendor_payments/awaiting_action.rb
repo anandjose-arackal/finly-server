@@ -131,12 +131,14 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
 
     if document_types[:grn]
       params[:filter_procurement_type] = "purchase_order"
-      params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
+      # params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
+      params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
       data = {
         title: "GRN",
         type: 'receive',
         count: Procurements::Grn::Pending::Index.(user, params).count,
-        filters: [{filter_status_tags: [7]}]
+        # filters: [{filter_status_tags: [7]}]
+        filters: [{filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]}]
       }
       self.result.push data
     end    

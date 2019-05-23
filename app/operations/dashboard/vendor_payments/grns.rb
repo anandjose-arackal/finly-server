@@ -3,7 +3,8 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
 
   def init
     params[:filter_procurement_type] = "purchase_order"
-    params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
+    # params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
+    params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]
     self.procurements = Procurements::Grn::Pending::Index.(user, params).procurements
   end
 
@@ -48,7 +49,8 @@ class Dashboard::VendorPayments::Grns < Dashboard::VendorPayments::Base
           data: [
             {
               title: "Total POs Awaiting Shipments",
-              count: apply_scopes(procurements, {filter_status_tags: [7]})&.count,
+              # count: apply_scopes(procurements, {filter_status_tags: [7]})&.count,
+              count: apply_scopes(procurements, {filter_status_tags: [StatusTag.id_for(:receiving_shipment), StatusTag.id_for(:po_approved), StatusTag.id_for(:po_sent)]})&.count,
               filters: []
             }
           ]
