@@ -20,15 +20,16 @@ class PaymentAgreements::Show < PaymentAgreements::Base
 
   def success
     params[:payment_agreement] = self.payment_agreement
-    Procurements::PurchaseRequests::Show::IndexPresenter.new(user, params, messages)
+    Procurements::PurchaseRequests::Show::ShowPresenter.new(user, params, messages)
   end
 
-  class Procurements::PurchaseRequests::Show::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Procurements::PurchaseRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_agreement, :reviewal_chain
 
     def init
       self.payment_agreement = params[:payment_agreement]
       self.reviewal_chain = payment_agreement.get_reviewal_chain if !payment_agreement.draft? && !payment_agreement.retracted? && !payment_agreement.rejected?
+
     end
 
   end
