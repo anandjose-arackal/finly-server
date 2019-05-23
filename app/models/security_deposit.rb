@@ -13,5 +13,18 @@ class SecurityDeposit < ApplicationRecord
 
 
 
+  def as_json
+    {
+      id: self.id, 
+      vendor_id: self.vendor_id,
+      cost_center_id: self.cost_center_id,
+      vendor_location_id: self.vendor_location_id,
+      department_id: self.department_id,
+      location_id: self.location_id,
+      description: self.description,
+      note: self.note
+    }
+  end
+
 
 end
