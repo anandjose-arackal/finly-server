@@ -329,6 +329,7 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
+  scope :exclude_revision_of_po, -> { where(revision_of_id: nil) }
 
   before_save :calculate_line_items
   after_create :purchase_request_tasks

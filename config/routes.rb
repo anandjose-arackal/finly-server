@@ -2399,7 +2399,7 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
-  # mount_griddler('/email/incoming')
+  mount_griddler('/email/incoming')
   # mount_opro_oauth controllers: {
   #     oauth_new: 'oauth/auth',
   #     oauth_token: 'oauth/token'
@@ -2638,6 +2638,7 @@ Rails.application.routes.draw do
       post 'dcode_check', to: 'companies#check_dcode'
       post 'configure_payu', to: 'companies#configure_payu'
       post 'import_data_configuration', to: 'companies#import_data_configuration'
+      get 'export_data_configuration', to: 'companies#export_data_configuration'
     end
     get 'company_types', to: 'companies#company_types'
     get 'users/count', to: 'users#count'

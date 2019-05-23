@@ -10,7 +10,8 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
       non_po_invoices: false,
       po_invoices: false,
       payment_tickets: false,
-      vendors: false
+      vendors: false,
+      grn: false
     }
 
     if user.vendor_payments_admin?
@@ -19,6 +20,7 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         document_types[:purchase_orders] = false
         document_types[:po_invoices] = false
         document_types[:non_po_invoices] = false
+        document_types[:grn] = false
       end
 
       unless user.company.purchase_requisition_enabled?
@@ -42,6 +44,8 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         when UserRole.id_for(:invoice_reviewer)
           document_types[:po_invoices] = true
           document_types[:non_po_invoices] = true
+        when UserRole.id_for(:goods_receiver)
+          document_types[:grn] = true
         when UserRole.id_for(:bank_payment_request_reviewer)
           document_types[:payment_tickets] = true
         when UserRole.id_for(:vendor_reviewer)
@@ -121,6 +125,18 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
         type: 'vendor',
         count: YesBankVendor.awaiting_action_items(user).count,
         filters: [{filter_status_id: 'awaiting_approval'}]
+      }
+      self.result.push data
+    end  
+
+    if document_types[:grn]
+      params[:filter_procurement_type] = "purchase_order"
+      params[:filter_status_tags] = [StatusTag.id_for(:receiving_shipment)]
+      data = {
+        title: "GRN",
+        type: 'receive',
+        count: Procurements::Grn::Pending::Index.(user, params).count,
+        filters: [{filter_status_tags: [7]}]
       }
       self.result.push data
     end    

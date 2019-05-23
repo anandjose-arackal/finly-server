@@ -282,8 +282,8 @@ class Admin::Users::Import < Admin::Base
     }
   end
 
-  def generate_default_password(length = 8)
-    (0...length).map { (65 + rand(26)).chr }.join
+  def generate_default_password
+    SecureRandom.base64 13
   end
 
 end
