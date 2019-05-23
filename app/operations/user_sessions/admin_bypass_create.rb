@@ -55,6 +55,7 @@ class UserSessions::AdminBypassCreate < UserSessions::Create
   def enrich_reason(args)
     args[:admin_access_reason] = params[:reason]
     args[:admin_access_reason_details] = params[:reason_details]
+    args[:admin_access_requested_by] = params[:requested_by]
     unless params[:reason].present? and params[:reason_details].present?
       args[:status_id] = UserSessionStatus.id_for(:blocked)
       args[:message] = 'Bypass access reason has not been provided'
