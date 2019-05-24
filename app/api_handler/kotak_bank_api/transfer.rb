@@ -19,7 +19,7 @@ class KotakBankApi::Transfer < KotakBankApi::Base
   end
 
   # defines the respective action that this API handler is executing
-  def yes_bank_action
+  def bank_action
     'transfer'
   end
 
