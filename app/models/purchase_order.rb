@@ -261,10 +261,67 @@ class PurchaseOrder < ApplicationRecord
     where("DATE(created_at) = ?", created_at)
   }
 
-  scope :filter_status, -> (status_name) {
+  scope :filter_po_advance_status, -> (status_name) {
     all_statuses = AdvanceAmountStatus.all.pluck(:name)
     if status_name.present? && all_statuses.include?(status_name)
       where advance_amount_status_id: AdvanceAmountStatus.id_for(status_name)
+    end
+  }
+
+  scope :filter_status, -> (status_name){
+    case status
+    when 'draft', :draft
+      where status_id: PurchaseOrder.status_ids(:open, :rejected, :retracted)
+    when 'processing', :processing
+      filter_status_id PurchaseOrder.id_for(:processing)
+    when 'approved', :approved
+      filter_status_id PurchaseOrder.status_ids(:approved, :auto_approved)
+    when 'sent_to_vendor', :sent_to_vendor
+      filter_status_id PurchaseOrder.id_for(:sent_to_vendor)
+    when 'vendor_confirmed', :vendor_confirmed
+      filter_status_id PurchaseOrder.id_for(:vendor_confirmed)
+    when 'closed', :closed
+      filter_status_id PurchaseOrder.id_for(:closed)
+    when 'revised', :revised
+      filter_status_id PurchaseOrder.id_for(:revised)
+    when 'voided', :voided
+      filter_status_id PurchaseOrder.id_for(:revised)
+    when 'awaiting_approval', :awaiting_approval
+      user_id = RequestStore.store[:current_user]&.id
+      if user_id.present?
+        ids = self.awaiting_action_items(RequestStore.store[:current_user]&.id)&.pluck(:id)
+        with_id(ids)
+      end
+    else
+      # all
+    end
+  }
+
+  scope :filter_creation_date_from, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at >= ?", date.beginning_of_day)
+    end
+  }
+
+  scope :filter_creation_date_to, -> (creation_date){
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("created_at <= ?", date.end_of_day)
+    end
+  }
+
+  scope :filter_submission_date_from, -> (submission_date) {
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("submitted_at <= ?", date.beginning_of_day)
+    end
+  }
+
+  scope :filter_submission_date_from, -> (submission_date) {
+    date = Date.parse(creation_date) rescue nil
+    if date
+      where("submitted_at <= ?", date.end_of_day)
     end
   }
 
@@ -351,37 +408,48 @@ class PurchaseOrder < ApplicationRecord
 
     if tag_ids.include?(StatusTag.id_for(:payment_processed))
       data[:payment][:status] = 'completed'
+      data[:status_text] = 'Payment Processed'
       data[:procurement_status_text] = "Procurement Complete"
     elsif tag_ids.include?(StatusTag.id_for(:payment_processing))
       data[:payment][:status] = 'processing'
+      data[:status_text] = 'Payment Processing'
       data[:procurement_status_text] = 'Payment Processing'
     else
       data[:payment][:status] = 'init'
+      data[:status_text] = 'Payment Pending'
       data[:procurement_status_text] = 'Payment Pending'
     end
 
     if tag_ids.include?(StatusTag.id_for(:shipment_received))
       data[:grn][:status] = 'copmleted'
+      data[:status_text] = 'Shipment Received'
       data[:procurement_status_text] = 'Shipment Received'
     elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
       data[:grn][:status] = 'processing'
+      data[:status_text] = 'Receiving Shipment'
       data[:procurement_status_text] = 'Receiving Shipment'
     else
       data[:grn][:status] = 'init'
+      data[:status_text] = 'Awaiting Shipment'
       data[:procurement_status_text] = 'Awaiting Shipment'
     end
 
     if tag_ids.include? StatusTag.id_for(:invoice_approved)
       data[:invoice][:status] = 'completed'
+      data[:status_text] = 'Invoice Approved'
+      data[:procurement_status_text] = 'Awaiting Shipment'
     elsif (tag_ids.include? StatusTag.id_for(:invoice_processing)) || (tag_ids.include? StatusTag.id_for(:invoice_received))
       data[:invoice][:status] = 'processing'
+      data[:status_text] = 'Invoice Processing'
       data[:procurement_status_text] = 'Invoice Processing'
     else
       data[:invoice][:status] = 'init'
       if self.procurement.invoices.present?
+        data[:status_text] = 'Invoice Processing'
         data[:procurement_status_text] = 'Invoice Processing'
       else
         data[:procurement_status_text] = 'Awaiting Invoice'
+        data[:status_text] = 'Awaiting Invoice'
       end
     end
     data
