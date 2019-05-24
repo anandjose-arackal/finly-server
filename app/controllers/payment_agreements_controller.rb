@@ -91,4 +91,8 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
+  def upcoming_invoices
+    @result = PaymentAgreements::UpcomingInvoices.(current_user, params)
+  end
+
 end
