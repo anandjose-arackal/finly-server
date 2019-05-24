@@ -6,6 +6,15 @@ class Export::Reports::AsCsv < Export::Reports::Base
 
   attr_accessor :reports, :preferences, :result, :report_names, :default_column_names, :custom_field_column_names
 
+  # this will override the default behaviour of this class for Consul alone
+  def personalizer
+    {
+        post_process: {
+            before: Personalizer::Process.new([:export, :reports], :as_csv, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin, :auditor]
   end
