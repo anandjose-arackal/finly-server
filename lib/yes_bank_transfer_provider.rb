@@ -61,6 +61,6 @@ class YesBankTransferProvider
 
   # this method will create a transfer request for a penny transfer to the beneficiary account
   def create_transfer_request(transfer_type, reference_number)
-    tr = TransferRequest.("BankAccount", self.account_number, self.ifsc, 0.1, transfer_type, reference_number, self.company_id)
+    tr = TransferRequest.("BankAccount", self.account_number, self.ifsc, 1, transfer_type, reference_number, self.company_id)
   end
 end
