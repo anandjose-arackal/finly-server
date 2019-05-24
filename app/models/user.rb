@@ -236,6 +236,8 @@ class User < ApplicationRecord
 
   has_many :vendors, class_name: "YesBankVendor", foreign_key: :created_by_id
 
+  has_many :payment_agreements, foreign_key: :creator_id
+
   has_many :document_message_receipts
   has_many :document_messages
 

@@ -36,7 +36,7 @@ class PaymentAgreements::Index < PaymentAgreements::Base
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.payment_agreements = ::PaymentAgreement.associated_items(user, ::PaymentAgreement.roles) || PaymentAgreement.none
     else
-      self.payment_agreements = user.payment_agreements
+      self.payment_agreements = user.payment_agreements rescue ::PaymentAgreement.none
     end
   end
 
