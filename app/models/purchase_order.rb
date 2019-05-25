@@ -271,21 +271,21 @@ class PurchaseOrder < ApplicationRecord
   scope :filter_status, -> (status_name){
     case status
     when 'draft', :draft
-      where status_id: PurchaseOrder.status_ids(:open, :rejected, :retracted)
+      filter_status_id PurchaseOrder.status_ids(:open, :rejected, :retracted)
     when 'processing', :processing
-      filter_status_id PurchaseOrder.id_for(:processing)
+      filter_status_id PurchaseOrderStatus.id_for(:processing)
     when 'approved', :approved
       filter_status_id PurchaseOrder.status_ids(:approved, :auto_approved)
     when 'sent_to_vendor', :sent_to_vendor
-      filter_status_id PurchaseOrder.id_for(:sent_to_vendor)
+      filter_status_id PurchaseOrderStatus.id_for(:sent_to_vendor)
     when 'vendor_confirmed', :vendor_confirmed
-      filter_status_id PurchaseOrder.id_for(:vendor_confirmed)
+      filter_status_id PurchaseOrderStatus.id_for(:vendor_confirmed)
     when 'closed', :closed
-      filter_status_id PurchaseOrder.id_for(:closed)
+      filter_status_id PurchaseOrderStatus.id_for(:closed)
     when 'revised', :revised
-      filter_status_id PurchaseOrder.id_for(:revised)
+      filter_status_id PurchaseOrderStatus.id_for(:revised)
     when 'voided', :voided
-      filter_status_id PurchaseOrder.id_for(:revised)
+      filter_status_id PurchaseOrderStatus.id_for(:revised)
     when 'awaiting_approval', :awaiting_approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
