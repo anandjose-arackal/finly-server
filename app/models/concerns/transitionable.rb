@@ -357,7 +357,7 @@ module Transitionable
     def document_role_users(type=nil)
       case type
       when :creditor, 'creditor', :creditors, 'creditors'
-        user_role_id = UserRole.id_for(:creditor)
+        user_role_id = [UserRole.id_for(:creditor), UserRole.id_for(:bank_payment_request_creditor)]
       when :finance_manager, 'finance_manager', :finance_managers, 'finance_managers'
         user_role_id = UserRole.id_for(:finance_manager)
       when :travel_manager, 'travel_manager', :travel_managers, 'travel_managers'

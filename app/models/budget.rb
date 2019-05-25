@@ -233,8 +233,8 @@ class Budget < ApplicationRecord
       self.parent.children.each do |child_budget|
         budget_criteria_mappings = child_budget.budget_criteria_mappings
         budget_criteria_mappings.each do |mapping|
-          next if self.budget_criteria_mappings.with_budgetable_type(mapping.budgetable_type).with_budgetable_id(mapping.budgetable_id).present?
-          self.budget_criteria_mappings.build(budgetable_type: mapping.budgetable_type, budgetable_id: mapping.budgetable_id).save
+          next if self.parent.budget_criteria_mappings.with_budgetable_type(mapping.budgetable_type).with_budgetable_id(mapping.budgetable_id).present?
+          self.parent.budget_criteria_mappings.build(budgetable_type: mapping.budgetable_type, budgetable_id: mapping.budgetable_id).save
         end
       end
     end

@@ -142,6 +142,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     when 'BeneficiaryPayment'
       bp = BeneficiaryPayment.find_by(id: payment.parent_id)
       self.bp_params[:original_amount_attributes][:id] = bp.original_amount_id
+      self.bp_params[:advance_amount_attributes][:id] = bp.advance_amount_id
       bp.assign_attributes(self.bp_params)
       bp.calculate_tax_and_amount
       bp.save
@@ -184,20 +185,24 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def calculate_tax_and_discounts
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      # InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
     end
     return
   end
 
   def recalculate_totals
     if payment.invoice.invoice_items.present?
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      # InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      # InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil)
     end
     self.payment.save
   end
@@ -211,6 +216,8 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     bp_payment[:inclusive_of_taxes] = self.payment_params[:invoice_attributes][:inclusive_of_taxes]
     bp_payment[:tax] = self.payment_params[:invoice_attributes][:tax]
     bp_payment[:original_amount_attributes] = self.payment_params[:invoice_attributes][:original_amount_attributes]
+    bp_payment[:advance_amount_attributes] = self.payment_params[:invoice_attributes][:advance_amount_attributes]
+    bp_payment[:roundoff_amount] = self.payment_params[:invoice_attributes][:roundoff_amount]
 
     self.bp_params = bp_payment
 

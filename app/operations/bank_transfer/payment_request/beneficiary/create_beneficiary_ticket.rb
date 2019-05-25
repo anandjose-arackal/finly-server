@@ -129,7 +129,7 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 
 	    # Delegate payment creation to the background operation
       # ::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
-			::BankTransfer::PaymentRequest::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
+			::BankTransfer::PaymentRequest::Beneficiary::BeneficiaryPaymentsBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.validate_operation.order_details})
 
 	end
 
@@ -173,7 +173,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    payment_order_status_id: PaymentOrderStatus.id_for(:creation_in_progress),
 		    company_id: user.company_id,
 		    amount_requested_attributes: {
-		        value: self.total_amount,
+		        # value: self.total_amount,
+		        value: 0,
 		        currency_id: 1
 		    },
 		    payment_mode: self.payment_mode,
@@ -191,7 +192,8 @@ class BankTransfer::PaymentRequest::Beneficiary::CreateBeneficiaryTicket < BankT
 		    status_id: BankPaymentRequestStatus.id_for(:creation_in_progress),
 		    controlling_user_id: user.id,
 		    requested_amount_attributes: {
-		        value: self.total_amount,
+		        # value: self.total_amount,
+		        value: 0,
 		        currency_id: 1
 		    },
 		    beneficiary_type_id: 2,
