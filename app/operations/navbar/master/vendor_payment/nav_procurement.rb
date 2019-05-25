@@ -35,27 +35,27 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def procure
     return nil unless user.company.procurement_enabled?
-    {name: 'Procure', id: 'procure', url: 'procurements'}
+    {name: 'Procure', id: 'procure', url: 'purchase_orders'}
   end
 
   def po_initiator
     return nil unless user.is_purchase_order_initiator?
-    {name: 'Your POs', id: 'procure', url: "procurements/params={\"search_type\":\"user_details\",\"search_query\":\"#{user.email}\"}"}
+    {name: 'Your POs', id: 'procure', url: "purchase_orders/params={\"search_type\":\"user_details\",\"search_query\":\"#{user.email}\"}"}
   end
 
   def po_awaiting_approval
     return nil unless user.is_purchase_order_reviewer?
-    {name: 'POs Awaiting Approval', id: 'procure', url: 'procurements/params={"filter_procurement_type":"purchase_order", "filter_awaiting_approval":"1"}'}
+    {name: 'POs Awaiting Approval', id: 'procure', url: 'purchase_orders/params={"filter_procurement_type":"purchase_order", "filter_awaiting_approval":"1"}'}
   end
 
   def po_team
     return nil unless user.is_purchase_order_reviewer?
-    {name: 'Team POs', id: 'procure', url: 'procurements'}
+    {name: 'Team POs', id: 'procure', url: 'purchase_orders'}
   end
 
   def po_company
     return nil unless user.vp_admin_or_auditor? || user.is_purchase_order_auditor?
-    {name: 'Company POs', id: 'procure', url: 'procurements'}
+    {name: 'Company POs', id: 'procure', url: 'purchase_orders'}
   end
 
   def receive
@@ -125,7 +125,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_purchase_order
     return nil unless user.is_purchase_order_initiator? || user.vendor_payments_admin?
-    {name: 'New Purchase Order', id: 'create', url: 'procurements/params={"action":"new_procurement"}'}
+    {name: 'New Purchase Order', id: 'create', url: 'purchase_orders/params={"action":"new_procurement"}'}
   end
 
   # def create_po_invoice

@@ -297,6 +297,10 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
+  scope :filter_procurement_name, -> (name) {
+    joins(:procurement).where("procurements.name LIKE ?", "%#{name}%")
+  }
+
   scope :filter_creation_date_from, -> (creation_date){
     date = Date.parse(creation_date) rescue nil
     if date
@@ -312,14 +316,14 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_submission_date_from, -> (submission_date) {
-    date = Date.parse(creation_date) rescue nil
+    date = Date.parse(submission_date) rescue nil
     if date
       where("submitted_at <= ?", date.beginning_of_day)
     end
   }
 
   scope :filter_submission_date_from, -> (submission_date) {
-    date = Date.parse(creation_date) rescue nil
+    date = Date.parse(submission_date) rescue nil
     if date
       where("submitted_at <= ?", date.end_of_day)
     end
