@@ -47,6 +47,9 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
         rule 'Unverified devices need to be verified before proceeding' do
           next unless RequestStoreUtil.current_user_device.status_id == UserDeviceStatus.id_for(:unverified)
+          policy = RequestStoreUtil.security_policy
+          next unless policy.browser_client.otp_verify?
+
           require_otp true
         end
 
@@ -82,9 +85,10 @@ Gatekeeper::Checker.new 'On Web Authentication' do
       end
 
       rule 'Unverified IPs need to be verified before proceeding' do
+        next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
         policy = RequestStoreUtil.security_policy
         next unless policy.browser_ip.otp_verify?
-        next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
+
         require_otp true
       end
     end
