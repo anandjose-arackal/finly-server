@@ -197,7 +197,7 @@ class Procurements::PurchaseRequests::BulkValidateFileData < Procurements::Purch
           end
         end
 
-        item[:estimated_value] = quantity.to_i * unit_price.to_i
+        item[:estimated_value] = quantity.to_f * unit_price.to_f
 
         item[:category_name] = self.category.find_by(id: category_id)&.name
         item[:category_id] = self.category.find_by(id: category_id)&.id

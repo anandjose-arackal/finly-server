@@ -49,7 +49,7 @@ class ReviewalManager::DocumentReviewalMappings::ValidationUpdate < ReviewalMana
             add_message :error, "Please select a reviewer for '#{level_details}' as amount doesn't fall within threshold range of reviewer"
           end
         else
-          if level_reviewer_data[:reviewer_id].present?
+          if level_reviewer_data.present? && level_reviewer_data[:reviewer_id].present?
             add_message :error, "Cannot set selected reviewer for '#{level_details}'"
           end
         end

@@ -58,7 +58,7 @@ class Procurements::Grn::Received::Index < Procurements::Base
       self.procurements = self.procurements.order_by_controlling_level(user.id)
       page = params[:page] || 1
       per_page = params[:per_page] || 30
-      self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).include_details
+      self.paginated_procurements = self.procurements.paginate(page: page, per_page: per_page).grn_include_details
       self.count = self.procurements.count
 
     end

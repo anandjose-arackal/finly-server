@@ -329,6 +329,7 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_delivery_date, -> (delivery_date) { where 'delivery_date = ?', delivery_date}
+  scope :exclude_revision_of_po, -> { where(revision_of_id: nil) }
 
   scope :includes_for_index, -> {
     includes(:user, :balance_amount, :vendor, :status, procurement: [:status_tags])
