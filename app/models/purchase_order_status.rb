@@ -11,7 +11,7 @@
 class PurchaseOrderStatus < ApplicationRecord
   include Seedable
   def self.values
-    %w( open retracted processing approved rejected auto_approved sent_to_vendor closed voided po_revised vendor_confirmed)
+    %w( open retracted processing approved rejected auto_approved sent_to_vendor closed voided po_revised vendor_confirmed )
   end
 
   def display_name

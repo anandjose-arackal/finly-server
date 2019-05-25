@@ -31,36 +31,23 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
   class Procurements::PurchaseOrders::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :purchase_orders, :paginated_purchase_orders
 
-    has_scope :filter_awaiting_approval
     has_scope :filter_user
-    has_scope :filter_vendor_id
-
-    # has_scope :filter_status_tags, type: :array
-    has_scope :filter_po_number, :filter_invoice_number, :filter_doc_number
-    has_scope :filter_sub_department, using: [:sub_department_name, :user_id], type: :hash
-    has_scope :filter_vendor, using: [:vendor_name, :user_id], type: :hash
-    has_scope :filter_user, using: [:user_details, :user_id], type: :hash
-    has_scope :filter_payment_term, using: [:payment_term_name, :user_id], type: :hash
-    has_scope :filter_category, using: [:category_name, :user_id], type: :hash
-    has_scope :filter_po_status
-    has_scope :filter_invoice_status
-    has_scope :filter_submission_date, using: [:from, :to], type: :hash
+    has_scope :filter_po_number
+    has_scope :filter_status
     has_scope :filter_delivery_date
-    has_scope :filter_received_date
-    has_scope :filter_location, using: [:location_name, :user_id], type: :hash
     has_scope :filter_procurement_name
-    has_scope :filter_procurement_type
-    has_scope :filter_invoice_serial
-    has_scope :filter_purchase_order_id, type: :array
-    has_scope :filter_invoice_id, type: :array
     has_scope :filter_creation_date_from
     has_scope :filter_creation_date_to
+    has_scope :filter_submission_date_from
+    has_scope :filter_submission_date_to
     has_scope :filter_month
     has_scope :filter_year
-    has_scope :filter_cost_center_id
-    has_scope :filter_location_id
-    has_scope :filter_department_id
-    has_scope :filter_sub_department_id
+
+    has_scope :filter_user_id, type: :array
+    has_scope :filter_vendor_id, type: :array
+    has_scope :filter_cost_center_id, type: :array
+    has_scope :filter_location_id, type: :array
+    has_scope :filter_department_id, type: :array
 
     def init
       self.purchase_orders = params[:purchase_orders]
