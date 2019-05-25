@@ -269,7 +269,7 @@ class PurchaseOrder < ApplicationRecord
   }
 
   scope :filter_status, -> (status_name){
-    case status
+    case status_name
     when 'draft', :draft
       filter_status_id PurchaseOrder.status_ids(:open, :rejected, :retracted)
     when 'processing', :processing
