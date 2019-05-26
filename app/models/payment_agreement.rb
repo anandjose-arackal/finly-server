@@ -26,6 +26,29 @@ class PaymentAgreement < ApplicationRecord
 
   AGREEMENT_TYPES = [{general_invoice: 'Invoice - General Invoice'}, {rental_invoice: 'Invoice - Rental Invoice'}, {beneficiary_payment: 'Payment - Beneficiary Payment'}, {security_deposit: 'Payment - Security Deposit'}]
 
+  scope :name, -> (title) {
+    where title: title
+  }
+
+  scope :vendor_id, -> (id){
+    where vendor_id: id
+  }
+
+  scope :policy_id, -> (id){
+    where policy_id: id
+  }
+
+  scope :creation_date, -> (date){
+    where created_at: date&.to_date
+  }
+
+  scope :created_by_id, -> (id){
+    where creator_id: id
+  }
+
+
+
+
   def as_json
     {
       id: self.id,

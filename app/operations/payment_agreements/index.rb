@@ -36,7 +36,7 @@ class PaymentAgreements::Index < PaymentAgreements::Base
     unless user.policy_user_roles.pluck(:user_role_id).uniq.blank?
       self.payment_agreements = ::PaymentAgreement.associated_items(user, ::PaymentAgreement.roles) || PaymentAgreement.none
     else
-      self.payment_agreements = user.payment_agreements rescue ::PaymentAgreement.none
+      self.payment_agreements = user.payment_agreements
     end
   end
 
@@ -47,6 +47,15 @@ class PaymentAgreements::Index < PaymentAgreements::Base
 
   class PaymentAgreements::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_agreements, :paginated_payment_agreements, :count
+
+    has_scope :name
+    has_scope :vendor_id
+    has_scope :vendor_name
+    has_scope :policy_id
+    has_scope :creation_date
+    has_scope :created_by_id
+    has_scope :created_by_name
+
 
     def init
       self.payment_agreements = params[:payment_agreements]
