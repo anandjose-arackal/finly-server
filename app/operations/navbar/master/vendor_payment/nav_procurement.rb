@@ -125,7 +125,7 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def create_purchase_order
     return nil unless user.is_purchase_order_initiator? || user.vendor_payments_admin?
-    {name: 'New Purchase Order', id: 'create', url: 'purchase_orders/params={"action":"new_procurement"}'}
+    {name: 'New Purchase Order', id: 'create', url: 'purchase_orders/params={"action":"new_purchase_order"}'}
   end
 
   # def create_po_invoice
