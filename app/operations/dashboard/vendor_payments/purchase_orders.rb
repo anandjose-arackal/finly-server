@@ -33,7 +33,8 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
         filter_sub_department_id: params[:filter_sub_department],
         filter_month: params[:filter_month],
         filter_year: params[:filter_year],
-        filter_location_id: params[:filter_location]
+        filter_location_id: params[:filter_location],
+        filter_cost_center_id: params[:filter_cost_center]
       }
 
       self.purchase_orders = params[:purchase_orders]
@@ -53,28 +54,28 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Processing",
               count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               filters: [
-                {filter_po_status: PurchaseOrderStatus.id_for(:processing)}
+                {filter_status: 'processing'}
               ]
             },
             {
               title: "Approved",
               count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count,
               filters: [
-                {filter_po_status: PurchaseOrderStatus.id_for(:approved)}
+                {filter_status: 'approved'}
               ]
             },
             {
               title: "Sent to Vendor",
               count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:sent_to_vendor)})&.count,
               filters: [
-                {filter_po_status: PurchaseOrderStatus.id_for(:sent_to_vendor)}
+                {filter_status: 'sent_to_vendor'}
               ]
             },
             {
               title: "Vendor Confirmed",
               count: apply_scopes(purchase_orders, {filter_status_id: PurchaseOrderStatus.id_for(:vendor_confirmed)})&.count,
               filters: [
-                {filter_po_status: PurchaseOrderStatus.id_for(:vendor_confirmed)}
+                {filter_status: 'vendor_confirmed'}
               ]
             }
           ]
@@ -91,26 +92,23 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Total",
               count: apply_scopes(purchase_orders, {filter_user_id: user.id})&.count,
               filters: [
-                {search_type: 'user_details'},
-                {search_query: user.email}
+                {filter_user_id: user.id}
               ]
             },
             {
               title: "Processing",
               count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               filters: [
-                {search_type: 'user_details'},
-                {search_query: user.email},
-                {filter_po_status: PurchaseOrderStatus.id_for(:processing)}
+                {filter_user_id: user.id},
+                {filter_status: 'processing'}
               ]
             },
             {
               title: "Approved",
               count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count,
               filters: [
-                {search_type: 'user_details'},
-                {search_query: user.email},
-                {filter_po_status: PurchaseOrderStatus.id_for(:approved)}
+                {filter_user_id: user.id},
+                {filter_status: 'approved'}
               ]
             }
           ]
