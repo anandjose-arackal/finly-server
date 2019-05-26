@@ -26,9 +26,9 @@ class PaymentAgreement < ApplicationRecord
 
   AGREEMENT_TYPES = [{general_invoice: 'Invoice - General Invoice'}, {rental_invoice: 'Invoice - Rental Invoice'}, {beneficiary_payment: 'Payment - Beneficiary Payment'}, {security_deposit: 'Payment - Security Deposit'}]
 
-  scope :name, -> (title) {
-    where title: title
-  }
+  # scope :name, -> (title) {
+  #   where title: title
+  # }
 
   scope :vendor_id, -> (id){
     where vendor_id: id
