@@ -323,7 +323,7 @@ class PurchaseOrder < ApplicationRecord
     end
   }
 
-  scope :filter_submission_date_from, -> (submission_date) {
+  scope :filter_submission_date_to, -> (submission_date) {
     date = Date.parse(submission_date) rescue nil
     if date
       where("submitted_at <= ?", date.end_of_day)
@@ -413,49 +413,57 @@ class PurchaseOrder < ApplicationRecord
 
     if tag_ids.include?(StatusTag.id_for(:payment_processed))
       data[:payment][:status] = 'completed'
-      data[:status_text] = 'Payment Processed'
+      data[:payment][:status_text] = 'Payment Processed'
       data[:procurement_status_text] = "Procurement Complete"
     elsif tag_ids.include?(StatusTag.id_for(:payment_processing))
       data[:payment][:status] = 'processing'
-      data[:status_text] = 'Payment Processing'
+      data[:payment][:status_text] = 'Payment Processing'
       data[:procurement_status_text] = 'Payment Processing'
     else
       data[:payment][:status] = 'init'
-      data[:status_text] = 'Payment Pending'
+      data[:payment][:status_text] = 'Payment Pending'
       data[:procurement_status_text] = 'Payment Pending'
     end
 
     if tag_ids.include?(StatusTag.id_for(:shipment_received))
       data[:grn][:status] = 'copmleted'
-      data[:status_text] = 'Shipment Received'
+      data[:grn][:status_text] = 'Shipment Received'
       data[:procurement_status_text] = 'Shipment Received'
     elsif tag_ids.include?(StatusTag.id_for(:receiving_shipment))
       data[:grn][:status] = 'processing'
-      data[:status_text] = 'Receiving Shipment'
+      data[:grn][:status_text] = 'Receiving Shipment'
       data[:procurement_status_text] = 'Receiving Shipment'
     else
       data[:grn][:status] = 'init'
-      data[:status_text] = 'Awaiting Shipment'
+      data[:grn][:status_text] = 'Awaiting Shipment'
       data[:procurement_status_text] = 'Awaiting Shipment'
     end
 
     if tag_ids.include? StatusTag.id_for(:invoice_approved)
       data[:invoice][:status] = 'completed'
-      data[:status_text] = 'Invoice Approved'
+      data[:invoice][:status_text] = 'Invoice Approved'
       data[:procurement_status_text] = 'Awaiting Shipment'
     elsif (tag_ids.include? StatusTag.id_for(:invoice_processing)) || (tag_ids.include? StatusTag.id_for(:invoice_received))
       data[:invoice][:status] = 'processing'
-      data[:status_text] = 'Invoice Processing'
+      data[:invoice][:status_text] = 'Invoice Processing'
       data[:procurement_status_text] = 'Invoice Processing'
     else
       data[:invoice][:status] = 'init'
       if self.procurement.invoices.present?
-        data[:status_text] = 'Invoice Processing'
+        data[:invoice][:status_text] = 'Invoice Processing'
         data[:procurement_status_text] = 'Invoice Processing'
       else
         data[:procurement_status_text] = 'Awaiting Invoice'
-        data[:status_text] = 'Awaiting Invoice'
+        data[:invoice][:status_text] = 'Awaiting Invoice'
       end
+    end
+
+    if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(self.purchase_order_status_id)
+      data[:procurement_status_text] = "Awaiting PO Submission"
+    elsif PurchaseOrder.status_ids(:processing).include?(self.purchase_order_status_id)
+      data[:procurement_status_text] = "PO Processing"
+    else
+      # nothing
     end
     data
   end
