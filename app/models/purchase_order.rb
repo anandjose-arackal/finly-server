@@ -284,9 +284,9 @@ class PurchaseOrder < ApplicationRecord
     when 'closed', :closed
       filter_status_id PurchaseOrderStatus.id_for(:closed)
     when 'revised', :revised
-      filter_status_id PurchaseOrderStatus.id_for(:revised)
+      filter_status_id PurchaseOrderStatus.id_for(:po_revised)
     when 'voided', :voided
-      filter_status_id PurchaseOrderStatus.id_for(:revised)
+      filter_status_id PurchaseOrderStatus.id_for(:voided)
     when 'awaiting_approval', :awaiting_approval
       user_id = RequestStore.store[:current_user]&.id
       if user_id.present?
