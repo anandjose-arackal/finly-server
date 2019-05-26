@@ -57,7 +57,7 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
       page = params[:page] || 1
       per_page = params[:per_page] || 30
     
-      self.paginated_purchase_orders = self.purchase_orders.paginate(page: page, per_page: per_page).includes_for_index
+      self.paginated_purchase_orders = self.purchase_orders.order(created_at: :desc).paginate(page: page, per_page: per_page).includes_for_index
     end
 
     def get_counts
