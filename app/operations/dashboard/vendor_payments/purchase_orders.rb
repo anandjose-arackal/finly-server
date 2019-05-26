@@ -92,7 +92,8 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               title: "Total",
               count: apply_scopes(purchase_orders, {filter_user_id: user.id})&.count,
               filters: [
-                {filter_user_id: user.id}
+                {filter_user_id: user.id},
+                {filter_user_name: user.name}
               ]
             },
             {
@@ -100,6 +101,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:processing)})&.count,
               filters: [
                 {filter_user_id: user.id},
+                {filter_user_name: user.name},
                 {filter_status: 'processing'}
               ]
             },
@@ -108,6 +110,7 @@ class Dashboard::VendorPayments::PurchaseOrders < Dashboard::VendorPayments::Bas
               count: apply_scopes(purchase_orders, {filter_user_id: user.id, filter_status_id: PurchaseOrderStatus.id_for(:approved)})&.count,
               filters: [
                 {filter_user_id: user.id},
+                {filter_user_name: user.name},
                 {filter_status: 'approved'}
               ]
             }

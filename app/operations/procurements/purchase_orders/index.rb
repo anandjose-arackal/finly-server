@@ -43,11 +43,12 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_month
     has_scope :filter_year
 
-    has_scope :filter_user_id, type: :array
-    has_scope :filter_vendor_id, type: :array
-    has_scope :filter_cost_center_id, type: :array
-    has_scope :filter_location_id, type: :array
-    has_scope :filter_department_id, type: :array
+    has_scope :filter_user_id
+    has_scope :filter_policy_id
+    has_scope :filter_vendor_id
+    has_scope :filter_cost_center_id
+    has_scope :filter_location_id
+    has_scope :filter_department_id
 
     def init
       self.purchase_orders = params[:purchase_orders]
