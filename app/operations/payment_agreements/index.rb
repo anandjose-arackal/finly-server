@@ -55,6 +55,7 @@ class PaymentAgreements::Index < PaymentAgreements::Base
     has_scope :creation_date
     has_scope :created_by_id
     has_scope :created_by_name
+    has_scope :filter_by_status_id
 
 
     def init

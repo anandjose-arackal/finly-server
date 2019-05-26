@@ -46,6 +46,10 @@ class PaymentAgreement < ApplicationRecord
     where creator_id: id
   }
 
+  scope :filter_by_status_id, -> (id){
+    where status_id: id
+  }
+
 
 
 
