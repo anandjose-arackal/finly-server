@@ -66,6 +66,10 @@ class PurchaseOrderItem < ApplicationRecord
     where(id: ids)
   }
 
+  scope :without_id, -> (ids) {
+    where.not(id: ids)
+  }
+
   scope :with_inventory_line_item, -> (inventory_line_item_id) {
     where inventory_line_item_id: inventory_line_item_id
   }

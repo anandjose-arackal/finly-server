@@ -83,6 +83,8 @@ class Item < ApplicationRecord
     where(supply_item_type: item_type)
   }
 
+  scope :includes_for_export, -> {includes(:category,:item_expense_type,:product_type, :supply_item_type, :tax_rate)}
+
   delegate :po_item?, :non_po_item?, to: :supply_item_type
 
   def goods?
@@ -123,6 +125,7 @@ class Item < ApplicationRecord
       active: active,
       item_expense_type_id: item_expense_type_id,
       item_expense_type_name: item_expense_type&.name,
+      tds_applicable: tds_applicable
     }
   end
 
