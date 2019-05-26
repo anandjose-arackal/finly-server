@@ -40,12 +40,12 @@ class Navbar::Master::VendorPayment::NavProcurement < Navbar::Master::Base
 
   def po_initiator
     return nil unless user.is_purchase_order_initiator?
-    {name: 'Your POs', id: 'procure', url: "purchase_orders/params={\"search_type\":\"user_details\",\"search_query\":\"#{user.email}\"}"}
+    {name: 'Your POs', id: 'procure', url: "purchase_orders/params={\"filter_user_id\":\"#{user.id}\"}"}
   end
 
   def po_awaiting_approval
     return nil unless user.is_purchase_order_reviewer?
-    {name: 'POs Awaiting Approval', id: 'procure', url: 'purchase_orders/params={"filter_procurement_type":"purchase_order", "filter_awaiting_approval":"1"}'}
+    {name: 'POs Awaiting Approval', id: 'procure', url: 'purchase_orders/params={"filter_status":"awaiting_approval"}'}
   end
 
   def po_team
