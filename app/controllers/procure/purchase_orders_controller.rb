@@ -261,4 +261,9 @@ class Procure::PurchaseOrdersController < BaseControllers::WebBase
     respond
   end
 
+  def counts
+    @result = Procurements::PurchaseOrders::Counts.(current_user, params)
+    respond
+  end
+
 end

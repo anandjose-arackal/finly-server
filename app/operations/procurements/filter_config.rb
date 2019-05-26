@@ -1,5 +1,5 @@
 class Procurements::FilterConfig < Procurements::Base
-  attr_accessor :config, :status_tags, :po_statuses, :invoice_statuses, :locations, :departments, :sub_departments, :cost_centers
+  attr_accessor :config, :status_tags, :po_statuses, :invoice_statuses, :locations, :departments, :sub_departments, :cost_centers, :policies
 
   def init
     self.status_tags = StatusTag.all
@@ -10,6 +10,7 @@ class Procurements::FilterConfig < Procurements::Base
     self.sub_departments = user.company.departments.only_sub_departments
     # self.sub_departments = user.company.dep_subdept_mapping
     self.cost_centers = user.company.cost_centers.with_application(current_app)
+    self.policies = ::Policy::VendorPayments::Index.(user, params).policies rescue Policy.none
   end
 
   def process
@@ -35,11 +36,12 @@ class Procurements::FilterConfig < Procurements::Base
     params[:departments] = self.departments
     params[:sub_departments] = self.sub_departments
     params[:cost_centers] = self.cost_centers
+    params[:policies] = self.policies
     Procurements::FilterConfig::ConfigPresenter.new(user, params, messages)
   end
 
   class Procurements::FilterConfig::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :config, :po_statuses, :invoice_statuses, :locations, :departments, :sub_departments, :cost_centers, :sub_departments
+    attr_accessor :config, :po_statuses, :invoice_statuses, :locations, :departments, :sub_departments, :cost_centers, :sub_departments, :policies
 
     def init
       self.config = params[:config]
@@ -49,6 +51,7 @@ class Procurements::FilterConfig < Procurements::Base
       self.departments = params[:departments]
       self.sub_departments = params[:sub_departments]
       self.cost_centers = params[:cost_centers]
+      self.policies = params[:policies]
     end
   end
 end

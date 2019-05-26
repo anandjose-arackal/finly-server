@@ -71,9 +71,9 @@ class Dashboard::VendorPayments::AwaitingAction < Dashboard::VendorPayments::Bas
     if document_types[:purchase_orders]
       data = {
         title: "Purchase Orders",
-        type: 'procurements',
+        type: 'purchase_orders',
         count: PurchaseOrder.awaiting_action_items(user).count,
-        filters: [{filter_awaiting_approval: true}]
+        filters: [{filter_status: 'awaiting_approval'}]
       }
       self.result.push data
     end
