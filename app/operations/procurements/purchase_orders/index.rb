@@ -50,6 +50,8 @@ class Procurements::PurchaseOrders::Index < Procurements::PurchaseOrders::Base
     has_scope :filter_location_id
     has_scope :filter_department_id
 
+    has_scope :filter_awaiting_approval
+
     def init
       self.purchase_orders = params[:purchase_orders]
       self.purchase_orders = apply_scopes(self.purchase_orders, params)
