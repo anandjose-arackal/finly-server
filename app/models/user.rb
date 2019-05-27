@@ -824,6 +824,8 @@ class User < ApplicationRecord
   def verify_expiration!(password = nil)
     return true if expired? and !otp_verified
 
+    nil_password = password.nil?
+
     expired = false
     expired ||= expired?
     expired ||= password_expired?
@@ -831,6 +833,8 @@ class User < ApplicationRecord
       self.password = password
       expired ||= password_weak?
     end
+
+    self.password = nil if nil_password
 
     expire! if expired
     expired

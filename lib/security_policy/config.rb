@@ -8,7 +8,7 @@ class SecurityPolicy::Config
           concurrent_logins: 5
       },
       password: {
-          minimum_score: 3,
+          minimum_score: 1,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,
@@ -30,7 +30,7 @@ class SecurityPolicy::Config
           concurrent_logins: 10
       },
       password: {
-          minimum_score: 2,
+          minimum_score: 1,
           mandate_special_character: true,
           mandate_numbers: true,
           mandate_lowercase: true,
