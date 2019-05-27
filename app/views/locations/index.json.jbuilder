@@ -3,4 +3,5 @@
 #     json.merge! location.as_json
 #   end
 # end
-json.array! @result.locations&.map(&:json_tree)
+# json.array! @result.locations&.map(&:json_tree)
+json.array! @result.locations.roots&.map(&:json_tree)

@@ -3188,6 +3188,10 @@ Rails.application.routes.draw do
   resources :locations
 
   resources :departments
+  
+  delete 'departments/bulk_destroy', to: 'departments#bulk_destroy'  
+  delete 'cost_centers/bulk_destroy', to: 'cost_centers#bulk_destroy'  
+  delete 'locations/bulk_destroy', to: 'locations#bulk_destroy'  
 
   get 'all_users' => 'departments#all_users'
 
