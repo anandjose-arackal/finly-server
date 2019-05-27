@@ -212,7 +212,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def invoice_status(invoice_line_item)
-    invoice_line_item.parent&.status&name&.humanize
+    invoice_line_item.parent&.status&.name&.humanize
   end
 
   def is_invoice_approved(invoice_line_item)
