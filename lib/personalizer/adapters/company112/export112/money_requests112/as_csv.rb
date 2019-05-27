@@ -1,6 +1,6 @@
 class Personalizer::Adapters::Company112::Export112::MoneyRequests112::AsCsv < Personalizer::Adapters::Base
 
-  attr_accessor :default_headers, :reports, :result, :column_names
+  attr_accessor :default_headers, :money_requests, :result, :column_names
 
   def init
 

@@ -1,6 +1,6 @@
 class Personalizer::Adapters::Company112::Export112::MoneyRequests112::AsXml < Personalizer::Adapters::Base
 
-  attr_accessor :default_headers, :reports
+  attr_accessor :default_headers, :money_requests
 
   def init
     self.op_instance.column_names = consul_column_names
