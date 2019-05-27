@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_13_160722) do
+ActiveRecord::Schema.define(version: 2019_05_22_112410) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -700,11 +700,13 @@ ActiveRecord::Schema.define(version: 2019_05_13_160722) do
     t.integer "balance_due_id"
     t.integer "net_amount_id"
     t.integer "gross_amount_id"
-    t.decimal "roundoff_amount", precision: 10
+    t.decimal "roundoff_amount", precision: 20, scale: 10
     t.integer "cost_center_id"
     t.text "invoice_number"
     t.date "invoice_date"
     t.date "invoice_due_date"
+    t.integer "advance_amount_id"
+    t.index ["advance_amount_id"], name: "index_beneficiary_payments_on_advance_amount_id"
     t.index ["balance_due_id"], name: "index_beneficiary_payments_on_balance_due_id"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
     t.index ["category_id"], name: "index_beneficiary_payments_on_category_id"
@@ -3348,6 +3350,7 @@ ActiveRecord::Schema.define(version: 2019_05_13_160722) do
     t.boolean "cost_allocation_items", default: false
     t.text "narration"
     t.string "po_number"
+    t.integer "bank_account_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["advance_amount_id"], name: "index_invoices_on_advance_amount_id"
     t.index ["amount_id"], name: "index_invoices_on_amount_id"
@@ -3484,6 +3487,7 @@ ActiveRecord::Schema.define(version: 2019_05_13_160722) do
     t.integer "user_id"
     t.boolean "active", default: true
     t.integer "item_expense_type_id"
+    t.boolean "tds_applicable", default: true
     t.index ["active"], name: "index_items_on_active"
     t.index ["category_id"], name: "index_items_on_category_id"
     t.index ["company_id"], name: "index_items_on_company_id"
@@ -6494,6 +6498,7 @@ ActiveRecord::Schema.define(version: 2019_05_13_160722) do
     t.text "admin_access_reason"
     t.text "admin_access_reason_details"
     t.string "scopes"
+    t.string "admin_access_requested_by"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"
