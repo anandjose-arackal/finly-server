@@ -26,27 +26,35 @@ class PaymentAgreement < ApplicationRecord
 
   AGREEMENT_TYPES = [{general_invoice: 'Invoice - General Invoice'}, {rental_invoice: 'Invoice - Rental Invoice'}, {beneficiary_payment: 'Payment - Beneficiary Payment'}, {security_deposit: 'Payment - Security Deposit'}]
 
-  scope :name, -> (title) {
-    where title: title
+  scope :filter_title, -> (title) {
+    where title: "#{title}"
   }
 
-  scope :vendor_id, -> (id){
+  scope :filter_vendor_id, -> (id){
     where vendor_id: id
   }
 
-  scope :policy_id, -> (id){
+  scope :filter_vendor_name, -> (name){
+    joins(:vendor).where('yes_bank_vendors.name = ?', "#{name}")
+  }
+
+  scope :filter_policy_id, -> (id){
     where policy_id: id
   }
 
-  scope :creation_date, -> (date){
-    where created_at: date&.to_date
+  scope :filter_creation_date, -> (from, to){
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
+    from = Date.parse(from) unless from.is_a?(Date)
+    to = Date.parse(to) unless to.is_a?(Date)
+    where('DATE(created_at) >= ? && DATE(created_at) <= ?', from, to)
   }
 
-  scope :created_by_id, -> (id){
+  scope :filter_creator_id, -> (id){
     where creator_id: id
   }
 
-  scope :filter_by_status_id, -> (id){
+  scope :filter_status_id, -> (id){
     where status_id: id
   }
 
