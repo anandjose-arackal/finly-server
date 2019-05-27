@@ -6,6 +6,14 @@ class Export::MoneyRequest::AsCsv < Export::MoneyRequest::Base
 
   attr_accessor :money_request, :preferences, :result, :money_request_name, :default_column_names
 
+  def personalizer
+    {
+        post_process: {
+            before: Personalizer::Process.new([:export, :money_requests], :as_csv, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin, :auditor]
   end
