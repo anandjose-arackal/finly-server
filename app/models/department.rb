@@ -68,10 +68,10 @@ class Department < ApplicationRecord
     args
   end
 
-  # def full_dept_name
-  #   # self.parent.blank? ? self.name : "#{self.parent&.name} / #{self.name}"
-  #   self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
-  # end
+  def full_dept_name
+    # self.parent.blank? ? self.name : "#{self.parent&.name} / #{self.name}"
+    self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
+  end
 
 
 end

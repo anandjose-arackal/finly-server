@@ -33,7 +33,8 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
        transfer_status_id: BankTransferStatus.id_for(:open),
        account_name_check: true,
        amount_attributes: {
-           value: 0.1,
+           value: 1,
+           # value: 0.1,
            currency_id: Currency.first.id
        }
     )
@@ -117,6 +118,6 @@ class BankTransfer::BankAccounts::CheckValidity < BankTransfer::BankAccounts::Ba
 
   # this method will create a transfer request for a penny transfer to the beneficiary account
   def create_transfer_request(transfer_type, reference_number)
-    tr = TransferRequest.("BankAccount", self.account_number, self.ifsc, 0.1, transfer_type, reference_number, self.company.id)
+    tr = TransferRequest.("BankAccount", self.account_number, self.ifsc, 1, transfer_type, reference_number, self.company.id)
   end
 end
