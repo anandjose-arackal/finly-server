@@ -148,21 +148,6 @@ class Procurement < ApplicationRecord
     filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
     where id: filtered_ids
   }
-
-  scope :filter_creation_date_from, -> (creation_date){
-    date = Date.parse(creation_date) rescue nil
-    if date
-      where("created_at >= ?", date.beginning_of_day)
-    end
-  }
-
-  scope :filter_creation_date_to, -> (creation_date){
-    date = Date.parse(creation_date) rescue nil
-    if date
-      where("created_at <= ?", date.end_of_day)
-    end
-  }
-
   
   scope :filter_year, -> (year) {
     if year.blank?
