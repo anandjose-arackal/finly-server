@@ -1,8 +1,8 @@
 class AddVendorPocToPurchaseOrders < ActiveRecord::Migration[5.2]
   def change
-    # add_column :purchase_orders, :vendor_poc_name, :string
-    # add_column :purchase_orders, :vendor_poc_email, :string
-    # add_column :purchase_orders, :vendor_poc_mobile_number, :string
+    add_column :purchase_orders, :vendor_poc_name, :string
+    add_column :purchase_orders, :vendor_poc_email, :string
+    add_column :purchase_orders, :vendor_poc_mobile_number, :string
 
     PurchaseOrder.non_deleted.each do |po|
       gstin_location = po.gstin_location
