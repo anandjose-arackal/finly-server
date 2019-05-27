@@ -91,8 +91,22 @@ class PaymentAgreementsController < BaseControllers::WebBase
     respond
   end
 
+  def summary
+    # @result = PaymentAgreements::Summary.(current_user, params)
+    # respond
+    @result = PaymentAgreements::Show.(current_user, params)
+    respond
+  end
+
   def upcoming_invoices
     @result = PaymentAgreements::UpcomingInvoices.(current_user, params)
+    respond
   end
+
+  def attachments
+    @result = PaymentAgreements::Attachments.(current_user, params)
+    respond
+  end
+
 
 end
