@@ -47,7 +47,7 @@ class YesBankTransferProvider
       else
         error_message = op.transfer_request.bank_error_message || op.messages&.dig(:error)
         if op.messages&.dig(:error).blank?
-          error_message = "Could not reach beneficiary bank servers. Please try again later"
+          error_message = "This is not a valid bank account number"
         end
         Resque.enqueue(queue, {success: false, full_name: "", bank_transaction_id: nil, messages: error_message})
       end

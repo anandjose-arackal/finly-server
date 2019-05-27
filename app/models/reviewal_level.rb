@@ -28,6 +28,7 @@ class ReviewalLevel < ApplicationRecord
   validates :policy_id, presence: true
   validates :level_number, presence: true
   validates :associated_entity_type, presence: true
+  validates :level_number, numericality: { greater_than: 0 }
 
   default_scope { unscope(:where) }
 
