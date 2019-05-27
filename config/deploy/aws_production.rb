@@ -13,8 +13,8 @@ server 'm3.finly.io', user: 'centos', roles: %w{web app}
 server 'm4.finly.io', user: 'centos', roles: %w{web app}
 server 'm5.finly.io', user: 'centos', roles: %w{web app}
 server 'm6.finly.io', user: 'centos', roles: %w{web app}
-# server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
-# server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app}
+server 'bgp.finly.io', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
+server 'bgg.finly.io', user: 'centos', roles: %w{sidekiq_app}
 
 set :stage, 'production'
 # set :stage, 'staging'
