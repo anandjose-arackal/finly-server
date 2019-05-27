@@ -98,7 +98,8 @@ class InvoiceLineItem < ApplicationRecord
   scope :with_invoice_id, -> (invoice_id) {where invoice_id: invoice_id}
 
   def check_outward_invoice?
-    return true if self.parent_type != 'OutwardInvoice'
+    # return true if self.parent_type != 'OutwardInvoice'
+    return true if ['OutwardInvoice', 'GeneralInvoice'].exclude? self.parent_type
   end
 
   def tds_applicable?
