@@ -84,7 +84,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def vendor_name(procurement)
-    procurement.vendor&.name
+    procurement.vendor&.display_name
   end
 
   def vendor_business_name(procurement)
