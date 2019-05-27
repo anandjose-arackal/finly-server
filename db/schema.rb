@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_27_101715) do
+ActiveRecord::Schema.define(version: 2019_05_27_105746) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3128,7 +3128,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_101715) do
   create_table "invoice_line_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "invoice_id"
     t.string "description"
-    t.integer "quantity"
+    t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 10
     t.decimal "tax", precision: 20, scale: 10
     t.decimal "discount", precision: 20, scale: 10
@@ -4692,7 +4692,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_101715) do
     t.string "product_id"
     t.string "description"
     t.string "hsn_sac"
-    t.integer "quantity"
+    t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 5
     t.decimal "tax", precision: 20, scale: 5
     t.decimal "tds", precision: 20, scale: 5
