@@ -73,7 +73,7 @@ class Personalizer::Adapters::Company74::ExportTemplates74::AllStatementsTemplat
     when PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:personal_expense), PaymentPurpose.id_for(:card_transaction)
       merchant = finly_transaction&.associated_transaction&.merchant_name
     when PaymentPurpose.id_for(:vendor_payment)
-      merchant = finly_transaction.payment&.receiving_user&.name
+      merchant = finly_transaction.payment&.receiving_user&.class&.name == 'YesBankVendor'? finly_transaction.payment&.receiving_user&.display_name : finly_transaction.payment&.receiving_user&.name
       if merchant.present?
         if finly_transaction.credit?
           merchant = "Reversal for #{merchant}'s Payment"
