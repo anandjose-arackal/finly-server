@@ -110,6 +110,8 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              # po_number: {spreadsheet: true},
              transaction_period_from: {spreadsheet: true},
              transaction_period_to: {spreadsheet: true},
+             is_invoice_approved: {spreadsheet: true},
+             invoice_status: {spreadsheet: true},
              category: {spreadsheet: true},
              quantity: {spreadsheet: true},
              rate: {spreadsheet: true},
@@ -168,7 +170,17 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def invoice_type(invoice_line_item)
-    invoice_line_item.parent.invoice_type&.name
+    # [:tax_invoice, :advance, :non_po_invoice, :beneficiary, :proforma_invoice]
+    case invoice_line_item.parent.invoice_type&.name
+    when 'tax_invoice'
+      "PO Invoice"
+    when 'non_po_invoice'
+      "NON PO Invoice"
+    when 'proforma_invoice'
+      "Proforma Invoice"
+    else
+      "Invoice"
+    end
   end
 
   def invoice_no(invoice_line_item)
@@ -176,7 +188,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
   end
 
   def vendor_name(invoice_line_item)
-    invoice_line_item.parent.vendor&.name
+    invoice_line_item.parent.vendor&.display_name
   end
 
   def vendor_ref_no(invoice_line_item)
@@ -197,6 +209,14 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def transaction_period_to(invoice_line_item)
     invoice_line_item.parent.transaction_service_period_from&.strftime("%d-%M-%y")
+  end
+
+  def invoice_status(invoice_line_item)
+    invoice_line_item.parent&.status&.name&.humanize
+  end
+
+  def is_invoice_approved(invoice_line_item)
+    InwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :paid, :approved, :auto_approved, :closed, :pending, :initiated).include?(invoice_line_item.parent&.invoice_status_id) ? 'Yes' : 'No'
   end
 
   def category(invoice_line_item)
