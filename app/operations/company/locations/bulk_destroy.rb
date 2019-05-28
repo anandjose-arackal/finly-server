@@ -6,6 +6,13 @@ class Company::Locations::BulkDestroy < Company::Locations::Base
     self.locations = user.company.locations.where id: location_ids
   end
 
+  def validate
+    if self.locations.blank?
+      add_message :error, "No locations found."
+      return
+    end
+  end
+
 
   def process
     # if self.locations.delete_all

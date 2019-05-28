@@ -6,6 +6,13 @@ class CostCenters::BulkDestroy < CostCenters::Base
     self.cost_centers = user.company.cost_centers.where id: cost_center_ids
   end
 
+  def validate
+    if self.cost_centers.blank?
+      add_message :error, "No cost centers found."
+      return
+    end
+  end
+
 
   def process
     # if self.cost_center.delete_all

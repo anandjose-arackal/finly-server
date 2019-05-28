@@ -6,6 +6,13 @@ class Company::Departments::BulkDestroy < Company::Departments::Base
     self.departments = user.company.departments.where id: department_ids
   end
 
+  def validate
+    if self.departments.blank?
+      add_message :error, "No departments found."
+      return
+    end
+  end
+
 
   def process
     # if self.department.delete_all
