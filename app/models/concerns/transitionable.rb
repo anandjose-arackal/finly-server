@@ -633,7 +633,7 @@ module Transitionable
         when :inventory_manager, 'inventory_manager'
           data = []
         when :vendor_creator, 'vendor_creator'
-          data = []
+          data = role_based_initiator_associated_items(user, role_id)
         when :vendor_reviewer, 'vendor_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :vendor_auditor, 'vendor_auditor'
@@ -677,6 +677,8 @@ module Transitionable
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
         document_table_name = 'inward_invoices'
+      elsif (document_table_name == "yes_bank_vendors") || ("#{self.table_name}" == "yes_bank_vendors")
+        document_table_name = 'vendors'
       end
       document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
     end
