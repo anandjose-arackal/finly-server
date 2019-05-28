@@ -253,11 +253,11 @@ class User < ApplicationRecord
   delegate :company_name, to: :company
 
   validates :company_id, presence: true
-  validates :email, uniqueness: {allow_blank: true, case_sensitive: false}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
+  validates :email, uniqueness: {allow_blank: true, case_sensitive: false, scope: :company_id}, format: {allow_blank: true, with: Constants::VALID_EMAIL_FORMAT}
   validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ']+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
-  validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
+  validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: {scope: :company_id}
   validates :user_panel_subscription, presence: true
   validate :password_complexity
 
