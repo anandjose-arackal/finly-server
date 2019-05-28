@@ -188,7 +188,7 @@ class Invoice < ApplicationRecord
   delegate :paid_amount, to: :paid_amount
 
   delegate :unpaid?, :partially_paid?, :paid?, :open?, :processing?, :rejected?,
-           :approved?, :retracted?, :auto_approved?, :closed?, to: :invoice_status
+           :approved?, :retracted?, :auto_approved?, :closed?, to: :invoice_status, allow_nil: true
   delegate :payment?, :advance?, to: :invoice_type
 
 
@@ -423,7 +423,6 @@ class Invoice < ApplicationRecord
     end
     where('extract(month from created_at) = ?', month)
   }
-
 
   # before_create :payment_agreement_updations
   before_validation :update_company, :payment_agreement_updations
@@ -741,7 +740,12 @@ class Invoice < ApplicationRecord
       user = user.present? ? user : RequestStore.store[:current_user]
       update_creator(user)
       # update_company(user)
+      # set_initial_status
     end
+  end
+
+  def set_initial_status
+    self.update(invoice_status_id: InwardInvoiceStatus.id_for(:open))
   end
 
   def set_invoice_type

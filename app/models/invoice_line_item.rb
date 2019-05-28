@@ -59,7 +59,7 @@ class InvoiceLineItem < ApplicationRecord
 
   # removing for now
   # validates_presence_of :unit_of_measurement
-  validates_presence_of :department, if: :check_outward_invoice?
+  # validates_presence_of :department, if: :check_outward_invoice?
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
