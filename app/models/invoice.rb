@@ -139,6 +139,7 @@ class Invoice < ApplicationRecord
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
   belongs_to :billing_type, optional: true
+  belongs_to :payment_term, optional: true
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
