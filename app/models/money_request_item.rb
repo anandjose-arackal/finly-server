@@ -19,7 +19,7 @@ class MoneyRequestItem < ApplicationRecord
 
   scope :with_id, -> (id) {where id: id}
   scope :with_amount, -> {joins :amount}
-  scope :sum_amount, -> (currency_code=:INR) {with_amount.sum(currency_code)}
+  scope :sum_amount, -> (currency_code=:INR) {currency_code = :INR if currency_code.blank?; with_amount.sum(currency_code)}
   scope :active_categories, -> do
 
   end
