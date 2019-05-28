@@ -4,7 +4,16 @@
 
 class Export::MoneyRequest::AsXml < Export::MoneyRequest::Base
 
-  attr_accessor :money_requests, :result, :money_request_name, :default_column_names
+  attr_accessor :money_requests, :result, :money_request_name, :default_column_names,
+                :column_names, :data
+
+  def personalizer
+    {
+        post_process: {
+            before: Personalizer::Process.new([:export, :money_requests], :as_xml, self)
+        }
+    }
+  end
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin, :auditor]
@@ -27,10 +36,10 @@ class Export::MoneyRequest::AsXml < Export::MoneyRequest::Base
   end
 
   def process
-    @column_names = default_column_names
-    @data = []
+    self.column_names = default_column_names
+    self.data = []
     money_requests.each do |mr|
-      @data << retrieve_data(mr)
+      self.data << retrieve_data(mr)
     end
   end
 
@@ -40,7 +49,7 @@ class Export::MoneyRequest::AsXml < Export::MoneyRequest::Base
   end
 
   def success
-    Export::Base::ExportPresenter.new(user, {header: @column_names, data: @data, money_request_name: money_request_name}, messages)
+    Export::Base::ExportPresenter.new(user, {header: self.column_names, data: self.data, money_request_name: money_request_name}, messages)
   end
 
 end

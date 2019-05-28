@@ -26,6 +26,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     has_scope :filter_month
     has_scope :filter_ids, type: :array
     has_scope :filter_policy_id
+    has_scope :filter_invoice_id
 
     def init
       # Todo temp workaround because of frontend format issue - START
@@ -35,7 +36,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
       # Todo temp workaround because of frontend format issue - END
       self.invoices = params[:invoices]
       self.invoices = apply_scopes(self.invoices, params)
-      self.paginated_invoices = self.invoices.paginate(page: params[:page], per_page: (params[:per_page] || 30))
+      self.paginated_invoices = self.invoices.order(created_at: :desc).paginate(page: params[:page], per_page: (params[:per_page] || 30))
     end
 
     def po_invoice_status_count
