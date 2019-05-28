@@ -2,7 +2,7 @@ class Vendors::Exports::Base < BaseOperation
   attr_accessor  :headers, :vendors
 
   def init
-    self.items= user.company.yes_bank_vendors.includes(:gstin_locations, :bank_accounts)
+    self.items= user.company.yes_bank_vendors.authorized.includes(:gstin_locations, :bank_accounts)
     self.headers = default_headers
   end
 
