@@ -298,9 +298,9 @@ class Amount < ApplicationRecord
     precision_value(super())
   end
 
-  def precision_value(val=nil)
-    super((val || self.value))
-  end
+  # def precision_value(val=nil)
+  #   super((val || self.value))
+  # end
 
   def amount_with_currency(currency_code)
     currency_code = currency_code.to_sym unless currency_code.is_a?(Symbol)

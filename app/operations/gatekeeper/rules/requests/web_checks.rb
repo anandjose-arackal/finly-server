@@ -144,6 +144,8 @@ Gatekeeper::Checker.new 'On New Request' do
       section 'Unverified' do
         before do
           skip unless RequestStoreUtil.current_session.user_device.status_id == UserDeviceStatus.id_for(:unverified)
+          policy = RequestStoreUtil.security_policy
+          skip unless policy.browser_client.otp_verify?
         end
         rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
           pass = false
@@ -207,6 +209,8 @@ Gatekeeper::Checker.new 'On New Request' do
       section 'Unverified' do
         before do
           skip unless RequestStoreUtil.current_session.user_ip.status_id == UserIpStatus.id_for(:unverified)
+          policy = RequestStoreUtil.security_policy
+          skip unless policy.browser_ip.otp_verify?
         end
         rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
           pass = false
@@ -242,6 +246,8 @@ Gatekeeper::Checker.new 'On New Request' do
       section 'Unverified' do
         before do
           skip unless RequestStoreUtil.current_session.user_agent_client.status_id == UserAgentClientStatus.id_for(:unverified)
+          policy = RequestStoreUtil.security_policy
+          skip unless policy.browser_user_agent.otp_verify?
         end
         rule 'cannot access the system  apart from SendOTP API and OTP Verification API' do
           pass = false
