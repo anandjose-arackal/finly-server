@@ -157,7 +157,7 @@ class InvoiceLineItemsCalculationUtils
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.value))
+    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (item.tax_rate&.rate))
     self.tax_amount = self.net_amount - self.gross_amount
 
     # setting the SGST, CGST and IGST values for the invoice
