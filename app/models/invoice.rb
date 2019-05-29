@@ -647,7 +647,11 @@ class Invoice < ApplicationRecord
         paid_amount: payment_amounts_total,
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
         po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
-        vendor_location_id: self.vendor_location_id
+        vendor_location_id: self.vendor_location_id,
+        payment_term_id: self.payment_term_id,
+        vendor: self.vendor.as_json,
+        department_id: self.department_id,
+        location_id: self.location_id
     }
   end
 

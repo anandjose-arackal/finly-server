@@ -6,7 +6,13 @@ json.results do
   json.reviewal_chain @result.reviewal_chain
 
   json.general_invoice_details do
-    json.merge! @result.general_invoices.as_json
+    json.array! @result.general_invoices.each do |general_invoice|
+      json.merge! general_invoice.as_json
+      json.vendor_details general_invoice.vendor.as_json
+      json.department_details general_invoice.department.as_json
+      json.location_details general_invoice.location.as_json
+      json.cost_center_details general_invoice.cost_center.as_json
+    end
   end
 
   json.rental_invoice_details do
@@ -20,4 +26,6 @@ json.results do
   json.beneficiary_payment_details do
     json.merge! @result.beneficiary_payments.as_json
   end
+
+
 end
