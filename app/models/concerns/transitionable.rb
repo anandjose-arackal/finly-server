@@ -247,11 +247,10 @@ module Transitionable
         forwarded_to_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
         forwarded_to_ids.compact!
 
-        # forwarded shud take first priority
-        if forwarded_to_ids.present?
-          user_ids = forwarded_to_ids
-        elsif taken_control_by_ids.present?
+        if taken_control_by_ids.present?
           user_ids = taken_control_by_ids
+        elsif forwarded_to_ids.present?
+          user_ids = forwarded_to_ids
         else
           user_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
         end
