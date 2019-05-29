@@ -12,6 +12,7 @@ json.results do
       json.department_details general_invoice.department.as_json
       json.location_details general_invoice.location.as_json
       json.cost_center_details general_invoice.cost_center.as_json
+      json.vendor_location_details general_invoice.gstin_location.as_json
     end
   end
 
