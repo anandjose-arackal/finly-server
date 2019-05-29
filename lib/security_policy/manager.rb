@@ -5,10 +5,6 @@ class SecurityPolicy::Manager
 
   attr_accessor :user, :user_roles, :user_role_names
 
-  SecurityPolicy::Manager.subscribers.each do |key, klass|
-    attr_accessor key
-  end
-
   def self.for(user)
     if RequestStoreUtil.security_policy&.user == user
       return RequestStoreUtil.security_policy
@@ -26,6 +22,8 @@ class SecurityPolicy::Manager
 
   def init_config
     SecurityPolicy::Manager.subscribers.each do |key, klass|
+      self.class.send(:attr_accessor, key) unless self.respond_to?(key)
+
       self.send("#{key}=", klass&.first.new(user, user_roles, user_role_names))
     end
   end
