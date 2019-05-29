@@ -203,12 +203,12 @@ class Amount < ApplicationRecord
 
   # method that returns the amount value
   def amount_value
-    self.precision_value
+    self.precision_value(self.value)
   end
 
   # method that returns the value of the amount
   def budget_value
-    self.precision_value
+    self.precision_value(self.value)
   end
 
   alias_method :transaction_amount_value, :amount_value
