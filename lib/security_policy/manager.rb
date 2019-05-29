@@ -24,7 +24,7 @@ class SecurityPolicy::Manager
     SecurityPolicy::Manager.subscribers.each do |key, klass|
       self.class.send(:attr_accessor, key) unless self.respond_to?(key)
 
-      self.send("@#{key}=", klass&.first.new(user, user_roles, user_role_names))
+      self.send("#{key}=", klass&.first.new(user, user_roles, user_role_names))
     end
   end
 
