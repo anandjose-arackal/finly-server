@@ -13,7 +13,7 @@ set :stage, 'production'
 # set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user
-set :rbenv_ruby, '2.6.0' # Edit this if you are using MRI Ruby
+set :rbenv_ruby, '2.6.1' # Edit this if you are using MRI Ruby
 
 set :sidekiq_config, -> {File.join(shared_path, 'config', 'sidekiq_yes_bank_balance_poller.yml')}
 set :sidekiq_pid, -> {File.join(shared_path, 'tmp', 'pids', 'sidekiq_yes_bank_balance.pid')}
