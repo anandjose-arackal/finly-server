@@ -66,6 +66,7 @@ class PaymentAgreement < ApplicationRecord
       id: self.id,
       agreement_number: self.order_number,
       title: self.title,
+      policy_id: self.policy_id,
       policy: self.policy&.name,
       created_by: self.creator&.name,
       status: self.status&.name,
