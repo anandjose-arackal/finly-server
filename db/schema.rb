@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_22_112410) do
+ActiveRecord::Schema.define(version: 2019_05_27_173719) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -3192,7 +3192,7 @@ ActiveRecord::Schema.define(version: 2019_05_22_112410) do
   create_table "invoice_line_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "invoice_id"
     t.string "description"
-    t.integer "quantity"
+    t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 10
     t.decimal "tax", precision: 20, scale: 10
     t.decimal "discount", precision: 20, scale: 10
@@ -3742,6 +3742,7 @@ ActiveRecord::Schema.define(version: 2019_05_22_112410) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "gl_code"
     t.index ["active"], name: "index_money_request_item_categories_on_active"
     t.index ["company_id"], name: "index_money_request_item_categories_on_company_id"
     t.index ["name"], name: "index_money_request_item_categories_on_name"
@@ -4756,7 +4757,7 @@ ActiveRecord::Schema.define(version: 2019_05_22_112410) do
     t.string "product_id"
     t.string "description"
     t.string "hsn_sac"
-    t.integer "quantity"
+    t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 5
     t.decimal "tax", precision: 20, scale: 5
     t.decimal "tds", precision: 20, scale: 5
@@ -4865,6 +4866,9 @@ ActiveRecord::Schema.define(version: 2019_05_22_112410) do
     t.boolean "cost_allocation_items", default: false
     t.text "internal_note"
     t.text "vendor_address"
+    t.string "vendor_poc_name"
+    t.string "vendor_poc_email"
+    t.string "vendor_poc_mobile_number"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["advance_tds_amount_id"], name: "index_purchase_orders_on_advance_tds_amount_id"

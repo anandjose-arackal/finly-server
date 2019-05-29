@@ -2,7 +2,7 @@ class SecurityPolicy::Config
 
   HIGH = {
       browser: {
-          client: {otp_verify: true},
+          client: {otp_verify: false},
           ip: {otp_verify: false},
           inactivity_timeout: 30.minutes,
           concurrent_logins: 5
