@@ -14,6 +14,7 @@ json.results do
       json.cost_center_details general_invoice.cost_center.as_json
       json.vendor_location_details general_invoice.gstin_location.as_json
       json.payment_term_details general_invoice.payment_term.as_json
+      json.notified_user_details general_invoice.notified_users.as_json
     end
   end
 

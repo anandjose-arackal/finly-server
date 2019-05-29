@@ -4,7 +4,6 @@ class PaymentAgreements::Update < PaymentAgreements::Base
   def init
     super
     self.payment_agreement_params = payment_agreement_parameters
-    binding.pry
     self.payment_agreement = user.company.payment_agreements.find_by_id(params[:id])
 
   end

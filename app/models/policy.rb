@@ -168,7 +168,6 @@ class Policy < ApplicationRecord
     begin
       ActiveRecord::Base.transaction do
         self.policy_cost_center_mappings.destroy_all
-        binding.pry
         params[:policy_cost_center_mappings_attributes].each do |cost_center_id|
           cost_center = self.company.cost_centers.find_by_id cost_center_id
           result = self.policy_cost_center_mappings.create!(cost_center_id: cost_center_id, enabled: true)
