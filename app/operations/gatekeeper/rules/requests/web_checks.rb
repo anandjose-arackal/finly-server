@@ -3,8 +3,6 @@ Gatekeeper::Checker.new 'On New Request' do
   before do
     skip unless RequestStoreUtil.current_session&.web?
     skip if RequestStoreUtil.current_session.admin_user_id.present?
-    skip
-    skip if RequestStoreUtil.current_user.company_id == 2
   end
 
   premise :on_authenticated_request do
@@ -67,10 +65,13 @@ Gatekeeper::Checker.new 'On New Request' do
       fail
     end
 
-    rule 'Session should timeout after 30 minute of inactivity' do
+    rule 'Session should timeout on inactivity' do
       session = RequestStoreUtil.current_session
+      policy = RequestStoreUtil.security_policy
 
-      if Time.now - Time.parse(session.last_request_at.to_s) > 30.minutes
+      next if policy.browser_client.inactivity_timeout.nil?
+
+      if Time.now - Time.parse(session.last_request_at.to_s) > policy.browser_client.inactivity_timeout
         message 'Session timeout'
         session_status_id UserSessionStatus.id_for(:expired)
         response_code 401

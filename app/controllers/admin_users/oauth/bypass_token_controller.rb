@@ -78,7 +78,7 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
     attachment = {
         "color": yellow,
         "author_name": "Admin Bypass Login",
-        "title": "Admin Accessor",
+        "title": "#{params[:reason_details]}",
         "text": "#{admin_user.id} - #{admin_user.name}",
         "fields": [
             {
@@ -105,7 +105,7 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
         "ts": Time.now.to_i
     }
 
-    SLACK_NOTIFIER.ping nil, attachments: [attachment]
+    SLACK_NOTIFIER.ping nil, attachments: [attachment], channel: '#admin_access'
   end
 
 end

@@ -34,12 +34,15 @@ class Procurements::PurchaseOrders::TakeControl < Procurements::PurchaseOrders::
       add_message :error, op.messages[:error]
       return
     end
-    if purchase_order.processing? || purchase_order.auto_approved?
-      old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
-      status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
-      self.procurement.status_tags.delete(old_status_tag)
-      self.procurement.status_tags << status_tag
-    end
+    
+    # while taking control, no status shud be updated
+    # 
+    # if purchase_order.processing? || purchase_order.auto_approved?
+    #   old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_processing))
+    #   status_tag = StatusTag.find_by(id: StatusTag.id_for(:po_approved))
+    #   self.procurement.status_tags.delete(old_status_tag)
+    #   self.procurement.status_tags << status_tag
+    # end
 
     self.workflow_output = op.workflow_output
   end

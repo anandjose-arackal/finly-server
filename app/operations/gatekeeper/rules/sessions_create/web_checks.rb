@@ -3,8 +3,6 @@ Gatekeeper::Checker.new 'On Web Authentication' do
   before do
     skip unless RequestStoreUtil.current_session&.web?
     skip if RequestStoreUtil.current_session&.admin_user_id.present?
-
-    skip if RequestStoreUtil.current_user.company_id == 2
   end
 
   premise :after_session_create do
@@ -47,6 +45,9 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
         rule 'Unverified devices need to be verified before proceeding' do
           next unless RequestStoreUtil.current_user_device.status_id == UserDeviceStatus.id_for(:unverified)
+          policy = RequestStoreUtil.security_policy
+          next unless policy.browser_client.otp_verify?
+
           require_otp true
         end
 
@@ -83,6 +84,9 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
       rule 'Unverified IPs need to be verified before proceeding' do
         next unless RequestStoreUtil.current_session&.user_ip.status_id == UserIpStatus.id_for(:unverified)
+        policy = RequestStoreUtil.security_policy
+        next unless policy.browser_ip.otp_verify?
+
         require_otp true
       end
     end
@@ -97,6 +101,9 @@ Gatekeeper::Checker.new 'On Web Authentication' do
 
       rule 'Unverified UserAgent Clients need to be verified before proceeding' do
         next unless RequestStoreUtil.current_session&.user_agent_client.status_id == UserIpStatus.id_for(:unverified)
+
+        policy = RequestStoreUtil.security_policy
+        next unless policy.browser_user_agent.otp_verify?
         require_otp true
       end
     end
@@ -108,12 +115,14 @@ Gatekeeper::Checker.new 'On Web Authentication' do
     end
 
     section 'Active Session' do
-      rule 'A user cannot have more than 2 active web sessions' do
+      rule 'Too many concurrent sessions' do
         authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
-        if authorized_web_sessions.size > 2
-          authorized_web_sessions[0..-3].each do |session|
-            session.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
-            session.access_token.update(status_id: UserSessionStatus.id_for(:revoked), message: 'A user cannot have more than 2 active web sessions')
+        policy = RequestStoreUtil.security_policy
+        max_concurrent_sessions = policy.browser_client.concurrent_logins
+        if authorized_web_sessions.size > max_concurrent_sessions
+          authorized_web_sessions[0..-(max_concurrent_sessions + 1)].each do |session|
+            session.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")
+            session.access_token.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")
           end
         end
       end

@@ -294,8 +294,12 @@ class Amount < ApplicationRecord
     self.currency.country_code
   end
 
-  def precision_value
-    super(self.value)
+  def value
+    precision_value(super())
+  end
+
+  def precision_value(val=nil)
+    super((val || self.value))
   end
 
   def amount_with_currency(currency_code)

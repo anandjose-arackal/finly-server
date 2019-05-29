@@ -3,8 +3,8 @@ RSpec.describe 'UserSessionEvent' do
 
   before :all do
     @company = create :company
-    @user1 = create :em_user, company: @company
-    @user2 = create :em_user, company: @company
+    @user1 = create :em_admin_user, company: @company
+    @user2 = create :em_admin_user, company: @company
     @user_agent = Faker::Internet.user_agent
 
     @ip = random_ip
