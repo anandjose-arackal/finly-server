@@ -18,15 +18,14 @@ class PaymentAgreements::UpcomingInvoices < PaymentAgreements::Base
 
   def process
     case 
-      when payment_agreement.general_invoices.present?
-        self.invoices = payment_agreement.general_invoices
-      when payment_agreement.rental_invoices.present?
-        self.invoices = payment_agreement.rental_invoices
-      when payment_agreement.beneficiary_payments.present?
-        self.invoices = payment_agreement.beneficiary_payments
-      when payment_agreement.security_deposits.present?
-        self.invoices = payment_agreement.security_deposits
-      end
+    when payment_agreement.general_invoices.present?
+      self.invoices = payment_agreement.general_invoices
+    when payment_agreement.rental_invoices.present?
+      self.invoices = payment_agreement.rental_invoices
+    when payment_agreement.beneficiary_payments.present?
+      self.invoices = payment_agreement.beneficiary_payments
+    when payment_agreement.security_deposits.present?
+      self.invoices = payment_agreement.security_deposits
     end
   end
 
