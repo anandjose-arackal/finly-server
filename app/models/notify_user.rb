@@ -6,7 +6,7 @@ class NotifyUser < ApplicationRecord
   def as_json
     {
       id: self.id,
-      self.email self.user.email
+      email: self.user.email
     }
   end
 end
