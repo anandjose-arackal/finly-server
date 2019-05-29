@@ -13,6 +13,7 @@ json.results do
       json.location_details general_invoice.location.as_json
       json.cost_center_details general_invoice.cost_center.as_json
       json.vendor_location_details general_invoice.gstin_location.as_json
+      json.payment_term_details general_invoice.payment_term.as_json
     end
   end
 
