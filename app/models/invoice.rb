@@ -646,7 +646,8 @@ class Invoice < ApplicationRecord
         # remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value))
         paid_amount: payment_amounts_total,
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
-        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value)
+        po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
+        note: self.note
     }
   end
 
