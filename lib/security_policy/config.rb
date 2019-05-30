@@ -4,7 +4,7 @@ class SecurityPolicy::Config
       browser: {
           client: {otp_verify: false},
           ip: {otp_verify: false},
-          inactivity_timeout: 3.hours,
+          inactivity_timeout: 1.hour,
           concurrent_logins: 5
       },
       password: {
