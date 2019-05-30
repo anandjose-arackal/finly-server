@@ -71,6 +71,7 @@ class UserSessions::Create < BaseOperation
 
   def post_process
     RequestStoreUtil.set_current_user self.user
+    RequestStoreUtil.set_current_company self.user&.company
     RequestStoreUtil.set_current_session self.session
     RequestStoreUtil.set_current_event self.session.events.last
     RequestStoreUtil.set_current_device self.session.user_device
@@ -88,7 +89,8 @@ class UserSessions::Create < BaseOperation
     args[:company_id] = user&.company_id
     args[:user_id] = user&.id
     args[:access_token] = self.token
-    args[:scopes] = self.token&.scopes&.to_s
+    args[:scopes] = self.token&.scopes&.to_s || params[:scope]
+    args[:scopes] = args[:scopes].join(' ') if args[:scopes].respond_to?(:each)
     args[:username] = params[:username]
   end
 
