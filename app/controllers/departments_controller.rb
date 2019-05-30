@@ -32,4 +32,9 @@ class DepartmentsController < BaseControllers::WebBase
     @result = Company::Departments::Destroy.(current_user, params)
     respond
   end
+
+  def bulk_destroy
+    @result = Company::Departments::BulkDestroy.(current_user, params)
+    respond
+  end
 end

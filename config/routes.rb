@@ -3186,6 +3186,12 @@ Rails.application.routes.draw do
   get 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#show'
   delete 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#destroy'
 
+  # keep this above
+  delete 'departments/bulk_destroy', to: 'departments#bulk_destroy'  
+  delete 'cost_centers/bulk_destroy', to: 'cost_centers#bulk_destroy'  
+  delete 'locations/bulk_destroy', to: 'locations#bulk_destroy'  
+  # keep this above
+  
   resources :locations
 
   resources :departments

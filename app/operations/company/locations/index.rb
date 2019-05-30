@@ -4,11 +4,14 @@ class Company::Locations::Index < Company::Locations::Base
 
   class Company::Locations::Index::LocationsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :locations, :policy_location_filter_mapping
+    attr_accessor :locations, :policy_location_filter_mapping, :all_locations
 
     def init
       self.locations = params[:locations]
       self.policy_location_filter_mapping = params[:policy_location_filter_mapping]
+
+      # used in vp organization account
+      self.all_locations = self.locations
     end
   end
 
