@@ -6,9 +6,10 @@ class BaseControllers::ApiBase < ApplicationController
   end
 
   def decrypt_parameters
-    # check if the request encryption is required for this particular request
-    if current_user&.company&.request_encryption_enabled?
-
-    end
+    path = Dir.home + '/certificates/encryption_certificates/finly_icici_final.key'
+    private_key = OpenSSL::PKey::RSA.new(File.read(path))
+    decrypted_response = private_key.private_decrypt(Base64.decode64(params))
+    parsed_response = JSON.parse(decrypted_response)
+    self.params = parsed_response
   end
 end

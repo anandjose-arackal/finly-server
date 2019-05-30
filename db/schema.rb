@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_20_090119) do
+ActiveRecord::Schema.define(version: 2019_05_27_173719) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -690,7 +690,7 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
     t.integer "balance_due_id"
     t.integer "net_amount_id"
     t.integer "gross_amount_id"
-    t.decimal "roundoff_amount", precision: 10
+    t.decimal "roundoff_amount", precision: 20, scale: 10
     t.integer "cost_center_id"
     t.text "invoice_number"
     t.date "invoice_date"
@@ -1502,6 +1502,7 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
     t.boolean "active", default: true, null: false
     t.integer "base_currency_id", default: 1
     t.integer "status_id", default: 1, null: false
+    t.boolean "test_account", default: false
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -3068,7 +3069,7 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
   create_table "invoice_line_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "invoice_id"
     t.string "description"
-    t.integer "quantity"
+    t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 10
     t.decimal "tax", precision: 20, scale: 10
     t.decimal "discount", precision: 20, scale: 10
@@ -3220,6 +3221,7 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
     t.boolean "cost_allocation_items", default: false
     t.text "narration"
     t.string "po_number"
+    t.integer "bank_account_id"
     t.index ["address_id"], name: "index_invoices_on_address_id"
     t.index ["deleted_at"], name: "index_invoices_on_deleted_at"
     t.index ["discount_type_id"], name: "index_invoices_on_discount_type_id"
@@ -3573,6 +3575,7 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "gl_code"
     t.index ["active"], name: "index_money_request_item_categories_on_active"
     t.index ["company_id"], name: "index_money_request_item_categories_on_company_id"
     t.index ["name"], name: "index_money_request_item_categories_on_name"
@@ -4318,6 +4321,13 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
     t.index ["technical_contact_id"], name: "index_policy_configurations_on_technical_contact_id"
   end
 
+  create_table "policy_cost_center_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.integer "cost_center_id"
+    t.integer "policy_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "policy_department_mappings", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "policy_id"
     t.integer "department_id"
@@ -4541,7 +4551,7 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
     t.string "product_id"
     t.string "description"
     t.string "hsn_sac"
-    t.integer "quantity"
+    t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 5
     t.decimal "tax", precision: 20, scale: 5
     t.decimal "tds", precision: 20, scale: 5
@@ -4650,6 +4660,10 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
     t.text "internal_note"
     t.text "vendor_address"
     t.integer "discount_type_id"
+    t.integer "taxable_amount_id"
+    t.string "vendor_poc_name"
+    t.string "vendor_poc_email"
+    t.string "vendor_poc_mobile_number"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"
@@ -6198,6 +6212,7 @@ ActiveRecord::Schema.define(version: 2019_05_20_090119) do
     t.text "admin_access_reason"
     t.text "admin_access_reason_details"
     t.string "scopes"
+    t.string "admin_access_requested_by"
     t.index ["company_id"], name: "index_user_sessions_on_company_id"
     t.index ["ip"], name: "index_user_sessions_on_ip"
     t.index ["latitude"], name: "index_user_sessions_on_latitude"
