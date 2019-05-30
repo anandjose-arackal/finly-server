@@ -94,9 +94,10 @@ class BranchLocation < ApplicationRecord
   end
 
   def as_json(options={})
+    display_name = options&.dig(:tree) ? full_name : name
     {
         id: self.id,
-        name: self.full_name,
+        name: display_name,
         gstin: self.gstin,
         pan: self.pan,
         address_1: self.address_1,

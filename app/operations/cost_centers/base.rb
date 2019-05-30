@@ -15,6 +15,6 @@ class CostCenters::Base < BaseOperation
   end
 
   def cost_center_params
-    params.require(:cost_center).permit(:name)
+    params.require(:cost_center).permit(:name, :parent_id)
   end
 end
