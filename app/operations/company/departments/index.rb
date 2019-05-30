@@ -12,7 +12,7 @@ class Company::Departments::Index < Company::Departments::Base
       self.departments = self.departments.filter_only_roots
       
       # used in vp organization account
-      self.all_departments = self.departments
+      self.all_departments = params[:departments]
 
       self.company_departments =  params[:departments]
       self.policy_department_filter_mapping = params[:policy_department_filter_mapping]
