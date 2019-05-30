@@ -7,8 +7,8 @@ class NotifyUser < ApplicationRecord
     {
       id: self.id,
       email: self&.user&.email,
-      mobile_number: self&.mobile_number,
-      name: self&.name
+      mobile_number: self&.user&.mobile_number,
+      name: self&.user&.name
     }
   end
 end
