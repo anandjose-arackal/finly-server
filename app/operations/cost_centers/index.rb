@@ -4,10 +4,13 @@ class CostCenters::Index < CostCenters::Base
 
   class CostCenters::Index::CostCenterPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :cost_centers
+    attr_accessor :cost_centers, :all_cost_centers
 
     def init
       self.cost_centers = params[:cost_centers]
+
+      # used in vp organization account
+      self.all_cost_centers = params[:cost_centers]
     end
   end
 
