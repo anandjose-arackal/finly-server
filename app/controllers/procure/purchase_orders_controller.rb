@@ -1,6 +1,6 @@
-class Procure::PurchaseOrdersController < ApplicationController
-  before_action :set_tokens_in_header, only: [:download]
-  before_action -> { finly_authorize! :web }
+class Procure::PurchaseOrdersController < BaseControllers::WebBase
+
+  set_tokens_in_header :download
 
   def index
     @result = Procurements::PurchaseOrders::Index.(current_user, params)
@@ -35,6 +35,15 @@ class Procure::PurchaseOrdersController < ApplicationController
   def submit
     @result = Procurements::PurchaseOrders::Submit.(current_user, params)
     respond
+  end
+
+  def save_submit
+    @result = Procurements::PurchaseOrders::SaveSubmit.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'procure/purchase_orders/save_submit'
+    end
   end
 
   def retract
@@ -106,7 +115,9 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def template_bulk_import_items
     @result = Procurements::PurchaseOrders::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   def reject
@@ -131,6 +142,11 @@ class Procure::PurchaseOrdersController < ApplicationController
 
   def mark_send_to_vendor
     @result = Procurements::PurchaseOrders::MarkSendToVendor.(current_user, params)
+    @respond
+  end
+
+  def mark_vendor_confirmed
+    @result = Procurements::PurchaseOrders::MarkVendorConfirmed.(current_user, params)
     @respond
   end
 

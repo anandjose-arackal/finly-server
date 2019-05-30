@@ -1,5 +1,4 @@
-class AnalyticsController < ApplicationController
-  before_action -> { finly_authorize! :web}
+class AnalyticsController < BaseControllers::WebBase
 
   def show
     # params[:page] = 1

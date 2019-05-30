@@ -2,7 +2,7 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
 
   attr_accessor :item_details, :error_messages, :valid, :contents, :headers,
                 :issues, :issue_item, :company_items, :items_in_sheet, :list_of_items, :items_found, :items_not_found,
-                :all_departments, :all_departments_ids, :category_ids, :category, :cost_centers
+                :all_departments, :all_departments_ids, :category_ids, :category, :cost_centers, :tax_rates
 
   class Procurements::Invoices::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -48,6 +48,8 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
     self.category = current_company.categories.inward_invoice_items_only
     self.category_ids = category.pluck(:id) rescue []
 
+    self.tax_rates = user.company.tax_rates.non_deleted
+
     self.cost_centers = user.company.cost_centers
     
   end
@@ -84,7 +86,7 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
       unit_of_measurement = item[:unit_of_measurement] || item["unit_of_measurement"]
       rate = item[:rate] || item["rate"]
       discount = item[:discount] || item["discount"]
-      tax = item[:tax] || item["tax"]
+      tax_rate_id = item[:tax_rate_id] || item["tax_rate_id"]
       total = item[:total] || item["total"]
 
       self.error_messages = []
@@ -155,6 +157,16 @@ class Procurements::Invoices::BulkValidateFileData < Procurements::Invoices::Bas
           self.valid = false
           self.error_messages << "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
           self.issue_item[:quantity] = "Entered category ID not found for this company. Please recheck the Category sheet for the list of IDs."
+        end
+      end
+
+
+      if tax_rate_id.present?
+        unless self.tax_rates.pluck(:id).include? tax_rate_id.to_i
+          item[:tax_rate_id] += "---error---"
+          self.valid = false
+          self.error_messages << "Invalid Tax Rate ID"
+          self.issue_item[:quantity] = "Invalid Tax Rate ID"
         end
       end
 

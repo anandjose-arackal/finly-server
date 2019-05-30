@@ -1,5 +1,4 @@
-class VendorsController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class VendorsController < BaseControllers::WebBase
 
   def filter_config
     @result = Vendors::FilterConfig.(current_user, params)
@@ -123,6 +122,11 @@ class VendorsController < ApplicationController
 
   def actions_config
     @result = ActionsManager::Processor.(current_user, params)
+    respond
+  end
+
+  def counts
+    @result = Vendors::Counts.(current_user, params)
     respond
   end
 end

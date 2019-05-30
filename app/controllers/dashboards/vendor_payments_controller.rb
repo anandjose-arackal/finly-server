@@ -1,5 +1,4 @@
-class Dashboards::VendorPaymentsController < ApplicationController
-  before_action -> { finly_authorize! :web }
+class Dashboards::VendorPaymentsController < BaseControllers::WebBase
 
   def configs
     @result = Dashboard::VendorPayments::Configs.(current_user, params)

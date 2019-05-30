@@ -274,7 +274,7 @@ class Amount < ApplicationRecord
 
   # i.e. updating the respective currency' column with value
   def set_base_currency_value
-    if Amount.column_names.include?(self.currency.country_code)
+    if Amount.column_names.include?(self.currency&.country_code)
       # self.update((self.currency.country_code) => self.value)
       # Setting the value without updating
       self.send("#{self.currency.country_code}=", self.value)

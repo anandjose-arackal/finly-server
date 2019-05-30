@@ -1,3 +1,0 @@
-class NotAuthorizedException < StandardError
-
-end

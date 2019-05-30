@@ -16,13 +16,14 @@ class Procurements::PurchaseRequests::PurchaseRequestEditConfig < Procurements::
       # self.departments = user.company.departments
       # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
       params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
-      self.departments = Company::Departments::Index.(user, params).policy_department_filter_mapping&.leaves
-      self.locations = Company::Locations::Index.(user, params).policy_location_filter_mapping&.leaves
+      initiating_user = self.purchase_request.present? ? purchase_request.creator : user
+      self.departments = Company::Departments::Index.(initiating_user, params).policy_department_filter_mapping&.leaves
+      self.locations = Company::Locations::Index.(initiating_user, params).policy_location_filter_mapping&.leaves
       # self.locations = user.initiator_associated_locations(UserRole.id_for(:purchase_request_initiator)).leaves
       # self.departments = user.company.departments
       # self.departments = user.initiator_associated_departments(UserRole.id_for(:purchase_request_initiator)).leaves
       # params[:filter_role_id] = [UserRole.id_for(:purchase_request_initiator)]
-      self.policies = Policy::VendorPayments::Index.(user, params).policies
+      self.policies = Policy::VendorPayments::Index.(initiating_user, params).policies
       self.cost_centers = user.company.cost_centers
       self.reviewal_chains = []
       self.department_mappings = []

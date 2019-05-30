@@ -38,6 +38,7 @@ class TrailAction < ApplicationRecord
         :credit,
         :send_to_vendor,
         :reopen,
+        :vendor_confirmed,
 
         # TravelRequestBookingActions
         :confirm_selection,

@@ -12,7 +12,7 @@ class Procurements::Create < Procurements::Base
       return
     end
 
-    unless user.is_purchase_order_initiator? #|| user.vendor_payments_admin?
+    unless user.is_purchase_order_initiator? || user.is_invoice_initiator?#|| user.vendor_payments_admin?
       add_message :error, 'You do not have permission for this action'
     end
 

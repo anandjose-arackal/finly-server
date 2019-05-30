@@ -1,6 +1,5 @@
-class CustomFieldsController < ApplicationController
+class CustomFieldsController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web }
 
   def create
     @result = CustomField::Configuration::Create.(current_user, params)

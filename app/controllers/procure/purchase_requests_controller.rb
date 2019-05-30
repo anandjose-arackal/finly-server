@@ -1,6 +1,4 @@
-class Procure::PurchaseRequestsController < ApplicationController
-
-  before_action -> { finly_authorize! :web}
+class Procure::PurchaseRequestsController < BaseControllers::WebBase
 
   def index
     @result = Procurements::PurchaseRequests::Index.(current_user, params)
@@ -140,7 +138,9 @@ class Procure::PurchaseRequestsController < ApplicationController
 
   def template_bulk_import_items
     @result = Procurements::PurchaseRequests::GenerateImportSample.(current_user, params)
-    respond
+    respond_to do |format|
+      format.json {}
+    end    
   end
 
 end

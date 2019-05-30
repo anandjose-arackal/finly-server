@@ -1,8 +1,7 @@
-class CardTransactionsController < ApplicationController
+class CardTransactionsController < BaseControllers::WebBase
 
 
 
-  before_action -> { finly_authorize! :web}
 
   def index
     @result = Card::Transaction::Index.(current_user, params)

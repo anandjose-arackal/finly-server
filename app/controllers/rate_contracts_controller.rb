@@ -1,6 +1,4 @@
-class RateContractsController < ApplicationController
-
-  before_action -> { finly_authorize! :web}
+class RateContractsController < BaseControllers::WebBase
 
   def index
     @result = RateContracts::Index.(current_user, params)

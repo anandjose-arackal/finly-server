@@ -1,6 +1,5 @@
-class FeedbackController < ApplicationController
+class FeedbackController < BaseControllers::WebBase
 
-  before_action -> { finly_authorize! :web}
 
   def create
     @result = Feedback::Create.(current_user, params)

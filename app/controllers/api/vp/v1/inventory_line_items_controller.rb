@@ -1,8 +1,7 @@
-class Api::Vp::V1::InventoryLineItemsController < ApplicationController
+class Api::Vp::V1::InventoryLineItemsController < BaseControllers::ApiBase
 
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :api }
 
   def create
     @result = ItemMaster::Item::Create.(current_user, params)

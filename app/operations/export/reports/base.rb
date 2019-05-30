@@ -44,7 +44,7 @@ class Export::Reports::Base < Export::Base
         when ExportField.type_report_name
           data_arr << report&.name
         when ExportField.type_report_status
-          data_arr << report.status.name
+          data_arr << report&.status&.name
         when ExportField.type_employee_name
           data_arr << user.name
         when ExportField.type_employee_id
@@ -96,11 +96,11 @@ class Export::Reports::Base < Export::Base
         when ExportField.id_for(:spent_from_account)
           data_arr << expense.spent_from.present? ? expense.spent_from.name : "NONE"
         when ExportField.id_for(:policy)
-          data_arr << expense.report.policy&.name
+          data_arr << expense&.report&.policy&.name
         when ExportField.id_for(:report_submission_date)
-          data_arr << expense.report.submitted_at&.strftime("%H:%M, %d/%m/%Y")
+          data_arr << expense&.report&.submitted_at&.strftime("%H:%M, %d/%m/%Y")
         when ExportField.id_for(:report_creation_date)
-          data_arr << expense.report.created_at&.strftime("%H:%M, %d/%m/%Y")
+          data_arr << expense&.report&.created_at&.strftime("%H:%M, %d/%m/%Y")
         else
           data_arr << ''
       end

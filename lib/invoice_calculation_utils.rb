@@ -241,7 +241,11 @@ class InvoiceCalculationUtils
       tds = invoice.tds_slab&.tds
       invoice.tds = tds # setting the TDS for this invoice as well
     else
-      tds = invoice.tds
+      if invoice.is_a?(Invoice)
+        tds = 0
+      else
+        tds = invoice.tds
+      end
     end
     new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, tds)
     self.tds_amount = (self.gross_amount - new_gross_amount) rescue 0

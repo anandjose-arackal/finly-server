@@ -55,6 +55,7 @@ class Budget < ApplicationRecord
   validates :end_date, presence: true
 
   after_update :recalculate_parent_budget
+  after_update :reassign_parent_mappings
 
   scope :with_id, -> (ids) {where id: ids}
   scope :filter_ids, -> (id) {
@@ -224,6 +225,18 @@ class Budget < ApplicationRecord
     if self.parent.present?
       sum_children = self.parent.children.joins(:budget_amount).sum(:value)
       self.parent.budget_amount.update(value: sum_children)
+    end
+  end
+
+  def reassign_parent_mappings
+    if self.parent.present?
+      self.parent.children.each do |child_budget|
+        budget_criteria_mappings = child_budget.budget_criteria_mappings
+        budget_criteria_mappings.each do |mapping|
+          next if self.budget_criteria_mappings.with_budgetable_type(mapping.budgetable_type).with_budgetable_id(mapping.budgetable_id).present?
+          self.budget_criteria_mappings.build(budgetable_type: mapping.budgetable_type, budgetable_id: mapping.budgetable_id).save
+        end
+      end
     end
   end
 
