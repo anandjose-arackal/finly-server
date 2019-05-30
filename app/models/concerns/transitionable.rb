@@ -159,16 +159,8 @@ module Transitionable
         }
         data[:reviewers].push(reviewer)
 
-        if dlrm.forwarded && dlrm.forwarded_to_id.present?
-          data[:forwarded_to] = {
-              id: dlrm.forwarded_to_id,
-              name: dlrm.forwarded_to&.name,
-              email: dlrm.forwarded_to&.email,
-              action_taken: (dlrm.forwarded_to_id == dlrm.action_taken_by_id),
-              action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
 
-          }
-        end
+        
 
         if dlrm.taken_control_by_id.present?
           data[:taken_control_by] = {
@@ -178,8 +170,18 @@ module Transitionable
               mobile_number: dlrm.taken_control_by&.mobile_number,
               action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id),
               action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
-
           }
+
+        else
+          if dlrm.forwarded && dlrm.forwarded_to_id.present?
+            data[:forwarded_to] = {
+                id: dlrm.forwarded_to_id,
+                name: dlrm.forwarded_to&.name,
+                email: dlrm.forwarded_to&.email,
+                action_taken: (dlrm.forwarded_to_id == dlrm.action_taken_by_id),
+                action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
+            }
+          end
         end
 
         chain[level_number - 1] = data
@@ -245,11 +247,10 @@ module Transitionable
         forwarded_to_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
         forwarded_to_ids.compact!
 
-        # forwarded shud take first priority
-        if forwarded_to_ids.present?
-          user_ids = forwarded_to_ids
-        elsif taken_control_by_ids.present?
+        if taken_control_by_ids.present?
           user_ids = taken_control_by_ids
+        elsif forwarded_to_ids.present?
+          user_ids = forwarded_to_ids
         else
           user_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
         end

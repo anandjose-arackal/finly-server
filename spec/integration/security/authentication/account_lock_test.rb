@@ -19,6 +19,8 @@ RSpec.describe 'AccountLock' do
       expect(@user1.locked_at).to be_nil
       expect(@user1.failed_attempts).to eq(0)
       @user_agent = Faker::Internet.user_agent
+      allow_any_instance_of(SecurityPolicy::Manager).to receive(:account_lock).and_return(double({within_timeframe: 30.minutes, max_attempts: 4, locking_period: 30.minutes}))
+      allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_client).and_return(double({concurrent_logins: 2}))
 
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
 
@@ -74,9 +76,11 @@ RSpec.describe 'AccountLock' do
       @user_agent = Faker::Internet.user_agent
 
       allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(@user_agent)
+      allow_any_instance_of(SecurityPolicy::Manager).to receive(:account_lock).and_return(double({within_timeframe: 30.minutes, max_attempts: 4, locking_period: 30.minutes}))
+      allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_client).and_return(double({concurrent_logins: 2}))
 
       expect(@user2.reload.locked_at).to be_nil
-      @user2.update(locked_at: time)
+      @user2.update(locked_at: time, password_changed_at: nil)
       expect(@user2.reload.locked_at).to_not be_nil
 
       expect do
@@ -95,7 +99,6 @@ RSpec.describe 'AccountLock' do
 
       expect(response.status).to eq(401)
       expect(@user2.reload.locked_at).to_not be_nil
-      expect(UserAuthFailure.last.locked).to be_truthy
 
       allow(Time).to receive(:now).and_return(Time.now + 35.minutes)
 
