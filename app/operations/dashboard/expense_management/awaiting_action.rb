@@ -36,7 +36,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Reports awaiting approval",
         type: 'reports',
         count: Report.reviewer_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_awaiting_approval: true}]
+        filters: [{filter_status: 99}]
       }
       self.result.push data
     end
@@ -45,7 +45,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Reports awaiting credit",
         type: 'reports',
         count: Report.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_awaiting_approval: true}]
+        filters: [{filter_status: 99}]
       }
       self.result.push data
     end
@@ -56,7 +56,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Money Requests awaiting approval",
         type: 'money_requests',
         count: MoneyRequest.reviewer_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_awaiting_approval: true}]
+        filters: [{filter_status: 99}]
       }
       self.result.push data
     end
@@ -65,7 +65,7 @@ class Dashboard::ExpenseManagement::AwaitingAction < Dashboard::ExpenseManagemen
         title: "Money Requests awaiting credit",
         type: 'money_requests',
         count: MoneyRequest.finance_associated_items(user).not_open.exclude_deleted.awaiting_action_items(user.id).count,
-        filters: [{filter_awaiting_approval: true}]
+        filters: [{filter_status: 99}]
       }
       self.result.push data
     end

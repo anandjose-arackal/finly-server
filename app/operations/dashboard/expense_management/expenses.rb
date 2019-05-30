@@ -14,11 +14,14 @@ class Dashboard::ExpenseManagement::Expenses < Dashboard::ExpenseManagement::Bas
   class Dashboard::ExpenseManagement::Expenses::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expenses, :counts
 
+    has_scope :filter_date, using: [:from, :to], type: :hash
+
     def init
       general_filter_params = {
       }
 
-      self.expenses = params[:expenses].expenses.includes(:amount).non_personal.unreported_and_rejected
+      self.expenses = apply_scopes(params[:expenses], params)
+      self.expenses = self.expenses.expenses.includes(:amount).non_personal.unreported_and_rejected
 
       self.counts = []
 

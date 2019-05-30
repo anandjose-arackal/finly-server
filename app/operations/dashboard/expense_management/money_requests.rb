@@ -16,11 +16,14 @@ class Dashboard::ExpenseManagement::MoneyRequests < Dashboard::ExpenseManagement
   class Dashboard::ExpenseManagement::MoneyRequests::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_requests, :counts
 
+    has_scope :filter_date, using: [:from, :to], type: :hash
+
     def init
       general_filter_params = {
       }
 
-      self.money_requests = params[:money_requests].money_requests.includes(:payment_mode, {destination_pocket: :base_currency}, {items: [{money_request: [:payment_mode, {destination_pocket: :base_currency}]}, {amount: [:currency]}]})
+      self.money_requests = apply_scopes(params[:money_requests], params)
+      self.money_requests = self.money_requests.money_requests.includes(:payment_mode, {destination_pocket: :base_currency}, {items: [{money_request: [:payment_mode, {destination_pocket: :base_currency}]}, {amount: [:currency]}]})
 
       self.counts = []
 

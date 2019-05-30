@@ -16,15 +16,15 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
   class Dashboard::ExpenseManagement::Trips::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :trips, :counts
 
-    has_scope
+    has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       general_filter_params = {
       }
 
-      self.trips = params[:trips].travel_requests
+      self.trips = apply_scope(params[:trips], params)
+      self.trips = self.trips.travel_requests
       self.counts = []
-      # binding.pry
       personal_travel_data = {
         type: 'personal_travel',
         data: [

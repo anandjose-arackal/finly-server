@@ -16,11 +16,14 @@ class Dashboard::ExpenseManagement::Reports < Dashboard::ExpenseManagement::Base
   class Dashboard::ExpenseManagement::Reports::DashboardPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reports, :counts
 
+    has_scope :filter_date, using: [:from, :to], type: :hash
+
     def init
       general_filter_params = {
       }
 
-      self.reports = params[:reports].reports.includes(expenses: [:amount])
+      self.reports = apply_scope(params[:reports], params)
+      self.reports = self.reports.reports.includes(expenses: [:amount])
 
       self.counts = []
 
