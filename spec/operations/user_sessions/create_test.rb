@@ -42,9 +42,9 @@ class UserSessionCreateHelper
 
         allow(RequestStoreUtil).to receive(:current_request).and_return(double({referer: @referer, ip: @ip, remote_ip: @ip, original_url: @original_url, headers: headers, path: @path, method_symbol: 'post', user_agent: @user_agent}))
         @message = 'Failed reason goes here'
-        allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({device: @device, success?: true}))
-        allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: @ip_addr, success?: true}))
-        allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: @user_agent_client, success?: true}))
+        allow(UserDevices::FindOrCreate).to receive(:call).and_return(double({device: nil, success?: false}))
+        allow(UserIps::FindOrCreate).to receive(:call).and_return(double({ip: nil, success?: false}))
+        allow(UserAgentClients::FindOrCreate).to receive(:call).and_return(double({user_agent_client: nil, success?: false}))
 
         response = double({token: @token})
         block.call if block_given?

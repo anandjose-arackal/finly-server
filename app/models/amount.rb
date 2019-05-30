@@ -203,12 +203,12 @@ class Amount < ApplicationRecord
 
   # method that returns the amount value
   def amount_value
-    self.precision_value
+    self.precision_value(self.value)
   end
 
   # method that returns the value of the amount
   def budget_value
-    self.precision_value
+    self.precision_value(self.value)
   end
 
   alias_method :transaction_amount_value, :amount_value
@@ -294,9 +294,13 @@ class Amount < ApplicationRecord
     self.currency.country_code
   end
 
-  def precision_value
-    super(self.value)
+  def value
+    precision_value(super())
   end
+
+  # def precision_value(val=nil)
+  #   super((val || self.value))
+  # end
 
   def amount_with_currency(currency_code)
     currency_code = currency_code.to_sym unless currency_code.is_a?(Symbol)

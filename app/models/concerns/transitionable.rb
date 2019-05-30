@@ -245,10 +245,11 @@ module Transitionable
         forwarded_to_ids += self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:forwarded_to_id)
         forwarded_to_ids.compact!
 
-        if taken_control_by_ids.present?
-          user_ids = taken_control_by_ids
-        elsif forwarded_to_ids.present?
+        # forwarded shud take first priority
+        if forwarded_to_ids.present?
           user_ids = forwarded_to_ids
+        elsif taken_control_by_ids.present?
+          user_ids = taken_control_by_ids
         else
           user_ids = self.document_level_reviewer_mappings.with_level_id(level.id).pluck(:reviewer_id)
         end
@@ -357,7 +358,7 @@ module Transitionable
     def document_role_users(type=nil)
       case type
       when :creditor, 'creditor', :creditors, 'creditors'
-        user_role_id = UserRole.id_for(:creditor)
+        user_role_id = [UserRole.id_for(:creditor), UserRole.id_for(:bank_payment_request_creditor)]
       when :finance_manager, 'finance_manager', :finance_managers, 'finance_managers'
         user_role_id = UserRole.id_for(:finance_manager)
       when :travel_manager, 'travel_manager', :travel_managers, 'travel_managers'
@@ -633,7 +634,7 @@ module Transitionable
         when :inventory_manager, 'inventory_manager'
           data = []
         when :vendor_creator, 'vendor_creator'
-          data = []
+          data = role_based_initiator_associated_items(user, role_id)
         when :vendor_reviewer, 'vendor_reviewer'
           data = role_based_reviewer_associated_items(user, role_id)
         when :vendor_auditor, 'vendor_auditor'
@@ -677,6 +678,8 @@ module Transitionable
       document_table_name = options[:document_table_name]
       if (document_table_name == "invoices") || ("#{self.table_name}" == "invoices")
         document_table_name = 'inward_invoices'
+      elsif (document_table_name == "yes_bank_vendors") || ("#{self.table_name}" == "yes_bank_vendors")
+        document_table_name = 'vendors'
       end
       document_table_name.present? ? user.send("#{document_table_name}") : user.send("#{self.table_name}")
     end

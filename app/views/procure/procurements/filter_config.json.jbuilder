@@ -41,3 +41,9 @@ json.cost_centers do
   json.extract! cost_center, :id, :name
   end
 end
+
+json.policies do |policy|
+  json.array! @result.policies do |policy|
+    json.extract! policy, :id, :name
+  end
+end

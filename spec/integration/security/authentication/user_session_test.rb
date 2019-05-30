@@ -34,6 +34,7 @@ RSpec.describe 'UserSession' do
         expect(@user1.user_sessions.count).to eq(0)
 
         allow_any_instance_of(ActionDispatch::Request).to receive(:user_agent).and_return(Faker::Internet.user_agent)
+        allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_client).and_return(double(concurrent_logins: 2))
 
         2.times.each do
           expect do
@@ -86,6 +87,7 @@ RSpec.describe 'UserSession' do
       it 'should throw 401' do
         @issue_string = 'Issue issue'
         allow(UserSessions::Create).to receive(:call).and_return(double({success?: false, messages: {error: [@issue_string]}}))
+        allow_any_instance_of(SecurityPolicy::Manager).to receive(:browser_client).and_return(double(concurrent_logins: 2))
 
         expect do
           post '/oauth/token.json', params: {
