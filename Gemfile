@@ -263,7 +263,7 @@ group :test do
 end
 
 group :production do
-  gem 'elastic-apm', '~> 2.1.2'
+  gem 'elastic-apm', '~> 2.8.1'
   gem "skylight", '~> 3.1'
   gem 'scout_apm', '~> 2.4'
 end
