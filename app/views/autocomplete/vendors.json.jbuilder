@@ -1,4 +1,4 @@
-json.array!(@result.vendors) do |vendor|
+json.array!(@result.paginated_vendors) do |vendor|
   # name = vendor.business_name || vendor.name
   json.vendor_name vendor.name || ""
   json.business_name  vendor.business_name || ""
