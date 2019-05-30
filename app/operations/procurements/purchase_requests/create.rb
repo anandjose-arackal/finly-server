@@ -88,8 +88,12 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   def get_line_item_attachment_ids(params)
     if params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).present?
       attachment_ids = []
-      params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).each{ |k, v| attachment_ids << v[:id] }
-      return attachment_ids
+      params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).each do |item|
+        if item[:id].present?
+          attachment_ids << item[:id]&.to_i
+        end
+      end
+      return attachment_ids.compact
     end
   end
 end
