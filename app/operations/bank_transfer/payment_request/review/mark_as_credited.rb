@@ -117,8 +117,6 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
         document_owner = user
         Event::EBankPaymentRequest::Credit.(document_owner, {payment: payment})
       end
-      Rails.logger.fatal "User from mark_as_credited #{user.inspect}" 
-      Rails.logger.fatal "document_owner from mark_as_credited #{document_owner.inspect}" 
     end
   end
 end
