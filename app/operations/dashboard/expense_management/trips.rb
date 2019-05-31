@@ -22,8 +22,8 @@ class Dashboard::ExpenseManagement::Trips < Dashboard::ExpenseManagement::Base
       general_filter_params = {
       }
 
-      self.trips = apply_scope(params[:trips], params)
-      self.trips = self.trips.travel_requests
+      self.trips = apply_scopes(params[:trips], params)
+      self.trips = self.trips.travel_requests.includes(:reports, :bookings, {policy: [:base_currency]}, {money_requests: [items: [{money_request: [:payment_mode, {destination_pocket: :base_currency}]}, {amount: [:currency]}]]})
       self.counts = []
       personal_travel_data = {
         type: 'personal_travel',

@@ -22,7 +22,7 @@ class Dashboard::ExpenseManagement::Reports < Dashboard::ExpenseManagement::Base
       general_filter_params = {
       }
 
-      self.reports = apply_scope(params[:reports], params)
+      self.reports = apply_scopes(params[:reports], params)
       self.reports = self.reports.reports.includes(expenses: [:amount])
 
       self.counts = []
