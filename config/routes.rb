@@ -3649,6 +3649,7 @@ Rails.application.routes.draw do
     post 'inward_invoices/bulk_upload_items', to: 'inward_invoices#bulk_upload_items'
     get 'inward_invoices/template_bulk_import_items', to: 'inward_invoices#template_bulk_import_items'
     put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
+    get 'inward_invoices/filter_config', to: 'inward_invoices#filter_config'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'

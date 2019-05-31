@@ -17,6 +17,12 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
 
   end
 
+
+  def filter_config
+    @result = Procurements::Invoices::FilterConfig.(current_user, params)
+    respond
+  end
+
   def index
     @result = Procurements::Invoices::Index.(current_user, params)
     respond
