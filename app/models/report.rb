@@ -491,9 +491,9 @@ class Report < ApplicationRecord
 
   def final_approver
     return nil unless self.approved? or self.settled? or self.settlement_confirmed? or self.closed?
-    tracks = self.tracks.with_action(ReportTrackingAction.id_for(:approve))
-    if tracks.present?
-      return tracks.last.action_user
+    trails = self.trails&.with_action_id(TrailAction.id_for(:approve))
+    if trails.present?
+      return trails.last&.action_user
     end
     nil
   end
