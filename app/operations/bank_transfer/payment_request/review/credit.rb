@@ -126,6 +126,26 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     role_id = self.workflow_output[:role_id]                                     
     Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request, role_id: role_id)
 
+    # Sending email to original document initiators about payments against it
+    payments = ::Payment.where(payment_order_id: bank_payment_requests.pluck(:payment_order_id))
+    payments.each do |payment|
+      case payment.parent_type
+      when 'Invoice'        
+        document_owner = payment.invoice.created_by
+        Event::EInvoice::Credit.(document_owner, {payment: payment})
+      when 'PurchaseOrder'
+        document_owner = payment.purchase_order.user
+        Rails.logger.fatal "User from mark_as_credited #{document_owner.inspect}" 
+        Event::EPurchaseOrder::Credit.(document_owner, {payment: payment})
+      when 'Beneficiary'
+        document_owner = payment.invoice.created_by
+        Event::EBankPaymentRequest::Credit.(document_owner, {payment: payment})
+      else
+        document_owner = user
+        Event::EBankPaymentRequest::Credit.(document_owner, {payment: payment})
+      end
+    end
+
 
     add_message :success, "Payment Order credit initiated!"
   end

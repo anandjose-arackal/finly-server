@@ -52,9 +52,9 @@ module Transitionable
       when :approve, 'approve'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids.push self.document_owner_id
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
         else
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
           user_ids += self.get_reviewers(self.controlling_level_id)&.map(&:id)
         end
       when :reject, 'reject'
@@ -82,6 +82,9 @@ module Transitionable
       when :take_control, 'take_control'
         user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
         user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:taken_control_by_id)
+      when :forwarded, "forwarded"
+        user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:forwarded_to_id)
+        user_ids << self.document_owner_id
       when :unapprove, 'unapprove'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids += self.get_reviewers(:next)&.map(&:id)

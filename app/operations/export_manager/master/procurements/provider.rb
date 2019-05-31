@@ -8,67 +8,70 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   processor ExportManager::Processor::Synchronous
   validate :input
   fields [
-                      procurement_name: {spreadsheet: true, pdf: true},
-                      vendor_name: {spreadsheet: true, pdf: true},
-                      vendor_business_name: {spreadsheet: false, pdf: true},
-                      vendor_mobile_number: {spreadsheet: false, pdf: true},
-                      vendor_state_code: {spreadsheet: false, pdf: true},
-                      vendor_gst: {spreadsheet: false, pdf: true},
-                      vendor_pan: {spreadsheet: false, pdf: true},
-                      vendor_tds_rate: {spreadsheet: false, pdf: true},
-                      vendor_tds_description: {spreadsheet: false, pdf: true},
-                      vendor_type: {spreadsheet: false, pdf: true},
-                      vendor_description: {spreadsheet: false, pdf: true},
-                      vendor_address: {spreadsheet: false, pdf: true},
-                      vendor_custom_fields: {spreadsheet: false, pdf: true},
-                      policy: {spreadsheet: false, pdf: true},
-                      department: {spreadsheet: true, pdf: true},
-                      sub_department: {spreadsheet: true, pdf: true},
-                      cost_center: {spreadsheet: true, pdf: true},
-                      po_user: {spreadsheet: true, pdf: true},
-                      po_status: {spreadsheet: true, pdf: true},
-                      po_number: {spreadsheet: true, pdf: true},
-                      po_payment_term: {spreadsheet: false, pdf: true},
-                      po_date: {spreadsheet: true, pdf: true},
-                      po_delivery_date: {spreadsheet: false, pdf: true},
-                      po_submitted_on: {spreadsheet: false, pdf: true},
-                      is_po_approved: {spreadsheet: true, pdf: true},
-                      po_approved_on: {spreadsheet: false, pdf: true},
-                      po_sent_on: {spreadsheet: false, pdf: true},
-                      po_base_value: {spreadsheet: true, pdf: true},
-                      po_cgst: {spreadsheet: false, pdf: true},
-                      po_sgst: {spreadsheet: false, pdf: true},
-                      po_igst: {spreadsheet: false, pdf: true},
-                      po_line_items_count: {spreadsheet: false, pdf: true},
-                      po_purchase_address: {spreadsheet: true, pdf: true},
-                      po_delivery_address: {spreadsheet: true, pdf: true},
-                      po_custom_fields: {spreadsheet: false, pdf: true},
-                      inwards_status: {spreadsheet: false, pdf: true},
-                      last_inward_received_on: {spreadsheet: false, pdf: true},
-                      invoice_number: {spreadsheet: true, pdf: true},
-                      invoice_id: {spreadsheet: true, pdf: true},
-                      invoice_payment_term: {spreadsheet: false, pdf: true},
-                      invoice_delivery_date: {spreadsheet: false, pdf: true},
-                      invoice_submitted_on: {spreadsheet: false, pdf: true},
-                      invoice_approved_on: {spreadsheet: false, pdf: true},
-                      is_invoice_approved: {spreadsheet: true, pdf: true},
-                      invoice_sent_on: {spreadsheet: false, pdf: true},
-                      invoice_cgst: {spreadsheet: true, pdf: true},
-                      invoice_sgst: {spreadsheet: true, pdf: true},
-                      invoice_igst: {spreadsheet: true, pdf: true},
-                      invoice_tds_type: {spreadsheet: true, pdf: true},
-                      invoice_tds_rate: {spreadsheet: true, pdf: true},
-                      invoice_tds_amount: {spreadsheet: false, pdf: true},
-                      invoice_base_amount: {spreadsheet: true, pdf: true},
-                      invoice_discount_amount: {spreadsheet: true, pdf: true},
-                      invoice_total_amount: {spreadsheet: true, pdf: true},
-                      invoice_total_amount_after_tds: {spreadsheet: false, pdf: true},
-                      invoice_payable_amount: {spreadsheet: false, pdf: true},
-                      invoice_line_items_count: {spreadsheet: false, pdf: true},
-                      invoice_purchase_address: {spreadsheet: false, pdf: true},
-                      invoice_delivery_address: {spreadsheet: false, pdf: true},
-                      invoice_custom_fields: {spreadsheet: false, pdf: true}
-                  ]
+             procurement_name: {spreadsheet: true, pdf: true},
+             vendor_name: {spreadsheet: true, pdf: true},
+             vendor_business_name: {spreadsheet: false, pdf: true},
+             vendor_mobile_number: {spreadsheet: false, pdf: true},
+             vendor_state_code: {spreadsheet: false, pdf: true},
+             vendor_gst: {spreadsheet: false, pdf: true},
+             vendor_pan: {spreadsheet: false, pdf: true},
+             vendor_tds_rate: {spreadsheet: false, pdf: true},
+             vendor_tds_description: {spreadsheet: false, pdf: true},
+             vendor_type: {spreadsheet: false, pdf: true},
+             vendor_description: {spreadsheet: false, pdf: true},
+             vendor_address: {spreadsheet: false, pdf: true},
+             vendor_custom_fields: {spreadsheet: false, pdf: true},
+             approval_pending_level_number: {spreadsheet: true, pdf: false},
+             approval_pending_level_name: {spreadsheet: true, pdf: false},
+             approval_pending_reviewers: {spreadsheet: true, pdf: false},
+             policy: {spreadsheet: false, pdf: true},
+             department: {spreadsheet: true, pdf: true},
+             sub_department: {spreadsheet: true, pdf: true},
+             cost_center: {spreadsheet: true, pdf: true},
+             po_user: {spreadsheet: true, pdf: true},
+             po_status: {spreadsheet: true, pdf: true},
+             po_number: {spreadsheet: true, pdf: true},
+             po_payment_term: {spreadsheet: false, pdf: true},
+             po_date: {spreadsheet: true, pdf: true},
+             po_delivery_date: {spreadsheet: false, pdf: true},
+             po_submitted_on: {spreadsheet: false, pdf: true},
+             is_po_approved: {spreadsheet: true, pdf: true},
+             po_approved_on: {spreadsheet: false, pdf: true},
+             po_sent_on: {spreadsheet: false, pdf: true},
+             po_base_value: {spreadsheet: true, pdf: true},
+             po_cgst: {spreadsheet: false, pdf: true},
+             po_sgst: {spreadsheet: false, pdf: true},
+             po_igst: {spreadsheet: false, pdf: true},
+             po_line_items_count: {spreadsheet: false, pdf: true},
+             po_purchase_address: {spreadsheet: true, pdf: true},
+             po_delivery_address: {spreadsheet: true, pdf: true},
+             po_custom_fields: {spreadsheet: false, pdf: true},
+             inwards_status: {spreadsheet: false, pdf: true},
+             last_inward_received_on: {spreadsheet: false, pdf: true},
+             invoice_number: {spreadsheet: true, pdf: true},
+             invoice_id: {spreadsheet: true, pdf: true},
+             invoice_payment_term: {spreadsheet: false, pdf: true},
+             invoice_delivery_date: {spreadsheet: false, pdf: true},
+             invoice_submitted_on: {spreadsheet: false, pdf: true},
+             invoice_approved_on: {spreadsheet: false, pdf: true},
+             is_invoice_approved: {spreadsheet: true, pdf: true},
+             invoice_sent_on: {spreadsheet: false, pdf: true},
+             invoice_cgst: {spreadsheet: true, pdf: true},
+             invoice_sgst: {spreadsheet: true, pdf: true},
+             invoice_igst: {spreadsheet: true, pdf: true},
+             invoice_tds_type: {spreadsheet: true, pdf: true},
+             invoice_tds_rate: {spreadsheet: true, pdf: true},
+             invoice_tds_amount: {spreadsheet: false, pdf: true},
+             invoice_base_amount: {spreadsheet: true, pdf: true},
+             invoice_discount_amount: {spreadsheet: true, pdf: true},
+             invoice_total_amount: {spreadsheet: true, pdf: true},
+             invoice_total_amount_after_tds: {spreadsheet: false, pdf: true},
+             invoice_payable_amount: {spreadsheet: false, pdf: true},
+             invoice_line_items_count: {spreadsheet: false, pdf: true},
+             invoice_purchase_address: {spreadsheet: false, pdf: true},
+             invoice_delivery_address: {spreadsheet: false, pdf: true},
+             invoice_custom_fields: {spreadsheet: false, pdf: true}
+         ]
 
   def input
     result = ::Procurements::Index.(user, params)
@@ -105,6 +108,18 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
 
   def vendor_gst(procurement)
     procurement.vendor&.gst
+  end
+
+  def approval_pending_level_number(procurement)
+    procurement&.purchase_order&.controlling_level&.level_number
+  end
+
+  def approval_pending_level_name(procurement)
+    procurement&.purchase_order&.controlling_level&.name
+  end
+
+  def approval_pending_reviewers(procurement)
+    procurement&.purchase_order&.get_reviewers&.map(&:name)&.join(", ")
   end
 
   def vendor_tds_rate(procurement)
@@ -306,7 +321,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   def invoice_tds_amount(procurement)
     invoice(procurement)&.tds_amount&.value
   end
-  
+
   def invoice_total_amount(procurement)
     invoice(procurement)&.net_amount&.value
   end
@@ -340,6 +355,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   protected
+
   def invoice(procurement)
     procurement&.invoices&.last
   end
