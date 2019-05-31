@@ -12,10 +12,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     self.payment_params = payment_attributes
     self.payment_amount = self.payment_params&.dig(:amount_attributes, :value).to_f
 
-    if self.payment.parent_type == "BeneficiaryPayment"
-      construct_bp_params
-    end
-
   end
 
   def validate
@@ -52,6 +48,11 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   end
 
   def pre_process
+
+    if self.payment.parent_type == "BeneficiaryPayment"
+      construct_bp_params
+    end
+    
     # adding the invoice id so that it gets updated and not created again
     # if it already exists in the database
     if self.payment&.invoice.present? && self.payment_params[:invoice_attributes].present?
