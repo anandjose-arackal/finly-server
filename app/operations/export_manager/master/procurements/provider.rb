@@ -119,7 +119,7 @@ class ExportManager::Master::Procurements::Provider < ExportManager::Master::Bas
   end
 
   def approval_pending_reviewers(procurement)
-    procurement&.purchase_order&.get_reviewers.map(&:name).join(", ")
+    procurement&.purchase_order&.get_reviewers&.map(&:name)&.join(", ")
   end
 
   def vendor_tds_rate(procurement)
