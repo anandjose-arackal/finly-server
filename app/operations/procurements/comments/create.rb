@@ -41,11 +41,10 @@ class Procurements::Comments::Create < Procurements::Comments::Base
     # Notify users involved in comment
     case self.document.class.name
     when 'PurchaseOrder'      
-      Event::EPurchaseOrder::Comment.(user, document: document)
+      Event::EPurchaseOrder::Comment.(user, document: document, purchase_order: document)
     when 'Invoice'
-      Event::EInvoice::Comment.(user, document: document)
+      Event::EInvoice::Comment.(user, document: document, invoice: document)
     end
-    
   end
 
   private

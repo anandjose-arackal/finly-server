@@ -25,7 +25,8 @@ class Event::EPurchaseOrder::Comment < Event::EPurchaseOrder::Base
   end
 
   def notification_affected_users
-    self.document.notification_affected_users(:approve)
+    # self.document.notification_affected_users(:approve)
+    ( self.document.affected_users(:approve) + self.document.affected_users(:reject) + self.document.affected_users(:take_control) + self.document.affected_users(:forwarded) + self.document.affected_users(:unapprove) + self.document.affected_users(:comment) ).uniq
   end
 
   def set_notification(user)
