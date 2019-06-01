@@ -56,7 +56,7 @@ class PaymentAgreements::Base < BaseOperation
         extra_charges_attributes: [:id, :currency_id, :value],
         notify_users_attributes: [:id, :_destroy, :user_id]
       ],
-      beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :tds_slab, 
+      beneficiary_payments_attributes: [:id, :_destroy, :vendor_id, :cost_center_id, :department_id, :location_id, :note, :vendor_location_id, :tax, :inclusive_of_taxes, :tds_slab_id, :tax_rate_id, 
         tax_amount_attributes: [:id, :value, :currency_id],
         payable_amount_attributes: [:id, :currency_id, :value],
         original_amount_attributes: [:id, :currency_id, :value]
