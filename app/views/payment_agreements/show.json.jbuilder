@@ -1,6 +1,7 @@
 json.results do
   json.agreement_details do
     json.merge! @result.payment_agreement.as_json
+    json.attachments @result.payment_agreement.attachments.as_json
   end
 
   json.reviewal_chain @result.reviewal_chain
