@@ -211,7 +211,7 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     doorkeeper (5.0.2)
       railties (>= 4.2)
-    elastic-apm (2.1.2)
+    elastic-apm (2.8.1)
       concurrent-ruby (~> 1.0)
       http (>= 3.0)
     erubi (1.8.0)
@@ -594,7 +594,7 @@ DEPENDENCIES
   devise_invitable (~> 1.7.5)
   devise_zxcvbn (= 4.4.1)
   doorkeeper (~> 5.0.2)
-  elastic-apm (~> 2.1.2)
+  elastic-apm (~> 2.8.1)
   factory_bot
   factory_bot_rails
   faker (~> 1.9.1)

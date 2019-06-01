@@ -52,9 +52,9 @@ module Transitionable
       when :approve, 'approve'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids.push self.document_owner_id
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
         else
-          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve)).last.action_user_id
+          user_ids.push self.trails.with_action_id(TrailAction.id_for(:approve))&.last&.action_user_id
           user_ids += self.get_reviewers(self.controlling_level_id)&.map(&:id)
         end
       when :reject, 'reject'
@@ -82,6 +82,9 @@ module Transitionable
       when :take_control, 'take_control'
         user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:reviewer_id)
         user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:taken_control_by_id)
+      when :forwarded, "forwarded"
+        user_ids += self.document_level_reviewer_mappings.with_level_id(self.controlling_level_id).pluck(:forwarded_to_id)
+        user_ids << self.document_owner_id
       when :unapprove, 'unapprove'
         if self.class.status_ids(:approved).include? self.send(self.class.document_status_attribute)
           user_ids += self.get_reviewers(:next)&.map(&:id)
@@ -159,16 +162,8 @@ module Transitionable
         }
         data[:reviewers].push(reviewer)
 
-        if dlrm.forwarded && dlrm.forwarded_to_id.present?
-          data[:forwarded_to] = {
-              id: dlrm.forwarded_to_id,
-              name: dlrm.forwarded_to&.name,
-              email: dlrm.forwarded_to&.email,
-              action_taken: (dlrm.forwarded_to_id == dlrm.action_taken_by_id),
-              action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
 
-          }
-        end
+        
 
         if dlrm.taken_control_by_id.present?
           data[:taken_control_by] = {
@@ -178,8 +173,18 @@ module Transitionable
               mobile_number: dlrm.taken_control_by&.mobile_number,
               action_taken: (dlrm.taken_control_by_id == dlrm.action_taken_by_id),
               action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
-
           }
+
+        else
+          if dlrm.forwarded && dlrm.forwarded_to_id.present?
+            data[:forwarded_to] = {
+                id: dlrm.forwarded_to_id,
+                name: dlrm.forwarded_to&.name,
+                email: dlrm.forwarded_to&.email,
+                action_taken: (dlrm.forwarded_to_id == dlrm.action_taken_by_id),
+                action_name: dlrm.action&.name&.split("_")&.map(&:capitalize)&.join(" ")
+            }
+          end
         end
 
         chain[level_number - 1] = data

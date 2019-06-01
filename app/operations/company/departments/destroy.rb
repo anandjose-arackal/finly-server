@@ -7,6 +7,13 @@ class Company::Departments::Destroy < Company::Departments::Base
     self.department = user.company.departments.find_by id: department_id
   end
 
+  def validate
+    if self.department.blank?
+      add_message :error, "Department not found."
+      return
+    end
+  end
+
 
   def process
     if self.department.destroy

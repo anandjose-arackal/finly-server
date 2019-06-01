@@ -2,7 +2,8 @@ class Company::Locations::Update < Company::Locations::Base
 
   def init
     super
-    self.location = user.company.locations.find_by id: params[:id]
+    location_id = params[:id] || params[:location_id]
+    self.location = user.company.locations.find_by id: location_id
 
 
     self.location_parameters = location_params

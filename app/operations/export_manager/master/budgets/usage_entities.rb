@@ -115,11 +115,20 @@ class ExportManager::Master::Budgets::UsageEntities < ExportManager::Master::Bas
 
   def category(item)
     if item.is_a?(PurchaseOrderItem)
-      return item.inventory_line_item&.category&.name
+      return item.category&.name || item.inventory_line_item&.category&.name
     elsif item.is_a?(InvoiceLineItem)
-      return item.inventory_line_item&.category&.name
+      return item.category&.name || item.inventory_line_item&.category&.name
     elsif item.is_a?(Payment)
-      return item.invoice.category&.name
+      case item.parent_type
+        when "Invoice"
+          return item.parent&.category&.name
+        when "BeneficiaryPayment"
+          return item.parent&.category&.name
+        when "PurchaseOrder"
+          return ""
+        else
+          return ""
+      end
     end
     ""
   end

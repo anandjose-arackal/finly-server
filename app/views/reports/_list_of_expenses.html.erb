@@ -39,7 +39,7 @@
                         margin-left: 20px;
                         background: #93c178;
                         color: white;" onclick="openEditableExpenseModal('<%= ej expense.id %>','<%= ej expense.merchant_name %>',
-                        '<%= ej expense.amount.precision_value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
+                        '<%= ej expense.amount.value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
                         '<%= ej expense.date %>','<%= ej section[:category_name] %>','<%= ej expense.category_id %>',
                         '<%= ej expense.receipts.first.image if expense.receipts.present? %>',
                         '<%= ej expense.receipts.first.image.url if expense.receipts.present? %>',
@@ -54,7 +54,7 @@
                   </div>
                   <div class="col-md-3"><%= expense.merchant_name %></div>
                   <div class="col-md-3"><%= expense.note %></div>
-                  <div class="col-md-3"><%= "\u20B9#{expense.amount.precision_value}" %>
+                  <div class="col-md-3"><%= "\u20B9#{expense.amount.value}" %>
                   </div>
                 </div>
 
@@ -98,7 +98,7 @@
                         margin-left: 10px;
                         background: #93c178;
                         color: white;" onclick="openEditableExpenseModal('<%= ej expense.id %>','<%= ej expense.merchant_name %>',
-                        '<%= ej expense.amount.precision_value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
+                        '<%= ej expense.amount.value %>','<%= ej expense.note %>','<%= ej expense.date.strftime("%d-%b-%y") %>',
                         '<%= ej expense.date %>','<%= ej section[:category_name] %>','<%= ej expense.category_id %>','<%= ej expense.receipts.first.image if expense.receipts.present? %>',
                         '<%= ej expense.receipts.first.image.url if expense.receipts.present? %>',
                         '<%= formatted_violations @violation_messages[expense.id]['expense_blocking'] if @policy %>',
@@ -112,7 +112,7 @@
                   </div>
                   <div class="col-md-3"><%= expense.merchant_name %></div>
                   <div class="col-md-3"><%= expense.note %></div>
-                  <div class="col-md-2"><%= "\u20B9#{expense.amount.precision_value}" %></div>
+                  <div class="col-md-2"><%= "\u20B9#{expense.amount.value}" %></div>
                 </div>
             <% end %>
             <div class="totalDivider"><span><%= "\u20B9" %></span><%= section[:category_total] %>
