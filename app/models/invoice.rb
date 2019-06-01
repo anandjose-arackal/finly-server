@@ -140,6 +140,7 @@ class Invoice < ApplicationRecord
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
   belongs_to :billing_type, optional: true
   belongs_to :payment_term, optional: true
+  belongs_to :vendor_location, class_name: "GstinLocation", optional: true
 
   has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
@@ -648,7 +649,7 @@ class Invoice < ApplicationRecord
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
         po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
         note: self.note,
-        discount_amount_attributes: {id: self.discount_amount_id, value: self.discount_amount&.value, currency_id: self.discount_amount&.currency_id}
+        discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id}
     }
   end
 

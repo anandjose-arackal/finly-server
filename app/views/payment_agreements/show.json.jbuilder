@@ -13,7 +13,7 @@ json.results do
       json.department general_invoice.department.as_json
       json.location general_invoice.location.as_json
       json.cost_center general_invoice.cost_center.as_json
-      json.vendor_location general_invoice.gstin_location.as_json
+      json.vendor_location general_invoice.vendor_location.as_json
       json.payment_term general_invoice.payment_term.as_json
       json.notify_users general_invoice.notify_users.as_json
       json.billing_type general_invoice.billing_type.as_json

@@ -32,6 +32,9 @@
 #
 
 class InvoiceLineItem < ApplicationRecord
+  include MathUtil
+
+
   belongs_to :invoice, optional: true
   belongs_to :category, optional: true
   belongs_to :amount, optional: true
@@ -116,19 +119,19 @@ class InvoiceLineItem < ApplicationRecord
       category_id: self.category_id,
       gst_type_id: self.gst_type_id,
       tax_amount_id: self.tax_amount_id,
-      discount_amount_id: self.discount_amount_id,
-      amount_id: self.amount_id,
-      net_amount_id: self.net_amount_id,
+      discount_amount_attributes: {id: self.discount_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.discount_amount&.currency_id},
+      amount_attributes: {id: self.amount_id, value: precision_value(self.amount&.value), currency_id: self.amount&.currency_id},
+      net_amount_attributes: {id: self.net_amount_id, value: precision_value(self.net_amount&.value), currency_id: self.net_amount&.currency_id },
       hsn_sac: self.hsn_sac,
-      taxable_amount_id: self.taxable_amount_id,
+      taxable_amount_id: {id: self.taxable_amount_id, value: precision_value(self.discount_amount&.value), currency_id: self.taxable_amount&.currency_id },
       inventory_line_item_id: self.inventory_line_item_id,
       item_info: self.item_info,
       comment: self.comment,
       account: self.account,
-      tax_rate_id: self.tax_rate_id,
-      cost_center_id: self.cost_center_id,
+      tax_rate: self.tax_rate.as_json,
+      cost_center: self.cost_center.as_json,
       unit_of_measurement: self.unit_of_measurement,
-      department_id: self.department_id
+      department: self.department.as_json, 
     }
   end
 
