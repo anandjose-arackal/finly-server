@@ -11,10 +11,15 @@ class RequestStoreUtil
 
   def self.set_current_user(user)
     RequestStore.store[:current_user] = user
+    set_security_policy(user) if user.class.name == User.name
   end
 
   def self.set_current_company(company)
     RequestStore.store[:current_company] = company
+  end
+
+  def self.set_security_policy(user)
+    RequestStore.store[:security_policy] = SecurityPolicy::Manager.new(user)
   end
 
   def self.set_authorized_scopes(scopes)
@@ -51,6 +56,15 @@ class RequestStoreUtil
 
   def self.set_x_finly_rp_attributes(attrs)
     RequestStore.store[:x_finly_rp_attributes] = attrs
+  end
+
+  # Used for requesting gatekeeper to skip x_finly_rp_check
+  def self.set_skip_x_finly_rp_check
+    RequestStore.store[:skip_x_finly_rp_check] = true
+  end
+
+  def self.skip_x_finly_rp_check?
+    RequestStore.store[:skip_x_finly_rp_check]
   end
 
   def self.to_hash
@@ -148,6 +162,10 @@ class RequestStoreUtil
 
   def self.current_admin_user
     RequestStore.store[:current_admin_user]
+  end
+
+  def self.security_policy
+    RequestStore.store[:security_policy]
   end
 
   def self.x_finly_rp_attributes

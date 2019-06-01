@@ -2399,7 +2399,7 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
-  # mount_griddler('/email/incoming')
+  mount_griddler('/email/incoming')
   # mount_opro_oauth controllers: {
   #     oauth_new: 'oauth/auth',
   #     oauth_token: 'oauth/token'
@@ -2638,6 +2638,7 @@ Rails.application.routes.draw do
       post 'dcode_check', to: 'companies#check_dcode'
       post 'configure_payu', to: 'companies#configure_payu'
       post 'import_data_configuration', to: 'companies#import_data_configuration'
+      get 'export_data_configuration', to: 'companies#export_data_configuration'
     end
     get 'company_types', to: 'companies#company_types'
     get 'users/count', to: 'users#count'
@@ -3185,6 +3186,12 @@ Rails.application.routes.draw do
   get 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#show'
   delete 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#destroy'
 
+  # keep this above
+  delete 'departments/bulk_destroy', to: 'departments#bulk_destroy'  
+  delete 'cost_centers/bulk_destroy', to: 'cost_centers#bulk_destroy'  
+  delete 'locations/bulk_destroy', to: 'locations#bulk_destroy'  
+  # keep this above
+  
   resources :locations
 
   resources :departments
@@ -3559,6 +3566,7 @@ Rails.application.routes.draw do
     patch 'purchase_orders/templates/:id', to: 'purchase_orders#template_update'
     delete 'purchase_orders/templates/:id', to: 'purchase_orders#template_destroy'
     delete 'purchase_orders/:id/delete', to: 'purchase_orders#destroy'
+    get 'purchase_orders/counts', to: 'purchase_orders#counts'
 
     put 'purchase_orders/forward', to: 'purchase_orders#bulk_forward'
     resources :purchase_orders do
@@ -3582,6 +3590,7 @@ Rails.application.routes.draw do
       put 'make_advance_payment', to: 'purchase_orders#create_payment'
       get 'advance_payments', to: 'purchase_orders#advance_payments', as: :advance_payments
       get 'create_po_revisions', to: 'purchase_orders#create_po_revisions', as: :create_po_revisions
+      put 'save_submit', to: 'purchase_orders#save_submit'
 
       resources :quotations, only: %i[index create update destroy]
     end
@@ -3647,6 +3656,7 @@ Rails.application.routes.draw do
     post 'inward_invoices/bulk_upload_items', to: 'inward_invoices#bulk_upload_items'
     get 'inward_invoices/template_bulk_import_items', to: 'inward_invoices#template_bulk_import_items'
     put 'inward_invoices/forward', to: 'inward_invoices#bulk_forward'
+    get 'inward_invoices/filter_config', to: 'inward_invoices#filter_config'
     resources :inward_invoices do
       put 'submit', to: 'inward_invoices#submit'
       put 'retract', to: 'inward_invoices#retract'
@@ -3659,6 +3669,7 @@ Rails.application.routes.draw do
       post 'save_as_template', to: 'inward_invoices#template_create'
       post 'apply_template', to: 'inward_invoices#template_apply'
       delete 'delete', to: 'inward_invoices#destroy'
+      put 'save_submit', to: 'inward_invoices#save_submit'
     end
 
     resources :delivery_challans

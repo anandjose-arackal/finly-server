@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '~> 2.6.0'
+ruby '~> 2.6.1'
 
 # gem for pdf export and its executable
 gem 'wicked_pdf', '~> 1.1.0'
@@ -144,9 +144,10 @@ gem 'font-awesome-rails', '~> 4.7.0.4'
 
 gem 'has_scope', '~> 0.7.2'
 
-# gem 'sendgrid-ruby', '~> 5.3.0'
-# gem 'griddler', '~> 1.5.2'
-# gem 'griddler-sendgrid', '~> 1.1.0'
+gem 'sendgrid-ruby'#, '~> 5.3.0'
+gem 'griddler'#, '~> 1.5.2'
+gem 'griddler-sendgrid'#, '~> 1.1.0'
+
 gem 'rmagick', '~> 2.16.0'
 gem 'imgkit', '~> 1.6.1'
 # gem 'wkhtmltoimage-binary'
@@ -266,7 +267,7 @@ group :test do
 end
 
 group :production do
-  gem 'elastic-apm', '~> 2.1.2'
+  gem 'elastic-apm', '~> 2.8.1'
   gem "skylight", '~> 3.1'
   gem 'scout_apm', '~> 2.4'
 end

@@ -3,13 +3,17 @@ class Company::Departments::Index < Company::Departments::Base
   attr_accessor :departments, :policy_department_filter_mapping
 
   class Company::Departments::Index::DepartmentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :departments, :company_departments, :policy_department_filter_mapping, :policy_user_department_document_mapping
+    attr_accessor :departments, :company_departments, :policy_department_filter_mapping, :policy_user_department_document_mapping, :all_departments
 
 
     def init
       self.departments = params[:departments]
       # Company departments has all the departments beloging to that company
       self.departments = self.departments.filter_only_roots
+      
+      # used in vp organization account
+      self.all_departments = params[:departments]
+
       self.company_departments =  params[:departments]
       self.policy_department_filter_mapping = params[:policy_department_filter_mapping]
     end

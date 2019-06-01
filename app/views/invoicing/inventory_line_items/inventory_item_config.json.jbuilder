@@ -2,6 +2,7 @@ json.categories do
   json.array! @result.categories.leaves.each do |cat|
     json.id cat.id
     json.name cat.full_name
+    json.gl_code cat.gl_code
   end
 end
 

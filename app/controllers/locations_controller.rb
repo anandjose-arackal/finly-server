@@ -20,4 +20,14 @@ class LocationsController < BaseControllers::WebBase
     @result = Company::Locations::Index.(current_user, params)
     respond
   end
+
+  def destroy
+    @result = Company::Locations::Destroy.(current_user, params)
+    respond
+  end
+
+  def bulk_destroy
+    @result = Company::Locations::BulkDestroy.(current_user, params)
+    respond
+  end
 end

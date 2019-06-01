@@ -1,6 +1,6 @@
 class Integration::TallyController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:vouchers, :reimbursements]
+  set_tokens_in_header :vouchers, :reimbursements
 
   def set_configuration
     @result = Integrations::Tally::SetConfiguration.(current_user, params)

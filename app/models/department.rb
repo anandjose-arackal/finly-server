@@ -58,6 +58,8 @@ class Department < ApplicationRecord
   def as_json(options={})
     args = {id: self.id}
     args[:name] = options&.dig(:tree) ? full_name : name
+    # args[:name] = name if ancestry.present?
+    args[:code] = department_code
     # args[:cost_center] = self.cost_center
     # if options&.dig(:tree)
     #   args[:name] = full_name
@@ -68,10 +70,10 @@ class Department < ApplicationRecord
     args
   end
 
-  # def full_dept_name
-  #   # self.parent.blank? ? self.name : "#{self.parent&.name} / #{self.name}"
-  #   self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
-  # end
+  def full_dept_name
+    # self.parent.blank? ? self.name : "#{self.parent&.name} / #{self.name}"
+    self.parent.blank? ? self.name : "#{self.ancestors&.pluck(:name)&.join(' / ')} / #{self.name}"
+  end
 
 
 end

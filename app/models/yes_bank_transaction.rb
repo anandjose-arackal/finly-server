@@ -45,6 +45,8 @@ class YesBankTransaction < ApplicationRecord
 
   scope :processing_transactions, -> {where transfer_status_id: [BankTransferStatus.id_for(:processing), BankTransferStatus.id_for(:possible_failure)]}
 
+  scope :non_penny_test, -> { where.not(account_name_check: true) }
+
   def retriable?
     self.transfer_status_id == BankTransferStatus.id_for(:failed)
   end

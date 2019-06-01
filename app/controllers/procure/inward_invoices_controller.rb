@@ -17,6 +17,12 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
 
   end
 
+
+  def filter_config
+    @result = Procurements::Invoices::FilterConfig.(current_user, params)
+    respond
+  end
+
   def index
     @result = Procurements::Invoices::Index.(current_user, params)
     respond
@@ -35,6 +41,15 @@ class Procure::InwardInvoicesController < BaseControllers::WebBase
   def submit
     @result = Procurements::Invoices::Submit.(current_user, params)
     respond
+  end
+
+  def save_submit
+    @result = Procurements::Invoices::SaveSubmit.(current_user, params)
+    if @result.success?
+      respond
+    else
+      render file: 'procure/inward_invoices/save_submit'
+    end
   end
 
   def approve

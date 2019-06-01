@@ -1,7 +1,7 @@
 class Gatekeeper::Event
   include Supporters::ErrorTracker
 
-  ENABLED = true #Rails.env.production? || Rails.env.test?
+  ENABLED = false #Rails.env.production? || Rails.env.test?
 
   attr_accessor :event, :params
 
@@ -16,6 +16,11 @@ class Gatekeeper::Event
 
   def run
     return success_verdict false unless ENABLED
+    return success_verdict false if RequestStoreUtil.current_user.class.name == AdminUser.name
+
+    if RequestStoreUtil.security_policy and not RequestStoreUtil.security_policy.gatekeeper.enabled?
+      return success_verdict false
+    end
 
     require_otp = false
     Gatekeeper::Registry.subscribers(event)&.each do |rule|

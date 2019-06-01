@@ -1,6 +1,6 @@
 class Settlement::MoneyRequestsController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:processing_payment_file]
+  set_tokens_in_header :processing_payment_file
 
   def pending_index
     @result = Settlement::SMoneyRequests::Pending::Index.(current_user, params)

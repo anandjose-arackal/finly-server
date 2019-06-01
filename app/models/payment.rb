@@ -439,6 +439,7 @@ class Payment < ApplicationRecord
   end
 
   after_save :budget_trail_entry
+  after_save :recalculate_order_summary
 
   after_destroy :budget_trail_destroy
 
@@ -602,9 +603,6 @@ class Payment < ApplicationRecord
   end
 
 
-
-
-
   def get_payable_amount
     case self.parent_type
     when 'BeneficiaryPayment'
@@ -639,6 +637,10 @@ class Payment < ApplicationRecord
 
 
   private
+
+  def recalculate_order_summary
+    self.payment_order&.update_requested_amount
+  end
 
   def initiating_account_presence
     unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly, :failed_transaction_reversal,

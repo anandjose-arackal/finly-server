@@ -1,7 +1,5 @@
 class AdminUsers::Kyc::CompaniesController < BaseControllers::AdminBase
 
-
-
   def show
     @result = Admin::KycProcesses::Companies::Show.(current_user, params)
     respond

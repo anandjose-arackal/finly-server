@@ -1,6 +1,6 @@
 class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
 
-  before_action :set_tokens_in_header, only: [:download_pending_attachment, :download_selected_attachment, :download_all_attachment]
+  set_tokens_in_header :download_pending_attachment, :download_selected_attachment, :download_all_attachment
 
   def show
     @result = BankTransfer::PaymentRequest::Show.(current_user, params)
@@ -13,6 +13,7 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
   end
 
   def new_pr
+    # DEPRECATED, NOT BEING USED
     logger.fatal "params from controller, #{params.inspect}"
     @result = BankTransfer::PaymentRequest::NewPr.(current_user, params)
     if @result.success?
@@ -286,7 +287,7 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
       # operation = BankTransfer::PaymentRequest::CreateBulkBeneficiaryTicket.(current_user, params)
       create_bulk_beneficiary_ticket(current_user, params)
     else
-      respond response: :failure, message: "WTF, tell me what type of ticket you want to create?"
+      respond response: :failure, message: "Invalid ticket type provided. Please provide one of either 'invoice', 'po_advance', 'beneficiary' or 'bulk_beneficiary'"
     end
   end
 
