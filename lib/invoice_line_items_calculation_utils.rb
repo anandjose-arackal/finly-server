@@ -83,7 +83,7 @@ class InvoiceLineItemsCalculationUtils
         item.taxable_amount.value = self.item_taxable_amount
         item.net_amount.currency_id = Currency.first.id
       else
-        item.taxable_amount = Amount.new(value: self.taxable_amount, currency_id: 1)
+        item.taxable_amount = Amount.new(value: self.item_taxable_amount, currency_id: 1)
       end
     end
 
