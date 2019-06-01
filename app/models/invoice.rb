@@ -647,7 +647,8 @@ class Invoice < ApplicationRecord
         paid_amount: payment_amounts_total,
         remaining_amount: (self.balance_due&.value.to_f - payment_amounts_total),
         po_adjusted_advance: precision_value(self.po_adjusted_advance&.value),
-        note: self.note
+        note: self.note,
+        discount_amount_attributes: {id: self.discount_amount_id, value: self.discount_amount&.value, currency_id: self.discount_amount&.currency_id}
     }
   end
 

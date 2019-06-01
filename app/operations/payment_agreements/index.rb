@@ -43,6 +43,8 @@ class PaymentAgreements::Index < PaymentAgreements::Base
 
     def init
       self.payment_agreements = params[:payment_agreements]
+      # Remove
+      self.payment_agreements = user.company.payment_agreements
       self.paginated_payment_agreements = payment_agreements.order(created_at: :desc).paginate(page: params[:page], per_page: 30) rescue ::PaymentAgreement.none
       self.count = payment_agreements&.count
     end

@@ -105,6 +105,33 @@ class InvoiceLineItem < ApplicationRecord
     self.inventory_line_item&.tds_applicable?
   end
 
+  def as_json
+    {
+      id: self.id,
+      description: self.description,
+      quantity: self.quantity,
+      rate: self.rate,
+      tax: self.tax,
+      discount: self.discount,
+      category_id: self.category_id,
+      gst_type_id: self.gst_type_id,
+      tax_amount_id: self.tax_amount_id,
+      discount_amount_id: self.discount_amount_id,
+      amount_id: self.amount_id,
+      net_amount_id: self.net_amount_id,
+      hsn_sac: self.hsn_sac,
+      taxable_amount_id: self.taxable_amount_id,
+      inventory_line_item_id: self.inventory_line_item_id,
+      item_info: self.item_info,
+      comment: self.comment,
+      account: self.account,
+      tax_rate_id: self.tax_rate_id,
+      cost_center_id: self.cost_center_id,
+      unit_of_measurement: self.unit_of_measurement,
+      department_id: self.department_id
+    }
+  end
+
   private
 
   def budget_trail_entry
@@ -122,4 +149,5 @@ class InvoiceLineItem < ApplicationRecord
       BudgetsCalculator::Calculate::InvoiceItemsBudgetsProcessor.new.destroy_trail(self)
     end
   end
+
 end

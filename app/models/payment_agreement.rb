@@ -85,4 +85,8 @@ class PaymentAgreement < ApplicationRecord
   def self.document_status_attribute
     'status_id'
   end
+
+  def self.roles
+    [:admin, :payment_agreement_initiator, :payment_agreement_reviewer, :payment_agreement_auditor]
+  end
 end
