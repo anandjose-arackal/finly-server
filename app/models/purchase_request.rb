@@ -42,6 +42,8 @@ class PurchaseRequest < ApplicationRecord
 
   # has_many :line_items, class_name: "PurchaseRequestItem", dependent: :destroy
   has_many :purchase_request_items, dependent: :destroy
+  has_many :custom_fields, as: :parent, dependent: :destroy
+
 
   validates :description, :location, :department, :policy, presence: true
 
@@ -49,7 +51,7 @@ class PurchaseRequest < ApplicationRecord
 
   before_validation :add_company
 
-  accepts_nested_attributes_for :purchase_request_items, :attachments, allow_destroy: true
+  accepts_nested_attributes_for :purchase_request_items, :custom_fields, :attachments, allow_destroy: true
 
 
   scope :filter_by_status_id,  -> (status_id) { where purchase_request_status_id: status_id }
