@@ -31,7 +31,7 @@ Gatekeeper::Checker.new 'On New Request' do
     #   fail
     # end
 
-    rule 'User agent is required for the request' do
+    rule 'UserAgent is required for the request' do
       if RequestStoreUtil.current_request.user_agent.nil?
         message 'User agent is blank in the request'
         session_status_id UserSessionStatus.id_for(:blocked)
@@ -49,7 +49,7 @@ Gatekeeper::Checker.new 'On New Request' do
       message 'UserAgent mismatch'
       session_status_id UserSessionStatus.id_for(:blocked)
       response_code 401
-      level 3
+      level 1
       fail
 
     end
