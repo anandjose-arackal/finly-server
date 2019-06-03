@@ -5,7 +5,7 @@ class SecurityPolicy::Config
           client: {otp_verify: false},
           ip: {otp_verify: false},
           inactivity_timeout: 1.hour,
-          concurrent_logins: 5
+          concurrent_logins: 10
       },
       password: {
           minimum_score: 1,
