@@ -49,6 +49,10 @@ class BranchLocation < ApplicationRecord
   scope :with_ids, -> (ids) { where id: ids }
   scope :include_state, -> { includes :state }
 
+  def state_code
+    self.state&.state_code
+  end
+
   def address
     address = ""
     if self.address_1.present?
