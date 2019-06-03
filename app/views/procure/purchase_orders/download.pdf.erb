@@ -253,7 +253,13 @@
           <th class="text-center">Qty</th>
           <th class="text-right">Rate</th>
           <th class="text-right">Discount</th>
-          <th class="text-right">Tax</th>
+          <th class="text-right">Tax
+          <% if @result.purchase_order.gst_type_id == 1%>
+            (SGST + CGST)
+          <% else %>
+            (IGST)
+          <% end %>
+          </th>
           <th class="text-right">Total</th>
         </tr>
         </thead>
@@ -294,9 +300,21 @@
           </tr>
           <tr>
             <% if @result.taxes_applicable_flag %>
-              <td class="font-light-gray text-left">Tax*</td>
+              <td class="font-light-gray text-left">Tax*
+              <% if @result.purchase_order.gst_type_id == 1 %>
+                  (SGST + CGST)
+              <% else %>
+                  (IGST)
+              <% end %>
+              </td>
             <% else %>
-              <td class="font-light-gray text-left">Tax</td>
+              <td class="font-light-gray text-left">Tax
+              <% if @result.purchase_order.gst_type_id == 1 %>
+                  (SGST + CGST)
+              <% else %>
+                  (IGST)
+              <% end %>
+              </td>
             <% end %>
             <td class="font-dark-gray text-right currency"><i class='fa fa-rupee'></i><%= @result.purchase_order.tax_amount&.value&.to_d.round(2) rescue 0 %></td>
           </tr>
