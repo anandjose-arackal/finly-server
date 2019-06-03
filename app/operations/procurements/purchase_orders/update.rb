@@ -188,6 +188,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # update gstin location id
     if self.gstin_location.present?
       self.purchase_order_params[:gstin_location_id] = self.gstin_location&.id
+
+      # check against the shipping location sent in the params
     end
 
     self.po_current_attachments = user.company.procurement_attachments.with_id(purchase_order_params[:attachments])
@@ -209,6 +211,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       self.purchase_order_params[:due_date] = self.purchase_order.due_date
       self.skip_adv_calculation = true
     end
+
   end
 
   def process
