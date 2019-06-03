@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_27_102618) do
+ActiveRecord::Schema.define(version: 2019_06_03_110556) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -710,6 +710,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_102618) do
     t.integer "location_id"
     t.integer "vendor_location_id"
     t.integer "advance_amount_id"
+    t.integer "tax_rate_id"
     t.index ["advance_amount_id"], name: "index_beneficiary_payments_on_advance_amount_id"
     t.index ["balance_due_id"], name: "index_beneficiary_payments_on_balance_due_id"
     t.index ["bank_account_id"], name: "index_beneficiary_payments_on_bank_account_id"
@@ -1530,6 +1531,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_102618) do
     t.boolean "active", default: true, null: false
     t.integer "base_currency_id", default: 1
     t.integer "status_id", default: 1, null: false
+    t.boolean "test_account", default: false
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -1853,7 +1855,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_102618) do
     t.string "designation"
   end
 
-  create_table "cost_centers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "cost_centers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "application"
     t.integer "company_id"
@@ -1862,6 +1864,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_102618) do
     t.boolean "is_deleted"
     t.datetime "deleted_at"
     t.string "cost_center_code"
+    t.string "ancestry"
+    t.index ["ancestry"], name: "index_cost_centers_on_ancestry"
     t.index ["company_id"], name: "index_cost_centers_on_company_id"
     t.index ["deleted_at"], name: "index_cost_centers_on_deleted_at"
   end
@@ -3102,7 +3106,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_102618) do
   create_table "invoice_line_items", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "invoice_id"
     t.string "description"
-    t.integer "quantity"
+    t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 10
     t.decimal "tax", precision: 20, scale: 10
     t.decimal "discount", precision: 20, scale: 10
@@ -3609,6 +3613,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_102618) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "gl_code"
     t.index ["active"], name: "index_money_request_item_categories_on_active"
     t.index ["company_id"], name: "index_money_request_item_categories_on_company_id"
     t.index ["name"], name: "index_money_request_item_categories_on_name"
@@ -4633,7 +4638,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_102618) do
     t.string "product_id"
     t.string "description"
     t.string "hsn_sac"
-    t.integer "quantity"
+    t.decimal "quantity", precision: 20, scale: 5
     t.decimal "rate", precision: 20, scale: 5
     t.decimal "tax", precision: 20, scale: 5
     t.decimal "tds", precision: 20, scale: 5
@@ -4739,6 +4744,9 @@ ActiveRecord::Schema.define(version: 2019_05_27_102618) do
     t.text "internal_note"
     t.integer "taxable_amount_id"
     t.text "vendor_address"
+    t.string "vendor_poc_name"
+    t.string "vendor_poc_email"
+    t.string "vendor_poc_mobile_number"
     t.index ["advance_amount_id"], name: "index_purchase_orders_on_advance_amount_id"
     t.index ["advance_amount_status_id"], name: "index_purchase_orders_on_advance_amount_status_id"
     t.index ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id"

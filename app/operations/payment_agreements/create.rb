@@ -19,6 +19,9 @@ class PaymentAgreements::Create < PaymentAgreements::Base
     self.payment_agreement.creator_id = user.id
     # self.payment_agreement.company_id = user.company_id
     if self.payment_agreement.save!
+      abp_attachment_ids = get_attachment_ids(params)
+      Attachment.update_resource({ids: abp_attachment_ids, resource_id: self.payment_agreement.id, user: user}) if abp_attachment_ids.present?
+
       # self.payment_agreement.status_id = PaymentAgreementStatus.id_for(:draft)
       # self.payment_agreement.creator_id = user.id
       # Create document level reviewer mapping
@@ -52,6 +55,15 @@ class PaymentAgreements::Create < PaymentAgreements::Base
       self.payment_agreement = params[:payment_agreement]
     end
 
+  end
+
+  private
+  def get_attachment_ids(params)
+    if params.dig(:payment_agreement, :attachments_attributes).present?
+      attachment_ids = []
+      params.dig(:payment_agreement, :attachments_attributes).each{ |ele| attachment_ids << ele[:id] }
+      return attachment_ids
+    end
   end
 
 end
