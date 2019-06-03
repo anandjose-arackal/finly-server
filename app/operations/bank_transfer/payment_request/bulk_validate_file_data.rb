@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount, :issues, :issue_item
+                :requested_amount, :issues, :issue_item, :ghost_invoice
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -89,11 +89,25 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
-      
 
 
       self.error_messages = []
       self.issue_item = {}
+
+      # adding the custom fields for the particular invoice, using a ghost invoice
+      self.ghost_invoice = Invoice.new
+      custom_fields = {custom_fields: item[:custom_fields]} || {}
+      custom_fields[:user] = user
+      custom_fields[:reset_fields] = true
+      custom_fields[:save] = false
+      CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
+
+      op = CustomField::Validate.(self.ghost_invoice)
+      unless op.success?
+        self.error_messages << op.messages[:error]
+        self.valid = false
+        self.issue_item[:custom_fields] = op.messages[:error]
+      end
 
       # new requirement
       # SET key as array to hold mupltiple errors

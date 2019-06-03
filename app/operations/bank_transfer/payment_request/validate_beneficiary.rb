@@ -1,3 +1,5 @@
+# DEPRECATED OPERATION, NOT BEING USED
+
 class BankTransfer::PaymentRequest::ValidateBeneficiary < BankTransfer::PaymentRequest::Base
 	attr_accessor :order_details
 
