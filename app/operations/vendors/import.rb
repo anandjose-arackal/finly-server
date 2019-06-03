@@ -76,7 +76,7 @@ class Vendors::Import < Vendors::Base
 
   def process_row(row)
     name = row[import_fields[:name]].to_s
-    mobile_number = row[import_fields[:mobile_number]].to_s
+    mobile_number = clean_up_data row[import_fields[:mobile_number]]
     email = row[import_fields[:email]].to_s
     business_name = row[import_fields[:business_name]].to_s
     pan = row[import_fields[:pan]].to_s
@@ -85,7 +85,7 @@ class Vendors::Import < Vendors::Base
     description = row[import_fields[:description]].to_s
     address = row[import_fields[:address]].to_s
     created_by_id = self.company.users.only_admins&.first&.id
-    account_number = row[import_fields[:account_number]].to_s
+    account_number = clean_up_data row[import_fields[:account_number]]
     ifsc = row[import_fields[:ifsc]].to_s
     gstin = row[import_fields[:gstin]].to_s
     location = row[import_fields[:location]].to_s
@@ -100,6 +100,7 @@ class Vendors::Import < Vendors::Base
      gstin_state_id = GstStateCode.where(state_code: gstin[0..1])&.first&.id
     end
 
+    gst_registered = (gstin.present? ? true : false)
 
     params =  {"vendor"=>{"name"=> row[import_fields[:name]].to_s,
                           "authorized"=>"1",
@@ -114,22 +115,27 @@ class Vendors::Import < Vendors::Base
                           "status_id"=> 6,
                           "created_by_id"=> created_by_id,
                           "vendor_id" => vendor_id,
-                          "vendor_type_id" => vendor_type_id
+                          "vendor_type_id" => vendor_type_id,
+                          "gst_registered" =>  gst_registered
                           }}
 
     bank_params={"bank_accounts_attributes" =>[{"name"=>"#{business_name}'s Account",
                                    "account_number"=>account_number,
                                    "ifsc"=> ifsc,
                                    "default_account"=>"1"}]}
+
     gstin_locations={"gstin_locations_attributes" => [{"location" =>location,
                                              "gstin"=>gstin,
+                                             "poc_mobile_number" => mobile_number,
+                                             "poc_mobile_number" => email,
+                                             "address" => "address",
                                              "state_id"=> gstin_state_id}]}
 
     if account_number.present?
        params["vendor"]["bank_accounts_attributes"] = bank_params["bank_accounts_attributes"]
     end
 
-    if gstin.present?
+    if location.present?
        params["vendor"]["gstin_locations_attributes"] = gstin_locations["gstin_locations_attributes"]
     end
     params
@@ -178,4 +184,14 @@ class Vendors::Import < Vendors::Base
     temp_file = TemporaryFile.create file: file, expires_on: (DateTime.now.beginning_of_day + 1.day)
     return temp_file.file.url
   end
+
+ def clean_up_data(text)
+     if text.is_a?(Float)
+       text.to_i&.to_s
+     elsif text.is_a?(Integer)
+       text.to_s
+     else
+       text&.strip
+     end
+   end
 end
