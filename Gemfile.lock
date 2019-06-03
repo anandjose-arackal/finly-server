@@ -12,7 +12,7 @@ GIT
       tilt (~> 2.0)
 
 GIT
-  remote: git@bitbucket.org:vivek_a17/finly-secure_storage-sdk.git
+  remote: git@gitlab.com:finlycore/finly-secure_storage-sdk.git
   revision: 278af4329cbd4f7687177831725e51756ddbc101
   specs:
     finly-secure_storage-sdk (0.1.31)
