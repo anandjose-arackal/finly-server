@@ -25,9 +25,9 @@ class Personalizer::Adapters::Company112::ExportTemplates112::SapTemplate < Pers
     reports.each do |report|
       report.expenses.each do |expense|
         self.contents << [
-            '',
+            sap_id(expense.user),
             expense.date,
-            '',
+            grade(expense.user),
             expense.amount.value,
             expense.merchant_name,
             '',
@@ -43,6 +43,26 @@ class Personalizer::Adapters::Company112::ExportTemplates112::SapTemplate < Pers
 
   def success
     Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents}, messages)
+  end
+
+  def profit_center(user)
+    user.gl_config&.dig(:"New Profit centre")
+  end
+
+  def cost_center(user)
+    user.gl_config&.dig(:"New Cost Centre")
+  end
+
+  def sap_id(user)
+    user.gl_config&.dig(:"SAP ID")
+  end
+
+  def grade(user)
+    ''
+  end
+
+  def plant(user)
+    ''
   end
 
 end

@@ -8,7 +8,7 @@
 #  product_id               :string(255)
 #  description              :string(255)
 #  hsn_sac                  :string(255)
-#  quantity                 :integer
+#  quantity                 :decimal(20, 5)
 #  rate                     :decimal(20, 5)
 #  tax                      :decimal(20, 5)
 #  tds                      :decimal(20, 5)
