@@ -48,7 +48,7 @@ class Event::EInvoice::Comment < Event::EInvoice::Base
     if user == self.document.created_by
       "New Comment on Invoice : #{self.document.invoice_number}"
     else
-      "#{document.created_by.name} has added a new comment to the invoice: #{self.document.invoice_number}\n Comment: #{self.document.comments.last.body}"
+      "#{document.created_by.name} has added a new comment to the invoice: #{self.document.invoice_number} (Invoice ID: #{self.invoice.invoice_id})"
     end
   end
 
@@ -56,7 +56,7 @@ class Event::EInvoice::Comment < Event::EInvoice::Base
     if user == self.document.created_by
       "New Comment on Invoice: #{self.document.invoice_number}"
     else
-      "#{self.document.created_by.name} has added a new comment to the invoice: #{self.document.invoice_number}\n Comment: #{self.document.comments.last.body}"
+      "#{self.document.created_by.name} has added a new comment to the invoice: #{self.document.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) \n Comment: #{self.document.comments.last.body}"
     end
   end
 
