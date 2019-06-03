@@ -136,7 +136,7 @@ class Invoice < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
 
-  # belongs_to :policy, optional: true
+  belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
 

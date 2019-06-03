@@ -408,6 +408,12 @@ module Transitionable
       end
     end
 
+    def validate_if_invoice_auditor(user)
+      if self.policy.present? && self.policy.policy_user_roles.present? && (!self.open?)
+        self.policy.policy_user_roles.where(user_role_id: UserRole.id_for(:invoice_auditor), user_id: user.id).present? rescue false
+      end
+    end
+
     def update_if_owner(user)
       (self.document_owner_id == user.id)
     end

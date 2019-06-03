@@ -119,6 +119,8 @@ Gatekeeper::Checker.new 'On Web Authentication' do
         authorized_web_sessions = RequestStoreUtil.current_user.user_sessions.web.authorized
         policy = RequestStoreUtil.security_policy
         max_concurrent_sessions = policy.browser_client.concurrent_logins
+        next if max_concurrent_sessions.nil?
+
         if authorized_web_sessions.size > max_concurrent_sessions
           authorized_web_sessions[0..-(max_concurrent_sessions + 1)].each do |session|
             session.update(status_id: UserSessionStatus.id_for(:revoked), message: "A user cannot have more than #{max_concurrent_sessions} active web sessions")
