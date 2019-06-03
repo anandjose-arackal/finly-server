@@ -6,7 +6,11 @@ Gatekeeper::Checker.new 'AccountLock' do
       rule 'Multiple failed attempts should lock the account' do
         user = params[:user]
         policy = SecurityPolicy::Manager.for(user)
+        next if user.nil? or policy.nil?
+
         auth_failure = user.user_auth_failures.build locked: false, ip: params[:ip], username: params[:username], invalid_password: true
+        next if policy.account_lock.within_timeframe.nil?
+
         timeframe = Time.now - policy.account_lock.within_timeframe
 
         # Check if the user password was changed post the timeframe. If so, consider that as the timeframe
