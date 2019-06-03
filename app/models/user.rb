@@ -1202,6 +1202,10 @@ class User < ApplicationRecord
     self.has_policy_role?(UserRole.id_for(:invoice_reviewer), document)
   end
 
+  def is_invoice_auditor?(document=nil)
+    self.has_policy_role?(UserRole.id_for(:is_invoice_auditor), document)
+  end
+
   def is_budget_manager?(document=nil)
     self.has_policy_role?(UserRole.id_for(:budget_manager), document)
   end
