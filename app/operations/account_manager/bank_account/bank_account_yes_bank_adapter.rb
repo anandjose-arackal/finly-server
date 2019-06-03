@@ -209,7 +209,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:open)
     end
-    bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
+    bank_transaction = company.yes_bank_transactions.create(unique_request_number: transfer_request.generate_unique_reference,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,

@@ -21,7 +21,8 @@ class AccountManager::Base < BackgroundOperation
       when 'ItzCashCompanyAccount'
         return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account, payment)
       when 'BankAccount'
-        return AccountManager::BankAccount::BankAccountAdapter.new(account, payment)
+        op = AccountManager::BankAccount::BankAccountAdapter.new(account, payment)
+        return op.bank_account_adapter
       when 'VendorPaymentWallet'
         return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(account, payment)
       when 'UserPocket'

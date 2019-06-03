@@ -21,7 +21,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   def init
     self.receiving_account_adapter = retrieve_adapter(payment.receiving_account, self.payment)
-    debugger
     self.source_account_adapter = retrieve_adapter(payment.initiating_account, self.payment)
     self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
     self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
@@ -42,11 +41,11 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     ################# Start Source account validations #######################
 
     # todo - temporary as the tests are failing saying this rule isn't defined
-    # op = PaymentProcessorRules::Event.(:check_source_account_debitable, {payment: self.payment, source_account_adapter: self.source_account_adapter, receiving_account_adapter: self.receiving_account_adapter})
-    # unless op.success?
-    #   add_message :error, op.messages
-    #   return
-    # end
+    op = PaymentProcessorRules::Event.(:check_source_account_debitable, {payment: self.payment, source_account_adapter: self.source_account_adapter, receiving_account_adapter: self.receiving_account_adapter})
+    unless op.success?
+      add_message :error, op.messages
+      return
+    end
 
     if self.payment.credit?
       op = PaymentProcessorRules::Event.(:check_source_account_balance, {payment: self.payment, options: self.options, source_account_adapter: self.source_account_adapter})

@@ -1,5 +1,6 @@
 class AccountManager::BankAccount::BankAccountAdapter < AccountManager::BaseAdapter
 
+  attr_accessor :bank_account_adapter
 
   def account_class
     BankAccount
@@ -10,28 +11,42 @@ class AccountManager::BankAccount::BankAccountAdapter < AccountManager::BaseAdap
     if payment.blank?
       raise 'Bank account payments require the Payment object as well'
     end
-    # case payment.bank_account_provider_id
-    #   when BankAccountProvider.id_for(:yes_bank)
-    #     return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
-    #   when BankAccountProvider.id_for(:icici_bank)
-    #     return AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
-    #   when BankAccountProvider.id_for(:kotak_mahindra_bank)
-    #     # todo - temporary
-    #     return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
-    #   else
-    #     raise 'Invalid bank account provider'
-    # end
-
-    return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
-    # return AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
 
     case payment.company.feature_subscription.bank_service_provider
       when "YES"
-        return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+        self.bank_account_adapter = AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+        # return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
       when "ICICI"
-        return AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
+        self.bank_account_adapter = AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
+        # return AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
       else
-        raise 'Invalid bank account provider'
+        self.bank_account_adapter = AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+        # return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
     end
+
+    # todo - uncomment this when multi-bank support is implemented
+    # # case payment.bank_account_provider_id
+    # #   when BankAccountProvider.id_for(:yes_bank)
+    # #     return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+    # #   when BankAccountProvider.id_for(:icici_bank)
+    # #     return AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
+    # #   when BankAccountProvider.id_for(:kotak_mahindra_bank)
+    # #     # todo - temporary
+    # #     return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+    # #   else
+    # #     raise 'Invalid bank account provider'
+    # # end
+    #
+    # return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+    # # return AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
+    #
+    # case payment.company.feature_subscription.bank_service_provider
+    #   when "YES"
+    #     return AccountManager::BankAccount::BankAccountYesBankAdapter.new(self.account)
+    #   when "ICICI"
+    #     return AccountManager::BankAccount::BankAccountIciciBankAdapter.new(self.account)
+    #   else
+    #     raise 'Invalid bank account provider'
+    # end
   end
 end
