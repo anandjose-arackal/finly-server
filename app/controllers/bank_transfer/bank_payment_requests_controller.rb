@@ -13,6 +13,7 @@ class BankTransfer::BankPaymentRequestsController < BaseControllers::WebBase
   end
 
   def new_pr
+    # DEPRECATED, NOT BEING USED
     logger.fatal "params from controller, #{params.inspect}"
     @result = BankTransfer::PaymentRequest::NewPr.(current_user, params)
     if @result.success?

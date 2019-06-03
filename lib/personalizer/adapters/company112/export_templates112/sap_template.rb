@@ -9,36 +9,32 @@ class Personalizer::Adapters::Company112::ExportTemplates112::SapTemplate < Pers
     users = user.company.users
     reports = Report.where(user_id: users.pluck(:id)).processed
     self.headers = [
-        'Vendor Number',
-        'Doc Date',
-        'Ref Doc no',
+        'SAP Employee ID',
+        'Date',
+        'Grade',
         'Amount',
-        'Text',
-        'G/L code',
-        'Debit / Crd Ind',
-        'Amount',
-        'Text1',
-        'cost center',
-        'profit center',
-        'count'
+        'Bus.Place',
+        'Plant',
+        'Cost Center',
+        'Profit Center',
+        'GL Code',
+        'Text'
     ]
     self.contents = []
     count = 1
     reports.each do |report|
       report.expenses.each do |expense|
         self.contents << [
-            expense.merchant_name,
+            '',
             expense.date,
-            expense.id,
-            expense.amount.value,
             '',
-            "GLCODE_#{expense.category.id}",
-            'Debit',
             expense.amount.value,
+            expense.merchant_name,
             '',
-            'Cost Center 1',
-            'Profit Center 1',
-            count
+            '',
+            '',
+            expense.category&.gl_code,
+            ''
         ]
         count += 1
       end
