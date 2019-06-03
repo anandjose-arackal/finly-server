@@ -12,6 +12,16 @@
 
 ActiveRecord::Schema.define(version: 2019_05_27_173719) do
 
+  create_table "account_reconciliation_balances", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "reconciliation_balance_id"
+    t.integer "account_id"
+    t.integer "account_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_account_reconciliation_balances_on_account_id"
+    t.index ["account_type"], name: "index_account_reconciliation_balances_on_account_type"
+  end
+
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
     t.boolean "enabled", default: false
@@ -513,6 +523,12 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "bank_account_providers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "bank_accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.integer "yes_bank_vendor_id"
     t.string "account_number"
@@ -626,6 +642,11 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "approved_at"
     t.integer "company_id"
     t.decimal "max_payment_amount", precision: 20, scale: 5
+    t.integer "bank_account_provider_id"
+    t.string "otp"
+    t.datetime "otp_sent_at"
+    t.integer "otp_attempts"
+    t.integer "otp_count"
     t.index ["company_id"], name: "index_bank_payment_requests_on_company_id"
     t.index ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id"
     t.index ["created_at"], name: "index_bank_payment_requests_on_created_at"
@@ -638,30 +659,6 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "bank_transactions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
-    t.string "unique_request_number"
-    t.string "transfer_type"
-    t.string "bank_reference_number"
-    t.string "unique_response_number"
-    t.integer "amount_id"
-    t.integer "beneficiary_bank_account_id"
-    t.integer "company_id"
-    t.integer "transfer_status_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "bank_response"
-    t.boolean "refunded"
-    t.string "error_sub_code"
-    t.integer "bank_transaction_type_id"
-    t.boolean "account_name_check", default: false
-    t.string "beneficiary_full_name"
-    t.index ["amount_id"], name: "index_bank_transactions_on_amount_id"
-    t.index ["beneficiary_bank_account_id"], name: "index_bank_transactions_on_beneficiary_bank_account_id"
-    t.index ["company_id"], name: "index_bank_transactions_on_company_id"
-    t.index ["transfer_status_id"], name: "index_bank_transactions_on_transfer_status_id"
-    t.index ["unique_request_number"], name: "index_bank_transactions_on_unique_request_number"
   end
 
   create_table "bank_transfer_statuses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -991,7 +988,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["booking_type_id"], name: "index_bookings_on_booking_type_id"
   end
 
-  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+  create_table "branch_locations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "gstin"
     t.string "pan"
@@ -2684,6 +2681,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.boolean "custom_currency_conversion", default: false
     t.boolean "vendor_empanelment_workflow", default: false
     t.boolean "purchase_requisition_system"
+    t.string "bank_service_provider"
     t.index ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id"
     t.index ["subscribable_type"], name: "index_feature_subscriptions_on_subscribable_type"
   end
@@ -2962,6 +2960,46 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.index ["status"], name: "index_gstins_on_status"
   end
 
+  create_table "icici_bank_company_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id"
+    t.integer "balance_id"
+  end
+
+  create_table "icici_bank_configs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "alias_id"
+    t.string "urn"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "company_id"
+  end
+
+  create_table "icici_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "aggr_id"
+    t.string "aggr_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "corp_id"
+    t.string "user_id"
+    t.string "debit_acc"
+    t.string "credit_acc"
+    t.string "txn_type"
+    t.integer "amount_id"
+    t.string "ifsc"
+    t.integer "receiving_account_id"
+    t.string "otp"
+    t.text "payee_name"
+    t.text "remarks"
+    t.boolean "customer_induced"
+    t.string "transfer_type"
+    t.string "unique_request_number"
+    t.string "utr"
+    t.integer "transfer_status_id"
+    t.integer "company_id"
+    t.string "request_id"
+  end
+
   create_table "icici_transaction_callbacks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "AGGRNAME"
     t.string "AGGRID"
@@ -2974,6 +3012,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.string "USERID"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "reconciled", default: false
   end
 
   create_table "individual_kyc_track_actions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
@@ -4163,6 +4202,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.text "post_operation"
     t.text "post_operation_payload"
     t.boolean "api_initiated", default: false
+    t.integer "bank_account_provider_id"
     t.index ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id"
     t.index ["amount_requested_id"], name: "index_payment_orders_on_amount_requested_id"
     t.index ["company_id"], name: "index_payment_orders_on_company_id"
@@ -4302,6 +4342,11 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "location_id"
     t.datetime "deleted_at"
     t.integer "beneficiary_payment_id"
+    t.integer "bank_account_provider_id"
+    t.string "otp"
+    t.integer "otp_attempts"
+    t.boolean "on_hold"
+    t.boolean "disabled"
     t.index ["amount_id"], name: "index_payments_on_amount_id"
     t.index ["beneficiary_payment_id"], name: "index_payments_on_beneficiary_payment_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
@@ -6805,6 +6850,30 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "yes_bank_transactions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
+    t.string "unique_request_number"
+    t.string "transfer_type"
+    t.string "bank_reference_number"
+    t.string "unique_response_number"
+    t.integer "amount_id"
+    t.integer "beneficiary_bank_account_id"
+    t.integer "company_id"
+    t.integer "transfer_status_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "bank_response"
+    t.boolean "refunded"
+    t.string "error_sub_code"
+    t.integer "bank_transaction_type_id"
+    t.boolean "account_name_check", default: false
+    t.string "beneficiary_full_name"
+    t.index ["amount_id"], name: "index_yes_bank_transactions_on_amount_id"
+    t.index ["beneficiary_bank_account_id"], name: "index_yes_bank_transactions_on_beneficiary_bank_account_id"
+    t.index ["company_id"], name: "index_yes_bank_transactions_on_company_id"
+    t.index ["transfer_status_id"], name: "index_yes_bank_transactions_on_transfer_status_id"
+    t.index ["unique_request_number"], name: "index_yes_bank_transactions_on_unique_request_number"
+  end
+
   create_table "yes_bank_vendors", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|
     t.string "name"
     t.integer "company_id"
@@ -6876,8 +6945,6 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
   add_foreign_key "bank_accounts", "yes_bank_vendors"
   add_foreign_key "bank_payment_request_comments", "users"
   add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
-  add_foreign_key "bank_transactions", "amounts"
-  add_foreign_key "bank_transactions", "companies"
   add_foreign_key "beneficiary_payments", "bank_accounts"
   add_foreign_key "beneficiary_payments", "categories"
   add_foreign_key "beneficiary_payments", "departments"
@@ -7234,6 +7301,8 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
   add_foreign_key "web_hook_tracks", "web_hooks"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
+  add_foreign_key "yes_bank_transactions", "amounts"
+  add_foreign_key "yes_bank_transactions", "companies"
   add_foreign_key "yes_bank_vendors", "companies"
   add_foreign_key "yes_bank_vendors", "tds_rates_lists"
   add_foreign_key "yes_bank_vendors", "vendor_types"
