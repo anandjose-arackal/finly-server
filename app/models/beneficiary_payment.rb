@@ -140,7 +140,15 @@ class BeneficiaryPayment < ApplicationRecord
       paid_amount: self.payments.successful.joins(:amount).sum(:value),
       remaining_amount: (self.balance_due&.value.to_f - self.payments.successful.joins(:amount).sum(:value)),
       original_amount: precision_value(self.original_amount&.value),
-      advance_amount: precision_value(self.advance_amount&.value)
+      advance_amount: precision_value(self.advance_amount&.value),
+      vendor_id: self.vendor_id,
+      vendor_location_id: self.vendor_location_id,
+      vendor_location_attributes: { id: self.vendor_location_id, location: self.vendor_location&.location },
+      department_attributes: { id: self.department_id, name: self.department&.name },
+      location_attributes: { id: self.location_id, name: self.location&.name },
+      cost_center_attributes: { id: self.cost_center_id, name: self.cost_center&.name },
+      note: self.note
+
   	}
   end
 
