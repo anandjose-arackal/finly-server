@@ -1114,7 +1114,7 @@ class User < ApplicationRecord
     return nil if subdomain.blank? or employee_id.blank?
 
     employee_id = employee_id&.to_s
-    Company.with_subdomain(subdomain)&.users&.joins(:profile)&.where('user_profiles.employee_id =?', employee_id)&.first
+    Company.find_by(subdomain: subdomain)&.users&.joins(:profile)&.where('user_profiles.employee_id =?', employee_id)&.first
   end
 
   def manager_activateable?
