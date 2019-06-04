@@ -123,6 +123,7 @@ class BeneficiaryPayment < ApplicationRecord
       inclusive_of_taxes: self.inclusive_of_taxes,
       roundoff_amount: self.roundoff_amount,
       net_payable_amount: self.balance_due&.value,
+      payable_amount_attributes: {id: self.payable_amount_id, value: self.payable_amount&.value, currency_id: self.payable_amount&.currency_id },
       balance_due: self.balance_due&.value,
       taxable_amount: precision_value(self.gross_amount&.value),
       editable: self.unpaid?,
