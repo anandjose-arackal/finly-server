@@ -49,6 +49,18 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
     self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
     if self.bank_payment_request.save
       # any changes to be made here? #todo
+      
+      # Create Document Level Reviewer Mapping
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:reviewal_document] = self.bank_payment_request.reload
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Set.(user, params)
+      unless document_reviewer_mappings_op.success?
+        self.bank_payment_request.destroy
+        add_message :error, document_reviewer_mappings_op.messages[:error]
+        return
+      end
+
     else
       add_message :error, self.bank_payment_request.errors.full_messages
     end
