@@ -1108,7 +1108,7 @@ class User < ApplicationRecord
       subdomain, employee_id = username.split('.')
     end
     # Check for subdomain from path
-    if RequestStoreUtil.current_request.subdomains(0)&.first.present?
+    if subdomain.nil? && RequestStoreUtil.current_request.subdomains(0)&.first.present?
       subdomain = RequestStoreUtil.current_request.subdomains(0)&.first
     end
     return nil if subdomain.blank? or employee_id.blank?
