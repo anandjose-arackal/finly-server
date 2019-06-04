@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_27_173719) do
+ActiveRecord::Schema.define(version: 2019_06_04_055458) do
 
   create_table "accounting_system_configurations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.integer "company_id", null: false
@@ -1520,6 +1520,7 @@ ActiveRecord::Schema.define(version: 2019_05_27_173719) do
     t.integer "base_currency_id", default: 1
     t.integer "status_id", default: 1, null: false
     t.boolean "test_account", default: false
+    t.string "subdomain"
   end
 
   create_table "company_account_types", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci", force: :cascade do |t|

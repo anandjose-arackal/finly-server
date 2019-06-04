@@ -713,6 +713,7 @@ class User < ApplicationRecord
     end
   }
 
+
   before_save :strip_whitespace
 
   after_create do
@@ -1093,7 +1094,27 @@ class User < ApplicationRecord
   def self.find_for_database_authentication(conditions = {})
     return nil if conditions.blank? or conditions[:username].blank?
     username = conditions[:username].delete(' ')
-    find_by(mobile_number: username) || find_by(email: username)
+    user = find_by(mobile_number: username) || find_by(email: username)
+    return user if user.present?
+
+    authenticate_with_employee_id(username)
+  end
+
+  def self.authenticate_with_employee_id(username)
+    employee_id = username
+    subdomain = nil
+    # Check for subdomain in username
+    if not username =~ Constants::VALID_EMAIL_FORMAT and username.include?(".")
+      subdomain, employee_id = username.split('.')
+    end
+    # Check for subdomain from path
+    if RequestStoreUtil.current_request.subdomains(0)&.first.present?
+      subdomain = RequestStoreUtil.current_request.subdomains(0)&.first
+    end
+    return nil if subdomain.blank? or employee_id.blank?
+
+    employee_id = employee_id&.to_s
+    Company.with_subdomain(subdomain)&.users&.joins(:profile)&.where('user_profiles.employee_id =?', employee_id)&.first
   end
 
   def manager_activateable?
@@ -1372,6 +1393,7 @@ class User < ApplicationRecord
   def access_locked?
     locked_at and locked_at > security_policy.account_lock.locking_period.ago
   end
+
   alias_method :locked?, :access_locked?
 
   # ************ User Role for vendor payments ******************
