@@ -7,7 +7,7 @@ class AutocompleteController < BaseControllers::WebBase
   end
 
   def user
-    @users = User::Team::Index.(current_user, params)&.uniq
+    @users = User::Team::Index.(current_user, params)
     respond_to do |format|
       format.json {}
     end
