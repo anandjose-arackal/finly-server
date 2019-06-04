@@ -36,7 +36,8 @@ class Procurements::PurchaseOrders::Reopen < Procurements::PurchaseOrders::Base
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       # add_message :error, op.messages[:error]
-      add_message :error, 'Unable to reopen purchase order. Please contact customer support.'
+      add_message :error, 'Unable to reopen purchase order'
+      return
     end
     self.workflow_output = op.workflow_output
 
