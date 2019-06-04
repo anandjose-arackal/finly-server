@@ -1,5 +1,5 @@
 class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::Base
-  attr_accessor :purchase_request, :purchase_request_params
+  attr_accessor :purchase_request, :purchase_request_params, :custom_fields
 
   def init
     super
@@ -7,7 +7,7 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
   #   pr_id = params[:id] || params[:purchase_request_id]
   #   self.purchase_request = user.company.purchase_requests.find_by(id: pr_id)
 
-  self.custom_fields = params&.dig(:custom_fields) || params&.dig(:purchase_request, :custom_fields)
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:purchase_request, :custom_fields)
 
   end
 

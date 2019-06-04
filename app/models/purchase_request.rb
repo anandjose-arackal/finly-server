@@ -47,7 +47,7 @@ class PurchaseRequest < ApplicationRecord
 
   validates :description, :location, :department, :policy, presence: true
 
-  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status
+  delegate :draft?, :retracted?, :rejected?, :awaiting_approval?, :approved?, :auto_approved?, :closed?, :order_initiated?, :cancelled?, to: :status, allow_nil: true
 
   before_validation :add_company
 
