@@ -126,6 +126,11 @@ class Vendors::Support::ValidateGstin < Vendors::Support::Base
   def make_api_call
     setup_connection
 
+    if self.connection.blank?
+      add_message :error, "Something went wrong, try again later"
+      return false
+    end
+
     Rails.logger.info "Making GSTIN Search API Call"
     self.api_response = self.connection.get
     self.api_call_count += 1
