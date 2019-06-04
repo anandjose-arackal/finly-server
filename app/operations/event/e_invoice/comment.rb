@@ -54,9 +54,9 @@ class Event::EInvoice::Comment < Event::EInvoice::Base
 
   def mailer_body(user)
     if user == self.document.created_by
-      "New Comment on Invoice: #{self.document.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) \n Comment: #{self.document.comments.last.body}"
+      "New Comment on Invoice: #{self.document.invoice_number} (Invoice ID: #{self.document.invoice_id}) \n Comment: #{self.document.comments.last.body}"
     else
-      "#{self.document.created_by.name} has added a new comment to the invoice: #{self.document.invoice_number} (Invoice ID: #{self.invoice.invoice_id}) \n Comment: #{self.document.comments.last.body}"
+      "#{self.document.created_by.name} has added a new comment to the invoice: #{self.document.invoice_number} (Invoice ID: #{self.document.invoice_id}) \n Comment: #{self.document.comments.last.body}"
     end
   end
 
