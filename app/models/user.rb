@@ -286,7 +286,7 @@ class User < ApplicationRecord
 
   # Use only for has_scope filter, scope to policy_user_roles
   scope :policy_id, -> (policy_id) {
-    joins(:policy_user_roles).where('policy_user_roles.policy_id = ?', policy_id)
+    joins(:policy_user_roles).where('policy_user_roles.policy_id = ?', policy_id).uniq
   }
 
   scope :reviewer_type, -> (type) {
