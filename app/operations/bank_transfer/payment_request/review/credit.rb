@@ -127,7 +127,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request, role_id: role_id)
 
     # Sending email to original document initiators about payments against it
-    payments = ::Payment.where(payment_order_id: bank_payment_request.pluck(:payment_order_id))
+    payments = self.bank_payment_request.payments
     payments.each do |payment|
       case payment.parent_type
       when 'Invoice'        
