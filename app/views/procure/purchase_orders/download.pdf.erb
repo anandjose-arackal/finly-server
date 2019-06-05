@@ -254,7 +254,7 @@
           <th class="text-right">Rate</th>
           <th class="text-right">Discount</th>
           <th class="text-right">Tax
-          <% if @result.purchase_order.gst_type_id == 1%>
+          <% if @result.purchase_order.gst_type_id == GstType.id_for(:cgst_sgst)%>
             (SGST + CGST)
           <% else %>
             (IGST)
@@ -301,7 +301,7 @@
           <tr>
             <% if @result.taxes_applicable_flag %>
               <td class="font-light-gray text-left">Tax*
-              <% if @result.purchase_order.gst_type_id == 1 %>
+              <% if @result.purchase_order.gst_type_id == GstType.id_for(:cgst_sgst) %>
                   (SGST + CGST)
               <% else %>
                   (IGST)
@@ -309,7 +309,7 @@
               </td>
             <% else %>
               <td class="font-light-gray text-left">Tax
-              <% if @result.purchase_order.gst_type_id == 1 %>
+              <% if @result.purchase_order.gst_type_id == GstType.id_for(:cgst_sgst) %>
                   (SGST + CGST)
               <% else %>
                   (IGST)

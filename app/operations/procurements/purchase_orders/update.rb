@@ -192,10 +192,12 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       # check against the shipping location sent in the params
       shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
       if self.gstin_location.state_code == shipping_location&.state_code
-        self.purchase_order_params[:gst_type_id] = 1
+        self.purchase_order_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
       else
-        self.purchase_order_params[:gst_type_id] = 2
+        self.purchase_order_params[:gst_type_id] = GstType.id_for(:igst)
       end
+    else
+      self.purchase_order_params[:gst_type_id] = GstType.id_for(:igst)
     end
 
     self.po_current_attachments = user.company.procurement_attachments.with_id(purchase_order_params[:attachments])
