@@ -214,6 +214,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
       self.inward_invoice_params[:inclusive_of_taxes] = false
     end
 
+    #strip_invoice_number
+    if self.inward_invoice_params&.dig(:invoice_number).present?
+      self.inward_invoice_params[:invoice_number] =self.inward_invoice_params[:invoice_number]&.strip
+    end
+
     if self.inward_invoice_params&.dig(:invoice_attachments_attributes)
       # only if the actual attached file is present, do you even make it save
       if self.inward_invoice_params[:invoice_attachments_attributes].first[:attached_file].present?

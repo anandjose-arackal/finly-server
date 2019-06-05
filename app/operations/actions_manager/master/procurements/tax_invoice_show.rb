@@ -45,6 +45,13 @@ class ActionsManager::Master::Procurements::TaxInvoiceShow < ActionsManager::Mas
     true
   end
 
+  def make_payment
+    # if (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?)
+    #   (user_in_level? && user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice)) || user.has_policy_role?(UserRole.id_for(:invoice_reviewer), invoice)
+    # end
+    (invoice.approved? || invoice.auto_approved? || invoice.unpaid? || invoice.partially_paid? || invoice.paid?)
+  end
+
   def approve
     if invoice.is_reviewing_user? || admin_has_taken_control?
       invoice.processing? && user_in_level?

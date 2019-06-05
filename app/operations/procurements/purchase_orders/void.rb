@@ -30,6 +30,7 @@ class Procurements::PurchaseOrders::Void < Procurements::PurchaseOrders::Base
     op = WorkflowManager::Base.(user, params)
     unless op.success?
       add_message :error, op.messages[:error]
+      return
     end
     self.workflow_output = op.workflow_output
 
