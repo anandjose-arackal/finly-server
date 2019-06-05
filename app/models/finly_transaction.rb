@@ -20,6 +20,11 @@
 #  updated_at                  :datetime         not null
 #  date                        :datetime
 #  sequence_number             :integer
+#  transaction_type_string     :string(255)
+#  purpose_string              :string(255)
+#  closing_balance_number      :decimal(10, 5)
+#  amount_number               :decimal(10, 5)
+#  formatted_date              :string(255)
 #
 
 class FinlyTransaction < ApplicationRecord
