@@ -33,6 +33,9 @@
 #  unit_of_measurement      :string(255)
 #  purchase_request_item_id :integer
 #  department_id            :integer
+#  cgst                     :decimal(10, 5)
+#  sgst                     :decimal(10, 5)
+#  igst                     :decimal(10, 5)
 #
 
 class PurchaseOrderItem < ApplicationRecord

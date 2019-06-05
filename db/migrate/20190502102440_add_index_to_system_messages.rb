@@ -40,7 +40,7 @@ class AddIndexToSystemMessages < ActiveRecord::Migration[5.2]
     add_index :beneficiary_payments, :gross_amount_id
     add_index :beneficiary_payments, :net_amount_id
     add_index :beneficiary_payments, :tds_amount_id
-    add_index :budget_modification_trails, :budget_modification_action_id, name: 'index_budget_modification_trails_on_action_id'
+    # add_index :budget_modification_trails, :budget_modification_action_id, name: 'index_budget_modification_trails_on_action_id'
     add_index :company_configurations, :default_card_expense_category_id
     add_index :company_kyc_trails, :action_id
     add_index :company_kyc_trails, [:action_resource_id, :action_resource_type], name: 'index_company_kyc_trails_on_action_resource'
