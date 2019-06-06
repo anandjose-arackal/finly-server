@@ -90,6 +90,9 @@ class Reports::Retract < Reports::Base
     # destroying the submitted amount field
     report.submitted_amount&.destroy
 
+    # update expense status
+    report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:unsubmitted))
+
     if prev_status.approved? || report.auto_approve
       op = Settlement::SReport::Unapproved.(user, report: report)
       report.update(auto_approve: false)
