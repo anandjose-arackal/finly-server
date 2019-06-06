@@ -829,8 +829,6 @@ class PurchaseOrder < ApplicationRecord
     if self.requested_advance_amount.present? #&& self.advance_amount_status.id == AdvanceAmountStatus.id_for(:paid)
       # self.balance_amount.value = total_amount - self.advance_amount.value
 
-      # if self.advance_tds_slab.present?
-
       # handles a case when adv amount and tds slab is unchanged, dont recalculate.
       unless skip_adv_calculation
         tds = self.advance_tds_slab&.tds
