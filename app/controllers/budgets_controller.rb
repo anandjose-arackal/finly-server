@@ -9,6 +9,11 @@ class BudgetsController < BaseControllers::WebBase
     respond
   end
 
+  def sub_budgets
+    @result = Budgets::SubBudgets.(current_user, params)
+    respond
+  end
+
   def create
     @result = Budgets::Create.(current_user, params)
     respond

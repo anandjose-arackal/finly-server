@@ -3530,6 +3530,7 @@ Rails.application.routes.draw do
 
   get 'budgets/sample_import_file', to: 'budgets#sample_import_file', as: :sample_import_file
   post 'budgets/import', to: 'budgets#import', as: :budget_import
+  get 'budgets/:id/give_me_children', to: 'budgets#sub_budgets', as: :sub_budgets
   ## Budget apis start ##
   resources :budgets do
     patch 'add_budget', to: 'budgets#add_budget', as: :add_budget

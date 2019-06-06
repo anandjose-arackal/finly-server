@@ -182,6 +182,15 @@ class Budget < ApplicationRecord
     where.not(id: id)
   }
 
+  scope :filter_criteria, -> (criteria) {
+    case criteria
+    when 'budget', :budget, '1'
+
+    when 'timeline', :timeline, '2'
+
+    end
+  }
+
   scope :include_details, -> {
     includes([
                  # :budget_criteria_mappings,
@@ -207,11 +216,70 @@ class Budget < ApplicationRecord
              ])
   }
 
+  def as_json(options={})
+    {
+      id: id,
+      name: name,
+      start_date: start_date&.strftime("%d-%b-%y"),
+      end_date: end_date&.strftime("%d-%b-%y"),
+      budget_amount: budget_amount.as_json,
+      spent_amount: processor_instance.spent_amount,
+      associated_vendors: budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_categories: budgetable_categories.as_json,
+      associated_cost_centers: budgetable_cost_centers.as_json,
+      associated_locations: budgetable_locations.as_json,
+      associated_departments: budgetable_departments.as_json,
+      associated_users: budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      user: {
+        id: user.id,
+        mobile_number: user.mobile_number,
+        email: user.email
+
+      },
+      sub_budgets: budget_children&.as_json,
+      sub_budgets_count: budget_children.size
+    }
+  end
+
+  def budget_criteria_as_json(options={})
+    {
+      id: id,
+      name: name,
+      associated_vendors: budgetable_vendors.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      associated_categories: budgetable_categories.as_json,
+      associated_cost_centers: budgetable_cost_centers.as_json,
+      associated_locations: budgetable_locations.as_json,
+      associated_departments: budgetable_departments.as_json,
+      associated_users: budgetable_users.collect {|vendor| {id:vendor.id, name:vendor.name}},
+      user: {
+        id: user.id,
+        mobile_number: user.mobile_number,
+        email: user.email
+
+      },
+      sub_budgets: budget_children&.as_json,
+      sub_budgets_count: budget_children.size
+    }
+  end
+
+  def timeline_criteria_json(options={})
+    {
+      id: id,
+      name: name,
+      start_date: start_date&.strftime("%d-%b-%y"),
+      end_date: end_date&.strftime("%d-%b-%y"),
+      budget_amount: budget_amount.as_json,
+      spent_amount: processor_instance.spent_amount,
+      sub_budgets: budget_children&.as_json,
+      sub_budgets_count: budget_children.size
+    }
+  end
+
   def validate_if_owner?(user)
     self.user_id == user.id
   end
 
-  def validate_of_manager?(user)
+  def validate_if_manager?(user)
     user.is_budget_manager?
   end
 
@@ -220,6 +288,10 @@ class Budget < ApplicationRecord
   end
 
   private
+
+  def processor_instance
+   BudgetsCalculator::Calculate::BudgetsProcessor.new(self)
+  end
 
   def recalculate_parent_budget
     if self.parent.present?
