@@ -26,6 +26,9 @@ json.result do
       json.name @result.purchase_request.policy&.name
       json.id @result.purchase_request&.policy_id
     end
+    json.custom_fields do
+      json.array! @result.purchase_request&.custom_fields
+    end
     json.total_cost @result.purchase_request.calculate_total_amount
     json.total_items @result.line_items_count
     json.line_items do
