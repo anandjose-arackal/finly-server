@@ -195,6 +195,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     # update gstin location id
     if self.gstin_location.present?
       self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+
+      shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
+      if self.gstin_location.state_code == shipping_location&.state_code
+        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
+      else
+        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
+      end
+    else
+      self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
     end
 
 
