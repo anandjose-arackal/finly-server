@@ -10,6 +10,7 @@ json.results do
     # json.can_reject invoice.can_reject?
     json.can_reject invoice.can_really_reject?
     json.can_take_control invoice.can_take_control?
+    json.rejection_note invoice.rejection_note
 
     json.invoice do
       json.id invoice.id
