@@ -24,20 +24,20 @@ class RetroactivelyAddGstTyeToPoAndInvoice < ActiveRecord::Migration[5.2]
     #   po.update(discount_type_id: 1) if po.discount_type_id.blank?
     # end
     #
-    # Invoice.all.each do |invoice|
+    # Invoice.all.find_each(batch_size: 10000) do |invoice|
     #   if invoice.gst_type_id.present?
     #     next
     #   end
     #   if invoice.gstin_location.present?
     #     if invoice.gstin_location.state&.state_code == invoice.delivery_location&.state&.state_code
-    #       invoice.update(gst_type_id: GstType.id_for(:cgst_sgst))
+    #       invoice.update_columns(gst_type_id: GstType.id_for(:cgst_sgst))
     #     else
-    #       invoice.update(gst_type_id: GstType.id_for(:igst))
+    #       invoice.update_columns(gst_type_id: GstType.id_for(:igst))
     #     end
     #   else
-    #     invoice.update(gst_type_id: GstType.id_for(:igst))
+    #     invoice.update_columns(gst_type_id: GstType.id_for(:igst))
     #   end
-    #   invoice.update(discount_type_id: 1) if invoice.discount_type_id.blank?
+    #   invoice.update_columns(discount_type_id: 1) if invoice.discount_type_id.blank?
     # end
   end
 end

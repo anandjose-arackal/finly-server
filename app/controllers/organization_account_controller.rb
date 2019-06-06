@@ -45,7 +45,7 @@ class OrganizationAccountController < BaseControllers::WebBase
   end
 
   def gst_state_codes
-    @codes = GstStateCode.all
+    @codes = State.all
     respond_to do |format|
       format.json {render 'organization_account/gst_state_codes'}
     end
