@@ -5,6 +5,8 @@ json.locations do
       # json.id location.id
       # json.name location.name
     end
+  else
+    [] # add something here otherwise FE breaks if key not present
   end
 end
 
