@@ -201,6 +201,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
         self.purchase_order_params[:gst_type_id] = GstType.id_for(:igst)
       end
     end
+    if self.gstin_location.present?
+      self.purchase_order_params[:gstin_location_id] = self.gstin_location&.id
+    end
 
     self.po_current_attachments = user.company.procurement_attachments.with_id(purchase_order_params[:attachments])
 
