@@ -3,7 +3,8 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   attr_accessor :payment, :payment_request, :payment_params, :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance, :advance_amount, :payment_order, :payment_amount, :bp_params, :po_params
+                :advance, :advance_amount, :payment_order, :payment_amount, :bp_params, :po_params,
+                :incoming_tds_for_po
 
   def init
     super
@@ -58,6 +59,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       construct_bp_params
     when 'PurchaseOrder'
       construct_po_params
+      validate_po_params
     end  
 
     # adding the invoice id so that it gets updated and not created again
@@ -127,29 +129,13 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     if self.payment_params&.dig(:invoice_attributes, :category_id)
       self.payment_params[:category_id] = payment_params[:invoice_attributes][:category_id]
     end
+
+    if payment.parent_type == 'PurchaseOrder'
+      self.payment_params.delete(:invoice_attributes)
+    end
   end
 
   def process
-    case payment.parent_type
-    when 'BeneficiaryPayment'
-      bp = BeneficiaryPayment.find_by(id: payment.parent_id)
-      self.bp_params[:original_amount_attributes][:id] = bp.original_amount_id
-      self.bp_params[:advance_amount_attributes][:id] = bp.advance_amount_id
-      bp.assign_attributes(self.bp_params)
-      bp.calculate_tax_and_amount
-      bp.save
-    when 'PurchaseOrder'
-      purchase_order = PurchaseOrder.find_by(id: payment.parent_id)
-      # trigger the calculation only if tds sent and it is different from po tds
-      if self.payment_params[:invoice_attributes][:tds_slab_id].present? && (self.payment_params[:invoice_attributes][:tds_slab_id].to_i != purchase_order.advance_tds_slab_id)
-        purchase_order.assign_attributes(self.po_params)
-        purchase_order.save
-        purchase_order.process_line_item_calculation
-        purchase_order.save
-      end
-      self.payment_params.delete(:invoice_attributes)
-      self.payment_params[:amount_attributes][:value] = purchase_order.advance_amount&.value
-    end
 
     payment.assign_attributes(payment_params)
     unless self.payment.valid?
@@ -165,6 +151,30 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
     else
       add_message :error, self.payment.errors.full_messages
+    end
+
+    case payment.parent_type
+    when 'BeneficiaryPayment'
+      bp = BeneficiaryPayment.find_by(id: payment.parent_id)
+      self.bp_params[:original_amount_attributes][:id] = bp.original_amount_id
+      self.bp_params[:advance_amount_attributes][:id] = bp.advance_amount_id
+      bp.assign_attributes(self.bp_params)
+      bp.calculate_tax_and_amount
+      bp.save
+    when 'PurchaseOrder'
+      purchase_order = PurchaseOrder.find_by(id: payment.parent_id)
+      # trigger the calculation only if tds sent and it is different from po tds
+      # if self.payment_params[:invoice_attributes][:tds_slab_id].present? && (self.payment_params[:invoice_attributes][:tds_slab_id].to_i != purchase_order.advance_tds_slab_id)
+      if self.incoming_tds_for_po.present? && (self.incoming_tds_for_po.to_i != purchase_order.advance_tds_slab_id)
+        purchase_order.assign_attributes(self.po_params)
+        purchase_order.save
+        purchase_order.process_line_item_calculation
+        purchase_order.save
+      end
+      # self.payment_params.delete(:invoice_attributes)
+      # self.payment_params[:amount_attributes][:value] = purchase_order.advance_amount&.value
+
+      payment.amount.update(value: purchase_order.advance_amount&.value)
     end
 
   end
@@ -268,6 +278,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     po_payment[:advance_tds_slab_id] = self.payment_params[:invoice_attributes][:tds_slab_id]
 
     self.po_params = po_payment
+  end
+
+  def validate_po_params
+    self.incoming_tds_for_po = self.payment_params[:invoice_attributes][:tds_slab_id]
   end
 
 end
