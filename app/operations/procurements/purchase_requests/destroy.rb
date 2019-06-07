@@ -16,7 +16,8 @@ class Procurements::PurchaseRequests::Destroy < Procurements::PurchaseRequests::
 
   def process
     unless purchase_request.destroy
-      add_message :error, "Some error occurred, unable to delete"
+      # add_message :error, "Some error occurred, unable to delete"
+      add_message :error, purchase_request.errors.full_messages.to_sentence
       return
     end
   end
