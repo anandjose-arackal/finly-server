@@ -148,6 +148,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
         purchase_order.save
       end
       self.payment_params.delete(:invoice_attributes)
+      self.payment_params[:amount_attributes][:value] = purchase_order.advance_amount&.value
     end
 
     payment.assign_attributes(payment_params)
@@ -226,7 +227,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   end
 
   def recalculate_totals
-    if payment.invoice.invoice_items.present?
+    if payment.invoice&.invoice_items.present?
       case payment.parent_type
       when 'Invoice'
         InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
