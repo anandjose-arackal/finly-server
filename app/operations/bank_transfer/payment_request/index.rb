@@ -169,11 +169,11 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       self.payment_requests = apply_scopes(payment_requests)
 
       # slightly dirty logic for the custom field text search #TODO - refactor later
-      if params[:filter_custom_field_text].present?
-        params[:filter_custom_field_text].each do |key, value|
-          self.payment_requests = self.payment_requestst.filter_custom_field_text(key, value)
-        end
-      end
+      # if params[:filter_custom_field_text].present?
+      #   params[:filter_custom_field_text].each do |key, value|
+      #     self.payment_requests = self.payment_requestst.filter_custom_field_text(key, value)
+      #   end
+      # end
       ######################## dirty logic end ####################################
 
       per_page = params[:per_page] || 30

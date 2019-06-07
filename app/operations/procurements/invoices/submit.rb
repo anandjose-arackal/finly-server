@@ -73,6 +73,7 @@ class Procurements::Invoices::Submit < Procurements::Invoices::Base
       end
     end
 
+    self.invoice.update(rejection_note: "")
     self.workflow_output = op.workflow_output
   end
 
