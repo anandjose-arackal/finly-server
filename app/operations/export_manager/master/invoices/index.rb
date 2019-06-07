@@ -104,8 +104,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              po_number: {spreadsheet: true},
              invoice_type: {spreadsheet: true},
              invoice_no: {spreadsheet: true},
+             invoice_date: {spreadsheet: true},
              vendor_name: {spreadsheet: true},
              vendor_ref_no: {spreadsheet: true},
+             delivery_location: {spreadsheet: true},
              # vendor_gst: {spreadsheet: true},
              # po_number: {spreadsheet: true},
              transaction_period_from: {spreadsheet: true},
@@ -123,6 +125,7 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
              gst_group: {spreadsheet: true},
              hsn_sac: {spreadsheet: true},
              tds_nature: {spreadsheet: true},
+             tds_amount: {spreadsheet: true},
              cost_center: {spreadsheet: true},
              nature_of_expense: {spreadsheet: true},
              nature_of_office: {spreadsheet: true},
@@ -155,6 +158,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def invoice_date(invoice_line_item)
     invoice_line_item.parent.date
+  end
+
+  def delivery_location(invoice_line_item)
+    invoice_line_item.parent.delivery_location&.name
   end
 
   def vendor_ref_num(invoice_line_item)
@@ -305,6 +312,10 @@ class ExportManager::Master::Invoices::Index < ExportManager::Master::BaseSubscr
 
   def tds_nature(invoice_line_item)
     invoice_line_item.parent.tds_slab&.name
+  end
+
+  def tds_amount(invoice_line_item)
+    invoice_line_item.parent.tds_amount&.value || 0
   end
 
 

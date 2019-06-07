@@ -28,6 +28,7 @@ class Procurements::Invoices::Reject < Procurements::Invoices::Base
       add_message :error, op.messages[:error]
       return
     end
+    self.invoice.update(rejection_note: params[:note])
     self.workflow_output = op.workflow_output
   end
 

@@ -69,6 +69,7 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
       end
     end
 
+    self.purchase_order.update(rejection_note: "")
     self.workflow_output = op.workflow_output
   end
 
