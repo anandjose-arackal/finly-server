@@ -207,7 +207,9 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
       end
     end
-
+    if self.gstin_location.present?
+      self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+    end
 
     # adding id for original_amount and freight_amount so that new copies aren't created every time
     if inward_invoice_params&.dig(:original_amount_attributes).present?
