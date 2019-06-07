@@ -104,7 +104,7 @@
         <% if @result.purchase_order.billing_address.present? %>
           <%= simple_format @result.purchase_order.billing_address, {}, wrapper_tag: "div" %>
         <% else %>
-          <%= @result.purchase_order.location.address %>
+          <%= @result.purchase_order.location&.address %>
         <% end %>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
@@ -125,7 +125,7 @@
         <% if @result.purchase_order.shipping_address.present? %>
             <%= simple_format @result.purchase_order.shipping_address, {}, wrapper_tag: "div" %>
         <% else %>
-            <%= @result.purchase_order.delivery_location.address %>
+            <%= @result.purchase_order.delivery_location&.address %>
         <% end %>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
