@@ -82,6 +82,7 @@
 #  cost_allocation_items           :boolean          default(FALSE)
 #  narration                       :text(65535)
 #  po_number                       :string(255)
+#  bank_account_id                 :integer
 #
 
 class Invoice < ApplicationRecord
@@ -135,7 +136,7 @@ class Invoice < ApplicationRecord
   belongs_to :department, optional: true
   belongs_to :sub_department, optional: true, class_name: 'Department', foreign_key: :sub_department_id
 
-  # belongs_to :policy, optional: true
+  belongs_to :policy, optional: true
   belongs_to :level, optional: true, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
   belongs_to :gstin_location, class_name: "GstinLocation", optional: true
 
@@ -192,7 +193,7 @@ class Invoice < ApplicationRecord
   # validates :net_amount, presence: true
   # validates :amount, presence: true
 
-  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:30}, :allow_blank => true
+  validates :invoice_number, :format => {with: /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/, :message => ' can only have letters, numbers, dashes and forward slash and no other special characters'}, :length => {minimum: 0, maximum:30}, :allow_blank => true
 
   scope :with_id, -> (id) {where id: id}
   scope :without_id, -> (id) {where.not(id: id)}

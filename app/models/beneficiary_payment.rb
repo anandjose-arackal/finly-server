@@ -24,11 +24,12 @@
 #  balance_due_id     :integer
 #  net_amount_id      :integer
 #  gross_amount_id    :integer
-#  roundoff_amount    :decimal(10, )
+#  roundoff_amount    :decimal(20, 10)
 #  cost_center_id     :integer
 #  invoice_number     :text(65535)
 #  invoice_date       :date
 #  invoice_due_date   :date
+#  advance_amount_id  :integer
 #
 
     #                 :id => :integer,
@@ -181,9 +182,9 @@ class BeneficiaryPayment < ApplicationRecord
 
     self.roundoff_amount = self.roundoff_amount.to_f # even if it's nil, it gets converted to 0
     if self.roundoff_amount != 0
-      balance_due_amount = precision_value (net_amount + self.roundoff_amount), 0
+      balance_due_amount = precision_value (net_amount + self.roundoff_amount)
     else
-      balance_due_amount = precision_value net_amount, 0
+      balance_due_amount = precision_value net_amount
     end
 
     # assign the respective calculated amounts to the payment and invoice object

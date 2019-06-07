@@ -56,7 +56,7 @@ class Export::Reports::Base < Export::Base
         when ExportField.type_expense_merchant
           data_arr << expense.merchant_name
         when ExportField.type_expense_category_name
-          data_arr << expense.category_name
+          data_arr << expense.category&.full_name
         when ExportField.type_expense_currency
           data_arr << expense.amount&.currency&.country_code
         when ExportField.type_expense_amount

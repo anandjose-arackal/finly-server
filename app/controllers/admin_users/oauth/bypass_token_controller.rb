@@ -67,7 +67,8 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
             company: {id: @user.company_id, name: @user.company.name},
             reason: params[:reason],
             reason_details: params[:reason_details],
-            accessed_at: DateTime.now.strftime("%I:%M %p, %d %b %Y")
+            accessed_at: DateTime.now.strftime("%I:%M %p, %d %b %Y"),
+            requested_by: params[:requested_by]
         }
     )
 
@@ -77,7 +78,7 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
     attachment = {
         "color": yellow,
         "author_name": "Admin Bypass Login",
-        "title": "Admin Accessor",
+        "title": "#{params[:reason_details]}",
         "text": "#{admin_user.id} - #{admin_user.name}",
         "fields": [
             {
@@ -104,7 +105,7 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
         "ts": Time.now.to_i
     }
 
-    SLACK_NOTIFIER.ping nil, attachments: [attachment]
+    SLACK_NOTIFIER.ping nil, attachments: [attachment], channel: '#admin_access'
   end
 
 end

@@ -148,21 +148,6 @@ class Procurement < ApplicationRecord
     filtered_ids = PurchaseOrder.with_id(purchase_order_ids).pluck(:procurement_id)
     where id: filtered_ids
   }
-
-  scope :filter_creation_date_from, -> (creation_date){
-    date = Date.parse(creation_date) rescue nil
-    if date
-      where("created_at >= ?", date.beginning_of_day)
-    end
-  }
-
-  scope :filter_creation_date_to, -> (creation_date){
-    date = Date.parse(creation_date) rescue nil
-    if date
-      where("created_at <= ?", date.end_of_day)
-    end
-  }
-
   
   scope :filter_year, -> (year) {
     if year.blank?
@@ -361,6 +346,15 @@ class Procurement < ApplicationRecord
     )
   }
 
+  scope :grn_include_details, -> {
+    includes(
+        {invoices: [{level: :reviewers}]},
+        {purchase_order: [:delivery_location, :cost_center, :department, :sub_department, :vendor, :user, {balance_amount: [:currency]}, :status]},
+        {inward_documents: [:vendor, :user, :items]},
+        :status_tags, :procurement_status_taggables, :user
+    )
+  }
+
   scope :filter_location_id, -> (location_id) {
     filtered_ids = PurchaseOrder.where(location_id: location_id).pluck(:procurement_id).uniq
     where id: filtered_ids
@@ -529,6 +523,10 @@ class Procurement < ApplicationRecord
     self.documents.map(&:updated_at).sort!.reverse!.first
   end
 
+  def receive_last_updated_at
+    self.receive_documents.map(&:updated_at).sort!.reverse!.first
+  end
+
   def documents
     data = []
     data.push self.purchase_order if self.purchase_order.present?
@@ -541,6 +539,16 @@ class Procurement < ApplicationRecord
     invoices.each do |invoice|
       data += invoice.payments
     end
+
+    data.sort_by!{ |doc| doc.created_at}.reverse!
+  end
+
+  # Used in receive index
+  def receive_documents
+    data = []
+    data.push self.purchase_order if self.purchase_order.present?
+
+    data += self.inward_documents&.to_a
 
     data.sort_by!{ |doc| doc.created_at}.reverse!
   end

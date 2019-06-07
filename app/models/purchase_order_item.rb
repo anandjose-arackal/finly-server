@@ -33,6 +33,9 @@
 #  unit_of_measurement      :string(255)
 #  purchase_request_item_id :integer
 #  department_id            :integer
+#  cgst                     :decimal(10, 5)
+#  sgst                     :decimal(10, 5)
+#  igst                     :decimal(10, 5)
 #
 
 class PurchaseOrderItem < ApplicationRecord
@@ -64,6 +67,10 @@ class PurchaseOrderItem < ApplicationRecord
 
   scope :with_id, -> (ids) {
     where(id: ids)
+  }
+
+  scope :without_id, -> (ids) {
+    where.not(id: ids)
   }
 
   scope :with_inventory_line_item, -> (inventory_line_item_id) {

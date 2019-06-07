@@ -19,6 +19,7 @@ RSpec.describe 'UserAuthentication > Password' do
 
     @reason = 'Reason goes here'
     @reason_details = 'Reason details goes here'
+    @requested_by = 'Requested user name here'
 
     @headers = authentication_headers_for(:web)
     @headers[:REMOTE_ADDR] = @ip
@@ -53,7 +54,8 @@ RSpec.describe 'UserAuthentication > Password' do
             client_secret: @doorkeeper_application.secret,
             for_user_id: @user1.id,
             reason: @reason,
-            reason_details: @reason_details
+            reason_details: @reason_details,
+            requested_by: @requested_by
         }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(1).and \
@@ -89,7 +91,8 @@ RSpec.describe 'UserAuthentication > Password' do
             client_secret: @doorkeeper_application.secret,
             for_user_id: @user1.id,
             reason: @reason,
-            reason_details: @reason_details
+            reason_details: @reason_details,
+            requested_by: @requested_by
         }, headers: headers
       end.to \
         change {GatekeeperBlock.count}.by(1).and \
@@ -122,7 +125,8 @@ RSpec.describe 'UserAuthentication > Password' do
             client_secret: @doorkeeper_application.secret,
             for_user_id: @user1.id,
             reason: @reason,
-            reason_details: @reason_details
+            reason_details: @reason_details,
+            requested_by: @requested_by
         }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
@@ -151,7 +155,8 @@ RSpec.describe 'UserAuthentication > Password' do
             client_secret: @doorkeeper_application.secret,
             for_user_id: @user1.id,
             reason: @reason,
-            reason_details: @reason_details
+            reason_details: @reason_details,
+            requested_by: @requested_by
         }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
@@ -180,7 +185,8 @@ RSpec.describe 'UserAuthentication > Password' do
             client_secret: @doorkeeper_application.secret,
             for_user_id: @user1.id,
             reason: @reason,
-            reason_details: @reason_details
+            reason_details: @reason_details,
+            requested_by: @requested_by
         }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
@@ -211,7 +217,8 @@ RSpec.describe 'UserAuthentication > Password' do
             client_secret: @doorkeeper_application.secret,
             for_user_id: @user1.id,
             reason: nil,
-            reason_details: @reason_details
+            reason_details: @reason_details,
+            requested_by: @requested_by
         }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
@@ -240,7 +247,8 @@ RSpec.describe 'UserAuthentication > Password' do
             client_secret: @doorkeeper_application.secret,
             for_user_id: @user1.id,
             reason: @reason,
-            reason_details: nil
+            reason_details: nil,
+            requested_by: @requested_by
         }, headers: @headers
       end.to \
         change {GatekeeperBlock.count}.by(0).and \
@@ -281,6 +289,7 @@ RSpec.describe 'UserAuthentication > Password' do
       expect(response.status).to eq(200)
       expect(UserSession.last.admin_access_reason).to eq(@reason)
       expect(UserSession.last.admin_access_reason_details).to eq(@reason_details)
+      expect(UserSession.last.admin_access_requested_by).to eq(@requested_by)
 
       body = JSON.parse(response.body)
       expect(body&.dig('data', 'access_token')).to_not be_nil

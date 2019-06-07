@@ -188,6 +188,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # update gstin location id
     if self.gstin_location.present?
       self.purchase_order_params[:gstin_location_id] = self.gstin_location&.id
+
+      # check against the shipping location sent in the params
+      shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
+      if self.gstin_location.state_code == shipping_location&.state_code
+        self.purchase_order_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
+      else
+        self.purchase_order_params[:gst_type_id] = GstType.id_for(:igst)
+      end
+    else
+      self.purchase_order_params[:gst_type_id] = GstType.id_for(:igst)
     end
 
     self.po_current_attachments = user.company.procurement_attachments.with_id(purchase_order_params[:attachments])
@@ -209,6 +219,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
       self.purchase_order_params[:due_date] = self.purchase_order.due_date
       self.skip_adv_calculation = true
     end
+
   end
 
   def process
@@ -219,6 +230,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
       # Set validation of DLRMs
       if PurchaseOrder.status_ids(:open, :retracted, :rejected).include?(purchase_order.purchase_order_status_id) && purchase_order.user_id == user.id
+
         dlrm_validation_op = ReviewalManager::DocumentReviewalMappings::ValidationUpdate.(user, {
           reviewal_document: self.purchase_order,
           document_reviewer_mappings_params: document_reviewer_mappings_params

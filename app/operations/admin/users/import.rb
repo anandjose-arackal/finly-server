@@ -236,6 +236,7 @@ class Admin::Users::Import < Admin::Base
                     mobile_number: mobile,
                     password: generated_password,
                     password_confirmation: generated_password,
+                    role_mapping_attributes: role_mapping_attributes,
                     profile_attributes: {address_1: row[import_fields[:address_1]],
                                          address_2: row[import_fields[:address_2]],
                                          pin_code: pin_code,

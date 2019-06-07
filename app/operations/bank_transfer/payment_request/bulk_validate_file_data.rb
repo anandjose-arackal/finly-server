@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::PaymentRequest::Base
 
   attr_accessor :order_details, :error_messages, :valid, :contents, :headers,
-                :requested_amount, :issues, :issue_item
+                :requested_amount, :issues, :issue_item, :ghost_invoice
 
   class BankTransfer::PaymentRequest::BulkValidateFileData::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -89,11 +89,25 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
       end
 
       item[:custom_fields] = (custom_fields_key.present?) ? custom_fields_key : custom_fields
-      
 
 
       self.error_messages = []
       self.issue_item = {}
+
+      # adding the custom fields for the particular invoice, using a ghost invoice
+      self.ghost_invoice = Invoice.new
+      custom_fields = {custom_fields: item[:custom_fields]} || {}
+      custom_fields[:user] = user
+      custom_fields[:reset_fields] = true
+      custom_fields[:save] = false
+      CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
+
+      op = CustomField::Validate.(self.ghost_invoice)
+      unless op.success?
+        self.error_messages << op.messages[:error]
+        self.valid = false
+        self.issue_item[:custom_fields] = op.messages[:error]
+      end
 
       # new requirement
       # SET key as array to hold mupltiple errors
@@ -292,7 +306,7 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
   end
 
   def validate_invoice_number(invoice_number)
-    ( /\A[a-zA-Z0-9\/\-\#\&]*\Z/.match(invoice_number) ) ? true : false
+    ( /\A[a-zA-Z0-9 \\\/\-\#\&]*\Z/.match(invoice_number) ) ? true : false
   end
 
   # def validate_amount(amount)
@@ -307,25 +321,25 @@ class BankTransfer::PaymentRequest::BulkValidateFileData < BankTransfer::Payment
     if inclusive_of_taxes
 
       # calculate_inclusive_taxes
-      gross_amount = TaxCalculationUtils.inclusive_tax_amount(original_amount.to_i, (tax.to_i))
+      gross_amount = TaxCalculationUtils.inclusive_tax_amount(original_amount.to_f, (tax.to_i))
       # calculate_tds
       tds = TdsRatesList.find(tds_slab_id).tds rescue 0
       new_gross_amount = TaxCalculationUtils.tds_amount(gross_amount, tds)
       tds_amount = gross_amount - new_gross_amount
 
-      net_amount = original_amount.to_i - tds_amount - advance_amount.to_i
+      net_amount = original_amount.to_f - tds_amount - advance_amount.to_f
 
     else 
 
       # calculate_exclusive_taxes
-      net_amount = TaxCalculationUtils.exclusive_tax_amount(original_amount.to_i, (tax.to_i))
-      tax_amount = net_amount - original_amount.to_i
+      net_amount = TaxCalculationUtils.exclusive_tax_amount(original_amount.to_f, (tax.to_i))
+      tax_amount = net_amount - original_amount.to_f
       # calculate_tds
       tds = TdsRatesList.find(tds_slab_id).tds rescue 0
-      new_gross_amount = TaxCalculationUtils.tds_amount(original_amount.to_i, tds.to_i)
-      tds_amount = original_amount.to_i - new_gross_amount
+      new_gross_amount = TaxCalculationUtils.tds_amount(original_amount.to_f, tds.to_i)
+      tds_amount = original_amount.to_f - new_gross_amount
 
-      net_amount = original_amount.to_i + tax_amount - tds_amount - advance_amount.to_i
+      net_amount = original_amount.to_f + tax_amount - tds_amount - advance_amount.to_f
     end
   end
 

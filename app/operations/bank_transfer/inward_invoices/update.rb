@@ -89,21 +89,24 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     end
 
     if self.inward_invoice.procurement.present? && self.purchase_order.present?
-        if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount&.value
-            add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
-          return
-        end 
+      if params[:invoice][:balance_amount_attributes][:value].to_i > self.purchase_order.balance_amount&.value
+          add_message :error, "Payable amount for this invoice has exceeded the Purchase Order payable amount."
+        return
+      end
 
-        self.inward_invoice_params[:invoice_items_attributes].each do |item|
-          po_item = self.purchase_order.items.find_by(inventory_line_item_id: item[:inventory_line_item_id])
+      # the below line is in the case of one PO having multiple line items of the same inventory item
+      processed_item_ids = []
+      self.inward_invoice_params[:invoice_items_attributes].each do |item|
+        po_item = self.purchase_order.items.without_id(processed_item_ids).find_by(inventory_line_item_id: item[:inventory_line_item_id])
 
-          item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
+        item_q = (po_item&.inventory_line_item&.product_type_id == ProductType.id_for(:goods)) ? po_item.accepted : po_item.quantity
 
-          if item_q < item[:quantity].to_i
-            add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
-            break
-          end
+        if item_q < item[:quantity].to_i
+          add_message :error, "Invoice item quantity should be on par with the Purchase Order quantity."
+          break
         end
+        processed_item_ids << po_item.id
+      end
     end
 
     if self.inward_invoice_params[:transaction_service_period_from].present?
@@ -192,6 +195,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     # update gstin location id
     if self.gstin_location.present?
       self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+
+      shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
+      if self.gstin_location.state_code == shipping_location&.state_code
+        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
+      else
+        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
+      end
+    else
+      self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
     end
 
 
@@ -209,6 +221,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     # setting the inclusive of taxes explicitly here because if unchecked it doesn't send anything from the frontend
     if self.inward_invoice_params[:inclusive_of_taxes].blank?
       self.inward_invoice_params[:inclusive_of_taxes] = false
+    end
+
+    #strip_invoice_number
+    if self.inward_invoice_params&.dig(:invoice_number).present?
+      self.inward_invoice_params[:invoice_number] =self.inward_invoice_params[:invoice_number]&.strip
     end
 
     if self.inward_invoice_params&.dig(:invoice_attachments_attributes)

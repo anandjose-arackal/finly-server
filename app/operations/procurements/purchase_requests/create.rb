@@ -1,8 +1,9 @@
 class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::Base
-  attr_accessor :purchase_request, :purchase_request_params
+  attr_accessor :purchase_request, :purchase_request_params, :custom_fields
 
   def init
     self.purchase_request_params = purchase_request_parameters
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:purchase_request, :custom_fields)
   end
 
   def validate
@@ -29,6 +30,11 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
     self.purchase_request = PurchaseRequest.new(purchase_request_params)
     self.purchase_request.creator_id = user.id
     self.purchase_request.purchase_request_status_id = PurchaseRequestStatus.id_for(:draft)
+
+    # Save Custom Fields
+    validate_custom_fields_pr
+    return if has_errors?
+
     #Update purchase request line items state to :draft
     if self.purchase_request.save && self.purchase_request.purchase_request_items.update_all(status_id: PurchaseRequestItemStatus.id_for(:draft), department_id: purchase_request.department_id)
       pr_attachment_ids = get_attachment_ids(params)
@@ -39,6 +45,11 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
       # Attachment.update_resource({ids: line_item_attachment_ids, resource_id: self.purchase_request.id, user: user}) if attachment_ids.present?
       # Update all estimated amount in the line item
       purchase_request.reload.purchase_request_items.map(&:update_estimated_amount)
+
+      # Save Custom Fields
+      # if params[:custom_fields].present?
+      #   CustomField::SetFields.(purchase_request, FieldParentType.id_for(:purchase_request), custom_fields: params[:custom_fields], save: true, reset_fields: true)
+      # end
 
       # Create document level reviewer mapping
       # For setting level specific reviewers from reviewal chain for a document
@@ -80,16 +91,24 @@ class Procurements::PurchaseRequests::Create < Procurements::PurchaseRequests::B
   def get_attachment_ids(params)
     if params.dig(:purchase_request, :attachments_attributes).present?
       attachment_ids = []
-      params.dig(:purchase_request, :attachments_attributes).each{ |k, v| attachment_ids << v[:id] }
-      return attachment_ids
+      params.dig(:purchase_request, :attachments_attributes).each do |item|
+        if item[:id].present?
+          attachment_ids << item[:id]&.to_i
+        end
+      end
+      return attachment_ids.compact
     end
   end
 
   def get_line_item_attachment_ids(params)
     if params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).present?
       attachment_ids = []
-      params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).each{ |k, v| attachment_ids << v[:id] }
-      return attachment_ids
+      params.dig(:purchase_request, :purchase_request_items_attributes, :attachments_attributes).each do |item|
+        if item[:id].present?
+          attachment_ids << item[:id]&.to_i
+        end
+      end
+      return attachment_ids.compact
     end
   end
 end

@@ -53,7 +53,7 @@ json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
   json.extract! invoice, :id, :invoice_number, :payment_term_id, :location_id, :delivery_location_id, :department_id, :sub_department_id, :policy_id, :procurement_id,
                 :billing_address, :shipping_address, :invoice_id, :gstin_location_id,
-                :cost_allocation_items, :narration
+                :cost_allocation_items, :narration, :discount_type_id
 
   json.transaction_service_period_from invoice.transaction_service_period_from&.strftime('%d/%b/%Y')
   json.transaction_service_period_to invoice.transaction_service_period_to&.strftime('%d/%b/%Y')
@@ -136,6 +136,7 @@ json.invoice do
 
       json.item_number item.inventory_line_item&.item_number rescue nil
       json.gl_code item.inventory_line_item&.item_code rescue nil
+      json.tds_applicable item.inventory_line_item&.tds_applicable
 
       json.tax_amount precision_value item.tax_amount&.value
       json.discount_amount precision_value item.discount_amount&.value
@@ -231,7 +232,7 @@ end
 
 json.gstin_locations do
   json.array! @result.gstin_locations do |gstin_location|
-    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address
+    json.extract! gstin_location, :id, :gstin, :poc_name, :poc_email, :poc_mobile_number, :location, :address, :state_code
     json.location (gstin_location.location.to_s + " - " + gstin_location.state&.name&.to_s)
   end
 end
@@ -292,7 +293,7 @@ end
 
 json.locations do
   json.array! @result.locations do |location|
-    json.extract! location, :id, :name, :gstin, :pan
+    json.extract! location, :id, :name, :gstin, :pan, :state_code
     json.address location.address
   end
 end
