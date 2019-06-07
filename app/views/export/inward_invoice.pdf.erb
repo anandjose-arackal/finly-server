@@ -97,7 +97,7 @@
         <% if @result.invoice.shipping_address.present? %>
           <%= simple_format @result.invoice.shipping_address, {}, wrapper_tag: "div" %>
         <% else %>
-          <%= @result.invoice.delivery_location.address %>
+          <%= @result.invoice.delivery_location&.address %>
         <% end %>
       </div>
       <div class="col col-xs-12 no-padding mg-botm-8">
