@@ -33,7 +33,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     # validate that the amount is being passed # todo - uncomment it later
-    unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present?
+    unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present? || (self.payment.parent_type == 'PurchaseOrder')
       add_message :error, "Sub Total cannot be blank"
       return
     end
@@ -130,22 +130,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   end
 
   def process
-    payment.assign_attributes(payment_params)
-    unless self.payment.valid?
-      add_message :error, self.payment.errors.full_messages
-      return
-    end
-    if payment.invoice&.present?
-      calculate_tax_and_discounts
-    end
-
-    set_custom_fields(false) # this should hopefully add the attributes to the model
-    if self.payment.save
-      recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
-    else
-      add_message :error, self.payment.errors.full_messages
-    end
-
     case payment.parent_type
     when 'BeneficiaryPayment'
       bp = BeneficiaryPayment.find_by(id: payment.parent_id)
@@ -163,7 +147,25 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
         purchase_order.process_line_item_calculation
         purchase_order.save
       end
+      self.payment_params.delete(:invoice_attributes)
     end
+
+    payment.assign_attributes(payment_params)
+    unless self.payment.valid?
+      add_message :error, self.payment.errors.full_messages
+      return
+    end
+    if payment.invoice&.present?
+      calculate_tax_and_discounts
+    end
+
+    set_custom_fields(false) # this should hopefully add the attributes to the model
+    if self.payment.save
+      recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
+    else
+      add_message :error, self.payment.errors.full_messages
+    end
+
   end
 
   def post_process
