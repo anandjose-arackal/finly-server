@@ -101,6 +101,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
   def retrieve_headers
     headers = ["Payment Order ID",
                "Payment Order Name",
+               "Payment ID",
                "Beneficiary Name",
                "Beneficiary Account Name",
                "Beneficiary Account Number",
@@ -139,6 +140,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
         payment_details = [
             pr.id,
             pr.name,
+            payment.id,
             "#{payment.receiving_account&.account_owner&.name}",
             "#{payment.receiving_account&.name}",
             payment.receiving_account&.account_number,
