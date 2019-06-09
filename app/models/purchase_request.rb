@@ -58,6 +58,8 @@ class PurchaseRequest < ApplicationRecord
   scope :search_by_email, -> (email) { where creator_id: User.find_by(email: email)&.id }
   scope :not_draft, -> { where.not purchase_request_status_id: PurchaseRequestStatus.id_for(:draft) }
 
+  scope :deleteable, -> { where purchase_request_status_id: [PurchaseRequestStatus.id_for(:draft), PurchaseRequestStatus.id_for(:retracted), PurchaseRequestStatus.id_for(:rejected)]}
+
   scope :with_ids, -> (ids) { where id: ids }
 
 
@@ -297,6 +299,10 @@ class PurchaseRequest < ApplicationRecord
     return false if user.blank?
     return false if self.action_users(:approve).include?(user)
     awaiting_approval? && user.vendor_payment_admin? && (self.document_level_reviewer_mappings&.find_by(level_id: self.level&.id)&.taken_control_by_id != user.id rescue false)# todo, add dlrm logic
+  end
+
+  def can_delete?
+    (self.draft? || self.retracted? || self.rejected?) rescue false
   end
 
   private
