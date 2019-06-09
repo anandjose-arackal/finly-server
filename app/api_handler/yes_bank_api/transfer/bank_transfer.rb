@@ -143,34 +143,38 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   def success
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
+    params[:transfer_status_id] = self.transfer_status_id
     YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params, messages)
   end
 
   def failure
     params[:bank_transaction] = self.bank_transaction
     params[:transfer_request] = self.transfer_request
+    params[:transfer_status_id] = self.transfer_status_id
     YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(params, messages)
   end
 
   class YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :transfer_request, :bank_transaction
+    attr_accessor :transfer_request, :bank_transaction, :transfer_status_id
 
     def initialize(params, messages)
       self.messages = messages
       self.transfer_request = params[:transfer_request]
       self.bank_transaction = params[:bank_transaction]
+      self.transfer_status_id = params[:transfer_status_id]
     end
   end
 
   class YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :transfer_request, :bank_transaction
+    attr_accessor :transfer_request, :bank_transaction, :transfer_status_id
 
     def initialize(params, messages)
       self.messages = messages
       self.transfer_request = params[:transfer_request]
       self.bank_transaction = params[:bank_transaction]
+      self.transfer_status_id = params[:transfer_status_id]
     end
   end
 

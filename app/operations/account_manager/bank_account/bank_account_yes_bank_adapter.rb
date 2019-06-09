@@ -31,7 +31,6 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     bank_transaction = payment.reference_resource
 
 
-
     if bank_transaction.present? && (bank_transaction.completed? || bank_transaction.processing? || bank_transaction.possible_failure?)
       # payment cannot be processed in this case
       return false
@@ -74,7 +73,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       bank_transaction = bank_transaction || payment.reference_resource
       bank_transaction.update(
           bank_reference_number: transfer_request.bank_reference_number,
-          transfer_status_id: transfer_status_id,
+          transfer_status_id: op.transfer_status_id,
           bank_response: transfer_request.transaction_result,
           beneficiary_full_name: transfer_request.beneficiary_full_name
       )
@@ -83,6 +82,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       # this is an anomaly, so send email and flag it
       Event::EAlert::Create.(nil, title: 'Payment did not have an associated bank transaction', description: "The payment: #{self.payment.to_json} inside the API Handler did not have an associated bank transaction.", subject: 'Payment did not have an associated bank transaction')
     end
+
 
     if op.success?
       if bank_transaction.completed?

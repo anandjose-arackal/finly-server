@@ -42,6 +42,7 @@ class YesBankApi::Base < BaseHandler
     end
 
 
+
     self.configuration = values[type] || {}
     self.client_id = self.configuration['client_id']
     self.client_secret = self.configuration['client_secret']
