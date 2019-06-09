@@ -80,6 +80,7 @@ class Categories::Import < Categories::Base
     category_name = row[import_fields[:category_name]].to_s
     sub_category_name = row[import_fields[:sub_category_name]].to_s
     gl_code = row[import_fields[:gl_code]].to_s
+    category_code = row[import_fields[:category_code]].to_s
     expense_management = row[import_fields[:expense_management]].to_s.upcase == 'Y' ? true : false
     vendor_payment = row[import_fields[:vendor_payment]].to_s.upcase == 'Y' ? true : false
     inward_invoice_line_items = row[import_fields[:inward_invoice_line_items]].to_s.upcase == 'Y' ? true : false

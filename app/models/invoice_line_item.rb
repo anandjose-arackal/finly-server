@@ -5,7 +5,7 @@
 #  id                     :integer          not null, primary key
 #  invoice_id             :integer
 #  description            :string(255)
-#  quantity               :integer
+#  quantity               :decimal(20, 5)
 #  rate                   :decimal(20, 10)
 #  tax                    :decimal(20, 10)
 #  discount               :decimal(20, 10)
@@ -29,6 +29,9 @@
 #  cost_center_id         :integer
 #  unit_of_measurement    :string(255)
 #  department_id          :integer
+#  sgst                   :decimal(10, 5)
+#  cgst                   :decimal(10, 5)
+#  igst                   :decimal(10, 5)
 #
 
 class InvoiceLineItem < ApplicationRecord

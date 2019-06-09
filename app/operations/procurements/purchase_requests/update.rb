@@ -1,11 +1,13 @@
 class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::Base
-  attr_accessor :purchase_request, :purchase_request_params
+  attr_accessor :purchase_request, :purchase_request_params, :custom_fields
 
   def init
     super
     self.purchase_request_params = purchase_request_parameters
   #   pr_id = params[:id] || params[:purchase_request_id]
   #   self.purchase_request = user.company.purchase_requests.find_by(id: pr_id)
+
+    self.custom_fields = params&.dig(:custom_fields) || params&.dig(:purchase_request, :custom_fields)
 
   end
 
@@ -31,6 +33,10 @@ class Procurements::PurchaseRequests::Update < Procurements::PurchaseRequests::B
 
   def process
     self.purchase_request.assign_attributes(purchase_request_parameters)
+
+    # Save Custom Fields
+    validate_custom_fields_pr
+    return if has_errors?
 
     if self.purchase_request.save
       # Copy department id to purchase request item

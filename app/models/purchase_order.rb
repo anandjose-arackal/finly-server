@@ -66,6 +66,8 @@
 #  cost_allocation_items        :boolean          default(FALSE)
 #  internal_note                :text(65535)
 #  vendor_address               :text(65535)
+#  discount_type_id             :integer
+#  taxable_amount_id            :integer
 #
 
 class PurchaseOrder < ApplicationRecord
@@ -749,8 +751,20 @@ class PurchaseOrder < ApplicationRecord
       if item.is_a?(PurchaseOrderItem)
         item_quantity = (item.quantity || 0).to_f
         item_rate = (item.rate || 0).to_f
-        item_tax = (item.tax || 0).to_f
-        item_discount = (item.discount || 0).to_f
+        item_amount = (item_quantity * item_rate)
+        item_tax = (item.tax_rate&.rate || 0).to_f
+
+        case self.discount_type_id
+          # i.e. discount is given as a rate
+          when 1
+            item_discount = (item.discount || 0).to_f
+            item_discount_amount = item_amount * item_discount / 100
+          when 2
+            item_discount_amount = item.discount
+          else
+            item_discount = (item.discount || 0).to_f
+            item_discount_amount = item_amount * item_discount / 100
+        end
 
         # Exclusive of tax
         item_amount = (item_quantity * item_rate)
@@ -771,6 +785,23 @@ class PurchaseOrder < ApplicationRecord
           item.tax_amount.value = item_tax_amount
         else
           item.tax_amount = Amount.new(value: item_tax_amount, currency_id: 1)
+        end
+
+        # also set the CGST, SGST, and IGST amounts in the PO Line item
+        case self.gst_type_id
+          # i.e. it's a CGST + SGST case
+          when GstType.id_for(:cgst_sgst)
+            item.cgst = item_tax_amount / 2
+            item.sgst = item_tax_amount / 2
+            item.igst = 0
+          when GstType.id_for(:igst)
+            item.igst = item_tax_amount
+            item.cgst = 0
+            item.sgst = 0
+          else
+            item.igst = 0
+            item.cgst = 0
+            item.sgst = 0
         end
 
         if item.discount_amount.present?

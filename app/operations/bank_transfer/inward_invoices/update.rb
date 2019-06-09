@@ -195,6 +195,15 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     # update gstin location id
     if self.gstin_location.present?
       self.inward_invoice_params[:gstin_location_id] = self.gstin_location&.id
+
+      shipping_location = user.company.locations.find_by(id: params[:shipping_location_id])
+      if self.gstin_location.state_code == shipping_location&.state_code
+        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:cgst_sgst)
+      else
+        self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
+      end
+    else
+      self.inward_invoice_params[:gst_type_id] = GstType.id_for(:igst)
     end
 
 
@@ -212,6 +221,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     # setting the inclusive of taxes explicitly here because if unchecked it doesn't send anything from the frontend
     if self.inward_invoice_params[:inclusive_of_taxes].blank?
       self.inward_invoice_params[:inclusive_of_taxes] = false
+    end
+
+    #strip_invoice_number
+    if self.inward_invoice_params&.dig(:invoice_number).present?
+      self.inward_invoice_params[:invoice_number] =self.inward_invoice_params[:invoice_number]&.strip
     end
 
     if self.inward_invoice_params&.dig(:invoice_attachments_attributes)
