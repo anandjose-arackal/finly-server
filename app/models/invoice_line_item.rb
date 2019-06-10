@@ -35,6 +35,7 @@
 #
 
 class InvoiceLineItem < ApplicationRecord
+  include MathUtil
   belongs_to :invoice, optional: true
   belongs_to :category, optional: true
   belongs_to :amount, optional: true
@@ -106,6 +107,25 @@ class InvoiceLineItem < ApplicationRecord
 
   def tds_applicable?
     self.inventory_line_item&.tds_applicable?
+  end
+
+  def as_json
+    {
+      rate: rate,
+      quantity: quantity,
+      tax: tax,
+      discount: discount,
+      category_id: category_id,
+      category_name: category&.name,
+      tax_amount: precision_value(tax_amount&.value),
+      discount_amount: precision_value(discount_amount&.value),
+      amount: precision_value(amount&.value),
+      id: id,
+      description: description,
+      total_amount: precision_value(net_amount&.value),
+      hsn_sac: hsn_sac,
+      taxable_amount: precision_value(taxable_amount&.value)
+    }
   end
 
   private
