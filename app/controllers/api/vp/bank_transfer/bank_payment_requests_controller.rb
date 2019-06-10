@@ -2,7 +2,7 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < BaseControllers::Ap
 
   protect_from_forgery with: :null_session
 
-  # before_action :decrypt_parameters
+  before_action :decrypt_parameters, only: [:initiate_payment, :bulk_initiate_payment]
 
   def create
     params[:api_initiated] = true
