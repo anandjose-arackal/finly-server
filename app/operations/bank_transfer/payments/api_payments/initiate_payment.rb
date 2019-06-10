@@ -37,7 +37,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
           "payments" => payments_array
       }
       json_response = response_hash.to_json
-      path = Dir.home + '/certificates/encryption_certificates/qkr.crt'
+      path = Dir.home + '/certificates/encryption_certificates/qkr_8192.crt'
       cert = OpenSSL::X509::Certificate.new(File.read(path))
       public_key = cert.public_key
       encrypted_response = Base64.encode64(public_key.public_encrypt(json_response))
