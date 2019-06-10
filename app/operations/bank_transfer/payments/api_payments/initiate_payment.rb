@@ -46,7 +46,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
     def payments_array
       result = []
       self.payment_order.payments.each do |payment|
-        {
+        result << {
             "owner_name" => payment.receiving_account&.account_owner&.name,
             "name" => payment.receiving_account&.name,
             "account_number" => payment.receiving_account.account_number,
