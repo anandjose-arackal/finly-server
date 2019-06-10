@@ -1,4 +1,3 @@
-debugger
 if current_company.request_encryption_enabled?
   json.encrypted_response @result.construct_response
 else
